@@ -74,7 +74,12 @@ DURATION_TAGS = {
     "grossProfit": ["GrossProfit"],
     "operatingExpenses": ["OperatingExpenses"],
     "operatingIncome": ["OperatingIncomeLoss"],
-    "interestExpense": ["InterestExpense", "InterestAndDebtExpense", "InterestExpenseDebt"],
+    "interestExpense": [
+        "InterestExpense",
+        "InterestAndDebtExpense",
+        "InterestExpenseDebt",
+        "InterestExpenseNonoperating",  # fallback: taxonomia XBRL migrou, ex: CMCSA reporta só em 2025
+    ],
     "taxExpense": ["IncomeTaxExpenseBenefit"],
     "netIncome": [
         "NetIncomeLoss",
@@ -89,6 +94,8 @@ DURATION_TAGS = {
     "operatingCashFlow": ["NetCashProvidedByUsedInOperatingActivities"],
     "capex": [
         "PaymentsToAcquirePropertyPlantAndEquipment",
+        "PaymentsToAcquireAndDevelopRealEstate",  # REITs: aquisição/desenvolvimento é o "capex"
+        "PaymentsToAcquireCommercialRealEstate",  # REITs alternativo
         "PaymentsToAcquireProductiveAssets",
         "PaymentsForProceedsFromProductiveAssets",
         "PaymentsForCapitalImprovements",
@@ -129,15 +136,29 @@ INSTANT_TAGS = {
     "longTermDebtCurrent": ["LongTermDebtCurrent"],
     "shortTermDebt": ["ShortTermBorrowings", "ShortTermDebt"],
     "commercialPaper": ["CommercialPaper"],
-    "totalDebt": ["DebtLongtermAndShorttermCombinedAmount", "LongTermDebtAndCapitalLeaseObligations"],
+    "totalDebt": [
+        "DebtLongtermAndShorttermCombinedAmount",
+        "LongTermDebtAndCapitalLeaseObligations",
+        "DebtInstrumentCarryingAmount",  # fallback: empresas que emitem dívida consolidada (ex: META bonds)
+    ],
+    "securedDebt": [  # não vai direto para a BD; fallback para REITs em build_row()
+        "SecuredDebt",
+        "SecuredDebtNoncurrent",
+        "SecuredDebtCurrent",
+    ],
+    "unsecuredDebt": [  # não vai direto para a BD; fallback para REITs em build_row()
+        "UnsecuredDebt",
+        "UnsecuredDebtNoncurrent",
+        "UnsecuredDebtCurrent",
+    ],
     "cash": [
         "CashAndCashEquivalentsAtCarryingValue",
         "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
         "Cash",
     ],
     "marketableSecuritiesCurrent": [
-        "MarketableSecuritiesCurrent", 
-        "AvailableForSaleSecuritiesDebtSecuritiesCurrent", 
+        "MarketableSecuritiesCurrent",
+        "AvailableForSaleSecuritiesDebtSecuritiesCurrent",
         "AvailableForSaleSecuritiesCurrent",
         "AvailableForSaleSecurities",
         "ShortTermInvestments"
@@ -462,11 +483,19 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
     
     total_debt = inst.get("totalDebt")
     if total_debt is None:
-        ltd_nc = inst.get("longTermDebt") or 0
-        ltd_c = inst.get("longTermDebtCurrent") or 0
-        st = inst.get("shortTermDebt") or inst.get("commercialPaper") or 0
-        if ltd_nc > 0 or ltd_c > 0 or st > 0:
-            total_debt = ltd_nc + ltd_c + st
+        # Nível 1: somar current + noncurrent (longTermDebt + longTermDebtCurrent + shortTermDebt/commercialPaper)
+        # Bug fix: distinguir "tag ausente" (None) de "tag presente com valor 0" — CMG tem LongTermDebt=0.0
+        ltd_nc = inst.get("longTermDebt")
+        ltd_c = inst.get("longTermDebtCurrent")
+        st = inst.get("shortTermDebt") or inst.get("commercialPaper")
+        if ltd_nc is not None or ltd_c is not None or st is not None:
+            total_debt = (ltd_nc or 0) + (ltd_c or 0) + (st or 0)
+    if total_debt is None:
+        # Nível 2: dívida secured + unsecured (REITs reportam assim em vez de current/noncurrent)
+        secured = inst.get("securedDebt")
+        unsecured = inst.get("unsecuredDebt")
+        if secured is not None or unsecured is not None:
+            total_debt = (secured or 0) + (unsecured or 0)
 
     cash = inst.get("cash")
     if cash is not None:

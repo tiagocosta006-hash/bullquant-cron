@@ -110,19 +110,19 @@ export function ScreenerResults({ companies, isLoading }: ScreenerResultsProps) 
               <TableCell className="text-right font-mono">{formatMoney(company.revenue)}</TableCell>
               <TableCell className="text-right font-mono">
                 {company.grossMargin !== null && company.grossMargin > 0.4 ? (
-                  <span className="text-emerald-500 font-semibold">{formatPercent(company.grossMargin)}</span>
+                  <span className="text-bull font-semibold">{formatPercent(company.grossMargin)}</span>
                 ) : (
                   formatPercent(company.grossMargin)
                 )}
               </TableCell>
               <TableCell className="text-right font-mono">
                 {company.roic !== null && company.roic > 0.15 ? (
-                  <span className="text-emerald-500 font-semibold flex items-center justify-end gap-1">
+                  <span className="text-bull font-semibold flex items-center justify-end gap-1">
                     <TrendingUp className="h-3 w-3" />
                     {formatPercent(company.roic)}
                   </span>
                 ) : company.roic !== null && company.roic < 0 ? (
-                  <span className="text-rose-500 flex items-center justify-end gap-1">
+                  <span className="text-bear flex items-center justify-end gap-1">
                     <TrendingDown className="h-3 w-3" />
                     {formatPercent(company.roic)}
                   </span>
@@ -132,7 +132,7 @@ export function ScreenerResults({ companies, isLoading }: ScreenerResultsProps) 
               </TableCell>
               <TableCell className="text-right font-mono">
                 {company.earningsYield !== undefined && company.earningsYield !== null && company.earningsYield > 0.05 ? (
-                  <span className="text-emerald-500 font-semibold">{formatPercent(company.earningsYield)}</span>
+                  <span className="text-bull font-semibold">{formatPercent(company.earningsYield)}</span>
                 ) : (
                   formatPercent(company.earningsYield ?? null)
                 )}

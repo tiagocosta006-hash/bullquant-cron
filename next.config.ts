@@ -27,6 +27,18 @@ const nextConfig: NextConfig = {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
           },
+          {
+            key: 'Content-Security-Policy-Report-Only',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: https://static2.finnhub.io",
+              "font-src 'self'",
+              "connect-src 'self'",
+              "frame-ancestors 'none'",
+            ].join('; '),
+          },
         ],
       },
     ]

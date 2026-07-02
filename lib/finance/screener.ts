@@ -41,7 +41,7 @@ export const DEFAULT_CATEGORY: ScreenerCategory = "sp500";
 
 // Listas curadas — todos os tickers confirmados presentes na BD (S&P 500 seeded).
 // "sp500" não tem lista: representa o universo inteiro.
-const CURATED_LISTS: Partial<Record<ScreenerCategory, string[]>> = {
+export const CURATED_LISTS: Partial<Record<ScreenerCategory, string[]>> = {
   trending: ["TSLA", "NVDA", "AAPL", "AMD", "PLTR", "SMCI", "COIN", "MSFT", "META", "AMZN"],
   growth: ["CRWD", "PLTR", "DDOG", "NOW", "UBER", "DASH", "ABNB", "AMD", "NVDA", "CRM"],
   dividend: ["JNJ", "PG", "KO", "PEP", "MMM", "ABBV", "TGT", "WMT", "CVX", "XOM", "MCD", "CAT", "CL", "LOW", "HD"],

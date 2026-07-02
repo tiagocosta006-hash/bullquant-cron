@@ -1,14 +1,14 @@
 /**
- * BullVision — brand single source of truth.
+ * Bull Metrics — brand single source of truth.
  *
- * Product: BullVision · Parent studio: Bullocracy.
+ * Product: Bull Metrics · Parent studio: Bullocracy.
  * Changing the product name = edit `name` + `nameParts` here only.
  */
 export const BRAND = {
   /** Product / wordmark name. */
-  name: "Bullmetrics",
+  name: "Bull Metrics",
   /** Wordmark split: [neutral part, gold-accent part]. */
-  nameParts: ["Bull", "metrics"] as const,
+  nameParts: ["Bull", "Metrics"] as const,
   /** Parent studio shown in footers / "by Bullocracy". */
   parent: "Bullocracy",
   /** Signature gold (matches the bull mark). */

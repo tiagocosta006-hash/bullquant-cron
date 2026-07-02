@@ -109,7 +109,7 @@ export function SettingsClient({ user, locale }: SettingsClientProps) {
                 </div>
 
                 {message && (
-                  <p className={`text-sm font-medium ${message.type === 'error' ? 'text-destructive' : 'text-emerald-500'}`}>
+                  <p className={`text-sm font-medium ${message.type === 'error' ? 'text-destructive' : 'text-bull'}`}>
                     {message.text}
                   </p>
                 )}

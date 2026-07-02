@@ -710,7 +710,7 @@ def process_company(conn, company: dict) -> int:
 
     dur_map, inst_map = extract_all_metrics(us_gaap, periods_list, period_ends)
 
-    inserted = 0
+    rows = []
     for (fy, fp) in periods_list:
         period_end = period_ends.get((fy, fp))
         filed_at = period_filed.get((fy, fp))
@@ -722,17 +722,31 @@ def process_company(conn, company: dict) -> int:
         if not dur and not inst:
             continue
 
-        row = build_row(company_id, fy, fp, period_end, filed_at, dur, inst)
+        rows.append(build_row(company_id, fy, fp, period_end, filed_at, dur, inst))
 
-        try:
-            with conn.cursor() as cur:
-                delete_period(cur, company_id, row["periodType"], fy, row["fiscalQuarter"])
+    # Commit único por empresa (~40 períodos): contra Supabase remoto, o commit
+    # por período dominava o tempo de execução (~3 round-trips × ~100ms cada).
+    inserted = 0
+    try:
+        with conn.cursor() as cur:
+            for row in rows:
+                delete_period(cur, company_id, row["periodType"], row["fiscalYear"], row["fiscalQuarter"])
                 insert_fundamental(cur, row)
-            conn.commit()
-            inserted += 1
-        except Exception as e:
-            conn.rollback()
-            print(f"    DB error {fy}/{fp}: {e}")
+        conn.commit()
+        inserted = len(rows)
+    except Exception as e:
+        conn.rollback()
+        print(f"    DB error (batch): {e} — fallback período a período")
+        for row in rows:
+            try:
+                with conn.cursor() as cur:
+                    delete_period(cur, company_id, row["periodType"], row["fiscalYear"], row["fiscalQuarter"])
+                    insert_fundamental(cur, row)
+                conn.commit()
+                inserted += 1
+            except Exception as e2:
+                conn.rollback()
+                print(f"    DB error {row['fiscalYear']}/{row['fiscalQuarter']}: {e2}")
 
     try:
         with conn.cursor() as cur:

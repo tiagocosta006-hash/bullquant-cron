@@ -90,7 +90,8 @@ const ANCHORS: Anchor[] = [
     operatingExpenses:  54_847_000_000,  // R&D 29,915 + SG&A 24,932
     operatingIncome:   114_301_000_000,
     interestExpense:     3_933_000_000,
-    taxExpense:         29_749_000_000,
+    // 10-K: income before taxes 113,736 − net income 96,995 = 16,741
+    taxExpense:         16_741_000_000,
     netIncome:          96_995_000_000,
     epsDiluted:                   6.16,
     sharesOutstanding: 15_744_231_000,   // diluted weighted avg shares
@@ -102,9 +103,14 @@ const ANCHORS: Anchor[] = [
     totalAssets:       352_583_000_000,
     totalCurrentLiab:  145_308_000_000,
     longTermDebt:       95_281_000_000,
-    totalDebt:         105_088_000_000,  // current 9,807 + long-term 95,281
-    cash:               29_965_000_000,  // cash & equivalents only (not securities)
-    totalEquity:       -13_407_000_000,  // negative devido a buybacks
+    // current 9,807 + long-term 95,281 + commercial paper 5,985
+    totalDebt:         111_073_000_000,
+    // BD guarda cash + short-term investments (decisão de produto, não bug):
+    // 29,965 equivalents + 31,590 marketable securities current
+    cash:               61_555_000_000,
+    // StockholdersEquity GAAP como reportado no 10-K (já líquido de treasury
+    // stock — a Apple retira as ações recompradas, nem tem TreasuryStockValue).
+    totalEquity:        62_146_000_000,
     // Ratios
     grossMargin:          0.44131,       // 169148/383285
     operatingMargin:      0.29815,       // 114301/383285
@@ -124,7 +130,8 @@ const ANCHORS: Anchor[] = [
     operatingExpenses:  57_529_000_000,  // R&D 27,195 + SG&A 24,456 + outros
     operatingIncome:    88_523_000_000,
     interestExpense:     1_943_000_000,
-    taxExpense:         11_598_000_000,
+    // 10-K: income before taxes 89,311 − net income 72,361 = 16,950
+    taxExpense:         16_950_000_000,
     netIncome:          72_361_000_000,
     epsDiluted:                   9.72,
     sharesOutstanding:  7_469_000_000,   // diluted weighted avg
@@ -135,7 +142,8 @@ const ANCHORS: Anchor[] = [
     totalCurrentLiab:  104_149_000_000,
     longTermDebt:       41_990_000_000,
     totalDebt:          47_322_000_000,  // current 5,247 + LT 41,990 + others ≈ 47,322
-    cash:               34_704_000_000,  // cash & equivalents
+    // cash + ST investments: 34,704 equivalents + 76,558 short-term investments
+    cash:              111_262_000_000,
     totalEquity:       206_223_000_000,
     grossMargin:          0.68921,
     operatingMargin:      0.41772,
@@ -166,7 +174,8 @@ const ANCHORS: Anchor[] = [
     totalCurrentLiab:   81_814_000_000,
     longTermDebt:       13_253_000_000,
     totalDebt:          13_253_000_000,  // Alphabet tem pouca dívida
-    cash:               24_048_000_000,
+    // cash + ST investments: 24,048 equivalents + 86,868 marketable securities
+    cash:              110_916_000_000,
     totalEquity:       283_379_000_000,
     grossMargin:          0.56623,
     operatingMargin:      0.27419,
@@ -183,21 +192,25 @@ const ANCHORS: Anchor[] = [
     revenue:            60_922_000_000,
     costOfRevenue:      16_621_000_000,
     grossProfit:        44_301_000_000,
-    operatingExpenses:   7_684_000_000,
+    // R&D 8,675 + SG&A 2,654 = gross profit 44,301 − operating income 32,972
+    operatingExpenses:  11_329_000_000,
     operatingIncome:    32_972_000_000,
     interestExpense:         270_000_000,
     taxExpense:          4_042_000_000,
     netIncome:          29_760_000_000,
-    epsDiluted:                  11.93,
-    sharesOutstanding:  2_469_000_000,   // diluted weighted avg
+    // Base pós-split 10:1 (Jun 2024): EDGAR devolve o filing mais recente,
+    // que reapresenta FY2024 retroativamente. 24,690M × $1.193 ≈ net income ✓
+    epsDiluted:                   1.193,
+    sharesOutstanding: 24_690_000_000,   // diluted weighted avg (post-split)
     operatingCashFlow:  28_083_000_000,
     capex:               1_069_000_000,
     freeCashFlow:       27_014_000_000,
     totalAssets:        65_728_000_000,
     totalCurrentLiab:   10_631_000_000,
-    longTermDebt:        8_462_000_000,
-    totalDebt:           8_462_000_000,
-    cash:                7_280_000_000,
+    longTermDebt:        8_459_000_000,
+    totalDebt:           9_709_000_000,  // LT 8,459 + current 1,250
+    // cash + ST investments: 7,280 equivalents + 18,704 marketable securities
+    cash:               25_984_000_000,
     totalEquity:        42_978_000_000,
     grossMargin:          0.72720,
     operatingMargin:      0.54123,

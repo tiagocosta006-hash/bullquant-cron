@@ -44,6 +44,10 @@ HISTORY_YEARS = 10
 # ── Tags XBRL com fallbacks (ordem = prioridade) ─────────────────────────────
 
 DURATION_TAGS = {
+    # NOTA: revenue usa seleção sensível à magnitude (ver extract_all_metrics):
+    # a tag ASC 606 só cobre contract revenue — leases (REITs) e juros/prémios
+    # (bancos/seguradoras) estão fora do ASC 606, portanto para esses setores
+    # ela devolve apenas fee income (ex.: AVB $7M vs Revenues $3.04B).
     "revenue": [
         "RevenueFromContractWithCustomerExcludingAssessedTax",
         "Revenues",
@@ -52,7 +56,14 @@ DURATION_TAGS = {
         "SalesRevenueGoodsNet",
         "RevenuesNetOfInterestExpense",
         "InterestAndDividendIncomeOperating",
+        "InterestIncomeOperating",
+        "InterestAndFeeIncomeLoansAndLeases",
+        "OperatingLeaseLeaseIncome",
         "OperatingLeasesIncomeStatementLeaseRevenue",
+        "OperatingLeasesIncomeStatementMinimumLeaseRevenue",
+        "RealEstateRevenueNet",
+        "RegulatedAndUnregulatedOperatingRevenue",
+        "RegulatedOperatingRevenue",
     ],
     "costOfRevenue": [
         "CostOfRevenue",
@@ -100,6 +111,8 @@ DURATION_TAGS = {
         "GeneralAndAdministrativeExpense",
     ],
     "ebitda": ["EarningsBeforeInterestTaxesDepreciationAndAmortization"],
+    # Só usado como fallback de operatingExpenses (não vai para a BD diretamente)
+    "costsAndExpenses": ["CostsAndExpenses"],
     "depreciationAndAmortization": [
         "DepreciationDepletionAndAmortization",
         "DepreciationAndAmortization",
@@ -141,10 +154,17 @@ def new_id() -> str:
     return uuid.uuid4().hex
 
 
-def get_companies_with_cik(cur) -> list[dict]:
-    cur.execute(
-        'SELECT id, ticker, cik FROM companies WHERE "isActive" = TRUE AND cik IS NOT NULL ORDER BY ticker'
-    )
+def get_companies_with_cik(cur, tickers: list[str] | None = None) -> list[dict]:
+    if tickers:
+        cur.execute(
+            'SELECT id, ticker, cik FROM companies WHERE "isActive" = TRUE AND cik IS NOT NULL '
+            "AND ticker = ANY(%s) ORDER BY ticker",
+            (tickers,),
+        )
+    else:
+        cur.execute(
+            'SELECT id, ticker, cik FROM companies WHERE "isActive" = TRUE AND cik IS NOT NULL ORDER BY ticker'
+        )
     return [{"id": r[0], "ticker": r[1], "cik": r[2]} for r in cur.fetchall()]
 
 
@@ -175,7 +195,10 @@ def extract_tag_entries(us_gaap: dict, tag: str) -> list[dict]:
         return []
     for unit_entries in (node.get("units") or {}).values():
         if isinstance(unit_entries, list):
-            return unit_entries
+            # Excluir proxies (DEF 14A etc.): a disclosure "pay versus performance"
+            # tagga NetIncomeLoss em milhões/milhares (ex.: PCG FY2023 val=2242
+            # no DEF 14A vs 2,242,000,000 no 10-K). Só formulários financeiros.
+            return [e for e in unit_entries if "14A" not in (e.get("form") or "")]
     return []
 
 
@@ -216,7 +239,17 @@ def best_for_period(entries: list[dict], expected_end: str) -> float | None:
     if not matches:
         return None
     matches.sort(key=lambda e: e.get("filed") or "", reverse=True)
-    return matches[0].get("val")
+    val = matches[0].get("val")
+    # Guard de unidades: alguns filings tagham o mesmo facto em milhares/milhões
+    # (ex.: ANET NetIncomeLoss "841" vs "841000000" com o mesmo period end).
+    # Restatements legítimos nunca divergem 100x; bugs de escala são 1000x+.
+    # Nesses casos, preferir o match de maior magnitude em vez do mais recente.
+    vals = [e.get("val") for e in matches if e.get("val") is not None]
+    if val is not None and val != 0 and vals:
+        vmax = max(vals, key=abs)
+        if abs(vmax) > 100 * abs(val):
+            return vmax
+    return val
 
 
 def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) -> tuple[dict, dict]:
@@ -231,22 +264,39 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
             expected_end = period_ends.get((fy, fp))
             if not expected_end:
                 continue
+            candidates: list[float] = []  # valores por tag, na ordem de prioridade
             for tag in tags:
                 entries = extract_tag_entries(us_gaap, tag)
                 if not entries:
+                    candidates.append(None)
                     continue
-                
+
                 if fp == "FY":
                     pool = [e for e in entries if is_annual_duration(e)]
                 elif field in ("operatingCashFlow", "capex"):
                     pool = [e for e in entries if is_ytd_duration(e, fp)]
                 else:
                     pool = [e for e in entries if is_quarterly_duration(e)]
-                    
+
                 val = best_for_period(pool, expected_end)
-                if val is not None:
+                candidates.append(val)
+                if val is not None and field != "revenue":
                     dur_map[(fy, fp)][field] = val
                     break
+
+            # Revenue: seleção sensível à magnitude. A prioridade cega falha para
+            # REITs/bancos/seguradoras, onde a tag ASC 606 só tem fee income.
+            # Escolher a tag de maior prioridade cujo valor seja >= 50% do maior
+            # candidato — mantém a tag "certa" nas empresas normais e rejeita
+            # componentes minúsculos quando existe um total muito maior.
+            if field == "revenue":
+                present = [v for v in candidates if v is not None]
+                if present:
+                    max_abs = max(abs(v) for v in present)
+                    for v in candidates:
+                        if v is not None and abs(v) >= 0.5 * max_abs:
+                            dur_map[(fy, fp)][field] = v
+                            break
 
     # Apply differencing for cash flow metrics
     original_ytd = {}
@@ -344,6 +394,25 @@ def get_period_info(us_gaap: dict, fy: int, fp: str) -> tuple[str | None, str | 
 def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str | None,
               dur: dict, inst: dict) -> dict:
     shares = dur.get("sharesOutstandingDur") or inst.get("sharesOutstandingInst")
+    # Guard: alguns filings têm shares em unidades erradas (milhares/milhões em
+    # vez de unidades — ex.: HST "738" ou BRO "276000" em vez de ~276M).
+    # netIncome / epsDiluted é a própria definição de shares diluídas: se o valor
+    # reportado desviar > 5x dessa referência, usar a referência; sem referência,
+    # aceitar apenas valores plausíveis (>= 100k ações).
+    # Referência fiável só quando |eps| >= 0.5 (senão o arredondamento a 2 casas
+    # domina — ex.: KMI eps 0.01) e o resultado é plausível (>= 1M ações).
+    ni_g = dur.get("netIncome")
+    eps_g = dur.get("epsDiluted")
+    expected_shares = None
+    if ni_g is not None and eps_g is not None and abs(eps_g) >= 0.5:
+        candidate = ni_g / eps_g
+        if candidate >= 1_000_000:
+            expected_shares = candidate
+    if expected_shares is not None:
+        if shares is None or shares / expected_shares > 5 or shares / expected_shares < 0.2:
+            shares = expected_shares
+    elif shares is not None and shares < 100_000:
+        shares = None
     capex_raw = dur.get("capex")
     capex = abs(capex_raw) if capex_raw is not None else None
     op_cf = dur.get("operatingCashFlow")
@@ -365,6 +434,27 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         gross_profit = revenue  # Força a integridade se a extração colidir tags residuais
 
     op_income = dur.get("operatingIncome")
+
+    # operatingExpenses: a tag mãe (OperatingExpenses) falta em ~76% das rows.
+    # Fallbacks por ordem de fiabilidade:
+    #   1. grossProfit − operatingIncome (identidade contabilística)
+    #   2. R&D + SG&A (quando ambos existem)
+    #   3. CostsAndExpenses − costOfRevenue (total de custos menos COGS)
+    op_expenses = dur.get("operatingExpenses")
+    if op_expenses is None and gross_profit is not None and op_income is not None:
+        derived = gross_profit - op_income
+        op_expenses = derived if derived >= 0 else None
+    if op_expenses is None:
+        rd = dur.get("researchAndDevelopment")
+        sga = dur.get("sellingGeneralAndAdmin")
+        if rd is not None and sga is not None:
+            op_expenses = rd + sga
+    if op_expenses is None:
+        total_costs = dur.get("costsAndExpenses")
+        if total_costs is not None and cost_of_rev is not None:
+            derived = total_costs - cost_of_rev
+            op_expenses = derived if derived >= 0 else None
+
     net_income = dur.get("netIncome")
     tax_expense = dur.get("taxExpense")
     total_assets = inst.get("totalAssets")
@@ -440,7 +530,7 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         "revenue": revenue,
         "costOfRevenue": dur.get("costOfRevenue"),
         "grossProfit": gross_profit,
-        "operatingExpenses": dur.get("operatingExpenses"),
+        "operatingExpenses": op_expenses,
         "operatingIncome": op_income,
         "interestExpense": dur.get("interestExpense"),
         "taxExpense": tax_expense,
@@ -592,11 +682,19 @@ def process_company(conn, company: dict) -> int:
 
 
 def main():
+    # Uso: python ingest_fundamentals.py [--tickers AAPL,MSFT,...]
+    tickers = None
+    if "--tickers" in sys.argv:
+        idx = sys.argv.index("--tickers")
+        if idx + 1 >= len(sys.argv):
+            sys.exit("--tickers requer lista separada por vírgulas (ex: --tickers AAPL,AVB)")
+        tickers = [t.strip().upper() for t in sys.argv[idx + 1].split(",") if t.strip()]
+
     conn = psycopg2.connect(DIRECT_URL)
     conn.autocommit = False
 
     with conn.cursor() as cur:
-        companies = get_companies_with_cik(cur)
+        companies = get_companies_with_cik(cur, tickers)
 
     total = len(companies)
     print(f"{total} empresas com CIK a processar.")

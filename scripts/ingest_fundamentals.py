@@ -89,7 +89,13 @@ DURATION_TAGS = {
         "ProfitLoss",
         "NetIncomeLossAvailableToCommonStockholdersBasic",
     ],
-    "epsDiluted": ["EarningsPerShareDiluted"],
+    "epsDiluted": [
+        "EarningsPerShareDiluted",
+        # Fallback: empresas com discontinued ops tagham só o EPS de continuing
+        # (ex.: COP FY2018 — sem isto, o guard NI/EPS de shares não corre e
+        # shares taggadas em milhares passam despercebidas).
+        "IncomeLossFromContinuingOperationsPerDilutedShare",
+    ],
     "sharesOutstandingDur": [
         "WeightedAverageNumberOfDilutedSharesOutstanding",
         "WeightedAverageNumberOfSharesOutstandingBasic",
@@ -142,8 +148,11 @@ INSTANT_TAGS = {
     "totalDebt": [
         "DebtLongtermAndShorttermCombinedAmount",
         "LongTermDebtAndCapitalLeaseObligations",
-        "DebtInstrumentCarryingAmount",  # fallback: empresas que emitem dívida consolidada (ex: META bonds)
     ],
+    # Fallback de nível 2 em build_row (DEPOIS da soma current+noncurrent):
+    # é valor de face da dívida emitida (ex: META bonds) — no MSFT dava $52.9B
+    # vs $47.2B do balanço, por isso não pode vencer a soma dos componentes.
+    "debtInstrumentCarryingAmount": ["DebtInstrumentCarryingAmount"],
     "securedDebt": [  # não vai direto para a BD; fallback para REITs em build_row()
         "SecuredDebt",
         "SecuredDebtNoncurrent",
@@ -534,7 +543,10 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         if ltd_nc is not None or ltd_c is not None or st is not None:
             total_debt = (ltd_nc or 0) + (ltd_c or 0) + (st or 0)
     if total_debt is None:
-        # Nível 2: dívida secured + unsecured (REITs reportam assim em vez de current/noncurrent)
+        # Nível 2: valor de face da dívida emitida (empresas sem tags de componentes, ex: META)
+        total_debt = inst.get("debtInstrumentCarryingAmount")
+    if total_debt is None:
+        # Nível 3: dívida secured + unsecured (REITs reportam assim em vez de current/noncurrent)
         secured = inst.get("securedDebt")
         unsecured = inst.get("unsecuredDebt")
         if secured is not None or unsecured is not None:

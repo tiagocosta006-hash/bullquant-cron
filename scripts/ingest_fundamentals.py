@@ -49,12 +49,15 @@ DURATION_TAGS = {
     # (bancos/seguradoras) estão fora do ASC 606, portanto para esses setores
     # ela devolve apenas fee income (ex.: AVB $7M vs Revenues $3.04B).
     "revenue": [
+        # RevenuesNetOfInterestExpense primeiro: quando existe, é o "total net
+        # revenues" reportado por brokers/bancos (ex.: IBKR $2.2B) — a tag ASC 606
+        # nestes emitentes só cobre comissões/fees e passaria o guard de 50%.
+        "RevenuesNetOfInterestExpense",
         "RevenueFromContractWithCustomerExcludingAssessedTax",
         "Revenues",
         "SalesRevenueNet",
         "RevenueFromContractWithCustomerIncludingAssessedTax",
         "SalesRevenueGoodsNet",
-        "RevenuesNetOfInterestExpense",
         "InterestAndDividendIncomeOperating",
         "InterestIncomeOperating",
         "InterestAndFeeIncomeLoansAndLeases",
@@ -255,10 +258,17 @@ def is_ytd_duration(entry, fp):
     return False
 
 
-def best_for_period(entries: list[dict], expected_end: str) -> float | None:
+def best_for_period(entries: list[dict], expected_end: str, prefer_annual_form: bool = False) -> float | None:
     matches = [e for e in entries if e.get("end") == expected_end]
     if not matches:
         return None
+    if prefer_annual_form:
+        # Um facto de período anual deve vir do relatório anual. 10-Qs posteriores
+        # por vezes mis-datam durações comparativas (ex.: FIX Q1-2026 tagga Revenues
+        # $1.83B com start/end anuais 2025) e, sendo mais recentes, venceriam o 10-K.
+        annual_forms = [e for e in matches if (e.get("form") or "").startswith(("10-K", "20-F", "40-F"))]
+        if annual_forms:
+            matches = annual_forms
     matches.sort(key=lambda e: e.get("filed") or "", reverse=True)
     val = matches[0].get("val")
     # Guard de unidades: alguns filings tagham o mesmo facto em milhares/milhões
@@ -299,7 +309,7 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
                 else:
                     pool = [e for e in entries if is_quarterly_duration(e)]
 
-                val = best_for_period(pool, expected_end)
+                val = best_for_period(pool, expected_end, prefer_annual_form=(fp == "FY"))
                 candidates.append(val)
                 if val is not None and field != "revenue":
                     dur_map[(fy, fp)][field] = val
@@ -311,11 +321,38 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
             # candidato — mantém a tag "certa" nas empresas normais e rejeita
             # componentes minúsculos quando existe um total muito maior.
             if field == "revenue":
-                present = [v for v in candidates if v is not None]
-                if present:
-                    max_abs = max(abs(v) for v in present)
-                    for v in candidates:
-                        if v is not None and abs(v) >= 0.5 * max_abs:
+                pairs = list(zip(tags, candidates))
+                # Excise taxes: em tabaco/combustíveis o guard de magnitude escolheria
+                # o revenue COM excise (ex.: PM $80.7B "IncludingAssessedTax" vs
+                # $31.8B net). Quando a variante Excluding existe, é o net revenue —
+                # descartar a Including e qualquer tag que seja ≈ net + excise.
+                excl = next(
+                    (v for t, v in pairs
+                     if t == "RevenueFromContractWithCustomerExcludingAssessedTax" and v is not None),
+                    None,
+                )
+                cleaned = []
+                if excl is not None:
+                    excise_entries = extract_tag_entries(us_gaap, "ExciseAndSalesTaxes")
+                    if fp == "FY":
+                        epool = [e for e in excise_entries if is_annual_duration(e)]
+                    else:
+                        epool = [e for e in excise_entries if is_quarterly_duration(e)]
+                    excise = best_for_period(epool, expected_end, prefer_annual_form=(fp == "FY"))
+                    for t, v in pairs:
+                        if v is None:
+                            continue
+                        if t == "RevenueFromContractWithCustomerIncludingAssessedTax":
+                            continue
+                        if excise and v > excl and abs(v - (excl + excise)) <= 0.05 * abs(v):
+                            continue  # gross de excise via outra tag (ex.: PM SalesRevenueNet)
+                        cleaned.append(v)
+                else:
+                    cleaned = [v for _, v in pairs if v is not None]
+                if cleaned:
+                    max_abs = max(abs(v) for v in cleaned)
+                    for v in cleaned:
+                        if abs(v) >= 0.5 * max_abs:
                             dur_map[(fy, fp)][field] = v
                             break
 
@@ -368,7 +405,7 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
                 entries = extract_tag_entries(us_gaap, tag)
                 if not entries:
                     continue
-                val = best_for_period(entries, expected_end)
+                val = best_for_period(entries, expected_end, prefer_annual_form=(fp == "FY"))
                 if val is not None:
                     inst_map[(fy, fp)][field] = val
                     break

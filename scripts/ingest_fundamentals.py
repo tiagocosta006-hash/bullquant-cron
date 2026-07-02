@@ -258,7 +258,8 @@ def is_ytd_duration(entry, fp):
     return False
 
 
-def best_for_period(entries: list[dict], expected_end: str, prefer_annual_form: bool = False) -> float | None:
+def best_for_period(entries: list[dict], expected_end: str, prefer_annual_form: bool = False,
+                    prefer_max_scale: bool = True) -> float | None:
     matches = [e for e in entries if e.get("end") == expected_end]
     if not matches:
         return None
@@ -275,11 +276,15 @@ def best_for_period(entries: list[dict], expected_end: str, prefer_annual_form: 
     # (ex.: ANET NetIncomeLoss "841" vs "841000000" com o mesmo period end).
     # Restatements legítimos nunca divergem 100x; bugs de escala são 1000x+.
     # Nesses casos, preferir o match de maior magnitude em vez do mais recente.
-    vals = [e.get("val") for e in matches if e.get("val") is not None]
-    if val is not None and val != 0 and vals:
-        vmax = max(vals, key=abs)
-        if abs(vmax) > 100 * abs(val):
-            return vmax
+    # SÓ para campos monetários (prefer_max_scale=True): em campos per-share o
+    # maior é quase sempre o errado (ICE 2016: EPS taggado "120000000" no 10-Q
+    # original vs 0.62 nos filings seguintes) — aí fica o mais recente.
+    if prefer_max_scale:
+        vals = [e.get("val") for e in matches if e.get("val") is not None]
+        if val is not None and val != 0 and vals:
+            vmax = max(vals, key=abs)
+            if abs(vmax) > 100 * abs(val):
+                return vmax
     return val
 
 
@@ -309,7 +314,8 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
                 else:
                     pool = [e for e in entries if is_quarterly_duration(e)]
 
-                val = best_for_period(pool, expected_end, prefer_annual_form=(fp == "FY"))
+                val = best_for_period(pool, expected_end, prefer_annual_form=(fp == "FY"),
+                                      prefer_max_scale=(field not in ("epsDiluted", "dividendPerShare")))
                 candidates.append(val)
                 if val is not None and field != "revenue":
                     dur_map[(fy, fp)][field] = val
@@ -578,6 +584,18 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         else:
             ebitda = None
 
+    # Guard: alguns filings tagham DPS em unidades erradas (ex.: STX "2770000"
+    # em vez de 2.77 — milionésimos). Nenhuma empresa do S&P 500 paga >$1000/ação;
+    # valores acima disso são bugs de escala (reduzir 1000x até plausível, senão N/A).
+    dps = dur.get("dividendPerShare")
+    if dps is not None:
+        for _ in range(3):
+            if abs(dps) <= 1000:
+                break
+            dps /= 1000
+        if abs(dps) > 1000:
+            dps = None
+
     if fp == "FY":
         period_type = "ANNUAL"
         fiscal_quarter = None
@@ -617,7 +635,7 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         "netMargin": net_margin,
         "roic": roic,
         "returnOnEquity": roe,
-        "dividendPerShare": dur.get("dividendPerShare"),
+        "dividendPerShare": dps,
         "researchAndDevelopment": dur.get("researchAndDevelopment"),
         "sellingGeneralAndAdmin": dur.get("sellingGeneralAndAdmin"),
         "ebitda": ebitda,

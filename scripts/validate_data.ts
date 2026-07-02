@@ -220,6 +220,73 @@ const ANCHORS: Anchor[] = [
     returnOnEquity:       0.6924,        // ~69%
   },
 
+  // ── PHILIP MORRIS FY2023 — regressão do bug de excise taxes ────────────────
+  // A tag "IncludingAssessedTax" ($84.6B, com excise) NÃO pode vencer a
+  // "ExcludingAssessedTax" ($35.2B, net revenues = top line do 10-K).
+  // Só os campos verificados no 10-K FY2023 (filed 2024-02-08); resto null.
+  {
+    ticker: 'PM', fiscalYear: 2023,
+    note: 'anchor mínimo — guarda contra revenue com excise taxes',
+    revenue:            35_174_000_000,  // net revenues (exclui excise)
+    costOfRevenue:            null,
+    grossProfit:              null,
+    operatingExpenses:        null,
+    operatingIncome:    11_560_000_000,
+    interestExpense:          null,
+    taxExpense:               null,
+    netIncome:           7_813_000_000,  // atribuível à PMI
+    epsDiluted:                   5.02,
+    sharesOutstanding:        null,
+    operatingCashFlow:        null,
+    capex:                    null,
+    freeCashFlow:             null,
+    totalAssets:              null,
+    totalCurrentLiab:         null,
+    longTermDebt:             null,
+    totalDebt:                null,
+    cash:                     null,
+    totalEquity:              null,
+    grossMargin:              null,
+    operatingMargin:      0.32865,       // 11560/35174
+    netMargin:            0.22212,       // 7813/35174
+    dividendPerShare:         null,
+    roic:                     null,
+    returnOnEquity:           null,
+  },
+
+  // ── COMFORT SYSTEMS (FIX) FY2025 — regressão do bug 10-Q vence 10-K ────────
+  // O 10-Q Q1-2026 mis-datou Revenues $1.83B com duração anual 2025; o 10-K
+  // FY2025 (filed 2026-02-19) reporta $9.10B. Valores do próprio 10-K no EDGAR.
+  {
+    ticker: 'FIX', fiscalYear: 2025,
+    note: 'anchor mínimo — guarda contra 10-Q mal datado a vencer 10-K',
+    revenue:             9_102_000_000,
+    costOfRevenue:            null,
+    grossProfit:              null,
+    operatingExpenses:        null,
+    operatingIncome:     1_315_000_000,
+    interestExpense:          null,
+    taxExpense:               null,
+    netIncome:           1_023_000_000,
+    epsDiluted:               null,
+    sharesOutstanding:        null,
+    operatingCashFlow:        null,
+    capex:                    null,
+    freeCashFlow:             null,
+    totalAssets:              null,
+    totalCurrentLiab:         null,
+    longTermDebt:             null,
+    totalDebt:                null,
+    cash:                     null,
+    totalEquity:              null,
+    grossMargin:              null,
+    operatingMargin:          null,
+    netMargin:                null,
+    dividendPerShare:         null,
+    roic:                     null,
+    returnOnEquity:           null,
+  },
+
 ]
 
 // Campos e como os apresentar no output
@@ -610,6 +677,46 @@ async function main() {
     take: 10,
   })
   console.log(`**Shares Outstanding ≤ 0:** ${badShares.length === 0 ? '✅ None' : badShares.map(r => `${r.company.ticker} FY${r.fiscalYear}`).join(', ')}\n`)
+
+  // Net margin > 100% com operating income positivo = revenue subestimado
+  // (padrão IBKR: tag ASC 606 só cobria comissões). Ganhos one-time legítimos
+  // (EBAY 2021, PSA 2022, CME 2017…) têm NI > revenue mas via non-operating.
+  const impossibleNm = await prisma.$queryRaw<{ ticker: string; fiscalYear: number; netMargin: number; operatingMargin: number | null }[]>`
+    SELECT c.ticker, f."fiscalYear", f."netMargin"::float8 AS "netMargin", f."operatingMargin"::float8 AS "operatingMargin"
+    FROM fundamentals f JOIN companies c ON f."companyId" = c.id
+    WHERE f."periodType" = 'ANNUAL' AND f."netMargin" > 1
+    ORDER BY f."netMargin" DESC
+  `
+  console.log(`**Net Margin > 100% (revenue subestimado? verificar se é ganho one-time):**`)
+  if (impossibleNm.length === 0) {
+    console.log(`✅ None found.\n`)
+  } else {
+    impossibleNm.forEach(r =>
+      console.log(`- ${r.ticker} FY${r.fiscalYear}: NM=${pct(r.netMargin)} OM=${pct(r.operatingMargin)}`))
+    console.log()
+  }
+
+  // Quebras >2.5x na série de shares = split não ajustado retroativamente
+  // (adjust_splits.py corrige as validadas contra splits EDGAR; o resto são
+  // mergers/IPOs/reorgs legítimos — KDP 2018, WBD 2022, DASH 2020, EXE, GEN, FE)
+  const shareBreaks = await prisma.$queryRaw<{ ticker: string; fiscalYear: number; sh: number; prev: number }[]>`
+    WITH s AS (
+      SELECT c.ticker, f."fiscalYear", f."sharesOutstanding"::float8 AS sh,
+             LAG(f."sharesOutstanding"::float8) OVER (PARTITION BY c.id ORDER BY f."fiscalYear") AS prev
+      FROM fundamentals f JOIN companies c ON f."companyId" = c.id
+      WHERE f."periodType" = 'ANNUAL' AND f."sharesOutstanding" IS NOT NULL)
+    SELECT ticker, "fiscalYear", sh, prev FROM s
+    WHERE prev IS NOT NULL AND prev > 0 AND (sh / prev > 2.5 OR sh / prev < 0.4)
+    ORDER BY ticker, "fiscalYear"
+  `
+  console.log(`**Quebras >2.5x em shares (split não ajustado? correr adjust_splits.py):**`)
+  if (shareBreaks.length === 0) {
+    console.log(`✅ None found.\n`)
+  } else {
+    shareBreaks.forEach(r =>
+      console.log(`- ${r.ticker} FY${r.fiscalYear}: ${(r.prev / 1e6).toFixed(0)}M → ${(r.sh / 1e6).toFixed(0)}M`))
+    console.log()
+  }
 
   // ──────────────────────────────────────────────────────────────────────────
   // §6 PRICE DATA

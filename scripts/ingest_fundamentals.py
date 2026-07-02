@@ -791,6 +791,72 @@ def process_company(conn, company: dict) -> int:
     return inserted
 
 
+# Classes B/C sem CIK próprio na BD (o schema tem cik @unique e a SEC mapeia
+# ambos os tickers para o mesmo filer). Os fundamentals são os da empresa —
+# copiar do ticker primário após cada ingestão.
+DUAL_CLASS_SIBLINGS = {
+    "GOOG": "GOOGL",
+    "FOX": "FOXA",
+    "NWS": "NWSA",
+}
+
+
+def sync_dual_class(conn):
+    print("\nSincronizar classes duplas (fundamentals do ticker primário):")
+    for sibling, primary in DUAL_CLASS_SIBLINGS.items():
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT id FROM companies WHERE ticker = %s", (sibling,))
+                s = cur.fetchone()
+                cur.execute("SELECT id FROM companies WHERE ticker = %s", (primary,))
+                p = cur.fetchone()
+                if not s or not p:
+                    print(f"  {sibling} ← {primary}: par não encontrado, ignorado")
+                    continue
+                cur.execute('DELETE FROM fundamentals WHERE "companyId" = %s', (s[0],))
+                cur.execute(
+                    """
+                    INSERT INTO fundamentals (
+                        id, "companyId", "periodType", "fiscalYear", "fiscalQuarter",
+                        "periodEnd", "filedAt",
+                        revenue, "costOfRevenue", "grossProfit", "operatingExpenses",
+                        "operatingIncome", "interestExpense", "taxExpense",
+                        "netIncome", "epsDiluted", "sharesOutstanding",
+                        "operatingCashFlow", capex, "freeCashFlow",
+                        "totalAssets", "totalCurrentLiab", "longTermDebt", "totalDebt",
+                        cash, "totalEquity",
+                        "grossMargin", "operatingMargin", "netMargin", roic, "returnOnEquity",
+                        "dividendPerShare", "researchAndDevelopment", "sellingGeneralAndAdmin", ebitda,
+                        "createdAt", "updatedAt"
+                    )
+                    SELECT
+                        replace(gen_random_uuid()::text, '-', ''), %s, "periodType", "fiscalYear", "fiscalQuarter",
+                        "periodEnd", "filedAt",
+                        revenue, "costOfRevenue", "grossProfit", "operatingExpenses",
+                        "operatingIncome", "interestExpense", "taxExpense",
+                        "netIncome", "epsDiluted", "sharesOutstanding",
+                        "operatingCashFlow", capex, "freeCashFlow",
+                        "totalAssets", "totalCurrentLiab", "longTermDebt", "totalDebt",
+                        cash, "totalEquity",
+                        "grossMargin", "operatingMargin", "netMargin", roic, "returnOnEquity",
+                        "dividendPerShare", "researchAndDevelopment", "sellingGeneralAndAdmin", ebitda,
+                        NOW(), NOW()
+                    FROM fundamentals WHERE "companyId" = %s
+                    """,
+                    (s[0], p[0]),
+                )
+                copied = cur.rowcount
+                cur.execute(
+                    'UPDATE companies SET "lastFundamentalsUpdate" = NOW(), "updatedAt" = NOW() WHERE id = %s',
+                    (s[0],),
+                )
+            conn.commit()
+            print(f"  {sibling} ← {primary}: {copied} períodos copiados")
+        except Exception as e:
+            conn.rollback()
+            print(f"  {sibling} ← {primary}: ERRO {e}")
+
+
 def main():
     # Uso: python ingest_fundamentals.py [--tickers AAPL,MSFT,...]
     tickers = None
@@ -836,6 +902,8 @@ def main():
             errors += 1
 
         time.sleep(SLEEP_BETWEEN)
+
+    sync_dual_class(conn)
 
     conn.close()
     print(f"\nConcluído. {total_periods} períodos inseridos. {errors} erros.")

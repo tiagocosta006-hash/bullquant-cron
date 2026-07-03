@@ -21,6 +21,8 @@ type FundamentalRow = {
   capex?: number | null
   freeCashFlow?: number | null
   epsDiluted?: number | null
+  operatingExpenses?: number | null
+  returnOnEquity?: number | null
   researchAndDevelopment?: number | null
   sellingGeneralAndAdmin?: number | null
   cash?: number | null
@@ -37,12 +39,14 @@ type FundamentalRow = {
 
 export function FinancialsEngine({ ticker, sector }: { ticker: string, sector?: string | null }) {
   const t = useTranslations("financials")
+  const isBank = sector === "Financials"
+  const isReit = sector === "Real Estate"
   const [data, setData] = useState<FundamentalRow[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [period, setPeriod] = useState<PeriodType>("ANNUAL")
   
   // Ratios internal tab state
-  const [ratioTab, setRatioTab] = useState<"ROIC" | "GROSS" | "OPERATING" | "PROFIT">("ROIC")
+  const [ratioTab, setRatioTab] = useState<"ROIC" | "ROE" | "GROSS" | "OPERATING" | "PROFIT">(isBank ? "ROE" : "ROIC")
 
   useEffect(() => {
     async function fetchFundamentals() {
@@ -97,6 +101,7 @@ export function FinancialsEngine({ ticker, sector }: { ticker: string, sector?: 
         const capex = last4.reduce((acc, q) => acc + (q.capex || 0), 0)
         const freeCashFlow = operatingCashFlow - capex
         const epsDiluted = last4.reduce((acc, q) => acc + (q.epsDiluted || 0), 0)
+        const opEx = last4.reduce((acc, q) => acc + (q.operatingExpenses || 0), 0)
         const rAndD = last4.reduce((acc, q) => acc + (q.researchAndDevelopment || 0), 0)
         const sga = last4.reduce((acc, q) => acc + (q.sellingGeneralAndAdmin || 0), 0)
         
@@ -107,7 +112,8 @@ export function FinancialsEngine({ ticker, sector }: { ticker: string, sector?: 
         const grossMargin = last4.reduce((acc, q) => acc + (q.grossProfit || 0), 0) / revenue
         const operatingMargin = last4.reduce((acc, q) => acc + (q.operatingIncome || 0), 0) / revenue
         const profitMargin = netIncome / revenue
-        const roic = current.roic // Usually TTM ROIC requires average capital, keeping current for simplicity
+        const roic = current.roic 
+        const returnOnEquity = current.returnOnEquity
         const dividendPerShare = last4.reduce((acc, q) => acc + (q.dividendPerShare || 0), 0)
 
         // Segments
@@ -124,9 +130,9 @@ export function FinancialsEngine({ ticker, sector }: { ticker: string, sector?: 
         ttmData.push({
           label: `TTM Q${current.fiscalQuarter} '${String(current.fiscalYear).slice(2)}`,
           revenue, netIncome, ebitda, operatingCashFlow, capex, freeCashFlow, epsDiluted,
-          researchAndDevelopment: rAndD, sellingGeneralAndAdmin: sga,
+          operatingExpenses: opEx, researchAndDevelopment: rAndD, sellingGeneralAndAdmin: sga,
           cash, totalDebt, sharesOutstanding, grossMargin, operatingMargin, profitMargin,
-          roic, dividendPerShare, revenueSegments: segments
+          roic, returnOnEquity, dividendPerShare, revenueSegments: segments
         })
       }
       return ttmData
@@ -157,15 +163,16 @@ export function FinancialsEngine({ ticker, sector }: { ticker: string, sector?: 
 
   // Pre-process segments for dynamic keys
   let segmentKeys: string[] = []
-  const firstSegments = processedData[0]?.revenueSegments
-  if (firstSegments) {
-    segmentKeys = Object.keys(firstSegments)
+  const periodWithSegments = processedData.find(d => d.revenueSegments && Object.keys(d.revenueSegments).length > 0)
+  if (periodWithSegments) {
+    segmentKeys = Object.keys(periodWithSegments.revenueSegments as Record<string, number>)
   }
 
   // Flatten segments into main object for Recharts
   const chartData = processedData.map(d => ({
     ...d,
     profitMargin: d.profitMargin !== undefined ? d.profitMargin : d.netMargin,
+    operatingExpenses: (d.operatingExpenses !== null && d.operatingExpenses !== undefined) ? d.operatingExpenses : (d.sellingGeneralAndAdmin !== null && d.sellingGeneralAndAdmin !== undefined ? d.sellingGeneralAndAdmin : null),
     ...d.revenueSegments,
     capexInv: d.capex ? -d.capex : 0 // Negative capex for composed chart
   }))
@@ -220,22 +227,24 @@ export function FinancialsEngine({ ticker, sector }: { ticker: string, sector?: 
           cagr={calcCAGR('epsDiluted')}
         />
 
-        <DecisionChart 
-          title={t('charts.freeCashFlow')} 
-          data={chartData} 
-          type="COMPOSED" 
-          config={{ 
-            isCurrency: true,
-            dataKeys: [
-              { key: 'freeCashFlow', name: 'FCF', color: '#3b82f6', type: 'bar' },
-              { key: 'operatingCashFlow', name: 'OCF', color: '#10b981', type: 'line' },
-              { key: 'capex', name: 'CapEx', color: '#f43f5e', type: 'line' }
-            ],
-            defaultHiddenKeys: ['operatingCashFlow', 'capex']
-          }} 
-          cagr={calcCAGR('freeCashFlow')}
-          infoTooltip={sector === 'Real Estate' ? "Para Fundos Imobiliários (REITs), o CapEx reflete apenas os custos de manutenção imobiliária (ex: melhorias para inquilinos e comissões de leasing), oferecendo um FCF preciso (AFFO). Exclui-se a compra de novos edifícios para não distorcer o FCF real de manutenção." : undefined}
-        />
+        {!isBank && (
+          <DecisionChart 
+            title={isReit ? "AFFO / FCF" : t('charts.freeCashFlow')} 
+            data={chartData} 
+            type="COMPOSED" 
+            config={{ 
+              isCurrency: true,
+              dataKeys: [
+                { key: 'freeCashFlow', name: 'FCF', color: '#3b82f6', type: 'bar' },
+                { key: 'operatingCashFlow', name: 'OCF', color: '#10b981', type: 'line' },
+                { key: 'capex', name: 'CapEx', color: '#f43f5e', type: 'line' }
+              ],
+              defaultHiddenKeys: ['operatingCashFlow', 'capex']
+            }} 
+            cagr={calcCAGR('freeCashFlow')}
+            infoTooltip={isReit ? "Para Fundos Imobiliários (REITs), o CapEx reflete os custos de manutenção imobiliária e de arrendamento, resultando numa proxy para o AFFO." : undefined}
+          />
+        )}
 
         <DecisionChart 
           title={t('charts.netIncome')} 
@@ -245,21 +254,25 @@ export function FinancialsEngine({ ticker, sector }: { ticker: string, sector?: 
           cagr={calcCAGR('netIncome')}
         />
 
-        <DecisionChart 
-          title={t('charts.ebitda')} 
-          data={chartData} 
-          type="BAR" 
-          config={{ isCurrency: true, dataKeys: [{ key: 'ebitda', color: '#f59e0b', type: 'bar' }] }} 
-          cagr={calcCAGR('ebitda')}
-        />
+        {!isBank && (
+          <DecisionChart 
+            title={t('charts.ebitda')} 
+            data={chartData} 
+            type="BAR" 
+            config={{ isCurrency: true, dataKeys: [{ key: 'ebitda', color: '#f59e0b', type: 'bar' }] }} 
+            cagr={calcCAGR('ebitda')}
+          />
+        )}
 
         <DecisionChart 
-          title={t('charts.expenses')} 
+          title={isBank ? "Operating Expenses" : t('charts.expenses')} 
           data={chartData} 
-          type="STACKED_BAR" 
+          type={isBank ? "BAR" : "STACKED_BAR"} 
           config={{ 
             isCurrency: true,
-            dataKeys: [
+            dataKeys: isBank ? [
+              { key: 'operatingExpenses', name: 'OpEx', color: '#f43f5e', type: 'bar' }
+            ] : [
               { key: 'researchAndDevelopment', name: 'R&D', color: '#0ea5e9', type: 'bar', stackId: 'a' },
               { key: 'sellingGeneralAndAdmin', name: 'SG&A', color: '#f43f5e', type: 'bar', stackId: 'a' },
               { key: 'capex', name: 'CapEx', color: '#eab308', type: 'bar', stackId: 'a' }
@@ -294,29 +307,44 @@ export function FinancialsEngine({ ticker, sector }: { ticker: string, sector?: 
           type="BAR" 
           config={{ dataKeys: [{ key: 'dividendPerShare', name: 'Dividend/Share', color: '#ec4899', type: 'bar' }] }} 
           cagr={calcCAGR('dividendPerShare')}
+          emptyMessage="Esta empresa não distribui dividendos."
         />
 
         {/* 4-in-1 Ratios Card */}
-        <div className="bg-card border border-border/40 rounded-xl p-4 shadow-sm h-[320px] flex flex-col group relative">
-          <div className="absolute top-2 right-4 flex bg-muted/50 p-1 rounded-md border border-border/40 z-10 scale-90 origin-top-right">
-            {(["ROIC", "GROSS", "OPERATING", "PROFIT"] as const).map(tab => (
-              <button
-                key={tab}
-                onClick={(e) => { e.stopPropagation(); setRatioTab(tab) }}
-                className={`px-2 py-1 text-xs font-semibold rounded-sm transition-all ${
-                  ratioTab === tab ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {t(`ratios.${tab.toLowerCase()}`)}
-              </button>
-            ))}
-          </div>
-          <div className="h-full w-full -m-4 p-4">
-            {ratioTab === "ROIC" && <DecisionChart title={t('charts.roic')} data={chartData} type="COMPOSED" config={{ isPercentage: true, dataKeys: [{ key: 'roic', color: '#3b82f6', type: 'bar' }], referenceLine: { y: 0.15, color: '#10b981', label: '15%' } }} />}
-            {ratioTab === "GROSS" && <DecisionChart title={t('charts.grossMargin')} data={chartData} type="LINE" config={{ isPercentage: true, dataKeys: [{ key: 'grossMargin', color: '#ec4899', type: 'line' }] }} />}
-            {ratioTab === "OPERATING" && <DecisionChart title={t('charts.operatingMargin')} data={chartData} type="LINE" config={{ isPercentage: true, dataKeys: [{ key: 'operatingMargin', color: '#f59e0b', type: 'line' }] }} />}
-            {ratioTab === "PROFIT" && <DecisionChart title={t('charts.profitMargin')} data={chartData} type="LINE" config={{ isPercentage: true, dataKeys: [{ key: 'profitMargin', color: '#14b8a6', type: 'line' }] }} />}
-          </div>
+        <div className="bg-card border border-border/40 rounded-xl shadow-sm h-[320px] flex flex-col group">
+          {(() => {
+            const tabs = (
+              <div className="flex bg-muted/50 p-1 rounded-md border border-border/40">
+                {(["ROIC", "ROE", "GROSS", "OPERATING", "PROFIT"] as const)
+                  .filter(tab => {
+                    if (isBank && (tab === "ROIC" || tab === "GROSS")) return false;
+                    if (!isBank && tab === "ROE") return false;
+                    return true;
+                  })
+                  .map(tab => (
+                  <button
+                    key={tab}
+                    onClick={(e) => { e.stopPropagation(); setRatioTab(tab) }}
+                    className={`px-2 py-1 text-xs font-semibold rounded-sm transition-all ${
+                      ratioTab === tab ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {t(`ratios.${tab.toLowerCase()}`)}
+                  </button>
+                ))}
+              </div>
+            );
+
+            return (
+              <div className="h-full w-full">
+                {ratioTab === "ROIC" && <DecisionChart title={t('charts.roic')} data={chartData} type="COMPOSED" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'roic', color: '#3b82f6', type: 'bar' }], referenceLine: { y: 0.15, color: '#10b981', label: '15%' } }} />}
+                {ratioTab === "ROE" && <DecisionChart title="Return on Equity" data={chartData} type="BAR" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'returnOnEquity', color: '#8b5cf6', type: 'bar' }] }} />}
+                {ratioTab === "GROSS" && <DecisionChart title={t('charts.grossMargin')} data={chartData} type="LINE" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'grossMargin', color: '#ec4899', type: 'line' }] }} />}
+                {ratioTab === "OPERATING" && <DecisionChart title={t('charts.operatingMargin')} data={chartData} type="LINE" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'operatingMargin', color: '#f59e0b', type: 'line' }] }} />}
+                {ratioTab === "PROFIT" && <DecisionChart title={t('charts.profitMargin')} data={chartData} type="LINE" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'profitMargin', color: '#14b8a6', type: 'line' }] }} />}
+              </div>
+            );
+          })()}
         </div>
 
       </div>

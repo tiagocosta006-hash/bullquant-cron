@@ -359,7 +359,8 @@
       "roic": "ROIC",
       "gross": "BRUTO",
       "operating": "OPERAT.",
-      "profit": "NETO"
+      "profit": "NETO",
+      "roe": "ROE"
     }
   },
   "calendar": {

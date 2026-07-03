@@ -361,7 +361,8 @@
       "roic": "ROIC",
       "gross": "BRUTA",
       "operating": "OPERAC.",
-      "profit": "LÍQUIDA"
+      "profit": "LÍQUIDA",
+      "roe": "ROE"
     }
   },
   "calendar": {

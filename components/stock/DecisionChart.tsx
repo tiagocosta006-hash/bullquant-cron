@@ -68,9 +68,11 @@ interface DecisionChartProps {
   config: ChartConfig
   cagr?: number | null
   infoTooltip?: React.ReactNode
+  emptyMessage?: string
+  headerExtra?: React.ReactNode
 }
 
-export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: DecisionChartProps) {
+export function DecisionChart({ title, data, type, config, cagr, infoTooltip, emptyMessage, headerExtra }: DecisionChartProps) {
   const t = useTranslations("stock.chart")
   const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart')
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -90,6 +92,13 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
     }
     return data.slice(-items);
   }, [data, timeFilter])
+
+  const hasValidData = useMemo(() => {
+    if (displayData.length === 0) return false;
+    return config.dataKeys.some(k => 
+      displayData.some(row => row[k.key] !== null && row[k.key] !== undefined)
+    );
+  }, [displayData, config.dataKeys])
 
   const formatValue = (val: number | string | null) => {
     if (val === null || val === undefined) return "N/A"
@@ -163,7 +172,14 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
   }
 
   const renderChart = (height: number | `${number}%` = "100%") => {
-    if (displayData.length === 0) return <div className="flex items-center justify-center h-full text-muted-foreground">{t('noData')}</div>
+    if (!hasValidData) return (
+      <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-1.5 bg-muted/10 rounded-lg border border-dashed border-border/30 m-2">
+        <p className="text-[13px] font-medium text-foreground/70">{t('noData')}</p>
+        <p className="text-[11px] opacity-50 text-center px-4">
+          {emptyMessage || "Métrica não aplicável (N/A) a este setor."}
+        </p>
+      </div>
+    )
 
     const ChartComponent = type === 'COMPOSED' || type === 'STACKED_BAR' ? ComposedChart : type === 'LINE' ? LineChart : BarChart
 
@@ -244,7 +260,16 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
     )
   }
 
-  const renderTable = () => (
+  const renderTable = () => {
+    if (!hasValidData) return (
+      <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-1.5 bg-muted/10 rounded-lg border border-dashed border-border/30 m-2">
+        <p className="text-[13px] font-medium text-foreground/70">{t('noData')}</p>
+        <p className="text-[11px] opacity-50 text-center px-4">
+          {emptyMessage || "Métrica não aplicável (N/A) a este setor."}
+        </p>
+      </div>
+    )
+    return (
     <div className="overflow-auto h-full w-full custom-scrollbar">
       <table className="w-full text-sm text-left">
         <thead className="sticky top-0 bg-muted/80 backdrop-blur text-muted-foreground text-xs uppercase">
@@ -269,7 +294,8 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
         </tbody>
       </table>
     </div>
-  )
+    )
+  }
 
   const content = (
     <div className="flex flex-col h-full">
@@ -300,6 +326,11 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
             </p>
           )}
         </div>
+        {headerExtra && (
+          <div className="flex-1 flex justify-center mx-2 hidden sm:flex">
+            {headerExtra}
+          </div>
+        )}
         <div className="flex gap-1 bg-muted/50 p-1 rounded-md border border-border/40">
           <button 
             onClick={() => setViewMode('chart')}
@@ -324,7 +355,10 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
             </DialogTrigger>
             <DialogContent className="sm:max-w-5xl w-[90vw] h-[80vh] flex flex-col bg-card border-border/50 outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0">
               <div className="flex items-center justify-between">
-                <DialogTitle className="text-xl">{title}</DialogTitle>
+                <div className="flex items-center gap-4">
+                  <DialogTitle className="text-xl">{title}</DialogTitle>
+                  {headerExtra && <div className="hidden md:block scale-90 origin-left">{headerExtra}</div>}
+                </div>
                 <div className="flex gap-1 bg-muted/50 p-1 rounded-md border border-border/40 mr-6">
                   {TIME_FILTERS.map(tf => (
                     <button

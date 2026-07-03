@@ -359,7 +359,8 @@
       "roic": "ROIC",
       "gross": "粗利",
       "operating": "営業",
-      "profit": "純利"
+      "profit": "純利",
+      "roe": "ROE"
     }
   },
   "calendar": {

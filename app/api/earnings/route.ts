@@ -43,11 +43,11 @@ export async function GET(request: NextRequest) {
       },
       orderBy: [{ date: 'asc' }, { company: { ticker: 'asc' } }],
       include: {
-        company: { select: { ticker: true, name: true, logoUrl: true } },
+        company: { select: { ticker: true, name: true, logoUrl: true, employees: true } },
       },
     })
 
-    // Serializar Decimals → number (o preço/estimativas nunca vão para o browser como Decimal)
+    // Serializar Decimals → number
     const data = events.map(e => ({
       id: e.id,
       date: e.date.toISOString().slice(0, 10),
@@ -61,6 +61,7 @@ export async function GET(request: NextRequest) {
       ticker: e.company.ticker,
       name: e.company.name,
       logoUrl: e.company.logoUrl,
+      employees: e.company.employees
     }))
 
     return NextResponse.json(data)

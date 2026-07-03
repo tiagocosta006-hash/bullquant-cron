@@ -470,6 +470,28 @@ async function main() {
     }
   })
 
+  // Q4 standalone = FY − (Q1+Q2+Q3): o EDGAR raramente tagga Q4; a ingestão
+  // sintetiza-o. Violações = backfill sobre base errada ou restatement
+  // (spin-offs). KDP FY2017 é exceção conhecida (mudança de calendário fiscal).
+  console.log(`### Q4 = FY − (Q1+Q2+Q3) (tolerance 2%)\n`)
+  for (const f of ['revenue', 'netIncome'] as const) {
+    const viol = await prisma.$queryRawUnsafe<{ ticker: string; fiscalYear: number }[]>(`
+      WITH q AS (
+        SELECT f."companyId", f."fiscalYear",
+          MAX(CASE WHEN f."periodType" = 'ANNUAL' THEN f."${f}"::float8 END) AS fy,
+          MAX(CASE WHEN f."fiscalQuarter" = 1 THEN f."${f}"::float8 END) AS q1,
+          MAX(CASE WHEN f."fiscalQuarter" = 2 THEN f."${f}"::float8 END) AS q2,
+          MAX(CASE WHEN f."fiscalQuarter" = 3 THEN f."${f}"::float8 END) AS q3,
+          MAX(CASE WHEN f."fiscalQuarter" = 4 THEN f."${f}"::float8 END) AS q4
+        FROM fundamentals f GROUP BY f."companyId", f."fiscalYear")
+      SELECT c.ticker, q."fiscalYear"
+      FROM q JOIN companies c ON q."companyId" = c.id
+      WHERE q.fy IS NOT NULL AND q.q1 IS NOT NULL AND q.q2 IS NOT NULL AND q.q3 IS NOT NULL AND q.q4 IS NOT NULL
+        AND ABS(q.q4 - (q.fy - q.q1 - q.q2 - q.q3)) > 0.02 * GREATEST(ABS(q.fy), 1e6)
+      ORDER BY c.ticker, q."fiscalYear"`)
+    console.log(`**${f}:** ${viol.length === 0 ? '✅ 0 violações' : viol.map(v => `${v.ticker} FY${v.fiscalYear}`).join(', ')}\n`)
+  }
+
   // ──────────────────────────────────────────────────────────────────────────
   // §3 ANCHOR VALUES — todos os campos vs 10-K publicados
   // ──────────────────────────────────────────────────────────────────────────

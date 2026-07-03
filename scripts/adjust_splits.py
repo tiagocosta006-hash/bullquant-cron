@@ -108,16 +108,17 @@ def candidate_factors(splits: list[tuple[str, float]], older_end: str) -> list[f
 
 
 def find_break_companies(cur) -> list[dict]:
-    """Empresas com quebras >2.5x entre rows anuais consecutivas."""
+    """Empresas com quebras >2.5x entre rows consecutivas (anuais E trimestrais:
+    Q4 sintetizado/backfilled pode ficar na base pré-split mesmo com a série
+    anual já ajustada — a deteção tem de ver todas as rows)."""
     cur.execute("""
         WITH s AS (
-          SELECT c.id, c.ticker, c.cik, f."fiscalYear",
+          SELECT c.id, c.ticker, c.cik,
                  f."sharesOutstanding"::float8 AS sh,
                  LAG(f."sharesOutstanding"::float8)
-                   OVER (PARTITION BY c.id ORDER BY f."fiscalYear") AS prev
+                   OVER (PARTITION BY c.id ORDER BY f."periodEnd") AS prev
           FROM fundamentals f JOIN companies c ON f."companyId" = c.id
-          WHERE f."periodType" = 'ANNUAL' AND f."sharesOutstanding" IS NOT NULL
-            AND c.cik IS NOT NULL)
+          WHERE f."sharesOutstanding" IS NOT NULL AND c.cik IS NOT NULL)
         SELECT DISTINCT id, ticker, cik FROM s
         WHERE prev IS NOT NULL AND prev > 0 AND (sh / prev > %s OR sh / prev < %s)
         ORDER BY ticker

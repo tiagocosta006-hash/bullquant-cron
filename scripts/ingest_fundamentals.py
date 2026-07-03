@@ -702,6 +702,93 @@ def insert_fundamental(cur, row: dict):
     )
 
 
+def synthesize_q4(periods: set, period_ends: dict, period_filed: dict,
+                  dur_map: dict, inst_map: dict) -> list[int]:
+    """Sintetiza Q4 standalone: o EDGAR raramente o tagga (as empresas reportam
+    FY, e Q4 = FY − Q1 − Q2 − Q3). Campo a campo: valores já extraídos do EDGAR
+    ficam; só os em falta são derivados. Balanço do Q4 = balanço do FY (mesmo
+    period end); shares = weighted avg do FY; eps = NI/shares.
+
+    Guard de mismatch de base: em spin-offs (MMM/Solventum, IBM/Kyndryl) o FY
+    mais recente é restated para continuing operations mas os quarters antigos
+    são os originais → o Q4 derivado seria lixo (revenue ~0 com margens
+    absurdas). Detetável porque o revenue Q4 derivado colapsa (<20% do Q3) sem
+    o Q3 ter colapsado. Nesses anos não se sintetiza nada.
+
+    Devolve os fiscal years cujo Q4 deve ser APAGADO da BD (anos sem síntese
+    válida — remove restos de backfills manuais sobre bases erradas)."""
+    SUBTRACTIVE = [
+        "revenue", "costOfRevenue", "grossProfit", "operatingExpenses",
+        "operatingIncome", "interestExpense", "taxExpense", "netIncome",
+        "operatingCashFlow", "capex", "researchAndDevelopment",
+        "sellingGeneralAndAdmin", "ebitda", "depreciationAndAmortization",
+        "dividendPerShare",
+    ]
+    drop_years: list[int] = []
+    fy_years = sorted({fy for (fy, fp) in periods if fp == "FY"})
+    for fy in fy_years:
+        q4_key = (fy, "Q4")
+        qs = [(fy, "Q1"), (fy, "Q2"), (fy, "Q3")]
+        if not all(q in periods for q in qs):
+            if q4_key not in periods:
+                drop_years.append(fy)  # sem quarters não há síntese; limpar Q4 órfão
+            continue
+
+        fy_dur = dur_map.get((fy, "FY")) or {}
+        q_durs = [dur_map.get(q) or {} for q in qs]
+        existing = dur_map.get(q4_key) or {}
+
+        derived: dict = {}
+        for field in SUBTRACTIVE:
+            if existing.get(field) is not None:
+                continue  # extração EDGAR é fonte de verdade
+            fv = fy_dur.get(field)
+            vals = [d.get(field) for d in q_durs]
+            if fv is None or any(v is None for v in vals):
+                continue
+            derived[field] = fv - sum(vals)
+
+        rev_synth = derived.get("revenue")
+        rev_q3 = q_durs[2].get("revenue")
+        base_mismatch = rev_synth is not None and (
+            rev_synth < 0
+            or (rev_q3 is not None and rev_q3 > 0 and rev_synth < 0.2 * rev_q3)
+        )
+        if base_mismatch:
+            if q4_key not in periods:
+                drop_years.append(fy)
+            continue
+
+        if not derived:
+            if q4_key not in periods:
+                drop_years.append(fy)
+            continue
+
+        periods.add(q4_key)
+        if not period_ends.get(q4_key):
+            period_ends[q4_key] = period_ends.get((fy, "FY"))
+        if not period_filed.get(q4_key):
+            period_filed[q4_key] = period_filed.get((fy, "FY"))
+        dur_map.setdefault(q4_key, {}).update(derived)
+        inst_map.setdefault(q4_key, {})
+
+        q4_dur = dur_map[q4_key]
+        if q4_dur.get("sharesOutstandingDur") is None:
+            sh = fy_dur.get("sharesOutstandingDur")
+            if sh is not None:
+                q4_dur["sharesOutstandingDur"] = sh
+        if q4_dur.get("epsDiluted") is None:
+            ni = q4_dur.get("netIncome")
+            sh = q4_dur.get("sharesOutstandingDur")
+            if ni is not None and sh:
+                q4_dur["epsDiluted"] = ni / sh
+
+        for k, v in (inst_map.get((fy, "FY")) or {}).items():
+            inst_map[q4_key].setdefault(k, v)
+
+    return drop_years
+
+
 def process_company(conn, company: dict) -> int:
     company_id = company["id"]
     cik = company["cik"]
@@ -740,6 +827,10 @@ def process_company(conn, company: dict) -> int:
 
     dur_map, inst_map = extract_all_metrics(us_gaap, periods_list, period_ends)
 
+    # Q4 sintético (FY − Q1−Q2−Q3) + anos cujo Q4 existente na BD deve ser limpo
+    drop_q4_years = synthesize_q4(periods, period_ends, period_filed, dur_map, inst_map)
+    periods_list = sorted(periods)
+
     rows = []
     for (fy, fp) in periods_list:
         period_end = period_ends.get((fy, fp))
@@ -759,6 +850,8 @@ def process_company(conn, company: dict) -> int:
     inserted = 0
     try:
         with conn.cursor() as cur:
+            for fy in drop_q4_years:
+                delete_period(cur, company_id, "QUARTERLY", fy, 4)
             for row in rows:
                 delete_period(cur, company_id, row["periodType"], row["fiscalYear"], row["fiscalQuarter"])
                 insert_fundamental(cur, row)
@@ -767,6 +860,13 @@ def process_company(conn, company: dict) -> int:
     except Exception as e:
         conn.rollback()
         print(f"    DB error (batch): {e} — fallback período a período")
+        try:
+            with conn.cursor() as cur:
+                for fy in drop_q4_years:
+                    delete_period(cur, company_id, "QUARTERLY", fy, 4)
+            conn.commit()
+        except Exception:
+            conn.rollback()
         for row in rows:
             try:
                 with conn.cursor() as cur:

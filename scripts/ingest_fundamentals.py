@@ -18,6 +18,12 @@ import requests
 import psycopg2
 from dotenv import load_dotenv
 
+# Consolas Windows usam cp1252 — sem isto, prints com caracteres fora do cp1252
+# (ex.: "←" no sync de classes duplas) matam o script a meio da ingestão.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 ROOT = os.path.join(os.path.dirname(__file__), "..")
 
 if os.environ.get("GITHUB_ACTIONS") == "true":
@@ -746,7 +752,13 @@ def synthesize_q4(periods: set, period_ends: dict, period_filed: dict,
             vals = [d.get(field) for d in q_durs]
             if fv is None or any(v is None for v in vals):
                 continue
-            derived[field] = fv - sum(vals)
+            val = fv - sum(vals)
+            # capex é "sempre positivo" por convenção; derivado negativo
+            # significa capex FY em falta/tag errada (REITs) — o abs() do
+            # build_row transformá-lo-ia em lixo positivo. Fica NULL (N/A).
+            if field == "capex" and val < 0:
+                continue
+            derived[field] = val
 
         rev_synth = derived.get("revenue")
         rev_q3 = q_durs[2].get("revenue")
@@ -775,12 +787,26 @@ def synthesize_q4(periods: set, period_ends: dict, period_filed: dict,
         q4_dur = dur_map[q4_key]
         if q4_dur.get("sharesOutstandingDur") is None:
             sh = fy_dur.get("sharesOutstandingDur")
+            # As shares do fy_dur são pré-guard e podem vir na escala errada
+            # (MCD tagga em milhões: 732.3). O guard NI/EPS do build_row não
+            # salva o Q4: o eps derivado abaixo ficaria auto-consistente com
+            # as shares erradas. Validar aqui contra NI/EPS do próprio FY.
+            fy_ni = fy_dur.get("netIncome")
+            fy_eps = fy_dur.get("epsDiluted")
+            if fy_ni is not None and fy_eps and abs(fy_eps) >= 0.5:
+                implied = fy_ni / fy_eps
+                if implied >= 1_000_000 and (
+                    sh is None or sh / implied > 5 or sh / implied < 0.2
+                ):
+                    sh = implied
             if sh is not None:
                 q4_dur["sharesOutstandingDur"] = sh
         if q4_dur.get("epsDiluted") is None:
             ni = q4_dur.get("netIncome")
             sh = q4_dur.get("sharesOutstandingDur")
-            if ni is not None and sh:
+            # >= 100k ações (plausibilidade, como no build_row) e eps dentro
+            # do Decimal(10,4) — nunca deixar um overflow matar o insert.
+            if ni is not None and sh and sh >= 100_000 and abs(ni / sh) < 100_000:
                 q4_dur["epsDiluted"] = ni / sh
 
         for k, v in (inst_map.get((fy, "FY")) or {}).items():

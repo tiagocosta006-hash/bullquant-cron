@@ -25,6 +25,11 @@ import requests
 import psycopg2
 from dotenv import load_dotenv
 
+# Consolas Windows usam cp1252 — sem isto, prints com "⚠"/"←" matam o script.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 ROOT = os.path.join(os.path.dirname(__file__), "..")
 
 if os.environ.get("GITHUB_ACTIONS") == "true":
@@ -236,6 +241,13 @@ def main():
         except Exception as e:
             conn.rollback()
             print(f"  DB error: {e}")
+
+    # GOOG/FOX/NWS não têm CIK próprio (find_break_companies exclui-os) e o
+    # sync no fim da ingestão copia a base pré-ajuste — sem isto, o GOOG
+    # ficava com a série GOOGL não ajustada ao split após cada cron semanal.
+    if total_updates > 0 and not dry_run:
+        from ingest_fundamentals import sync_dual_class
+        sync_dual_class(conn)
 
     conn.close()
     print(f"\nConcluído{' (dry-run)' if dry_run else ''}. {total_updates} rows ajustadas.")

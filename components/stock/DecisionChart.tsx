@@ -7,6 +7,8 @@ import {
   Bar,
   LineChart,
   Line,
+  AreaChart,
+  Area,
   ComposedChart,
   XAxis,
   YAxis,
@@ -22,7 +24,7 @@ import { TooltipProvider, Tooltip as UITooltip, TooltipTrigger, TooltipContent }
 import { useTranslations } from "next-intl"
 
 export type ChartConfig = {
-  dataKeys: { key: string; color: string; type: 'bar' | 'line'; stackId?: string; name?: string }[]
+  dataKeys: { key: string; color: string; type: 'bar' | 'line' | 'area'; stackId?: string; name?: string }[]
   referenceLine?: { y: number; label: string; color: string }
   isCurrency?: boolean
   isPercentage?: boolean
@@ -63,16 +65,17 @@ const CustomTooltip = ({ active, payload, label, formatTooltipValue }: CustomToo
 
 interface DecisionChartProps {
   title: string
-  data: Record<string, unknown>[]
-  type: 'BAR' | 'LINE' | 'COMPOSED' | 'STACKED_BAR'
+  data: any[]
+  type: 'BAR' | 'LINE' | 'COMPOSED' | 'STACKED_BAR' | 'AREA'
   config: ChartConfig
   cagr?: number | null
   infoTooltip?: React.ReactNode
   emptyMessage?: string
   headerExtra?: React.ReactNode
+  currencySymbol?: string
 }
 
-export function DecisionChart({ title, data, type, config, cagr, infoTooltip, emptyMessage, headerExtra }: DecisionChartProps) {
+export function DecisionChart({ title, data, type, config, cagr, infoTooltip, emptyMessage, headerExtra, currencySymbol = "$" }: DecisionChartProps) {
   const t = useTranslations("stock.chart")
   const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart')
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -110,7 +113,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
     if (config.isCurrency || config.isLargeNumber) {
       const formatter = new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short", maximumFractionDigits: 1 })
       const formatted = formatter.format(absVal)
-      if (config.isCurrency) return num < 0 ? `-$${formatted}` : `$${formatted}`
+      if (config.isCurrency) return num < 0 ? `-${currencySymbol}${formatted}` : `${currencySymbol}${formatted}`
       return num < 0 ? `-${formatted}` : formatted
     }
     
@@ -133,7 +136,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
       } else {
         formatted = `${absVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
       }
-      if (config.isCurrency) return num < 0 ? `-$${formatted}` : `$${formatted}`
+      if (config.isCurrency) return num < 0 ? `-${currencySymbol}${formatted}` : `${currencySymbol}${formatted}`
       return num < 0 ? `-${formatted}` : formatted
     }
     
@@ -181,7 +184,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
       </div>
     )
 
-    const ChartComponent = type === 'COMPOSED' || type === 'STACKED_BAR' ? ComposedChart : type === 'LINE' ? LineChart : BarChart
+    const ChartComponent = type === 'COMPOSED' || type === 'STACKED_BAR' ? ComposedChart : type === 'LINE' ? LineChart : type === 'AREA' ? AreaChart : BarChart
 
     return (
       <div className="w-full h-full outline-none focus:outline-none focus-visible:outline-none [&_*:focus]:outline-none [&_*:focus]:ring-0" tabIndex={-1}>
@@ -234,6 +237,9 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
               const isHidden = hiddenKeys.has(k.key)
               if (k.type === 'line' || type === 'LINE') {
                 return <Line hide={isHidden} key={k.key} type="monotone" dataKey={k.key} name={k.name || k.key} stroke={k.color} strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+              }
+              if (k.type === 'area' || type === 'AREA') {
+                return <Area hide={isHidden} key={k.key} type="monotone" dataKey={k.key} name={k.name || k.key} fill={k.color} stroke={k.color} fillOpacity={0.2} strokeWidth={2} activeDot={{ r: 5 }} />
               }
               return (
                 <Bar hide={isHidden} key={k.key} dataKey={k.key} name={k.name || k.key} fill={k.color} stackId={k.stackId} radius={type === 'STACKED_BAR' ? 0 : [4, 4, 0, 0]}>

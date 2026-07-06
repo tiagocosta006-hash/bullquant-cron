@@ -62,6 +62,7 @@ DURATION_TAGS = {
         "RevenueFromContractWithCustomerExcludingAssessedTax",
         "Revenues",
         "SalesRevenueNet",
+        "Revenue",
         "RevenueFromContractWithCustomerIncludingAssessedTax",
         "SalesRevenueGoodsNet",
         "InterestAndDividendIncomeOperating",
@@ -76,6 +77,7 @@ DURATION_TAGS = {
     ],
     "costOfRevenue": [
         "CostOfRevenue",
+        "CostOfSales",
         "CostOfGoodsAndServicesSold",
         "CostOfGoodsSold",
         "CostOfServices",
@@ -89,8 +91,8 @@ DURATION_TAGS = {
         "PolicyholderBenefitsAndClaimsIncurredNet"
     ],
     "grossProfit": ["GrossProfit"],
-    "operatingExpenses": ["OperatingExpenses", "NoninterestExpense", "OperatingCostsAndExpenses"],
-    "operatingIncome": ["OperatingIncomeLoss", "IncomeFromOperations", "OperatingIncomeLossFromContinuingOperations"],
+    "operatingExpenses": ["OperatingExpenses", "NoninterestExpense", "OperatingCostsAndExpenses", "OtherOperatingIncomeExpense", "AdministrativeExpense"],
+    "operatingIncome": ["OperatingIncomeLoss", "IncomeFromOperations", "OperatingIncomeLossFromContinuingOperations", "ProfitLossFromOperatingActivities"],
     "interestExpense": [
         "InterestExpense",
         "InterestAndDebtExpense",
@@ -101,10 +103,12 @@ DURATION_TAGS = {
     "netIncome": [
         "NetIncomeLoss",
         "ProfitLoss",
+        "ProfitLossAttributableToOwnersOfParent",
         "NetIncomeLossAvailableToCommonStockholdersBasic",
     ],
     "epsDiluted": [
         "EarningsPerShareDiluted",
+        "DilutedEarningsLossPerShare",
         "NetIncomeLossPerOutstandingShare",
         "NetIncomeLossPerShareDiluted",
         # Fallback: empresas com discontinued ops tagham só o EPS de continuing
@@ -116,13 +120,16 @@ DURATION_TAGS = {
     "sharesOutstandingDur": [
         "WeightedAverageNumberOfDilutedSharesOutstanding",
         "WeightedAverageNumberOfSharesOutstandingBasic",
+        "NumberOfSharesOutstanding",
     ],
     "operatingCashFlow": [
         "NetCashProvidedByUsedInOperatingActivities",
-        "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations"
+        "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations",
+        "CashFlowsFromUsedInOperatingActivities"
     ],
     "capex": [
         "PaymentsToAcquirePropertyPlantAndEquipment",
+        "PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities",
         "PaymentsToAcquireOtherPropertyPlantAndEquipment",
         "PaymentsToAcquirePropertyPlantAndEquipmentAndOtherAssets",
         "PaymentsToAcquireAndDevelopRealEstate",  # REITs: aquisição/desenvolvimento é o "capex"
@@ -134,11 +141,13 @@ DURATION_TAGS = {
     ],
     "intangibles": [
         "PaymentsToAcquireIntangibleAssets",
+        "PurchaseOfIntangibleAssetsClassifiedAsInvestingActivities",
         "PaymentsToDevelopSoftware",
     ],
     "dividendPerShare": [
         "CommonStockDividendsPerShareDeclared",
         "CommonStockDividendsPerShareCashPaid",
+        "DividendsPerShare",
     ],
     "researchAndDevelopment": [
         "ResearchAndDevelopmentExpense",
@@ -155,6 +164,9 @@ DURATION_TAGS = {
     "depreciationAndAmortization": [
         "DepreciationDepletionAndAmortization",
         "DepreciationAndAmortization",
+        "DepreciationAndAmortisationExpense",
+        "DepreciationExpense",
+        "AmortisationExpense",
         "Depreciation",
         "AmortizationOfIntangibleAssets",
     ],
@@ -162,19 +174,21 @@ DURATION_TAGS = {
 
 INSTANT_TAGS = {
     "totalAssets": ["Assets"],
-    "totalCurrentLiab": ["LiabilitiesCurrent"],
+    "totalCurrentLiab": ["LiabilitiesCurrent", "CurrentLiabilities"],
     "totalLiabilities": ["Liabilities"],
     "longTermDebt": [
         "LongTermDebtNoncurrent", 
+        "NoncurrentLiabilities",
         "LongTermDebt",
         "ConvertibleDebtNoncurrent",
         "ConvertibleDebt"
     ],
-    "longTermDebtCurrent": ["LongTermDebtCurrent"],
-    "shortTermDebt": ["ShortTermBorrowings", "ShortTermDebt"],
+    "longTermDebtCurrent": ["LongTermDebtCurrent", "CurrentBorrowings"],
+    "shortTermDebt": ["ShortTermBorrowings", "ShortTermDebt", "ShorttermBorrowings"],
     "commercialPaper": ["CommercialPaper"],
     "totalDebt": [
         "DebtLongtermAndShorttermCombinedAmount",
+        "Borrowings",
         "LongTermDebtAndCapitalLeaseObligations",
     ],
     # Fallback de nível 2 em build_row (DEPOIS da soma current+noncurrent):
@@ -193,6 +207,7 @@ INSTANT_TAGS = {
     ],
     "cash": [
         "CashAndCashEquivalentsAtCarryingValue",
+        "CashAndCashEquivalents",
         "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
         "Cash",
     ],
@@ -205,9 +220,11 @@ INSTANT_TAGS = {
     ],
     "totalEquity": [
         "StockholdersEquity",
+        "Equity",
+        "EquityAttributableToOwnersOfParent",
         "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
     ],
-    "sharesOutstandingInst": ["CommonStockSharesOutstanding"],
+    "sharesOutstandingInst": ["CommonStockSharesOutstanding", "NumberOfSharesOutstanding"],
 }
 
 
@@ -470,11 +487,11 @@ def safe_clamp(v, lo, hi):
 
 def get_period_info(us_gaap: dict, fy: int, fp: str) -> tuple[str | None, str | None]:
     """Devolve (period_end, filed_at) para um período."""
-    for tag in ["Assets", "NetIncomeLoss", "Revenues", "StockholdersEquity"]:
+    for tag in ["Assets", "NetIncomeLoss", "ProfitLoss", "Revenues", "Revenue", "StockholdersEquity", "Equity"]:
         entries = extract_tag_entries(us_gaap, tag)
         matches = [e for e in entries if e.get("fy") == fy and e.get("fp") == fp]
         if matches:
-            if tag in ["NetIncomeLoss", "Revenues"]:
+            if tag in ["NetIncomeLoss", "ProfitLoss", "Revenues", "Revenue"]:
                 if fp == "FY":
                     matches = [e for e in matches if is_annual_duration(e)]
                 else:
@@ -646,6 +663,10 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
                 break
             dps /= 1000
         if abs(dps) > 1000:
+            dps = None
+        # Guard: dividendos são SEMPRE não-negativos. Um valor negativo é sempre
+        # um bug de ingestão (ex: subtração errada de acumulado anual). Rejeitar.
+        if dps is not None and dps < 0:
             dps = None
 
     if fp == "FY":
@@ -891,17 +912,18 @@ def process_company(conn, company: dict) -> int:
     if not facts_json:
         return 0
 
-    us_gaap = (facts_json.get("facts") or {}).get("us-gaap") or {}
-    if not us_gaap:
+    facts = facts_json.get("facts") or {}
+    namespace = facts.get("us-gaap") or facts.get("ifrs-full") or {}
+    if not namespace:
         return 0
 
     min_fy = datetime.date.today().year - HISTORY_YEARS
     periods: set = set()
 
     # Descobrir todos os (fy, fp) disponíveis nos últimos 10 anos
-    for sample_tags in [["NetIncomeLoss", "Assets", "Revenues"]]:
+    for sample_tags in [["NetIncomeLoss", "ProfitLoss", "Assets", "Revenues", "Revenue"]]:
         for tag in sample_tags:
-            for e in extract_tag_entries(us_gaap, tag):
+            for e in extract_tag_entries(namespace, tag):
                 fy = e.get("fy")
                 fp = e.get("fp")
                 if fy and fp and fy >= min_fy and fp in ("FY", "Q1", "Q2", "Q3", "Q4"):
@@ -915,11 +937,11 @@ def process_company(conn, company: dict) -> int:
     period_ends = {}
     period_filed = {}
     for (fy, fp) in periods_list:
-        p_end, p_filed = get_period_info(us_gaap, fy, fp)
+        p_end, p_filed = get_period_info(namespace, fy, fp)
         period_ends[(fy, fp)] = p_end
         period_filed[(fy, fp)] = p_filed
 
-    dur_map, inst_map = extract_all_metrics(us_gaap, periods_list, period_ends)
+    dur_map, inst_map = extract_all_metrics(namespace, periods_list, period_ends)
 
     # Q4 sintético (FY − Q1−Q2−Q3) + anos cujo Q4 existente na BD deve ser limpo
     drop_q4_years = synthesize_q4(periods, period_ends, period_filed, dur_map, inst_map)
@@ -937,11 +959,7 @@ def process_company(conn, company: dict) -> int:
         if not dur and not inst:
             continue
 
-<<<<<<< HEAD
-        row = build_row(company_id, fy, fp, period_end, filed_at, dur, inst, company.get('sector'))
-=======
-        rows.append(build_row(company_id, fy, fp, period_end, filed_at, dur, inst))
->>>>>>> origin/main
+        rows.append(build_row(company_id, fy, fp, period_end, filed_at, dur, inst, company.get('sector')))
 
     # Commit único por empresa (~40 períodos): contra Supabase remoto, o commit
     # por período dominava o tempo de execução (~3 round-trips × ~100ms cada).

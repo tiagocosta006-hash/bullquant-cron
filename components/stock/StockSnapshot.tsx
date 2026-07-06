@@ -7,16 +7,17 @@ import type { Fundamental } from "@prisma/client"
 type StockSnapshotProps = {
   ticker: string
   fundamentals: Fundamental[] // 4 quarters or 1 annual
+  currencySymbol?: string
 }
 
-function formatVal(value: number | null | undefined, isPercent = false, isCurrency = false, isRatio = false) {
+function formatVal(value: number | null | undefined, isPercent = false, isCurrency = false, isRatio = false, currencySymbol = "$") {
   if (value === null || value === undefined || isNaN(Number(value))) return "---"
   const num = Number(value)
   if (isPercent) return `${(num * 100).toFixed(2)}%`
   if (isCurrency) {
-    if (Math.abs(num) >= 1e9) return `$${(num / 1e9).toFixed(2)}B`
-    if (Math.abs(num) >= 1e6) return `$${(num / 1e6).toFixed(2)}M`
-    return `$${num.toFixed(2)}`
+    if (Math.abs(num) >= 1e9) return `${currencySymbol}${(num / 1e9).toFixed(2)}B`
+    if (Math.abs(num) >= 1e6) return `${currencySymbol}${(num / 1e6).toFixed(2)}M`
+    return `${currencySymbol}${num.toFixed(2)}`
   }
   if (isRatio) return `${num.toFixed(2)}x`
   return num.toFixed(2)
@@ -33,6 +34,7 @@ function Stat({
   loading,
   naLabel,
   naReason,
+  currencySymbol
 }: {
   label: string
   value: number | null
@@ -42,6 +44,7 @@ function Stat({
   loading?: boolean
   naLabel: string
   naReason: string
+  currencySymbol?: string
 }) {
   return (
     <div className="flex justify-between items-center">
@@ -56,13 +59,13 @@ function Stat({
           {naLabel}
         </span>
       ) : (
-        <span className="font-bold">{formatVal(value, percent, currency, ratio)}</span>
+        <span className="font-bold">{formatVal(value, percent, currency, ratio, currencySymbol)}</span>
       )}
     </div>
   )
 }
 
-export function StockSnapshot({ ticker, fundamentals }: StockSnapshotProps) {
+export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$" }: StockSnapshotProps) {
   const t = useTranslations("stock.snapshot")
   const [price, setPrice] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -165,7 +168,7 @@ export function StockSnapshot({ ticker, fundamentals }: StockSnapshotProps) {
       {/* 1. Valuation */}
       <div className="bg-card p-5 rounded-xl border border-border shadow-sm flex flex-col gap-3">
         <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider">{t("valuation")}</h3>
-        <Stat label="Market Cap" value={marketCap} currency loading={isLoading} naLabel={naLabel} naReason={naGeneric} />
+        <Stat label="Market Cap" value={marketCap} currency loading={isLoading} naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
         <Stat label="P/E (TTM)" value={pe} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} />
         <Stat label="P/Sales" value={ps} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} />
         <Stat label="EV/EBITDA" value={evEbitda} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} />
@@ -175,8 +178,8 @@ export function StockSnapshot({ ticker, fundamentals }: StockSnapshotProps) {
       {/* 2. Cash Flow */}
       <div className="bg-card p-5 rounded-xl border border-border shadow-sm flex flex-col gap-3">
         <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider">{t("cashFlow")}</h3>
-        <Stat label="Operating CF" value={ttm.operatingCashFlow} currency naLabel={naLabel} naReason={naGeneric} />
-        <Stat label="Free Cash Flow" value={ttm.freeCashFlow} currency naLabel={naLabel} naReason={naGeneric} />
+        <Stat label="Operating CF" value={ttm.operatingCashFlow} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
+        <Stat label="Free Cash Flow" value={ttm.freeCashFlow} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
         <Stat label="FCF Yield" value={fcfYield} percent loading={isLoading} naLabel={naLabel} naReason={naGeneric} />
       </div>
 
@@ -191,9 +194,9 @@ export function StockSnapshot({ ticker, fundamentals }: StockSnapshotProps) {
       {/* 4. Balance */}
       <div className="bg-card p-5 rounded-xl border border-border shadow-sm flex flex-col gap-3">
         <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider">{t("balance")}</h3>
-        <Stat label="Cash" value={ttm.cash} currency naLabel={naLabel} naReason={naGeneric} />
-        <Stat label="Total Assets" value={ttm.totalAssets} currency naLabel={naLabel} naReason={naGeneric} />
-        <Stat label="Total Debt" value={ttm.totalDebt} currency naLabel={naLabel} naReason={naGeneric} />
+        <Stat label="Cash" value={ttm.cash} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
+        <Stat label="Total Assets" value={ttm.totalAssets} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
+        <Stat label="Total Debt" value={ttm.totalDebt} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
       </div>
 
       {/* 5. Dividend */}
@@ -206,8 +209,9 @@ export function StockSnapshot({ ticker, fundamentals }: StockSnapshotProps) {
           currency
           naLabel={naLabel}
           naReason={naGeneric}
+          currencySymbol={currencySymbol}
         />
-        <Stat label="Net Debt" value={netDebt} currency naLabel={naLabel} naReason={naGeneric} />
+        <Stat label="Net Debt" value={netDebt} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
       </div>
     </div>
   )

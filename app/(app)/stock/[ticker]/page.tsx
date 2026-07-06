@@ -8,10 +8,12 @@ import { StockPriceChart } from '@/components/stock/StockPriceChart'
 import { SavedValuations, type SerializedDcfAnalysis } from '@/components/stock/SavedValuations'
 import { FinancialsEngine } from '@/components/stock/FinancialsEngine'
 import { InsiderActivity } from '@/components/stock/InsiderActivity'
+import { getCurrencySymbol } from '@/lib/finance/format'
 
 import { CompanyProfile } from '@/components/stock/CompanyProfile'
 import { StockNews } from '@/components/stock/StockNews'
 import { ManagementTeam } from '@/components/stock/ManagementTeam'
+import { StockKPIs } from '@/components/stock/StockKPIs'
 
 export default async function StockPage({
   params,
@@ -69,9 +71,21 @@ export default async function StockPage({
     take: 4,
   })
 
+  // Fetch the historical annual fundamentals for the Business KPIs chart
+  const historicalAnnual = await prisma.fundamental.findMany({
+    where: {
+      companyId: company.id,
+      periodType: 'ANNUAL'
+    },
+    orderBy: {
+      fiscalYear: 'desc',
+    },
+    take: 10,
+  })
+
   let fundamentalsToPass = latestFundamentals
 
-  if (latestFundamentals.length < 4) {
+  if (fundamentalsToPass.length < 4) {
     // Fallback to the latest ANNUAL record if we don't have enough quarters
     const latestAnnual = await prisma.fundamental.findFirst({
       where: {
@@ -85,6 +99,8 @@ export default async function StockPage({
     fundamentalsToPass = latestAnnual ? [latestAnnual] : []
   }
 
+  const currencySymbol = getCurrencySymbol(company.currency)
+
   return (
     <div className="container max-w-7xl mx-auto py-8 px-4 space-y-8">
       {/* 1. Header (Info + Live Finnhub Price) */}
@@ -92,7 +108,8 @@ export default async function StockPage({
         ticker: company.ticker,
         name: company.name,
         exchange: company.exchange,
-        logoUrl: company.logoUrl
+        logoUrl: company.logoUrl,
+        currency: company.currency
       }} />
 
 
@@ -100,26 +117,27 @@ export default async function StockPage({
       {/* 2. Fundamentals Snapshot */}
       <div>
         <h2 className="text-xl font-bold tracking-tight mb-4 text-foreground">{t('snapshotTitle')}</h2>
-        <StockSnapshot ticker={company.ticker} fundamentals={fundamentalsToPass} />
+        <StockSnapshot ticker={company.ticker} fundamentals={JSON.parse(JSON.stringify(fundamentalsToPass))} currencySymbol={currencySymbol} />
+        <StockKPIs fundamentals={JSON.parse(JSON.stringify(historicalAnnual))} />
       </div>
 
       {/* 3. Price History Chart */}
-      <StockPriceChart ticker={company.ticker} />
+      <StockPriceChart ticker={company.ticker} currencySymbol={currencySymbol} />
 
       {/* 3.5 Saved Valuations */}
       {serializedDcfs.length > 0 && (
         <SavedValuations 
           analyses={serializedDcfs} 
           ticker={company.ticker} 
-          currency={company.currency === 'EUR' ? '€' : '$'}
+          currency={currencySymbol}
         />
       )}
 
       {/* 4. Financials & Decision Engine */}
-      <FinancialsEngine ticker={company.ticker} sector={company.sector} />
+      <FinancialsEngine ticker={company.ticker} sector={company.sector} currencySymbol={currencySymbol} />
 
       {/* 5. Insider Activity (SEC Form 4) */}
-      <InsiderActivity ticker={company.ticker} />
+      <InsiderActivity ticker={company.ticker} currencySymbol={currencySymbol} />
 
       {/* 6. Company News */}
       <StockNews ticker={company.ticker} />

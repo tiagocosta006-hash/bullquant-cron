@@ -18,8 +18,13 @@ CUMULATIVE_FIELDS = [
 
 SNAPSHOT_FIELDS = [
     "totalAssets", "totalCurrentLiab", "longTermDebt", "totalDebt", 
-    "cash", "totalEquity", "sharesOutstanding", "dividendPerShare"
+    "cash", "totalEquity", "sharesOutstanding"
 ]
+
+# dividendPerShare é tratado separadamente: o valor anual é a SOMA dos
+# dividendos trimestrais (não um snapshot), por isso não pode ser copiado
+# diretamente do ANNUAL. Usamos o Q3 como proxy do Q4, que é a melhor
+# aproximação (o dividendo raramente muda entre Q3 e Q4 do mesmo ano).
 
 def main(dry_run=True, target_ticker="AAPL"):
     conn = get_db_connection()
@@ -97,6 +102,23 @@ def main(dry_run=True, target_ticker="AAPL"):
                 
                 for idx, field in enumerate(SNAPSHOT_FIELDS):
                     new_q4[field] = ann[4 + len(CUMULATIVE_FIELDS) + idx]
+                
+                # dividendPerShare: usar o valor do Q3 como proxy do Q4.
+                # O valor anual é a SOMA dos 4 trimestres — copiá-lo geraria
+                # um valor ~4x superior ao correto e causaria Q4 negativos
+                # quando o script for re-executado sobre dados já existentes.
+                dps_q3 = q3[4 + len(CUMULATIVE_FIELDS) + len(SNAPSHOT_FIELDS)]
+                if dps_q3 is not None and float(dps_q3) >= 0:
+                    new_q4["dividendPerShare"] = float(dps_q3)
+                else:
+                    # fallback: tentar Q1 ou Q2 se Q3 for inválido
+                    dps_q1 = q1[4 + len(CUMULATIVE_FIELDS) + len(SNAPSHOT_FIELDS)]
+                    dps_q2 = q2[4 + len(CUMULATIVE_FIELDS) + len(SNAPSHOT_FIELDS)]
+                    fallback = next(
+                        (float(v) for v in [dps_q2, dps_q1] if v is not None and float(v) >= 0),
+                        None
+                    )
+                    new_q4["dividendPerShare"] = fallback
                     
                 new_segments = {}
                 seg_a = ann[26]

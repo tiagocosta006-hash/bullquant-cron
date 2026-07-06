@@ -1,14 +1,17 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { TrendingUp, TrendingDown, Clock, Check, Plus } from "lucide-react"
+import { TrendingUp, TrendingDown, Clock, Check, Plus, Scale } from "lucide-react"
 import { useTranslations, useLocale } from "next-intl"
+import Link from "next/link"
+import { getCurrencySymbol } from "@/lib/finance/format"
 
 type CompanyProp = {
   ticker: string;
   name: string;
   exchange: string;
   logoUrl: string | null;
+  currency?: string | null;
 }
 
 type PriceData = {
@@ -157,6 +160,15 @@ export function StockHeader({ company }: { company: CompanyProp }) {
                 )}
               </button>
             )}
+
+            {/* Compare Button */}
+            <Link 
+              href={`/compare?ticker=${company.ticker}`}
+              className="px-3 py-1 text-xs font-bold rounded-full transition-all flex items-center gap-1.5 shadow-sm active:scale-95 bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border/50"
+            >
+              <Scale className="w-3.5 h-3.5" />
+              Comparar Pares
+            </Link>
           </div>
         </div>
       </div>
@@ -172,9 +184,9 @@ export function StockHeader({ company }: { company: CompanyProp }) {
           <>
             <div className="flex items-end gap-3">
               <span className="text-4xl font-extrabold tracking-tighter">
-                ${priceData.currentPrice.toFixed(2)}
+                {getCurrencySymbol(company.currency)}{priceData.currentPrice.toFixed(2)}
               </span>
-              <span className="text-sm text-muted-foreground mb-1.5 font-medium">USD</span>
+              <span className="text-sm text-muted-foreground mb-1.5 font-medium">{company.currency || 'USD'}</span>
             </div>
             
             <div className={`flex items-center gap-1.5 text-sm font-bold mt-1 ${isPositive ? 'text-bull' : 'text-bear'}`}>

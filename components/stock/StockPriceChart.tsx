@@ -20,7 +20,7 @@ type PricePoint = {
 
 type TabType = "1m" | "6m" | "1y" | "5y" | "max"
 
-export function StockPriceChart({ ticker }: { ticker: string }) {
+export function StockPriceChart({ ticker, currencySymbol = "$" }: { ticker: string, currencySymbol?: string }) {
   const t = useTranslations("stock.chart")
   const locale = useLocale()
   const [allData, setAllData] = useState<PricePoint[]>([])
@@ -168,7 +168,7 @@ export function StockPriceChart({ ticker }: { ticker: string }) {
       >
         <div className="flex w-fit items-center gap-1.5 px-2 py-1 mt-1 ml-1 rounded-md bg-background/90 backdrop-blur-sm border border-border/50 text-xs font-semibold shadow-sm animate-in fade-in zoom-in-95">
           <span className={selectionDelta.isPos ? 'text-bull' : 'text-bear'}>
-            {selectionDelta.isPos ? '+' : '-'}${Math.abs(selectionDelta.diff).toFixed(2)} ({Math.abs(selectionDelta.pct).toFixed(2)}%)
+            {selectionDelta.isPos ? '+' : '-'}{currencySymbol}{Math.abs(selectionDelta.diff).toFixed(2)} ({Math.abs(selectionDelta.pct).toFixed(2)}%)
           </span>
           <span className={selectionDelta.isPos ? 'text-bull' : 'text-bear'}>
             {selectionDelta.isPos ? '↑' : '↓'}
@@ -203,12 +203,12 @@ export function StockPriceChart({ ticker }: { ticker: string }) {
           <h2 className="text-lg font-bold text-foreground">{t('title')}</h2>
           <div className="flex items-center gap-3 mt-1">
             <span className="text-3xl font-extrabold tracking-tight text-foreground">
-              ${endPrice.toFixed(2)}
+              {currencySymbol}{endPrice.toFixed(2)}
             </span>
             <div className={`flex items-center gap-2 ${isPositive ? 'text-bull' : 'text-bear'}`}>
               <span className={`flex items-center text-sm font-bold px-2 py-0.5 rounded-md ${isPositive ? 'bg-bull/10' : 'bg-bear/10'}`}>
                 {isPositive ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
-                {isPositive ? '+' : '-'}${Math.abs(changeValue).toFixed(2)} ({Math.abs(changePercent).toFixed(2)}%)
+                {isPositive ? '+' : '-'}{currencySymbol}{Math.abs(changeValue).toFixed(2)} ({Math.abs(changePercent).toFixed(2)}%)
               </span>
             </div>
           </div>
@@ -272,7 +272,7 @@ export function StockPriceChart({ ticker }: { ticker: string }) {
               axisLine={false}
               tickLine={false}
               tick={{ fill: '#888888', fontSize: 12 }}
-              tickFormatter={(val) => `$${val}`}
+              tickFormatter={(val) => `${currencySymbol}${val}`}
               width={60}
               orientation="right"
             />
@@ -285,7 +285,7 @@ export function StockPriceChart({ ticker }: { ticker: string }) {
                         {label != null ? formatTooltipDate(String(label)) : ''}
                       </p>
                       <p className="font-bold text-foreground text-lg">
-                        ${Number(payload[0].value).toFixed(2)}
+                        {currencySymbol}{Number(payload[0].value).toFixed(2)}
                       </p>
                     </div>
                   )

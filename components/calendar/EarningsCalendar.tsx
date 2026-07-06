@@ -285,6 +285,7 @@ function MonthView({ cursor, byDay, loading, todayStr }: ViewProps) {
                   ))}
                   {dayEvents.length > 4 && (
                     <Dialog>
+                      {/* @ts-ignore - shadcn base-ui migration */}
                       <DialogTrigger asChild>
                         <button className="text-[10px] text-muted-foreground px-1 text-left hover:underline w-full mt-0.5">
                           +{dayEvents.length - 4} {t("more")}
@@ -453,6 +454,7 @@ function DayEventCard({ e }: { e: EarningsItem }) {
   
   return (
     <Dialog>
+      {/* @ts-ignore - shadcn base-ui migration */}
       <DialogTrigger asChild>
         <button className="flex items-center gap-3 p-3 rounded-lg border border-border/60 bg-background hover:bg-muted/50 hover:border-border transition-all text-left group">
           {e.logoUrl ? (

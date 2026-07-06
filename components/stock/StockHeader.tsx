@@ -17,7 +17,7 @@ type PriceData = {
   changePercent: number;
 }
 
-export function StockHeader({ company }: { company: CompanyProp }) {
+export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfButton?: React.ReactNode }) {
   const t = useTranslations("stock")
   const locale = useLocale()
   const [priceData, setPriceData] = useState<PriceData | null>(null)
@@ -157,6 +157,9 @@ export function StockHeader({ company }: { company: CompanyProp }) {
                 )}
               </button>
             )}
+
+            {/* PDF Report Button */}
+            {pdfButton}
           </div>
         </div>
       </div>

@@ -100,7 +100,7 @@ export default async function StockPage({
       {/* 2. Fundamentals Snapshot */}
       <div>
         <h2 className="text-xl font-bold tracking-tight mb-4 text-foreground">{t('snapshotTitle')}</h2>
-        <StockSnapshot ticker={company.ticker} fundamentals={fundamentalsToPass} />
+        <StockSnapshot ticker={company.ticker} fundamentals={JSON.parse(JSON.stringify(fundamentalsToPass))} />
       </div>
 
       {/* 3. Price History Chart */}

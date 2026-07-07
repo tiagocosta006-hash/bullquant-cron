@@ -332,6 +332,7 @@ export function StockKPIs({ fundamentals, isPro, ticker }: StockKPIsProps) {
           </div>
 
           <DialogFooter className="sm:justify-between items-center mt-2">
+            {/* @ts-ignore */}
             <DialogClose asChild>
               <Button type="button" variant="ghost">
                 Voltar

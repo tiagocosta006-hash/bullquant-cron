@@ -130,6 +130,8 @@ DURATION_TAGS = {
     "capex": [
         "PaymentsToAcquirePropertyPlantAndEquipment",
         "PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities",
+        "PurchaseOfPropertyPlantAndEquipmentIntangibleAssetsOtherThanGoodwillInvestmentPropertyAndOtherNoncurrentAssets",
+        "PurchaseOfPropertyPlantAndEquipment",
         "PaymentsToAcquireOtherPropertyPlantAndEquipment",
         "PaymentsToAcquirePropertyPlantAndEquipmentAndOtherAssets",
         "PaymentsToAcquireAndDevelopRealEstate",  # REITs: aquisição/desenvolvimento é o "capex"
@@ -415,6 +417,27 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
                         if abs(v) >= 0.5 * max_abs:
                             dur_map[(fy, fp)][field] = v
                             break
+
+    # IFRS Fallback para SG&A (Sales & Marketing + Administrative)
+    for (fy, fp) in periods:
+        if "sellingGeneralAndAdmin" not in dur_map[(fy, fp)]:
+            expected_end = period_ends.get((fy, fp))
+            if expected_end:
+                pool_sales = extract_tag_entries(us_gaap, "SalesAndMarketingExpense")
+                pool_admin = extract_tag_entries(us_gaap, "AdministrativeExpense")
+                
+                if fp == "FY":
+                    pool_s = [e for e in pool_sales if is_annual_duration(e)]
+                    pool_a = [e for e in pool_admin if is_annual_duration(e)]
+                else:
+                    pool_s = [e for e in pool_sales if is_quarterly_duration(e)]
+                    pool_a = [e for e in pool_admin if is_quarterly_duration(e)]
+                    
+                val_s = best_for_period(pool_s, expected_end, prefer_annual_form=(fp == "FY"))
+                val_a = best_for_period(pool_a, expected_end, prefer_annual_form=(fp == "FY"))
+                
+                if val_s is not None or val_a is not None:
+                    dur_map[(fy, fp)]["sellingGeneralAndAdmin"] = (val_s or 0) + (val_a or 0)
 
     # Apply differencing for cash flow metrics
     original_ytd = {}

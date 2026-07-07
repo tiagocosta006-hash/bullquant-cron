@@ -333,7 +333,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
                   <button
                     key={tab}
                     onClick={(e) => { e.stopPropagation(); setRatioTab(tab) }}
-                    className={`px-2 py-1 text-xs font-semibold rounded-sm transition-all ${
+                    className={`px-2 py-1 text-xs font-semibold rounded-sm transition-all whitespace-nowrap shrink-0 ${
                       ratioTab === tab ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >

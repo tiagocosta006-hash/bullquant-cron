@@ -9,15 +9,15 @@ DIRECT_URL = os.environ.get("DIRECT_URL")
 EUROPEAN_CHAMPIONS = [
     # ticker, name, cik, exchange, sector, country, currency
     ("RACE", "Ferrari N.V.", "0001648416", "NYSE", "Consumer Discretionary", "IT", "EUR"),
-    ("ASML", "ASML Holding N.V.", "0000937556", "NASDAQ", "Information Technology", "NL", "EUR"),
+    ("ASML", "ASML Holding N.V.", "0000937966", "NASDAQ", "Information Technology", "NL", "EUR"),
     ("NVO",  "Novo Nordisk A/S", "0000353278", "NYSE", "Health Care", "DK", "DKK"),
-    ("SAP",  "SAP SE", "0000812128", "NYSE", "Information Technology", "DE", "EUR"),
-    ("UL",   "Unilever PLC", "0000101830", "NYSE", "Consumer Staples", "GB", "GBP"),
+    ("SAP",  "SAP SE", "0001000184", "NYSE", "Information Technology", "DE", "EUR"),
+    ("UL",   "Unilever PLC", "0000217410", "NYSE", "Consumer Staples", "GB", "GBP"),
     ("SHEL", "Shell plc", "0001306965", "NYSE", "Energy", "GB", "USD"),
     ("TTE",  "TotalEnergies SE", "0000879764", "NYSE", "Energy", "FR", "USD"),
     ("BTI",  "British American Tobacco", "0001303523", "NYSE", "Consumer Staples", "GB", "GBP"),
     ("NVS",  "Novartis AG", "0001114448", "NYSE", "Health Care", "CH", "USD"),
-    ("SNY",  "Sanofi", "0001123979", "NASDAQ", "Health Care", "FR", "EUR"),
+    ("SNY",  "Sanofi", "0001121404", "NASDAQ", "Health Care", "FR", "EUR"),
     ("GSK",  "GSK plc", "0001131399", "NYSE", "Health Care", "GB", "GBP"),
     ("AZN",  "AstraZeneca PLC", "0000901832", "NASDAQ", "Health Care", "GB", "USD"),
 ]

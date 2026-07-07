@@ -36,12 +36,20 @@ export default async function StockPage({
     notFound()
   }
 
-  // Fetch user to get their saved DCFs
+  // Fetch user to get their saved DCFs and PRO plan status
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  let isPro = false
   let serializedDcfs: SerializedDcfAnalysis[] = []
+  
   if (user) {
+    // Check PRO plan
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    })
+    isPro = dbUser?.plan === 'PRO'
+
     const rawDcfs = await prisma.dcfAnalysis.findMany({
       where: { companyId: company.id, userId: user.id },
       orderBy: { createdAt: 'desc' },
@@ -118,7 +126,7 @@ export default async function StockPage({
       <div>
         <h2 className="text-xl font-bold tracking-tight mb-4 text-foreground">{t('snapshotTitle')}</h2>
         <StockSnapshot ticker={company.ticker} fundamentals={JSON.parse(JSON.stringify(fundamentalsToPass))} currencySymbol={currencySymbol} />
-        <StockKPIs fundamentals={JSON.parse(JSON.stringify(historicalAnnual))} />
+        <StockKPIs fundamentals={JSON.parse(JSON.stringify(historicalAnnual))} isPro={isPro} ticker={company.ticker} />
       </div>
 
       {/* 3. Price History Chart */}

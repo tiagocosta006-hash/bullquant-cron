@@ -1,8 +1,8 @@
 import React from "react";
 
 export const metadata = {
-  title: "Política de Reembolso e Cancelamento | BullQuant",
-  description: "Regras de cancelamento e reembolso para assinaturas na plataforma BullQuant.",
+  title: "Política de Reembolso e Cancelamento | Bullmetrics",
+  description: "Regras de cancelamento e reembolso para assinaturas na plataforma Bullmetrics.",
 };
 
 export default function RefundPolicyPage() {
@@ -17,7 +17,7 @@ export default function RefundPolicyPage() {
           </p>
           <p>
             Esta política estabelece os termos e condições relativos a cancelamentos e reembolsos aplicáveis aos
-            planos de subscrição (Plano PRO) adquiridos na <strong>BullQuant</strong>. Como a faturação é gerida
+            planos de subscrição (Plano PRO) adquiridos na <strong>Bullmetrics</strong>. Como a faturação é gerida
             pelo nosso parceiro integrado <strong>Paddle</strong>, enquanto *Merchant of Record*, aderimos estritamente
             a estes processos padronizados e transparentes.
           </p>
@@ -26,7 +26,7 @@ export default function RefundPolicyPage() {
         <section>
           <h2 className="text-2xl font-bold mb-4">1. Natureza do Serviço e Execução Imediata</h2>
           <p>
-            O Plano PRO da BullQuant é classificado legalmente como <strong>conteúdo digital de execução imediata</strong>.
+            O Plano PRO da Bullmetrics é classificado legalmente como <strong>conteúdo digital de execução imediata</strong>.
             Ao ativar a subscrição, obtém acesso instantâneo aos relatórios avançados gerados por Inteligência Artificial,
             às componentes exclusivas da calculadora DCF, base de dados profunda e sem limitações de uso impostas ao Plano FREE.
             Consequentemente, o consumo do produto digital começa no momento exato em que a transação é confirmada e o
@@ -38,7 +38,7 @@ export default function RefundPolicyPage() {
           <h2 className="text-2xl font-bold mb-4">2. Regra Estrita de Não-Reembolso</h2>
           <p className="mb-4">
             Devido à natureza de consumo imediato de acesso a dados financeiros valiosos, consultas de IA (que comportam
-            custos técnicos de processamento não recuperáveis) e modelos avançados, a BullQuant <strong>não efetua
+            custos técnicos de processamento não recuperáveis) e modelos avançados, a Bullmetrics <strong>não efetua
             reembolsos, devoluções parciais ou créditos</strong> aplicados a períodos de faturação parciais.
           </p>
           <ul className="list-disc pl-6 space-y-2">
@@ -56,7 +56,7 @@ export default function RefundPolicyPage() {
           </p>
           <p className="mb-4 font-semibold">Como Cancelar:</p>
           <ul className="list-decimal pl-6 space-y-2 mb-4">
-            <li>Efetue o login na sua conta BullQuant.</li>
+            <li>Efetue o login na sua conta Bullmetrics.</li>
             <li>Aceda à secção de definições de conta (<strong>Configurações / O Meu Perfil</strong>).</li>
             <li>Navegue até ao painel de Faturação, que conectará diretamente ao portal self-service e seguro do <strong>Paddle</strong>.</li>
             <li>Selecione a opção para cancelar a subscrição ativa.</li>
@@ -75,7 +75,7 @@ export default function RefundPolicyPage() {
           <p>
             Caso seja identificada uma cobrança dupla, erro de sistema no momento do checkout via Paddle,
             ou incapacidade técnica devidamente comprovada em aceder à infraestrutura PRO nas primeiras 48 horas
-            pós-compra (por responsabilidade exclusiva da BullQuant), deverá contactar imediatamente a equipa
+            pós-compra (por responsabilidade exclusiva da Bullmetrics), deverá contactar imediatamente a equipa
             através de <strong>support@bullocracy.com</strong>. Estes casos manifestamente excecionais serão
             revisados num prazo de 3 a 5 dias úteis, e as retificações ou devoluções serão executadas caso
             se confirme o erro de processamento fiduciário.

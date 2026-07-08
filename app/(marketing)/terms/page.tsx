@@ -1,8 +1,8 @@
 import React from "react";
 
 export const metadata = {
-  title: "Termos de Serviço | BullQuant",
-  description: "Termos e Condições de Uso da plataforma BullQuant.",
+  title: "Termos de Serviço | Bullmetrics",
+  description: "Termos e Condições de Uso da plataforma Bullmetrics.",
 };
 
 export default function TermsOfServicePage() {
@@ -16,25 +16,25 @@ export default function TermsOfServicePage() {
             Última atualização: {new Date().toLocaleDateString("pt-PT")}
           </p>
           <p>
-            Bem-vindo ao <strong>BullQuant</strong>. Os presentes Termos de Serviço ("Termos") regulam o seu acesso e utilização
-            da nossa plataforma, serviços e ferramentas. Ao aceder ou utilizar o BullQuant, concorda em ficar vinculado por estes Termos.
+            Bem-vindo ao <strong>Bullmetrics</strong>. Os presentes Termos de Serviço ("Termos") regulam o seu acesso e utilização
+            da nossa plataforma, serviços e ferramentas. Ao aceder ou utilizar o Bullmetrics, concorda em ficar vinculado por estes Termos.
           </p>
         </section>
 
         <section>
           <h2 className="text-2xl font-bold mb-4">1. Natureza do Serviço e Isenção de Responsabilidade</h2>
           <p className="mb-4">
-            A plataforma BullQuant fornece ferramentas analíticas, modelos financeiros interativos (como a calculadora DCF),
+            A plataforma Bullmetrics fornece ferramentas analíticas, modelos financeiros interativos (como a calculadora DCF),
             agregadores de dados históricos baseados em fontes oficiais (como a SEC) e resumos gerados automatizadamente por
             Inteligência Artificial (IA). 
           </p>
           <p className="mb-4 font-semibold text-red-600 dark:text-red-400">
-            AVISO CRUCIAL: O BullQuant é uma ferramenta de natureza estritamente educacional e informativa. NÃO constituímos,
+            AVISO CRUCIAL: O Bullmetrics é uma ferramenta de natureza estritamente educacional e informativa. NÃO constituímos,
             sob qualquer forma, aconselhamento financeiro, recomendação de investimento, intermediação financeira ou gestão
             de património.
           </p>
           <p>
-            A BullQuant não é uma entidade regulada pela Comissão do Mercado de Valores Mobiliários (CMVM) nem por qualquer
+            A Bullmetrics não é uma entidade regulada pela Comissão do Mercado de Valores Mobiliários (CMVM) nem por qualquer
             outra autoridade de supervisão financeira europeia. Qualquer decisão de investimento baseada nos dados, análises,
             ou resumos de IA fornecidos pela plataforma é da sua exclusiva e total responsabilidade. Recomendamos vivamente
             a consulta de um consultor financeiro certificado antes de efetuar qualquer investimento no mercado de capitais.
@@ -44,7 +44,7 @@ export default function TermsOfServicePage() {
         <section>
           <h2 className="text-2xl font-bold mb-4">2. Regras de Subscrição, Faturação e Pagamento</h2>
           <p className="mb-4">
-            O BullQuant opera num modelo "Freemium", disponibilizando um Plano FREE limitado e um Plano PRO pago.
+            O Bullmetrics opera num modelo "Freemium", disponibilizando um Plano FREE limitado e um Plano PRO pago.
           </p>
           <ul className="list-disc pl-6 space-y-2 mb-4">
             <li>
@@ -69,7 +69,7 @@ export default function TermsOfServicePage() {
           <h2 className="text-2xl font-bold mb-4">3. Propriedade Intelectual e Uso Aceitável</h2>
           <p className="mb-4">
             A arquitetura da plataforma, código-fonte, design, logótipos e infraestrutura tecnológica (o "Motor") são
-            propriedade exclusiva do BullQuant. Concorda que, ao utilizar a plataforma, é expressamente <strong>proibido</strong>:
+            propriedade exclusiva do Bullmetrics. Concorda que, ao utilizar a plataforma, é expressamente <strong>proibido</strong>:
           </p>
           <ul className="list-disc pl-6 space-y-2">
             <li>Efetuar engenharia reversa, descompilar, ou desmontar qualquer componente da plataforma.</li>
@@ -77,7 +77,7 @@ export default function TermsOfServicePage() {
             <li>Abusar de forma deliberada das chamadas à nossa infraestrutura de Inteligência Artificial, gerando um volume de pedidos incompatível com o uso humano razoável, com o intuito de causar sobrecarga na plataforma.</li>
           </ul>
           <p className="mt-4">
-            Qualquer violação destas regras de uso aceitável confere ao BullQuant o direito de suspender ou terminar
+            Qualquer violação destas regras de uso aceitável confere ao Bullmetrics o direito de suspender ou terminar
             imediatamente o seu acesso à plataforma, sem aviso prévio ou direito a reembolso.
           </p>
         </section>
@@ -85,11 +85,11 @@ export default function TermsOfServicePage() {
         <section>
           <h2 className="text-2xl font-bold mb-4">4. Inteligência Artificial e Dados Históricos</h2>
           <p>
-            O BullQuant utiliza modelos avançados de Inteligência Artificial para gerar resumos qualitativos (AI Insights).
+            O Bullmetrics utiliza modelos avançados de Inteligência Artificial para gerar resumos qualitativos (AI Insights).
             A IA, pela sua natureza, está sujeita a fenómenos de "alucinação", podendo gerar respostas imprecisas ou falsas.
             Da mesma forma, enquanto envidamos todos os esforços para extrair dados fidedignos e inalterados a partir dos
             relatórios formais da SEC ou agregadores oficiais de preço, anomalias e erros de base de dados podem ocorrer.
-            O utilizador aceita estes riscos tecnológicos e exime o BullQuant de qualquer responsabilidade por eventuais
+            O utilizador aceita estes riscos tecnológicos e exime o Bullmetrics de qualquer responsabilidade por eventuais
             perdas financeiras decorrentes da utilização das informações disponibilizadas.
           </p>
         </section>

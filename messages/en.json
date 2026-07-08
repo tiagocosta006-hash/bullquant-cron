@@ -184,7 +184,7 @@
     "preferences": {
       "title": "App Preferences",
       "language": "Interface Language",
-      "languageDesc": "Choose the language you want to use in BullQuant.",
+      "languageDesc": "Choose the language you want to use in Bullmetrics.",
       "theme": "Visual Theme",
       "themeDesc": "Switch between Dark and Light mode."
     },

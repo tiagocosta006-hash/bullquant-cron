@@ -258,7 +258,7 @@ async function fetchConcept(cik: string, tag: string): Promise<SecUnitEntry[] | 
 async function layerC() {
   if (!SEC_USER_AGENT) {
     add({ layer: 'C-sec', ticker: '-', metric: '-', period: '-', severity: 'INFO',
-      details: 'SEC_USER_AGENT não definido — camada C ignorada. Define-o (ex: "BullQuant dev@exemplo.pt") para cruzar com a SEC.' })
+      details: 'SEC_USER_AGENT não definido — camada C ignorada. Define-o (ex: "Bullmetrics dev@exemplo.pt") para cruzar com a SEC.' })
     return
   }
 

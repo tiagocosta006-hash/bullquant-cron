@@ -31,29 +31,23 @@ export default async function ComparePage({
     notFound()
   }
 
-  // Busca todos os concorrentes diretos (mesma industry)
-  const allPeers = await prisma.company.findMany({
-    where: {
-      industry: baseCompany.industry,
-      ticker: {
-        not: baseCompany.ticker
-      }
-    },
-    orderBy: {
-      name: 'asc'
-    }
-  })
-
-  // Busca os dados fundamentais para a empresa base
-  const baseFundamentals = await prisma.fundamental.findMany({
-    where: {
-      companyId: baseCompany.id,
-      periodType: 'ANNUAL'
-    },
-    orderBy: {
-      periodEnd: 'asc'
-    }
-  })
+  // Paraleliza as queries pesadas e seleciona apenas o necessário para os peers
+  const [allPeers, baseFundamentals] = await Promise.all([
+    prisma.company.findMany({
+      where: {
+        industry: baseCompany.industry,
+        ticker: { not: baseCompany.ticker }
+      },
+      orderBy: { name: 'asc' }
+    }),
+    prisma.fundamental.findMany({
+      where: {
+        companyId: baseCompany.id,
+        periodType: 'ANNUAL'
+      },
+      orderBy: { periodEnd: 'asc' }
+    })
+  ])
 
   // Busca os dados fundamentais dos pares (apenas os necessários para a lista inicial, ou todos se a lista for pequena)
   // Para otimizar, o Dashboard vai fazer o fetch do peer selecionado no lado do cliente, ou passamos tudo de uma vez.

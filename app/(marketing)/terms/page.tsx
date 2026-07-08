@@ -1,42 +1,42 @@
 import React from "react";
 
 export const metadata = {
-  title: "Termos de Serviço | Bullmetrics",
-  description: "Termos e Condições de Uso da plataforma Bullmetrics.",
+  title: "Termos de Serviço | BullMetrics",
+  description: "Termos e Condições de Uso da plataforma BullMetrics.",
 };
 
 export default function TermsOfServicePage() {
   return (
     <div className="container mx-auto px-4 py-16 max-w-4xl text-gray-900 dark:text-gray-100">
       <h1 className="text-4xl font-extrabold tracking-tight mb-8">Termos de Serviço e Condições de Uso</h1>
-      
+
       <div className="space-y-8 leading-relaxed">
         <section>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
             Última atualização: {new Date().toLocaleDateString("pt-PT")}
           </p>
           <p>
-            Bem-vindo ao <strong>Bullmetrics</strong>. Os presentes Termos de Serviço ("Termos") regulam o seu acesso e utilização
-            da nossa plataforma, serviços e ferramentas. Ao aceder ou utilizar o Bullmetrics, concorda em ficar vinculado por estes Termos.
+            Bem-vindo ao <strong>BullMetrics</strong>. Os presentes Termos de Serviço ("Termos") regulam o seu acesso e utilização
+            da nossa plataforma, serviços e ferramentas. Ao aceder ou utilizar o BullMetrics, concorda em ficar vinculado por estes Termos.
           </p>
         </section>
 
         <section>
           <h2 className="text-2xl font-bold mb-4">1. Natureza do Serviço e Isenção de Responsabilidade</h2>
           <p className="mb-4">
-            A plataforma Bullmetrics fornece ferramentas analíticas, modelos financeiros interativos (como a calculadora DCF),
+            A plataforma BullMetrics fornece ferramentas analíticas, modelos financeiros interativos (como a calculadora DCF),
             agregadores de dados históricos baseados em fontes oficiais (como a SEC) e resumos gerados automatizadamente por
-            Inteligência Artificial (IA). 
+            Inteligência Artificial.
           </p>
           <p className="mb-4 font-semibold text-red-600 dark:text-red-400">
-            AVISO CRUCIAL: O Bullmetrics é uma ferramenta de natureza estritamente educacional e informativa. NÃO constituímos,
+            AVISO CRUCIAL: A BullMetrics é uma ferramenta de natureza estritamente educacional e informativa. NÃO constituímos,
             sob qualquer forma, aconselhamento financeiro, recomendação de investimento, intermediação financeira ou gestão
             de património.
           </p>
           <p>
-            A Bullmetrics não é uma entidade regulada pela Comissão do Mercado de Valores Mobiliários (CMVM) nem por qualquer
+            A BullMetrics não é uma entidade regulada pela Comissão do Mercado de Valores Mobiliários (CMVM) nem por qualquer
             outra autoridade de supervisão financeira europeia. Qualquer decisão de investimento baseada nos dados, análises,
-            ou resumos de IA fornecidos pela plataforma é da sua exclusiva e total responsabilidade. Recomendamos vivamente
+            ou resumos de IA fornecidos pela plataforma é da sua exclusiva e total responsabilidade. Recomendamos
             a consulta de um consultor financeiro certificado antes de efetuar qualquer investimento no mercado de capitais.
           </p>
         </section>
@@ -44,7 +44,7 @@ export default function TermsOfServicePage() {
         <section>
           <h2 className="text-2xl font-bold mb-4">2. Regras de Subscrição, Faturação e Pagamento</h2>
           <p className="mb-4">
-            O Bullmetrics opera num modelo "Freemium", disponibilizando um Plano FREE limitado e um Plano PRO pago.
+            A BullMetrics opera através de um modelo "Freemium", disponibilizando um Plano FREE limitado e um Plano PRO pago.
           </p>
           <ul className="list-disc pl-6 space-y-2 mb-4">
             <li>
@@ -69,27 +69,23 @@ export default function TermsOfServicePage() {
           <h2 className="text-2xl font-bold mb-4">3. Propriedade Intelectual e Uso Aceitável</h2>
           <p className="mb-4">
             A arquitetura da plataforma, código-fonte, design, logótipos e infraestrutura tecnológica (o "Motor") são
-            propriedade exclusiva do Bullmetrics. Concorda que, ao utilizar a plataforma, é expressamente <strong>proibido</strong>:
+            propriedade exclusiva da BullMetrics. Concorda que, ao utilizar a plataforma, é expressamente <strong>proibido</strong>:
           </p>
           <ul className="list-disc pl-6 space-y-2">
             <li>Efetuar engenharia reversa, descompilar, ou desmontar qualquer componente da plataforma.</li>
             <li>Utilizar *bots*, *crawlers*, *spiders* ou qualquer ferramenta de extração de dados (*scraping*) para contornar limites, armazenar ou distribuir em massa os dados financeiros e relatórios disponíveis na plataforma.</li>
-            <li>Abusar de forma deliberada das chamadas à nossa infraestrutura de Inteligência Artificial, gerando um volume de pedidos incompatível com o uso humano razoável, com o intuito de causar sobrecarga na plataforma.</li>
-          </ul>
-          <p className="mt-4">
-            Qualquer violação destas regras de uso aceitável confere ao Bullmetrics o direito de suspender ou terminar
-            imediatamente o seu acesso à plataforma, sem aviso prévio ou direito a reembolso.
-          </p>
+            <p className="mt-4">
+              Qualquer violação destas regras de uso aceitável confere à BullMetrics o direito de suspender ou terminar
+              imediatamente o seu acesso à plataforma, sem aviso prévio ou direito a reembolso.
+            </p>
         </section>
 
         <section>
           <h2 className="text-2xl font-bold mb-4">4. Inteligência Artificial e Dados Históricos</h2>
           <p>
-            O Bullmetrics utiliza modelos avançados de Inteligência Artificial para gerar resumos qualitativos (AI Insights).
-            A IA, pela sua natureza, está sujeita a fenómenos de "alucinação", podendo gerar respostas imprecisas ou falsas.
-            Da mesma forma, enquanto envidamos todos os esforços para extrair dados fidedignos e inalterados a partir dos
+            Apesar de fazermos todos os esforços para obter dados fidedignos a partir dos
             relatórios formais da SEC ou agregadores oficiais de preço, anomalias e erros de base de dados podem ocorrer.
-            O utilizador aceita estes riscos tecnológicos e exime o Bullmetrics de qualquer responsabilidade por eventuais
+            O utilizador aceita estes riscos tecnológicos e exime a BullMetrics de qualquer responsabilidade por eventuais
             perdas financeiras decorrentes da utilização das informações disponibilizadas.
           </p>
         </section>

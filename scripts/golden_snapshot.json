@@ -1,0 +1,754 @@
+[
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2025,
+    "end": "2025-09-27",
+    "field": "grossProfit",
+    "tag": "GrossProfit",
+    "secValue": 195201000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2024,
+    "end": "2024-09-28",
+    "field": "grossProfit",
+    "tag": "GrossProfit",
+    "secValue": 180683000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2025,
+    "end": "2025-09-27",
+    "field": "operatingIncome",
+    "tag": "OperatingIncomeLoss",
+    "secValue": 133050000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2024,
+    "end": "2024-09-28",
+    "field": "operatingIncome",
+    "tag": "OperatingIncomeLoss",
+    "secValue": 123216000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2025,
+    "end": "2025-09-27",
+    "field": "netIncome",
+    "tag": "NetIncomeLoss",
+    "secValue": 112010000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2024,
+    "end": "2024-09-28",
+    "field": "netIncome",
+    "tag": "NetIncomeLoss",
+    "secValue": 93736000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2025,
+    "end": "2025-09-27",
+    "field": "operatingCashFlow",
+    "tag": "NetCashProvidedByUsedInOperatingActivities",
+    "secValue": 111482000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2024,
+    "end": "2024-09-28",
+    "field": "operatingCashFlow",
+    "tag": "NetCashProvidedByUsedInOperatingActivities",
+    "secValue": 118254000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2025,
+    "end": "2025-09-27",
+    "field": "capex",
+    "tag": "PaymentsToAcquirePropertyPlantAndEquipment",
+    "secValue": 12715000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2024,
+    "end": "2024-09-28",
+    "field": "capex",
+    "tag": "PaymentsToAcquirePropertyPlantAndEquipment",
+    "secValue": 9447000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2025,
+    "end": "2025-09-27",
+    "field": "totalAssets",
+    "tag": "Assets",
+    "secValue": 359241000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2024,
+    "end": "2024-09-28",
+    "field": "totalAssets",
+    "tag": "Assets",
+    "secValue": 364980000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2025,
+    "end": "2025-09-27",
+    "field": "cash",
+    "tag": "CashAndCashEquivalentsAtCarryingValue",
+    "secValue": 35934000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2024,
+    "end": "2024-09-28",
+    "field": "cash",
+    "tag": "CashAndCashEquivalentsAtCarryingValue",
+    "secValue": 29943000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2025,
+    "end": "2025-09-27",
+    "field": "totalCurrentLiab",
+    "tag": "LiabilitiesCurrent",
+    "secValue": 165631000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2024,
+    "end": "2024-09-28",
+    "field": "totalCurrentLiab",
+    "tag": "LiabilitiesCurrent",
+    "secValue": 176392000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2025,
+    "end": "2025-09-27",
+    "field": "longTermDebt",
+    "tag": "LongTermDebtNoncurrent",
+    "secValue": 78328000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2024,
+    "end": "2024-09-28",
+    "field": "longTermDebt",
+    "tag": "LongTermDebtNoncurrent",
+    "secValue": 85750000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2025,
+    "end": "2025-09-27",
+    "field": "totalEquity",
+    "tag": "StockholdersEquity",
+    "secValue": 73733000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2024,
+    "end": "2024-09-28",
+    "field": "totalEquity",
+    "tag": "StockholdersEquity",
+    "secValue": 56950000000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2025,
+    "end": "2025-09-27",
+    "field": "sharesOutstanding",
+    "tag": "CommonStockSharesOutstanding",
+    "secValue": 14773260000
+  },
+  {
+    "ticker": "AAPL",
+    "fiscalYear": 2024,
+    "end": "2024-09-28",
+    "field": "sharesOutstanding",
+    "tag": "CommonStockSharesOutstanding",
+    "secValue": 15116786000
+  },
+  {
+    "ticker": "JPM",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "revenue",
+    "tag": "Revenues",
+    "secValue": 182447000000
+  },
+  {
+    "ticker": "JPM",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "revenue",
+    "tag": "Revenues",
+    "secValue": 177556000000
+  },
+  {
+    "ticker": "JPM",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "netIncome",
+    "tag": "NetIncomeLoss",
+    "secValue": 57048000000
+  },
+  {
+    "ticker": "JPM",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "netIncome",
+    "tag": "NetIncomeLoss",
+    "secValue": 58471000000
+  },
+  {
+    "ticker": "JPM",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "operatingCashFlow",
+    "tag": "NetCashProvidedByUsedInOperatingActivities",
+    "secValue": -147782000000
+  },
+  {
+    "ticker": "JPM",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "operatingCashFlow",
+    "tag": "NetCashProvidedByUsedInOperatingActivities",
+    "secValue": -42012000000
+  },
+  {
+    "ticker": "JPM",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "totalAssets",
+    "tag": "Assets",
+    "secValue": 4424900000000
+  },
+  {
+    "ticker": "JPM",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "totalAssets",
+    "tag": "Assets",
+    "secValue": 4002814000000
+  },
+  {
+    "ticker": "JPM",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "totalEquity",
+    "tag": "StockholdersEquity",
+    "secValue": 362438000000
+  },
+  {
+    "ticker": "JPM",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "totalEquity",
+    "tag": "StockholdersEquity",
+    "secValue": 344758000000
+  },
+  {
+    "ticker": "JPM",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "sharesOutstanding",
+    "tag": "CommonStockSharesOutstanding",
+    "secValue": 2696200000
+  },
+  {
+    "ticker": "JPM",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "sharesOutstanding",
+    "tag": "CommonStockSharesOutstanding",
+    "secValue": 2797600000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2025,
+    "end": "2025-06-30",
+    "field": "grossProfit",
+    "tag": "GrossProfit",
+    "secValue": 193893000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2024,
+    "end": "2024-06-30",
+    "field": "grossProfit",
+    "tag": "GrossProfit",
+    "secValue": 171008000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2025,
+    "end": "2025-06-30",
+    "field": "operatingIncome",
+    "tag": "OperatingIncomeLoss",
+    "secValue": 128528000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2024,
+    "end": "2024-06-30",
+    "field": "operatingIncome",
+    "tag": "OperatingIncomeLoss",
+    "secValue": 109433000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2025,
+    "end": "2025-06-30",
+    "field": "netIncome",
+    "tag": "NetIncomeLoss",
+    "secValue": 101832000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2024,
+    "end": "2024-06-30",
+    "field": "netIncome",
+    "tag": "NetIncomeLoss",
+    "secValue": 88136000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2025,
+    "end": "2025-06-30",
+    "field": "operatingCashFlow",
+    "tag": "NetCashProvidedByUsedInOperatingActivities",
+    "secValue": 136162000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2024,
+    "end": "2024-06-30",
+    "field": "operatingCashFlow",
+    "tag": "NetCashProvidedByUsedInOperatingActivities",
+    "secValue": 118548000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2025,
+    "end": "2025-06-30",
+    "field": "capex",
+    "tag": "PaymentsToAcquirePropertyPlantAndEquipment",
+    "secValue": 64551000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2024,
+    "end": "2024-06-30",
+    "field": "capex",
+    "tag": "PaymentsToAcquirePropertyPlantAndEquipment",
+    "secValue": 44477000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2025,
+    "end": "2025-06-30",
+    "field": "totalAssets",
+    "tag": "Assets",
+    "secValue": 619003000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2024,
+    "end": "2024-06-30",
+    "field": "totalAssets",
+    "tag": "Assets",
+    "secValue": 512163000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2025,
+    "end": "2025-06-30",
+    "field": "cash",
+    "tag": "CashAndCashEquivalentsAtCarryingValue",
+    "secValue": 30242000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2024,
+    "end": "2024-06-30",
+    "field": "cash",
+    "tag": "CashAndCashEquivalentsAtCarryingValue",
+    "secValue": 18315000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2025,
+    "end": "2025-06-30",
+    "field": "totalCurrentLiab",
+    "tag": "LiabilitiesCurrent",
+    "secValue": 141218000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2024,
+    "end": "2024-06-30",
+    "field": "totalCurrentLiab",
+    "tag": "LiabilitiesCurrent",
+    "secValue": 125286000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2025,
+    "end": "2025-06-30",
+    "field": "longTermDebt",
+    "tag": "LongTermDebtNoncurrent",
+    "secValue": 40152000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2024,
+    "end": "2024-06-30",
+    "field": "longTermDebt",
+    "tag": "LongTermDebtNoncurrent",
+    "secValue": 42688000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2025,
+    "end": "2025-06-30",
+    "field": "totalEquity",
+    "tag": "StockholdersEquity",
+    "secValue": 343479000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2024,
+    "end": "2024-06-30",
+    "field": "totalEquity",
+    "tag": "StockholdersEquity",
+    "secValue": 268477000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2025,
+    "end": "2025-06-30",
+    "field": "sharesOutstanding",
+    "tag": "CommonStockSharesOutstanding",
+    "secValue": 7434000000
+  },
+  {
+    "ticker": "MSFT",
+    "fiscalYear": 2024,
+    "end": "2024-06-30",
+    "field": "sharesOutstanding",
+    "tag": "CommonStockSharesOutstanding",
+    "secValue": 7434000000
+  },
+  {
+    "ticker": "O",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "revenue",
+    "tag": "Revenues",
+    "secValue": 5749377000
+  },
+  {
+    "ticker": "O",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "revenue",
+    "tag": "Revenues",
+    "secValue": 5271142000
+  },
+  {
+    "ticker": "O",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "netIncome",
+    "tag": "NetIncomeLoss",
+    "secValue": 1058590000
+  },
+  {
+    "ticker": "O",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "netIncome",
+    "tag": "NetIncomeLoss",
+    "secValue": 860772000
+  },
+  {
+    "ticker": "O",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "operatingCashFlow",
+    "tag": "NetCashProvidedByUsedInOperatingActivities",
+    "secValue": 3994754000
+  },
+  {
+    "ticker": "O",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "operatingCashFlow",
+    "tag": "NetCashProvidedByUsedInOperatingActivities",
+    "secValue": 3573276000
+  },
+  {
+    "ticker": "O",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "totalAssets",
+    "tag": "Assets",
+    "secValue": 72795612000
+  },
+  {
+    "ticker": "O",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "totalAssets",
+    "tag": "Assets",
+    "secValue": 68835039000
+  },
+  {
+    "ticker": "O",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "cash",
+    "tag": "CashAndCashEquivalentsAtCarryingValue",
+    "secValue": 434842000
+  },
+  {
+    "ticker": "O",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "cash",
+    "tag": "CashAndCashEquivalentsAtCarryingValue",
+    "secValue": 444962000
+  },
+  {
+    "ticker": "O",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "totalEquity",
+    "tag": "StockholdersEquity",
+    "secValue": 39438695000
+  },
+  {
+    "ticker": "O",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "totalEquity",
+    "tag": "StockholdersEquity",
+    "secValue": 38840738000
+  },
+  {
+    "ticker": "O",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "sharesOutstanding",
+    "tag": "CommonStockSharesOutstanding",
+    "secValue": 933975000
+  },
+  {
+    "ticker": "O",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "sharesOutstanding",
+    "tag": "CommonStockSharesOutstanding",
+    "secValue": 891511000
+  },
+  {
+    "ticker": "SPG",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "revenue",
+    "tag": "Revenues",
+    "secValue": 6364505000
+  },
+  {
+    "ticker": "SPG",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "revenue",
+    "tag": "Revenues",
+    "secValue": 5963798000
+  },
+  {
+    "ticker": "SPG",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "operatingIncome",
+    "tag": "OperatingIncomeLoss",
+    "secValue": 3175396000
+  },
+  {
+    "ticker": "SPG",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "operatingIncome",
+    "tag": "OperatingIncomeLoss",
+    "secValue": 3092796000
+  },
+  {
+    "ticker": "SPG",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "operatingCashFlow",
+    "tag": "NetCashProvidedByUsedInOperatingActivities",
+    "secValue": 4136551000
+  },
+  {
+    "ticker": "SPG",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "operatingCashFlow",
+    "tag": "NetCashProvidedByUsedInOperatingActivities",
+    "secValue": 3814655000
+  },
+  {
+    "ticker": "SPG",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "capex",
+    "tag": "PaymentsToAcquireProductiveAssets",
+    "secValue": 934346000
+  },
+  {
+    "ticker": "SPG",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "capex",
+    "tag": "PaymentsToAcquireProductiveAssets",
+    "secValue": 755584000
+  },
+  {
+    "ticker": "SPG",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "totalAssets",
+    "tag": "Assets",
+    "secValue": 40606466000
+  },
+  {
+    "ticker": "SPG",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "totalAssets",
+    "tag": "Assets",
+    "secValue": 32405691000
+  },
+  {
+    "ticker": "SPG",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "cash",
+    "tag": "CashAndCashEquivalentsAtCarryingValue",
+    "secValue": 823147000
+  },
+  {
+    "ticker": "SPG",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "cash",
+    "tag": "CashAndCashEquivalentsAtCarryingValue",
+    "secValue": 1400345000
+  },
+  {
+    "ticker": "SPG",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "totalEquity",
+    "tag": "StockholdersEquity",
+    "secValue": 5208268000
+  },
+  {
+    "ticker": "SPG",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "totalEquity",
+    "tag": "StockholdersEquity",
+    "secValue": 2941925000
+  },
+  {
+    "ticker": "WFC",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "netIncome",
+    "tag": "NetIncomeLoss",
+    "secValue": 21338000000
+  },
+  {
+    "ticker": "WFC",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "netIncome",
+    "tag": "NetIncomeLoss",
+    "secValue": 19722000000
+  },
+  {
+    "ticker": "WFC",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "operatingCashFlow",
+    "tag": "NetCashProvidedByUsedInOperatingActivities",
+    "secValue": -19001000000
+  },
+  {
+    "ticker": "WFC",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "operatingCashFlow",
+    "tag": "NetCashProvidedByUsedInOperatingActivities",
+    "secValue": 3035000000
+  },
+  {
+    "ticker": "WFC",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "totalAssets",
+    "tag": "Assets",
+    "secValue": 2148631000000
+  },
+  {
+    "ticker": "WFC",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "totalAssets",
+    "tag": "Assets",
+    "secValue": 1929845000000
+  },
+  {
+    "ticker": "WFC",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "totalEquity",
+    "tag": "StockholdersEquity",
+    "secValue": 181117000000
+  },
+  {
+    "ticker": "WFC",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "totalEquity",
+    "tag": "StockholdersEquity",
+    "secValue": 179120000000
+  },
+  {
+    "ticker": "WFC",
+    "fiscalYear": 2025,
+    "end": "2025-12-31",
+    "field": "sharesOutstanding",
+    "tag": "CommonStockSharesOutstanding",
+    "secValue": 3092600000
+  },
+  {
+    "ticker": "WFC",
+    "fiscalYear": 2024,
+    "end": "2024-12-31",
+    "field": "sharesOutstanding",
+    "tag": "CommonStockSharesOutstanding",
+    "secValue": 3288900000
+  }
+]

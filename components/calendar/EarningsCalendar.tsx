@@ -37,6 +37,59 @@ const endOfMonth = (d: Date) => new Date(d.getFullYear(), d.getMonth() + 1, 0)
 const addDays = (d: Date, days: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + days)
 const addMonths = (d: Date, m: number) => new Date(d.getFullYear(), d.getMonth() + m, d.getDate())
 
+// ─────────────────────────────────────────────────────────────
+// DEV DEMO: dados ilustrativos para ver o calendário sem BD/ingest.
+// Só ativa em `next dev` (NODE_ENV !== production) e só quando a API
+// não devolve nada. Em produção, ou com dados reais, isto nunca corre.
+// ─────────────────────────────────────────────────────────────
+const DEMO_TICKERS = [
+  { ticker: "AAPL", name: "Apple Inc." },
+  { ticker: "MSFT", name: "Microsoft Corp." },
+  { ticker: "GOOGL", name: "Alphabet Inc." },
+  { ticker: "AMZN", name: "Amazon.com Inc." },
+  { ticker: "NVDA", name: "NVIDIA Corp." },
+  { ticker: "META", name: "Meta Platforms Inc." },
+  { ticker: "TSLA", name: "Tesla Inc." },
+  { ticker: "JPM", name: "JPMorgan Chase & Co." },
+  { ticker: "V", name: "Visa Inc." },
+  { ticker: "KO", name: "The Coca-Cola Company" },
+  { ticker: "WMT", name: "Walmart Inc." },
+  { ticker: "O", name: "Realty Income Corp." },
+]
+
+function makeDemoEvents(monthStart: Date): EarningsItem[] {
+  const year = monthStart.getFullYear()
+  const month = monthStart.getMonth()
+  const daysInMonth = endOfMonth(monthStart).getDate()
+  const todayStr = fmtDate(new Date())
+  const hours: EarningsItem["hour"][] = ["BMO", "AMC", "AMC", "BMO"]
+  const picks = [3, 6, 6, 9, 13, 16, 20, 23, 27, 29]
+
+  return picks.map((dayNum, i) => {
+    const day = Math.min(dayNum, daysInMonth)
+    const date = new Date(year, month, day)
+    const dateStr = fmtDate(date)
+    const co = DEMO_TICKERS[i % DEMO_TICKERS.length]
+    const reported = dateStr < todayStr
+    const epsEstimate = 0.8 + (i % 5) * 0.35
+    const epsActual = reported ? epsEstimate + (i % 2 === 0 ? 0.12 : -0.07) : null
+    return {
+      id: `demo-${dateStr}-${co.ticker}`,
+      date: dateStr,
+      hour: hours[i % hours.length],
+      fiscalYear: year,
+      fiscalQuarter: Math.floor(month / 3) + 1,
+      epsEstimate,
+      epsActual,
+      revenueEstimate: null,
+      revenueActual: null,
+      ticker: co.ticker,
+      name: co.name,
+      logoUrl: null,
+    }
+  })
+}
+
 export function EarningsCalendar() {
   const t = useTranslations("calendar")
   const [cursor, setCursor] = useState(() => new Date())
@@ -56,12 +109,14 @@ export function EarningsCalendar() {
       setLoading(true)
       const params = new URLSearchParams({ from: fmtDate(monthStart), to: fmtDate(monthEnd) })
       if (scope === "watchlist") params.set("watchlist", "1")
+      const isDev = process.env.NODE_ENV !== "production"
       try {
         const res = await fetch(`/api/earnings?${params.toString()}`)
         const data: EarningsItem[] = res.ok ? await res.json() : []
-        if (active) setEvents(Array.isArray(data) ? data : [])
+        const real = Array.isArray(data) ? data : []
+        if (active) setEvents(real.length === 0 && isDev ? makeDemoEvents(monthStart) : real)
       } catch {
-        if (active) setEvents([])
+        if (active) setEvents(isDev ? makeDemoEvents(monthStart) : [])
       } finally {
         if (active) setLoading(false)
       }

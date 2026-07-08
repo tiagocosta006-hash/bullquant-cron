@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils"
 
 /** Inputs guardados em unidades absolutas / decimais (convenção do motor DCF). */
 export type SavedDcfInputs = {
+  fcfMode?: "FCFF" | "FCFE" | null
   fcf0: number
   growthStage1: number
   growthStage2: number

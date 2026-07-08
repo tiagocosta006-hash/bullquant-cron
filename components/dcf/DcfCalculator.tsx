@@ -8,9 +8,11 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useDebounce } from "@/hooks/useDebounce"
 import { runDcf, solveReverseDcf, type DcfInputs } from "@/lib/finance/dcf"
+import { computeWacc, type WaccBreakdown } from "@/lib/finance/wacc"
 import { DcfResults } from "./DcfResults"
 import { Slider } from "./Slider"
 import { SavedAnalyses, type SavedAnalysis } from "./SavedAnalyses"
+import { WaccBreakdownCard } from "./WaccBreakdown"
 
 type SearchResult = {
   ticker: string
@@ -19,15 +21,28 @@ type SearchResult = {
   logoUrl: string | null
 }
 
+type FcfSourceRecord = {
+  fiscalYear: number
+  operatingCashFlow: number | null
+  capex: number | null
+  interestExpense: number | null
+  taxExpense: number | null
+  operatingIncome: number | null
+}
+
 type DcfDataResponse = {
   ticker: string
   name: string
   currency: string
-  fcf0: number | null
+  fcfe0: number | null
+  fcff0: number | null
+  effectiveTaxRate: number
   shares: number | null
   netDebt: number | null
   currentPrice: number | null
+  beta: number | null
   suggestedGrowth: number | null
+  annualFcfSeries: FcfSourceRecord[]
 }
 
 const MILLION = 1_000_000
@@ -59,6 +74,10 @@ export function DcfCalculator() {
   const [growth2, setGrowth2] = React.useState(DEFAULTS.growth2)
   const [wacc, setWacc] = React.useState(DEFAULTS.wacc)
   const [terminalGrowth, setTerminalGrowth] = React.useState(DEFAULTS.terminalGrowth)
+  const [fcfMode, setFcfMode] = React.useState<"FCFF" | "FCFE">("FCFF")
+  const [annualFcfSeries, setAnnualFcfSeries] = React.useState<FcfSourceRecord[]>([])
+  const [beta, setBeta] = React.useState<number | null>(null)
+  const [waccBreakdown, setWaccBreakdown] = React.useState<WaccBreakdown | null>(null)
 
   // --- autopreencher (pesquisa) ---
   const [query, setQuery] = React.useState("")
@@ -118,14 +137,37 @@ export function DcfCalculator() {
       setCurrency(data.currency === "EUR" ? "€" : "$")
       setLoadedName(data.name)
       setLoadedTicker(ticker.toUpperCase())
+      setAnnualFcfSeries(data.annualFcfSeries)
+      setFcfMode("FCFF") // default, pode ser alterado depois
       if (data.currentPrice != null) setCurrentPrice(round2(data.currentPrice))
-      if (data.fcf0 != null) setFcf0M(round2(data.fcf0 / MILLION))
+      // Usar fcff0 (com fallback fcfe0 se FCFF derivado for nulo)
+      const baseFcf = data.fcff0 ?? data.fcfe0
+      if (baseFcf != null) setFcf0M(round2(baseFcf / MILLION))
       if (data.shares != null) setSharesM(round2(data.shares / MILLION))
       if (data.netDebt != null) setNetDebtM(round2(data.netDebt / MILLION))
       if (data.suggestedGrowth != null) {
         const g = round2(data.suggestedGrowth * 100)
         setGrowth1(g)
         setGrowth2(round2(g / 2))
+      }
+
+      // Calcular WACC via CAPM se temos beta
+      setBeta(data.beta)
+      if (data.beta != null && data.currentPrice != null && data.shares != null) {
+        const breakdown = computeWacc({
+          beta: data.beta,
+          currentPrice: data.currentPrice,
+          shares: data.shares,
+          netDebt: data.netDebt ?? 0,
+          interestExpense: null, // será derivado depois se necessário
+          effectiveTaxRate: data.effectiveTaxRate,
+        })
+        setWaccBreakdown(breakdown)
+        if (breakdown) {
+          setWacc(round2(breakdown.wacc * 100))
+        }
+      } else {
+        setWaccBreakdown(null)
       }
     } catch {
       setLoadError(t("loadError"))
@@ -145,9 +187,10 @@ export function DcfCalculator() {
       shares: sharesM * MILLION,
       netDebt: netDebtM * MILLION,
       currentPrice,
+      mode: fcfMode,
     }
     return runDcf(inputs)
-  }, [fcf0M, growth1, growth2, wacc, terminalGrowth, sharesM, netDebtM, currentPrice])
+  }, [fcf0M, growth1, growth2, wacc, terminalGrowth, sharesM, netDebtM, currentPrice, fcfMode])
 
   // Valores atuais a guardar (unidades absolutas / decimais).
   const currentForSave = React.useMemo(() => {
@@ -161,12 +204,13 @@ export function DcfCalculator() {
         terminalGrowth: terminalGrowth / 100,
         shares: sharesM * MILLION,
         netDebt: netDebtM * MILLION,
+        fcfMode,
       },
       fairValue: result.fairValue,
       currentPrice,
       marginOfSafety: result.marginOfSafety,
     }
-  }, [result, fcf0M, growth1, growth2, wacc, terminalGrowth, sharesM, netDebtM, currentPrice])
+  }, [result, fcf0M, growth1, growth2, wacc, terminalGrowth, sharesM, netDebtM, currentPrice, fcfMode])
 
   // Aplicar uma análise guardada de volta aos inputs.
   const handleLoadSaved = (a: SavedAnalysis) => {
@@ -177,24 +221,34 @@ export function DcfCalculator() {
     setGrowth2(round2(a.growthStage2 * 100))
     setWacc(round2(a.wacc * 100))
     setTerminalGrowth(round2(a.terminalGrowth * 100))
+    setFcfMode(a.fcfMode ?? "FCFF")
     if (a.priceAtSave != null) setCurrentPrice(round2(a.priceAtSave))
   }
 
   // Resolver Crescimento Implícito (Reverse DCF)
   const handleReverseDcf = () => {
     if (currentPrice <= 0 || fcf0M <= 0 || sharesM <= 0) return
-    const implied = solveReverseDcf({
-      fcf0: fcf0M * MILLION,
-      wacc: wacc / 100,
-      terminalGrowth: terminalGrowth / 100,
-      shares: sharesM * MILLION,
-      netDebt: netDebtM * MILLION,
-      currentPrice,
-    })
+    const implied = solveReverseDcf(
+      {
+        fcf0: fcf0M * MILLION,
+        wacc: wacc / 100,
+        terminalGrowth: terminalGrowth / 100,
+        shares: sharesM * MILLION,
+        netDebt: netDebtM * MILLION,
+        currentPrice,
+      },
+      // Limites do slider growth1 (a restrição vinculativa: growth2 = growth1/2
+      // fica sempre dentro do seu próprio range -10/20 quando growth1 respeita -10/30).
+      { minGrowth: -0.10, maxGrowth: 0.30 }
+    )
     if (implied) {
       setGrowth1(round2(implied.impliedGrowth1 * 100))
       setGrowth2(round2(implied.impliedGrowth2 * 100))
     }
+  }
+
+  const handleUseWacc = (suggestedWacc: number) => {
+    setWacc(round2(suggestedWacc * 100))
   }
 
   return (
@@ -286,6 +340,26 @@ export function DcfCalculator() {
           />
         </div>
 
+        {/* Toggle FCFF/FCFE */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium text-muted-foreground">{t("fcfMode") || "FCF Base"}:</span>
+          <div className="flex gap-1 bg-muted/50 rounded-lg p-1">
+            {["FCFF", "FCFE"].map((mode) => (
+              <button
+                key={mode}
+                onClick={() => setFcfMode(mode as "FCFF" | "FCFE")}
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                  fcfMode === mode
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {mode}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Sliders */}
         <div className="space-y-5 pt-2">
           <div className="flex items-center justify-end">
@@ -313,14 +387,14 @@ export function DcfCalculator() {
             display={(v) => `${v.toFixed(1)}%`}
           />
           <Slider
-            label={t("wacc")}
+            label={t("wacc.label")}
             value={wacc}
             onChange={setWacc}
             min={4}
             max={15}
             step={0.25}
             display={(v) => `${v.toFixed(2)}%`}
-            hint={t("waccHint")}
+            hint={t("wacc.hint")}
           />
           <Slider
             label={t("terminalGrowth")}
@@ -337,7 +411,8 @@ export function DcfCalculator() {
 
       {/* ── Painel direito: resultados ── */}
       <div className="space-y-4 lg:sticky lg:top-6 self-start">
-        <DcfResults result={result} currency={currency} />
+        <DcfResults result={result} currency={currency} mode={fcfMode} />
+        <WaccBreakdownCard breakdown={waccBreakdown} onUseWacc={handleUseWacc} />
         <SavedAnalyses
           ticker={loadedTicker}
           currency={currency}

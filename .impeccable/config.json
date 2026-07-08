@@ -1,0 +1,16 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [
+      "app/(app)/dashboard/DashboardClient.tsx"
+    ],
+    "ignoreValues": [
+      {
+        "rule": "design-system-color",
+        "value": "#888888",
+        "reason": "Already used identically in components/stock/StockPriceChart.tsx for Recharts axis tick color; consistent with existing pattern, not new drift",
+        "createdAt": "2026-07-07T17:52:12.004Z"
+      }
+    ]
+  }
+}

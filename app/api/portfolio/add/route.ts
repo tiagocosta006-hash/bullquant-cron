@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { createClient } from "@/lib/supabase/server"
+import { mergePosition } from "@/lib/finance/portfolio"
 
 export async function POST(request: Request) {
   try {
@@ -12,10 +13,15 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { ticker } = body
+    const { ticker, quantity, avgBuyPrice } = body
 
     if (!ticker) {
       return NextResponse.json({ error: "Ticker is required" }, { status: 400 })
+    }
+
+    const hasPosition = quantity !== undefined && avgBuyPrice !== undefined
+    if (hasPosition && (!(quantity > 0) || !(avgBuyPrice > 0))) {
+      return NextResponse.json({ error: "quantity and avgBuyPrice must be positive numbers" }, { status: 400 })
     }
 
     // Find the company
@@ -37,6 +43,28 @@ export async function POST(request: Request) {
       }
     })
 
+    const existing = await prisma.portfolioItem.findUnique({
+      where: {
+        portfolioId_companyId: {
+          portfolioId: portfolio.id,
+          companyId: company.id
+        }
+      }
+    })
+
+    // Se já existe posição (própria ou vinda desta chamada), funde por média ponderada.
+    let positionFields: { quantity?: number; avgBuyPrice?: number } = {}
+    if (hasPosition) {
+      if (existing?.quantity && existing?.avgBuyPrice) {
+        positionFields = mergePosition(
+          { quantity: Number(existing.quantity), avgBuyPrice: Number(existing.avgBuyPrice) },
+          { quantity, avgBuyPrice }
+        )
+      } else {
+        positionFields = { quantity, avgBuyPrice }
+      }
+    }
+
     // Add to portfolio using upsert to prevent race conditions (double-click)
     const item = await prisma.portfolioItem.upsert({
       where: {
@@ -45,10 +73,11 @@ export async function POST(request: Request) {
           companyId: company.id
         }
       },
-      update: {},
+      update: hasPosition ? positionFields : {},
       create: {
         portfolioId: portfolio.id,
-        companyId: company.id
+        companyId: company.id,
+        ...positionFields,
       }
     })
 

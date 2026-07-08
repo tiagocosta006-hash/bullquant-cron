@@ -73,13 +73,16 @@
       "transcriptsDesc": "Transcrições das calls de resultados trimestrais"
     },
     "tabs": {
-      "sp500": "S&P 500",
-      "trending": "Em Destaque",
-      "growth": "Crescimento",
-      "dividend": "Dividendos",
-      "buyback": "Recompras",
-      "ai": "Inteligência Artificial"
-    }
+      "marketCap": "Maior Capitalização",
+      "gainers": "Maiores Subidas",
+      "losers": "Maiores Descidas",
+      "sp500": "S&P 500"
+    },
+    "sectorFilter": {
+      "all": "Todos os setores"
+    },
+    "eodNotice": "Capitalização e variação com base no fecho do último dia útil — não é tempo real.",
+    "loadMore": "Carregar mais"
   },
   "sidebar": {
     "dashboard": "Dashboard",
@@ -215,7 +218,104 @@
       "createAccount": "Criar Conta Grátis"
     },
     "card": {
-      "currentPrice": "Preço Atual"
+      "currentPrice": "Preço Atual",
+      "remove": "Remover da Watchlist"
+    },
+    "table": {
+      "company": "Empresa",
+      "sector": "Setor",
+      "roic": "ROIC",
+      "grossMargin": "Margem Bruta",
+      "change": "Variação",
+      "pnl": "Ganho/Perda",
+      "action": "Ação"
+    },
+    "toolbar": {
+      "sortBy": "Ordenar por",
+      "sort": {
+        "addedAt": "Adicionado recentemente",
+        "name": "Nome (A-Z)",
+        "changePercent": "Maior variação",
+        "sector": "Setor"
+      },
+      "allSectors": "Todos os setores",
+      "gridView": "Vista em grelha",
+      "tableView": "Vista em tabela"
+    },
+    "position": {
+      "shares": "ações",
+      "avgCost": "custo médio",
+      "pnl": "Ganho/Perda"
+    },
+    "summary": {
+      "marketValue": "Valor de Mercado",
+      "totalPnl": "Ganho/Perda Total",
+      "watchlistOnly": "Adiciona quantidade e preço de compra às tuas posições para veres o valor de mercado e o ganho/perda."
+    },
+    "valueChart": {
+      "title": "Evolução do Portfólio",
+      "approximationTooltip": "Estimativa baseada na quantidade atual de cada posição aplicada aos preços históricos — não reflete o histórico real de compras/vendas.",
+      "noData": "Sem dados suficientes para mostrar a evolução.",
+      "tabs": {
+        "1m": "1M",
+        "6m": "6M",
+        "1y": "1A",
+        "max": "Máx"
+      }
+    },
+    "allocation": {
+      "title": "Alocação por Setor",
+      "unknownSector": "Setor desconhecido",
+      "barsView": "Vista em barras",
+      "donutView": "Vista circular"
+    },
+    "manage": {
+      "title": "Adicionar ou sincronizar posições",
+      "importCsv": "Importar CSV"
+    },
+    "import": {
+      "trigger": "Importar Portfólio",
+      "title": "Importar Portfólio",
+      "close": "Fechar",
+      "description": "Carrega um ficheiro CSV exportado da tua corretora com o ticker, quantidade e preço médio de compra de cada posição.",
+      "chooseFile": "Escolher ficheiro CSV",
+      "emptyFile": "O ficheiro está vazio ou não foi possível lê-lo.",
+      "parseError": "Não foi possível processar o ficheiro. Confirma que é um CSV válido.",
+      "submitError": "Não foi possível importar o portfólio. Tenta novamente.",
+      "mapDescription": "Indica a que corresponde cada coluna do teu ficheiro:",
+      "columns": {
+        "ignore": "Ignorar",
+        "ticker": "Ticker",
+        "quantity": "Quantidade",
+        "avgBuyPrice": "Preço médio de compra"
+      },
+      "moreRows": "+ {count} linhas não mostradas",
+      "mapIncomplete": "Seleciona as colunas de ticker, quantidade e preço médio para continuar.",
+      "back": "Voltar",
+      "confirmImport": "Importar {count} linhas",
+      "status": {
+        "added": "Adicionado",
+        "merged": "Fundido com posição existente",
+        "unsupported": "Empresa não suportada",
+        "invalid": "Linha inválida"
+      },
+      "done": "Concluído"
+    },
+    "trading212": {
+      "connectTrigger": "Ligar à Trading212",
+      "connectDescription": "Liga a tua conta Trading212 (Invest ou Stocks ISA) para sincronizar automaticamente as tuas posições. Gera uma API Key em Settings → API na app da Trading212.",
+      "apiKeyPlaceholder": "API Key",
+      "apiSecretPlaceholder": "API Secret",
+      "cancel": "Cancelar",
+      "connectSubmit": "Ligar",
+      "invalidCredentials": "API Key ou Secret inválidos.",
+      "connectError": "Não foi possível ligar à Trading212. Tenta novamente.",
+      "connectedLabel": "Ligado à Trading212",
+      "syncNow": "Sincronizar agora",
+      "disconnect": "Desligar",
+      "lastSynced": "Última sincronização:",
+      "syncSummary": "{synced} posições sincronizadas, {unsupported} não suportadas.",
+      "syncError": "Não foi possível sincronizar com a Trading212."
     },
     "lastUpdate": "Última atualização:"
   },
@@ -292,6 +392,7 @@
   },
   "dcf": {
     "title": "Calculadora DCF",
+    "mode": "Método",
     "subtitle": "Estima o valor intrínseco de uma empresa pelo método dos fluxos de caixa descontados.",
     "educationalWarning": "Um DCF é um modelo, não uma bola de cristal. O resultado é extremamente sensível aos pressupostos de crescimento e à taxa de desconto (WACC). Usa-o como uma de várias ferramentas de análise — nunca como conselho de investimento.",
     "autofillLabel": "Autopreencher a partir de uma empresa",
@@ -300,13 +401,30 @@
     "loadError": "Não foi possível carregar os dados desta empresa.",
     "currentPriceInput": "Preço Atual",
     "fcf0": "FCF Inicial",
+    "fcfMode": "Metodologia",
     "shares": "Nº de Ações",
     "netDebt": "Dívida Líquida",
     "millionsSuffix": "Milhões",
     "growth1": "Crescimento Anos 1-5",
     "growth2": "Crescimento Anos 6-10",
-    "wacc": "WACC (Taxa de Desconto)",
-    "waccHint": "Retorno exigido. Quanto maior, mais conservador o valor.",
+    "wacc": {
+      "label": "WACC (Taxa de Desconto)",
+      "hint": "Retorno exigido. Quanto maior, mais conservador o valor.",
+      "suggested": "WACC Sugerido (CAPM)",
+      "useButton": "Usar",
+      "breakdownTitle": "Breakdown",
+      "costOfEquity": "Custo do Capital Próprio",
+      "riskFreeRate": "Rf (Taxa Sem Risco)",
+      "beta": "Beta",
+      "equityRiskPremium": "ERP (Prémio de Risco)",
+      "costOfDebt": "Custo da Dívida",
+      "costOfDebtLabel": "Rd (Pré-imposto)",
+      "taxRate": "Taxa de Imposto",
+      "capitalStructure": "Estrutura de Capital",
+      "weightEquity": "Peso do Equity",
+      "weightDebt": "Peso da Dívida",
+      "betaUnavailable": "Beta não disponível — preenche o WACC manualmente"
+    },
     "terminalGrowth": "Crescimento Perpétuo",
     "terminalGrowthHint": "Crescimento a longo prazo após o ano 10 (tipicamente ≤ inflação).",
     "reverseDcf": "Calcular Crescimento Implícito (Reverse DCF)",

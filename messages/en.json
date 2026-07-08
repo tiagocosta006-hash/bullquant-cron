@@ -73,13 +73,16 @@
       "transcriptsDesc": "Quarterly earnings call transcripts"
     },
     "tabs": {
-      "sp500": "S&P 500",
-      "trending": "Most Trending",
-      "growth": "Growth",
-      "dividend": "Dividend Growth",
-      "buyback": "Buyback Machines",
-      "ai": "Artificial Intelligence"
-    }
+      "marketCap": "Largest Market Cap",
+      "gainers": "Top Gainers",
+      "losers": "Top Losers",
+      "sp500": "S&P 500"
+    },
+    "sectorFilter": {
+      "all": "All sectors"
+    },
+    "eodNotice": "Market cap and change based on the last trading day's close — not real-time.",
+    "loadMore": "Load more"
   },
   "sidebar": {
     "dashboard": "Dashboard",
@@ -219,7 +222,104 @@
       "createAccount": "Create Free Account"
     },
     "card": {
-      "currentPrice": "Current Price"
+      "currentPrice": "Current Price",
+      "remove": "Remove from Watchlist"
+    },
+    "table": {
+      "company": "Company",
+      "sector": "Sector",
+      "roic": "ROIC",
+      "grossMargin": "Gross Margin",
+      "change": "Change",
+      "pnl": "P&L",
+      "action": "Action"
+    },
+    "toolbar": {
+      "sortBy": "Sort by",
+      "sort": {
+        "addedAt": "Recently added",
+        "name": "Name (A-Z)",
+        "changePercent": "Biggest movers",
+        "sector": "Sector"
+      },
+      "allSectors": "All sectors",
+      "gridView": "Grid view",
+      "tableView": "Table view"
+    },
+    "position": {
+      "shares": "shares",
+      "avgCost": "avg. cost",
+      "pnl": "P&L"
+    },
+    "summary": {
+      "marketValue": "Market Value",
+      "totalPnl": "Total P&L",
+      "watchlistOnly": "Add quantity and buy price to your positions to see market value and P&L."
+    },
+    "valueChart": {
+      "title": "Portfolio Value Over Time",
+      "approximationTooltip": "Estimate based on each position's current quantity applied to historical prices — does not reflect actual buy/sell history.",
+      "noData": "Not enough data to show the trend yet.",
+      "tabs": {
+        "1m": "1M",
+        "6m": "6M",
+        "1y": "1Y",
+        "max": "Max"
+      }
+    },
+    "allocation": {
+      "title": "Allocation by Sector",
+      "unknownSector": "Unknown sector",
+      "barsView": "Bar view",
+      "donutView": "Donut view"
+    },
+    "manage": {
+      "title": "Add or sync positions",
+      "importCsv": "Import CSV"
+    },
+    "import": {
+      "trigger": "Import Portfolio",
+      "title": "Import Portfolio",
+      "close": "Close",
+      "description": "Upload a CSV file exported from your broker with the ticker, quantity, and average buy price for each position.",
+      "chooseFile": "Choose CSV file",
+      "emptyFile": "The file is empty or could not be read.",
+      "parseError": "Could not parse the file. Make sure it's a valid CSV.",
+      "submitError": "Could not import the portfolio. Please try again.",
+      "mapDescription": "Tell us what each column in your file corresponds to:",
+      "columns": {
+        "ignore": "Ignore",
+        "ticker": "Ticker",
+        "quantity": "Quantity",
+        "avgBuyPrice": "Average buy price"
+      },
+      "moreRows": "+ {count} rows not shown",
+      "mapIncomplete": "Select the ticker, quantity, and average price columns to continue.",
+      "back": "Back",
+      "confirmImport": "Import {count} rows",
+      "status": {
+        "added": "Added",
+        "merged": "Merged with existing position",
+        "unsupported": "Company not supported",
+        "invalid": "Invalid row"
+      },
+      "done": "Done"
+    },
+    "trading212": {
+      "connectTrigger": "Connect to Trading212",
+      "connectDescription": "Connect your Trading212 account (Invest or Stocks ISA) to automatically sync your positions. Generate an API Key under Settings → API in the Trading212 app.",
+      "apiKeyPlaceholder": "API Key",
+      "apiSecretPlaceholder": "API Secret",
+      "cancel": "Cancel",
+      "connectSubmit": "Connect",
+      "invalidCredentials": "Invalid API Key or Secret.",
+      "connectError": "Could not connect to Trading212. Please try again.",
+      "connectedLabel": "Connected to Trading212",
+      "syncNow": "Sync now",
+      "disconnect": "Disconnect",
+      "lastSynced": "Last synced:",
+      "syncSummary": "{synced} positions synced, {unsupported} not supported.",
+      "syncError": "Could not sync with Trading212."
     },
     "lastUpdate": "Last update:"
   },
@@ -296,6 +396,7 @@
   },
   "dcf": {
     "title": "DCF Calculator",
+    "mode": "Method",
     "subtitle": "Estimate a company's intrinsic value using the discounted cash flow method.",
     "educationalWarning": "A DCF is a model, not a crystal ball. The output is extremely sensitive to your growth assumptions and discount rate (WACC). Use it as one of several analysis tools — never as investment advice.",
     "autofillLabel": "Autofill from a company",
@@ -304,13 +405,30 @@
     "loadError": "Could not load data for this company.",
     "currentPriceInput": "Current Price",
     "fcf0": "Initial FCF",
+    "fcfMode": "Methodology",
     "shares": "Shares Outstanding",
     "netDebt": "Net Debt",
     "millionsSuffix": "Millions",
     "growth1": "Growth Years 1-5",
     "growth2": "Growth Years 6-10",
-    "wacc": "WACC (Discount Rate)",
-    "waccHint": "Required return. Higher means a more conservative value.",
+    "wacc": {
+      "label": "WACC (Discount Rate)",
+      "hint": "Required return. Higher means a more conservative value.",
+      "suggested": "Suggested WACC (CAPM)",
+      "useButton": "Use",
+      "breakdownTitle": "Breakdown",
+      "costOfEquity": "Cost of Equity",
+      "riskFreeRate": "Rf (Risk-Free Rate)",
+      "beta": "Beta",
+      "equityRiskPremium": "ERP (Equity Risk Premium)",
+      "costOfDebt": "Cost of Debt",
+      "costOfDebtLabel": "Rd (Pre-tax)",
+      "taxRate": "Tax Rate",
+      "capitalStructure": "Capital Structure",
+      "weightEquity": "Equity Weight",
+      "weightDebt": "Debt Weight",
+      "betaUnavailable": "Beta unavailable — enter WACC manually"
+    },
     "terminalGrowth": "Perpetual Growth",
     "terminalGrowthHint": "Long-term growth after year 10 (typically ≤ inflation).",
     "reverseDcf": "Calculate Implied Growth (Reverse DCF)",

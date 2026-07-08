@@ -134,7 +134,7 @@ export async function extractKpisAction(ticker: string) {
     while (attempts < maxAttempts) {
       try {
         response = await ai.models.generateContent({
-          model: 'gemini-3.5-flash',
+          model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
           contents: [
             prompt,
             optimalText

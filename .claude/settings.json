@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh repo view *)",
+      "Bash(gh api repos/*/contents/*)",
+      "Bash(claude mcp list)"
+    ]
+  }
+}

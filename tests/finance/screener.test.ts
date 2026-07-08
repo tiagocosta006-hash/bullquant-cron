@@ -1,15 +1,11 @@
 import { describe, it, expect } from "vitest"
 import {
   SCREENER_CATEGORIES,
-  CURATED_LISTS,
   DEFAULT_CATEGORY,
   isValidCategory,
 } from "@/lib/finance/screener"
 
-// Categorias com lista curada ("sp500" representa o universo inteiro, sem lista).
-const CURATED_CATEGORIES = SCREENER_CATEGORIES.filter((c) => c !== "sp500")
-
-describe("screener — integridade das listas curadas", () => {
+describe("screener — categorias", () => {
   it("a categoria default existe e é válida", () => {
     expect(SCREENER_CATEGORIES).toContain(DEFAULT_CATEGORY)
     expect(isValidCategory(DEFAULT_CATEGORY)).toBe(true)
@@ -17,54 +13,101 @@ describe("screener — integridade das listas curadas", () => {
     expect(isValidCategory(undefined)).toBe(false)
   })
 
-  it("todas as categorias curadas têm lista não-vazia", () => {
-    for (const category of CURATED_CATEGORIES) {
-      const list = CURATED_LISTS[category]
-      expect(list, `categoria "${category}" sem lista`).toBeDefined()
-      expect(list!.length, `categoria "${category}" vazia`).toBeGreaterThan(0)
-    }
-  })
-
-  it("todos os tickers são strings não-vazias, em maiúsculas e sem espaços", () => {
-    for (const category of CURATED_CATEGORIES) {
-      for (const ticker of CURATED_LISTS[category]!) {
-        expect(typeof ticker).toBe("string")
-        expect(ticker.trim().length, `ticker vazio em "${category}"`).toBeGreaterThan(0)
-        expect(ticker, `ticker "${ticker}" em "${category}" não está normalizado`).toBe(
-          ticker.trim().toUpperCase(),
-        )
-      }
-    }
-  })
-
-  it("nenhuma categoria tem tickers duplicados", () => {
-    for (const category of CURATED_CATEGORIES) {
-      const list = CURATED_LISTS[category]!
-      const unique = new Set(list)
-      expect(unique.size, `duplicados em "${category}": ${list.join(", ")}`).toBe(list.length)
+  it("todas as categorias são chaves estáveis conhecidas", () => {
+    for (const category of SCREENER_CATEGORIES) {
+      expect(["marketCap", "gainers", "losers", "sp500"]).toContain(category)
     }
   })
 })
 
-// Teste de integração contra a BD real (Supabase). Faz skip se não houver
+// Testes de integração contra a BD real (Supabase). Fazem skip se não houver
 // DATABASE_URL (ex: CI sem secrets) — em dev carrega de .env.local via tests/setup.ts.
-describe.skipIf(!process.env.DATABASE_URL)("screener — tickers existem na tabela companies", () => {
-  it("todos os tickers curados existem na BD", async () => {
+describe.skipIf(!process.env.DATABASE_URL)("screener — dados dinâmicos reais", () => {
+  it("getAvailableSectors devolve setores não-vazios", async () => {
+    const { getAvailableSectors } = await import("@/lib/finance/screener")
     const { prisma } = await import("@/lib/prisma")
     try {
-      const allTickers = [...new Set(CURATED_CATEGORIES.flatMap((c) => CURATED_LISTS[c]!))]
+      const sectors = await getAvailableSectors()
+      expect(sectors.length).toBeGreaterThan(0)
+      for (const sector of sectors) {
+        expect(typeof sector).toBe("string")
+        expect(sector.length).toBeGreaterThan(0)
+      }
+    } finally {
+      await prisma.$disconnect()
+    }
+  })
 
-      const found = await prisma.company.findMany({
-        where: { ticker: { in: allTickers } },
-        select: { ticker: true },
-      })
-      const foundSet = new Set(found.map((c) => c.ticker))
-      const missing = allTickers.filter((t) => !foundSet.has(t))
+  it("marketCap devolve empresas ordenadas por capitalização decrescente", async () => {
+    const { getCategoryCompanies } = await import("@/lib/finance/screener")
+    const { prisma } = await import("@/lib/prisma")
+    try {
+      const companies = await getCategoryCompanies("marketCap", 10)
+      expect(companies.length).toBeGreaterThan(0)
 
-      expect(
-        missing,
-        `tickers curados sem registo em companies: ${missing.join(", ")}`,
-      ).toEqual([])
+      const marketCaps = companies.map((c) =>
+        c.sharesOutstanding !== null && c.lastClose !== null
+          ? c.sharesOutstanding * c.lastClose
+          : null,
+      )
+      for (let i = 1; i < marketCaps.length; i++) {
+        if (marketCaps[i] !== null && marketCaps[i - 1] !== null) {
+          expect(marketCaps[i]!).toBeLessThanOrEqual(marketCaps[i - 1]!)
+        }
+      }
+    } finally {
+      await prisma.$disconnect()
+    }
+  })
+
+  it("gainers devolve empresas ordenadas por variação % decrescente", async () => {
+    const { getCategoryCompanies } = await import("@/lib/finance/screener")
+    const { prisma } = await import("@/lib/prisma")
+    try {
+      const companies = await getCategoryCompanies("gainers", 10)
+      for (let i = 1; i < companies.length; i++) {
+        const prev = companies[i - 1].lastChangePercent
+        const curr = companies[i].lastChangePercent
+        if (prev !== null && curr !== null) {
+          expect(curr).toBeLessThanOrEqual(prev)
+        }
+      }
+    } finally {
+      await prisma.$disconnect()
+    }
+  })
+
+  it("filtro por setor devolve só empresas desse setor", async () => {
+    const { getCategoryCompanies, getAvailableSectors } = await import("@/lib/finance/screener")
+    const { prisma } = await import("@/lib/prisma")
+    try {
+      const sectors = await getAvailableSectors()
+      if (sectors.length === 0) return
+
+      const targetSector = sectors[0]
+      const companies = await getCategoryCompanies("marketCap", 50, targetSector)
+      for (const company of companies) {
+        expect(company.sector).toBe(targetSector)
+      }
+    } finally {
+      await prisma.$disconnect()
+    }
+  })
+
+  it("paginação (offset) devolve empresas diferentes e reporta hasMore corretamente", async () => {
+    const { getCategoryCompaniesPage } = await import("@/lib/finance/screener")
+    const { prisma } = await import("@/lib/prisma")
+    try {
+      const firstPage = await getCategoryCompaniesPage("marketCap", 10, 0)
+      const secondPage = await getCategoryCompaniesPage("marketCap", 10, 10)
+
+      expect(firstPage.companies.length).toBe(10)
+      expect(firstPage.hasMore).toBe(true)
+
+      const firstTickers = new Set(firstPage.companies.map((c) => c.ticker))
+      for (const company of secondPage.companies) {
+        expect(firstTickers.has(company.ticker)).toBe(false)
+      }
     } finally {
       await prisma.$disconnect()
     }

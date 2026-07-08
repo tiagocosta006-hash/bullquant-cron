@@ -1,0 +1,431 @@
+{
+  "marketing": {
+    "eyebrow": "ファンダメンタル分析 · バリュー投資",
+    "titleLead": "他の人が見逃す",
+    "titleAccent": "価値を見つけよう。",
+    "subtitle": "10年間のファンダメンタルズ、組み込みのDCF計算機、AIインサイトが無料で利用可能。長期投資家のための本格的な分析ツール。",
+    "primaryCta": "無料アカウントを作成",
+    "secondaryCta": "例を見る: AAPL",
+    "trust": "S&P 500 カバー · SEC EDGAR データ · クレジットカード不要",
+    "features": {
+      "fundamentals": {
+        "title": "10年間の財務データ",
+        "desc": "収益、利益率、ROIC、キャッシュフローを一目で確認できます。"
+      },
+      "dcf": {
+        "title": "組み込みDCF",
+        "desc": "数秒で本質的価値を推定します。"
+      },
+      "ai": {
+        "title": "AIインサイト",
+        "desc": "最近の動向に関するAIによる要約。"
+      }
+    }
+  },
+  "insider": {
+    "title": "インサイダー取引",
+    "subtitle": "役員および10%以上の株主による取引。",
+    "emptyTitle": "活動なし",
+    "emptyDesc": "最近のインサイダー取引は検出されませんでした。",
+    "showMore": "さらに{n}件の取引を表示",
+    "showLess": "少なく表示",
+    "buysWindow": "{n} 買い ({days}日)",
+    "sellsWindow": "{n} 売り ({days}日)",
+    "col": {
+      "insider": "名前",
+      "type": "タイプ",
+      "shares": "株式数",
+      "price": "価格",
+      "value": "価値",
+      "date": "日付"
+    },
+    "type": {
+      "buy": "買い",
+      "sell": "売り",
+      "other": "その他"
+    },
+    "codes": {
+      "P": "P - 買い",
+      "S": "S - 売り",
+      "A": "A - 付与",
+      "M": "M - オプション行使",
+      "F": "F - 源泉徴収",
+      "G": "G - 贈与",
+      "J": "J - その他",
+      "unknown": "SEC コード: {code}"
+    }
+  },
+  "dashboard": {
+    "title": "インサイト",
+    "subtitle": "市場のトレンドを探り、機会を見つけましょう。",
+    "empty": "企業が見つかりませんでした。",
+    "marketCap": "時価総額",
+    "quickActionsTitle": "クイックアクション",
+    "exploreTitle": "企業を探す",
+    "actions": {
+      "portfolio": "ポートフォリオ",
+      "portfolioDesc": "フォロー中の企業",
+      "dcf": "新しいDCF",
+      "dcfDesc": "本質的価値を推定",
+      "calendar": "カレンダー",
+      "calendarDesc": "四半期決算",
+      "transcripts": "トランスクリプト",
+      "transcriptsDesc": "決算説明会"
+    },
+    "tabs": {
+      "sp500": "S&P 500",
+      "trending": "トレンド",
+      "growth": "成長",
+      "dividend": "配当",
+      "buyback": "自社株買い",
+      "ai": "人工知能"
+    }
+  },
+  "sidebar": {
+    "dashboard": "ダッシュボード",
+    "portfolio": "ポートフォリオ",
+    "calendar": "カレンダー",
+    "dcf": "DCF計算機",
+    "transcripts": "トランスクリプト",
+    "screener": "スクリーナー",
+    "recentSearches": "最近の検索",
+    "desc": {
+      "dashboard": "概要",
+      "portfolio": "フォローしている企業",
+      "calendar": "財務結果",
+      "dcf": "適正価格を評価",
+      "transcripts": "投資家会議",
+      "screener": "企業を見つける"
+    }
+  },
+  "login": {
+    "title": "ログイン",
+    "subtitle": "ポートフォリオにアクセスします。",
+    "emailLabel": "メールアドレス",
+    "emailPlaceholder": "name@email.com",
+    "passwordLabel": "パスワード",
+    "forgotPasswordLink": "パスワードをお忘れですか？",
+    "submitButton": "ログイン",
+    "submitLoading": "ログイン中...",
+    "noAccount": "アカウントがありませんか？",
+    "registerLink": "無料登録"
+  },
+  "register": {
+    "title": "アカウント作成",
+    "subtitle": "BullVisionに参加しましょう。",
+    "nameLabel": "名前",
+    "namePlaceholder": "あなたの名前",
+    "emailLabel": "メールアドレス",
+    "emailPlaceholder": "name@email.com",
+    "passwordLabel": "パスワード",
+    "submitButton": "登録",
+    "submitLoading": "作成中...",
+    "hasAccount": "既にアカウントをお持ちですか？",
+    "loginLink": "ログイン"
+  },
+  "forgotPassword": {
+    "title": "パスワードのリセット",
+    "subtitle": "メールアドレスを入力してください。",
+    "emailLabel": "メールアドレス",
+    "emailPlaceholder": "name@email.com",
+    "submitButton": "リンクを送信",
+    "submitLoading": "送信中...",
+    "remembered": "パスワードを思い出しましたか？",
+    "backToLogin": "ログインに戻る"
+  },
+  "resetPassword": {
+    "title": "新しいパスワード",
+    "subtitle": "新しいパスワードを選択してください。",
+    "passwordLabel": "新しいパスワード",
+    "passwordPlaceholder": "******",
+    "submitButton": "更新",
+    "submitLoading": "更新中..."
+  },
+  "header": {
+    "settingsTitle": "設定",
+    "logoutTitle": "ログアウト",
+    "login": "ログイン",
+    "register": "登録",
+    "dcf": "DCF",
+    "calendar": "カレンダー"
+  },
+  "search": {
+    "placeholder": "ティッカーを検索 (例: AAPL)...",
+    "noResults": "結果がありません。",
+    "recentTitle": "最近の検索",
+    "clearAll": "すべてクリア"
+  },
+  "settings": {
+    "title": "設定",
+    "subtitle": "プロフィールと設定を管理します。",
+    "planFree": "無料プラン",
+    "saveSuccess": "プロフィールが更新されました！",
+    "tabs": {
+      "profile": "プロフィール",
+      "preferences": "設定",
+      "subscription": "サブスクリプション"
+    },
+    "profile": {
+      "title": "詳細",
+      "email": "メールアドレス",
+      "name": "名前",
+      "namePlaceholder": "表示名",
+      "save": "保存",
+      "dangerZone": "危険ゾーン",
+      "logoutDesc": "安全にログアウトします。",
+      "logoutBtn": "ログアウト"
+    },
+    "preferences": {
+      "title": "環境設定",
+      "language": "言語",
+      "languageDesc": "言語を選択してください。",
+      "theme": "テーマ",
+      "themeDesc": "ライトモードとダークモードを切り替えます。"
+    },
+    "subscription": {
+      "title": "現在のプラン",
+      "desc": "現在、無料プランを利用しています。",
+      "premiumSoonTitle": "PROアクセスは近日公開",
+      "premiumSoonDesc": "高度な機能を準備中です。",
+      "upgradeBtn": "PROにアップグレード"
+    }
+  },
+  "portfolio": {
+    "loginRequired": "ポートフォリオにアクセスするにはログインしてください。",
+    "loginButton": "ログイン",
+    "title": "マイポートフォリオ",
+    "subtitle": "お気に入りの企業をリアルタイムで追跡します。",
+    "positions": "ポジション",
+    "upToday": "本日の上昇",
+    "emptyState": {
+      "title": "ウォッチリストは空です",
+      "description": "企業を追加し始めましょう。",
+      "quickAdd": "追加",
+      "adding": "追加中..."
+    },
+    "suggestions": {
+      "title": "おすすめ"
+    },
+    "landing": {
+      "title": "BullVision",
+      "description": "企業を検索して開始してください。",
+      "testExample": "例を試す",
+      "createAccount": "無料アカウント作成"
+    },
+    "card": {
+      "currentPrice": "現在の価格"
+    },
+    "lastUpdate": "最終更新:"
+  },
+  "stock": {
+    "underConstruction": "工事中",
+    "buildingMessage": "このページは開発中です。",
+    "backHome": "ホームに戻る",
+    "updatedAt": "更新日時",
+    "priceUnavailable": "価格は利用できません",
+    "header": {
+      "followed": "フォロー中",
+      "addToPortfolio": "ポートフォリオに追加",
+      "updating": "更新中..."
+    },
+    "savedValuations": {
+      "title": "保存されたDCF評価",
+      "openCalculator": "開く",
+      "noAnalyses": "保存された分析はありません。",
+      "savedAt": "保存日",
+      "fairValue": "適正価値",
+      "mos": "安全域",
+      "growth": "成長率 (1-5)",
+      "termGrowth": "永久成長率"
+    },
+    "brief": {
+      "title": "AIブリーフ",
+      "loading": "分析中...",
+      "subtitle": "最近の動向の要約",
+      "date": "日付",
+      "sentiment": {
+        "bullish": "強気",
+        "bearish": "弱気",
+        "neutral": "中立"
+      },
+      "expand": "さらに{n}件表示",
+      "collapse": "折りたたむ"
+    },
+    "profile": {
+      "title": "会社概要",
+      "website": "ウェブサイト",
+      "sector": "セクター",
+      "industry": "産業",
+      "employees": "従業員数",
+      "country": "国",
+      "exchange": "取引所"
+    },
+    "snapshotTitle": "スナップショット",
+    "chart": {
+      "title": "価格履歴",
+      "noData": "データなし",
+      "period": "期間",
+      "chartView": "チャート",
+      "tableView": "テーブル",
+      "fullScreen": "フルスクリーン",
+      "tabs": {
+        "1m": "1ヶ月",
+        "6m": "6ヶ月",
+        "1y": "1年",
+        "5y": "5年",
+        "max": "最大"
+      }
+    },
+    "snapshot": {
+      "valuation": "評価",
+      "cashFlow": "キャッシュフロー",
+      "marginAndGrowth": "マージンと成長",
+      "balance": "バランスシート",
+      "dividend": "配当",
+      "na": "N/A",
+      "naGeneric": "利用不可。",
+      "naMargin": "報告されていません。",
+      "naPrice": "利用不可。"
+    }
+  },
+  "dcf": {
+    "title": "DCF計算機",
+    "subtitle": "企業価値を推定します。",
+    "educationalWarning": "これはモデルであり、水晶玉ではありません。",
+    "autofillLabel": "自動入力",
+    "autofillPlaceholder": "ティッカーを検索...",
+    "loadedFor": "読み込み済みデータ:",
+    "loadError": "データの読み込みエラー。",
+    "currentPriceInput": "現在の価格",
+    "fcf0": "初期FCF",
+    "shares": "発行済株式数",
+    "netDebt": "純有利子負債",
+    "millionsSuffix": "百万",
+    "growth1": "成長率 1-5年",
+    "growth2": "成長率 6-10年",
+    "wacc": "WACC (割引率)",
+    "waccHint": "要求利回り。",
+    "terminalGrowth": "永久成長率",
+    "terminalGrowthHint": "長期的な成長率。",
+    "reverseDcf": "リバースDCF",
+    "fairValue": "適正価値",
+    "currentPrice": "現在の価格",
+    "marginOfSafety": "安全域",
+    "undervalued": "割安の可能性",
+    "overvalued": "割高の可能性",
+    "enterpriseValue": "企業価値",
+    "equityValue": "株式価値",
+    "terminalValuePv": "終端価値 (PV)",
+    "fcfPv": "割引FCF",
+    "disclaimer": "これらは単なる推定値です。",
+    "saved": {
+      "title": "マイ分析",
+      "saveButton": "保存",
+      "saveError": "保存エラー。",
+      "labelPlaceholder": "名前 (オプション)",
+      "empty": "分析はありません。",
+      "loadButton": "読み込む",
+      "deleteButton": "削除",
+      "fairValueShort": "適正:"
+    },
+    "errorWacc": "WACCは永久成長率より大きくなければなりません。",
+    "errorShares": "株式数を入力してください。",
+    "errorFcf": "有効なFCFを入力してください。"
+  },
+  "financials": {
+    "engineTitle": "財務データ",
+    "periods": {
+      "quarterly": "四半期",
+      "ttm": "TTM",
+      "annual": "年間"
+    },
+    "charts": {
+      "revenue": "収益",
+      "revenueBySegment": "セグメント別収益",
+      "epsDiluted": "EPS",
+      "freeCashFlow": "フリーキャッシュフロー",
+      "netIncome": "純利益",
+      "ebitda": "EBITDA",
+      "expenses": "費用",
+      "cashDebt": "現金と負債",
+      "sharesOutstanding": "株式数",
+      "dividends": "配当 (DPS)",
+      "roic": "ROIC",
+      "grossMargin": "粗利益率",
+      "operatingMargin": "営業利益率",
+      "profitMargin": "純利益率"
+    },
+    "ratios": {
+      "roic": "ROIC",
+      "gross": "粗利",
+      "operating": "営業",
+      "profit": "純利",
+      "roe": "ROE"
+    }
+  },
+  "calendar": {
+    "title": "決算カレンダー",
+    "subtitle": "四半期報告。",
+    "disclaimer": "推定日です。",
+    "today": "今日",
+    "prevMonth": "前月",
+    "nextMonth": "翌月",
+    "scopeAll": "すべて",
+    "scopeWatchlist": "マイポートフォリオ",
+    "more": "もっと",
+    "empty": "イベントはありません。",
+    "summary": "{count}件の決算",
+    "legendBmo": "市場オープン前",
+    "legendAmc": "市場クローズ後"
+  },
+  "news": {
+    "title": "ニュース",
+    "subtitle": "最近の記事。",
+    "source": "Finnhubより",
+    "emptyTitle": "ニュースなし",
+    "emptyDesc": "最近のニュースはありません。",
+    "showMore": "さらに{n}件表示",
+    "showLess": "少なく表示",
+    "readMore": "記事を読む"
+  },
+  "transcripts": {
+    "title": "トランスクリプト",
+    "subtitle": "決算説明会。",
+    "inDevelopment": "開発中",
+    "placeholderTitle": "近日公開",
+    "placeholderDesc": "この機能はまもなく利用可能になります。"
+  },
+  "screener": {
+    "title": "株式スクリーナー",
+    "subtitle": "素晴らしい企業を見つけましょう。",
+    "filters": {
+      "title": "フィルター",
+      "guruStrategies": "偉大な投資家",
+      "moatCompounders": "ウォーレン・バフェット",
+      "moatTooltip": "競争優位性フィルター",
+      "magicFormula": "ジョエル・グリーンブラット",
+      "magicTooltip": "魔法の公式",
+      "sector": "セクター",
+      "sectorPlaceholder": "すべて",
+      "allSectors": "すべて",
+      "minGrossMargin": "粗利益率",
+      "minRoic": "ROIC",
+      "minRevenue": "収益",
+      "minEarningsYield": "Earnings Yield"
+    },
+    "results": {
+      "count": "{count}社見つかりました",
+      "loading": "検索中...",
+      "empty": "結果がありません。",
+      "emptyDesc": "フィルターを調整してください。",
+      "company": "企業",
+      "sector": "セクター",
+      "revenue": "収益",
+      "grossMargin": "粗利益率",
+      "roic": "ROIC",
+      "earningsYield": "Earnings Yield",
+      "action": "表示",
+      "viewStock": "分析"
+    }
+  }
+}

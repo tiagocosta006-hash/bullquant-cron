@@ -372,42 +372,56 @@ bullquant/
 ├── .github/workflows/
 │   ├── ingest-prices.yml       # cron diário
 │   └── ingest-fundamentals.yml # cron semanal
-├── src/
-│   ├── app/
-│   │   ├── (auth)/
-│   │   │   ├── login/page.tsx
-│   │   │   └── register/page.tsx
-│   │   ├── profile/page.tsx
-│   │   ├── stock/[ticker]/page.tsx
+├── app/                            # App Router na RAIZ (não em src/)
+│   ├── (marketing)/                # grupo PÚBLICO — landing, sem AppSidebar
+│   │   ├── layout.tsx              # <Header /> público
+│   │   └── page.tsx                # landing (redireciona p/ /dashboard se autenticado)
+│   ├── (auth)/                     # login/registo/reset (sem header da app)
+│   │   ├── actions.ts              # server actions de auth (login → /dashboard)
+│   │   ├── login/page.tsx
+│   │   └── register/page.tsx
+│   ├── (app)/                      # grupo PRIVADO — terminal financeiro
+│   │   ├── layout.tsx              # <AppSidebar /> + <AppHeader /> fixos
+│   │   ├── dashboard/              # Insights (screener de listas curadas)
+│   │   │   ├── page.tsx            # server: auth + getCategoryCompanies()
+│   │   │   └── DashboardClient.tsx # client: tabs + grelha + preços batch
+│   │   ├── calendar/page.tsx       # Earnings Calendar (estimates + beat/miss)
 │   │   ├── portfolio/page.tsx
+│   │   ├── stock/[ticker]/page.tsx
 │   │   ├── dcf/page.tsx
-│   │   ├── ai-insights/page.tsx
-│   │   └── api/
-│   │       ├── search/route.ts
-│   │       ├── price/[ticker]/route.ts        # preço atual (Finnhub)
-│   │       ├── prices/[ticker]/route.ts       # histórico EOD (Prisma → tabela prices)
-│   │       ├── fundamentals/[ticker]/route.ts
-│   │       ├── dcf-data/[ticker]/route.ts
-│   │       ├── ai-insights/route.ts
-│   │       └── portfolio/
-│   │           ├── route.ts                   # GET
-│   │           ├── add/route.ts
-│   │           └── remove/route.ts
-│   ├── components/
-│   │   ├── ui/                 # shadcn/ui
-│   │   ├── search/SearchBar.tsx
-│   │   ├── stock/             # FundamentalsSnapshot, PriceChart, DecisionEngine…
-│   │   ├── dcf/
-│   │   └── portfolio/
-│   ├── lib/
-│   │   ├── prisma.ts          # singleton do PrismaClient
-│   │   ├── supabase.ts        # clientes Supabase (server/client)
-│   │   ├── finnhub.ts         # wrapper da API
-│   │   ├── gemini.ts          # wrapper + prompt
-│   │   └── finance/           # cálculos: dcf.ts, cagr.ts, metrics.ts
-│   └── i18n/                  # config next-intl
+│   │   └── settings/page.tsx
+│   └── api/
+│       ├── search/route.ts
+│       ├── price/[ticker]/route.ts        # preço atual (Finnhub)
+│       ├── prices/[ticker]/route.ts       # histórico EOD (Prisma → tabela prices)
+│       ├── prices/batch/route.ts          # preços em lote (Finnhub, cache 60s, chunked)
+│       ├── earnings/route.ts              # earnings calendar
+│       ├── fundamentals/[ticker]/route.ts
+│       ├── dcf-data/[ticker]/route.ts
+│       └── portfolio/
+│           ├── route.ts                   # GET
+│           ├── add/route.ts
+│           ├── check/route.ts
+│           └── remove/route.ts
+├── components/
+│   ├── ui/                 # shadcn/ui
+│   ├── layout/             # AppSidebar, AppHeader, Header (marketing)
+│   ├── search/SearchBar.tsx
+│   ├── stock/             # StockCard, FundamentalsSnapshot, PriceChart…
+│   ├── calendar/EarningsCalendar.tsx
+│   ├── dcf/
+│   └── portfolio/
+├── lib/
+│   ├── prisma.ts          # singleton do PrismaClient
+│   ├── supabase/          # clientes Supabase (server/client)
+│   └── finance/           # cálculos + screener.ts (listas curadas), format.ts, dcf.ts…
 └── .env.local
 ```
+
+> **Route groups:** `(marketing)` é público (landing), `(app)` é o terminal privado
+> com sidebar/header próprios, `(auth)` são as páginas de login. O `app/layout.tsx`
+> raiz **não** renderiza header nenhum — cada grupo trata do seu. Após login, o
+> destino é `/dashboard`.
 
 ---
 
@@ -546,6 +560,39 @@ conselho de investimento". Fluxo em `/api/ai-insights`:
 1. Verificar `AIUsageLog` (limite diário, sugestão 5 no free) → senão 429 amigável.
 2. Verificar `AIInsightCache` (TTL 24h) → se válido, serve instantâneo.
 3. Senão, chamar Gemini (JSON estruturado, em PT) → guardar cache + log.
+
+### Extras já implementados (fora das 6 MVP originais)
+
+**Dashboard / Insights (`/dashboard`)** — landing pós-login do grupo `(app)`.
+Hero "Insights" + tabs horizontais de categorias + grelha de `StockCard`. Os dados
+base (ticker, nome, logo, sharesOutstanding) vêm do PostgreSQL no server; os preços
+ao vivo são pedidos pelo cliente em lote via `/api/prices/batch` (Finnhub, cache 60s).
+Market Cap é calculado no card (`shares × preço`), nunca guardado.
+- ⚠️ As categorias (`Growth`, `Dividend Growth`, `Buyback Machines`, etc.) em
+  `lib/finance/screener.ts` são **listas temáticas CURADAS** (arrays de tickers
+  validados contra a BD), **não** um screener por métricas. Não fingir o contrário.
+  Screening real (CAGR de revenue, buybacks via `sharesOutstanding`, dividend growth)
+  é um TODO — bloqueado pela qualidade atual dos dados de ingestão (revenues com tags
+  XBRL erradas). As `tabs` usam **chaves estáveis** (`sp500`, `growth`…); os labels
+  são traduzidos via i18n (`messages/*.json` → `dashboard.tabs.*`).
+
+**Earnings Calendar (`/calendar`)** — grelha mensal de resultados. Cada `EventChip`
+abre um `<Dialog>` com **estimates** (EPS/revenue estimados) e, nos já reportados,
+indicação visual de **beat/miss** (bateu ou não as expectativas). Dados via
+`/api/earnings`. Ingestão: `scripts/ingest_earnings.py` + `.github/workflows/ingest-earnings.yml`.
+
+**Guardar análises DCF** — na calculadora, com uma empresa carregada, o utilizador
+pode **guardar cenários DCF** (inputs + snapshot do fair value/margem) e revisitá-los
+mais tarde (carregar de volta aos sliders ou apagar). Modelo `DcfAnalysis`
+(tabela `dcf_analyses`), por `userId` + `companyId`. API: `GET/POST /api/dcf/analyses`
+e `DELETE /api/dcf/analyses/[id]`. UI em `components/dcf/SavedAnalyses.tsx`.
+
+> ⚠️ **Migrations vs db push:** a BD tem *drift* — `earnings_events` e `dcf_analyses`
+> foram criadas com `prisma db push` (aditivo, não-destrutivo), **não** com migration.
+> Por isso `prisma migrate dev` agora detetaria drift e quereria **resetar a BD
+> (apaga tudo)**. Até alguém consolidar o histórico de migrations, usar `prisma db push`
+> para mudanças aditivas. Carregar `.env.local` antes (`set -a; . ./.env.local; set +a`)
+> porque o Prisma CLI lê `.env`, não `.env.local`.
 
 ---
 

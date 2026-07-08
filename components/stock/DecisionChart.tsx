@@ -7,6 +7,8 @@ import {
   Bar,
   LineChart,
   Line,
+  AreaChart,
+  Area,
   ComposedChart,
   XAxis,
   YAxis,
@@ -22,7 +24,7 @@ import { TooltipProvider, Tooltip as UITooltip, TooltipTrigger, TooltipContent }
 import { useTranslations } from "next-intl"
 
 export type ChartConfig = {
-  dataKeys: { key: string; color: string; type: 'bar' | 'line'; stackId?: string; name?: string }[]
+  dataKeys: { key: string; color: string; type: 'bar' | 'line' | 'area'; stackId?: string; name?: string }[]
   referenceLine?: { y: number; label: string; color: string }
   isCurrency?: boolean
   isPercentage?: boolean
@@ -63,14 +65,17 @@ const CustomTooltip = ({ active, payload, label, formatTooltipValue }: CustomToo
 
 interface DecisionChartProps {
   title: string
-  data: Record<string, unknown>[]
-  type: 'BAR' | 'LINE' | 'COMPOSED' | 'STACKED_BAR'
+  data: any[]
+  type: 'BAR' | 'LINE' | 'COMPOSED' | 'STACKED_BAR' | 'AREA'
   config: ChartConfig
   cagr?: number | null
   infoTooltip?: React.ReactNode
+  emptyMessage?: string
+  headerExtra?: React.ReactNode
+  currencySymbol?: string
 }
 
-export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: DecisionChartProps) {
+export function DecisionChart({ title, data, type, config, cagr, infoTooltip, emptyMessage, headerExtra, currencySymbol = "$" }: DecisionChartProps) {
   const t = useTranslations("stock.chart")
   const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart')
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -91,6 +96,13 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
     return data.slice(-items);
   }, [data, timeFilter])
 
+  const hasValidData = useMemo(() => {
+    if (displayData.length === 0) return false;
+    return config.dataKeys.some(k => 
+      displayData.some(row => row[k.key] !== null && row[k.key] !== undefined)
+    );
+  }, [displayData, config.dataKeys])
+
   const formatValue = (val: number | string | null) => {
     if (val === null || val === undefined) return "N/A"
     const num = Number(val)
@@ -101,7 +113,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
     if (config.isCurrency || config.isLargeNumber) {
       const formatter = new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short", maximumFractionDigits: 1 })
       const formatted = formatter.format(absVal)
-      if (config.isCurrency) return num < 0 ? `-$${formatted}` : `$${formatted}`
+      if (config.isCurrency) return num < 0 ? `-${currencySymbol}${formatted}` : `${currencySymbol}${formatted}`
       return num < 0 ? `-${formatted}` : formatted
     }
     
@@ -124,7 +136,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
       } else {
         formatted = `${absVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
       }
-      if (config.isCurrency) return num < 0 ? `-$${formatted}` : `$${formatted}`
+      if (config.isCurrency) return num < 0 ? `-${currencySymbol}${formatted}` : `${currencySymbol}${formatted}`
       return num < 0 ? `-${formatted}` : formatted
     }
     
@@ -163,9 +175,16 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
   }
 
   const renderChart = (height: number | `${number}%` = "100%") => {
-    if (displayData.length === 0) return <div className="flex items-center justify-center h-full text-muted-foreground">{t('noData')}</div>
+    if (!hasValidData) return (
+      <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-1.5 bg-muted/10 rounded-lg border border-dashed border-border/30 m-2">
+        <p className="text-[13px] font-medium text-foreground/70">{t('noData')}</p>
+        <p className="text-[11px] opacity-50 text-center px-4">
+          {emptyMessage || "Métrica não aplicável (N/A) a este setor."}
+        </p>
+      </div>
+    )
 
-    const ChartComponent = type === 'COMPOSED' || type === 'STACKED_BAR' ? ComposedChart : type === 'LINE' ? LineChart : BarChart
+    const ChartComponent = type === 'COMPOSED' || type === 'STACKED_BAR' ? ComposedChart : type === 'LINE' ? LineChart : type === 'AREA' ? AreaChart : BarChart
 
     return (
       <div className="w-full h-full outline-none focus:outline-none focus-visible:outline-none [&_*:focus]:outline-none [&_*:focus]:ring-0" tabIndex={-1}>
@@ -219,6 +238,9 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
               if (k.type === 'line' || type === 'LINE') {
                 return <Line hide={isHidden} key={k.key} type="monotone" dataKey={k.key} name={k.name || k.key} stroke={k.color} strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
               }
+              if (k.type === 'area' || type === 'AREA') {
+                return <Area hide={isHidden} key={k.key} type="monotone" dataKey={k.key} name={k.name || k.key} fill={k.color} stroke={k.color} fillOpacity={0.2} strokeWidth={2} activeDot={{ r: 5 }} />
+              }
               return (
                 <Bar hide={isHidden} key={k.key} dataKey={k.key} name={k.name || k.key} fill={k.color} stackId={k.stackId} radius={type === 'STACKED_BAR' ? 0 : [4, 4, 0, 0]}>
                   {displayData.map((entry, index) => {
@@ -244,7 +266,16 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
     )
   }
 
-  const renderTable = () => (
+  const renderTable = () => {
+    if (!hasValidData) return (
+      <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-1.5 bg-muted/10 rounded-lg border border-dashed border-border/30 m-2">
+        <p className="text-[13px] font-medium text-foreground/70">{t('noData')}</p>
+        <p className="text-[11px] opacity-50 text-center px-4">
+          {emptyMessage || "Métrica não aplicável (N/A) a este setor."}
+        </p>
+      </div>
+    )
+    return (
     <div className="overflow-auto h-full w-full custom-scrollbar">
       <table className="w-full text-sm text-left">
         <thead className="sticky top-0 bg-muted/80 backdrop-blur text-muted-foreground text-xs uppercase">
@@ -269,20 +300,21 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
         </tbody>
       </table>
     </div>
-  )
+    )
+  }
 
   const content = (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between mb-4">
-        <div>
+      <div className="flex flex-wrap items-center justify-between mb-4 gap-2">
+        <div className="shrink-0 max-w-[50%]">
           <div className="flex items-center gap-1.5">
-            <h3 className="font-bold text-foreground text-base leading-tight">{title}</h3>
+            <h3 className="font-bold text-foreground text-base leading-tight truncate" title={title}>{title}</h3>
             {infoTooltip && (
               <TooltipProvider delay={100}>
                 <UITooltip>
                   <TooltipTrigger
                     render={
-                      <span className="cursor-help inline-flex text-muted-foreground hover:text-foreground transition-colors">
+                      <span className="cursor-help inline-flex text-muted-foreground hover:text-foreground transition-colors shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
                       </span>
                     }
@@ -296,11 +328,16 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
           </div>
           {cagr !== undefined && cagr !== null && (
             <p className="text-xs font-semibold text-muted-foreground mt-0.5">
-              CAGR: <span className={cagr >= 0 ? "text-emerald-500" : "text-rose-500"}>{cagr > 0 ? '+' : ''}{(cagr * 100).toFixed(1)}%</span>
+              CAGR: <span className={cagr >= 0 ? "text-bull" : "text-bear"}>{cagr > 0 ? '+' : ''}{(cagr * 100).toFixed(1)}%</span>
             </p>
           )}
         </div>
-        <div className="flex gap-1 bg-muted/50 p-1 rounded-md border border-border/40">
+        {headerExtra && (
+          <div className="flex-1 flex justify-center mx-2 min-w-0 hidden sm:flex overflow-x-auto no-scrollbar">
+            {headerExtra}
+          </div>
+        )}
+        <div className="flex gap-1 shrink-0 bg-muted/50 p-1 rounded-md border border-border/40">
           <button 
             onClick={() => setViewMode('chart')}
             className={`p-1.5 rounded-sm transition-colors ${viewMode === 'chart' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
@@ -324,7 +361,10 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip }: 
             </DialogTrigger>
             <DialogContent className="sm:max-w-5xl w-[90vw] h-[80vh] flex flex-col bg-card border-border/50 outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0">
               <div className="flex items-center justify-between">
-                <DialogTitle className="text-xl">{title}</DialogTitle>
+                <div className="flex items-center gap-4">
+                  <DialogTitle className="text-xl">{title}</DialogTitle>
+                  {headerExtra && <div className="hidden md:block scale-90 origin-left">{headerExtra}</div>}
+                </div>
                 <div className="flex gap-1 bg-muted/50 p-1 rounded-md border border-border/40 mr-6">
                   {TIME_FILTERS.map(tf => (
                     <button

@@ -1,0 +1,81 @@
+name: Health Check
+
+on:
+  schedule:
+    - cron: "0 */6 * * *" # a cada 6 horas
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      BASE_URL: https://bullmetrics.app
+    steps:
+      - name: Check endpoints and open issues on failure
+        run: |
+          set -u
+          FAILED=0
+
+          # Cria um issue para o endpoint falhado, ou comenta num issue aberto
+          # existente do mesmo endpoint (dedup via pesquisa no título).
+          report_failure() {
+            local endpoint="$1"
+            local output="$2"
+            FAILED=1
+            echo "::error::Health check failed — ${endpoint}"
+
+            # Trunca output para o corpo do issue
+            output="${output:0:900}"
+
+            local body
+            body="$(printf '**Endpoint:** `%s`\n\n**Curl/validation output:**\n```\n%s\n```\n\n**Workflow run:** %s\n' \
+              "$endpoint" "$output" "$RUN_URL")"
+
+            local existing
+            existing="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label bug \
+              --search "\"Health Check Failed — ${endpoint}\" in:title" \
+              --json number --jq '.[0].number // empty')"
+
+            if [ -n "$existing" ]; then
+              echo "Issue aberto #${existing} já existe para ${endpoint} — a comentar."
+              gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" \
+                --body "$(printf 'Ainda a falhar em %s.\n\n%s' "$(date -u +'%Y-%m-%d %H:%M UTC')" "$body")"
+            else
+              gh issue create --repo "$GITHUB_REPOSITORY" \
+                --title "🚨 Health Check Failed — ${endpoint} — $(date -u +'%Y-%m-%d %H:%M UTC')" \
+                --label bug \
+                --body "$body"
+            fi
+          }
+
+          # 1) Homepage responde 2xx
+          if ! OUT="$(curl -fsS --max-time 30 "$BASE_URL" -o /dev/null 2>&1)"; then
+            report_failure "$BASE_URL" "$OUT"
+          else
+            echo "✓ homepage OK"
+          fi
+
+          # 2) /api/search devolve JSON com "ticker"
+          OUT="$(curl -sS --max-time 30 "$BASE_URL/api/search?q=AAPL" 2>&1 || true)"
+          if ! printf '%s' "$OUT" | grep -q "ticker"; then
+            report_failure "/api/search" "$OUT"
+          else
+            echo "✓ /api/search OK"
+          fi
+
+          # 3) /api/prices/AAPL devolve JSON com "close"
+          OUT="$(curl -sS --max-time 30 "$BASE_URL/api/prices/AAPL" 2>&1 || true)"
+          if ! printf '%s' "$OUT" | grep -q "close"; then
+            report_failure "/api/prices/AAPL" "$OUT"
+          else
+            echo "✓ /api/prices/AAPL OK"
+          fi
+
+          exit "$FAILED"

@@ -1,20 +1,32 @@
 {
-  "name": "bullquant",
+  "name": "bull-metrics",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@ai-sdk/google": "^4.0.2",
     "@base-ui/react": "^1.6.0",
+    "@google/genai": "^2.10.0",
+    "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^5.4.0",
+    "@prisma/client": "^6.19.3",
+    "@react-pdf/renderer": "^4.5.1",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.2",
+    "ai": "^7.0.4",
+    "cheerio": "^1.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
     "lucide-react": "^1.21.0",
     "next": "16.2.9",
     "next-intl": "^4.13.0",
@@ -22,13 +34,11 @@
     "react-dom": "19.2.4",
     "react-hook-form": "^7.80.0",
     "recharts": "^3.9.0",
-    "shadcn": "^4.11.0",
     "tailwind-merge": "^3.6.0",
     "tw-animate-css": "^1.4.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@prisma/client": "^6.19.3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -36,9 +46,12 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "prisma": "^6.19.3",
+    "shadcn": "^4.11.0",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
-    "typescript": "^5"
+    "tsx": "^4.22.4",
+    "typescript": "^5",
+    "vitest": "^4.1.9"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"

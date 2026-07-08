@@ -48,7 +48,7 @@ export default async function ResetPasswordPage({
           )}
 
           {resolvedParams.message && (
-            <div className="text-sm text-center text-emerald-400 p-3 bg-emerald-400/10 rounded-md font-medium">
+            <div className="text-sm text-center text-bull p-3 bg-bull/10 rounded-md font-medium">
               {resolvedParams.message}
             </div>
           )}

@@ -26,3 +26,10 @@ jobs:
         env:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
         run: python scripts/ingest_fundamentals.py
+
+      # A re-ingestão repõe o histórico de shares na base pré-split do EDGAR
+      # (só reapresenta 2-3 anos comparativos) — ajustar sempre a seguir.
+      - name: Adjust historical stock splits
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: python scripts/adjust_splits.py

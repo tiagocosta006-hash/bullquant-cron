@@ -1,0 +1,431 @@
+{
+  "marketing": {
+    "eyebrow": "基本面分析 · 价值投资",
+    "titleLead": "发现别人",
+    "titleAccent": "忽视的价值。",
+    "subtitle": "10年基本面数据、内置DCF估值模型和AI洞察 — 完全免费。专为长期投资者打造的严肃分析工具。",
+    "primaryCta": "免费创建账户",
+    "secondaryCta": "查看示例: AAPL",
+    "trust": "覆盖标普500 · 采用SEC官方数据 · 无需信用卡",
+    "features": {
+      "fundamentals": {
+        "title": "10年基本面",
+        "desc": "收入、利润率、ROIC和现金流一目了然。"
+      },
+      "dcf": {
+        "title": "内置 DCF",
+        "desc": "几秒钟内估算内在价值。"
+      },
+      "ai": {
+        "title": "AI 洞察",
+        "desc": "通过人工智能总结近期重要动态。"
+      }
+    }
+  },
+  "insider": {
+    "title": "内部交易",
+    "subtitle": "高管和10%以上股东的交易记录。",
+    "emptyTitle": "无活动",
+    "emptyDesc": "近期未发现内部交易。",
+    "showMore": "显示更多 {n} 笔",
+    "showLess": "显示较少",
+    "buysWindow": "{n} 笔买入 ({days}天)",
+    "sellsWindow": "{n} 笔卖出 ({days}天)",
+    "col": {
+      "insider": "姓名",
+      "type": "类型",
+      "shares": "股份",
+      "price": "价格",
+      "value": "价值",
+      "date": "日期"
+    },
+    "type": {
+      "buy": "买入",
+      "sell": "卖出",
+      "other": "其他"
+    },
+    "codes": {
+      "P": "P - 买入",
+      "S": "S - 卖出",
+      "A": "A - 授予",
+      "M": "M - 期权行使",
+      "F": "F - 扣留",
+      "G": "G - 赠予",
+      "J": "J - 其他",
+      "unknown": "SEC 代码: {code}"
+    }
+  },
+  "dashboard": {
+    "title": "市场洞察",
+    "subtitle": "探索市场趋势，发现投资机会。",
+    "empty": "未找到公司。",
+    "marketCap": "市值",
+    "quickActionsTitle": "快速操作",
+    "exploreTitle": "探索公司",
+    "actions": {
+      "portfolio": "我的投资组合",
+      "portfolioDesc": "你关注的公司和实时价格",
+      "dcf": "新建 DCF 分析",
+      "dcfDesc": "估算股票的内在价值",
+      "calendar": "财报日历",
+      "calendarDesc": "即将发布的财报",
+      "transcripts": "财报电话会议",
+      "transcriptsDesc": "季度电话会议记录"
+    },
+    "tabs": {
+      "sp500": "标普500",
+      "trending": "热门关注",
+      "growth": "高增长",
+      "dividend": "股息增长",
+      "buyback": "股票回购",
+      "ai": "人工智能"
+    }
+  },
+  "sidebar": {
+    "dashboard": "控制台",
+    "portfolio": "投资组合",
+    "calendar": "财报日历",
+    "dcf": "DCF 估值",
+    "transcripts": "电话会议",
+    "screener": "选股器",
+    "recentSearches": "最近搜索",
+    "desc": {
+      "dashboard": "总览与探索",
+      "portfolio": "你关注的公司",
+      "calendar": "财务业绩日程",
+      "dcf": "评估合理价格",
+      "transcripts": "投资者会议",
+      "screener": "高级筛选寻找公司"
+    }
+  },
+  "login": {
+    "title": "登录",
+    "subtitle": "访问您的投资组合和分析。",
+    "emailLabel": "电子邮件",
+    "emailPlaceholder": "name@email.com",
+    "passwordLabel": "密码",
+    "forgotPasswordLink": "忘记密码？",
+    "submitButton": "登录",
+    "submitLoading": "登录中...",
+    "noAccount": "没有账户？",
+    "registerLink": "免费注册"
+  },
+  "register": {
+    "title": "创建账户",
+    "subtitle": "加入 BullVision。",
+    "nameLabel": "姓名",
+    "namePlaceholder": "您的称呼",
+    "emailLabel": "电子邮件",
+    "emailPlaceholder": "name@email.com",
+    "passwordLabel": "密码",
+    "submitButton": "注册",
+    "submitLoading": "注册中...",
+    "hasAccount": "已有账户？",
+    "loginLink": "登录"
+  },
+  "forgotPassword": {
+    "title": "重置密码",
+    "subtitle": "输入您的电子邮件。",
+    "emailLabel": "电子邮件",
+    "emailPlaceholder": "name@email.com",
+    "submitButton": "发送链接",
+    "submitLoading": "发送中...",
+    "remembered": "想起来了？",
+    "backToLogin": "返回登录"
+  },
+  "resetPassword": {
+    "title": "新密码",
+    "subtitle": "选择您的新密码。",
+    "passwordLabel": "新密码",
+    "passwordPlaceholder": "******",
+    "submitButton": "更新密码",
+    "submitLoading": "更新中..."
+  },
+  "header": {
+    "settingsTitle": "账户设置",
+    "logoutTitle": "退出登录",
+    "login": "登录",
+    "register": "注册",
+    "dcf": "DCF",
+    "calendar": "日历"
+  },
+  "search": {
+    "placeholder": "搜索股票代码 (如 AAPL)...",
+    "noResults": "未找到公司。",
+    "recentTitle": "最近搜索",
+    "clearAll": "清除全部"
+  },
+  "settings": {
+    "title": "设置",
+    "subtitle": "管理您的个人资料和首选项。",
+    "planFree": "免费计划",
+    "saveSuccess": "资料已更新！",
+    "tabs": {
+      "profile": "个人资料",
+      "preferences": "首选项",
+      "subscription": "订阅"
+    },
+    "profile": {
+      "title": "您的信息",
+      "email": "电子邮件地址",
+      "name": "显示名称",
+      "namePlaceholder": "您的称呼",
+      "save": "保存更改",
+      "dangerZone": "危险区域",
+      "logoutDesc": "安全退出您的账户。",
+      "logoutBtn": "退出登录"
+    },
+    "preferences": {
+      "title": "应用首选项",
+      "language": "界面语言",
+      "languageDesc": "选择您的语言。",
+      "theme": "视觉主题",
+      "themeDesc": "在浅色和深色模式之间切换。"
+    },
+    "subscription": {
+      "title": "当前计划",
+      "desc": "您当前使用的是免费计划。",
+      "premiumSoonTitle": "PRO 版本即将推出",
+      "premiumSoonDesc": "我们正在为高级订阅者准备先进的 AI 功能。",
+      "upgradeBtn": "升级至 PRO"
+    }
+  },
+  "portfolio": {
+    "loginRequired": "您需要登录才能访问投资组合。",
+    "loginButton": "登录",
+    "title": "我的投资组合",
+    "subtitle": "实时跟踪您喜欢的公司。",
+    "positions": "持仓",
+    "upToday": "今日上涨",
+    "emptyState": {
+      "title": "您的观察列表为空",
+      "description": "开始添加公司以跟踪表现。",
+      "quickAdd": "添加",
+      "adding": "添加中..."
+    },
+    "suggestions": {
+      "title": "建议添加"
+    },
+    "landing": {
+      "title": "BullVision",
+      "description": "在顶部搜索公司或注册账户。",
+      "testExample": "查看示例",
+      "createAccount": "创建免费账户"
+    },
+    "card": {
+      "currentPrice": "当前价格"
+    },
+    "lastUpdate": "最后更新:"
+  },
+  "stock": {
+    "underConstruction": "建设中",
+    "buildingMessage": "此页面正在开发中。",
+    "backHome": "返回主页",
+    "updatedAt": "更新于",
+    "priceUnavailable": "价格不可用",
+    "header": {
+      "followed": "已关注",
+      "addToPortfolio": "加入投资组合",
+      "updating": "更新中..."
+    },
+    "savedValuations": {
+      "title": "我保存的 DCF 估值",
+      "openCalculator": "在计算器中打开",
+      "noAnalyses": "您尚未保存任何估值。",
+      "savedAt": "保存于",
+      "fairValue": "公允价值",
+      "mos": "安全边际",
+      "growth": "增长 (1-5年)",
+      "termGrowth": "永续增长"
+    },
+    "brief": {
+      "title": "AI 简报",
+      "loading": "AI 正在分析近期动态...",
+      "subtitle": "近期动态战略摘要",
+      "date": "日期",
+      "sentiment": {
+        "bullish": "看涨",
+        "bearish": "看跌",
+        "neutral": "中性"
+      },
+      "expand": "展开 {n} 条更多",
+      "collapse": "收起"
+    },
+    "profile": {
+      "title": "公司简介",
+      "website": "网站",
+      "sector": "板块",
+      "industry": "行业",
+      "employees": "全职员工",
+      "country": "国家",
+      "exchange": "交易所"
+    },
+    "snapshotTitle": "财务快照",
+    "chart": {
+      "title": "历史价格",
+      "noData": "无数据",
+      "period": "期间",
+      "chartView": "图表视图",
+      "tableView": "表格视图",
+      "fullScreen": "全屏",
+      "tabs": {
+        "1m": "1个月",
+        "6m": "6个月",
+        "1y": "1年",
+        "5y": "5年",
+        "max": "最大"
+      }
+    },
+    "snapshot": {
+      "valuation": "估值倍数",
+      "cashFlow": "现金流",
+      "marginAndGrowth": "利润率与增长",
+      "balance": "资产负债",
+      "dividend": "股息",
+      "na": "N/A",
+      "naGeneric": "暂无数据。",
+      "naMargin": "未报告 — 金融机构常见。",
+      "naPrice": "不可用：正在加载最新价格。"
+    }
+  },
+  "dcf": {
+    "title": "DCF 估值模型",
+    "subtitle": "使用现金流折现法估算公司内在价值。",
+    "educationalWarning": "DCF 只是一个模型，不是水晶球。请结合其他工具使用，不可作为投资建议。",
+    "autofillLabel": "自动填充公司数据",
+    "autofillPlaceholder": "搜索代码 (如 AAPL)...",
+    "loadedFor": "数据已加载:",
+    "loadError": "无法加载该公司数据。",
+    "currentPriceInput": "当前价格",
+    "fcf0": "初始自由现金流",
+    "shares": "总股本",
+    "netDebt": "净债务",
+    "millionsSuffix": "百万",
+    "growth1": "1-5年 增长率",
+    "growth2": "6-10年 增长率",
+    "wacc": "WACC (折现率)",
+    "waccHint": "要求的最低回报率。",
+    "terminalGrowth": "永续增长率",
+    "terminalGrowthHint": "第10年后的长期增长率。",
+    "reverseDcf": "计算隐含增长率 (反向 DCF)",
+    "fairValue": "公允价值",
+    "currentPrice": "当前价格",
+    "marginOfSafety": "安全边际",
+    "undervalued": "潜在被低估",
+    "overvalued": "潜在被高估",
+    "enterpriseValue": "企业价值",
+    "equityValue": "股权价值",
+    "terminalValuePv": "终值 (现值)",
+    "fcfPv": "折现现金流 (现值)",
+    "disclaimer": "以上仅为基于假设的估算，不构成买卖建议。",
+    "saved": {
+      "title": "我的分析",
+      "saveButton": "保存",
+      "saveError": "保存失败。",
+      "labelPlaceholder": "方案名称 (可选)",
+      "empty": "您尚未保存任何分析。",
+      "loadButton": "加载",
+      "deleteButton": "删除",
+      "fairValueShort": "公允:"
+    },
+    "errorWacc": "WACC 必须大于永续增长率。",
+    "errorShares": "请输入总股本以计算每股价值。",
+    "errorFcf": "请输入有效的初始自由现金流。"
+  },
+  "financials": {
+    "engineTitle": "财务数据",
+    "periods": {
+      "quarterly": "单季度",
+      "ttm": "TTM (滚动)",
+      "annual": "年度"
+    },
+    "charts": {
+      "revenue": "营业收入",
+      "revenueBySegment": "按业务板块收入",
+      "epsDiluted": "每股收益 (EPS)",
+      "freeCashFlow": "自由现金流",
+      "netIncome": "净利润",
+      "ebitda": "EBITDA",
+      "expenses": "各项支出",
+      "cashDebt": "现金与债务",
+      "sharesOutstanding": "总股本",
+      "dividends": "股息 (DPS)",
+      "roic": "投资资本回报率 (ROIC)",
+      "grossMargin": "毛利率",
+      "operatingMargin": "营业利润率",
+      "profitMargin": "净利率"
+    },
+    "ratios": {
+      "roic": "ROIC",
+      "gross": "毛利率",
+      "operating": "营业",
+      "profit": "净利",
+      "roe": "ROE"
+    }
+  },
+  "calendar": {
+    "title": "财报日历",
+    "subtitle": "跟踪公司的财报发布日期。",
+    "disclaimer": "日期为预估，请以公司官网为准。",
+    "today": "今天",
+    "prevMonth": "上个月",
+    "nextMonth": "下个月",
+    "scopeAll": "全部",
+    "scopeWatchlist": "我的投资组合",
+    "more": "更多",
+    "empty": "此期间没有财报发布。",
+    "summary": "本期共有 {count} 份财报",
+    "legendBmo": "盘前发布",
+    "legendAmc": "盘后发布"
+  },
+  "news": {
+    "title": "公司新闻",
+    "subtitle": "过去 30 天的最新文章。",
+    "source": "来源 Finnhub",
+    "emptyTitle": "无近期新闻",
+    "emptyDesc": "未找到该公司近期的新闻文章。",
+    "showMore": "显示更多 {n} 篇文章",
+    "showLess": "显示较少",
+    "readMore": "阅读全文"
+  },
+  "transcripts": {
+    "title": "财报电话会议记录",
+    "subtitle": "阅读和搜索季度电话会议记录。",
+    "inDevelopment": "开发中",
+    "placeholderTitle": "记录即将推出",
+    "placeholderDesc": "此功能将很快可用。"
+  },
+  "screener": {
+    "title": "股票选股器",
+    "subtitle": "根据您的标准寻找优质公司。",
+    "filters": {
+      "title": "筛选条件",
+      "guruStrategies": "大师策略",
+      "moatCompounders": "沃伦·巴菲特 (护城河)",
+      "moatTooltip": "竞争优势过滤：毛利率 > 40% 且 ROIC > 15%。",
+      "magicFormula": "乔尔·格林布拉特 (神奇公式)",
+      "magicTooltip": "高效过滤：高 ROIC，忽略绝对利润率。",
+      "sector": "板块",
+      "sectorPlaceholder": "所有板块",
+      "allSectors": "所有板块",
+      "minGrossMargin": "最低毛利率",
+      "minRoic": "最低 ROIC",
+      "minRevenue": "最低年收入",
+      "minEarningsYield": "最低盈利收益率"
+    },
+    "results": {
+      "count": "找到 {count} 家公司",
+      "loading": "搜索中...",
+      "empty": "未找到公司。",
+      "emptyDesc": "尝试放宽筛选条件。",
+      "company": "公司",
+      "sector": "板块",
+      "revenue": "收入",
+      "grossMargin": "毛利率",
+      "roic": "ROIC",
+      "earningsYield": "盈利收益率",
+      "action": "操作",
+      "viewStock": "查看分析"
+    }
+  }
+}

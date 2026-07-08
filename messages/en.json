@@ -1,6 +1,105 @@
 {
+  "marketing": {
+    "eyebrow": "Fundamental analysis · Value investing",
+    "titleLead": "See the value",
+    "titleAccent": "others miss.",
+    "subtitle": "10 years of fundamentals, a DCF calculator that autofills, and AI Insights — free. Serious analysis for long-term investors.",
+    "primaryCta": "Create free account",
+    "secondaryCta": "See example: AAPL",
+    "trust": "S&P 500 coverage · SEC EDGAR data · No credit card",
+    "features": {
+      "fundamentals": {
+        "title": "10 years of fundamentals",
+        "desc": "Revenue, margins, ROIC and cash flow at a glance — with CAGR computed automatically."
+      },
+      "dcf": {
+        "title": "Built-in DCF",
+        "desc": "Estimate intrinsic value in seconds. Autofill from the company and tune with sliders."
+      },
+      "ai": {
+        "title": "AI Brief",
+        "desc": "An AI summary of each company's recent developments, classified by sentiment — never investment advice."
+      }
+    }
+  },
+  "insider": {
+    "title": "Company Insider Trading",
+    "subtitle": "Form 4 filings by directors, officers, and 10% owners.",
+    "emptyTitle": "No Activity",
+    "emptyDesc": "No recent insider transactions detected for this company.",
+    "showMore": "Show {n} more transactions",
+    "showLess": "Show less",
+    "buysWindow": "{n} Buys ({days}d)",
+    "sellsWindow": "{n} Sells ({days}d)",
+    "col": {
+      "insider": "Name",
+      "type": "Type",
+      "shares": "Transacted",
+      "price": "Price",
+      "value": "Value",
+      "date": "Date"
+    },
+    "type": {
+      "buy": "BUY",
+      "sell": "SELL",
+      "other": "OTHER"
+    },
+    "codes": {
+      "P": "P - Open Market Purchase",
+      "S": "S - Open Market Sale",
+      "A": "A - Grant or Award",
+      "M": "M - Option Exercise",
+      "F": "F - Tax Withholding (In Kind)",
+      "G": "G - Gift",
+      "J": "J - Other",
+      "unknown": "SEC Code: {code}"
+    }
+  },
+  "dashboard": {
+    "title": "Insights",
+    "subtitle": "Explore market trends, discover high-growth opportunities, and track the most discussed stocks across Wall Street.",
+    "empty": "No companies found for this category.",
+    "marketCap": "Market Cap",
+    "quickActionsTitle": "Quick actions",
+    "exploreTitle": "Explore companies",
+    "actions": {
+      "portfolio": "My Portfolio",
+      "portfolioDesc": "Companies you follow and live prices",
+      "dcf": "New DCF analysis",
+      "dcfDesc": "Estimate a stock's intrinsic value",
+      "calendar": "Earnings calendar",
+      "calendarDesc": "Upcoming earnings and who beat estimates",
+      "transcripts": "Earnings transcripts",
+      "transcriptsDesc": "Quarterly earnings call transcripts"
+    },
+    "tabs": {
+      "sp500": "S&P 500",
+      "trending": "Most Trending",
+      "growth": "Growth",
+      "dividend": "Dividend Growth",
+      "buyback": "Buyback Machines",
+      "ai": "Artificial Intelligence"
+    }
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "portfolio": "Portfolio",
+    "calendar": "Calendar",
+    "dcf": "DCF Calculator",
+    "transcripts": "Transcripts",
+    "screener": "Stock Screener",
+    "recentSearches": "Recent Searches",
+    "desc": {
+      "dashboard": "Overview, shortcuts and company explorer",
+      "portfolio": "The companies you follow and their live prices",
+      "calendar": "Upcoming earnings reports for US companies",
+      "dcf": "Evaluate the fair price of any stock using cash flows",
+      "transcripts": "Read full investor meeting transcripts",
+      "screener": "Find companies using advanced filters"
+    }
+  },
   "login": {
-    "title": "Sign in to BullQuant",
+    "title": "Sign in to BullVision",
     "subtitle": "Access your portfolio and analytics.",
     "emailLabel": "Email",
     "emailPlaceholder": "name@email.com",
@@ -13,7 +112,7 @@
   },
   "register": {
     "title": "Create Account",
-    "subtitle": "Join thousands of investors on BullQuant.",
+    "subtitle": "Join BullVision..",
     "nameLabel": "Name",
     "namePlaceholder": "Your name",
     "emailLabel": "Email",
@@ -47,7 +146,8 @@
     "logoutTitle": "Sign out",
     "login": "Sign in",
     "register": "Sign up",
-    "dcf": "DCF"
+    "dcf": "DCF",
+    "calendar": "Calendar"
   },
   "search": {
     "placeholder": "Search ticker (e.g., AAPL)...",
@@ -56,13 +156,72 @@
     "clearAll": "Clear All"
   },
   "settings": {
-    "title": "My Account",
-    "subtitle": "Manage your personal data and settings.",
-    "planFree": "FREE Plan",
-    "subscriptionTitle": "Subscription Details",
-    "subscriptionDesc": "You are currently on the BullQuant free tier. This includes access to the search engine and basic fundamental snapshots.",
-    "premiumSoonTitle": "🚀 Premium features coming soon!",
-    "premiumSoonDesc": "Price alerts, advanced screeners, and PDF reports are under development."
+    "title": "Settings",
+    "subtitle": "Manage your profile, preferences, and subscription in one place.",
+    "planFree": "Free Plan",
+    "saveSuccess": "Profile updated successfully!",
+    "tabs": {
+      "profile": "Profile",
+      "preferences": "Preferences",
+      "subscription": "Subscription"
+    },
+    "profile": {
+      "title": "Your Details",
+      "email": "Email Address",
+      "name": "Display Name",
+      "namePlaceholder": "How you want to be called",
+      "save": "Save Changes",
+      "dangerZone": "Danger Zone",
+      "logoutDesc": "Securely sign out of your Bullmetrics session.",
+      "settings": "Settings",
+      "settingsDesc": "Manage your profile, subscription, and app preferences.",
+      "language": "Language",
+      "languageDesc": "Choose the language you want to use in Bullmetrics.",
+      "theme": "Visual Theme",
+      "themeDesc": "Switch between Dark and Light mode.",
+      "logoutBtn": "Sign Out"
+    },
+    "preferences": {
+      "title": "App Preferences",
+      "language": "Interface Language",
+      "languageDesc": "Choose the language you want to use in BullQuant.",
+      "theme": "Visual Theme",
+      "themeDesc": "Switch between Dark and Light mode."
+    },
+    "subscription": {
+      "title": "Your Current Plan",
+      "desc": "You are currently on the free plan. You have unlimited access to quotes, but daily AI analyses and DCFs are limited.",
+      "premiumSoonTitle": "Premium Access Coming Soon",
+      "premiumSoonDesc": "We are preparing advanced artificial intelligence features exclusively for PRO subscribers.",
+      "upgradeBtn": "Upgrade to PRO"
+    }
+  },
+  "portfolio": {
+    "loginRequired": "You need to sign in to access your Watchlist.",
+    "loginButton": "Sign In",
+    "title": "My Portfolio",
+    "subtitle": "Track your favourite companies in real time.",
+    "positions": "Positions",
+    "upToday": "Up Today",
+    "emptyState": {
+      "title": "Your Watchlist is empty",
+      "description": "Start adding companies to track their performance in real time, or explore some of the popular options below.",
+      "quickAdd": "Add",
+      "adding": "Adding..."
+    },
+    "suggestions": {
+      "title": "Suggestions to add"
+    },
+    "landing": {
+      "title": "BullVision",
+      "description": "Search for a company ticker in the top bar to get started, or sign up to access your Watchlist.",
+      "testExample": "Try Example",
+      "createAccount": "Create Free Account"
+    },
+    "card": {
+      "currentPrice": "Current Price"
+    },
+    "lastUpdate": "Last update:"
   },
   "stock": {
     "underConstruction": "Under construction",
@@ -70,6 +229,43 @@
     "backHome": "Back Home",
     "updatedAt": "Updated at",
     "priceUnavailable": "Price unavailable",
+    "header": {
+      "followed": "Following",
+      "addToPortfolio": "Add to Portfolio",
+      "updating": "Updating..."
+    },
+    "savedValuations": {
+      "title": "My Saved Valuations",
+      "openCalculator": "Open in Calculator",
+      "noAnalyses": "You haven't saved any DCF valuations for this company.",
+      "savedAt": "Saved on",
+      "fairValue": "Fair Value",
+      "mos": "Margin of Safety",
+      "growth": "Growth (1-5y)",
+      "termGrowth": "Term. Growth"
+    },
+    "brief": {
+      "title": "Brief",
+      "loading": "Our AI is analysing recent developments...",
+      "subtitle": "A strategic summary of recent developments (AI-generated)",
+      "date": "Date",
+      "sentiment": {
+        "bullish": "Bullish",
+        "bearish": "Bearish",
+        "neutral": "Neutral"
+      },
+      "expand": "Read {n} more developments",
+      "collapse": "Collapse"
+    },
+    "profile": {
+      "title": "Company Profile",
+      "website": "Website",
+      "sector": "Sector",
+      "industry": "Industry",
+      "employees": "Full Time Employees",
+      "country": "Country",
+      "exchange": "Exchange"
+    },
     "snapshotTitle": "Snapshot",
     "chart": {
       "title": "Price History",
@@ -91,7 +287,11 @@
       "cashFlow": "Cash Flow",
       "marginAndGrowth": "Margins & Growth",
       "balance": "Balance Sheet",
-      "dividend": "Dividends"
+      "dividend": "Dividends",
+      "na": "N/A",
+      "naGeneric": "No data available for this company.",
+      "naMargin": "Margin not reported — common for banks and insurers, which have no cost of goods (COGS).",
+      "naPrice": "Unavailable: depends on the live price, which hasn't loaded yet."
     }
   },
   "dcf": {
@@ -113,6 +313,7 @@
     "waccHint": "Required return. Higher means a more conservative value.",
     "terminalGrowth": "Perpetual Growth",
     "terminalGrowthHint": "Long-term growth after year 10 (typically ≤ inflation).",
+    "reverseDcf": "Calculate Implied Growth (Reverse DCF)",
     "fairValue": "Fair Value",
     "currentPrice": "Current Price",
     "marginOfSafety": "Margin of Safety",
@@ -123,6 +324,16 @@
     "terminalValuePv": "Terminal Value (PV)",
     "fcfPv": "Discounted FCF (PV)",
     "disclaimer": "Values are an estimate based on your assumptions. They are not a buy or sell recommendation.",
+    "saved": {
+      "title": "My analyses",
+      "saveButton": "Save",
+      "saveError": "Couldn't save. Please try again.",
+      "labelPlaceholder": "Scenario name (optional)",
+      "empty": "You haven't saved any analysis for this company yet.",
+      "loadButton": "Load",
+      "deleteButton": "Delete",
+      "fairValueShort": "Fair:"
+    },
     "errorWacc": "WACC must be greater than perpetual growth for the model to be valid. Adjust the sliders.",
     "errorShares": "Enter the number of shares outstanding to compute value per share.",
     "errorFcf": "Enter a valid initial Free Cash Flow to start."
@@ -154,7 +365,73 @@
       "roic": "ROIC",
       "gross": "GROSS",
       "operating": "OPERAT.",
-      "profit": "PROFIT"
+      "profit": "PROFIT",
+      "roe": "ROE"
+    }
+  },
+  "calendar": {
+    "title": "Earnings Calendar",
+    "subtitle": "Track the earnings report dates of the companies we cover.",
+    "disclaimer": "Future dates are estimates from the data sources and may change. Always confirm on the company's investor relations page.",
+    "today": "Today",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "scopeAll": "All",
+    "scopeWatchlist": "Watchlist",
+    "more": "more",
+    "empty": "No earnings scheduled in this period.",
+    "summary": "{count} earnings in this period",
+    "legendBmo": "Before open",
+    "legendAmc": "After close"
+  },
+  "news": {
+    "title": "Company News",
+    "subtitle": "Latest articles from the past 30 days.",
+    "source": "via Finnhub",
+    "emptyTitle": "No Recent News",
+    "emptyDesc": "No recent news articles found for this company.",
+    "showMore": "Show {n} more articles",
+    "showLess": "Show less",
+    "readMore": "Read full article"
+  },
+  "transcripts": {
+    "title": "Earnings Calls Transcripts",
+    "subtitle": "Read and search through quarterly earnings conference calls.",
+    "inDevelopment": "In Development",
+    "placeholderTitle": "Transcripts Coming Soon",
+    "placeholderDesc": "We are finalizing our data provider integration. This feature will be available shortly."
+  },
+  "screener": {
+    "title": "Stock Screener",
+    "subtitle": "Find high-quality companies based on your own criteria.",
+    "filters": {
+      "title": "Criteria",
+      "guruStrategies": "Great Investors",
+      "moatCompounders": "Warren Buffett",
+      "moatTooltip": "Competitive Moat filter: Gross Margin > 40% and ROIC > 15%.",
+      "magicFormula": "Joel Greenblatt (Test)",
+      "magicTooltip": "Efficiency filter: High ROIC ignoring absolute margins.",
+      "sector": "Sector",
+      "sectorPlaceholder": "All Sectors",
+      "allSectors": "All Sectors",
+      "minGrossMargin": "Gross Margin",
+      "minRoic": "ROIC",
+      "minRevenue": "Annual Revenue",
+      "minEarningsYield": "Earnings Yield"
+    },
+    "results": {
+      "count": "{count} companies found",
+      "loading": "Searching database...",
+      "empty": "No companies found.",
+      "emptyDesc": "Try adjusting your filters to broaden the search.",
+      "company": "Company",
+      "sector": "Sector",
+      "revenue": "Revenue",
+      "grossMargin": "Gross Margin",
+      "roic": "ROIC",
+      "earningsYield": "Earnings Yield",
+      "action": "View",
+      "viewStock": "View Analysis"
     }
   }
 }

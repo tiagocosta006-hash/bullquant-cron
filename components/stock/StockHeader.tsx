@@ -1,14 +1,17 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { TrendingUp, TrendingDown, Clock, Check, Plus } from "lucide-react"
+import { TrendingUp, TrendingDown, Clock, Check, Plus, Scale } from "lucide-react"
 import { useTranslations, useLocale } from "next-intl"
+import Link from "next/link"
+import { getCurrencySymbol } from "@/lib/finance/format"
 
 type CompanyProp = {
   ticker: string;
   name: string;
   exchange: string;
   logoUrl: string | null;
+  currency?: string | null;
 }
 
 type PriceData = {
@@ -17,7 +20,7 @@ type PriceData = {
   changePercent: number;
 }
 
-export function StockHeader({ company }: { company: CompanyProp }) {
+export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfButton?: React.ReactNode }) {
   const t = useTranslations("stock")
   const locale = useLocale()
   const [priceData, setPriceData] = useState<PriceData | null>(null)
@@ -107,13 +110,20 @@ export function StockHeader({ company }: { company: CompanyProp }) {
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border/40">
       {/* Left side: Company Info */}
       <div className="flex items-center gap-4">
-        <div className="bg-primary/10 p-3 rounded-xl border border-primary/20 shadow-sm flex items-center justify-center shrink-0 w-16 h-16">
+        <div className="bg-primary/10 p-3 rounded-xl border border-primary/20 shadow-sm flex items-center justify-center shrink-0 w-16 h-16 relative overflow-hidden">
           {company.logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={company.logoUrl} alt={company.name} className="w-12 h-12 object-contain rounded-lg bg-white p-1" />
-          ) : (
-            <span className="font-extrabold text-2xl text-primary">{company.ticker[0]}</span>
-          )}
+            <img 
+              src={company.logoUrl} 
+              alt={company.name} 
+              className="w-12 h-12 object-contain rounded-lg bg-white p-1" 
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = "none";
+                (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
+              }}
+            />
+          ) : null}
+          <span className={`font-extrabold text-2xl text-primary absolute ${company.logoUrl ? "hidden" : ""}`}>{company.ticker[0]}</span>
         </div>
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">{company.name}</h1>
@@ -150,6 +160,18 @@ export function StockHeader({ company }: { company: CompanyProp }) {
                 )}
               </button>
             )}
+
+            {/* Compare Button */}
+            <Link
+              href={`/compare?ticker=${company.ticker}`}
+              className="px-3 py-1 text-xs font-bold rounded-full transition-all flex items-center gap-1.5 shadow-sm active:scale-95 bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border/50"
+            >
+              <Scale className="w-3.5 h-3.5" />
+              Comparar Pares
+            </Link>
+
+            {/* PDF Report Button */}
+            {pdfButton}
           </div>
         </div>
       </div>
@@ -165,12 +187,12 @@ export function StockHeader({ company }: { company: CompanyProp }) {
           <>
             <div className="flex items-end gap-3">
               <span className="text-4xl font-extrabold tracking-tighter">
-                ${priceData.currentPrice.toFixed(2)}
+                {getCurrencySymbol(company.currency)}{priceData.currentPrice.toFixed(2)}
               </span>
-              <span className="text-sm text-muted-foreground mb-1.5 font-medium">USD</span>
+              <span className="text-sm text-muted-foreground mb-1.5 font-medium">{company.currency || 'USD'}</span>
             </div>
             
-            <div className={`flex items-center gap-1.5 text-sm font-bold mt-1 ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>
+            <div className={`flex items-center gap-1.5 text-sm font-bold mt-1 ${isPositive ? 'text-bull' : 'text-bear'}`}>
               {isPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
               <span>{isPositive ? '+' : ''}{priceData.change.toFixed(2)}</span>
               <span>({isPositive ? '+' : ''}{priceData.changePercent.toFixed(2)}%)</span>

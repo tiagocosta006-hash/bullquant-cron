@@ -63,8 +63,8 @@ export function DcfResults({ result, currency = "$" }: DcfResultsProps) {
               className={cn(
                 "px-2.5 py-1 rounded-full text-sm font-bold tabular-nums",
                 undervalued
-                  ? "bg-emerald-500/15 text-emerald-500"
-                  : "bg-red-500/15 text-red-500"
+                  ? "bg-bull/15 text-bull"
+                  : "bg-bear/15 text-bear"
               )}
             >
               {undervalued ? "+" : ""}
@@ -76,7 +76,7 @@ export function DcfResults({ result, currency = "$" }: DcfResultsProps) {
             <div
               className={cn(
                 "absolute top-0 bottom-0",
-                undervalued ? "bg-emerald-500 left-1/2" : "bg-red-500 right-1/2"
+                undervalued ? "bg-bull left-1/2" : "bg-bear right-1/2"
               )}
               style={{ width: `${barPct}%` }}
             />

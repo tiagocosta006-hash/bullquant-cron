@@ -8,20 +8,274 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// ── UTILIZADORES ──────────────────────────────
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  avatarUrl String?
-  plan      Plan     @default(FREE)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  portfolio   Portfolio?
+  id          String        @id @default(cuid())
+  email       String        @unique
+  name        String?
+  avatarUrl   String?
+  plan        Plan          @default(FREE)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
   aiUsageLogs AIUsageLog[]
+  dcfAnalyses DcfAnalysis[]
+  portfolio   Portfolio?
 
   @@map("users")
+}
+
+model Company {
+  id                     String               @id @default(cuid())
+  ticker                 String               @unique
+  name                   String
+  cik                    String?              @unique
+  exchange               String
+  sector                 String?
+  industry               String?
+  country                String               @default("US")
+  currency               String               @default("USD")
+  logoUrl                String?
+  description            String?
+  website                String?
+  employees              Int?
+  isActive               Boolean              @default(true)
+  lastFundamentalsUpdate DateTime?
+  lastPriceUpdate        DateTime?
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  ceo                    String?
+  aiInsightCache         AIInsightCache?
+  companyBrief           CompanyBrief?
+  dcfAnalyses            DcfAnalysis[]
+  earnings               EarningsEvent[]
+  fundamentals           Fundamental[]
+  insiderTxns            InsiderTransaction[]
+  managementProfile      ManagementProfile?
+  portfolioItems         PortfolioItem[]
+  prices                 Price[]
+
+  @@index([ticker])
+  @@index([exchange])
+  @@index([sector])
+  @@map("companies")
+}
+
+model Fundamental {
+  id                     String     @id @default(cuid())
+  companyId              String
+  periodType             PeriodType
+  fiscalYear             Int
+  fiscalQuarter          Int?
+  periodEnd              DateTime
+  filedAt                DateTime?
+  revenue                Decimal?   @db.Decimal(20, 4)
+  costOfRevenue          Decimal?   @db.Decimal(20, 4)
+  grossProfit            Decimal?   @db.Decimal(20, 4)
+  operatingExpenses      Decimal?   @db.Decimal(20, 4)
+  researchAndDevelopment Decimal?   @db.Decimal(20, 4)
+  sellingGeneralAndAdmin Decimal?   @db.Decimal(20, 4)
+  ebitda                 Decimal?   @db.Decimal(20, 4)
+  operatingIncome        Decimal?   @db.Decimal(20, 4)
+  revenueSegments        Json?
+  interestExpense        Decimal?   @db.Decimal(20, 4)
+  taxExpense             Decimal?   @db.Decimal(20, 4)
+  netIncome              Decimal?   @db.Decimal(20, 4)
+  epsDiluted             Decimal?   @db.Decimal(10, 4)
+  sharesOutstanding      Decimal?   @db.Decimal(20, 4)
+  operatingCashFlow      Decimal?   @db.Decimal(20, 4)
+  capex                  Decimal?   @db.Decimal(20, 4)
+  freeCashFlow           Decimal?   @db.Decimal(20, 4)
+  totalAssets            Decimal?   @db.Decimal(20, 4)
+  totalCurrentLiab       Decimal?   @db.Decimal(20, 4)
+  longTermDebt           Decimal?   @db.Decimal(20, 4)
+  totalDebt              Decimal?   @db.Decimal(20, 4)
+  cash                   Decimal?   @db.Decimal(20, 4)
+  totalEquity            Decimal?   @db.Decimal(20, 4)
+  grossMargin            Decimal?   @db.Decimal(8, 6)
+  operatingMargin        Decimal?   @db.Decimal(8, 6)
+  netMargin              Decimal?   @db.Decimal(8, 6)
+  roic                   Decimal?   @db.Decimal(8, 6)
+  returnOnEquity         Decimal?   @db.Decimal(8, 6)
+  dividendPerShare       Decimal?   @db.Decimal(10, 4)
+  createdAt              DateTime   @default(now())
+  updatedAt              DateTime   @updatedAt
+  businessKpis           Json?
+  company                Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, periodType, fiscalYear, fiscalQuarter])
+  @@index([companyId, periodEnd])
+  @@index([companyId, periodType, fiscalYear])
+  @@map("fundamentals")
+}
+
+model Price {
+  ticker  String
+  date    DateTime @db.Date
+  open    Decimal? @db.Decimal(12, 4)
+  high    Decimal? @db.Decimal(12, 4)
+  low     Decimal? @db.Decimal(12, 4)
+  close   Decimal  @db.Decimal(12, 4)
+  volume  BigInt?
+  company Company  @relation(fields: [ticker], references: [ticker])
+
+  @@id([ticker, date])
+  @@map("prices")
+}
+
+model Portfolio {
+  id        String          @id @default(cuid())
+  userId    String          @unique
+  name      String          @default("O Meu Portfólio")
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  items     PortfolioItem[]
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("portfolios")
+}
+
+model PortfolioItem {
+  id          String    @id @default(cuid())
+  portfolioId String
+  companyId   String
+  addedAt     DateTime  @default(now())
+  company     Company   @relation(fields: [companyId], references: [id])
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@unique([portfolioId, companyId])
+  @@index([portfolioId])
+  @@map("portfolio_items")
+}
+
+model DcfAnalysis {
+  id             String   @id @default(cuid())
+  userId         String
+  companyId      String
+  label          String?
+  fcf0           Decimal  @db.Decimal(20, 4)
+  growthStage1   Decimal  @db.Decimal(8, 6)
+  growthStage2   Decimal  @db.Decimal(8, 6)
+  wacc           Decimal  @db.Decimal(8, 6)
+  terminalGrowth Decimal  @db.Decimal(8, 6)
+  shares         Decimal  @db.Decimal(20, 4)
+  netDebt        Decimal  @db.Decimal(20, 4)
+  fairValue      Decimal  @db.Decimal(20, 4)
+  priceAtSave    Decimal? @db.Decimal(20, 4)
+  marginOfSafety Decimal? @db.Decimal(8, 6)
+  createdAt      DateTime @default(now())
+  company        Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, companyId, createdAt])
+  @@map("dcf_analyses")
+}
+
+model EarningsEvent {
+  id              String       @id @default(cuid())
+  companyId       String
+  date            DateTime     @db.Date
+  hour            EarningsHour @default(UNKNOWN)
+  fiscalYear      Int
+  fiscalQuarter   Int
+  epsEstimate     Decimal?     @db.Decimal(10, 4)
+  epsActual       Decimal?     @db.Decimal(10, 4)
+  revenueEstimate Decimal?     @db.Decimal(20, 4)
+  revenueActual   Decimal?     @db.Decimal(20, 4)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  company         Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, fiscalYear, fiscalQuarter])
+  @@index([date])
+  @@index([companyId, date])
+  @@map("earnings_events")
+}
+
+model AIInsightCache {
+  id               String   @id @default(cuid())
+  companyId        String   @unique
+  executiveSummary String
+  moat             String
+  catalysts        String
+  risks            String
+  modelVersion     String
+  generatedAt      DateTime @default(now())
+  expiresAt        DateTime
+  company          Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, expiresAt])
+  @@map("ai_insight_cache")
+}
+
+model CompanyBrief {
+  id           String   @id @default(cuid())
+  companyId    String   @unique
+  briefData    Json
+  modelVersion String
+  generatedAt  DateTime @default(now())
+  expiresAt    DateTime
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, expiresAt])
+  @@map("company_brief")
+}
+
+model ManagementProfile {
+  id                          String   @id @default(cuid())
+  companyId                   String   @unique
+  ceoName                     String
+  isFamilyRun                 Boolean
+  capitalAllocationRating     String
+  skinInTheGame               String
+  modelVersion                String
+  generatedAt                 DateTime @default(now())
+  expiresAt                   DateTime
+  analysis_en                 String
+  analysis_pt                 String
+  capitalAllocationSummary_en String
+  capitalAllocationSummary_pt String
+  familyInfluence_en          String?
+  familyInfluence_pt          String?
+  tenure_en                   String
+  tenure_pt                   String
+  company                     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, expiresAt])
+  @@map("management_profile")
+}
+
+model AIUsageLog {
+  id     String   @id @default(cuid())
+  userId String
+  ticker String
+  usedAt DateTime @default(now())
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, usedAt])
+  @@map("ai_usage_logs")
+}
+
+model InsiderTransaction {
+  id               String         @id @default(cuid())
+  companyId        String
+  insiderName      String
+  title            String?
+  type             InsiderTxnType
+  transactionCode  String?
+  shares           Decimal        @db.Decimal(20, 4)
+  sharesChange     Decimal?       @db.Decimal(20, 4)
+  price            Decimal?       @db.Decimal(12, 4)
+  value            Decimal?       @db.Decimal(20, 4)
+  sharesOwnedAfter Decimal?       @db.Decimal(20, 4)
+  transactionDate  DateTime       @db.Date
+  filedAt          DateTime?      @db.Date
+  source           String         @default("finnhub")
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  company          Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, insiderName, transactionDate, transactionCode, sharesChange])
+  @@index([companyId, transactionDate])
+  @@map("insider_transactions")
 }
 
 enum Plan {
@@ -31,101 +285,6 @@ enum Plan {
   @@map("plan")
 }
 
-// ── EMPRESAS ──────────────────────────────────
-model Company {
-  id          String  @id @default(cuid())
-  ticker      String  @unique
-  name        String
-  cik         String? @unique
-  exchange    String
-  sector      String?
-  industry    String?
-  country     String  @default("US")
-  currency    String  @default("USD")
-  logoUrl     String?
-  description String? @db.Text
-  website     String?
-  employees   Int?
-  isActive    Boolean @default(true)
-
-  lastFundamentalsUpdate DateTime?
-  lastPriceUpdate        DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  fundamentals   Fundamental[]
-  prices         Price[]
-  aiInsightCache AIInsightCache?
-  portfolioItems PortfolioItem[]
-
-  @@index([ticker])
-  @@index([exchange])
-  @@index([sector])
-  @@map("companies")
-}
-
-// ── FUNDAMENTAIS ──────────────────────────────
-model Fundamental {
-  id        String @id @default(cuid())
-  companyId String
-
-  periodType    PeriodType
-  fiscalYear    Int
-  fiscalQuarter Int?
-  periodEnd     DateTime
-  filedAt       DateTime?
-
-  // Income Statement
-  revenue           Decimal? @db.Decimal(20, 4)
-  costOfRevenue     Decimal? @db.Decimal(20, 4)
-  grossProfit       Decimal? @db.Decimal(20, 4)
-  operatingExpenses      Decimal? @db.Decimal(20, 4)
-  researchAndDevelopment Decimal? @db.Decimal(20, 4)
-  sellingGeneralAndAdmin Decimal? @db.Decimal(20, 4)
-  ebitda                 Decimal? @db.Decimal(20, 4)
-  operatingIncome        Decimal? @db.Decimal(20, 4)
-  revenueSegments        Json?
-  interestExpense        Decimal? @db.Decimal(20, 4)
-  taxExpense        Decimal? @db.Decimal(20, 4)
-  netIncome         Decimal? @db.Decimal(20, 4)
-  epsDiluted        Decimal? @db.Decimal(10, 4)
-  sharesOutstanding Decimal? @db.Decimal(20, 4)
-
-  // Cash Flow
-  operatingCashFlow Decimal? @db.Decimal(20, 4)
-  capex             Decimal? @db.Decimal(20, 4)
-  freeCashFlow      Decimal? @db.Decimal(20, 4)
-
-  // Balance Sheet
-  totalAssets      Decimal? @db.Decimal(20, 4)
-  totalCurrentLiab Decimal? @db.Decimal(20, 4)
-  longTermDebt     Decimal? @db.Decimal(20, 4)
-  totalDebt        Decimal? @db.Decimal(20, 4)
-  cash             Decimal? @db.Decimal(20, 4)
-  totalEquity      Decimal? @db.Decimal(20, 4)
-
-  // Métricas calculadas (ex: 0.430000 = 43%)
-  grossMargin     Decimal? @db.Decimal(8, 6)
-  operatingMargin Decimal? @db.Decimal(8, 6)
-  netMargin       Decimal? @db.Decimal(8, 6)
-  roic            Decimal? @db.Decimal(8, 6)
-  returnOnEquity  Decimal? @db.Decimal(8, 6)
-
-  // Dividendos
-  dividendPerShare Decimal? @db.Decimal(10, 4)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  @@unique([companyId, periodType, fiscalYear, fiscalQuarter])
-  @@index([companyId, periodEnd])
-  @@index([companyId, periodType, fiscalYear])
-  @@map("fundamentals")
-}
-
 enum PeriodType {
   QUARTERLY
   ANNUAL
@@ -133,79 +292,19 @@ enum PeriodType {
   @@map("period_type")
 }
 
-// ── PREÇOS EOD (PostgreSQL, NÃO R2) ───────────
-model Price {
-  ticker String
-  date   DateTime @db.Date
-  open   Decimal? @db.Decimal(12, 4)
-  high   Decimal? @db.Decimal(12, 4)
-  low    Decimal? @db.Decimal(12, 4)
-  close  Decimal  @db.Decimal(12, 4)
-  volume BigInt?
+enum EarningsHour {
+  BMO
+  AMC
+  DMH
+  UNKNOWN
 
-  company Company @relation(fields: [ticker], references: [ticker])
-
-  @@id([ticker, date])
-  @@map("prices")
+  @@map("earnings_hour")
 }
 
-// ── PORTFÓLIO / WATCHLIST ─────────────────────
-model Portfolio {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  name      String   @default("O Meu Portfólio")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum InsiderTxnType {
+  BUY
+  SELL
+  OTHER
 
-  user  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items PortfolioItem[]
-
-  @@map("portfolios")
-}
-
-model PortfolioItem {
-  id          String   @id @default(cuid())
-  portfolioId String
-  companyId   String
-  addedAt     DateTime @default(now())
-
-  portfolio Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
-  company   Company   @relation(fields: [companyId], references: [id])
-
-  @@unique([portfolioId, companyId])
-  @@index([portfolioId])
-  @@map("portfolio_items")
-}
-
-// ── AI INSIGHTS (CACHE) ───────────────────────
-model AIInsightCache {
-  id        String @id @default(cuid())
-  companyId String @unique
-
-  executiveSummary String @db.Text
-  moat             String @db.Text
-  catalysts        String @db.Text
-  risks            String @db.Text
-
-  modelVersion String
-  generatedAt  DateTime @default(now())
-  expiresAt    DateTime
-
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  @@index([companyId, expiresAt])
-  @@map("ai_insight_cache")
-}
-
-// ── CONTROLO DE USO DE AI ─────────────────────
-model AIUsageLog {
-  id     String   @id @default(cuid())
-  userId String
-  ticker String
-  usedAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, usedAt])
-  @@map("ai_usage_logs")
+  @@map("insider_txn_type")
 }

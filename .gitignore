@@ -52,3 +52,6 @@ scratch/
 # relatórios gerados pelos scripts de validação (artefactos, não versionar)
 fundamentals_verification_report.md
 database_health_report.md
+
+# claude code — skills são tooling instalável (8M+), não código de produto
+/.claude/skills/

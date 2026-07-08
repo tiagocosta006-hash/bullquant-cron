@@ -4,12 +4,21 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ============================================================
+   BullVision — Golden Terminal design system
+   Layer 1 Primitives → Layer 2 Semantic → Layer 3 Component
+   Dark-first. Gold on near-black. Mono numerals.
+   ============================================================ */
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-heading);
+  --font-mono: var(--font-mono);
+
+  /* Sidebar */
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -18,11 +27,20 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
+
+  /* Charts */
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
+
+  /* Finance semantics */
+  --color-bull: var(--bull);
+  --color-bull-foreground: var(--bull-foreground);
+  --color-bear: var(--bear);
+  --color-bear-foreground: var(--bear-foreground);
+
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -39,6 +57,7 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -48,47 +67,125 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ── Layer 1 · PRIMITIVES ─────────────────────────────────── */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: #9d4edd;
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: #9d4edd;
-  --radius: 0.75rem;
+  /* Gold (brand) */
+  --gold-300: #f2c861;
+  --gold-400: #ecb94a;
+  --gold-500: #e4aa33; /* signature */
+  --gold-600: #c88e27;
+  --gold-700: #a1701c;
+
+  /* Ink — warm near-black neutrals */
+  --ink-950: #0b0b0e; /* app canvas */
+  --ink-900: #111014; /* card */
+  --ink-850: #16151a; /* popover / card-hover */
+  --ink-800: #1c1b21; /* muted / secondary surface */
+  --ink-700: #27252d; /* border-strong */
+  --ink-600: #34323b;
+
+  /* Parchment — warm light neutrals */
+  --parchment-50: #f7f5ef;
+  --parchment-100: #f2efe6; /* primary text on dark */
+  --parchment-300: #cbc7ba;
+  --grey-400: #a8a498; /* muted text */
+  --grey-500: #6f6c64;
+
+  /* Market */
+  --emerald: #2ebd85; /* bull */
+  --crimson: #f0565b; /* bear */
+  --azure: #5b9dd9; /* neutral accent */
+  --copper: #d98c4a;
+
+  --radius: 0.625rem;
 }
 
-.dark {
-  --background: #0b0a10;
-  --foreground: #e2e8f0;
-  --card: #13111a;
-  --card-foreground: #e2e8f0;
-  --popover: #13111a;
-  --popover-foreground: #e2e8f0;
-  --primary: #9d4edd;
+/* ── Layer 2 · SEMANTIC (light, fallback) ─────────────────── */
+:root {
+  --background: var(--parchment-50);
+  --foreground: #1a1812;
+  --card: #ffffff;
+  --card-foreground: #1a1812;
+  --popover: #ffffff;
+  --popover-foreground: #1a1812;
+
+  --primary: var(--gold-600);
   --primary-foreground: #ffffff;
-  --secondary: #1a1825;
-  --secondary-foreground: #e2e8f0;
-  --muted: #1a1825;
-  --muted-foreground: #94a3b8;
-  --accent: #2d2640;
-  --accent-foreground: #ffffff;
-  --destructive: #ef4444;
-  --border: #1f1b2e;
-  --input: #1f1b2e;
-  --ring: #9d4edd;
+  --secondary: #efece2;
+  --secondary-foreground: #2a2722;
+  --muted: #efece2;
+  --muted-foreground: #6f6c64;
+  --accent: #f0e7d2;
+  --accent-foreground: #2a2722;
+
+  --destructive: var(--crimson);
+  --border: #e4e0d4;
+  --input: #e4e0d4;
+  --ring: var(--gold-600);
+
+  --bull: #1aa06a;
+  --bull-foreground: #ffffff;
+  --bear: #d8434a;
+  --bear-foreground: #ffffff;
+
+  --chart-1: var(--gold-500);
+  --chart-2: #1aa06a;
+  --chart-3: var(--azure);
+  --chart-4: var(--copper);
+  --chart-5: #8a8578;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1a1812;
+  --sidebar-primary: var(--gold-600);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f0e7d2;
+  --sidebar-accent-foreground: #2a2722;
+  --sidebar-border: #e4e0d4;
+  --sidebar-ring: var(--gold-600);
+}
+
+/* ── Layer 2 · SEMANTIC (dark — Golden Terminal, default) ── */
+.dark {
+  --background: var(--ink-950);
+  --foreground: var(--parchment-100);
+  --card: var(--ink-900);
+  --card-foreground: var(--parchment-100);
+  --popover: var(--ink-850);
+  --popover-foreground: var(--parchment-100);
+
+  --primary: var(--gold-500);
+  --primary-foreground: #0b0b0e;
+  --secondary: var(--ink-800);
+  --secondary-foreground: var(--parchment-100);
+  --muted: var(--ink-800);
+  --muted-foreground: var(--grey-400);
+  --accent: var(--ink-800);
+  --accent-foreground: var(--parchment-100);
+
+  --destructive: var(--crimson);
+  --border: var(--ink-700);
+  --input: var(--ink-700);
+  --ring: var(--gold-500);
+
+  --bull: var(--emerald);
+  --bull-foreground: #06281c;
+  --bear: var(--crimson);
+  --bear-foreground: #2a0d0e;
+
+  --chart-1: var(--gold-500);
+  --chart-2: var(--emerald);
+  --chart-3: var(--azure);
+  --chart-4: var(--copper);
+  --chart-5: var(--parchment-300);
+
+  --sidebar: var(--ink-900);
+  --sidebar-foreground: var(--parchment-100);
+  --sidebar-primary: var(--gold-500);
+  --sidebar-primary-foreground: #0b0b0e;
+  --sidebar-accent: var(--ink-800);
+  --sidebar-accent-foreground: var(--parchment-100);
+  --sidebar-border: var(--ink-700);
+  --sidebar-ring: var(--gold-500);
 }
 
 @layer base {
@@ -97,9 +194,42 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "cv01";
   }
   html {
     @apply font-sans;
+  }
+  h1, h2, h3, h4, .font-heading {
+    @apply font-heading;
+  }
+  /* Tabular, mono numerals for all financial data */
+  .nums {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* ── Layer 3 · COMPONENT utilities ────────────────────────── */
+@layer components {
+  /* Hairline gold top-accent used on hero panels / featured cards */
+  .gold-rule {
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      var(--gold-500) 20%,
+      var(--gold-400) 50%,
+      var(--gold-500) 80%,
+      transparent
+    );
+  }
+  /* Subtle radial gold glow for hero backgrounds */
+  .gold-glow {
+    background-image: radial-gradient(
+      60% 60% at 50% 0%,
+      color-mix(in oklch, var(--gold-500) 14%, transparent),
+      transparent 70%
+    );
   }
 }
 

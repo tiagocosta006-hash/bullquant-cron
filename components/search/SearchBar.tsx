@@ -6,22 +6,18 @@ import { Input } from "@/components/ui/input"
 import { useRouter } from "next/navigation"
 import { useDebounce } from "@/hooks/useDebounce"
 import { useTranslations } from "next-intl"
+import { useRecentSearches, type RecentSearch } from "@/hooks/useRecentSearches"
 
-type SearchResult = {
-  ticker: string;
-  name: string;
-  exchange: string;
-  logoUrl: string | null;
-};
 
 export function SearchBar() {
   const router = useRouter()
   const t = useTranslations('search')
   const [query, setQuery] = React.useState("")
-  const [results, setResults] = React.useState<SearchResult[]>([])
+  const [results, setResults] = React.useState<RecentSearch[]>([])
   const [isLoading, setIsLoading] = React.useState(false)
   const [isOpen, setIsOpen] = React.useState(false)
   const wrapperRef = React.useRef<HTMLFormElement>(null)
+  const { addSearch } = useRecentSearches()
   
   const debouncedQuery = useDebounce(query, 300)
 
@@ -67,10 +63,11 @@ export function SearchBar() {
     }
   }
 
-  const handleSelect = (ticker: string) => {
+  const handleSelect = (company: RecentSearch) => {
+    addSearch(company)
     setQuery("")
     setIsOpen(false)
-    router.push(`/stock/${ticker}`)
+    router.push(`/stock/${company.ticker}`)
   }
 
   return (
@@ -100,15 +97,24 @@ export function SearchBar() {
               <li key={company.ticker}>
                 <button
                   type="button"
-                  onClick={() => handleSelect(company.ticker)}
+                  onClick={() => handleSelect(company)}
                   className="w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors flex items-center justify-between group/item"
                 >
-                  <div>
-                    <div className="font-bold text-foreground group-hover/item:text-primary transition-colors">
-                      {company.ticker}
-                    </div>
-                    <div className="text-sm text-muted-foreground line-clamp-1">
-                      {company.name}
+                  <div className="flex items-center gap-3">
+                    {company.logoUrl ? (
+                      <img src={company.logoUrl} alt={company.ticker} className="w-8 h-8 rounded-full bg-white p-0.5 object-contain" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center bg-muted text-[10px] font-bold text-muted-foreground border border-border/50">
+                        {company.ticker.substring(0, 2)}
+                      </div>
+                    )}
+                    <div>
+                      <div className="font-bold text-foreground group-hover/item:text-primary transition-colors">
+                        {company.ticker}
+                      </div>
+                      <div className="text-sm text-muted-foreground line-clamp-1">
+                        {company.name}
+                      </div>
                     </div>
                   </div>
                   <div className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-md">

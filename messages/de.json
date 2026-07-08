@@ -1,0 +1,431 @@
+{
+  "marketing": {
+    "eyebrow": "Fundamentalanalyse · Value Investing",
+    "titleLead": "Sehen Sie den Wert,",
+    "titleAccent": "den andere übersehen.",
+    "subtitle": "10 Jahre Fundamentaldaten, ein DCF-Rechner und KI-Zusammenfassungen — kostenlos. Ernsthafte Analyse für langfristige Investoren.",
+    "primaryCta": "Kostenloses Konto erstellen",
+    "secondaryCta": "Beispiel ansehen: AAPL",
+    "trust": "S&P 500 Abdeckung · SEC EDGAR Daten · Keine Kreditkarte",
+    "features": {
+      "fundamentals": {
+        "title": "10 Jahre Fundamentaldaten",
+        "desc": "Umsatz, Margen, ROIC und Cashflow auf einen Blick."
+      },
+      "dcf": {
+        "title": "Integrierter DCF",
+        "desc": "Schätzen Sie den inneren Wert in Sekunden."
+      },
+      "ai": {
+        "title": "KI-Zusammenfassung",
+        "desc": "Eine KI-Zusammenfassung der jüngsten Entwicklungen."
+      }
+    }
+  },
+  "insider": {
+    "title": "Insiderhandel",
+    "subtitle": "Transaktionen von Direktoren und 10%-Eigentümern.",
+    "emptyTitle": "Keine Aktivität",
+    "emptyDesc": "Keine jüngsten Transaktionen entdeckt.",
+    "showMore": "{n} weitere anzeigen",
+    "showLess": "Weniger anzeigen",
+    "buysWindow": "{n} Käufe ({days}T)",
+    "sellsWindow": "{n} Verkäufe ({days}T)",
+    "col": {
+      "insider": "Name",
+      "type": "Typ",
+      "shares": "Aktien",
+      "price": "Preis",
+      "value": "Wert",
+      "date": "Datum"
+    },
+    "type": {
+      "buy": "KAUF",
+      "sell": "VERKAUF",
+      "other": "ANDERE"
+    },
+    "codes": {
+      "P": "P - Kauf",
+      "S": "S - Verkauf",
+      "A": "A - Zuteilung",
+      "M": "M - Optionsausübung",
+      "F": "F - Einbehalt",
+      "G": "G - Geschenk",
+      "J": "J - Andere",
+      "unknown": "SEC Code: {code}"
+    }
+  },
+  "dashboard": {
+    "title": "Einblicke",
+    "subtitle": "Erkunden Sie Markttrends, entdecken Sie Chancen.",
+    "empty": "Keine Unternehmen gefunden.",
+    "marketCap": "Marktkap.",
+    "quickActionsTitle": "Schnellzugriff",
+    "exploreTitle": "Entdecken",
+    "actions": {
+      "portfolio": "Mein Portfolio",
+      "portfolioDesc": "Ihre Unternehmen",
+      "dcf": "Neuer DCF",
+      "dcfDesc": "Inneren Wert schätzen",
+      "calendar": "Kalender",
+      "calendarDesc": "Quartalszahlen",
+      "transcripts": "Transkripte",
+      "transcriptsDesc": "Gewinnanrufe"
+    },
+    "tabs": {
+      "sp500": "S&P 500",
+      "trending": "Im Trend",
+      "growth": "Wachstum",
+      "dividend": "Dividenden",
+      "buyback": "Aktienrückkäufe",
+      "ai": "Künstliche Intelligenz"
+    }
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "portfolio": "Portfolio",
+    "calendar": "Kalender",
+    "dcf": "DCF-Rechner",
+    "transcripts": "Transkripte",
+    "screener": "Aktien-Screener",
+    "recentSearches": "Letzte Suchen",
+    "desc": {
+      "dashboard": "Übersicht",
+      "portfolio": "Beobachtete Unternehmen",
+      "calendar": "Finanzergebnisse",
+      "dcf": "Fairen Preis bewerten",
+      "transcripts": "Investorentreffen",
+      "screener": "Unternehmen finden"
+    }
+  },
+  "login": {
+    "title": "Anmelden",
+    "subtitle": "Greifen Sie auf Ihr Portfolio zu.",
+    "emailLabel": "E-Mail",
+    "emailPlaceholder": "name@email.com",
+    "passwordLabel": "Passwort",
+    "forgotPasswordLink": "Passwort vergessen?",
+    "submitButton": "Anmelden",
+    "submitLoading": "Anmelden...",
+    "noAccount": "Kein Konto?",
+    "registerLink": "Registrieren"
+  },
+  "register": {
+    "title": "Konto erstellen",
+    "subtitle": "Treten Sie BullVision bei.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Ihr Name",
+    "emailLabel": "E-Mail",
+    "emailPlaceholder": "name@email.com",
+    "passwordLabel": "Passwort",
+    "submitButton": "Registrieren",
+    "submitLoading": "Erstellen...",
+    "hasAccount": "Bereits ein Konto?",
+    "loginLink": "Anmelden"
+  },
+  "forgotPassword": {
+    "title": "Passwort zurücksetzen",
+    "subtitle": "Geben Sie Ihre E-Mail ein.",
+    "emailLabel": "E-Mail",
+    "emailPlaceholder": "name@email.com",
+    "submitButton": "Link senden",
+    "submitLoading": "Senden...",
+    "remembered": "Passwort wieder eingefallen?",
+    "backToLogin": "Zurück zur Anmeldung"
+  },
+  "resetPassword": {
+    "title": "Neues Passwort",
+    "subtitle": "Wählen Sie ein neues Passwort.",
+    "passwordLabel": "Neues Passwort",
+    "passwordPlaceholder": "******",
+    "submitButton": "Aktualisieren",
+    "submitLoading": "Aktualisieren..."
+  },
+  "header": {
+    "settingsTitle": "Einstellungen",
+    "logoutTitle": "Abmelden",
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "dcf": "DCF",
+    "calendar": "Kalender"
+  },
+  "search": {
+    "placeholder": "Ticker suchen (z.B. AAPL)...",
+    "noResults": "Keine Ergebnisse.",
+    "recentTitle": "Letzte Suchen",
+    "clearAll": "Alles löschen"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "subtitle": "Verwalten Sie Profil und Präferenzen.",
+    "planFree": "Kostenloser Plan",
+    "saveSuccess": "Profil aktualisiert!",
+    "tabs": {
+      "profile": "Profil",
+      "preferences": "Präferenzen",
+      "subscription": "Abonnement"
+    },
+    "profile": {
+      "title": "Ihre Details",
+      "email": "E-Mail-Adresse",
+      "name": "Name",
+      "namePlaceholder": "Wie Sie genannt werden möchten",
+      "save": "Speichern",
+      "dangerZone": "Gefahrenzone",
+      "logoutDesc": "Melden Sie sich sicher ab.",
+      "logoutBtn": "Abmelden"
+    },
+    "preferences": {
+      "title": "Präferenzen",
+      "language": "Sprache",
+      "languageDesc": "Wählen Sie Ihre Sprache.",
+      "theme": "Visuelles Design",
+      "themeDesc": "Zwischen hellem und dunklem Modus wechseln."
+    },
+    "subscription": {
+      "title": "Ihr Plan",
+      "desc": "Sie nutzen den kostenlosen Plan.",
+      "premiumSoonTitle": "PRO-Zugang in Kürze",
+      "premiumSoonDesc": "Wir bereiten erweiterte Funktionen vor.",
+      "upgradeBtn": "Auf PRO upgraden"
+    }
+  },
+  "portfolio": {
+    "loginRequired": "Melden Sie sich an, um Ihr Portfolio zu sehen.",
+    "loginButton": "Anmelden",
+    "title": "Mein Portfolio",
+    "subtitle": "Verfolgen Sie Unternehmen in Echtzeit.",
+    "positions": "Positionen",
+    "upToday": "Heute im Plus",
+    "emptyState": {
+      "title": "Portfolio ist leer",
+      "description": "Fügen Sie Unternehmen hinzu.",
+      "quickAdd": "Hinzufügen",
+      "adding": "Wird hinzugefügt..."
+    },
+    "suggestions": {
+      "title": "Vorschläge"
+    },
+    "landing": {
+      "title": "BullVision",
+      "description": "Suchen Sie ein Unternehmen.",
+      "testExample": "Beispiel testen",
+      "createAccount": "Konto erstellen"
+    },
+    "card": {
+      "currentPrice": "Aktueller Preis"
+    },
+    "lastUpdate": "Letztes Update:"
+  },
+  "stock": {
+    "underConstruction": "Im Bau",
+    "buildingMessage": "Diese Seite wird entwickelt.",
+    "backHome": "Zurück",
+    "updatedAt": "Aktualisiert am",
+    "priceUnavailable": "Preis nicht verfügbar",
+    "header": {
+      "followed": "Beobachtet",
+      "addToPortfolio": "Zum Portfolio",
+      "updating": "Aktualisiere..."
+    },
+    "savedValuations": {
+      "title": "Meine DCF-Bewertungen",
+      "openCalculator": "Öffnen",
+      "noAnalyses": "Keine Analysen gespeichert.",
+      "savedAt": "Gespeichert am",
+      "fairValue": "Fairer Wert",
+      "mos": "Sicherheitsmarge",
+      "growth": "Wachstum (1-5)",
+      "termGrowth": "Endwachstum"
+    },
+    "brief": {
+      "title": "KI-Zusammenfassung",
+      "loading": "Analysiere...",
+      "subtitle": "Zusammenfassung der Entwicklungen",
+      "date": "Datum",
+      "sentiment": {
+        "bullish": "Bullish",
+        "bearish": "Bearish",
+        "neutral": "Neutral"
+      },
+      "expand": "{n} weitere anzeigen",
+      "collapse": "Einklappen"
+    },
+    "profile": {
+      "title": "Profil",
+      "website": "Webseite",
+      "sector": "Sektor",
+      "industry": "Branche",
+      "employees": "Mitarbeiter",
+      "country": "Land",
+      "exchange": "Börse"
+    },
+    "snapshotTitle": "Überblick",
+    "chart": {
+      "title": "Historie",
+      "noData": "Keine Daten",
+      "period": "Zeitraum",
+      "chartView": "Diagramm",
+      "tableView": "Tabelle",
+      "fullScreen": "Vollbild",
+      "tabs": {
+        "1m": "1M",
+        "6m": "6M",
+        "1y": "1J",
+        "5y": "5J",
+        "max": "MAX"
+      }
+    },
+    "snapshot": {
+      "valuation": "Bewertung",
+      "cashFlow": "Cashflow",
+      "marginAndGrowth": "Margen & Wachstum",
+      "balance": "Bilanz",
+      "dividend": "Dividenden",
+      "na": "k.A.",
+      "naGeneric": "Nicht verfügbar.",
+      "naMargin": "Nicht gemeldet.",
+      "naPrice": "Nicht verfügbar."
+    }
+  },
+  "dcf": {
+    "title": "DCF-Rechner",
+    "subtitle": "Unternehmenswert schätzen.",
+    "educationalWarning": "Dies ist ein Modell, keine Kristallkugel.",
+    "autofillLabel": "Automatisch ausfüllen",
+    "autofillPlaceholder": "Ticker suchen...",
+    "loadedFor": "Daten geladen für:",
+    "loadError": "Ladefehler.",
+    "currentPriceInput": "Aktueller Preis",
+    "fcf0": "Anfangs-FCF",
+    "shares": "Ausstehende Aktien",
+    "netDebt": "Nettoschulden",
+    "millionsSuffix": "Millionen",
+    "growth1": "Wachstum Jahre 1-5",
+    "growth2": "Wachstum Jahre 6-10",
+    "wacc": "WACC (Diskontsatz)",
+    "waccHint": "Erforderliche Rendite.",
+    "terminalGrowth": "Ewiges Wachstum",
+    "terminalGrowthHint": "Langfristiges Wachstum.",
+    "reverseDcf": "Umgekehrter DCF",
+    "fairValue": "Fairer Wert",
+    "currentPrice": "Aktueller Preis",
+    "marginOfSafety": "Sicherheitsmarge",
+    "undervalued": "Unterbewertet",
+    "overvalued": "Überbewertet",
+    "enterpriseValue": "Unternehmenswert",
+    "equityValue": "Eigenkapitalwert",
+    "terminalValuePv": "Endwert (Barwert)",
+    "fcfPv": "Abgezinster FCF",
+    "disclaimer": "Dies sind nur Schätzungen.",
+    "saved": {
+      "title": "Meine Analysen",
+      "saveButton": "Speichern",
+      "saveError": "Speicherfehler.",
+      "labelPlaceholder": "Name (optional)",
+      "empty": "Keine Analysen.",
+      "loadButton": "Laden",
+      "deleteButton": "Löschen",
+      "fairValueShort": "Fair:"
+    },
+    "errorWacc": "WACC muss > ewiges Wachstum sein.",
+    "errorShares": "Aktien eingeben.",
+    "errorFcf": "Gültigen FCF eingeben."
+  },
+  "financials": {
+    "engineTitle": "Finanzdaten",
+    "periods": {
+      "quarterly": "Quartal",
+      "ttm": "TTM",
+      "annual": "Jährlich"
+    },
+    "charts": {
+      "revenue": "Umsatz",
+      "revenueBySegment": "Umsatz nach Segment",
+      "epsDiluted": "EPS",
+      "freeCashFlow": "Free Cashflow",
+      "netIncome": "Nettogewinn",
+      "ebitda": "EBITDA",
+      "expenses": "Ausgaben",
+      "cashDebt": "Barmittel & Schulden",
+      "sharesOutstanding": "Aktien",
+      "dividends": "Dividenden (DPS)",
+      "roic": "ROIC",
+      "grossMargin": "Bruttomarge",
+      "operatingMargin": "Operative Marge",
+      "profitMargin": "Gewinnmarge"
+    },
+    "ratios": {
+      "roic": "ROIC",
+      "gross": "BRUTTO",
+      "operating": "OPERAT.",
+      "profit": "NETTO",
+      "roe": "ROE"
+    }
+  },
+  "calendar": {
+    "title": "Ergebniskalender",
+    "subtitle": "Quartalsberichte.",
+    "disclaimer": "Geschätzte Termine.",
+    "today": "Heute",
+    "prevMonth": "Vorheriger Monat",
+    "nextMonth": "Nächster Monat",
+    "scopeAll": "Alle",
+    "scopeWatchlist": "Mein Portfolio",
+    "more": "mehr",
+    "empty": "Keine Ereignisse.",
+    "summary": "{count} Ergebnisse",
+    "legendBmo": "Vor Eröffnung",
+    "legendAmc": "Nach Handelsschluss"
+  },
+  "news": {
+    "title": "Nachrichten",
+    "subtitle": "Aktuelle Artikel.",
+    "source": "via Finnhub",
+    "emptyTitle": "Keine Nachrichten",
+    "emptyDesc": "Keine aktuellen Nachrichten.",
+    "showMore": "{n} weitere anzeigen",
+    "showLess": "Weniger anzeigen",
+    "readMore": "Artikel lesen"
+  },
+  "transcripts": {
+    "title": "Transkripte",
+    "subtitle": "Gewinnanrufe.",
+    "inDevelopment": "In Entwicklung",
+    "placeholderTitle": "Demnächst",
+    "placeholderDesc": "Diese Funktion ist bald verfügbar."
+  },
+  "screener": {
+    "title": "Aktien-Screener",
+    "subtitle": "Finden Sie großartige Unternehmen.",
+    "filters": {
+      "title": "Filter",
+      "guruStrategies": "Große Investoren",
+      "moatCompounders": "Warren Buffett",
+      "moatTooltip": "Wettbewerbsvorteil-Filter.",
+      "magicFormula": "Joel Greenblatt",
+      "magicTooltip": "Zauberformel.",
+      "sector": "Sektor",
+      "sectorPlaceholder": "Alle",
+      "allSectors": "Alle",
+      "minGrossMargin": "Bruttomarge",
+      "minRoic": "ROIC",
+      "minRevenue": "Umsatz",
+      "minEarningsYield": "Earnings Yield"
+    },
+    "results": {
+      "count": "{count} Unternehmen",
+      "loading": "Suchen...",
+      "empty": "Keine Ergebnisse.",
+      "emptyDesc": "Passen Sie die Filter an.",
+      "company": "Unternehmen",
+      "sector": "Sektor",
+      "revenue": "Umsatz",
+      "grossMargin": "Bruttomarge",
+      "roic": "ROIC",
+      "earningsYield": "Earnings Yield",
+      "action": "Ansehen",
+      "viewStock": "Analyse"
+    }
+  }
+}

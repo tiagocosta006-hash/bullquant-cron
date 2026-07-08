@@ -1,0 +1,431 @@
+{
+  "marketing": {
+    "eyebrow": "Fundamentele analyse · Value investing",
+    "titleLead": "Zie de waarde",
+    "titleAccent": "die anderen missen.",
+    "subtitle": "10 jaar aan fundamentele gegevens, een DCF-calculator en AI-inzichten — gratis. Serieuze analyse voor langetermijnbeleggers.",
+    "primaryCta": "Maak gratis account aan",
+    "secondaryCta": "Bekijk voorbeeld: AAPL",
+    "trust": "S&P 500 dekking · SEC EDGAR data · Geen creditcard",
+    "features": {
+      "fundamentals": {
+        "title": "10 jaar fundamenten",
+        "desc": "Omzet, marges, ROIC en cashflow in één oogopslag."
+      },
+      "dcf": {
+        "title": "Ingebouwde DCF",
+        "desc": "Schat de intrinsieke waarde in seconden in."
+      },
+      "ai": {
+        "title": "AI-Inzichten",
+        "desc": "Een door AI gegenereerde samenvatting van recente ontwikkelingen."
+      }
+    }
+  },
+  "insider": {
+    "title": "Handel met Voorkennis",
+    "subtitle": "Transacties door directieleden en 10%-eigenaren.",
+    "emptyTitle": "Geen Activiteit",
+    "emptyDesc": "Geen recente transacties gevonden.",
+    "showMore": "Toon nog {n} transacties",
+    "showLess": "Toon minder",
+    "buysWindow": "{n} Aankopen ({days}d)",
+    "sellsWindow": "{n} Verkopen ({days}d)",
+    "col": {
+      "insider": "Naam",
+      "type": "Type",
+      "shares": "Aandelen",
+      "price": "Prijs",
+      "value": "Waarde",
+      "date": "Datum"
+    },
+    "type": {
+      "buy": "KOOP",
+      "sell": "VERKOOP",
+      "other": "ANDERS"
+    },
+    "codes": {
+      "P": "P - Aankoop",
+      "S": "S - Verkoop",
+      "A": "A - Toekenning",
+      "M": "M - Optie Uitoefening",
+      "F": "F - Inhouding",
+      "G": "G - Geschenk",
+      "J": "J - Anders",
+      "unknown": "SEC Code: {code}"
+    }
+  },
+  "dashboard": {
+    "title": "Inzichten",
+    "subtitle": "Verken markttrends, ontdek kansen en volg de markt.",
+    "empty": "Geen bedrijven gevonden.",
+    "marketCap": "Marktkapitalisatie",
+    "quickActionsTitle": "Snelle acties",
+    "exploreTitle": "Verken bedrijven",
+    "actions": {
+      "portfolio": "Mijn Portfolio",
+      "portfolioDesc": "Je gevolgde bedrijven",
+      "dcf": "Nieuwe DCF",
+      "dcfDesc": "Intrinsieke waarde berekenen",
+      "calendar": "Kalender",
+      "calendarDesc": "Kwartaalcijfers",
+      "transcripts": "Transcripties",
+      "transcriptsDesc": "Aandeelhoudersvergaderingen"
+    },
+    "tabs": {
+      "sp500": "S&P 500",
+      "trending": "Trending",
+      "growth": "Groei",
+      "dividend": "Dividenden",
+      "buyback": "Aandeleninkoop",
+      "ai": "Kunstmatige Intelligentie"
+    }
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "portfolio": "Portfolio",
+    "calendar": "Kalender",
+    "dcf": "DCF Calculator",
+    "transcripts": "Transcripties",
+    "screener": "Screener",
+    "recentSearches": "Recente Zoekopdrachten",
+    "desc": {
+      "dashboard": "Overzicht",
+      "portfolio": "Gevolgde bedrijven",
+      "calendar": "Financiële resultaten",
+      "dcf": "Evalueer de juiste prijs",
+      "transcripts": "Investeerdersvergaderingen",
+      "screener": "Vind bedrijven"
+    }
+  },
+  "login": {
+    "title": "Inloggen",
+    "subtitle": "Krijg toegang tot je portfolio.",
+    "emailLabel": "E-mailadres",
+    "emailPlaceholder": "naam@email.com",
+    "passwordLabel": "Wachtwoord",
+    "forgotPasswordLink": "Wachtwoord vergeten?",
+    "submitButton": "Inloggen",
+    "submitLoading": "Inloggen...",
+    "noAccount": "Nog geen account?",
+    "registerLink": "Maak een account aan"
+  },
+  "register": {
+    "title": "Account Aanmaken",
+    "subtitle": "Word lid van BullVision.",
+    "nameLabel": "Naam",
+    "namePlaceholder": "Je naam",
+    "emailLabel": "E-mailadres",
+    "emailPlaceholder": "naam@email.com",
+    "passwordLabel": "Wachtwoord",
+    "submitButton": "Registreren",
+    "submitLoading": "Aanmaken...",
+    "hasAccount": "Heb je al een account?",
+    "loginLink": "Inloggen"
+  },
+  "forgotPassword": {
+    "title": "Wachtwoord Herstellen",
+    "subtitle": "Vul je e-mailadres in.",
+    "emailLabel": "E-mailadres",
+    "emailPlaceholder": "naam@email.com",
+    "submitButton": "Stuur link",
+    "submitLoading": "Verzenden...",
+    "remembered": "Wachtwoord herinnerd?",
+    "backToLogin": "Terug naar inloggen"
+  },
+  "resetPassword": {
+    "title": "Nieuw Wachtwoord",
+    "subtitle": "Kies een nieuw wachtwoord.",
+    "passwordLabel": "Nieuw Wachtwoord",
+    "passwordPlaceholder": "******",
+    "submitButton": "Bijwerken",
+    "submitLoading": "Bijwerken..."
+  },
+  "header": {
+    "settingsTitle": "Instellingen",
+    "logoutTitle": "Uitloggen",
+    "login": "Inloggen",
+    "register": "Registreren",
+    "dcf": "DCF",
+    "calendar": "Kalender"
+  },
+  "search": {
+    "placeholder": "Zoek ticker (bijv. AAPL)...",
+    "noResults": "Geen resultaten gevonden.",
+    "recentTitle": "Recente Zoekopdrachten",
+    "clearAll": "Alles Wissen"
+  },
+  "settings": {
+    "title": "Instellingen",
+    "subtitle": "Beheer je profiel en voorkeuren.",
+    "planFree": "Gratis Plan",
+    "saveSuccess": "Profiel succesvol bijgewerkt!",
+    "tabs": {
+      "profile": "Profiel",
+      "preferences": "Voorkeuren",
+      "subscription": "Abonnement"
+    },
+    "profile": {
+      "title": "Jouw Gegevens",
+      "email": "E-mailadres",
+      "name": "Naam",
+      "namePlaceholder": "Hoe wil je genoemd worden",
+      "save": "Opslaan",
+      "dangerZone": "Gevarenzone",
+      "logoutDesc": "Veilig uitloggen.",
+      "logoutBtn": "Uitloggen"
+    },
+    "preferences": {
+      "title": "Voorkeuren",
+      "language": "Taal",
+      "languageDesc": "Kies je voorkeurstaal.",
+      "theme": "Visueel Thema",
+      "themeDesc": "Wissel tussen lichte en donkere modus."
+    },
+    "subscription": {
+      "title": "Jouw Plan",
+      "desc": "Je hebt momenteel het gratis plan.",
+      "premiumSoonTitle": "PRO-toegang binnenkort beschikbaar",
+      "premiumSoonDesc": "We bereiden geavanceerde functies voor.",
+      "upgradeBtn": "Upgrade naar PRO"
+    }
+  },
+  "portfolio": {
+    "loginRequired": "Log in om je Portfolio te bekijken.",
+    "loginButton": "Inloggen",
+    "title": "Mijn Portfolio",
+    "subtitle": "Volg je bedrijven in realtime.",
+    "positions": "Posities",
+    "upToday": "Vandaag Gestegen",
+    "emptyState": {
+      "title": "Je portfolio is leeg",
+      "description": "Begin met het toevoegen van bedrijven.",
+      "quickAdd": "Toevoegen",
+      "adding": "Toevoegen..."
+    },
+    "suggestions": {
+      "title": "Suggesties"
+    },
+    "landing": {
+      "title": "BullVision",
+      "description": "Zoek een bedrijf om te beginnen.",
+      "testExample": "Probeer Voorbeeld",
+      "createAccount": "Account Aanmaken"
+    },
+    "card": {
+      "currentPrice": "Huidige Prijs"
+    },
+    "lastUpdate": "Laatste update:"
+  },
+  "stock": {
+    "underConstruction": "In aanbouw",
+    "buildingMessage": "Deze pagina wordt nog ontwikkeld.",
+    "backHome": "Terug",
+    "updatedAt": "Bijgewerkt op",
+    "priceUnavailable": "Prijs niet beschikbaar",
+    "header": {
+      "followed": "Gevolgd",
+      "addToPortfolio": "Toevoegen aan Portfolio",
+      "updating": "Updaten..."
+    },
+    "savedValuations": {
+      "title": "Mijn DCF-waarderingen",
+      "openCalculator": "Openen",
+      "noAnalyses": "Geen opgeslagen analyses.",
+      "savedAt": "Opgeslagen op",
+      "fairValue": "Reële Waarde",
+      "mos": "Veiligheidsmarge",
+      "growth": "Groei (1-5)",
+      "termGrowth": "Term. Groei"
+    },
+    "brief": {
+      "title": "AI-Samenvatting",
+      "loading": "Analyseren...",
+      "subtitle": "Samenvatting van ontwikkelingen",
+      "date": "Datum",
+      "sentiment": {
+        "bullish": "Bullish",
+        "bearish": "Bearish",
+        "neutral": "Neutraal"
+      },
+      "expand": "Toon nog {n}",
+      "collapse": "Inklappen"
+    },
+    "profile": {
+      "title": "Profiel",
+      "website": "Website",
+      "sector": "Sector",
+      "industry": "Industrie",
+      "employees": "Werknemers",
+      "country": "Land",
+      "exchange": "Beurs"
+    },
+    "snapshotTitle": "Overzicht",
+    "chart": {
+      "title": "Historie",
+      "noData": "Geen data",
+      "period": "Periode",
+      "chartView": "Grafiek",
+      "tableView": "Tabel",
+      "fullScreen": "Volledig Scherm",
+      "tabs": {
+        "1m": "1M",
+        "6m": "6M",
+        "1y": "1J",
+        "5y": "5J",
+        "max": "MAX"
+      }
+    },
+    "snapshot": {
+      "valuation": "Waardering",
+      "cashFlow": "Cashflow",
+      "marginAndGrowth": "Marges en Groei",
+      "balance": "Balans",
+      "dividend": "Dividenden",
+      "na": "N.v.t.",
+      "naGeneric": "Niet beschikbaar.",
+      "naMargin": "Niet gerapporteerd.",
+      "naPrice": "Niet beschikbaar."
+    }
+  },
+  "dcf": {
+    "title": "DCF Calculator",
+    "subtitle": "Schat de waarde van een bedrijf.",
+    "educationalWarning": "Dit is een model, geen kristallen bol.",
+    "autofillLabel": "Automatisch invullen",
+    "autofillPlaceholder": "Zoek ticker...",
+    "loadedFor": "Data geladen voor:",
+    "loadError": "Fout bij laden.",
+    "currentPriceInput": "Huidige Prijs",
+    "fcf0": "Start FCF",
+    "shares": "Uitstaande Aandelen",
+    "netDebt": "Netto Schuld",
+    "millionsSuffix": "Miljoen",
+    "growth1": "Groei Jaar 1-5",
+    "growth2": "Groei Jaar 6-10",
+    "wacc": "WACC (Disconteringsvoet)",
+    "waccHint": "Vereist rendement.",
+    "terminalGrowth": "Eeuwigdurende Groei",
+    "terminalGrowthHint": "Langetermijngroei.",
+    "reverseDcf": "Omgekeerde DCF",
+    "fairValue": "Reële Waarde",
+    "currentPrice": "Huidige Prijs",
+    "marginOfSafety": "Veiligheidsmarge",
+    "undervalued": "Ondergewaardeerd",
+    "overvalued": "Overgewaardeerd",
+    "enterpriseValue": "Ondernemingswaarde",
+    "equityValue": "Aandelenwaarde",
+    "terminalValuePv": "Eindwaarde (Contant)",
+    "fcfPv": "Gedisconteerde FCF",
+    "disclaimer": "Dit zijn slechts schattingen.",
+    "saved": {
+      "title": "Mijn analyses",
+      "saveButton": "Opslaan",
+      "saveError": "Fout bij opslaan.",
+      "labelPlaceholder": "Naam (optioneel)",
+      "empty": "Geen analyses.",
+      "loadButton": "Laden",
+      "deleteButton": "Verwijderen",
+      "fairValueShort": "Reëel:"
+    },
+    "errorWacc": "WACC moet groter zijn dan groei.",
+    "errorShares": "Voer de aandelen in.",
+    "errorFcf": "Voer een geldige FCF in."
+  },
+  "financials": {
+    "engineTitle": "Financiële Data",
+    "periods": {
+      "quarterly": "Kwartaal",
+      "ttm": "TTM",
+      "annual": "Jaarlijks"
+    },
+    "charts": {
+      "revenue": "Omzet",
+      "revenueBySegment": "Omzet per Segment",
+      "epsDiluted": "WPA",
+      "freeCashFlow": "Vrije Cashflow",
+      "netIncome": "Nettowinst",
+      "ebitda": "EBITDA",
+      "expenses": "Uitgaven",
+      "cashDebt": "Kas en Schuld",
+      "sharesOutstanding": "Aandelen",
+      "dividends": "Dividenden (DPS)",
+      "roic": "ROIC",
+      "grossMargin": "Brutomarge",
+      "operatingMargin": "Operationele Marge",
+      "profitMargin": "Winstmarge"
+    },
+    "ratios": {
+      "roic": "ROIC",
+      "gross": "BRUTO",
+      "operating": "OPERAT.",
+      "profit": "NETTO",
+      "roe": "ROE"
+    }
+  },
+  "calendar": {
+    "title": "Cijferkalender",
+    "subtitle": "Kwartaalrapporten.",
+    "disclaimer": "Geschatte data.",
+    "today": "Vandaag",
+    "prevMonth": "Vorige maand",
+    "nextMonth": "Volgende maand",
+    "scopeAll": "Alle",
+    "scopeWatchlist": "Mijn Portfolio",
+    "more": "meer",
+    "empty": "Geen evenementen.",
+    "summary": "{count} rapporten",
+    "legendBmo": "Voor opening",
+    "legendAmc": "Na sluiting"
+  },
+  "news": {
+    "title": "Nieuws",
+    "subtitle": "Recente artikelen.",
+    "source": "via Finnhub",
+    "emptyTitle": "Geen Nieuws",
+    "emptyDesc": "Geen recent nieuws.",
+    "showMore": "Toon nog {n}",
+    "showLess": "Toon minder",
+    "readMore": "Lees artikel"
+  },
+  "transcripts": {
+    "title": "Transcripties",
+    "subtitle": "Aandeelhoudersvergaderingen.",
+    "inDevelopment": "In Ontwikkeling",
+    "placeholderTitle": "Binnenkort Beschikbaar",
+    "placeholderDesc": "Deze functie is binnenkort beschikbaar."
+  },
+  "screener": {
+    "title": "Screener",
+    "subtitle": "Vind geweldige bedrijven.",
+    "filters": {
+      "title": "Filters",
+      "guruStrategies": "Grote Investeerders",
+      "moatCompounders": "Warren Buffett",
+      "moatTooltip": "Concurrentievoordeel filter.",
+      "magicFormula": "Joel Greenblatt",
+      "magicTooltip": "Magische formule.",
+      "sector": "Sector",
+      "sectorPlaceholder": "Alle",
+      "allSectors": "Alle",
+      "minGrossMargin": "Brutomarge",
+      "minRoic": "ROIC",
+      "minRevenue": "Omzet",
+      "minEarningsYield": "Earnings Yield"
+    },
+    "results": {
+      "count": "{count} bedrijven",
+      "loading": "Zoeken...",
+      "empty": "Geen resultaten.",
+      "emptyDesc": "Pas de filters aan.",
+      "company": "Bedrijf",
+      "sector": "Sector",
+      "revenue": "Omzet",
+      "grossMargin": "Brutomarge",
+      "roic": "ROIC",
+      "earningsYield": "Earnings Yield",
+      "action": "Bekijk",
+      "viewStock": "Analyse"
+    }
+  }
+}

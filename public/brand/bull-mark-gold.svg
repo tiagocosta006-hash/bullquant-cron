@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="#E4AA33" role="img" aria-label="Bullocracy">
+  <path d="M23 19C16 17 9 15 4 9C7 14 12 18 26 24Z"/>
+  <path d="M41 19C48 17 55 15 60 9C57 14 52 18 38 24Z"/>
+  <path d="M20 28 14 29 19 33Z"/>
+  <path d="M44 28 50 29 45 33Z"/>
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M24 21C18 23 17 29 20 34C22 39 26 43 30 44.5C31.5 45.2 32.5 45.2 34 44.5C38 43 42 39 44 34C47 29 46 23 40 21C35 19 29 19 24 21ZM24.3 30.6a1.8 1.8 0 1 0 3.6 0a1.8 1.8 0 1 0 -3.6 0ZM36.1 30.6a1.8 1.8 0 1 0 3.6 0a1.8 1.8 0 1 0 -3.6 0Z"/>
+  <rect x="28" y="45.5" width="8" height="2.6" rx="1.2"/>
+  <rect x="24" y="49" width="16" height="3" rx="1.5"/>
+  <rect x="20" y="53" width="24" height="3.6" rx="1.8"/>
+</svg>

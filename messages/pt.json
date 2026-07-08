@@ -1,6 +1,105 @@
 {
+  "marketing": {
+    "eyebrow": "Análise fundamental · Value investing",
+    "titleLead": "Vê o valor que",
+    "titleAccent": "os outros não veem.",
+    "subtitle": "10 anos de fundamentais, uma calculadora DCF que se autopreenche e AI Insights — em português e de graça. Análise séria para quem investe a longo prazo.",
+    "primaryCta": "Criar conta grátis",
+    "secondaryCta": "Ver exemplo: AAPL",
+    "trust": "Cobertura S&P 500 · Dados da SEC EDGAR · Sem cartão de crédito",
+    "features": {
+      "fundamentals": {
+        "title": "10 anos de fundamentais",
+        "desc": "Receitas, margens, ROIC e cash flow num relance — com CAGR calculado automaticamente."
+      },
+      "dcf": {
+        "title": "DCF integrada",
+        "desc": "Estima o valor intrínseco em segundos. Autopreenche a partir da empresa e ajusta com sliders."
+      },
+      "ai": {
+        "title": "AI Brief",
+        "desc": "Resumo por IA dos desenvolvimentos recentes de cada empresa, classificados por sentimento — nunca conselho de investimento."
+      }
+    }
+  },
+  "insider": {
+    "title": "Transações de Insiders",
+    "subtitle": "Declarações (Form 4) de diretores, executivos e detentores de >10%.",
+    "emptyTitle": "Sem Atividade",
+    "emptyDesc": "Não foram detetadas transações recentes de insiders para esta empresa.",
+    "showMore": "Mostrar mais {n} transações",
+    "showLess": "Ver menos",
+    "buysWindow": "{n} Compras ({days}d)",
+    "sellsWindow": "{n} Vendas ({days}d)",
+    "col": {
+      "insider": "Nome",
+      "type": "Tipo",
+      "shares": "Ações",
+      "price": "Preço",
+      "value": "Valor",
+      "date": "Data"
+    },
+    "type": {
+      "buy": "COMPRA",
+      "sell": "VENDA",
+      "other": "OUTRO"
+    },
+    "codes": {
+      "P": "P - Compra no Mercado",
+      "S": "S - Venda no Mercado",
+      "A": "A - Atribuição / Bónus",
+      "M": "M - Exercício de Opções",
+      "F": "F - Retenção de Impostos (In Kind)",
+      "G": "G - Oferta / Doação",
+      "J": "J - Outro",
+      "unknown": "Código SEC: {code}"
+    }
+  },
+  "dashboard": {
+    "title": "Insights",
+    "subtitle": "Explora tendências de mercado, descobre oportunidades de crescimento e acompanha as ações mais comentadas de Wall Street.",
+    "empty": "Nenhuma empresa encontrada para esta categoria.",
+    "marketCap": "Capitalização",
+    "quickActionsTitle": "Ações rápidas",
+    "exploreTitle": "Explorar empresas",
+    "actions": {
+      "portfolio": "O Meu Portfólio",
+      "portfolioDesc": "Empresas que segues e preços ao vivo",
+      "dcf": "Nova análise DCF",
+      "dcfDesc": "Calcula o valor intrínseco de uma ação",
+      "calendar": "Calendário de resultados",
+      "calendarDesc": "Próximos earnings e quem bateu estimativas",
+      "transcripts": "Transcrições de resultados",
+      "transcriptsDesc": "Transcrições das calls de resultados trimestrais"
+    },
+    "tabs": {
+      "sp500": "S&P 500",
+      "trending": "Em Destaque",
+      "growth": "Crescimento",
+      "dividend": "Dividendos",
+      "buyback": "Recompras",
+      "ai": "Inteligência Artificial"
+    }
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "portfolio": "Portfólio",
+    "calendar": "Calendário",
+    "dcf": "Calculadora DCF",
+    "transcripts": "Transcrições",
+    "screener": "Filtro (Screener)",
+    "recentSearches": "Pesquisas Recentes",
+    "desc": {
+      "dashboard": "Visão geral, atalhos e exploração de empresas",
+      "portfolio": "As empresas que segues e os seus preços ao vivo",
+      "calendar": "Próximos relatórios de ganhos das empresas americanas",
+      "dcf": "Avalia o preço justo de qualquer ação usando fluxos de caixa",
+      "transcripts": "Lê as reuniões com investidores na íntegra",
+      "screener": "Encontra empresas usando filtros avançados"
+    }
+  },
   "login": {
-    "title": "Entrar no BullQuant",
+    "title": "Entrar no BullVision",
     "subtitle": "Acede ao teu portfólio e análises.",
     "emailLabel": "Email",
     "emailPlaceholder": "nome@email.com",
@@ -13,7 +112,7 @@
   },
   "register": {
     "title": "Criar Conta",
-    "subtitle": "Junta-te a milhares de investidores no BullQuant.",
+    "subtitle": "Junta-te a milhares de investidores no BullVision.",
     "nameLabel": "Nome",
     "namePlaceholder": "O teu nome",
     "emailLabel": "Email",
@@ -47,7 +146,8 @@
     "logoutTitle": "Sair",
     "login": "Login",
     "register": "Registar",
-    "dcf": "DCF"
+    "dcf": "DCF",
+    "calendar": "Calendário"
   },
   "search": {
     "placeholder": "Pesquisar ticker (ex: AAPL)...",
@@ -56,13 +156,41 @@
     "clearAll": "Limpar Tudo"
   },
   "settings": {
-    "title": "A Minha Conta",
-    "subtitle": "Gere os teus dados pessoais e definições.",
-    "planFree": "Plano FREE",
-    "subscriptionTitle": "Detalhes da Subscrição",
-    "subscriptionDesc": "Atualmente estás a usar a versão gratuita do BullQuant. O plano gratuito inclui acesso ao motor de pesquisa de empresas e snapshots básicos de fundamentais.",
-    "premiumSoonTitle": "🚀 Funcionalidades Premium em breve!",
-    "premiumSoonDesc": "Alertas de preço, screener avançado e relatórios em PDF estão a ser desenvolvidos."
+    "title": "Configurações",
+    "subtitle": "Gere o teu perfil, preferências e subscrição num só lugar.",
+    "planFree": "Plano Gratuito",
+    "saveSuccess": "Perfil atualizado com sucesso!",
+    "tabs": {
+      "profile": "Perfil",
+      "preferences": "Preferências",
+      "subscription": "Subscrição"
+    },
+    "profile": {
+      "title": "Os Teus Dados",
+      "email": "Endereço de Email",
+      "name": "Nome de Apresentação",
+      "namePlaceholder": "Como queres ser chamado",
+      "save": "Guardar Alterações",
+      "dangerZone": "Zona de Perigo",
+      "logoutDesc": "Termina a tua sessão atual no Bullmetrics com segurança.",
+      "logoutBtn": "Sair da Conta"
+    },
+    "preferences": {
+      "title": "Preferências de Utilização",
+      "settings": "Definições",
+      "settingsDesc": "Gere o teu perfil, subscrição e preferências da app.",
+      "language": "Idioma",
+      "languageDesc": "Escolhe a língua em que queres usar o Bullmetrics.",
+      "theme": "Tema Visual",
+      "themeDesc": "Alterna entre modo escuro (Dark) e modo claro (Light)."
+    },
+    "subscription": {
+      "title": "O Teu Plano Atual",
+      "desc": "Estás atualmente no plano gratuito. Tens acesso ilimitado a cotações, mas o número de análises de IA e DCF diárias é limitado.",
+      "premiumSoonTitle": "Acesso Premium em Breve",
+      "premiumSoonDesc": "Estamos a preparar funcionalidades avançadas de inteligência artificial exclusivas para subscritores PRO.",
+      "upgradeBtn": "Fazer Upgrade para PRO"
+    }
   },
   "portfolio": {
     "loginRequired": "Precisas de iniciar sessão para aceder à tua Watchlist.",
@@ -81,7 +209,7 @@
       "title": "Sugestões para adicionares"
     },
     "landing": {
-      "title": "BullQuant Alpha",
+      "title": "BullVision",
       "description": "Pesquisa pelo ticker de uma empresa na barra superior para começar ou regista-te para acederes à tua Watchlist.",
       "testExample": "Testar Exemplo",
       "createAccount": "Criar Conta Grátis"
@@ -101,6 +229,38 @@
       "followed": "Seguido",
       "addToPortfolio": "Adicionar ao Portfólio",
       "updating": "A atualizar..."
+    },
+    "savedValuations": {
+      "title": "As Minhas Avaliações (DCF)",
+      "openCalculator": "Abrir Calculadora",
+      "noAnalyses": "Ainda não guardaste nenhuma avaliação DCF para esta empresa.",
+      "savedAt": "Guardado a",
+      "fairValue": "Preço Justo",
+      "mos": "Margem de Segurança",
+      "growth": "Crescimento (1-5a)",
+      "termGrowth": "Cresc. Terminal"
+    },
+    "brief": {
+      "title": "Brief",
+      "loading": "A nossa IA está a analisar os acontecimentos recentes...",
+      "subtitle": "Resumo estratégico dos desenvolvimentos recentes (gerado por IA)",
+      "date": "Data",
+      "sentiment": {
+        "bullish": "Otimista",
+        "bearish": "Pessimista",
+        "neutral": "Neutro"
+      },
+      "expand": "Ler mais {n} desenvolvimentos",
+      "collapse": "Recolher"
+    },
+    "profile": {
+      "title": "Perfil da Empresa",
+      "website": "Website",
+      "sector": "Setor",
+      "industry": "Indústria",
+      "employees": "Trabalhadores Efetivos",
+      "country": "País",
+      "exchange": "Bolsa"
     },
     "snapshotTitle": "Snapshot",
     "chart": {
@@ -123,7 +283,11 @@
       "cashFlow": "Cash Flow",
       "marginAndGrowth": "Margens & Crescimento",
       "balance": "Balanço",
-      "dividend": "Dividendos"
+      "dividend": "Dividendos",
+      "na": "N/D",
+      "naGeneric": "Sem dados disponíveis para esta empresa.",
+      "naMargin": "Margem não reportada — típico de bancos e seguradoras, que não têm custo de produção (COGS).",
+      "naPrice": "Indisponível: depende do preço atual, que ainda não carregou."
     }
   },
   "dcf": {
@@ -145,6 +309,7 @@
     "waccHint": "Retorno exigido. Quanto maior, mais conservador o valor.",
     "terminalGrowth": "Crescimento Perpétuo",
     "terminalGrowthHint": "Crescimento a longo prazo após o ano 10 (tipicamente ≤ inflação).",
+    "reverseDcf": "Calcular Crescimento Implícito (Reverse DCF)",
     "fairValue": "Valor Justo",
     "currentPrice": "Preço Atual",
     "marginOfSafety": "Margem de Segurança",
@@ -155,6 +320,16 @@
     "terminalValuePv": "Valor Terminal (VP)",
     "fcfPv": "FCF Descontado (VP)",
     "disclaimer": "Os valores são uma estimativa baseada nos teus pressupostos. Não constituem recomendação de compra ou venda.",
+    "saved": {
+      "title": "As minhas análises",
+      "saveButton": "Guardar",
+      "saveError": "Não foi possível guardar. Tenta novamente.",
+      "labelPlaceholder": "Nome do cenário (opcional)",
+      "empty": "Ainda não guardaste nenhuma análise para esta empresa.",
+      "loadButton": "Carregar",
+      "deleteButton": "Apagar",
+      "fairValueShort": "Justo:"
+    },
     "errorWacc": "O WACC tem de ser superior ao crescimento perpétuo para o modelo ser válido. Ajusta os sliders.",
     "errorShares": "Indica o número de ações em circulação para calcular o valor por ação.",
     "errorFcf": "Indica um Free Cash Flow inicial válido para começar."
@@ -186,7 +361,73 @@
       "roic": "ROIC",
       "gross": "BRUTA",
       "operating": "OPERAC.",
-      "profit": "LÍQUIDA"
+      "profit": "LÍQUIDA",
+      "roe": "ROE"
+    }
+  },
+  "calendar": {
+    "title": "Calendário de Resultados",
+    "subtitle": "Acompanha as datas de apresentação de resultados das empresas que monitorizamos.",
+    "disclaimer": "As datas futuras são estimativas das fontes de dados e podem mudar. Confirma sempre na página de relações com investidores da empresa.",
+    "today": "Hoje",
+    "prevMonth": "Mês anterior",
+    "nextMonth": "Mês seguinte",
+    "scopeAll": "Todas",
+    "scopeWatchlist": "Watchlist",
+    "more": "mais",
+    "empty": "Sem resultados agendados neste período.",
+    "summary": "{count} resultados neste período",
+    "legendBmo": "Antes da abertura",
+    "legendAmc": "Após o fecho"
+  },
+  "news": {
+    "title": "Notícias da Empresa",
+    "subtitle": "Artigos recentes dos últimos 30 dias.",
+    "source": "via Finnhub",
+    "emptyTitle": "Sem Notícias Recentes",
+    "emptyDesc": "Não foram encontradas notícias recentes para esta empresa.",
+    "showMore": "Mostrar mais {n} artigos",
+    "showLess": "Ver menos",
+    "readMore": "Ler artigo completo"
+  },
+  "transcripts": {
+    "title": "Earnings Calls Transcripts",
+    "subtitle": "Leia e pesquise nas conferências de apresentação de resultados.",
+    "inDevelopment": "Em Desenvolvimento",
+    "placeholderTitle": "Transcrições em Breve",
+    "placeholderDesc": "Estamos a finalizar a integração com os fornecedores de dados. Esta funcionalidade ficará disponível brevemente."
+  },
+  "screener": {
+    "title": "Filtro de Mercado",
+    "subtitle": "Encontra empresas de alta qualidade com base nos teus próprios critérios.",
+    "filters": {
+      "title": "Critérios",
+      "guruStrategies": "Grandes Investidores",
+      "moatCompounders": "Warren Buffett",
+      "moatTooltip": "Filtro de Fosso Competitivo: Margem Bruta > 40% e ROIC > 15%.",
+      "magicFormula": "Joel Greenblatt (Teste)",
+      "magicTooltip": "Filtro de Eficiência: ROIC elevado ignorando as margens absolutas.",
+      "sector": "Setor",
+      "sectorPlaceholder": "Todos os Setores",
+      "allSectors": "Todos os Setores",
+      "minGrossMargin": "Margem Bruta (Gross Margin)",
+      "minRoic": "ROIC (Eficiência)",
+      "minRevenue": "Receita Anual",
+      "minEarningsYield": "Earnings Yield"
+    },
+    "results": {
+      "count": "{count} empresas encontradas",
+      "loading": "A pesquisar na base de dados...",
+      "empty": "Nenhuma empresa encontrada.",
+      "emptyDesc": "Tenta ajustar os filtros para abranger mais resultados.",
+      "company": "Empresa",
+      "sector": "Setor",
+      "revenue": "Receita",
+      "grossMargin": "Margem Bruta",
+      "roic": "ROIC",
+      "earningsYield": "Yield de Lucro",
+      "action": "Ver",
+      "viewStock": "Ver Análise"
     }
   }
 }

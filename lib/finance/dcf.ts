@@ -114,3 +114,57 @@ export function runDcf(inputs: DcfInputs): DcfResult {
     marginOfSafety,
   }
 }
+
+/**
+ * Calcula a taxa de crescimento implícita (Reverse DCF) necessária para
+ * justificar o preço atual da ação (targetPrice), assumindo que a
+ * growthStage2 = growthStage1 / 2.
+ * Utiliza o método da biseção (Bisection Method).
+ */
+export function solveReverseDcf(
+  baseInputs: Omit<DcfInputs, "growthStage1" | "growthStage2">
+): { impliedGrowth1: number; impliedGrowth2: number } | null {
+  if (baseInputs.currentPrice <= 0 || baseInputs.fcf0 <= 0 || baseInputs.shares <= 0) {
+    return null;
+  }
+
+  const target = baseInputs.currentPrice;
+  let low = -0.5; // -50% crescimento
+  let high = 2.0; // 200% crescimento
+  const tolerance = 0.01; // precisão do preço a 1 cêntimo
+  let bestGuess = 0;
+
+  for (let i = 0; i < 50; i++) {
+    const mid = (low + high) / 2;
+    const testInputs: DcfInputs = {
+      ...baseInputs,
+      growthStage1: mid,
+      growthStage2: mid / 2, // A nossa Opção B!
+    };
+
+    const res = runDcf(testInputs);
+    if (!res.valid) {
+      // Se não for válido (ex: WACC inválido), abortamos ou limitamos
+      return null;
+    }
+
+    if (Math.abs(res.fairValue - target) <= tolerance) {
+      bestGuess = mid;
+      break;
+    }
+
+    // Se fairValue > target, assumimos demasiado crescimento, logo baixa o 'high'.
+    // Nota: O fairValue aumenta monotonamente com o crescimento.
+    if (res.fairValue > target) {
+      high = mid;
+    } else {
+      low = mid;
+    }
+    bestGuess = mid;
+  }
+
+  return {
+    impliedGrowth1: bestGuess,
+    impliedGrowth2: bestGuess / 2,
+  };
+}

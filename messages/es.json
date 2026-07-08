@@ -1,0 +1,431 @@
+{
+  "marketing": {
+    "eyebrow": "Análisis fundamental · Value investing",
+    "titleLead": "Ve el valor",
+    "titleAccent": "que otros ignoran.",
+    "subtitle": "10 años de fundamentales, una calculadora DCF y Resumen AI — gratis. Análisis serio para inversores a largo plazo.",
+    "primaryCta": "Crear cuenta gratuita",
+    "secondaryCta": "Ver ejemplo: AAPL",
+    "trust": "Cobertura S&P 500 · Datos SEC EDGAR · Sin tarjeta de crédito",
+    "features": {
+      "fundamentals": {
+        "title": "10 años de fundamentales",
+        "desc": "Ingresos, márgenes, ROIC y flujo de caja en un vistazo."
+      },
+      "dcf": {
+        "title": "DCF integrado",
+        "desc": "Estima el valor intrínseco en segundos. Autocompletado rápido."
+      },
+      "ai": {
+        "title": "Resumen AI",
+        "desc": "Un resumen de IA de los desarrollos recientes de cada empresa."
+      }
+    }
+  },
+  "insider": {
+    "title": "Transacciones de Insiders",
+    "subtitle": "Formularios 4 de directores y propietarios del 10%.",
+    "emptyTitle": "Sin Actividad",
+    "emptyDesc": "No se detectaron transacciones recientes.",
+    "showMore": "Mostrar {n} transacciones más",
+    "showLess": "Mostrar menos",
+    "buysWindow": "{n} Compras ({days}d)",
+    "sellsWindow": "{n} Ventas ({days}d)",
+    "col": {
+      "insider": "Nombre",
+      "type": "Tipo",
+      "shares": "Acciones",
+      "price": "Precio",
+      "value": "Valor",
+      "date": "Fecha"
+    },
+    "type": {
+      "buy": "COMPRA",
+      "sell": "VENTA",
+      "other": "OTRO"
+    },
+    "codes": {
+      "P": "P - Compra",
+      "S": "S - Venta",
+      "A": "A - Otorgamiento",
+      "M": "M - Ejercicio de Opción",
+      "F": "F - Retención",
+      "G": "G - Regalo",
+      "J": "J - Otro",
+      "unknown": "Código SEC: {code}"
+    }
+  },
+  "dashboard": {
+    "title": "Perspectivas",
+    "subtitle": "Explora tendencias, descubre oportunidades y sigue el mercado.",
+    "empty": "No se encontraron empresas.",
+    "marketCap": "Cap. Mercado",
+    "quickActionsTitle": "Acciones Rápidas",
+    "exploreTitle": "Explorar",
+    "actions": {
+      "portfolio": "Mi Cartera",
+      "portfolioDesc": "Tus empresas y precios",
+      "dcf": "Nuevo DCF",
+      "dcfDesc": "Calcula el valor intrínseco",
+      "calendar": "Calendario",
+      "calendarDesc": "Resultados trimestrales",
+      "transcripts": "Transcripciones",
+      "transcriptsDesc": "Llamadas de ganancias"
+    },
+    "tabs": {
+      "sp500": "S&P 500",
+      "trending": "Tendencia",
+      "growth": "Crecimiento",
+      "dividend": "Dividendos",
+      "buyback": "Recompras",
+      "ai": "Inteligencia Artificial"
+    }
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "portfolio": "Cartera",
+    "calendar": "Calendario",
+    "dcf": "Calculadora DCF",
+    "transcripts": "Transcripciones",
+    "screener": "Buscador (Screener)",
+    "recentSearches": "Búsquedas Recientes",
+    "desc": {
+      "dashboard": "Vista general y explorador",
+      "portfolio": "Tus empresas seguidas",
+      "calendar": "Resultados financieros",
+      "dcf": "Evalúa el precio justo",
+      "transcripts": "Reuniones de inversores",
+      "screener": "Encuentra empresas"
+    }
+  },
+  "login": {
+    "title": "Iniciar Sesión",
+    "subtitle": "Accede a tu cartera.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "nombre@email.com",
+    "passwordLabel": "Contraseña",
+    "forgotPasswordLink": "¿Olvidaste la contraseña?",
+    "submitButton": "Entrar",
+    "submitLoading": "Entrando...",
+    "noAccount": "¿No tienes cuenta?",
+    "registerLink": "Crear cuenta"
+  },
+  "register": {
+    "title": "Crear Cuenta",
+    "subtitle": "Únete a BullVision.",
+    "nameLabel": "Nombre",
+    "namePlaceholder": "Tu nombre",
+    "emailLabel": "Email",
+    "emailPlaceholder": "nombre@email.com",
+    "passwordLabel": "Contraseña",
+    "submitButton": "Registrarse",
+    "submitLoading": "Creando...",
+    "hasAccount": "¿Ya tienes cuenta?",
+    "loginLink": "Entrar"
+  },
+  "forgotPassword": {
+    "title": "Recuperar Contraseña",
+    "subtitle": "Introduce tu email.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "nombre@email.com",
+    "submitButton": "Enviar enlace",
+    "submitLoading": "Enviando...",
+    "remembered": "¿Recordaste la contraseña?",
+    "backToLogin": "Volver a iniciar sesión"
+  },
+  "resetPassword": {
+    "title": "Nueva Contraseña",
+    "subtitle": "Elige tu nueva contraseña.",
+    "passwordLabel": "Nueva Contraseña",
+    "passwordPlaceholder": "******",
+    "submitButton": "Actualizar",
+    "submitLoading": "Actualizando..."
+  },
+  "header": {
+    "settingsTitle": "Configuración",
+    "logoutTitle": "Salir",
+    "login": "Entrar",
+    "register": "Crear Cuenta",
+    "dcf": "DCF",
+    "calendar": "Calendario"
+  },
+  "search": {
+    "placeholder": "Buscar ticker (ej. AAPL)...",
+    "noResults": "No hay resultados.",
+    "recentTitle": "Búsquedas Recientes",
+    "clearAll": "Borrar Todo"
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Gestiona tu perfil y preferencias.",
+    "planFree": "Plan Gratis",
+    "saveSuccess": "¡Perfil actualizado!",
+    "tabs": {
+      "profile": "Perfil",
+      "preferences": "Preferencias",
+      "subscription": "Suscripción"
+    },
+    "profile": {
+      "title": "Tus Datos",
+      "email": "Email",
+      "name": "Nombre",
+      "namePlaceholder": "Cómo quieres que te llamemos",
+      "save": "Guardar",
+      "dangerZone": "Zona de Peligro",
+      "logoutDesc": "Cierra tu sesión de forma segura.",
+      "logoutBtn": "Cerrar Sesión"
+    },
+    "preferences": {
+      "title": "Preferencias",
+      "language": "Idioma",
+      "languageDesc": "Elige tu idioma preferido.",
+      "theme": "Tema Visual",
+      "themeDesc": "Cambia entre modo claro y oscuro."
+    },
+    "subscription": {
+      "title": "Tu Plan",
+      "desc": "Estás en el plan gratuito.",
+      "premiumSoonTitle": "Acceso PRO próximamente",
+      "premiumSoonDesc": "Estamos preparando funciones avanzadas de inteligencia artificial.",
+      "upgradeBtn": "Subir a PRO"
+    }
+  },
+  "portfolio": {
+    "loginRequired": "Inicia sesión para ver tu Cartera.",
+    "loginButton": "Iniciar Sesión",
+    "title": "Mi Cartera",
+    "subtitle": "Sigue a tus empresas en tiempo real.",
+    "positions": "Posiciones",
+    "upToday": "Sube Hoy",
+    "emptyState": {
+      "title": "Tu cartera está vacía",
+      "description": "Empieza a añadir empresas.",
+      "quickAdd": "Añadir",
+      "adding": "Añadiendo..."
+    },
+    "suggestions": {
+      "title": "Sugerencias"
+    },
+    "landing": {
+      "title": "BullVision",
+      "description": "Busca una empresa para comenzar.",
+      "testExample": "Probar Ejemplo",
+      "createAccount": "Crear Cuenta"
+    },
+    "card": {
+      "currentPrice": "Precio Actual"
+    },
+    "lastUpdate": "Última act.:"
+  },
+  "stock": {
+    "underConstruction": "En construcción",
+    "buildingMessage": "Esta página está en desarrollo.",
+    "backHome": "Volver al Inicio",
+    "updatedAt": "Actualizado el",
+    "priceUnavailable": "Precio no disponible",
+    "header": {
+      "followed": "Siguiendo",
+      "addToPortfolio": "Añadir a Cartera",
+      "updating": "Actualizando..."
+    },
+    "savedValuations": {
+      "title": "Mis Valoraciones DCF",
+      "openCalculator": "Abrir",
+      "noAnalyses": "No hay análisis guardados.",
+      "savedAt": "Guardado el",
+      "fairValue": "Valor Justo",
+      "mos": "Margen de Seg.",
+      "growth": "Crecimiento (1-5)",
+      "termGrowth": "Crec. Terminal"
+    },
+    "brief": {
+      "title": "Resumen IA",
+      "loading": "Analizando...",
+      "subtitle": "Resumen de noticias recientes",
+      "date": "Fecha",
+      "sentiment": {
+        "bullish": "Alcista",
+        "bearish": "Bajista",
+        "neutral": "Neutral"
+      },
+      "expand": "Ver {n} más",
+      "collapse": "Ocultar"
+    },
+    "profile": {
+      "title": "Perfil",
+      "website": "Web",
+      "sector": "Sector",
+      "industry": "Industria",
+      "employees": "Empleados",
+      "country": "País",
+      "exchange": "Bolsa"
+    },
+    "snapshotTitle": "Resumen",
+    "chart": {
+      "title": "Histórico",
+      "noData": "Sin datos",
+      "period": "Período",
+      "chartView": "Gráfico",
+      "tableView": "Tabla",
+      "fullScreen": "Pantalla Completa",
+      "tabs": {
+        "1m": "1M",
+        "6m": "6M",
+        "1y": "1A",
+        "5y": "5A",
+        "max": "MAX"
+      }
+    },
+    "snapshot": {
+      "valuation": "Valoración",
+      "cashFlow": "Flujo de Caja",
+      "marginAndGrowth": "Márgenes y Crecimiento",
+      "balance": "Balance",
+      "dividend": "Dividendos",
+      "na": "N/D",
+      "naGeneric": "No disponible.",
+      "naMargin": "No reportado.",
+      "naPrice": "No disponible."
+    }
+  },
+  "dcf": {
+    "title": "Calculadora DCF",
+    "subtitle": "Estima el valor de una empresa.",
+    "educationalWarning": "Es un modelo, no una bola de cristal.",
+    "autofillLabel": "Autocompletar",
+    "autofillPlaceholder": "Buscar ticker...",
+    "loadedFor": "Datos cargados:",
+    "loadError": "Error al cargar datos.",
+    "currentPriceInput": "Precio Actual",
+    "fcf0": "FCF Inicial",
+    "shares": "Acciones en Circulación",
+    "netDebt": "Deuda Neta",
+    "millionsSuffix": "Millones",
+    "growth1": "Crecimiento Años 1-5",
+    "growth2": "Crecimiento Años 6-10",
+    "wacc": "WACC (Tasa Descuento)",
+    "waccHint": "Tasa requerida.",
+    "terminalGrowth": "Crecimiento Perpetuo",
+    "terminalGrowthHint": "Crecimiento a largo plazo.",
+    "reverseDcf": "DCF Inverso",
+    "fairValue": "Valor Justo",
+    "currentPrice": "Precio Actual",
+    "marginOfSafety": "Margen de Seguridad",
+    "undervalued": "Infravalorada",
+    "overvalued": "Sobrevalorada",
+    "enterpriseValue": "Enterprise Value",
+    "equityValue": "Equity Value",
+    "terminalValuePv": "Valor Terminal (PV)",
+    "fcfPv": "FCF Descontado (PV)",
+    "disclaimer": "Son solo estimaciones.",
+    "saved": {
+      "title": "Mis análisis",
+      "saveButton": "Guardar",
+      "saveError": "Error al guardar.",
+      "labelPlaceholder": "Nombre (opcional)",
+      "empty": "No tienes análisis.",
+      "loadButton": "Cargar",
+      "deleteButton": "Borrar",
+      "fairValueShort": "Justo:"
+    },
+    "errorWacc": "El WACC debe ser mayor que el crecimiento perpetuo.",
+    "errorShares": "Introduce las acciones.",
+    "errorFcf": "Introduce un FCF válido."
+  },
+  "financials": {
+    "engineTitle": "Datos Financieros",
+    "periods": {
+      "quarterly": "Trimestral",
+      "ttm": "TTM",
+      "annual": "Anual"
+    },
+    "charts": {
+      "revenue": "Ingresos",
+      "revenueBySegment": "Ingresos por Segmento",
+      "epsDiluted": "BPA",
+      "freeCashFlow": "Flujo de Caja",
+      "netIncome": "Beneficio Neto",
+      "ebitda": "EBITDA",
+      "expenses": "Gastos",
+      "cashDebt": "Caja y Deuda",
+      "sharesOutstanding": "Acciones",
+      "dividends": "Dividendos (DPS)",
+      "roic": "ROIC",
+      "grossMargin": "Margen Bruto",
+      "operatingMargin": "Margen Op.",
+      "profitMargin": "Margen Neto"
+    },
+    "ratios": {
+      "roic": "ROIC",
+      "gross": "BRUTO",
+      "operating": "OPERAT.",
+      "profit": "NETO",
+      "roe": "ROE"
+    }
+  },
+  "calendar": {
+    "title": "Calendario de Resultados",
+    "subtitle": "Resultados trimestrales.",
+    "disclaimer": "Fechas estimadas.",
+    "today": "Hoy",
+    "prevMonth": "Mes anterior",
+    "nextMonth": "Próximo mes",
+    "scopeAll": "Todo",
+    "scopeWatchlist": "Mi Cartera",
+    "more": "más",
+    "empty": "Sin eventos.",
+    "summary": "{count} resultados",
+    "legendBmo": "Antes apertura",
+    "legendAmc": "Después cierre"
+  },
+  "news": {
+    "title": "Noticias",
+    "subtitle": "Artículos recientes.",
+    "source": "vía Finnhub",
+    "emptyTitle": "Sin Noticias",
+    "emptyDesc": "No hay noticias recientes.",
+    "showMore": "Mostrar {n} más",
+    "showLess": "Mostrar menos",
+    "readMore": "Leer más"
+  },
+  "transcripts": {
+    "title": "Transcripciones",
+    "subtitle": "Transcripciones de resultados.",
+    "inDevelopment": "En Desarrollo",
+    "placeholderTitle": "Próximamente",
+    "placeholderDesc": "Esta función estará disponible pronto."
+  },
+  "screener": {
+    "title": "Buscador de Acciones",
+    "subtitle": "Encuentra empresas increíbles.",
+    "filters": {
+      "title": "Filtros",
+      "guruStrategies": "Grandes Inversores",
+      "moatCompounders": "Warren Buffett",
+      "moatTooltip": "Empresas con ventaja competitiva.",
+      "magicFormula": "Joel Greenblatt",
+      "magicTooltip": "Fórmula mágica.",
+      "sector": "Sector",
+      "sectorPlaceholder": "Todos",
+      "allSectors": "Todos",
+      "minGrossMargin": "Margen Bruto",
+      "minRoic": "ROIC",
+      "minRevenue": "Ingresos",
+      "minEarningsYield": "Earnings Yield"
+    },
+    "results": {
+      "count": "{count} empresas",
+      "loading": "Buscando...",
+      "empty": "Sin resultados.",
+      "emptyDesc": "Ajusta los filtros.",
+      "company": "Empresa",
+      "sector": "Sector",
+      "revenue": "Ingresos",
+      "grossMargin": "Margen Bruto",
+      "roic": "ROIC",
+      "earningsYield": "Earnings Yield",
+      "action": "Ver",
+      "viewStock": "Análisis"
+    }
+  }
+}

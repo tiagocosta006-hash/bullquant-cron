@@ -22,6 +22,7 @@ export async function GET(request: Request) {
         ticker: true,
         name: true,
         exchange: true,
+        logoUrl: true,
       },
       orderBy: {
         ticker: 'asc'

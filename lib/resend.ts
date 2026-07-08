@@ -6,7 +6,7 @@ const resendApiKey = process.env.RESEND_API_KEY;
 export const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 // Substitui pelo email que tens configurado/verificado no Resend
-const FROM_EMAIL = 'BullQuant <info@thebullocracy.com>';
+const FROM_EMAIL = 'BullMetrics <info@thebullocracy.com>';
 
 /**
  * Envia o email de Boas-vindas (após registo/confirmação)
@@ -20,10 +20,10 @@ export const sendWelcomeEmail = async (email: string, name: string) => {
   return await resend.emails.send({
     from: FROM_EMAIL,
     to: [email],
-    subject: 'Bem-vindo ao BullQuant!',
+    subject: 'Bem-vindo ao BullMetrics!',
     html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2>Olá ${name}, bem-vindo ao BullQuant!</h2>
+        <h2>Olá ${name}, bem-vindo ao BullMetrics!</h2>
         <p>Estamos muito felizes por te ter connosco. Explora a plataforma e tira o máximo partido da análise fundamental potenciada por IA.</p>
         <p>A tua jornada para melhores investimentos começa agora.</p>
       </div>

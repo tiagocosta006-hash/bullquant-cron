@@ -15,6 +15,7 @@ import { StockNews } from '@/components/stock/StockNews'
 import { ManagementTeam } from '@/components/stock/ManagementTeam'
 import { StockKPIs } from '@/components/stock/StockKPIs'
 import { PremiumPdfButton } from '@/components/stock/pdf/PremiumPdfButton'
+import { ValuationMultiples } from '@/components/stock/ValuationMultiples'
 
 export default async function StockPage({
   params,
@@ -177,11 +178,14 @@ export default async function StockPage({
 
 
 
-      {/* 2. Fundamentals Snapshot */}
-      <div>
-        <h2 className="text-xl font-bold tracking-tight mb-4 text-foreground">{t('snapshotTitle')}</h2>
-        <StockSnapshot ticker={company.ticker} fundamentals={JSON.parse(JSON.stringify(fundamentalsToPass))} currencySymbol={currencySymbol} />
+      {/* 2. Fundamentals Snapshot & Valuation */}
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight mb-4 text-foreground">{t('snapshotTitle')}</h2>
+          <StockSnapshot ticker={company.ticker} fundamentals={JSON.parse(JSON.stringify(fundamentalsToPass))} currencySymbol={currencySymbol} />
+        </div>
         <StockKPIs fundamentals={JSON.parse(JSON.stringify(historicalAnnual))} isPro={isPro} ticker={company.ticker} />
+        <ValuationMultiples ticker={company.ticker} isPro={isPro} />
       </div>
 
       {/* 3. Price History Chart */}

@@ -40,7 +40,7 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/dashboard') ||
     request.nextUrl.pathname.startsWith('/dcf') ||
     request.nextUrl.pathname.startsWith('/calendar') ||
-    request.nextUrl.pathname.startsWith('/screener') ||
+    request.nextUrl.pathname.startsWith('/explore') ||
     request.nextUrl.pathname.startsWith('/transcripts')
 
   // Redirecionar utilizadores autenticados para a página inicial se tentarem aceder a rotas de auth

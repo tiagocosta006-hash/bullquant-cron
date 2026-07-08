@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Briefcase, CalendarDays, Calculator, MessageSquareText, LayoutDashboard, PanelLeftClose, PanelLeftOpen, SearchCode } from 'lucide-react';
+import { Briefcase, CalendarDays, Calculator, MessageSquareText, LayoutDashboard, PanelLeftClose, PanelLeftOpen, Compass } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { BRAND } from '@/lib/brand';
@@ -19,7 +19,7 @@ export function AppSidebar() {
 
   const links = [
     { href: '/dashboard', icon: LayoutDashboard, label: t('dashboard'), desc: t('desc.dashboard') },
-    { href: '/screener', icon: SearchCode, label: t('screener'), desc: t('desc.screener') },
+    { href: '/explore', icon: Compass, label: t('explore'), desc: t('desc.explore') },
     { href: '/portfolio', icon: Briefcase, label: t('portfolio'), desc: t('desc.portfolio') },
     { href: '/calendar', icon: CalendarDays, label: t('calendar'), desc: t('desc.calendar') },
     { href: '/dcf', icon: Calculator, label: t('dcf'), desc: t('desc.dcf') },

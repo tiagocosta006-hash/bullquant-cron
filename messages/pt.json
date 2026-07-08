@@ -90,7 +90,7 @@
     "calendar": "Calendário",
     "dcf": "Calculadora DCF",
     "transcripts": "Transcrições",
-    "screener": "Filtro (Screener)",
+    "explore": "Explorar (Screener)",
     "recentSearches": "Pesquisas Recentes",
     "desc": {
       "dashboard": "Visão geral, atalhos e exploração de empresas",
@@ -98,7 +98,7 @@
       "calendar": "Próximos relatórios de ganhos das empresas americanas",
       "dcf": "Avalia o preço justo de qualquer ação usando fluxos de caixa",
       "transcripts": "Lê as reuniões com investidores na íntegra",
-      "screener": "Encontra empresas usando filtros avançados"
+      "explore": "Encontra e explora empresas organizadas por tipo de negócio"
     }
   },
   "login": {
@@ -546,6 +546,30 @@
       "earningsYield": "Yield de Lucro",
       "action": "Ver",
       "viewStock": "Ver Análise"
+    }
+  },
+  "explore": {
+    "title": "Explorar Negócios",
+    "subtitle": "Descobre novas oportunidades organizadas por setor e tipo de negócio.",
+    "searchPlaceholder": "Procurar empresa, ticker ou área de negócio...",
+    "sectorsTitle": "Setores da Economia",
+    "industriesFor": "Indústrias: {sector}",
+    "companiesIn": "Empresas em {industry}",
+    "backToSectors": "Voltar aos Setores",
+    "backToIndustries": "Voltar às Indústrias",
+    "metrics": {
+      "revenue": "Faturação",
+      "netMargin": "Margem Líq.",
+      "roic": "ROIC"
+    },
+    "noDescription": "Sem resumo disponível.",
+    "sheet": {
+      "businessModel": "O Negócio",
+      "revenueStreams": "Como ganham dinheiro",
+      "leadership": "Liderança",
+      "compareTitle": "Comparar com Concorrentes",
+      "compareDesc": "Avalia o desempenho financeiro lado a lado.",
+      "viewFinancials": "Ver Análise Financeira Completa"
     }
   }
 }

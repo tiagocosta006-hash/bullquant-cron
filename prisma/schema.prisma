@@ -41,6 +41,12 @@ model Company {
   isActive               Boolean              @default(true)
   lastFundamentalsUpdate DateTime?
   lastPriceUpdate        DateTime?
+  descriptionGeneratedAt DateTime?
+  geographicFocus        String?
+  bullCase               String?   @db.Text
+  bearCase               String?   @db.Text
+  swot                   Json?
+  extraInfo              String?   @db.Text
   createdAt              DateTime             @default(now())
   updatedAt              DateTime             @updatedAt
   ceo                    String?

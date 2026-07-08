@@ -90,15 +90,15 @@
     "calendar": "Calendar",
     "dcf": "DCF Calculator",
     "transcripts": "Transcripts",
-    "screener": "Stock Screener",
+    "explore": "Explore",
     "recentSearches": "Recent Searches",
     "desc": {
       "dashboard": "Overview, shortcuts and company explorer",
       "portfolio": "The companies you follow and their live prices",
       "calendar": "Upcoming earnings reports for US companies",
       "dcf": "Evaluate the fair price of any stock using cash flows",
-      "transcripts": "Read full investor meeting transcripts",
-      "screener": "Find companies using advanced filters"
+      "transcripts": "Read investor meetings in full",
+      "explore": "Discover and explore companies by business type"
     }
   },
   "login": {
@@ -550,6 +550,30 @@
       "earningsYield": "Earnings Yield",
       "action": "View",
       "viewStock": "View Analysis"
+    }
+  },
+  "explore": {
+    "title": "Explore Businesses",
+    "subtitle": "Discover new opportunities organized by sector and business type.",
+    "searchPlaceholder": "Search company, ticker or business area...",
+    "sectorsTitle": "Economic Sectors",
+    "industriesFor": "Industries: {sector}",
+    "companiesIn": "Companies in {industry}",
+    "backToSectors": "Back to Sectors",
+    "backToIndustries": "Back to Industries",
+    "metrics": {
+      "revenue": "Revenue",
+      "netMargin": "Net Margin",
+      "roic": "ROIC"
+    },
+    "noDescription": "No summary available.",
+    "sheet": {
+      "businessModel": "The Business",
+      "revenueStreams": "Revenue Streams",
+      "leadership": "Leadership",
+      "compareTitle": "Compare with Peers",
+      "compareDesc": "Evaluate financial performance side-by-side.",
+      "viewFinancials": "View Full Financial Analysis"
     }
   }
 }

@@ -14,6 +14,7 @@ import { CompanyProfile } from '@/components/stock/CompanyProfile'
 import { StockNews } from '@/components/stock/StockNews'
 import { ManagementTeam } from '@/components/stock/ManagementTeam'
 import { StockKPIs } from '@/components/stock/StockKPIs'
+import { PremiumPdfButton } from '@/components/stock/pdf/PremiumPdfButton'
 
 export default async function StockPage({
   params,
@@ -109,6 +110,51 @@ export default async function StockPage({
 
   const currencySymbol = getCurrencySymbol(company.currency)
 
+  // Fetch AI Insights safely for PDF
+  const aiInsightRaw = await prisma.aIInsightCache.findUnique({
+    where: { companyId: company.id }
+  })
+  let parsedAiInsight = null;
+  if (aiInsightRaw) {
+    try {
+      parsedAiInsight = {
+        executiveSummary: aiInsightRaw.executiveSummary,
+        moat: aiInsightRaw.moat,
+        catalysts: JSON.parse(aiInsightRaw.catalysts),
+        risks: JSON.parse(aiInsightRaw.risks),
+      }
+    } catch (e) {
+      console.error("Failed to parse AI Insight JSON for PDF", e);
+    }
+  }
+
+  const latestPrice = await prisma.price.findFirst({
+    where: { ticker: company.ticker },
+    orderBy: { date: 'desc' }
+  })
+
+  // Format data for PDF
+  const pdfCompanyData = {
+    name: company.name,
+    ticker: company.ticker,
+    exchange: company.exchange,
+    sector: company.sector,
+    country: company.country,
+    price: latestPrice ? Number(latestPrice.close) : null,
+    marketCap: latestPrice && fundamentalsToPass[0]?.sharesOutstanding
+      ? Number(latestPrice.close) * Number(fundamentalsToPass[0].sharesOutstanding)
+      : null,
+  }
+
+  const pdfFundamentals = fundamentalsToPass.map(f => ({
+    year: f.fiscalYear,
+    revenue: f.revenue ? Number(f.revenue) : null,
+    netIncome: f.netIncome ? Number(f.netIncome) : null,
+    eps: f.epsDiluted ? Number(f.epsDiluted) : null,
+    fcf: f.freeCashFlow ? Number(f.freeCashFlow) : null,
+    grossMargin: f.grossMargin ? Number(f.grossMargin) : null,
+  }))
+
   return (
     <div className="container max-w-7xl mx-auto py-8 px-4 space-y-8">
       {/* 1. Header (Info + Live Finnhub Price) */}
@@ -118,7 +164,16 @@ export default async function StockPage({
         exchange: company.exchange,
         logoUrl: company.logoUrl,
         currency: company.currency
-      }} />
+      }}
+      pdfButton={
+        <PremiumPdfButton
+          company={pdfCompanyData}
+          fundamentals={pdfFundamentals}
+          aiInsight={parsedAiInsight}
+          isPremiumUser={true} // Hardcoded for now as requested
+        />
+      }
+      />
 
 
 

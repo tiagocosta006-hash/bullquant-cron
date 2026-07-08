@@ -20,7 +20,7 @@ type PriceData = {
   changePercent: number;
 }
 
-export function StockHeader({ company }: { company: CompanyProp }) {
+export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfButton?: React.ReactNode }) {
   const t = useTranslations("stock")
   const locale = useLocale()
   const [priceData, setPriceData] = useState<PriceData | null>(null)
@@ -162,13 +162,16 @@ export function StockHeader({ company }: { company: CompanyProp }) {
             )}
 
             {/* Compare Button */}
-            <Link 
+            <Link
               href={`/compare?ticker=${company.ticker}`}
               className="px-3 py-1 text-xs font-bold rounded-full transition-all flex items-center gap-1.5 shadow-sm active:scale-95 bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border/50"
             >
               <Scale className="w-3.5 h-3.5" />
               Comparar Pares
             </Link>
+
+            {/* PDF Report Button */}
+            {pdfButton}
           </div>
         </div>
       </div>

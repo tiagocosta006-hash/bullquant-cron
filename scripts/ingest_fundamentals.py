@@ -43,7 +43,7 @@ if not DIRECT_URL:
     sys.exit("DIRECT_URL não definida")
 
 EDGAR_BASE = "https://data.sec.gov/api/xbrl/companyfacts"
-EDGAR_HEADERS = {"User-Agent": "BullQuant admin@bullocracy.com"}
+EDGAR_HEADERS = {"User-Agent": "Bullmetrics admin@bullocracy.com"}
 SLEEP_BETWEEN = 0.2
 HISTORY_YEARS = 10
 

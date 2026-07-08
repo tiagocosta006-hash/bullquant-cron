@@ -8,7 +8,7 @@ export type RecentSearch = {
 };
 
 const MAX_RECENT_SEARCHES = 5;
-const STORAGE_KEY = 'bullquant_recent_searches';
+const STORAGE_KEY = 'bullmetrics_recent_searches';
 
 export function useRecentSearches() {
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);

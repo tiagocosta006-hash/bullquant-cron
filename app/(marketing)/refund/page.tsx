@@ -76,7 +76,7 @@ export default function RefundPolicyPage() {
             Caso seja identificada uma cobrança dupla, erro de sistema no momento do checkout via Paddle,
             ou incapacidade técnica devidamente comprovada em aceder à infraestrutura PRO nas primeiras 48 horas
             pós-compra (por responsabilidade exclusiva da Bullmetrics), deverá contactar imediatamente a equipa
-            através de <strong>support@bullocracy.com</strong>. Estes casos manifestamente excecionais serão
+            através de <strong>info@thebullocracy.com</strong>. Estes casos manifestamente excecionais serão
             revisados num prazo de 3 a 5 dias úteis, e as retificações ou devoluções serão executadas caso
             se confirme o erro de processamento fiduciário.
           </p>

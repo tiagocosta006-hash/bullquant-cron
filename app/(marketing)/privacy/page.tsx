@@ -28,7 +28,7 @@ export default function PrivacyPolicyPage() {
           <p>
             A Bullmetrics é a entidade responsável pelo tratamento dos seus dados pessoais no âmbito da prestação dos
             serviços descritos nos nossos Termos de Serviço. Em caso de dúvidas ou necessidade de exercer os seus direitos,
-            pode contactar o Responsável pelo Tratamento através do e-mail corporativo: <strong>support@bullocracy.com</strong>.
+            pode contactar o Responsável pelo Tratamento através do e-mail corporativo: <strong>info@thebullocracy.com</strong>.
           </p>
         </section>
 
@@ -99,7 +99,7 @@ export default function PrivacyPolicyPage() {
             <li><strong>Direito de Oposição e Limitação:</strong> Opor-se a certos tipos de tratamentos ou pedir a sua suspensão.</li>
           </ul>
           <p className="mt-4">
-            Para exercer qualquer um dos seus direitos, contacte-nos de forma inequívoca através do e-mail <strong>support@bullocracy.com</strong>.
+            Para exercer qualquer um dos seus direitos, contacte-nos de forma inequívoca através do e-mail <strong>info@thebullocracy.com</strong>.
             Garantimos resposta atempada dentro dos prazos legais estipulados. Caso considere existir infração no tratamento,
             assiste-lhe o direito de apresentar queixa à autoridade de controlo competente nacional (CNPD em Portugal).
           </p>

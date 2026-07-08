@@ -1,13 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { Briefcase, Calculator, CalendarDays, MessageSquareText, ArrowUpRight, LucideIcon } from "lucide-react";
+import { Briefcase, Calculator, CalendarDays, MessageSquareText, ArrowUpRight, Loader2, LucideIcon } from "lucide-react";
 import { StockCard } from "@/components/stock/StockCard";
 import { ScreenerCompany, ScreenerCategory } from "@/lib/finance/screener";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface PriceData {
   currentPrice?: number;
@@ -18,31 +26,44 @@ interface PriceData {
 interface DashboardClientProps {
   tabs: ScreenerCategory[];
   activeTab: ScreenerCategory;
-  companies: ScreenerCompany[];
+  activeSector: string | undefined;
+  sectors: string[];
+  initialCompanies: ScreenerCompany[];
+  initialHasMore: boolean;
 }
 
-export function DashboardClient({ tabs, activeTab, companies }: DashboardClientProps) {
+export function DashboardClient({ tabs, activeTab, activeSector, sectors, initialCompanies, initialHasMore }: DashboardClientProps) {
   const router = useRouter();
   const t = useTranslations("dashboard");
+  const [companies, setCompanies] = useState<ScreenerCompany[]>(initialCompanies);
+  const [hasMore, setHasMore] = useState(initialHasMore);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [prices, setPrices] = useState<Record<string, PriceData>>({});
   const [isPricesLoading, setIsPricesLoading] = useState(true);
+  // Rastreia que tickers já têm pedido de preço feito/em curso, para "Carregar mais" só pedir os novos.
+  // Nota: o componente é remontado (via `key` no page.tsx) sempre que tab/setor mudam,
+  // por isso não é preciso sincronizar `initialCompanies`/`initialHasMore` via efeito aqui.
+  const requestedTickers = useRef<Set<string>>(new Set());
 
-  // Fetch prices only when companies array changes (tab changes)
   useEffect(() => {
     let isMounted = true;
+    const pending = companies.filter(c => !requestedTickers.current.has(c.ticker));
+    if (pending.length === 0) {
+      setIsPricesLoading(false);
+      return;
+    }
 
     async function fetchLivePrices() {
-      if (companies.length === 0) return;
-
       setIsPricesLoading(true);
-      const tickers = companies.map((c) => c.ticker);
+      const tickers = pending.map((c) => c.ticker);
+      tickers.forEach(ticker => requestedTickers.current.add(ticker));
 
       try {
         const res = await fetch(`/api/prices/batch?tickers=${tickers.join(",")}`);
         if (res.ok) {
           const data = await res.json();
           if (isMounted) {
-            setPrices(data);
+            setPrices(prev => ({ ...prev, ...data }));
           }
         }
       } catch (err) {
@@ -61,11 +82,37 @@ export function DashboardClient({ tabs, activeTab, companies }: DashboardClientP
     };
   }, [companies]);
 
+  const buildUrl = (tab: ScreenerCategory, sector: string | undefined) => {
+    const params = new URLSearchParams({ tab });
+    if (sector) params.set("sector", sector);
+    return `/dashboard?${params.toString()}`;
+  };
+
   const handleTabChange = (tab: ScreenerCategory) => {
-    // Clear prices optimistic UI
-    setIsPricesLoading(true);
-    setPrices({});
-    router.push(`/dashboard?tab=${tab}`);
+    router.push(buildUrl(tab, activeSector));
+  };
+
+  const handleSectorChange = (sector: string | null) => {
+    router.push(buildUrl(activeTab, sector && sector !== "ALL" ? sector : undefined));
+  };
+
+  const handleLoadMore = async () => {
+    setIsLoadingMore(true);
+    try {
+      const params = new URLSearchParams({ tab: activeTab, offset: String(companies.length) });
+      if (activeSector) params.set("sector", activeSector);
+
+      const res = await fetch(`/api/dashboard/companies?${params.toString()}`);
+      if (res.ok) {
+        const data: { companies: ScreenerCompany[]; hasMore: boolean } = await res.json();
+        setCompanies(prev => [...prev, ...data.companies]);
+        setHasMore(data.hasMore);
+      }
+    } catch (err) {
+      console.error("Failed to load more companies", err);
+    } finally {
+      setIsLoadingMore(false);
+    }
   };
 
   return (
@@ -92,10 +139,23 @@ export function DashboardClient({ tabs, activeTab, companies }: DashboardClientP
       </div>
 
       {/* Explore companies heading */}
-      <div className="w-full max-w-[1600px] mx-auto px-6 pb-1">
+      <div className="w-full max-w-[1600px] mx-auto px-6 pb-1 flex items-center justify-between gap-3 flex-wrap">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           {t("exploreTitle")}
         </h2>
+        <Select value={activeSector ?? "ALL"} onValueChange={handleSectorChange}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder={t("sectorFilter.all")}>
+              {(value: string | null) => !value || value === "ALL" ? t("sectorFilter.all") : value}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">{t("sectorFilter.all")}</SelectItem>
+            {sectors.map(sector => (
+              <SelectItem key={sector} value={sector}>{sector}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Tabs Section */}
@@ -120,12 +180,23 @@ export function DashboardClient({ tabs, activeTab, companies }: DashboardClientP
         </div>
       </div>
 
+      {/* Freshness note — os dados de variação/market cap usam o fecho do último dia útil ingerido, não tempo real */}
+      {(activeTab === "gainers" || activeTab === "losers" || activeTab === "marketCap") && (
+        <div className="w-full max-w-[1600px] mx-auto px-6 pt-3">
+          <p className="text-xs text-muted-foreground">{t("eodNotice")}</p>
+        </div>
+      )}
+
       {/* Grid Section */}
       <div className="flex-1 overflow-auto px-6 py-5">
         <div className="max-w-[1600px] mx-auto">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
             {companies.map((company) => {
               const priceData = prices[company.ticker];
+              // Fallback ao preço/variação EOD (já vindos do servidor) enquanto o batch em tempo real não chega.
+              const currentPrice = priceData?.currentPrice ?? company.lastClose;
+              const changePercent = priceData?.changePercent ?? company.lastChangePercent;
+              const isLoadingCard = isPricesLoading && priceData === undefined && company.lastClose === null;
 
               return (
                 <StockCard
@@ -134,9 +205,9 @@ export function DashboardClient({ tabs, activeTab, companies }: DashboardClientP
                   name={company.name}
                   logoUrl={company.logoUrl}
                   sharesOutstanding={company.sharesOutstanding}
-                  currentPrice={priceData?.currentPrice ?? null}
-                  changePercent={priceData?.changePercent ?? null}
-                  isLoading={isPricesLoading}
+                  currentPrice={currentPrice ?? null}
+                  changePercent={changePercent ?? null}
+                  isLoading={isLoadingCard}
                 />
               );
             })}
@@ -145,6 +216,15 @@ export function DashboardClient({ tabs, activeTab, companies }: DashboardClientP
           {companies.length === 0 && (
             <div className="text-center py-20 text-muted-foreground">
               {t("empty")}
+            </div>
+          )}
+
+          {hasMore && (
+            <div className="flex justify-center mt-6">
+              <Button variant="outline" onClick={handleLoadMore} disabled={isLoadingMore} className="gap-2">
+                {isLoadingMore && <Loader2 className="w-4 h-4 animate-spin" />}
+                {t("loadMore")}
+              </Button>
             </div>
           )}
         </div>

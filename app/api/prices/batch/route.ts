@@ -100,9 +100,7 @@ export async function GET(request: NextRequest) {
     const results = await fetchWithDelay(tickers, apiKey);
     
     const pricesRecord = results.reduce((acc, curr) => {
-      if (!curr.error) {
-        acc[curr.ticker] = curr
-      }
+      acc[curr.ticker] = curr
       return acc
     }, {} as Record<string, PriceResult>)
 

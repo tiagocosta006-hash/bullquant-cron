@@ -36,7 +36,6 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/reset-password')
 
   const isPrivateRoute =
-    request.nextUrl.pathname.startsWith('/portfolio') ||
     request.nextUrl.pathname.startsWith('/settings') ||
     request.nextUrl.pathname.startsWith('/dashboard') ||
     request.nextUrl.pathname.startsWith('/dcf') ||

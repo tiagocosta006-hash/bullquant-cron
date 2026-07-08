@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
     const analyses = rows.map((a) => ({
       id: a.id,
       label: a.label,
+      fcfMode: a.fcfMode ?? "FCFF",
       fcf0: Number(a.fcf0),
       growthStage1: Number(a.growthStage1),
       growthStage2: Number(a.growthStage2),
@@ -84,11 +85,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Company not found" }, { status: 404 })
     }
 
+    const fcfMode = typeof inputs.fcfMode === "string" && ["FCFF", "FCFE"].includes(inputs.fcfMode)
+      ? inputs.fcfMode
+      : "FCFF"
+
     const created = await prisma.dcfAnalysis.create({
       data: {
         userId: user.id,
         companyId: company.id,
         label: typeof label === "string" && label.trim() ? label.trim().slice(0, 60) : null,
+        fcfMode,
         fcf0,
         growthStage1: num(inputs.growthStage1) ?? 0,
         growthStage2: num(inputs.growthStage2) ?? 0,

@@ -18,9 +18,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  portfolio   Portfolio?
-  aiUsageLogs AIUsageLog[]
-  dcfAnalyses DcfAnalysis[]
+  portfolio         Portfolio?
+  aiUsageLogs       AIUsageLog[]
+  dcfAnalyses       DcfAnalysis[]
+  brokerConnections BrokerConnection[]
 
   @@map("users")
 }
@@ -122,6 +123,9 @@ model Fundamental {
   // Dividendos
   dividendPerShare Decimal? @db.Decimal(10, 4)
 
+  // KPIs extraídos por IA (Gemini) diretamente do 10-K — formato livre por setor.
+  businessKpis Json?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -176,12 +180,52 @@ model PortfolioItem {
   companyId   String
   addedAt     DateTime @default(now())
 
+  // Posição real (opcional — null/null = watchlist pura, sem posição).
+  // Modelo agregado simples: uma posição = compra média (quantidade + preço médio).
+  // Se o utilizador adicionar mais quantidade do mesmo ticker, o preço médio é
+  // recalculado ponderado pela quantidade (ver lib/finance/portfolio.ts).
+  quantity    Decimal? @db.Decimal(20, 6)
+  avgBuyPrice Decimal? @db.Decimal(12, 4)
+
   portfolio Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
   company   Company   @relation(fields: [companyId], references: [id])
 
   @@unique([portfolioId, companyId])
   @@index([portfolioId])
   @@map("portfolio_items")
+}
+
+// ── LIGAÇÃO A CORRETORA (Trading212, Degiro, etc.) ─
+// Chave única por (userId, broker) — não por userId sozinho — para permitir,
+// no futuro, um utilizador ligar mais do que uma corretora em simultâneo sem
+// mudar o schema outra vez. A UI atual só mostra/gere uma ligação de cada vez,
+// mas o modelo já suporta N. apiKey/apiSecret guardados encriptados (ver
+// lib/crypto.ts) — nunca em texto simples, nunca expostos ao browser.
+model BrokerConnection {
+  id     String @id @default(cuid())
+  userId String
+  broker Broker
+
+  encryptedApiKey    String @db.Text
+  encryptedApiSecret String @db.Text
+
+  lastSyncedAt DateTime?
+  lastSyncError String?  @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, broker])
+  @@index([userId])
+  @@map("broker_connections")
+}
+
+enum Broker {
+  TRADING212
+
+  @@map("broker")
 }
 
 // ── ANÁLISES DCF GUARDADAS ────────────────────
@@ -196,6 +240,7 @@ model DcfAnalysis {
   label String? // nome opcional do cenário (ex: "Conservador")
 
   // Inputs
+  fcfMode        String?        // "FCFF" | "FCFE"; null = legacy row, trata como "FCFF"
   fcf0           Decimal @db.Decimal(20, 4)
   growthStage1   Decimal @db.Decimal(8, 6)
   growthStage2   Decimal @db.Decimal(8, 6)

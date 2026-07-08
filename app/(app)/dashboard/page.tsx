@@ -1,7 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import {
-  getCategoryCompanies,
+  getCategoryCompaniesPage,
+  getAvailableSectors,
   SCREENER_CATEGORIES,
   DEFAULT_CATEGORY,
   isValidCategory,
@@ -11,7 +12,7 @@ import { DashboardClient } from "./DashboardClient";
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; sector?: string }>;
 }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -21,17 +22,25 @@ export default async function DashboardPage({
   }
 
   const resolvedParams = await searchParams;
-  // O `tab` é uma chave estável (sp500, growth, ...) — o label é traduzido no cliente.
+  // O `tab` é uma chave estável (marketCap, gainers, ...) — o label é traduzido no cliente.
   const activeTab = isValidCategory(resolvedParams.tab) ? resolvedParams.tab : DEFAULT_CATEGORY;
+  const activeSector = resolvedParams.sector || undefined;
 
-  // Buscar empresas do backend (Prisma)
-  const companies = await getCategoryCompanies(activeTab, 24);
+  const [{ companies, hasMore }, sectors] = await Promise.all([
+    getCategoryCompaniesPage(activeTab, 24, 0, activeSector),
+    getAvailableSectors(),
+  ]);
 
   return (
     <DashboardClient
+      // Força remount ao mudar tab/setor — evita sincronizar props->estado via useEffect.
+      key={`${activeTab}:${activeSector ?? ""}`}
       tabs={SCREENER_CATEGORIES}
       activeTab={activeTab}
-      companies={companies}
+      activeSector={activeSector}
+      sectors={sectors}
+      initialCompanies={companies}
+      initialHasMore={hasMore}
     />
   );
 }

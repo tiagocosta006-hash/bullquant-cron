@@ -25,6 +25,14 @@ export interface DcfInputs {
   shares: number        // nº de ações em circulação (absoluto)
   netDebt: number       // dívida total − caixa (pode ser negativo = net cash)
   currentPrice: number  // preço atual por ação
+  /**
+   * "FCFF" (default): fcf0 é o fluxo da empresa (unlevered) — descontado à
+   * WACC, subtrai-se netDebt para chegar a equity value.
+   * "FCFE": fcf0 já é fluxo do acionista (ex: OperatingCashFlow − CapEx, já
+   * líquido de juros pagos) — não se subtrai netDebt outra vez, senão a
+   * dívida é penalizada duas vezes.
+   */
+  mode?: "FCFF" | "FCFE"
 }
 
 export interface DcfProjectionYear {
@@ -37,6 +45,7 @@ export interface DcfResult {
   valid: boolean
   /** preenchido quando valid === false */
   error?: "INVALID_WACC" | "INVALID_SHARES" | "INVALID_FCF"
+  mode: "FCFF" | "FCFE"
   projections: DcfProjectionYear[]
   sumPvFcf: number          // Σ PV dos 10 anos de FCF
   terminalValue: number     // valor terminal nominal (ano 10)
@@ -59,6 +68,7 @@ const EMPTY_RESULT = (
 ): DcfResult => ({
   valid: false,
   error,
+  mode: inputs.mode ?? "FCFF",
   projections: [],
   sumPvFcf: 0,
   terminalValue: 0,
@@ -71,13 +81,12 @@ const EMPTY_RESULT = (
 })
 
 export function runDcf(inputs: DcfInputs): DcfResult {
-  const { fcf0, growthStage1, growthStage2, wacc, terminalGrowth, shares, netDebt } = inputs
+  const { fcf0, growthStage1, growthStage2, wacc, terminalGrowth, shares, netDebt, mode } = inputs
+  const resolvedMode = mode ?? "FCFF"
 
-  // Guardas: WACC tem de exceder o crescimento perpétuo (senão o valor
-  // terminal de Gordon diverge / fica negativo), ações > 0, FCF base válido.
+  // Guardas universais: ações > 0, FCF base válido.
   if (!Number.isFinite(fcf0)) return EMPTY_RESULT(inputs, "INVALID_FCF")
   if (!(shares > 0)) return EMPTY_RESULT(inputs, "INVALID_SHARES")
-  if (!(wacc > terminalGrowth)) return EMPTY_RESULT(inputs, "INVALID_WACC")
 
   const projections: DcfProjectionYear[] = []
   let sumPvFcf = 0
@@ -91,18 +100,31 @@ export function runDcf(inputs: DcfInputs): DcfResult {
     projections.push({ year, fcf, presentValue })
   }
 
-  // Valor terminal (Gordon Growth) a partir do FCF do ano 10.
+  // Valor terminal: por enquanto só Gordon Growth (Fase 4 adiciona EXIT_MULTIPLE).
+  // Gordon Growth: WACC tem de exceder o crescimento perpétuo (senão diverge).
+  if (!(wacc > terminalGrowth)) return EMPTY_RESULT(inputs, "INVALID_WACC")
+
   const fcf10 = projections[TOTAL_YEARS - 1].fcf
   const terminalValue = (fcf10 * (1 + terminalGrowth)) / (wacc - terminalGrowth)
   const pvTerminalValue = terminalValue / Math.pow(1 + wacc, TOTAL_YEARS)
 
   const enterpriseValue = sumPvFcf + pvTerminalValue
-  const equityValue = enterpriseValue - netDebt
+
+  // Ponte para equity value: depende do modo (FCFF vs FCFE).
+  // FCFF: EV − dívida líquida (padrão). FCFE: fluxo já do acionista, sem subtrair dívida.
+  let equityValue: number
+  if (resolvedMode === "FCFE") {
+    equityValue = enterpriseValue
+  } else {
+    equityValue = enterpriseValue - netDebt
+  }
+
   const fairValue = equityValue / shares
   const marginOfSafety = fairValue !== 0 ? (fairValue - inputs.currentPrice) / fairValue : 0
 
   return {
     valid: true,
+    mode: resolvedMode,
     projections,
     sumPvFcf,
     terminalValue,
@@ -115,22 +137,34 @@ export function runDcf(inputs: DcfInputs): DcfResult {
   }
 }
 
+export interface ReverseDcfRange {
+  minGrowth: number
+  maxGrowth: number
+}
+
+const DEFAULT_REVERSE_DCF_RANGE: ReverseDcfRange = { minGrowth: -0.5, maxGrowth: 2.0 }
+
 /**
  * Calcula a taxa de crescimento implícita (Reverse DCF) necessária para
  * justificar o preço atual da ação (targetPrice), assumindo que a
  * growthStage2 = growthStage1 / 2.
  * Utiliza o método da biseção (Bisection Method).
+ *
+ * `range` limita a procura (por defeito -50%..+200%). Passa os limites reais
+ * dos sliders da UI para garantir que o valor devolvido é sempre
+ * representável neles.
  */
 export function solveReverseDcf(
-  baseInputs: Omit<DcfInputs, "growthStage1" | "growthStage2">
+  baseInputs: Omit<DcfInputs, "growthStage1" | "growthStage2">,
+  range: ReverseDcfRange = DEFAULT_REVERSE_DCF_RANGE
 ): { impliedGrowth1: number; impliedGrowth2: number } | null {
   if (baseInputs.currentPrice <= 0 || baseInputs.fcf0 <= 0 || baseInputs.shares <= 0) {
     return null;
   }
 
   const target = baseInputs.currentPrice;
-  let low = -0.5; // -50% crescimento
-  let high = 2.0; // 200% crescimento
+  let low = range.minGrowth;
+  let high = range.maxGrowth;
   const tolerance = 0.01; // precisão do preço a 1 cêntimo
   let bestGuess = 0;
 
@@ -139,12 +173,11 @@ export function solveReverseDcf(
     const testInputs: DcfInputs = {
       ...baseInputs,
       growthStage1: mid,
-      growthStage2: mid / 2, // A nossa Opção B!
+      growthStage2: mid / 2,
     };
 
     const res = runDcf(testInputs);
     if (!res.valid) {
-      // Se não for válido (ex: WACC inválido), abortamos ou limitamos
       return null;
     }
 
@@ -163,8 +196,12 @@ export function solveReverseDcf(
     bestGuess = mid;
   }
 
+  // Defesa em profundidade: bestGuess já devia estar dentro do range (low/high
+  // nunca saem dele), mas garantimos explicitamente para o caller.
+  const clamped = Math.min(range.maxGrowth, Math.max(range.minGrowth, bestGuess))
+
   return {
-    impliedGrowth1: bestGuess,
-    impliedGrowth2: bestGuess / 2,
+    impliedGrowth1: clamped,
+    impliedGrowth2: clamped / 2,
   };
 }

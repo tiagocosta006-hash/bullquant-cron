@@ -9,9 +9,10 @@ import { cn } from "@/lib/utils"
 interface DcfResultsProps {
   result: DcfResult
   currency?: string
+  mode?: "FCFF" | "FCFE"
 }
 
-export function DcfResults({ result, currency = "$" }: DcfResultsProps) {
+export function DcfResults({ result, currency = "$", mode = "FCFF" }: DcfResultsProps) {
   const t = useTranslations("dcf")
 
   if (!result.valid) {
@@ -38,6 +39,14 @@ export function DcfResults({ result, currency = "$" }: DcfResultsProps) {
 
   return (
     <Card className="p-6 gap-0 space-y-6">
+      {/* Modo badge */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs uppercase tracking-wide font-semibold text-muted-foreground">
+          {t("mode")} •
+        </span>
+        <span className="text-xs font-bold text-primary">{mode}</span>
+      </div>
+
       {/* Fair Value vs Preço Atual */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1">

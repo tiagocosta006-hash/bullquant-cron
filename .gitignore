@@ -51,3 +51,6 @@ scratch/
 
 # claude code — skills são tooling instalável (8M+), não código de produto
 /.claude/skills/
+
+# claude code — definições pessoais/locais, não partilhar com a equipa
+/.claude/settings.local.json

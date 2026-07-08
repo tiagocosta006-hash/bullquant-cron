@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import { useTranslations, useLocale } from "next-intl"
 import {
   AreaChart,
@@ -11,7 +11,8 @@ import {
   ResponsiveContainer,
   ReferenceArea
 } from "recharts"
-import { TrendingUp, TrendingDown } from "lucide-react"
+import { TrendingUp, TrendingDown, Download } from "lucide-react"
+import { exportSvgToPng } from "@/lib/exportChart"
 
 type PricePoint = {
   date: string
@@ -26,6 +27,7 @@ export function StockPriceChart({ ticker }: { ticker: string }) {
   const [allData, setAllData] = useState<PricePoint[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<TabType>("1y")
+  const chartRef = useRef<HTMLDivElement>(null)
 
   // Drag-to-measure state
   const [refAreaLeft, setRefAreaLeft] = useState<string | null>(null)
@@ -231,10 +233,23 @@ export function StockPriceChart({ ticker }: { ticker: string }) {
               {t(`tabs.${tab}`)}
             </button>
           ))}
+          
+          {/* Export Button */}
+          <button
+            onClick={() => {
+              if (chartRef.current) {
+                exportSvgToPng(chartRef.current, `${ticker}-price-chart.png`);
+              }
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 ml-2 text-sm font-semibold rounded-md transition-all text-muted-foreground hover:text-foreground hover:bg-background shadow-sm border border-transparent hover:border-border/40"
+            title="Download Chart"
+          >
+            <Download className="w-4 h-4" />
+          </button>
         </div>
       </div>
 
-      <div className="h-[300px] w-full relative select-none focus:outline-none focus-visible:outline-none [&_*:focus]:outline-none [&_*:focus]:ring-0" tabIndex={-1}>
+      <div ref={chartRef} className="h-[300px] w-full relative select-none focus:outline-none focus-visible:outline-none [&_*:focus]:outline-none [&_*:focus]:ring-0" tabIndex={-1}>
         <ResponsiveContainer width="100%" height="100%" className="outline-none focus:outline-none">
           <AreaChart 
             data={filteredData} 

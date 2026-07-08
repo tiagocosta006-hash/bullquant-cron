@@ -16,7 +16,7 @@ export default function TermsOfServicePage() {
             Última atualização: {new Date().toLocaleDateString("pt-PT")}
           </p>
           <p>
-            Bem-vindo ao <strong>BullMetrics</strong>. Os presentes Termos de Serviço ("Termos") regulam o seu acesso e utilização
+            Bem-vindo à <strong>BullMetrics</strong>. Os presentes Termos de Serviço ("Termos") regulam o seu acesso e utilização
             da nossa plataforma, serviços e ferramentas. Ao aceder ou utilizar o BullMetrics, concorda em ficar vinculado por estes Termos.
           </p>
         </section>
@@ -74,10 +74,11 @@ export default function TermsOfServicePage() {
           <ul className="list-disc pl-6 space-y-2">
             <li>Efetuar engenharia reversa, descompilar, ou desmontar qualquer componente da plataforma.</li>
             <li>Utilizar *bots*, *crawlers*, *spiders* ou qualquer ferramenta de extração de dados (*scraping*) para contornar limites, armazenar ou distribuir em massa os dados financeiros e relatórios disponíveis na plataforma.</li>
-            <p className="mt-4">
-              Qualquer violação destas regras de uso aceitável confere à BullMetrics o direito de suspender ou terminar
-              imediatamente o seu acesso à plataforma, sem aviso prévio ou direito a reembolso.
-            </p>
+          </ul>
+          <p className="mt-4">
+            Qualquer violação destas regras de uso aceitável confere à BullMetrics o direito de suspender ou terminar
+            imediatamente o seu acesso à plataforma, sem aviso prévio ou direito a reembolso.
+          </p>
         </section>
 
         <section>

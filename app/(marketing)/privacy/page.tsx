@@ -100,6 +100,7 @@ export default function PrivacyPolicyPage() {
           </ul>
           <p className="mt-4">
             Para exercer qualquer um dos seus direitos, contacte-nos de forma inequívoca através do e-mail <strong>info@thebullocracy.com</strong>.
+          </p>
         </section>
       </div>
     </div>

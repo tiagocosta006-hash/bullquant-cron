@@ -359,7 +359,8 @@
       "roic": "ROIC",
       "gross": "LORDO",
       "operating": "OPERAT.",
-      "profit": "NETTO"
+      "profit": "NETTO",
+      "roe": "ROE"
     }
   },
   "calendar": {

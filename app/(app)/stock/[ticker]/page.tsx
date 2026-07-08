@@ -8,10 +8,12 @@ import { StockPriceChart } from '@/components/stock/StockPriceChart'
 import { SavedValuations, type SerializedDcfAnalysis } from '@/components/stock/SavedValuations'
 import { FinancialsEngine } from '@/components/stock/FinancialsEngine'
 import { InsiderActivity } from '@/components/stock/InsiderActivity'
+import { getCurrencySymbol } from '@/lib/finance/format'
 
 import { CompanyProfile } from '@/components/stock/CompanyProfile'
 import { StockNews } from '@/components/stock/StockNews'
 import { ManagementTeam } from '@/components/stock/ManagementTeam'
+import { StockKPIs } from '@/components/stock/StockKPIs'
 import { PremiumPdfButton } from '@/components/stock/pdf/PremiumPdfButton'
 
 export default async function StockPage({
@@ -35,12 +37,20 @@ export default async function StockPage({
     notFound()
   }
 
-  // Fetch user to get their saved DCFs
+  // Fetch user to get their saved DCFs and PRO plan status
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  let isPro = false
   let serializedDcfs: SerializedDcfAnalysis[] = []
+  
   if (user) {
+    // Check PRO plan
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    })
+    isPro = dbUser?.plan === 'PRO'
+
     const rawDcfs = await prisma.dcfAnalysis.findMany({
       where: { companyId: company.id, userId: user.id },
       orderBy: { createdAt: 'desc' },
@@ -70,9 +80,21 @@ export default async function StockPage({
     take: 4,
   })
 
+  // Fetch the historical annual fundamentals for the Business KPIs chart
+  const historicalAnnual = await prisma.fundamental.findMany({
+    where: {
+      companyId: company.id,
+      periodType: 'ANNUAL'
+    },
+    orderBy: {
+      fiscalYear: 'desc',
+    },
+    take: 10,
+  })
+
   let fundamentalsToPass = latestFundamentals
 
-  if (latestFundamentals.length < 4) {
+  if (fundamentalsToPass.length < 4) {
     // Fallback to the latest ANNUAL record if we don't have enough quarters
     const latestAnnual = await prisma.fundamental.findFirst({
       where: {
@@ -85,6 +107,8 @@ export default async function StockPage({
     })
     fundamentalsToPass = latestAnnual ? [latestAnnual] : []
   }
+
+  const currencySymbol = getCurrencySymbol(company.currency)
 
   // Fetch AI Insights safely for PDF
   const aiInsightRaw = await prisma.aIInsightCache.findUnique({
@@ -117,8 +141,8 @@ export default async function StockPage({
     sector: company.sector,
     country: company.country,
     price: latestPrice ? Number(latestPrice.close) : null,
-    marketCap: latestPrice && fundamentalsToPass[0]?.sharesOutstanding 
-      ? Number(latestPrice.close) * Number(fundamentalsToPass[0].sharesOutstanding) 
+    marketCap: latestPrice && fundamentalsToPass[0]?.sharesOutstanding
+      ? Number(latestPrice.close) * Number(fundamentalsToPass[0].sharesOutstanding)
       : null,
   }
 
@@ -138,10 +162,11 @@ export default async function StockPage({
         ticker: company.ticker,
         name: company.name,
         exchange: company.exchange,
-        logoUrl: company.logoUrl
-      }} 
+        logoUrl: company.logoUrl,
+        currency: company.currency
+      }}
       pdfButton={
-        <PremiumPdfButton 
+        <PremiumPdfButton
           company={pdfCompanyData}
           fundamentals={pdfFundamentals}
           aiInsight={parsedAiInsight}
@@ -155,26 +180,27 @@ export default async function StockPage({
       {/* 2. Fundamentals Snapshot */}
       <div>
         <h2 className="text-xl font-bold tracking-tight mb-4 text-foreground">{t('snapshotTitle')}</h2>
-        <StockSnapshot ticker={company.ticker} fundamentals={JSON.parse(JSON.stringify(fundamentalsToPass))} />
+        <StockSnapshot ticker={company.ticker} fundamentals={JSON.parse(JSON.stringify(fundamentalsToPass))} currencySymbol={currencySymbol} />
+        <StockKPIs fundamentals={JSON.parse(JSON.stringify(historicalAnnual))} isPro={isPro} ticker={company.ticker} />
       </div>
 
       {/* 3. Price History Chart */}
-      <StockPriceChart ticker={company.ticker} />
+      <StockPriceChart ticker={company.ticker} currencySymbol={currencySymbol} />
 
       {/* 3.5 Saved Valuations */}
       {serializedDcfs.length > 0 && (
         <SavedValuations 
           analyses={serializedDcfs} 
           ticker={company.ticker} 
-          currency={company.currency === 'EUR' ? '€' : '$'}
+          currency={currencySymbol}
         />
       )}
 
       {/* 4. Financials & Decision Engine */}
-      <FinancialsEngine ticker={company.ticker} sector={company.sector} />
+      <FinancialsEngine ticker={company.ticker} sector={company.sector} currencySymbol={currencySymbol} />
 
       {/* 5. Insider Activity (SEC Form 4) */}
-      <InsiderActivity ticker={company.ticker} />
+      <InsiderActivity ticker={company.ticker} currencySymbol={currencySymbol} />
 
       {/* 6. Company News */}
       <StockNews ticker={company.ticker} />

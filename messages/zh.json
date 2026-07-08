@@ -359,7 +359,8 @@
       "roic": "ROIC",
       "gross": "毛利率",
       "operating": "营业",
-      "profit": "净利"
+      "profit": "净利",
+      "roe": "ROE"
     }
   },
   "calendar": {

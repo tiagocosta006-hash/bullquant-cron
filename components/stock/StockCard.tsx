@@ -12,6 +12,7 @@ interface StockCardProps {
   currentPrice: number | null;
   changePercent: number | null;
   isLoading: boolean;
+  currencySymbol?: string;
 }
 
 export function StockCard({
@@ -22,6 +23,7 @@ export function StockCard({
   currentPrice,
   changePercent,
   isLoading,
+  currencySymbol = "$",
 }: StockCardProps) {
   const t = useTranslations("dashboard");
   // Calculate Market Cap
@@ -71,7 +73,7 @@ export function StockCard({
               <div className="h-5 w-14 bg-muted animate-pulse rounded"></div>
             ) : (
               <span className="nums font-semibold text-sm">
-                {currentPrice ? `$${currentPrice.toFixed(2)}` : "N/A"}
+                {currentPrice ? `${currencySymbol}${currentPrice.toFixed(2)}` : "N/A"}
               </span>
             )}
 
@@ -95,7 +97,7 @@ export function StockCard({
         <div className="mt-2.5 pt-2.5 border-t border-border/40 flex items-center justify-between">
           <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">{t("marketCap")}</span>
           <span className="nums text-xs font-semibold text-foreground/90">
-            {marketCap ? formatLargeNumber(marketCap) : "N/A"}
+            {marketCap ? formatLargeNumber(marketCap, currencySymbol) : "N/A"}
           </span>
         </div>
       </div>

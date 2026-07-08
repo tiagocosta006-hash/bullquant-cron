@@ -60,21 +60,16 @@ export function useRecentSearches() {
   };
 
   const addSearch = (search: RecentSearch) => {
-    setRecentSearches((prev) => {
-      // Remove if already exists to move it to the top
-      const filtered = prev.filter((s) => s.ticker !== search.ticker);
-      const newSearches = [search, ...filtered].slice(0, MAX_RECENT_SEARCHES);
-      updateStorageAndNotify(newSearches);
-      return newSearches;
-    });
+    const filtered = recentSearches.filter((s) => s.ticker !== search.ticker);
+    const newSearches = [search, ...filtered].slice(0, MAX_RECENT_SEARCHES);
+    setRecentSearches(newSearches);
+    updateStorageAndNotify(newSearches);
   };
 
   const removeSearch = (ticker: string) => {
-    setRecentSearches((prev) => {
-      const newSearches = prev.filter((s) => s.ticker !== ticker);
-      updateStorageAndNotify(newSearches);
-      return newSearches;
-    });
+    const newSearches = recentSearches.filter((s) => s.ticker !== ticker);
+    setRecentSearches(newSearches);
+    updateStorageAndNotify(newSearches);
   };
 
   const clearSearches = () => {

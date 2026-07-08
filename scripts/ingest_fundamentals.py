@@ -62,6 +62,7 @@ DURATION_TAGS = {
         "RevenueFromContractWithCustomerExcludingAssessedTax",
         "Revenues",
         "SalesRevenueNet",
+        "Revenue",
         "RevenueFromContractWithCustomerIncludingAssessedTax",
         "SalesRevenueGoodsNet",
         "InterestAndDividendIncomeOperating",
@@ -76,13 +77,22 @@ DURATION_TAGS = {
     ],
     "costOfRevenue": [
         "CostOfRevenue",
+        "CostOfSales",
         "CostOfGoodsAndServicesSold",
         "CostOfGoodsSold",
         "CostOfServices",
+        "CostOfPurchasedPower",
+        "CostOfSalesEnergy",
+        "FuelCosts",
+        "UtilitiesOperatingExpenseMaintenanceOperationsAndOtherCostsAndExpenses",
+        "DirectCostsOfLeasedAndRentedPropertyOrEquipment",
+        "PropertyOperatingExpense",
+        "RealEstateTaxExpense",
+        "PolicyholderBenefitsAndClaimsIncurredNet"
     ],
     "grossProfit": ["GrossProfit"],
-    "operatingExpenses": ["OperatingExpenses"],
-    "operatingIncome": ["OperatingIncomeLoss"],
+    "operatingExpenses": ["OperatingExpenses", "NoninterestExpense", "OperatingCostsAndExpenses", "OtherOperatingIncomeExpense", "AdministrativeExpense"],
+    "operatingIncome": ["OperatingIncomeLoss", "IncomeFromOperations", "OperatingIncomeLossFromContinuingOperations", "ProfitLossFromOperatingActivities"],
     "interestExpense": [
         "InterestExpense",
         "InterestAndDebtExpense",
@@ -93,22 +103,37 @@ DURATION_TAGS = {
     "netIncome": [
         "NetIncomeLoss",
         "ProfitLoss",
+        "ProfitLossAttributableToOwnersOfParent",
         "NetIncomeLossAvailableToCommonStockholdersBasic",
     ],
     "epsDiluted": [
         "EarningsPerShareDiluted",
+        "DilutedEarningsLossPerShare",
+        "NetIncomeLossPerOutstandingShare",
+        "NetIncomeLossPerShareDiluted",
         # Fallback: empresas com discontinued ops tagham só o EPS de continuing
         # (ex.: COP FY2018 — sem isto, o guard NI/EPS de shares não corre e
         # shares taggadas em milhares passam despercebidas).
         "IncomeLossFromContinuingOperationsPerDilutedShare",
+        "IncomeLossFromContinuingOperationsPerBasicShare" 
     ],
     "sharesOutstandingDur": [
         "WeightedAverageNumberOfDilutedSharesOutstanding",
         "WeightedAverageNumberOfSharesOutstandingBasic",
+        "NumberOfSharesOutstanding",
     ],
-    "operatingCashFlow": ["NetCashProvidedByUsedInOperatingActivities"],
+    "operatingCashFlow": [
+        "NetCashProvidedByUsedInOperatingActivities",
+        "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations",
+        "CashFlowsFromUsedInOperatingActivities"
+    ],
     "capex": [
         "PaymentsToAcquirePropertyPlantAndEquipment",
+        "PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities",
+        "PurchaseOfPropertyPlantAndEquipmentIntangibleAssetsOtherThanGoodwillInvestmentPropertyAndOtherNoncurrentAssets",
+        "PurchaseOfPropertyPlantAndEquipment",
+        "PaymentsToAcquireOtherPropertyPlantAndEquipment",
+        "PaymentsToAcquirePropertyPlantAndEquipmentAndOtherAssets",
         "PaymentsToAcquireAndDevelopRealEstate",  # REITs: aquisição/desenvolvimento é o "capex"
         "PaymentsToAcquireCommercialRealEstate",  # REITs alternativo
         "PaymentsToAcquireProductiveAssets",
@@ -118,15 +143,18 @@ DURATION_TAGS = {
     ],
     "intangibles": [
         "PaymentsToAcquireIntangibleAssets",
+        "PurchaseOfIntangibleAssetsClassifiedAsInvestingActivities",
         "PaymentsToDevelopSoftware",
     ],
     "dividendPerShare": [
         "CommonStockDividendsPerShareDeclared",
         "CommonStockDividendsPerShareCashPaid",
+        "DividendsPerShare",
     ],
     "researchAndDevelopment": [
         "ResearchAndDevelopmentExpense",
         "ResearchAndDevelopmentExpenseExcludingAcquiredInProcessCost",
+        "ResearchAndDevelopmentExpenseSoftwareExcludingAcquiredInProcessCost"
     ],
     "sellingGeneralAndAdmin": [
         "SellingGeneralAndAdministrativeExpense",
@@ -138,6 +166,9 @@ DURATION_TAGS = {
     "depreciationAndAmortization": [
         "DepreciationDepletionAndAmortization",
         "DepreciationAndAmortization",
+        "DepreciationAndAmortisationExpense",
+        "DepreciationExpense",
+        "AmortisationExpense",
         "Depreciation",
         "AmortizationOfIntangibleAssets",
     ],
@@ -145,14 +176,21 @@ DURATION_TAGS = {
 
 INSTANT_TAGS = {
     "totalAssets": ["Assets"],
-    "totalCurrentLiab": ["LiabilitiesCurrent"],
+    "totalCurrentLiab": ["LiabilitiesCurrent", "CurrentLiabilities"],
     "totalLiabilities": ["Liabilities"],
-    "longTermDebt": ["LongTermDebtNoncurrent", "LongTermDebt"],
-    "longTermDebtCurrent": ["LongTermDebtCurrent"],
-    "shortTermDebt": ["ShortTermBorrowings", "ShortTermDebt"],
+    "longTermDebt": [
+        "LongTermDebtNoncurrent", 
+        "NoncurrentLiabilities",
+        "LongTermDebt",
+        "ConvertibleDebtNoncurrent",
+        "ConvertibleDebt"
+    ],
+    "longTermDebtCurrent": ["LongTermDebtCurrent", "CurrentBorrowings"],
+    "shortTermDebt": ["ShortTermBorrowings", "ShortTermDebt", "ShorttermBorrowings"],
     "commercialPaper": ["CommercialPaper"],
     "totalDebt": [
         "DebtLongtermAndShorttermCombinedAmount",
+        "Borrowings",
         "LongTermDebtAndCapitalLeaseObligations",
     ],
     # Fallback de nível 2 em build_row (DEPOIS da soma current+noncurrent):
@@ -171,6 +209,7 @@ INSTANT_TAGS = {
     ],
     "cash": [
         "CashAndCashEquivalentsAtCarryingValue",
+        "CashAndCashEquivalents",
         "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
         "Cash",
     ],
@@ -183,9 +222,11 @@ INSTANT_TAGS = {
     ],
     "totalEquity": [
         "StockholdersEquity",
+        "Equity",
+        "EquityAttributableToOwnersOfParent",
         "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
     ],
-    "sharesOutstandingInst": ["CommonStockSharesOutstanding"],
+    "sharesOutstandingInst": ["CommonStockSharesOutstanding", "NumberOfSharesOutstanding"],
 }
 
 
@@ -196,15 +237,15 @@ def new_id() -> str:
 def get_companies_with_cik(cur, tickers: list[str] | None = None) -> list[dict]:
     if tickers:
         cur.execute(
-            'SELECT id, ticker, cik FROM companies WHERE "isActive" = TRUE AND cik IS NOT NULL '
+            'SELECT id, ticker, cik, sector FROM companies WHERE "isActive" = TRUE AND cik IS NOT NULL '
             "AND ticker = ANY(%s) ORDER BY ticker",
             (tickers,),
         )
     else:
         cur.execute(
-            'SELECT id, ticker, cik FROM companies WHERE "isActive" = TRUE AND cik IS NOT NULL ORDER BY ticker'
+            'SELECT id, ticker, cik, sector FROM companies WHERE "isActive" = TRUE AND cik IS NOT NULL ORDER BY ticker'
         )
-    return [{"id": r[0], "ticker": r[1], "cik": r[2]} for r in cur.fetchall()]
+    return [{"id": r[0], "ticker": r[1], "cik": r[2], "sector": r[3]} for r in cur.fetchall()]
 
 
 session = requests.Session()
@@ -377,6 +418,27 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
                             dur_map[(fy, fp)][field] = v
                             break
 
+    # IFRS Fallback para SG&A (Sales & Marketing + Administrative)
+    for (fy, fp) in periods:
+        if "sellingGeneralAndAdmin" not in dur_map[(fy, fp)]:
+            expected_end = period_ends.get((fy, fp))
+            if expected_end:
+                pool_sales = extract_tag_entries(us_gaap, "SalesAndMarketingExpense")
+                pool_admin = extract_tag_entries(us_gaap, "AdministrativeExpense")
+                
+                if fp == "FY":
+                    pool_s = [e for e in pool_sales if is_annual_duration(e)]
+                    pool_a = [e for e in pool_admin if is_annual_duration(e)]
+                else:
+                    pool_s = [e for e in pool_sales if is_quarterly_duration(e)]
+                    pool_a = [e for e in pool_admin if is_quarterly_duration(e)]
+                    
+                val_s = best_for_period(pool_s, expected_end, prefer_annual_form=(fp == "FY"))
+                val_a = best_for_period(pool_a, expected_end, prefer_annual_form=(fp == "FY"))
+                
+                if val_s is not None or val_a is not None:
+                    dur_map[(fy, fp)]["sellingGeneralAndAdmin"] = (val_s or 0) + (val_a or 0)
+
     # Apply differencing for cash flow metrics
     original_ytd = {}
     for (fy, fp) in periods:
@@ -448,11 +510,11 @@ def safe_clamp(v, lo, hi):
 
 def get_period_info(us_gaap: dict, fy: int, fp: str) -> tuple[str | None, str | None]:
     """Devolve (period_end, filed_at) para um período."""
-    for tag in ["Assets", "NetIncomeLoss", "Revenues", "StockholdersEquity"]:
+    for tag in ["Assets", "NetIncomeLoss", "ProfitLoss", "Revenues", "Revenue", "StockholdersEquity", "Equity"]:
         entries = extract_tag_entries(us_gaap, tag)
         matches = [e for e in entries if e.get("fy") == fy and e.get("fp") == fp]
         if matches:
-            if tag in ["NetIncomeLoss", "Revenues"]:
+            if tag in ["NetIncomeLoss", "ProfitLoss", "Revenues", "Revenue"]:
                 if fp == "FY":
                     matches = [e for e in matches if is_annual_duration(e)]
                 else:
@@ -471,7 +533,7 @@ def get_period_info(us_gaap: dict, fy: int, fp: str) -> tuple[str | None, str | 
 
 
 def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str | None,
-              dur: dict, inst: dict) -> dict:
+              dur: dict, inst: dict, sector: str | None = None) -> dict:
     shares = dur.get("sharesOutstandingDur") or inst.get("sharesOutstandingInst")
     # Guard: alguns filings têm shares em unidades erradas (milhares/milhões em
     # vez de unidades — ex.: HST "738" ou BRO "276000" em vez de ~276M).
@@ -492,6 +554,9 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
             shares = expected_shares
     elif shares is not None and shares < 100_000:
         shares = None
+
+    if eps_g is None and ni_g is not None and shares is not None and shares > 0:
+        eps_g = ni_g / shares
     capex_raw = dur.get("capex")
     capex = abs(capex_raw) if capex_raw is not None else None
     op_cf = dur.get("operatingCashFlow")
@@ -533,6 +598,15 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         if total_costs is not None and cost_of_rev is not None:
             derived = total_costs - cost_of_rev
             op_expenses = derived if derived >= 0 else None
+
+    # Universal Accounting Identities
+    if op_income is None and gross_profit is not None and op_expenses is not None:
+        op_income = gross_profit - op_expenses
+        
+    if gross_profit is None and op_income is not None and op_expenses is not None:
+        gross_profit = op_income + op_expenses
+        if revenue is not None and gross_profit > revenue:
+            gross_profit = revenue
 
     net_income = dur.get("netIncome")
     tax_expense = dur.get("taxExpense")
@@ -613,6 +687,10 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
             dps /= 1000
         if abs(dps) > 1000:
             dps = None
+        # Guard: dividendos são SEMPRE não-negativos. Um valor negativo é sempre
+        # um bug de ingestão (ex: subtração errada de acumulado anual). Rejeitar.
+        if dps is not None and dps < 0:
+            dps = None
 
     if fp == "FY":
         period_type = "ANNUAL"
@@ -620,6 +698,40 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
     else:
         period_type = "QUARTERLY"
         fiscal_quarter = int(fp[1]) if fp.startswith("Q") else None
+
+
+    # --- SECTOR SPECIFIC FALLBACKS ---
+    if sector in ("Financials", "Real Estate", "Utilities", "Energy", "Materials"):
+        if dur.get("researchAndDevelopment") is None:
+            dur["researchAndDevelopment"] = 0.0
+
+    if sector == "Financials":
+        if capex is None:
+            capex = 0.0
+            if op_cf is not None:
+                fcf = op_cf
+        if gross_profit is None and revenue is not None:
+            gross_profit = revenue
+        if op_income is None:
+            if net_income is not None:
+                tax = tax_expense or 0.0
+                op_income = net_income + tax
+            elif revenue is not None and op_expenses is not None:
+                op_income = revenue - op_expenses
+        if dur.get("sellingGeneralAndAdmin") is None and op_expenses is not None:
+            dur["sellingGeneralAndAdmin"] = op_expenses
+
+    if sector == "Real Estate":
+        if capex is None:
+            capex = 0.0
+            if op_cf is not None:
+                fcf = op_cf
+        if dur.get("operatingExpenses") is None and dur.get("sellingGeneralAndAdmin") is not None:
+            op_expenses = dur.get("sellingGeneralAndAdmin")
+
+    if sector == "Utilities":
+        if dur.get("sellingGeneralAndAdmin") is None and op_expenses is not None:
+            dur["sellingGeneralAndAdmin"] = op_expenses
 
     return {
         "id": new_id(),
@@ -637,7 +749,7 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         "interestExpense": dur.get("interestExpense"),
         "taxExpense": tax_expense,
         "netIncome": net_income,
-        "epsDiluted": dur.get("epsDiluted"),
+        "epsDiluted": eps_g,
         "sharesOutstanding": shares,
         "operatingCashFlow": op_cf,
         "capex": capex,
@@ -681,14 +793,14 @@ def insert_fundamental(cur, row: dict):
         INSERT INTO fundamentals (
             id, "companyId", "periodType", "fiscalYear", "fiscalQuarter",
             "periodEnd", "filedAt",
-            revenue, "costOfRevenue", "grossProfit", "operatingExpenses",
+            "revenue", "costOfRevenue", "grossProfit", "operatingExpenses",
             "operatingIncome", "interestExpense", "taxExpense",
             "netIncome", "epsDiluted", "sharesOutstanding",
-            "operatingCashFlow", capex, "freeCashFlow",
+            "operatingCashFlow", "capex", "freeCashFlow",
             "totalAssets", "totalCurrentLiab", "longTermDebt", "totalDebt",
-            cash, "totalEquity",
-            "grossMargin", "operatingMargin", "netMargin", roic, "returnOnEquity",
-            "dividendPerShare", "researchAndDevelopment", "sellingGeneralAndAdmin", ebitda,
+            "cash", "totalEquity",
+            "grossMargin", "operatingMargin", "netMargin", "roic", "returnOnEquity",
+            "dividendPerShare", "researchAndDevelopment", "sellingGeneralAndAdmin", "ebitda",
             "createdAt", "updatedAt"
         ) VALUES (
             %(id)s, %(companyId)s, %(periodType)s::"period_type", %(fiscalYear)s, %(fiscalQuarter)s,
@@ -823,17 +935,18 @@ def process_company(conn, company: dict) -> int:
     if not facts_json:
         return 0
 
-    us_gaap = (facts_json.get("facts") or {}).get("us-gaap") or {}
-    if not us_gaap:
+    facts = facts_json.get("facts") or {}
+    namespace = facts.get("us-gaap") or facts.get("ifrs-full") or {}
+    if not namespace:
         return 0
 
     min_fy = datetime.date.today().year - HISTORY_YEARS
     periods: set = set()
 
     # Descobrir todos os (fy, fp) disponíveis nos últimos 10 anos
-    for sample_tags in [["NetIncomeLoss", "Assets", "Revenues"]]:
+    for sample_tags in [["NetIncomeLoss", "ProfitLoss", "Assets", "Revenues", "Revenue"]]:
         for tag in sample_tags:
-            for e in extract_tag_entries(us_gaap, tag):
+            for e in extract_tag_entries(namespace, tag):
                 fy = e.get("fy")
                 fp = e.get("fp")
                 if fy and fp and fy >= min_fy and fp in ("FY", "Q1", "Q2", "Q3", "Q4"):
@@ -847,11 +960,11 @@ def process_company(conn, company: dict) -> int:
     period_ends = {}
     period_filed = {}
     for (fy, fp) in periods_list:
-        p_end, p_filed = get_period_info(us_gaap, fy, fp)
+        p_end, p_filed = get_period_info(namespace, fy, fp)
         period_ends[(fy, fp)] = p_end
         period_filed[(fy, fp)] = p_filed
 
-    dur_map, inst_map = extract_all_metrics(us_gaap, periods_list, period_ends)
+    dur_map, inst_map = extract_all_metrics(namespace, periods_list, period_ends)
 
     # Q4 sintético (FY − Q1−Q2−Q3) + anos cujo Q4 existente na BD deve ser limpo
     drop_q4_years = synthesize_q4(periods, period_ends, period_filed, dur_map, inst_map)
@@ -869,7 +982,7 @@ def process_company(conn, company: dict) -> int:
         if not dur and not inst:
             continue
 
-        rows.append(build_row(company_id, fy, fp, period_end, filed_at, dur, inst))
+        rows.append(build_row(company_id, fy, fp, period_end, filed_at, dur, inst, company.get('sector')))
 
     # Commit único por empresa (~40 períodos): contra Supabase remoto, o commit
     # por período dominava o tempo de execução (~3 round-trips × ~100ms cada).

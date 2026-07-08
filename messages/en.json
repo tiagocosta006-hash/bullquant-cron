@@ -365,7 +365,8 @@
       "roic": "ROIC",
       "gross": "GROSS",
       "operating": "OPERAT.",
-      "profit": "PROFIT"
+      "profit": "PROFIT",
+      "roe": "ROE"
     }
   },
   "calendar": {

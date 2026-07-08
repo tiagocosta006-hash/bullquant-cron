@@ -9,6 +9,19 @@ function isInvalid(value: number | null | undefined): value is null | undefined 
   return value === null || value === undefined || !Number.isFinite(value)
 }
 
+export function getCurrencySymbol(currency: string | null | undefined): string {
+  if (!currency) return "$"
+  switch (currency.toUpperCase()) {
+    case "EUR": return "€"
+    case "GBP": return "£"
+    case "DKK": return "kr."
+    case "CHF": return "CHF"
+    case "CAD": return "CA$"
+    case "JPY": return "¥"
+    default: return "$"
+  }
+}
+
 /** Formata valores grandes em B / M / K (ex: 1_500_000_000 → "1.50B"). */
 export function formatLargeNumber(value: number | null | undefined, currency = "$"): string {
   if (isInvalid(value)) return NA

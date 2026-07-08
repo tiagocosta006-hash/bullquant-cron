@@ -27,7 +27,7 @@ interface InsiderSummary {
   sellValue: number;
 }
 
-export function InsiderActivity({ ticker }: { ticker: string }) {
+export function InsiderActivity({ ticker, currencySymbol = "$" }: { ticker: string, currencySymbol?: string }) {
   const t = useTranslations("insider");
   const [txns, setTxns] = useState<InsiderTxn[] | null>(null);
   const [summary, setSummary] = useState<InsiderSummary | null>(null);
@@ -94,11 +94,13 @@ export function InsiderActivity({ ticker }: { ticker: string }) {
               dir="up"
               label={t("buysWindow", { n: summary.buyCount, days: summary.windowDays })}
               value={summary.buyValue}
+              currencySymbol={currencySymbol}
             />
             <SummaryChip
               dir="down"
               label={t("sellsWindow", { n: summary.sellCount, days: summary.windowDays })}
               value={summary.sellValue}
+              currencySymbol={currencySymbol}
             />
           </div>
         )}
@@ -175,10 +177,10 @@ export function InsiderActivity({ ticker }: { ticker: string }) {
                       {tx.shares.toLocaleString("en-US")}
                     </td>
                     <td className="nums hidden px-4 py-2.5 text-right text-muted-foreground md:table-cell">
-                      {tx.price ? `$${tx.price.toFixed(2)}` : "N/A"}
+                      {tx.price ? `${currencySymbol}${tx.price.toFixed(2)}` : "N/A"}
                     </td>
                     <td className="nums px-4 py-2.5 text-right font-medium text-foreground/90">
-                      {tx.value ? `$${formatLargeNumber(tx.value)}` : "N/A"}
+                      {tx.value ? `${formatLargeNumber(tx.value, currencySymbol)}` : "N/A"}
                     </td>
                     <td className="nums hidden px-4 py-2.5 text-right text-muted-foreground sm:table-cell">
                       {tx.transactionDate}
@@ -226,10 +228,12 @@ function SummaryChip({
   dir,
   label,
   value,
+  currencySymbol = "$",
 }: {
   dir: "up" | "down";
   label: string;
   value: number;
+  currencySymbol?: string;
 }) {
   return (
     <div
@@ -242,7 +246,7 @@ function SummaryChip({
         {label}
       </span>
       <span className="nums text-xs font-semibold text-foreground/80">
-        ${formatLargeNumber(value)}
+        {formatLargeNumber(value, currencySymbol)}
       </span>
     </div>
   );

@@ -1,0 +1,3286 @@
+{
+    "WAT": [],
+    "EVRG": [
+        {
+            "name": "Total Customers",
+            "value": "1.7 million",
+            "description": "Total number of electricity customers served in Kansas and Missouri."
+        },
+        {
+            "name": "Residential Customers",
+            "value": "1.5 million",
+            "description": "Number of residential customers."
+        },
+        {
+            "name": "Commercial Customers",
+            "value": "0.2 million",
+            "description": "Number of commercial firm customers."
+        },
+        {
+            "name": "Industrial, Municipal and Utility Customers",
+            "value": "7,400",
+            "description": "Number of industrials, municipalities and other electric utility customers."
+        },
+        {
+            "name": "Total Generating Capacity",
+            "value": "15,812 MW",
+            "description": "Estimated 2026 total owned generating capacity and renewable power purchase agreements."
+        },
+        {
+            "name": "Coal Generation Capacity",
+            "value": "5,930 MW",
+            "description": "Estimated 2026 capacity for coal generation, representing 37% of total capacity."
+        },
+        {
+            "name": "Wind Generation Capacity",
+            "value": "4,525 MW",
+            "description": "Estimated 2026 capacity for wind generation, representing 29% of total capacity."
+        },
+        {
+            "name": "Natural Gas and Oil Capacity",
+            "value": "4,229 MW",
+            "description": "Estimated 2026 capacity for natural gas and oil generation, representing 27% of total capacity."
+        },
+        {
+            "name": "Projected Peak Summer Demand",
+            "value": "11,200 MW",
+            "description": "Projected peak summer demand for 2026."
+        },
+        {
+            "name": "Dividend Payout Ratio Target",
+            "value": "50% - 60%",
+            "description": "Targeted dividend payout ratio to deliver competitive long-term returns to shareholders."
+        }
+    ],
+    "ZBRA": [
+        {
+            "name": "Channel Partners",
+            "value": "over 10,000",
+            "description": "Number of channel partners in the company's extensive global network."
+        },
+        {
+            "name": "Countries of Operation",
+            "value": "179",
+            "description": "Number of countries in which the company provides its offerings."
+        },
+        {
+            "name": "Facilities",
+            "value": "129",
+            "description": "Number of facilities the company operates worldwide."
+        },
+        {
+            "name": "Employees",
+            "value": "approximately 10,700",
+            "description": "Total number of employees worldwide."
+        }
+    ],
+    "HCA": [
+        {
+            "name": "Total Hospitals",
+            "value": "190",
+            "description": "Total number of hospitals operated as of December 31, 2025."
+        },
+        {
+            "name": "General Acute Care Hospitals",
+            "value": "179",
+            "description": "Number of general acute care hospitals operated as of December 31, 2025."
+        },
+        {
+            "name": "Behavioral Hospitals",
+            "value": "7",
+            "description": "Number of behavioral hospitals operated as of December 31, 2025."
+        },
+        {
+            "name": "Rehabilitation Hospitals",
+            "value": "4",
+            "description": "Number of rehabilitation hospitals operated as of December 31, 2025."
+        },
+        {
+            "name": "Freestanding Ambulatory Surgery Centers (ASCs)",
+            "value": "121",
+            "description": "Number of freestanding ASCs operated as of December 31, 2025."
+        },
+        {
+            "name": "Freestanding Endoscopy Centers",
+            "value": "31",
+            "description": "Number of freestanding endoscopy centers operated as of December 31, 2025."
+        },
+        {
+            "name": "Licensed Beds (General Acute Care)",
+            "value": "50,436",
+            "description": "Total licensed beds in general acute care hospitals as of December 31, 2025."
+        },
+        {
+            "name": "Licensed Beds (Behavioral)",
+            "value": "714",
+            "description": "Total licensed beds in behavioral hospitals as of December 31, 2025."
+        }
+    ],
+    "HIG": [
+        {
+            "name": "Small Business Automation Quoting Rate",
+            "value": ">75%",
+            "description": "Percentage of new business policies from admitted markets quoted without human intervention through the ICON quoting tool."
+        },
+        {
+            "name": "Small Business Average Written Premium per Policy",
+            "value": "<$5,000",
+            "description": "The average written premium generated per policy within the small business segment."
+        },
+        {
+            "name": "AARP Program Earned Premiums",
+            "value": "$3.4 billion (2025)",
+            "description": "Earned premiums from business sold to AARP members, either directly or through independent agents."
+        },
+        {
+            "name": "Business Insurance Earned Premiums",
+            "value": "$13.88 billion (2025)",
+            "description": "Total earned premiums for the Business Insurance segment in 2025."
+        },
+        {
+            "name": "Personal Insurance Earned Premiums",
+            "value": "$3.725 billion (2025)",
+            "description": "Total earned premiums for the Personal Insurance segment in 2025."
+        }
+    ],
+    "REGN": [
+        {
+            "name": "Net product sales of Regeneron-discovered products",
+            "description": "An aggregate metric representing the net product sales for all products discovered by Regeneron, including sales recorded by the company itself as well as those recorded by collaborators and licensees. Management uses this metric to demonstrate pipeline productivity, evaluate commercial trends, and assess revenues associated with profit shares and royalties.",
+            "value": "2025 Totals (in millions): EYLEA HD and EYLEA $7,891.0; Dupixent $17,806.7; Libtayo $1,452.2; Praluent $856.8; Kevzara $574.6; Other products $323.3."
+        }
+    ],
+    "LRCX": [
+        "installed base",
+        "served available market",
+        "market share"
+    ],
+    "JKHY": [
+        {
+            "name": "Net Core Footprints",
+            "description": "Tracks the net growth in both bank and credit union core client bases, indicating the company's success in retaining and acquiring core clients despite industry consolidation.",
+            "value": "Increased year-over-year (calendar year 2023 to 2024)"
+        },
+        {
+            "name": "Average Assets Under Management - Banking Core Clients",
+            "description": "Measures the average assets under management (AUM) of the banking clients utilizing the company's core processing platforms.",
+            "value": "$1.29 billion (up from $1.26 billion)"
+        },
+        {
+            "name": "Average Assets Under Management - Credit Union Core Clients",
+            "description": "Measures the average assets under management (AUM) of the credit union clients utilizing the company's core processing platforms.",
+            "value": "$1.20 billion (up from $1.17 billion)"
+        }
+    ],
+    "FOXA": [
+        {
+            "name": "Tubi Total View Time",
+            "value": "11 billion hours",
+            "description": "Total hours of content streamed on the Tubi AVOD service over the course of the fiscal year."
+        },
+        {
+            "name": "Tubi Total View Time Growth",
+            "value": "13%",
+            "description": "Growth in Tubi's total view time in fiscal 2025 compared to the prior fiscal year."
+        },
+        {
+            "name": "Tubi Share of Television Viewing",
+            "value": "2.2%",
+            "description": "Tubi's share of all television viewing at the end of the fiscal year according to Nielsen's The Gauge."
+        },
+        {
+            "name": "FOX Local Streams and LiveNOW Total View Time Growth",
+            "value": ">150%",
+            "description": "Growth in total view time for local news content across connected televisions and FAST services compared to the prior fiscal year."
+        },
+        {
+            "name": "FOX News Subscribers",
+            "value": "61 million",
+            "description": "Number of subscribers for the FOX News network as estimated by Nielsen as of June 30, 2025."
+        }
+    ],
+    "TEL": [
+        {
+            "metric": "Total Backlog",
+            "value": "$6,188 million",
+            "context": "Fiscal year end 2025"
+        },
+        {
+            "metric": "Transportation Solutions Backlog",
+            "value": "$2,278 million",
+            "context": "Fiscal year end 2025"
+        },
+        {
+            "metric": "Industrial Solutions Backlog",
+            "value": "$3,910 million",
+            "context": "Fiscal year end 2025"
+        },
+        {
+            "metric": "OSHA Total Recordable Incident Rate",
+            "value": "0.06",
+            "context": "Fiscal year 2025"
+        }
+    ],
+    "TTD": [
+        {
+            "metric": "Customer Retention Rate",
+            "value": ">95%",
+            "description": "Customer retention rate has exceeded 95% for over a decade, supported by ongoing master services agreements (MSAs) rather than episodic insertion orders."
+        },
+        {
+            "metric": "Total Platform Spend",
+            "value": "Not explicitly quantified in extract",
+            "description": "The primary basis for generating revenue, as the company charges clients a platform fee generally based on a percentage of their total platform spend."
+        }
+    ],
+    "TPL": [
+        {
+            "name": "Surface Acres Owned",
+            "value": "882,000",
+            "description": "Total surface acres of land owned by the company, principally concentrated in the Permian Basin."
+        },
+        {
+            "name": "Net Royalty Acres (NRA)",
+            "value": "224,000",
+            "description": "Total net royalty acres (normalized to 1/8th) owned by the company."
+        },
+        {
+            "name": "Production Volumes (Equivalents per day)",
+            "value": "34.6 MBoe/d",
+            "description": "The company's share of production volumes in thousand barrels of oil equivalent per day for the year ended December 31, 2025."
+        },
+        {
+            "name": "Realized Price (Equivalents)",
+            "value": "$34.18 per Boe",
+            "description": "The average realized price per barrel of oil equivalent for the year ended December 31, 2025."
+        },
+        {
+            "name": "Net Producing Wells",
+            "value": "116.1",
+            "description": "Number of net producing oil and gas wells on the company's royalty acreage as of December 31, 2025."
+        },
+        {
+            "name": "Net DUC Wells",
+            "value": "9.8",
+            "description": "Number of drilled but not yet completed (DUC) wells on the company's royalty acreage as of December 31, 2025."
+        },
+        {
+            "name": "Water Sales Volume",
+            "value": "278,564 MBbls",
+            "description": "Total volume of water sold in thousand barrels for the year ended December 31, 2025."
+        },
+        {
+            "name": "Produced Water Royalties Volume",
+            "value": "1,566,588 MBbls",
+            "description": "Total volume of produced water subject to royalties in thousand barrels for the year ended December 31, 2025."
+        }
+    ],
+    "ED": [
+        "Electric Customers",
+        "Gas Customers",
+        "Steam Customers",
+        "Steam Delivery Volume",
+        "Electric Peak Demand",
+        "Gas Peak Demand",
+        "Steam Peak Demand",
+        "Energy Efficiency Measures",
+        "Vehicle Electrification Measures"
+    ],
+    "AMGN": [
+        {
+            "name": "Top 3 Wholesaler Revenue Concentration",
+            "value": "77%",
+            "description": "Percentage of worldwide gross revenues accounted for by the three largest wholesale distributors (McKesson, Cencora, and Cardinal Health) on a combined basis in 2025."
+        },
+        {
+            "name": "U.S. Product Sales Mix",
+            "value": "73%",
+            "description": "Percentage of total product sales generated in the United States in 2025 (amounting to $25,656 million)."
+        },
+        {
+            "name": "Rest of World (ROW) Product Sales Mix",
+            "value": "27%",
+            "description": "Percentage of total product sales generated outside the United States in 2025 (amounting to $9,492 million)."
+        }
+    ],
+    "DLTR": [
+        {
+            "name": "US Store Count",
+            "value": "9,000",
+            "description": "Approximate number of Dollar Tree stores operating across 48 states and the District of Columbia as of January 31, 2026."
+        },
+        {
+            "name": "Canadian Store Count",
+            "value": "275",
+            "description": "Approximate number of Dollar Tree Canada stores operating across seven Canadian provinces as of January 31, 2026."
+        },
+        {
+            "name": "Items per Store",
+            "value": "8,400",
+            "description": "Approximate number of items carried in Dollar Tree stores."
+        },
+        {
+            "name": "Automatic Replenishment Rate",
+            "value": "40%",
+            "description": "Percentage of store items that were automatically replenished as of the end of fiscal 2025."
+        },
+        {
+            "name": "Instacart Serviceable Stores",
+            "value": "8,400+",
+            "description": "Number of Dollar Tree stores where customers can shop online and receive same-day delivery via Instacart as of January 31, 2026."
+        },
+        {
+            "name": "Uber Eats Serviceable Stores",
+            "value": "8,800+",
+            "description": "Number of Dollar Tree stores serviceable through Uber Eats as of January 31, 2026."
+        },
+        {
+            "name": "Directly Imported Merchandise",
+            "value": "40%",
+            "description": "Approximate percentage of total retail value purchases from directly imported merchandise."
+        },
+        {
+            "name": "US Distribution Centers",
+            "value": "16",
+            "description": "Number of distribution centers operated in the United States."
+        },
+        {
+            "name": "Distribution Center Fulfillment Rate",
+            "value": "90%",
+            "description": "Approximate percentage of store inventory received from distribution centers."
+        }
+    ],
+    "BNY": [
+        {
+            "name": "Assets under custody and/or administration (AUC/A)",
+            "description": "The total value of assets for which the company provides custody and/or administrative services.",
+            "value": "$59.3 trillion"
+        },
+        {
+            "name": "Assets under management (AUM)",
+            "description": "The total market value of the investments that the company manages on behalf of its clients.",
+            "value": "$2.2 trillion"
+        }
+    ],
+    "GL": [
+        {
+            "metric": "Annualized Premium in Force - Life",
+            "value": "3,421,143",
+            "unit": "USD thousands"
+        },
+        {
+            "metric": "Annualized Premium in Force - Health",
+            "value": "1,649,670",
+            "unit": "USD thousands"
+        },
+        {
+            "metric": "Policy Count - Life",
+            "value": "14,284,789",
+            "unit": "count"
+        },
+        {
+            "metric": "Average Face Amount Per Policy - Life",
+            "value": "16.2",
+            "unit": "USD thousands"
+        },
+        {
+            "metric": "Average Producing Agents - American Income Life",
+            "value": "11,920",
+            "unit": "count"
+        },
+        {
+            "metric": "Average Producing Agents - Liberty National",
+            "value": "3,846",
+            "unit": "count"
+        },
+        {
+            "metric": "Average Producing Agents - Family Heritage",
+            "value": "1,527",
+            "unit": "count"
+        },
+        {
+            "metric": "Independent Producing Agents - United American",
+            "value": "4,396",
+            "unit": "count"
+        }
+    ],
+    "WBD": [
+        {
+            "name": "Streaming Subscribers",
+            "value": "131.6 million",
+            "description": "Total number of streaming subscribers as of December 31, 2025."
+        },
+        {
+            "name": "Global Subscriber Additions",
+            "value": "14.7 million",
+            "description": "Number of global subscribers added to the streaming products in 2025."
+        }
+    ],
+    "AMCR": [
+        {
+            "name": "Organic Growth",
+            "description": "Growth in the base business used to measure operational performance and value creation, excluding impacts from acquisitions or currency.",
+            "value": null
+        },
+        {
+            "name": "Free Cash Flow",
+            "description": "Cash flow generation used to pursue targeted acquisitions and return cash to shareholders via share buybacks or dividends.",
+            "value": null
+        },
+        {
+            "name": "Total Recordable Incidence Rate (TRIR)",
+            "description": "A safety and operational metric tracking workplace injuries.",
+            "value": "0.27 (Legacy Amcor), 0.57 (Legacy Berry)"
+        }
+    ],
+    "VLTO": [
+        {
+            "name": "Recurring Sales Percentage",
+            "value": "61%",
+            "description": "Percentage of total sales derived from recurring sources such as consumables, spare parts, services, and software during the year ended December 31, 2025."
+        },
+        {
+            "name": "Hach Customers",
+            "value": "Over 149,000",
+            "description": "Number of customers served by Hach, including community water utilities and industrial customers."
+        },
+        {
+            "name": "Population Served with Safe Water (Hach)",
+            "value": "More than 3.4 billion",
+            "description": "Number of people provided with safe water daily by Hach solutions, representing approximately 40% of the global population."
+        },
+        {
+            "name": "Water Saved (ChemTreat)",
+            "value": "Over 88 billion gallons",
+            "description": "Amount of water saved by customers in 2025 utilizing ChemTreat's chemical treatment plans."
+        },
+        {
+            "name": "Water Treated Annually (Trojan Technologies)",
+            "value": "15 trillion gallons",
+            "description": "Amount of water treated annually by Trojan Technologies' UV and membrane filtration systems."
+        },
+        {
+            "name": "Population Served with Clean Water (Trojan Technologies)",
+            "value": "More than 312 million",
+            "description": "Number of people provided with improved access to clean water daily via Trojan Technologies systems."
+        },
+        {
+            "name": "Esko Customers",
+            "value": "Over 25,000",
+            "description": "Number of customers using Esko's packaging design software and imaging systems across over 140 countries."
+        },
+        {
+            "name": "X-Rite Customers",
+            "value": "Over 13,000",
+            "description": "Number of brands and suppliers served by X-Rite's color management solutions across 140 countries."
+        },
+        {
+            "name": "Top CPG & Pharmaceutical Brands Penetration (PQI)",
+            "value": "Majority of top 25 global CPG brands and top 20 pharmaceutical brands",
+            "description": "Usage of Product Quality & Innovation (PQI) segment solutions among leading global consumer packaged goods and pharmaceutical brands."
+        }
+    ],
+    "DAL": [
+        "Completion factor",
+        "On-time departures and arrivals",
+        "Peak-day flights",
+        "Revenue miles flown",
+        "Award tickets",
+        "Remuneration from American Express",
+        "Gallons consumed",
+        "Average price per gallon",
+        "Jet fuel savings",
+        "Full-time employee equivalents"
+    ],
+    "CHTR": {
+        "Adjusted EBITDA": "$22,708 million",
+        "Total Mobile Lines Added": "1.9 million",
+        "Residential Mobile Lines": "Increased by 1.8 million",
+        "Residential Internet Customers": "Decreased by 393,000",
+        "Residential Video Customers": "Decreased by 255,000",
+        "Residential Voice Customers": "Decreased by 804,000",
+        "Small Business Customers": "Decreased by 13,000",
+        "Mid-market & Large Business PSUs": "Increased by 17,000",
+        "Subsidized Rural Passings Activated": "483,000"
+    },
+    "D": [
+        {
+            "name": "Electric Utility Customers",
+            "value": "4.1 million",
+            "description": "Number of primarily electric utility customers served in Virginia, North Carolina, and South Carolina."
+        },
+        {
+            "name": "Electric Generating Capacity",
+            "value": "30.7 GW",
+            "description": "Total electric generating capacity in Dominion Energy's portfolio."
+        },
+        {
+            "name": "Electric Transmission Lines",
+            "value": "10,800 miles",
+            "description": "Total length of electric transmission lines operated by the company."
+        },
+        {
+            "name": "Electric Distribution Lines",
+            "value": "80,400 miles",
+            "description": "Total length of electric distribution lines operated by the company."
+        },
+        {
+            "name": "Full-time Employees",
+            "value": "15,200",
+            "description": "Total number of full-time employees across the company as of December 31, 2025."
+        },
+        {
+            "name": "OSHA Recordable Rate",
+            "value": "0.26",
+            "description": "Safety metric representing the number of recordable cases per 100 employees. The rate was 0.26 in 2025, improving from 0.42 in 2024 and 0.45 in 2023."
+        }
+    ],
+    "ORCL": [
+        "Annualized cloud revenue"
+    ],
+    "IVZ": [
+        "Assets under management (AUM)",
+        "Net asset flows",
+        "Covenant Adjusted EBITDA"
+    ],
+    "SMCI": [
+        {
+            "name": "Research and Development Employees",
+            "value": "Over 3,200",
+            "description": "Number of employees in the research and development organization as of June 30, 2025."
+        },
+        {
+            "name": "Active Customers",
+            "value": "Over 1,000",
+            "description": "Number of customers sold to during each of the fiscal years ended June 30, 2025, 2024, and 2023."
+        },
+        {
+            "name": "Significant Customers",
+            "value": "4",
+            "description": "Number of customers that each accounted for 10% or more of net sales in fiscal year 2025."
+        },
+        {
+            "name": "International Sales Percentage",
+            "value": "40.6%",
+            "description": "Percentage of net sales from customers located outside of the United States in fiscal year 2025."
+        }
+    ],
+    "COIN": [
+        "Monthly Transacting Users",
+        "Assets on Platform",
+        "Trading Volume"
+    ],
+    "FSLR": [
+        {
+            "name": "Cumulative Modules Sold",
+            "value": "Over 93 GW",
+            "description": "Total volume of PV modules sold worldwide to date."
+        },
+        {
+            "name": "Cumulative R&D Investments",
+            "value": "Over $2 billion",
+            "description": "Total R&D investments made over the last 20 years."
+        },
+        {
+            "name": "Research Cell Efficiency",
+            "value": "23.1%",
+            "description": "Independently certified world record for CdTe PV research cell efficiency."
+        },
+        {
+            "name": "Module Aperture Area Efficiency",
+            "value": "19.9%",
+            "description": "Independently certified world record for CdTe PV module aperture area efficiency."
+        },
+        {
+            "name": "Energy Payback Time",
+            "value": "Less than 2 months",
+            "description": "Time required for Series 7 PV modules to produce more energy than was used in manufacturing."
+        },
+        {
+            "name": "Energy Return on Investment",
+            "value": "Approximately 190-fold",
+            "description": "Net energy gain over a 30-year project lifetime for Series 7 PV modules."
+        },
+        {
+            "name": "Recycled PV Modules",
+            "value": "Over 400,000 metric tons",
+            "description": "Total volume of PV modules recycled globally to date."
+        },
+        {
+            "name": "U.S. Net Sales Share",
+            "value": "96%",
+            "description": "Percentage of First Solar's 2025 net sales generated in the United States."
+        },
+        {
+            "name": "India Nameplate Production Capacity",
+            "value": "3.2 GW",
+            "description": "Total installed nameplate production capacity at the manufacturing facility in India."
+        }
+    ],
+    "BDX": [],
+    "OKE": [
+        {
+            "name": "EBITDA",
+            "description": "Earnings before interest expense, income taxes, depreciation and amortization"
+        },
+        {
+            "name": "Fee-based earnings",
+            "description": "Percentage of consolidated earnings derived from fee-based contracts, which reduces exposure to direct commodity price volatility",
+            "value": "Approximately 90% in 2025"
+        },
+        {
+            "name": "Natural gas processing plant utilization rate",
+            "description": "Weighted-average utilization rate of natural gas processing plants in the Rocky Mountain region, Mid-Continent region, and Permian Basin",
+            "value": "78% in 2025 and 84% in 2024"
+        }
+    ],
+    "APP": [],
+    "PNW": [
+        {
+            "name": "Total Electric Customers",
+            "value": "1.4 million",
+            "description": "The number of customers APS currently provides electric service to."
+        },
+        {
+            "name": "Regulated Generation Capacity",
+            "value": "6,257 MW",
+            "description": "The total amount of regulated generation capacity owned or leased by APS."
+        },
+        {
+            "name": "Clean Resources Energy Supply Share",
+            "value": "58%",
+            "description": "The share of APS's energy supply derived from clean resources in 2025, including nuclear, renewables, demand side management (DSM), and clean resource PPAs."
+        }
+    ],
+    "BIIB": [],
+    "KKR": [
+        {
+            "name": "Total Assets Under Management (AUM)",
+            "value": "$744 billion",
+            "description": "Total assets managed by KKR across all business lines as of December 31, 2025."
+        },
+        {
+            "name": "Global Atlantic AUM",
+            "value": "$219 billion",
+            "description": "Assets under management derived from the Global Atlantic insurance business."
+        },
+        {
+            "name": "Credit and Liquid Strategies AUM",
+            "value": "$322 billion",
+            "description": "Assets under management for the Credit and Liquid Strategies business line."
+        },
+        {
+            "name": "Private Equity AUM",
+            "value": "$229 billion",
+            "description": "Assets under management for the Private Equity business line, including traditional, core, and growth equity."
+        },
+        {
+            "name": "Real Assets AUM",
+            "value": "$192 billion",
+            "description": "Assets under management for the Real Assets business line."
+        },
+        {
+            "name": "Private Equity FPAUM",
+            "value": "$151 billion",
+            "description": "Fee Paying Assets Under Management for the Private Equity business line as of December 31, 2025."
+        },
+        {
+            "name": "Total Management Fees",
+            "value": "$4.1 billion",
+            "description": "Total management fees earned by KKR in 2025."
+        },
+        {
+            "name": "Private Equity Management Fees",
+            "value": "$1.529 billion",
+            "description": "Management fees earned from the Private Equity business line in 2025."
+        },
+        {
+            "name": "Private Equity Capital Invested",
+            "value": "$24 billion",
+            "description": "Amount of capital invested within the Private Equity business line in 2025."
+        },
+        {
+            "name": "Private Equity New Capital Raised (AUM)",
+            "value": "$27 billion",
+            "description": "New capital raised for the Private Equity business line in 2025."
+        },
+        {
+            "name": "Long-Duration Capital",
+            "value": "92%",
+            "description": "Percentage of total AUM consisting of capital with a duration of at least eight years at inception or longer."
+        }
+    ],
+    "DD": [
+        {
+            "name": "Operating EBITDA",
+            "description": "Earnings (i.e., Income from continuing operations before income taxes) before interest, depreciation, amortization, non-operating pension / other post-employment benefits (OPEB) / charges, and foreign exchange gains / losses, excluding future reimbursable indirect costs, remediation costs associated with divested businesses, and is adjusted for significant items."
+        }
+    ],
+    "TXN": [
+        "Free cash flow",
+        "Free cash flow per share",
+        "Free cash flow as a percentage of revenue"
+    ],
+    "AJG": [
+        {
+            "metric": "Brokerage Segment Revenue Contribution",
+            "value": "87%"
+        },
+        {
+            "metric": "Risk Management Segment Revenue Contribution",
+            "value": "13%"
+        },
+        {
+            "metric": "U.S. Revenue Contribution (Combined Segments)",
+            "value": "67%"
+        },
+        {
+            "metric": "International Revenue Contribution (Combined Segments)",
+            "value": "33%"
+        },
+        {
+            "metric": "Brokerage Segment Compensation Expense Ratio",
+            "value": "55%"
+        },
+        {
+            "metric": "Risk Management Segment Compensation Expense Ratio",
+            "value": "61%"
+        },
+        {
+            "metric": "Risk Management Revenue - Workers' Compensation",
+            "value": "59%"
+        },
+        {
+            "metric": "Risk Management Revenue - General & Commercial Auto Liability",
+            "value": "34%"
+        },
+        {
+            "metric": "Risk Management Revenue - Property-related",
+            "value": "7%"
+        }
+    ],
+    "VLO": [
+        {
+            "name": "Combined Throughput Capacity",
+            "value": "3.2 million BPD",
+            "description": "Combined feedstock throughput capacity of the 15 petroleum refineries."
+        },
+        {
+            "name": "Crude Oil Capacity",
+            "value": "2.7 million BPD",
+            "description": "Total estimated crude oil capacity across all petroleum refineries."
+        },
+        {
+            "name": "Low-Carbon Fuels Production Capacity",
+            "value": "1.2 billion gallons per year",
+            "description": "Combined production capacity of low-carbon fuels at the two DGD plants."
+        },
+        {
+            "name": "Ethanol Production Capacity",
+            "value": "1.7 billion gallons per year",
+            "description": "Combined production capacity of the 12 ethanol plants."
+        },
+        {
+            "name": "Renewable Diesel Annual Production Capacity (DGD Port Arthur Plant)",
+            "value": "470 million gallons",
+            "description": "Annual production capacity of renewable diesel at the DGD Port Arthur Plant, with optionality to upgrade approximately 50 percent to neat SAF."
+        }
+    ],
+    "CINF": [
+        {
+            "name": "Written premium to surplus ratio",
+            "description": "A key statutory measure of property casualty insurance company capacity and security. A lower ratio indicates more security for policyholders and greater capacity for growth by an insurer.",
+            "value": "1.0"
+        },
+        {
+            "name": "Life statutory adjusted risk-based surplus to liabilities",
+            "description": "A key measure of life insurance company capital strength. A higher ratio indicates an insurer's stronger security for policyholders and capacity to support business growth.",
+            "value": "17.6%"
+        },
+        {
+            "name": "Risk-based capital to authorized control level risk-based capital ratio",
+            "description": "A statutory measure of capital adequacy comparing risk-based capital to the authorized control level.",
+            "value": "5.6 (Standard market property casualty); 9.7 (Life insurance)"
+        },
+        {
+            "name": "Ratio of investments in common stock, at fair value, to statutory capital and surplus",
+            "description": "A statutory measure indicating the concentration of capital invested in equity securities.",
+            "value": "74.0%"
+        },
+        {
+            "name": "Debt-to-total-capital ratio",
+            "description": "Measures the company's reliance on debt as a source of capital.",
+            "value": "4.9%"
+        },
+        {
+            "name": "Property casualty agency relationships",
+            "description": "The number of independent agencies marketing standard market property casualty insurance.",
+            "value": "2,292"
+        },
+        {
+            "name": "Property casualty reporting locations",
+            "description": "The number of physical agency locations indicating agents' regional scope and presence.",
+            "value": "3,702"
+        }
+    ],
+    "STZ": [
+        {
+            "name": "Comparable operating income (loss)",
+            "description": "A non-GAAP financial measure used in monitoring and evaluating the results and underlying business trends of the core operations of the Company and/or in internal goal setting, excluding Comparable Adjustments."
+        },
+        {
+            "name": "Depletions",
+            "description": "Represents U.S. distributor shipments of the company's respective branded products to retail customers, based on third-party data."
+        },
+        {
+            "name": "Comparable net leverage",
+            "description": "A metric mentioned in the long-term financial model, representing leverage calculated on a comparable basis."
+        }
+    ],
+    "AKAM": [],
+    "MCHP": [
+        "Unique customers",
+        "Percentage of net sales through distributors",
+        "Percentage of net sales from direct customers",
+        "Percentage of sales from internal wafer fabrication facilities",
+        "Percentage of internal assembly requirements",
+        "Percentage of internal test requirements"
+    ],
+    "CNC": [
+        {
+            "name": "Adjusted net earnings",
+            "values": {
+                "2025": 1028,
+                "2024": 3753,
+                "2023": 3646
+            },
+            "unit": "Millions of Dollars"
+        },
+        {
+            "name": "Adjusted diluted earnings per share (EPS)",
+            "values": {
+                "2025": 2.08,
+                "2024": 7.17,
+                "2023": 6.68
+            },
+            "unit": "Dollars"
+        },
+        {
+            "name": "Adjusted selling, general and administrative expenses",
+            "values": {
+                "2025": 12876,
+                "2024": 12305,
+                "2023": 12407
+            },
+            "unit": "Millions of Dollars"
+        }
+    ],
+    "NXPI": [],
+    "WST": [
+        {
+            "name": "International Sales Percentage",
+            "value": "56.7%",
+            "description": "Percentage of consolidated net sales generated from operations outside of the United States in 2025."
+        },
+        {
+            "name": "Top 10 Customers Revenue Concentration",
+            "value": "47.6%",
+            "description": "Percentage of consolidated net sales accounted for by the company's ten largest customers in 2025."
+        },
+        {
+            "name": "Largest Single Customer Revenue Concentration",
+            "value": "15.8%",
+            "description": "Percentage of consolidated net sales accounted for by the single largest customer in 2025, equating to $485.9 million."
+        },
+        {
+            "name": "Total Employees",
+            "value": "10,800",
+            "description": "Approximate number of people employed by the company globally, excluding contractors and temporary workers, as of December 31, 2025."
+        }
+    ],
+    "VMC": [
+        "Aggregates cash gross profit per ton",
+        "Return on Invested Capital (ROIC)",
+        "Adjusted EBITDA"
+    ],
+    "SNPS": [],
+    "DUK": [
+        {
+            "name": "Adjusted earnings",
+            "description": "A non-GAAP financial measure representing net income available to Duke Energy excluding or including certain amounts to supplement GAAP evaluation."
+        },
+        {
+            "name": "Adjusted EPS",
+            "description": "A non-GAAP financial measure representing adjusted earnings per basic share."
+        }
+    ],
+    "ECL": [
+        {
+            "name": "Total Employees",
+            "value": "48,000",
+            "description": "Total number of associates or employees as of December 31, 2025."
+        },
+        {
+            "name": "Sales and Service Employees",
+            "value": "More than 25,000",
+            "description": "The largest component of the workforce focused on sales and service."
+        },
+        {
+            "name": "R&D, Engineering and Digital Experts",
+            "value": "Approximately 3,000",
+            "description": "Number of employees supporting innovation efforts."
+        },
+        {
+            "name": "Water Conserved by Customers",
+            "value": "More than 226 billion gallons",
+            "description": "Amount of water Ecolab helped customers conserve in 2024."
+        },
+        {
+            "name": "Greenhouse Gas Emissions Avoided by Customers",
+            "value": "More than 4.6 million metric tons",
+            "description": "Amount of greenhouse gas emissions Ecolab helped customers avoid in 2024."
+        },
+        {
+            "name": "Warewashing Products Sales Concentration",
+            "value": "13%",
+            "description": "Percentage of consolidated net sales in 2025 derived from one class of products (warewashing)."
+        }
+    ],
+    "DVN": [
+        "Operated Rigs"
+    ],
+    "FRT": [
+        {
+            "name": "Total Leased Rate",
+            "description": "The percentage of total real estate projects that are leased.",
+            "value": "96.1%"
+        },
+        {
+            "name": "Total Occupied Rate",
+            "description": "The percentage of total real estate projects that are occupied.",
+            "value": "94.1%"
+        },
+        {
+            "name": "Anchor Tenant Leased Rate",
+            "description": "The percentage of anchor tenant space that is leased.",
+            "value": "97.3%"
+        },
+        {
+            "name": "Anchor Tenant Occupied Rate",
+            "description": "The percentage of anchor tenant space that is occupied.",
+            "value": "95.5%"
+        },
+        {
+            "name": "Commercial Square Feet",
+            "description": "Total commercial square feet of the real estate projects.",
+            "value": "28.8 million"
+        }
+    ],
+    "LEN": [
+        {
+            "name": "New home deliveries",
+            "value": "82,583",
+            "description": "Total number of new home deliveries in fiscal 2025, including deliveries from unconsolidated entities."
+        },
+        {
+            "name": "Average sales price",
+            "value": "$391,000",
+            "description": "Average sales price of a Lennar home in fiscal 2025, excluding deliveries from unconsolidated entities."
+        },
+        {
+            "name": "Active communities",
+            "value": "1,708",
+            "description": "Number of communities in which the company was actively building and marketing homes as of November 30, 2025."
+        },
+        {
+            "name": "Completed unsold homes",
+            "value": "5,000",
+            "description": "Total number of completed unsold homes at fiscal year-end 2025, representing 2.9 homes per community."
+        },
+        {
+            "name": "Cancellation rate",
+            "value": "14%",
+            "description": "Percentage of home sales contracts cancelled during fiscal 2025."
+        },
+        {
+            "name": "Backlog dollar value",
+            "value": "$5.2 billion",
+            "description": "Dollar value of homes under sales contracts at fiscal year-end 2025, including unconsolidated entities."
+        },
+        {
+            "name": "Homesites controlled through options",
+            "value": "98%",
+            "description": "Percentage of total homesites controlled through options rather than direct ownership as of November 30, 2025."
+        },
+        {
+            "name": "Residential mortgage loans originated",
+            "value": "55,900",
+            "description": "Number of residential mortgage loans originated during fiscal 2025, totaling $20.0 billion in value."
+        }
+    ],
+    "SPG": [
+        {
+            "metric": "Funds from Operations (FFO)",
+            "value": "Not explicitly stated for 2025",
+            "context": "Key non-GAAP measure used internally to evaluate portfolio operating performance."
+        },
+        {
+            "metric": "Real Estate FFO",
+            "value": "Not explicitly stated for 2025",
+            "context": "Key non-GAAP measure used internally to evaluate portfolio operating performance."
+        },
+        {
+            "metric": "Net Operating Income (NOI)",
+            "value": "Not explicitly stated for 2025",
+            "context": "Key non-GAAP measure used internally to evaluate portfolio operating performance."
+        },
+        {
+            "metric": "Portfolio NOI Growth",
+            "value": "4.7%",
+            "context": "Increase in 2025 as compared to 2024."
+        },
+        {
+            "metric": "Ending Occupancy (U.S. Malls and Premium Outlets)",
+            "value": "96.4%",
+            "context": "As of December 31, 2025, representing a 10 basis point decrease from 2024."
+        },
+        {
+            "metric": "Average Base Minimum Rent (U.S. Malls and Premium Outlets)",
+            "value": "$60.97 psf",
+            "context": "As of December 31, 2025, representing a 4.7% increase from 2024."
+        },
+        {
+            "metric": "Ending Occupancy (The Mills)",
+            "value": "99.2%",
+            "context": "As of December 31, 2025, an increase of 40 basis points from 2024."
+        },
+        {
+            "metric": "Average Base Minimum Rent (The Mills)",
+            "value": "$41.24 psf",
+            "context": "As of December 31, 2025, an increase of 8.7% from 2024."
+        },
+        {
+            "metric": "Ending Occupancy (Japan Premium Outlets)",
+            "value": "99.9%",
+            "context": "As of December 31, 2025, an increase of 60 basis points from 2024."
+        },
+        {
+            "metric": "Average Base Minimum Rent (Japan Premium Outlets)",
+            "value": "\u00a55,581 psf",
+            "context": "As of December 31, 2025, an increase of 1.27% from 2024."
+        },
+        {
+            "metric": "New Leases Signed (U.S. Malls & Premium Outlets)",
+            "value": "1,112",
+            "context": "For the twelve months ended December 31, 2025."
+        },
+        {
+            "metric": "Renewal Leases Signed (U.S. Malls & Premium Outlets)",
+            "value": "2,035",
+            "context": "For the twelve months ended December 31, 2025."
+        },
+        {
+            "metric": "Total Leased Area (New and Renewal)",
+            "value": "11.4 million sq ft",
+            "context": "Across U.S. Malls and Premium Outlets for the twelve months ended December 31, 2025."
+        },
+        {
+            "metric": "Average Annual Initial Base Minimum Rent (New Leases)",
+            "value": "$65.09 psf",
+            "context": "For new leases signed in 2025."
+        },
+        {
+            "metric": "Average Tenant Allowance (New Leases)",
+            "value": "$63.92 psf",
+            "context": "For new leases signed in 2025."
+        }
+    ],
+    "APD": [
+        {
+            "name": "United States Patents",
+            "value": "560",
+            "description": "Approximate number of United States patents owned by the company during fiscal year 2025."
+        },
+        {
+            "name": "Foreign Patents",
+            "value": "2,650",
+            "description": "Approximate number of foreign patents owned by the company during fiscal year 2025."
+        },
+        {
+            "name": "International Countries and Regions of Operation",
+            "value": "50",
+            "description": "Approximate number of countries and regions outside the United States where the company conducts business."
+        }
+    ],
+    "EBAY": {
+        "Gross Merchandise Volume (GMV)": "$80 billion",
+        "Active Buyers": "135 million",
+        "Live Listings": "2.5 billion"
+    },
+    "AMT": [
+        {
+            "metric": "Property Operations Revenue Share",
+            "value": "97%"
+        },
+        {
+            "metric": "Total Communications Sites",
+            "value": "149,686"
+        },
+        {
+            "metric": "U.S. & Canada Sites",
+            "value": "42,224"
+        },
+        {
+            "metric": "Africa & APAC Sites",
+            "value": "27,857"
+        },
+        {
+            "metric": "Europe Sites",
+            "value": "32,524"
+        },
+        {
+            "metric": "Latin America Sites",
+            "value": "47,081"
+        },
+        {
+            "metric": "Operating Data Center Facilities",
+            "value": "30"
+        },
+        {
+            "metric": "Expected Non-cancellable Tenant Lease Revenue",
+            "value": "$54 billion"
+        },
+        {
+            "metric": "Tenant Churn Rate",
+            "value": "2%"
+        },
+        {
+            "metric": "Available Liquidity",
+            "value": "$11.1 billion"
+        }
+    ],
+    "TKO": [
+        {
+            "name": "Adjusted EBITDA",
+            "description": "Net income excluding income taxes, net interest expense, depreciation and amortization, equity-based compensation, merger and acquisition costs, certain legal costs, restructuring, severance, impairment charges, and other items."
+        },
+        {
+            "name": "Adjusted EBITDA Margin",
+            "description": "Calculated as Adjusted EBITDA divided by revenue."
+        },
+        {
+            "name": "Free Cash Flow",
+            "description": "Defined as net cash provided by operating activities less cash used for capital expenditures."
+        },
+        {
+            "name": "Free Cash Flow Conversion",
+            "description": "Defined as Free Cash Flow divided by Adjusted EBITDA."
+        }
+    ],
+    "SNDK": [],
+    "WDC": [
+        "Exabytes shipped",
+        "Average capacity per drive",
+        "Average selling price (ASP)"
+    ],
+    "TRV": {
+        "Net Written Premiums": "$44.39 billion",
+        "Gross Written Premiums": "$47.73 billion",
+        "Net Earned Premiums": "$43.91 billion",
+        "Combined Ratio": "89.9%",
+        "Loss and Loss Adjustment Expense Ratio": "61.4%",
+        "Underwriting Expense Ratio": "28.5%",
+        "Catastrophe Losses": "$3.69 billion",
+        "Net Favorable Prior Year Reserve Development": "$1.04 billion",
+        "Total Capital Returned to Shareholders": "$4.18 billion",
+        "Retention Rates": "Remained strong across segments, slightly decreased in Select Accounts but comparable elsewhere",
+        "Renewal Premium Changes": "Remained positive across domestic business segments but generally lower than 2024"
+    },
+    "MKC": [
+        "organic net sales",
+        "adjusted gross profit",
+        "adjusted gross profit margin",
+        "adjusted operating income",
+        "adjusted operating income margin",
+        "adjusted income tax expense",
+        "adjusted income tax rate",
+        "adjusted net income",
+        "adjusted diluted earnings per share",
+        "segment operating income"
+    ],
+    "COHR": [
+        "Segment profit"
+    ],
+    "GWW": [
+        {
+            "metric": "Global Customers",
+            "value": "More than 4.6 million"
+        },
+        {
+            "metric": "High-Touch Solutions N.A. Products",
+            "value": "Approximately 2 million"
+        },
+        {
+            "metric": "Zoro Products",
+            "value": "Approximately 13 million"
+        },
+        {
+            "metric": "MonotaRO Products",
+            "value": "Approximately 29 million"
+        },
+        {
+            "metric": "Products Stocked",
+            "value": "More than 1.5 million"
+        },
+        {
+            "metric": "Primary Suppliers",
+            "value": "More than 5,000"
+        },
+        {
+            "metric": "Private Label U.S. Sales",
+            "value": "19% of 2025 U.S. stocked product sales"
+        },
+        {
+            "metric": "U.S. Operations Net Sales",
+            "value": "81% of 2025 consolidated net sales"
+        },
+        {
+            "metric": "Worldwide Team Members",
+            "value": "Approximately 25,000"
+        },
+        {
+            "metric": "U.S. OSHA Total Recordable Incident Rate",
+            "value": "1.3"
+        },
+        {
+            "metric": "U.S. Lost Time Incident Rate",
+            "value": "0.7"
+        }
+    ],
+    "PNR": [
+        "Adjusted operating income"
+    ],
+    "CF": [
+        {
+            "name": "Total Sales Volume",
+            "value": "19.1 million product tons",
+            "description": "Total volume of product sold during the year ended December 31, 2025."
+        },
+        {
+            "name": "Gross Ammonia Capacity",
+            "value": "10,845,000 tons",
+            "description": "Total average annual gross production capacity for ammonia across all facilities."
+        },
+        {
+            "name": "Low-Carbon Ammonia Capacity (Donaldsonville)",
+            "value": "1.9 million tons",
+            "description": "Annual capacity to produce low-carbon ammonia at the Donaldsonville complex."
+        },
+        {
+            "name": "Blue Point Nameplate Capacity",
+            "value": "1.4 million metric tons",
+            "description": "Designed annual low-carbon ammonia production capacity for the Blue Point joint venture facility."
+        },
+        {
+            "name": "Annual CO2 Sequestration (Donaldsonville)",
+            "value": "Up to 2 million metric tons",
+            "description": "Capacity of the carbon dioxide dehydration and compression unit for transportation and permanent geological sequestration."
+        }
+    ],
+    "MRK": [
+        {
+            "name": "Alliance revenue - Lynparza",
+            "value": "$1,450 million",
+            "description": "Represents Merck's share of profits for Lynparza, calculated as product sales net of cost of sales and commercialization costs."
+        },
+        {
+            "name": "Alliance revenue - Lenvima",
+            "value": "$1,053 million",
+            "description": "Represents Merck's share of profits for Lenvima, calculated as product sales net of cost of sales and commercialization costs."
+        }
+    ],
+    "VRT": [
+        {
+            "name": "Combined Order Backlog",
+            "value": "$15.0 billion",
+            "description": "Total estimated product and services backlog as of December 31, 2025 for which purchase orders or commitments have been received but not yet delivered."
+        },
+        {
+            "name": "First-Time Fix Rate",
+            "value": ">90%",
+            "description": "The percentage of site emergency visits where issues are resolved on the first attempt."
+        },
+        {
+            "name": "Global Service Centers",
+            "value": ">300",
+            "description": "The number of worldwide service locations utilized to provide standardized customer support."
+        },
+        {
+            "name": "Field Service Engineers",
+            "value": "~5,000",
+            "description": "The approximate number of engineers deployed globally providing around-the-clock direct support."
+        }
+    ],
+    "BEN": [
+        {
+            "name": "Assets Under Management (AUM)",
+            "description": "The total market value of the assets managed by the company on behalf of clients, driving the majority of investment management fees.",
+            "value": "$1,661.2 billion"
+        },
+        {
+            "name": "Net Flows",
+            "description": "The level and direction of client asset inflows and outflows, which alongside market performance, dictates the growth or decline of total AUM."
+        }
+    ],
+    "CEG": [
+        "Capacity Factor",
+        "Refueling Outage Duration",
+        "Dispatch Match",
+        "Renewables Energy Capture"
+    ],
+    "ANET": [
+        {
+            "name": "Top Customer Revenue Concentration",
+            "value": "26%",
+            "description": "Percentage of total revenue derived from the largest customer for the year ended December 31, 2025."
+        },
+        {
+            "name": "Second Largest Customer Revenue Concentration",
+            "value": "16%",
+            "description": "Percentage of total revenue derived from the second largest customer for the year ended December 31, 2025."
+        },
+        {
+            "name": "Etherlink Portfolio Products",
+            "value": "> 20",
+            "description": "Number of products designed to support AI Scale Out, Scale Across, and Scale Up networking use cases."
+        },
+        {
+            "name": "Global Spare Parts Locations",
+            "value": "> 200",
+            "description": "Number of locations worldwide where spare parts are stocked through third-party logistics suppliers."
+        }
+    ],
+    "SHW": [
+        "Number of company-operated specialty paint stores",
+        "Number of company-operated branches",
+        "Intersegment transfers as a percentage of total sales"
+    ],
+    "INTU": [
+        {
+            "name": "Total Platform Customers",
+            "value": "100 million",
+            "description": "Approximate number of consumers, small and mid-market businesses, and accountants served worldwide."
+        },
+        {
+            "name": "Global Business Solutions Revenue Mix",
+            "value": "59%",
+            "description": "Percentage of total revenue contributed by the Global Business Solutions segment in Fiscal 2025."
+        },
+        {
+            "name": "Consumer Revenue Mix",
+            "value": "26%",
+            "description": "Percentage of total revenue contributed by the Consumer segment in Fiscal 2025."
+        },
+        {
+            "name": "Credit Karma Revenue Mix",
+            "value": "12%",
+            "description": "Percentage of total revenue contributed by the Credit Karma segment in Fiscal 2025."
+        },
+        {
+            "name": "ProTax Revenue Mix",
+            "value": "3%",
+            "description": "Percentage of total revenue contributed by the ProTax segment in Fiscal 2025."
+        },
+        {
+            "name": "International Revenue Share",
+            "value": "8%",
+            "description": "Total international net revenue as a percentage of consolidated total net revenue."
+        },
+        {
+            "name": "AI-Enabled Expert Network",
+            "value": "Thousands",
+            "description": "Number of AI-enabled financial, tax, and bookkeeping experts available on the platform."
+        },
+        {
+            "name": "ProAdvisor Accountant Network",
+            "value": "Hundreds of thousands",
+            "description": "Number of accountants in the QuickBooks ProAdvisor program network."
+        }
+    ],
+    "TMUS": [
+        {
+            "name": "Total Customers",
+            "value": "142.4 million",
+            "description": "Total number of postpaid and prepaid wireless communications and broadband customers as of December 31, 2025."
+        },
+        {
+            "name": "Postpaid Service Revenue Share",
+            "value": "81%",
+            "description": "Percentage of total service revenues generated by postpaid customers in 2025."
+        },
+        {
+            "name": "Prepaid Service Revenue Share",
+            "value": "15%",
+            "description": "Percentage of total service revenues generated by prepaid customers in 2025."
+        },
+        {
+            "name": "Wholesale and Other Service Revenue Share",
+            "value": "4%",
+            "description": "Percentage of total service revenues generated by wholesale and other services in 2025."
+        }
+    ],
+    "GE": [],
+    "ALLE": [
+        {
+            "metric": "Brands Portfolio Size",
+            "value": ">40",
+            "context": "Number of brands spanning the company's security and access control solutions portfolio."
+        },
+        {
+            "metric": "Top 10 Customers Revenue Concentration",
+            "value": "26%",
+            "context": "Percentage of total Net revenues represented by the 10 largest customers in 2025."
+        },
+        {
+            "metric": "Largest Single Customer Revenue Concentration",
+            "value": "<10%",
+            "context": "No single customer represented 10% or more of total Net revenues in 2025."
+        },
+        {
+            "metric": "Total Principal Production and Assembly Facilities",
+            "value": 37,
+            "context": "Total number of principal production and assembly facilities globally."
+        },
+        {
+            "metric": "Allegion Americas Segment Facilities",
+            "value": 22,
+            "context": "Number of principal production and assembly facilities in the Allegion Americas segment."
+        },
+        {
+            "metric": "Allegion International Segment Facilities",
+            "value": 15,
+            "context": "Number of principal production and assembly facilities in the Allegion International segment."
+        },
+        {
+            "metric": "Allegion Ventures Second Fund Allocation",
+            "value": "$100 million",
+            "context": "Additional allocation for the second fund to invest in technologies like AI, video monitoring, ML, and cybersecurity."
+        }
+    ],
+    "IBM": [
+        {
+            "name": "Countries of Operation",
+            "value": "over 175",
+            "description": "Number of countries worldwide where IBM does business."
+        },
+        {
+            "name": "International Revenue Share",
+            "value": "about 60%",
+            "description": "Percentage of total revenues derived from sales outside the United States."
+        }
+    ],
+    "KMI": [],
+    "TECH": [
+        {
+            "name": "Protein Sciences Segment Revenue Share",
+            "value": "72%",
+            "description": "Percentage of net sales from the Protein Sciences segment in fiscal 2025."
+        },
+        {
+            "name": "Diagnostics and Spatial Biology Segment Revenue Share",
+            "value": "28%",
+            "description": "Percentage of net revenues from the Diagnostics and Spatial Biology segment in fiscal 2025."
+        },
+        {
+            "name": "New Products Introduced",
+            "value": "Over 400",
+            "description": "Number of new products introduced during fiscal 2025 across major product lines."
+        },
+        {
+            "name": "Total Employees",
+            "value": "3,100",
+            "description": "Total full-time and part-time employees globally as of June 30, 2025."
+        }
+    ],
+    "BA": [],
+    "HSIC": [
+        "Active user base (practices)",
+        "Active user base (consumers)",
+        "Customers worldwide",
+        "Average daily shipped cartons"
+    ],
+    "VRTX": [
+        {
+            "metric": "CF patient population treated with Vertex medicines",
+            "value": "Nearly three quarters of approximately 97,000 people in target regions"
+        },
+        {
+            "metric": "Estimated CF patient population in all target markets",
+            "value": "112,000"
+        },
+        {
+            "metric": "Estimated eligible severe SCD or TDT patient population for CASGEVY in target geographies",
+            "value": "60,000"
+        },
+        {
+            "metric": "Patients who initiated treatment with CASGEVY globally in 2025",
+            "value": "Approximately 300"
+        },
+        {
+            "metric": "Patients who had their first cell collection for CASGEVY globally in 2025",
+            "value": "147"
+        },
+        {
+            "metric": "Patients who received infusions of CASGEVY globally in 2025",
+            "value": "64"
+        },
+        {
+            "metric": "Estimated people prescribed acute pain medicine annually in the U.S.",
+            "value": "Over 80 million"
+        },
+        {
+            "metric": "JOURNAVX prescriptions written and filled (March 2025 - end of 2025)",
+            "value": "More than 550,000"
+        },
+        {
+            "metric": "Individuals with coverage to JOURNAVX (as of Jan 2026)",
+            "value": "More than 200 million"
+        },
+        {
+            "metric": "States providing JOURNAVX coverage via Medicaid (as of Jan 2026)",
+            "value": "21"
+        },
+        {
+            "metric": "Estimated IgAN patient population in the U.S. and Europe",
+            "value": "Approximately 330,000"
+        },
+        {
+            "metric": "Estimated global IgAN diagnosed patient population",
+            "value": "More than 1.5 million"
+        },
+        {
+            "metric": "Estimated AMKD patient population in the U.S. and Europe",
+            "value": "Approximately 150,000"
+        },
+        {
+            "metric": "Estimated AMKD patient population with comorbidities",
+            "value": "Approximately 100,000"
+        }
+    ],
+    "TYL": [
+        "Annualized Recurring Revenue (ARR)",
+        "Voluntary workforce turnover"
+    ],
+    "MAA": [
+        {
+            "name": "Average Effective Rent per Unit (Same Store)",
+            "value": "$1,690",
+            "description": "Average of gross rent amounts, after the effect of leasing concessions, for occupied apartment units plus prevalent market rates asked for unoccupied apartment units, divided by the total number of units for the year ended December 31, 2025."
+        },
+        {
+            "name": "Average Physical Occupancy (Same Store)",
+            "value": "95.6%",
+            "description": "Measurement of the total number of apartment units occupied by residents, representing the average daily physical occupancy for the year ended December 31, 2025."
+        },
+        {
+            "name": "Resident Turnover (Same Store)",
+            "value": "40.2%",
+            "description": "Resident move outs, excluding transfers within the Same Store segment, as a percentage of expiring leases on a trailing twelve-month basis as of December 31, 2025."
+        },
+        {
+            "name": "Funds from Operations (FFO)",
+            "value": "$998.3 million",
+            "description": "FFO attributable to common shareholders and unitholders for the year ended December 31, 2025. Represents net income excluding gains/losses on disposition of operating properties, asset impairment, plus depreciation and amortization of real estate assets."
+        },
+        {
+            "name": "Core Funds from Operations (Core FFO)",
+            "value": "$1,048.4 million",
+            "description": "Core FFO attributable to common shareholders and unitholders for the year ended December 31, 2025. Represents FFO adjusted for items not considered part of core business operations, such as legal costs and casualty-related charges."
+        },
+        {
+            "name": "Adjusted EBITDAre",
+            "value": "$1,246.8 million",
+            "description": "EBITDAre adjusted for items not considered part of core operations, for the year ended December 31, 2025."
+        },
+        {
+            "name": "Net Debt to Adjusted EBITDAre Ratio",
+            "value": "4.3x",
+            "description": "Ratio of net debt to trailing twelve-month Adjusted EBITDAre as of December 31, 2025, used to manage debt levels and maintain investment grade credit ratings."
+        }
+    ],
+    "USB": [],
+    "GPN": [
+        {
+            "name": "Team Members",
+            "value": "26,000",
+            "description": "Total number of team members employed worldwide by the company."
+        }
+    ],
+    "HSY": [],
+    "ALGN": [
+        {
+            "name": "Cumulative Invisalign Patients Treated",
+            "value": "Over 22 million",
+            "description": "Total number of people worldwide who have been treated with the Invisalign System to date."
+        },
+        {
+            "name": "Clear Aligner Revenue Mix",
+            "value": "80%",
+            "description": "Percentage of worldwide net revenues represented by the Clear Aligner segment for the year ended December 31, 2025."
+        },
+        {
+            "name": "Systems and Services Revenue Mix",
+            "value": "20%",
+            "description": "Percentage of worldwide net revenues represented by the Imaging Systems and CAD/CAM Services segment for the year ended December 31, 2025."
+        },
+        {
+            "name": "Market Share of Orthodontic Case Starts",
+            "value": "10%",
+            "description": "Align's estimated global share of the 22 million annual case starts treated through orthodontists."
+        },
+        {
+            "name": "Digital Scan Submission Rate",
+            "value": "More than 95%",
+            "description": "Percentage of Invisalign System prescription orders submitted globally via digital scan rather than PVS impressions."
+        }
+    ],
+    "GPC": [],
+    "EXPE": [
+        {
+            "name": "Total Lodging Properties Available",
+            "value": "3.6 million",
+            "description": "Total lodging properties available across the Expedia Group platforms at the end of 2025."
+        },
+        {
+            "name": "Online Bookable Alternative Accommodations (Vrbo)",
+            "value": "2.4 million",
+            "description": "Number of alternative accommodations available for online booking through the Vrbo brand at the end of 2025."
+        },
+        {
+            "name": "Hotels and Alternative Accommodations (Other Brands)",
+            "value": "1.2 million",
+            "description": "Number of hotels and alternative accommodations available through brands other than Vrbo at the end of 2025."
+        },
+        {
+            "name": "Airlines",
+            "value": "> 500",
+            "description": "Number of airlines available on the platform at the end of 2025."
+        },
+        {
+            "name": "Merchant Model Revenue Share",
+            "value": "70%",
+            "description": "Percentage of total revenue generated by the merchant model for the year ended December 31, 2025."
+        },
+        {
+            "name": "Agency Model Revenue Share",
+            "value": "22%",
+            "description": "Percentage of total revenue generated by the agency model for the year ended December 31, 2025."
+        },
+        {
+            "name": "Advertising, Media and Other Revenue Share",
+            "value": "8%",
+            "description": "Percentage of total revenue generated by the advertising and media model for the year ended December 31, 2025."
+        }
+    ],
+    "WMB": [
+        {
+            "name": "NGL production volumes under fee-based contracts",
+            "value": "93%",
+            "description": "Percentage of NGL production volumes under fee-based contracts for the year ended December 31, 2025"
+        },
+        {
+            "name": "NGL production volumes under noncash commodity-based contracts",
+            "value": "7%",
+            "description": "Percentage of NGL production volumes under noncash commodity-based contracts for the year ended December 31, 2025"
+        },
+        {
+            "name": "Gathering and processing customers",
+            "value": "253",
+            "description": "Approximate number of customers for whom Williams gathered and processed gas during 2025"
+        },
+        {
+            "name": "Top 10 gathering and processing customers revenue share",
+            "value": "55%",
+            "description": "Percentage of gathering and processing fee revenues and NGL margins from noncash commodity-based agreements accounted for by the top ten customers"
+        },
+        {
+            "name": "Top 10 interstate natural gas pipeline customers revenue share",
+            "value": "44%",
+            "description": "Percentage of regulated interstate natural gas transportation and storage revenues accounted for by the top ten customers"
+        },
+        {
+            "name": "Top 3 natural gas storage customers revenue share",
+            "value": "20%",
+            "description": "Percentage of standalone, market-based rate natural gas storage operating revenues accounted for by the three largest customers"
+        },
+        {
+            "name": "Top 3 natural gas marketing customers sales share",
+            "value": "8%",
+            "description": "Percentage of gross natural gas marketing sales accounted for by the three largest natural gas marketing customers"
+        },
+        {
+            "name": "Top 3 NGL marketing customers sales share",
+            "value": "42%",
+            "description": "Percentage of NGL marketing sales accounted for by the three largest NGL marketing customers"
+        },
+        {
+            "name": "Transco system design capacity",
+            "value": "20.6 MMdth/d",
+            "description": "Design capacity of the Transco pipeline system"
+        },
+        {
+            "name": "NWP system design capacity",
+            "value": "3.8 MMdth/d",
+            "description": "Design capacity of the NWP pipeline system"
+        },
+        {
+            "name": "MountainWest system design capacity",
+            "value": "8.4 MMdth/d",
+            "description": "Design capacity of the MountainWest pipeline system"
+        },
+        {
+            "name": "Total natural gas storage capacity",
+            "value": "423 Bcf",
+            "description": "Total natural gas storage capacity available across WMB operations"
+        },
+        {
+            "name": "Total NGL storage capacity",
+            "value": "23 million barrels",
+            "description": "Approximate NGL storage capacity available across WMB operations"
+        }
+    ],
+    "DHR": [],
+    "EA": [
+        {
+            "name": "Player Network",
+            "value": "Hundreds of millions",
+            "description": "The estimated size of EA's global online communities engaging with their games and services."
+        },
+        {
+            "name": "Digital Live Services and Other Net Revenue Share",
+            "value": "71%",
+            "description": "Percentage of total net revenue generated outside of full game sales, including extra content and subscriptions, during fiscal year 2026."
+        },
+        {
+            "name": "Direct Sales to Sony",
+            "value": "39%",
+            "description": "Percentage of total net revenue derived from direct sales through Sony PlayStation consoles in fiscal year 2026."
+        },
+        {
+            "name": "Direct Sales to Microsoft",
+            "value": "16%",
+            "description": "Percentage of total net revenue derived from direct sales through Microsoft Xbox consoles in fiscal year 2026."
+        },
+        {
+            "name": "Global Employees",
+            "value": "14,600",
+            "description": "Approximate global employee headcount as of March 31, 2026, with 71% located internationally."
+        }
+    ],
+    "AWK": [],
+    "FIX": [
+        {
+            "metric": "Backlog (Aggregate Contract Value of Projects in Process)",
+            "value": "$24.17 billion"
+        },
+        {
+            "metric": "Projects in Process",
+            "value": "8,427"
+        },
+        {
+            "metric": "Average Contract Price",
+            "value": "$2.9 million"
+        },
+        {
+            "metric": "Large Contracts in Progress (> $2 million)",
+            "value": "1,668"
+        },
+        {
+            "metric": "Largest Project in Progress",
+            "value": "$496.9 million"
+        }
+    ],
+    "TSCO": [
+        "Comparable Store Sales",
+        "Transaction Count",
+        "Transaction Value",
+        "Store Count",
+        "Selling Square Footage"
+    ],
+    "IEX": [
+        {
+            "name": "HST Segment Adjusted EBITDA Share",
+            "value": "39%",
+            "description": "Percentage of total Segment Adjusted EBITDA contributed by the Health & Science Technologies (HST) segment in 2025."
+        },
+        {
+            "name": "FMT Segment Adjusted EBITDA Share",
+            "value": "40%",
+            "description": "Percentage of total Segment Adjusted EBITDA contributed by the Fluid & Metering Technologies (FMT) segment in 2025."
+        },
+        {
+            "name": "FSDP Segment Adjusted EBITDA Share",
+            "value": "21%",
+            "description": "Percentage of total Segment Adjusted EBITDA contributed by the Fire & Safety/Diversified Products (FSDP) segment in 2025."
+        },
+        {
+            "name": "Unallocated Corporate Costs",
+            "value": "$92.2 million",
+            "description": "Corporate costs excluded from the Segment Adjusted EBITDA calculation for 2025."
+        },
+        {
+            "name": "International Sales Mix",
+            "value": "49%",
+            "description": "Percentage of total IDEX sales to customers outside the United States in 2025."
+        }
+    ],
+    "IDXX": [
+        "Catalyst Installed Base",
+        "Premium Hematology Installed Base",
+        "SediVue Dx Installed Base",
+        "IDEXX inVue Dx Installed Base",
+        "U.S. average diagnostics revenue per practice",
+        "U.S. same-store clinical visits"
+    ],
+    "URI": [
+        {
+            "name": "Total Original Equipment Cost (OEC)",
+            "value": "$22.5 billion",
+            "description": "Total original cost of the company's fleet of rental equipment."
+        },
+        {
+            "name": "Average OEC Growth",
+            "value": "3.9%",
+            "description": "Year-over-year percentage increase in the average original equipment cost."
+        },
+        {
+            "name": "Fleet Productivity Growth",
+            "value": "2.2%",
+            "description": "Comprehensive metric reflecting the combined impact of changes in rental rates, time utilization, and mix on owned equipment rental revenue (2.0% on a pro forma basis)."
+        },
+        {
+            "name": "Key Account Revenue Concentration",
+            "value": "69%",
+            "description": "Percentage of equipment rental revenue derived from key accounts."
+        },
+        {
+            "name": "Adjusted EBITDA",
+            "value": "$7,328 million",
+            "description": "Earnings before interest, taxes, depreciation, and amortization, adjusted for restructuring charges, stock compensation, and fair value mark-up of acquired fleet."
+        },
+        {
+            "name": "Adjusted EBITDA Margin",
+            "value": "45.5%",
+            "description": "Adjusted EBITDA as a percentage of total revenue."
+        },
+        {
+            "name": "Ancillary Fees Contribution",
+            "value": "18%",
+            "description": "Percentage of equipment rental revenue derived from ancillary fees such as delivery, pick-up, damage protection, and fuel."
+        }
+    ],
+    "JBHT": [
+        {
+            "segment": "JBI",
+            "metric": "Revenue",
+            "value": "5.98",
+            "unit": "Billions USD"
+        },
+        {
+            "segment": "JBI",
+            "metric": "Company-owned trailing equipment",
+            "value": "124838",
+            "unit": "Units"
+        },
+        {
+            "segment": "JBI",
+            "metric": "Chassis fleet",
+            "value": "104474",
+            "unit": "Units"
+        },
+        {
+            "segment": "JBI",
+            "metric": "Company-owned tractors",
+            "value": "5880",
+            "unit": "Units"
+        },
+        {
+            "segment": "JBI",
+            "metric": "Independent contractor trucks",
+            "value": "308",
+            "unit": "Units"
+        },
+        {
+            "segment": "JBI",
+            "metric": "Employees",
+            "value": "8704",
+            "unit": "Count"
+        },
+        {
+            "segment": "DCS",
+            "metric": "Revenue",
+            "value": "3.38",
+            "unit": "Billions USD"
+        },
+        {
+            "segment": "DCS",
+            "metric": "Company-owned trucks",
+            "value": "11878",
+            "unit": "Units"
+        },
+        {
+            "segment": "DCS",
+            "metric": "Customer-owned trucks",
+            "value": "761",
+            "unit": "Units"
+        },
+        {
+            "segment": "DCS",
+            "metric": "Owned trailing equipment",
+            "value": "26767",
+            "unit": "Units"
+        },
+        {
+            "segment": "DCS",
+            "metric": "Customer-owned trailers",
+            "value": "5218",
+            "unit": "Units"
+        },
+        {
+            "segment": "DCS",
+            "metric": "Employees",
+            "value": "15131",
+            "unit": "Count"
+        },
+        {
+            "segment": "ICS",
+            "metric": "Revenue",
+            "value": "1.11",
+            "unit": "Billions USD"
+        },
+        {
+            "segment": "ICS",
+            "metric": "Available third-party carriers",
+            "value": "126000",
+            "unit": "Count"
+        },
+        {
+            "segment": "ICS",
+            "metric": "Employees",
+            "value": "575",
+            "unit": "Count"
+        },
+        {
+            "segment": "FMS",
+            "metric": "Revenue",
+            "value": "824",
+            "unit": "Millions USD"
+        },
+        {
+            "segment": "FMS",
+            "metric": "Company-owned trucks",
+            "value": "1085",
+            "unit": "Units"
+        },
+        {
+            "segment": "FMS",
+            "metric": "Customer-owned trucks",
+            "value": "169",
+            "unit": "Units"
+        },
+        {
+            "segment": "FMS",
+            "metric": "Independent contractor trucks",
+            "value": "39",
+            "unit": "Units"
+        },
+        {
+            "segment": "FMS",
+            "metric": "Owned trailing equipment",
+            "value": "1091",
+            "unit": "Units"
+        },
+        {
+            "segment": "FMS",
+            "metric": "Customer-owned trailers",
+            "value": "98",
+            "unit": "Units"
+        },
+        {
+            "segment": "FMS",
+            "metric": "Employees",
+            "value": "2271",
+            "unit": "Count"
+        },
+        {
+            "segment": "JBT",
+            "metric": "Revenue",
+            "value": "734",
+            "unit": "Millions USD"
+        },
+        {
+            "segment": "JBT",
+            "metric": "Company-owned trailers",
+            "value": "12658",
+            "unit": "Units"
+        },
+        {
+            "segment": "JBT",
+            "metric": "Independent contractors",
+            "value": "2003",
+            "unit": "Count"
+        },
+        {
+            "segment": "JBT",
+            "metric": "Employees",
+            "value": "276",
+            "unit": "Count"
+        },
+        {
+            "segment": "Total",
+            "metric": "Total Employees",
+            "value": "31750",
+            "unit": "Count"
+        },
+        {
+            "segment": "Total",
+            "metric": "Company drivers",
+            "value": "21554",
+            "unit": "Count"
+        },
+        {
+            "segment": "Total",
+            "metric": "Company-owned tractor and truck fleet",
+            "value": "18843",
+            "unit": "Units"
+        },
+        {
+            "segment": "Total",
+            "metric": "Average age of tractor fleet",
+            "value": "2.7",
+            "unit": "Years"
+        },
+        {
+            "segment": "Total",
+            "metric": "Average age of containers",
+            "value": "10.5",
+            "unit": "Years"
+        },
+        {
+            "segment": "Total",
+            "metric": "Average age of trailers",
+            "value": "7.1",
+            "unit": "Years"
+        }
+    ],
+    "TRGP": [
+        {
+            "name": "New Cryogenic Natural Gas Processing Plant Capacity",
+            "value": "275 MMcf/d",
+            "description": "Standard capacity for new natural gas processing plant additions across the Permian Basin."
+        },
+        {
+            "name": "Reactivated GCF Fractionation Facility Capacity",
+            "value": "135 MBbl/d",
+            "description": "Capacity of the Gulf Coast Fractionators facility reactivated in Q1 2025."
+        },
+        {
+            "name": "New Fractionation Train Capacity",
+            "value": "150 MBbl/d",
+            "description": "Capacity of each new fractionation train addition in Mont Belvieu, Texas."
+        },
+        {
+            "name": "Speedway NGL Pipeline Initial Capacity",
+            "value": "500 MBbl/d",
+            "description": "Initial transportation capacity of the planned Speedway NGL Pipeline, expandable to 1,000 MBbl/d."
+        },
+        {
+            "name": "Effective LPG Export Capacity",
+            "value": "19 MMBbl per month",
+            "description": "Expected export capacity at the Galena Park Marine Terminal following its planned expansion."
+        },
+        {
+            "name": "Blackcomb Pipeline Capacity",
+            "value": "2.5 Bcf/d",
+            "description": "Design transportation capacity of the natural gas pipeline from the Permian Basin to the Agua Dulce area."
+        },
+        {
+            "name": "Traverse Pipeline Capacity",
+            "value": "2.5 Bcf/d",
+            "description": "Design transportation capacity of the bi-directional natural gas pipeline between Agua Dulce and Katy."
+        },
+        {
+            "name": "Stakeholder Acquisition Processing Capacity",
+            "value": "180 MMcf/d",
+            "description": "Cryogenic natural gas processing and sour treating capacity acquired through Stakeholder Midstream."
+        },
+        {
+            "name": "Maintenance Capital Expenditures",
+            "value": "$234 million",
+            "description": "Three-year average of annual capital expenditures allocated for routine maintenance."
+        }
+    ],
+    "STX": [
+        {
+            "name": "Total HDD Exabytes Shipped",
+            "value": "595",
+            "description": "Total storage capacity in exabytes of hard disk drives shipped during the fiscal year."
+        },
+        {
+            "name": "Mass Capacity HDD Exabytes Shipped",
+            "value": "552",
+            "description": "Storage capacity in exabytes shipped specifically for the mass capacity market."
+        },
+        {
+            "name": "Legacy HDD Exabytes Shipped",
+            "value": "43",
+            "description": "Storage capacity in exabytes shipped specifically for the legacy market."
+        },
+        {
+            "name": "HDD Price per Terabyte",
+            "value": "$14",
+            "description": "Average price per terabyte for hard disk drives shipped."
+        }
+    ],
+    "DTE": [],
+    "ARE": [
+        {
+            "name": "Occupancy Percentage",
+            "description": "The percentage of operating properties that are occupied, used to gauge the utilization of the real estate portfolio."
+        },
+        {
+            "name": "Rentable Square Feet (RSF)",
+            "description": "The total footprint of operating properties, as well as properties undergoing construction or redevelopment, measuring the scale of the portfolio."
+        },
+        {
+            "name": "Investment-Grade / Large Cap Tenant Percentage",
+            "description": "The percentage of total annual rental revenue derived from investment-grade or publicly traded large cap tenants, indicating the quality and stability of the tenant base."
+        }
+    ],
+    "SJM": [
+        "Volume/Mix",
+        "Comparable Net Sales"
+    ],
+    "WY": [
+        {
+            "name": "Scope 1 carbon emissions",
+            "description": "Direct greenhouse gas emissions primarily attributable to fuel usage within wood products mills and fertilizer application in timberlands.",
+            "value": "0.4 million mtCO2e"
+        },
+        {
+            "name": "Scope 2 carbon emissions",
+            "description": "Indirect greenhouse gas emissions from purchased energy (both location- and market-based).",
+            "value": "0.4 million mtCO2e"
+        },
+        {
+            "name": "Scope 3 carbon emissions",
+            "description": "Indirect emissions across the value chain, primarily generated by customers who purchase wood fiber and the end-of-life emissions of products sold.",
+            "value": "9.0 million mtCO2e"
+        },
+        {
+            "name": "Direct carbon removals",
+            "description": "The increase in above-ground carbon in U.S. timberlands attributable to forest growth and management practices after accounting for harvest and mortality.",
+            "value": "10 million mtCO2e"
+        },
+        {
+            "name": "Indirect carbon removals",
+            "description": "Carbon stored across the value chain, primarily in the company's own long-lived wood products and products customers make from logs.",
+            "value": "27 million mtCO2e"
+        },
+        {
+            "name": "Recordable Incident Rate",
+            "description": "The number of Occupational Safety and Health Administration-defined recordable injuries and illnesses that occur per 100 workers working in one year.",
+            "value": "2.17"
+        }
+    ],
+    "WFC": [],
+    "BX": [
+        "Total Assets Under Management",
+        "Fee-Earning Assets Under Management",
+        "Perpetual Capital"
+    ],
+    "DXCM": [
+        {
+            "metric": "MARD (Mean Absolute Relative Difference)",
+            "value": "8.0%"
+        },
+        {
+            "metric": "Values within 20% of comparator",
+            "value": "94.2%"
+        },
+        {
+            "metric": "Sensor wear period (G7 15 Day)",
+            "value": "15.5 days"
+        },
+        {
+            "metric": "Sensor wear period (G7)",
+            "value": "10 days"
+        },
+        {
+            "metric": "Sensor warm-up time (G7)",
+            "value": "30 minutes"
+        },
+        {
+            "metric": "Sensor warm-up time (G7 15 Day)",
+            "value": "60 minutes"
+        },
+        {
+            "metric": "Sensor replacement grace period",
+            "value": "12 hours"
+        },
+        {
+            "metric": "Transmitter size reduction (G7 vs G6)",
+            "value": "60%"
+        }
+    ],
+    "MAS": [
+        {
+            "name": "Net sales, excluding divestitures",
+            "value": "$7,562 million",
+            "description": "Net sales adjusted to exclude the impact of divestitures."
+        },
+        {
+            "name": "Net sales, excluding divestitures and the effect of currency translation",
+            "value": "$7,517 million",
+            "description": "Net sales adjusted for both divestitures and foreign currency translation effects to reflect organic top-line performance."
+        },
+        {
+            "name": "Operating profit, excluding rationalization charges and impairment charge",
+            "value": "$1,272 million",
+            "description": "Adjusted operating profit removing the effects of rationalization charges and impairment charges for other intangible assets."
+        },
+        {
+            "name": "Operating profit margin, excluding rationalization charges and impairment charge",
+            "value": "16.8%",
+            "description": "Adjusted operating profit margin removing the effects of rationalization and impairment charges."
+        },
+        {
+            "name": "Working capital as a percentage of net sales",
+            "value": "16.7%",
+            "description": "Measures working capital (receivables plus inventories, less accounts payable) relative to net sales."
+        }
+    ],
+    "LHX": [
+        {
+            "name": "Contractual Backlog",
+            "value": "$38.7 billion",
+            "description": "Represents expected future revenue from firm orders and contracts as of the end of fiscal 2025."
+        },
+        {
+            "name": "U.S. Government Revenue Concentration",
+            "value": "75%",
+            "description": "Percentage of fiscal 2025 revenue derived from sales to U.S. Government customers, including direct and foreign military sales."
+        },
+        {
+            "name": "Fixed-Price Contracts Concentration",
+            "value": "75%",
+            "description": "Percentage of fiscal 2025 revenue derived from fixed-price contracts, which subject the company to the risk of potential cost overruns."
+        },
+        {
+            "name": "Technical Workforce",
+            "value": "18,000",
+            "description": "Number of engineers and scientists employed out of the 45,000 total employees as of January 2, 2026."
+        }
+    ],
+    "ABBV": [
+        {
+            "name": "Maximum Wholesale Distributor Concentration",
+            "value": "43%",
+            "description": "The maximum percentage of AbbVie's 2025 gross revenues in the United States accounted for by a single wholesale distributor."
+        }
+    ],
+    "HPE": [
+        {
+            "name": "Annualized Revenue Run-Rate (ARR)",
+            "description": "A forward-looking metric used to project anticipated revenue, typically associated with recurring revenue from as-a-service (aaS) and flexible consumption models like HPE GreenLake."
+        },
+        {
+            "name": "Order Backlog",
+            "description": "A metric representing the value of customer orders that have been received but not yet fulfilled or recognized as revenue."
+        }
+    ],
+    "EQR": [
+        {
+            "name": "Physical Occupancy",
+            "value": "Strong (Qualitative)",
+            "type": "Operational Metric"
+        },
+        {
+            "name": "Turnover",
+            "value": "Low (Qualitative)",
+            "type": "Operational Metric"
+        },
+        {
+            "name": "Renewal rate growth",
+            "value": "Strong (Qualitative)",
+            "type": "Operational Metric"
+        },
+        {
+            "name": "Employee engagement score",
+            "value": "87%",
+            "type": "Human Capital Metric"
+        },
+        {
+            "name": "Employee survey participation",
+            "value": "90%",
+            "type": "Human Capital Metric"
+        },
+        {
+            "name": "Inclusion index score",
+            "value": "85%",
+            "type": "Human Capital Metric"
+        }
+    ],
+    "CCI": [
+        {
+            "metric": "Towers and other structures",
+            "value": "40,000+"
+        },
+        {
+            "metric": "Small cell nodes",
+            "value": "105,000"
+        },
+        {
+            "metric": "Route miles of fiber",
+            "value": "90,000"
+        },
+        {
+            "metric": "Adjusted Site Rental Gross Margin (owned land)",
+            "value": "40%"
+        },
+        {
+            "metric": "Adjusted Site Rental Gross Margin (leased/managed land)",
+            "value": "60%"
+        },
+        {
+            "metric": "Average remaining life of tenant contracts",
+            "value": "6 years"
+        },
+        {
+            "metric": "Expected future cash inflows from tenant contracts",
+            "value": "$23.7 billion"
+        },
+        {
+            "metric": "Tenant retention rate",
+            "value": "98%-99%"
+        },
+        {
+            "metric": "Average number of tenants per tower",
+            "value": "2.4"
+        }
+    ],
+    "IFF": [
+        {
+            "metric": "Sales in the U.S. as Percentage of Total Sales",
+            "value": "28%"
+        },
+        {
+            "metric": "Granted U.S. Patents",
+            "value": "849"
+        },
+        {
+            "metric": "Pending U.S. Patent Applications",
+            "value": "451"
+        },
+        {
+            "metric": "Global R&D Employees",
+            "value": "3,000"
+        },
+        {
+            "metric": "Different Raw Materials Sourced",
+            "value": "20,000"
+        },
+        {
+            "metric": "Manufacturing Facilities, Creative Centers and Application Laboratories",
+            "value": "170"
+        },
+        {
+            "metric": "Total Worldwide Employees",
+            "value": "21,500"
+        },
+        {
+            "metric": "Total U.S. Employees",
+            "value": "5,500"
+        }
+    ],
+    "EME": [
+        {
+            "metric": "Construction Operations Revenue Share",
+            "value": "72%"
+        },
+        {
+            "metric": "Building Services Operations Revenue Share",
+            "value": "21%"
+        },
+        {
+            "metric": "Industrial Services Operations Revenue Share",
+            "value": "7%"
+        },
+        {
+            "metric": "Large Projects (>$10M) Revenue Share",
+            "value": "58%"
+        },
+        {
+            "metric": "Small Projects (<$10M) Revenue Share",
+            "value": "42%"
+        },
+        {
+            "metric": "Total Employees",
+            "value": "44,000"
+        },
+        {
+            "metric": "Union Representation",
+            "value": "62%"
+        }
+    ],
+    "EIX": [
+        {
+            "name": "Core Earnings",
+            "value": "$2,520 million (2025) / $1,900 million (2024)",
+            "description": "Non-GAAP financial measure defined as earnings available to Edison International shareholders less non-core items. Used internally for financial planning and performance analysis."
+        },
+        {
+            "name": "Total Capital Expenditures",
+            "value": "$6.7 billion (2025) / $5.7 billion (2024)",
+            "description": "Total capital expenditures reflecting planned grid investments, wildfire mitigation, and system readiness. Forecasted to reach $40.6 billion from 2026 to 2030."
+        },
+        {
+            "name": "Year-End Rate Base",
+            "value": "$48.2 billion (2025) / $45.7 billion (2024)",
+            "description": "SCE's authorized rate base, determining the return on capital investments, projected to grow to $67.9 billion by 2030."
+        },
+        {
+            "name": "Carbon-Free Energy Deliveries",
+            "value": "61%",
+            "description": "Estimated percentage of SCE's customer deliveries in 2025 coming from carbon-free resources."
+        },
+        {
+            "name": "Authorized Return on Equity (ROE)",
+            "value": "10.03%",
+            "description": "CPUC-authorized return on equity for SCE covering the 2026-2028 period."
+        },
+        {
+            "name": "EV Charge Ports Constructed",
+            "value": "9,761 ports",
+            "description": "Number of light-duty charge ports completed across 572 sites under SCE's Charge Ready programs as of December 31, 2025."
+        }
+    ],
+    "CDW": [],
+    "RJF": [
+        {
+            "name": "Client assets under administration (AUA) - PCG segment",
+            "unit": "Trillions"
+        },
+        {
+            "name": "Fee-based client assets under administration (AUA) - PCG segment",
+            "unit": "Trillions"
+        },
+        {
+            "name": "Employee and independent contractor financial advisors",
+            "unit": "Count"
+        },
+        {
+            "name": "Client assets under administration (AUA) - RCS division",
+            "unit": "Billions"
+        },
+        {
+            "name": "Total associates",
+            "unit": "Count"
+        },
+        {
+            "name": "Employee financial advisors",
+            "unit": "Count"
+        },
+        {
+            "name": "Independent advisors",
+            "unit": "Count"
+        },
+        {
+            "name": "Securities-based and residential mortgage loans to Bank segment total assets",
+            "unit": "Percentage"
+        },
+        {
+            "name": "Corporate and tax exempt loans to Bank segment total assets",
+            "unit": "Percentage"
+        }
+    ],
+    "DVA": [
+        {
+            "name": "U.S. Outpatient Dialysis Centers",
+            "unit": "Count"
+        },
+        {
+            "name": "U.S. Dialysis Patients",
+            "unit": "Count"
+        },
+        {
+            "name": "International Outpatient Dialysis Centers",
+            "unit": "Count"
+        },
+        {
+            "name": "International Dialysis Patients",
+            "unit": "Count"
+        },
+        {
+            "name": "Patients in Risk-Based Integrated Care Arrangements",
+            "unit": "Count"
+        },
+        {
+            "name": "U.S. Dialysis Patient Service Revenues by Payor",
+            "unit": "Percentage"
+        }
+    ],
+    "UL": [
+        {
+            "name": "Prepaid Customer Base",
+            "unit": "Count"
+        },
+        {
+            "name": "Wholesale Customer Base",
+            "unit": "Count"
+        },
+        {
+            "name": "Churn",
+            "unit": "Percentage"
+        }
+    ],
+    "V": [
+        {
+            "name": "Non-GAAP operating expenses",
+            "unit": "Millions"
+        },
+        {
+            "name": "Non-GAAP net income",
+            "unit": "Millions"
+        },
+        {
+            "name": "Non-GAAP diluted earnings per share",
+            "unit": "Dollars"
+        },
+        {
+            "name": "Nominal payments volume",
+            "unit": "Billions"
+        },
+        {
+            "name": "Constant payments volume growth",
+            "unit": "Percentage"
+        },
+        {
+            "name": "Cash volume",
+            "unit": "Billions"
+        },
+        {
+            "name": "Total nominal volume",
+            "unit": "Billions"
+        },
+        {
+            "name": "Processed transactions",
+            "unit": "Millions"
+        },
+        {
+            "name": "Nominal cross-border volume growth",
+            "unit": "Percentage"
+        }
+    ],
+    "TSLA": [
+        {
+            "name": "Consumer Vehicle Production",
+            "type": "number",
+            "unit": "vehicles",
+            "values": {
+                "2025": 1660000
+            }
+        },
+        {
+            "name": "Consumer Vehicle Deliveries",
+            "type": "number",
+            "unit": "vehicles",
+            "values": {
+                "2025": 1640000
+            }
+        },
+        {
+            "name": "Energy Storage Deployments",
+            "type": "number",
+            "unit": "GWh",
+            "values": {
+                "2025": 46.7
+            }
+        },
+        {
+            "name": "Employee Headcount",
+            "type": "number",
+            "unit": "employees",
+            "values": {
+                "2025": 134785
+            }
+        }
+    ],
+    "LLY": [],
+    "IBKR": [
+        {
+            "name": "Brokerage Customers",
+            "unit": "Millions"
+        }
+    ],
+    "GOOGL": [
+        {
+            "name": "Products with over 500 million users",
+            "unit": "Count"
+        },
+        {
+            "name": "Products with over 2 billion users",
+            "unit": "Count"
+        },
+        {
+            "name": "Annual Google Searches",
+            "unit": "Trillions"
+        },
+        {
+            "name": "Percentage of revenues from online advertising",
+            "unit": "Percentage"
+        },
+        {
+            "name": "Employee Headcount",
+            "unit": "Count"
+        }
+    ],
+    "BRO": [],
+    "DOV": [
+        {
+            "name": "Organic Sales Growth",
+            "unit": "Percentage"
+        },
+        {
+            "name": "Return on Invested Capital (ROIC)",
+            "unit": "Percentage"
+        },
+        {
+            "name": "Free Cash Flow",
+            "unit": "Millions"
+        },
+        {
+            "name": "Earnings Margin",
+            "unit": "Percentage"
+        },
+        {
+            "name": "Recurring Demand",
+            "unit": "Percentage"
+        },
+        {
+            "name": "Capital Spending",
+            "unit": "Percentage"
+        }
+    ],
+    "ETR": [],
+    "HST": [
+        {
+            "name": "RevPAR (Revenue per available room)",
+            "unit": "Currency"
+        },
+        {
+            "name": "EBITDA (Earnings before interest, taxes, depreciation and amortization)",
+            "unit": "Currency"
+        },
+        {
+            "name": "Net debt-to-EBITDA ratio (Leverage Ratio)",
+            "unit": "Ratio"
+        },
+        {
+            "name": "Occupancy",
+            "unit": "Percentage"
+        },
+        {
+            "name": "Total Energy Consumption",
+            "unit": "Energy Measurement Units"
+        },
+        {
+            "name": "Total Water Consumption",
+            "unit": "Volume Measurement Units"
+        }
+    ],
+    "AON": [
+        {
+            "name": "EBITA (Earnings before Interest, Taxes, and Amortization)",
+            "unit": "Millions"
+        },
+        {
+            "name": "EBITDA (Earnings before Interest, Taxes, Depreciation, and Amortization)",
+            "unit": "Millions"
+        },
+        {
+            "name": "Market Derived Income (MDI)",
+            "unit": "Millions"
+        },
+        {
+            "name": "Assets Under Management (AUM)",
+            "unit": "Millions"
+        }
+    ],
+    "ROST": [
+        {
+            "name": "Comparable store sales",
+            "unit": "Percentage"
+        },
+        {
+            "name": "Non-comp store sales",
+            "unit": "Millions"
+        },
+        {
+            "name": "Traffic",
+            "unit": "Percentage"
+        },
+        {
+            "name": "Basket",
+            "unit": "Percentage"
+        },
+        {
+            "name": "Accounts payable leverage",
+            "unit": "Percentage"
+        },
+        {
+            "name": "Packaway inventory",
+            "unit": "Percentage"
+        },
+        {
+            "name": "Total selling square footage",
+            "unit": "Millions"
+        },
+        {
+            "name": "Store count",
+            "unit": "Count"
+        }
+    ],
+    "CVX": [
+        {
+            "name": "Return on Capital Employed",
+            "unit": "Percentage"
+        },
+        {
+            "name": "Oil production GHG intensity",
+            "unit": "kg CO2e/boe"
+        },
+        {
+            "name": "Gas production GHG intensity",
+            "unit": "kg CO2e/boe"
+        },
+        {
+            "name": "Methane intensity",
+            "unit": "kg CO2e/boe"
+        },
+        {
+            "name": "Flaring GHG intensity",
+            "unit": "kg CO2e/boe"
+        },
+        {
+            "name": "Portfolio Carbon Intensity (PCI)",
+            "unit": "g CO2e/MJ"
+        }
+    ],
+    "HPQ": [],
+    "DHI": [
+        {
+            "name": "Homes Closed",
+            "unit": "Count"
+        },
+        {
+            "name": "Average Closing Price",
+            "unit": "Dollars"
+        },
+        {
+            "name": "Single-family Rental Homes Closed",
+            "unit": "Count"
+        },
+        {
+            "name": "Multi-family Rental Units Closed",
+            "unit": "Count"
+        },
+        {
+            "name": "Lots Sold",
+            "unit": "Count"
+        },
+        {
+            "name": "Mortgage Loans Originated or Brokered",
+            "unit": "Count"
+        },
+        {
+            "name": "Mortgage Capture Rate",
+            "unit": "Percentage"
+        },
+        {
+            "name": "Sales Order Backlog Value",
+            "unit": "Millions"
+        },
+        {
+            "name": "Sales Order Backlog Homes",
+            "unit": "Count"
+        },
+        {
+            "name": "Average Sales Price of Homes in Backlog",
+            "unit": "Dollars"
+        },
+        {
+            "name": "Sales Contract Cancellation Rate",
+            "unit": "Percentage"
+        }
+    ],
+    "MSFT": [
+        {
+            "name": "Microsoft Cloud revenue",
+            "type": "number",
+            "unit": "USD",
+            "values": {
+                "2025": 168900000000,
+                "2024": 137700000000,
+                "2023": 111600000000
+            }
+        },
+        {
+            "name": "Microsoft 365 Consumer subscribers",
+            "type": "number",
+            "unit": "subscribers",
+            "values": {
+                "2025": 89000000,
+                "2024": 82400000
+            }
+        },
+        {
+            "name": "LinkedIn revenue",
+            "type": "number",
+            "unit": "USD",
+            "values": {
+                "2025": 17812000000,
+                "2024": 16372000000,
+                "2023": 14989000000
+            }
+        },
+        {
+            "name": "Windows OEM and Devices revenue",
+            "type": "number",
+            "unit": "USD",
+            "values": {
+                "2025": 17314000000,
+                "2024": 17026000000,
+                "2023": 17147000000
+            }
+        },
+        {
+            "name": "Commercial remaining performance obligation",
+            "type": "number",
+            "unit": "USD",
+            "values": {
+                "2025": 368000000000
+            }
+        },
+        {
+            "name": "Server products and cloud services revenue",
+            "type": "number",
+            "unit": "USD",
+            "values": {
+                "2025": 98435000000,
+                "2024": 79828000000,
+                "2023": 65007000000
+            }
+        },
+        {
+            "name": "Microsoft 365 Commercial products and cloud services revenue",
+            "type": "number",
+            "unit": "USD",
+            "values": {
+                "2025": 87767000000,
+                "2024": 76969000000,
+                "2023": 66949000000
+            }
+        },
+        {
+            "name": "Gaming revenue",
+            "type": "number",
+            "unit": "USD",
+            "values": {
+                "2025": 23455000000,
+                "2024": 21503000000,
+                "2023": 15466000000
+            }
+        },
+        {
+            "name": "Search and news advertising revenue",
+            "type": "number",
+            "unit": "USD",
+            "values": {
+                "2025": 13878000000,
+                "2024": 12306000000,
+                "2023": 12125000000
+            }
+        },
+        {
+            "name": "Dynamics products and cloud services revenue",
+            "type": "number",
+            "unit": "USD",
+            "values": {
+                "2025": 7827000000,
+                "2024": 6831000000,
+                "2023": 5796000000
+            }
+        },
+        {
+            "name": "Enterprise and partner services revenue",
+            "type": "number",
+            "unit": "USD",
+            "values": {
+                "2025": 7760000000,
+                "2024": 7594000000,
+                "2023": 7900000000
+            }
+        },
+        {
+            "name": "Microsoft 365 Consumer products and cloud services revenue",
+            "type": "number",
+            "unit": "USD",
+            "values": {
+                "2025": 7404000000,
+                "2024": 6648000000,
+                "2023": 6417000000
+            }
+        }
+    ],
+    "AAPL": [
+        {
+            "name": "Full-time equivalent employees",
+            "type": "number",
+            "unit": "employees",
+            "values": {
+                "2025": 166000
+            }
+        },
+        {
+            "name": "Net sales share through direct distribution channel",
+            "type": "percentage",
+            "unit": "%",
+            "values": {
+                "2025": 40
+            }
+        },
+        {
+            "name": "Net sales share through indirect distribution channel",
+            "type": "percentage",
+            "unit": "%",
+            "values": {
+                "2025": 60
+            }
+        }
+    ],
+    "CRM": [
+        {
+            "name": "Total Remaining Performance Obligation",
+            "type": "number",
+            "unit": "billions USD",
+            "values": {
+                "2026": 72.4,
+                "2025": 63.4
+            }
+        },
+        {
+            "name": "Current Remaining Performance Obligation",
+            "type": "number",
+            "unit": "billions USD",
+            "values": {
+                "2026": 35.1,
+                "2025": 30.2
+            }
+        },
+        {
+            "name": "Attrition Rate (excluding Slack self-service and current year acquisitions)",
+            "type": "number",
+            "unit": "percent",
+            "values": {
+                "2026": 8,
+                "2025": 8
+            }
+        },
+        {
+            "name": "Agentforce Sales Subscription and Support Revenue",
+            "type": "number",
+            "unit": "millions USD",
+            "values": {
+                "2026": 9028,
+                "2025": 8322
+            }
+        },
+        {
+            "name": "Agentforce Service Subscription and Support Revenue",
+            "type": "number",
+            "unit": "millions USD",
+            "values": {
+                "2026": 9818,
+                "2025": 9054
+            }
+        },
+        {
+            "name": "Agentforce 360 Platform, Slack and Other Subscription and Support Revenue",
+            "type": "number",
+            "unit": "millions USD",
+            "values": {
+                "2026": 8882,
+                "2025": 7247
+            }
+        },
+        {
+            "name": "Agentforce Marketing and Agentforce Commerce Subscription and Support Revenue",
+            "type": "number",
+            "unit": "millions USD",
+            "values": {
+                "2026": 5428,
+                "2025": 5281
+            }
+        },
+        {
+            "name": "Agentforce Integration and Agentforce Analytics Subscription and Support Revenue",
+            "type": "number",
+            "unit": "millions USD",
+            "values": {
+                "2026": 6232,
+                "2025": 5775
+            }
+        },
+        {
+            "name": "Americas Total Revenue",
+            "type": "number",
+            "unit": "millions USD",
+            "values": {
+                "2026": 27193,
+                "2025": 25143
+            }
+        },
+        {
+            "name": "Europe Total Revenue",
+            "type": "number",
+            "unit": "millions USD",
+            "values": {
+                "2026": 10017,
+                "2025": 8891
+            }
+        },
+        {
+            "name": "Asia Pacific Total Revenue",
+            "type": "number",
+            "unit": "millions USD",
+            "values": {
+                "2026": 4315,
+                "2025": 3861
+            }
+        },
+        {
+            "name": "Number of Employees",
+            "type": "number",
+            "unit": "employees",
+            "values": {
+                "2026": 83334
+            }
+        }
+    ],
+    "AMZN": [
+        {
+            "name": "Common shares outstanding plus shares underlying outstanding stock awards",
+            "type": "number",
+            "unit": "shares",
+            "values": {
+                "2023": 10800000000,
+                "2024": 10900000000,
+                "2025": 11000000000
+            }
+        },
+        {
+            "name": "Restricted Stock Units Outstanding",
+            "type": "number",
+            "unit": "shares",
+            "values": {
+                "2023": 405800000,
+                "2024": 283100000,
+                "2025": 222500000
+            }
+        },
+        {
+            "name": "Restricted Stock Units Granted",
+            "type": "number",
+            "unit": "shares",
+            "values": {
+                "2023": 218100000,
+                "2024": 126900000,
+                "2025": 112900000
+            }
+        },
+        {
+            "name": "Restricted Stock Units Vested",
+            "type": "number",
+            "unit": "shares",
+            "values": {
+                "2023": 139900000,
+                "2024": 209700000,
+                "2025": 138100000
+            }
+        },
+        {
+            "name": "Restricted Stock Units Forfeited",
+            "type": "number",
+            "unit": "shares",
+            "values": {
+                "2023": 56800000,
+                "2024": 39900000,
+                "2025": 35400000
+            }
+        }
+    ],
+    "META": [
+        {
+            "name": "Family Daily Active People (DAP)",
+            "type": "number",
+            "unit": "billion people",
+            "values": {
+                "2025": 3.58,
+                "2024": 3.35
+            }
+        },
+        {
+            "name": "Annual Average Revenue Per Person (ARPP)",
+            "type": "currency",
+            "unit": "USD",
+            "values": {
+                "2025": 57.03
+            }
+        },
+        {
+            "name": "Quarterly Average Revenue Per Person (ARPP)",
+            "type": "currency",
+            "unit": "USD",
+            "values": {
+                "Q4 2025": 16.56,
+                "Q3 2025": 14.46,
+                "Q2 2025": 13.65,
+                "Q1 2025": 12.36,
+                "Q4 2024": 14.25,
+                "Q3 2024": 12.29,
+                "Q2 2024": 11.89,
+                "Q1 2024": 11.2,
+                "Q4 2023": 12.33
+            }
+        },
+        {
+            "name": "Ad Impressions YoY Growth",
+            "type": "percentage",
+            "unit": "%",
+            "values": {
+                "2025": 12,
+                "2024": 11
+            }
+        },
+        {
+            "name": "Average Price Per Ad YoY Growth",
+            "type": "percentage",
+            "unit": "%",
+            "values": {
+                "2025": 9,
+                "2024": 10
+            }
+        },
+        {
+            "name": "Headcount",
+            "type": "number",
+            "unit": "employees",
+            "values": {
+                "2025": 78865
+            }
+        }
+    ],
+    "NVDA": [
+        {
+            "name": "Shares Repurchased",
+            "type": "number",
+            "unit": "shares",
+            "values": {
+                "2026": 282000000,
+                "2025": 310000000,
+                "2024": 211000000
+            }
+        },
+        {
+            "name": "Equity Awards Granted (RSUs, PSUs and Market-based PSUs)",
+            "type": "number",
+            "unit": "shares",
+            "values": {
+                "2026": 70000000,
+                "2025": 89000000,
+                "2024": 140000000
+            }
+        },
+        {
+            "name": "ESPP Shares Purchased",
+            "type": "number",
+            "unit": "shares",
+            "values": {
+                "2026": 13000000,
+                "2025": 30000000,
+                "2024": 30000000
+            }
+        },
+        {
+            "name": "Shares Withheld for Employee Stock Plan Taxes",
+            "type": "number",
+            "unit": "shares",
+            "values": {
+                "2026": 51000000,
+                "2025": 59000000,
+                "2024": 72000000
+            }
+        },
+        {
+            "name": "Shares Issued Under Employee Stock Plans",
+            "type": "number",
+            "unit": "shares",
+            "values": {
+                "2026": 160000000,
+                "2025": 203000000,
+                "2024": 265000000
+            }
+        },
+        {
+            "name": "Anti-dilutive Equity Awards Excluded from Diluted EPS",
+            "type": "number",
+            "unit": "shares",
+            "values": {
+                "2026": 41000000,
+                "2025": 51000000,
+                "2024": 150000000
+            }
+        },
+        {
+            "name": "Weighted Average Grant-Date Fair Value Per Share of Equity Awards Granted",
+            "type": "number",
+            "unit": "USD",
+            "values": {
+                "2026": 133.97,
+                "2025": 87.99,
+                "2024": 37.41
+            }
+        },
+        {
+            "name": "Weighted Average Price Per Share of ESPP Shares Purchased",
+            "type": "number",
+            "unit": "USD",
+            "values": {
+                "2026": 49.13,
+                "2025": 17.74,
+                "2024": 15.81
+            }
+        },
+        {
+            "name": "Weighted Average Grant-Date Fair Value Per Share of ESPP Shares Purchased",
+            "type": "number",
+            "unit": "USD",
+            "values": {
+                "2026": 20.75,
+                "2025": 8.61,
+                "2024": 6.99
+            }
+        }
+    ]
+}

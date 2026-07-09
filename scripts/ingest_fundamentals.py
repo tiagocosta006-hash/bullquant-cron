@@ -15,7 +15,9 @@ import time
 import datetime
 import uuid
 import requests
+import yfinance as yf
 import psycopg2
+from psycopg2.extras import Json
 from dotenv import load_dotenv
 
 # Consolas Windows usam cp1252 — sem isto, prints com caracteres fora do cp1252
@@ -135,6 +137,9 @@ DURATION_TAGS = {
         "PaymentsToAcquireOtherPropertyPlantAndEquipment",
         "PaymentsToAcquirePropertyPlantAndEquipmentAndOtherAssets",
         "PaymentsToAcquireAndDevelopRealEstate",  # REITs: aquisição/desenvolvimento é o "capex"
+        "PaymentsToAcquireOilAndGasProperty",
+        "PaymentsToAcquireEquityMethodInvestments",
+        "PaymentsForExplorationAndDevelopment",
         "PaymentsToAcquireCommercialRealEstate",  # REITs alternativo
         "PaymentsToAcquireProductiveAssets",
         "PaymentsForProceedsFromProductiveAssets",
@@ -787,6 +792,61 @@ def delete_period(cur, company_id: str, period_type: str, fy: int, fq):
         )
 
 
+def apply_stock_splits(ticker: str, periods_data: list[dict]):
+    periods_data.sort(key=lambda x: x['periodEnd'])
+    try:
+        t = yf.Ticker(ticker)
+        splits = t.splits
+    except Exception as e:
+        print(f"    Erro ao extrair splits do yfinance para {ticker}: {e}")
+        return
+        
+    if splits.empty:
+        return
+        
+    for split_date, ratio in splits.items():
+        try:
+            # Em versões recentes, split_date pode ser timestamp tz-aware
+            split_date_only = split_date.date()
+        except:
+            split_date_only = split_date
+            
+        if ratio == 1.0 or ratio == 0.0:
+            continue
+            
+        reference_shares = None
+        for p in periods_data:
+            p_date = datetime.date.fromisoformat(p['periodEnd']) if isinstance(p['periodEnd'], str) else p['periodEnd']
+            if p_date >= split_date_only and p.get('sharesOutstanding'):
+                reference_shares = p['sharesOutstanding']
+                break
+                
+        if not reference_shares:
+            continue
+            
+        for p in periods_data:
+            p_date = datetime.date.fromisoformat(p['periodEnd']) if isinstance(p['periodEnd'], str) else p['periodEnd']
+            if p_date < split_date_only:
+                shares = p.get('sharesOutstanding')
+                if not shares:
+                    continue
+                    
+                needs_adjustment = False
+                if ratio > 1:
+                    threshold = reference_shares / (ratio * 0.7)
+                    if shares < threshold:
+                        needs_adjustment = True
+                else:
+                    threshold = reference_shares / (ratio * 1.3)
+                    if shares > threshold:
+                        needs_adjustment = True
+                        
+                if needs_adjustment:
+                    p['sharesOutstanding'] = shares * ratio
+                    if p.get('epsDiluted'): p['epsDiluted'] /= ratio
+                    if p.get('epsBasic'): p['epsBasic'] /= ratio
+                    if p.get('dividendPerShare'): p['dividendPerShare'] /= ratio
+                    
 def insert_fundamental(cur, row: dict):
     cur.execute(
         """
@@ -983,6 +1043,10 @@ def process_company(conn, company: dict) -> int:
             continue
 
         rows.append(build_row(company_id, fy, fp, period_end, filed_at, dur, inst, company.get('sector')))
+
+    ticker = company.get('ticker')
+    if ticker:
+        apply_stock_splits(ticker, rows)
 
     # Commit único por empresa (~40 períodos): contra Supabase remoto, o commit
     # por período dominava o tempo de execução (~3 round-trips × ~100ms cada).

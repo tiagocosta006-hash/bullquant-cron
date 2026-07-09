@@ -139,17 +139,42 @@ export function DcfCalculator() {
       setLoadedTicker(ticker.toUpperCase())
       setAnnualFcfSeries(data.annualFcfSeries)
       setFcfMode("FCFF") // default, pode ser alterado depois
-      if (data.currentPrice != null) setCurrentPrice(round2(data.currentPrice))
+      if (data.currentPrice != null) {
+        setCurrentPrice(round2(data.currentPrice))
+      } else {
+        setCurrentPrice(DEFAULTS.currentPrice)
+      }
+      
       // Usar fcff0 (com fallback fcfe0 se FCFF derivado for nulo)
       const baseFcf = data.fcff0 ?? data.fcfe0
-      if (baseFcf != null) setFcf0M(round2(baseFcf / MILLION))
-      if (data.shares != null) setSharesM(round2(data.shares / MILLION))
-      if (data.netDebt != null) setNetDebtM(round2(data.netDebt / MILLION))
+      if (baseFcf != null) {
+        setFcf0M(round2(baseFcf / MILLION))
+      } else {
+        setFcf0M(DEFAULTS.fcf0M)
+      }
+      
+      if (data.shares != null) {
+        setSharesM(round2(data.shares / MILLION))
+      } else {
+        setSharesM(DEFAULTS.sharesM)
+      }
+      
+      if (data.netDebt != null) {
+        setNetDebtM(round2(data.netDebt / MILLION))
+      } else {
+        setNetDebtM(DEFAULTS.netDebtM)
+      }
+      
       if (data.suggestedGrowth != null) {
         const g = round2(data.suggestedGrowth * 100)
         setGrowth1(g)
         setGrowth2(round2(g / 2))
+      } else {
+        setGrowth1(DEFAULTS.growth1)
+        setGrowth2(DEFAULTS.growth2)
       }
+
+      setTerminalGrowth(DEFAULTS.terminalGrowth)
 
       // Calcular WACC via CAPM se temos beta
       setBeta(data.beta)
@@ -165,9 +190,12 @@ export function DcfCalculator() {
         setWaccBreakdown(breakdown)
         if (breakdown) {
           setWacc(round2(breakdown.wacc * 100))
+        } else {
+          setWacc(DEFAULTS.wacc)
         }
       } else {
         setWaccBreakdown(null)
+        setWacc(DEFAULTS.wacc)
       }
     } catch {
       setLoadError(t("loadError"))

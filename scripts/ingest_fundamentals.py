@@ -64,6 +64,7 @@ DURATION_TAGS = {
         "RevenueFromContractWithCustomerExcludingAssessedTax",
         "Revenues",
         "SalesRevenueNet",
+        "SalesRevenueServicesNet",
         "Revenue",
         "RevenueFromContractWithCustomerIncludingAssessedTax",
         "SalesRevenueGoodsNet",
@@ -139,7 +140,7 @@ DURATION_TAGS = {
         "PaymentsToAcquireAndDevelopRealEstate",  # REITs: aquisição/desenvolvimento é o "capex"
         "PaymentsToAcquireOilAndGasProperty",
         "PaymentsToAcquireEquityMethodInvestments",
-        "PaymentsForExplorationAndDevelopment",
+        "PaymentsToExploreAndDevelopOilAndGasProperties",
         "PaymentsToAcquireCommercialRealEstate",  # REITs alternativo
         "PaymentsToAcquireProductiveAssets",
         "PaymentsForProceedsFromProductiveAssets",
@@ -242,15 +243,15 @@ def new_id() -> str:
 def get_companies_with_cik(cur, tickers: list[str] | None = None) -> list[dict]:
     if tickers:
         cur.execute(
-            'SELECT id, ticker, cik, sector FROM companies WHERE "isActive" = TRUE AND cik IS NOT NULL '
+            'SELECT id, ticker, cik, sector, currency FROM companies WHERE "isActive" = TRUE AND cik IS NOT NULL '
             "AND ticker = ANY(%s) ORDER BY ticker",
             (tickers,),
         )
     else:
         cur.execute(
-            'SELECT id, ticker, cik, sector FROM companies WHERE "isActive" = TRUE AND cik IS NOT NULL ORDER BY ticker'
+            'SELECT id, ticker, cik, sector, currency FROM companies WHERE "isActive" = TRUE AND cik IS NOT NULL ORDER BY ticker'
         )
-    return [{"id": r[0], "ticker": r[1], "cik": r[2], "sector": r[3]} for r in cur.fetchall()]
+    return [{"id": r[0], "ticker": r[1], "cik": r[2], "sector": r[3], "currency": r[4]} for r in cur.fetchall()]
 
 
 session = requests.Session()
@@ -278,7 +279,19 @@ def extract_tag_entries(us_gaap: dict, tag: str) -> list[dict]:
     node = us_gaap.get(tag)
     if not node:
         return []
-    for unit_entries in (node.get("units") or {}).values():
+        
+    units = node.get("units") or {}
+    valid_currencies = ["USD", "EUR", "GBP", "CHF", "CAD", "JPY", "AUD"]
+    
+    # Priorizar extração de valores monetários (fiat) corretos
+    for currency in valid_currencies:
+        if currency in units:
+            unit_entries = units[currency]
+            if isinstance(unit_entries, list):
+                return [e for e in unit_entries if "14A" not in (e.get("form") or "")]
+                
+    # Fallback para métricas não monetárias (ex: shares, pure)
+    for unit_entries in units.values():
         if isinstance(unit_entries, list):
             # Excluir proxies (DEF 14A etc.): a disclosure "pay versus performance"
             # tagga NetIncomeLoss em milhões/milhares (ex.: PCG FY2023 val=2242
@@ -685,17 +698,19 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
     # em vez de 2.77 — milionésimos). Nenhuma empresa do S&P 500 paga >$1000/ação;
     # valores acima disso são bugs de escala (reduzir 1000x até plausível, senão N/A).
     dps = dur.get("dividendPerShare")
-    if dps is not None:
+    if dps is None:
+        dps = 0.0
+    else:
         for _ in range(3):
             if abs(dps) <= 1000:
                 break
             dps /= 1000
         if abs(dps) > 1000:
-            dps = None
+            dps = 0.0
         # Guard: dividendos são SEMPRE não-negativos. Um valor negativo é sempre
         # um bug de ingestão (ex: subtração errada de acumulado anual). Rejeitar.
         if dps is not None and dps < 0:
-            dps = None
+            dps = 0.0
 
     if fp == "FY":
         period_type = "ANNUAL"
@@ -706,9 +721,8 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
 
 
     # --- SECTOR SPECIFIC FALLBACKS ---
-    if sector in ("Financials", "Real Estate", "Utilities", "Energy", "Materials"):
-        if dur.get("researchAndDevelopment") is None:
-            dur["researchAndDevelopment"] = 0.0
+    if dur.get("researchAndDevelopment") is None:
+        dur["researchAndDevelopment"] = 0.0
 
     if sector == "Financials":
         if capex is None:
@@ -790,6 +804,89 @@ def delete_period(cur, company_id: str, period_type: str, fy: int, fq):
                AND "fiscalYear" = %s AND "fiscalQuarter" = %s""",
             (company_id, period_type, fy, fq),
         )
+
+def apply_fx_conversion(company_currency: str, periods_data: list[dict]):
+    if not company_currency or company_currency == "USD":
+        return
+        
+    fx_ticker = f"{company_currency}USD=X"
+    try:
+        import datetime
+        # Convert string dates to date objects
+        parsed_dates = []
+        for p in periods_data:
+            end = p.get('periodEnd')
+            if end:
+                if isinstance(end, str):
+                    parsed_dates.append(datetime.date.fromisoformat(end))
+                else:
+                    parsed_dates.append(end)
+                    
+        if not parsed_dates:
+            return
+            
+        min_date = min(parsed_dates)
+        # Add a few days to max_date to ensure we cover the last day
+        max_date = max(parsed_dates) + datetime.timedelta(days=5)
+        
+        fx_data = yf.download(fx_ticker, start=min_date, end=max_date, progress=False)
+        if fx_data.empty:
+            print(f"    Erro FX: Sem dados cambiais para {fx_ticker}")
+            return
+            
+        # Helper to get closest rate
+        def get_rate(target_date):
+            # Convert target_date (date or datetime) to pandas Timestamp
+            import pandas as pd
+            target_ts = pd.Timestamp(target_date)
+            # Find the closest date in the index that is <= target_date
+            valid_dates = fx_data.index[fx_data.index <= target_ts]
+            if len(valid_dates) > 0:
+                closest = valid_dates[-1]
+                # For MultiIndex columns in yfinance >= 0.2.33, accessing 'Close' is slightly different.
+                # Usually fx_data['Close'] is a Series or DataFrame
+                try:
+                    close_col = fx_data['Close']
+                    if isinstance(close_col, pd.DataFrame):
+                        return float(close_col.iloc[fx_data.index.get_loc(closest)].iloc[0])
+                    return float(close_col.loc[closest])
+                except Exception as e:
+                    # Fallback for old yfinance
+                    return float(fx_data.loc[closest, 'Close'])
+            # If no date <= target, just get the absolute closest (first available)
+            if len(fx_data) > 0:
+                try:
+                    close_col = fx_data['Close']
+                    if isinstance(close_col, pd.DataFrame):
+                        return float(close_col.iloc[0].iloc[0])
+                    return float(close_col.iloc[0])
+                except:
+                    return float(fx_data.iloc[0]['Close'])
+            return 1.0
+
+        monetary_fields = [
+            "revenue", "costOfRevenue", "grossProfit", "operatingExpenses",
+            "operatingIncome", "interestExpense", "taxExpense", "netIncome",
+            "epsDiluted", "operatingCashFlow", "capex", "freeCashFlow",
+            "totalAssets", "totalCurrentLiab", "longTermDebt", "totalDebt",
+            "cash", "totalEquity", "dividendPerShare", "researchAndDevelopment",
+            "sellingGeneralAndAdmin", "ebitda"
+        ]
+
+        for p in periods_data:
+            if not p.get('periodEnd'):
+                continue
+                
+            rate = get_rate(p['periodEnd'])
+            for field in monetary_fields:
+                if p.get(field) is not None:
+                    p[field] = float(p[field]) * rate
+                    
+        return True
+    except Exception as e:
+        print(f"    Erro ao aplicar conversão cambial {fx_ticker}: {e}")
+        return False
+
 
 
 def apply_stock_splits(ticker: str, periods_data: list[dict]):
@@ -1045,6 +1142,30 @@ def process_company(conn, company: dict) -> int:
         rows.append(build_row(company_id, fy, fp, period_end, filed_at, dur, inst, company.get('sector')))
 
     ticker = company.get('ticker')
+    
+    # Inferir a moeda de reporte diretamente do XBRL em vez de confiar no Ticker (que pode ser USD no NYSE)
+    reporting_currency = "USD"
+    core_tag = namespace.get("NetIncomeLoss") or namespace.get("ProfitLoss") or namespace.get("Assets") or namespace.get("Revenues") or namespace.get("Revenue")
+    if core_tag:
+        core_units = core_tag.get("units") or {}
+        for curr in ["USD", "EUR", "GBP", "CHF", "CAD", "JPY", "AUD"]:
+            if curr in core_units:
+                reporting_currency = curr
+                break
+                
+    if reporting_currency != 'USD':
+        success = apply_fx_conversion(reporting_currency, rows)
+        if success:
+            # Tudo foi convertido para USD
+            for row in rows:
+                row["currency"] = "USD"
+            try:
+                with conn.cursor() as cur:
+                    cur.execute('UPDATE companies SET currency = %s WHERE id = %s', ('USD', company_id))
+                conn.commit()
+            except Exception:
+                conn.rollback()
+
     if ticker:
         apply_stock_splits(ticker, rows)
 

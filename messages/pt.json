@@ -499,7 +499,9 @@
       "roic": "Retorno s/ Capital (ROIC)",
       "grossMargin": "Margem Bruta",
       "operatingMargin": "Margem Operacional",
-      "profitMargin": "Margem Líquida"
+      "profitMargin": "Margem Líquida",
+      "noDividends": "Esta empresa não distribui dividendos.",
+      "returnOnEquity": "Retorno s/ Capital Próprio (ROE)"
     },
     "ratios": {
       "roic": "ROIC",
@@ -508,6 +510,12 @@
       "profit": "LÍQUIDA",
       "roe": "ROE"
     }
+  },
+  "compare": {
+    "title": "Análise de Pares: {industry}",
+    "subtitle": "Comparação direta de múltiplos e desempenho dentro da mesma sub-indústria GICS.",
+    "emptyTitle": "Batalha de Pares (Peer Comparison)",
+    "emptyDesc": "Por favor, aceda a esta página a partir de uma empresa para iniciar a comparação com a sua indústria."
   },
   "calendar": {
     "title": "Calendário de Resultados",
@@ -589,6 +597,11 @@
     "companiesIn": "Empresas em {industry}",
     "backToSectors": "Voltar aos Setores",
     "backToIndustries": "Voltar às Indústrias",
+    "other": "Outros",
+    "otherIndustries": "Outras Indústrias",
+    "companiesCount": "{count, plural, one {# empresa} other {# empresas}}",
+    "searchResults": "Resultados da pesquisa",
+    "searchEmpty": "Nenhuma empresa encontrada para a tua pesquisa.",
     "metrics": {
       "revenue": "Faturação",
       "netMargin": "Margem Líq.",
@@ -599,6 +612,16 @@
       "businessModel": "O Negócio",
       "revenueStreams": "Como ganham dinheiro",
       "leadership": "Liderança",
+      "mainMarket": "Mercado Principal",
+      "globalPresence": "Atuação Global",
+      "bullCase": "Tese do Touro (Bull)",
+      "bearCase": "Tese do Urso (Bear)",
+      "swotTitle": "Análise SWOT",
+      "swotStrengths": "S - Forças",
+      "swotWeaknesses": "W - Fraquezas",
+      "swotOpportunities": "O - Oportunidades",
+      "swotThreats": "T - Ameaças",
+      "extraInfo": "Info Relevante",
       "compareTitle": "Comparar com Concorrentes",
       "compareDesc": "Avalia o desempenho financeiro lado a lado.",
       "viewFinancials": "Ver Análise Financeira Completa"

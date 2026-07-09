@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Building2, Cpu, HeartPulse, ShoppingBag, ShoppingCart, Zap, Landmark, Factory, Plane, Wheat, Home, BoxSelect } from "lucide-react"
 
 // Mapeamento simples de setores para ícones e cores
@@ -24,6 +25,8 @@ interface SectorGridProps {
 }
 
 export function SectorGrid({ sectors, onSelect }: SectorGridProps) {
+  const t = useTranslations("explore")
+
   // Ordenar por número de empresas (descendente)
   const sortedSectors = Object.entries(sectors).sort((a, b) => b[1].count - a[1].count)
 
@@ -42,8 +45,8 @@ export function SectorGrid({ sectors, onSelect }: SectorGridProps) {
             <div className={`p-3 rounded-lg ${config.bg} ${config.color} mb-4 group-hover:scale-110 transition-transform`}>
               <Icon size={24} strokeWidth={1.5} />
             </div>
-            <h3 className="font-semibold text-foreground text-lg mb-1">{sectorName === "Unknown" ? "Outros" : sectorName}</h3>
-            <p className="text-sm text-muted-foreground">{data.count} empresas</p>
+            <h3 className="font-semibold text-foreground text-lg mb-1">{sectorName === "Unknown" ? t("other") : sectorName}</h3>
+            <p className="text-sm text-muted-foreground">{t("companiesCount", { count: data.count })}</p>
           </button>
         )
       })}

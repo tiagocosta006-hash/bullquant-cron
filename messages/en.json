@@ -503,7 +503,9 @@
       "roic": "Return on Capital (ROIC)",
       "grossMargin": "Gross Margin",
       "operatingMargin": "Operating Margin",
-      "profitMargin": "Profit Margin"
+      "profitMargin": "Profit Margin",
+      "noDividends": "This company does not pay dividends.",
+      "returnOnEquity": "Return on Equity"
     },
     "ratios": {
       "roic": "ROIC",
@@ -512,6 +514,12 @@
       "profit": "PROFIT",
       "roe": "ROE"
     }
+  },
+  "compare": {
+    "title": "Peer Analysis: {industry}",
+    "subtitle": "Direct comparison of multiples and performance within the same GICS sub-industry.",
+    "emptyTitle": "Peer Comparison",
+    "emptyDesc": "Please access this page from a company to start comparing it with its industry."
   },
   "calendar": {
     "title": "Earnings Calendar",
@@ -593,6 +601,11 @@
     "companiesIn": "Companies in {industry}",
     "backToSectors": "Back to Sectors",
     "backToIndustries": "Back to Industries",
+    "other": "Other",
+    "otherIndustries": "Other Industries",
+    "companiesCount": "{count, plural, one {# company} other {# companies}}",
+    "searchResults": "Search results",
+    "searchEmpty": "No companies found for your search.",
     "metrics": {
       "revenue": "Revenue",
       "netMargin": "Net Margin",
@@ -603,6 +616,16 @@
       "businessModel": "The Business",
       "revenueStreams": "Revenue Streams",
       "leadership": "Leadership",
+      "mainMarket": "Main Market",
+      "globalPresence": "Global Footprint",
+      "bullCase": "Bull Case",
+      "bearCase": "Bear Case",
+      "swotTitle": "SWOT Analysis",
+      "swotStrengths": "S - Strengths",
+      "swotWeaknesses": "W - Weaknesses",
+      "swotOpportunities": "O - Opportunities",
+      "swotThreats": "T - Threats",
+      "extraInfo": "Relevant Info",
       "compareTitle": "Compare with Peers",
       "compareDesc": "Evaluate financial performance side-by-side.",
       "viewFinancials": "View Full Financial Analysis"

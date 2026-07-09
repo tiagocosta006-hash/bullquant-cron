@@ -381,7 +381,9 @@
       "roic": "ROIC",
       "grossMargin": "Margen Bruto",
       "operatingMargin": "Margen Op.",
-      "profitMargin": "Margen Neto"
+      "profitMargin": "Margen Neto",
+      "noDividends": "Esta empresa no distribuye dividendos.",
+      "returnOnEquity": "Retorno sobre el Capital (ROE)"
     },
     "ratios": {
       "roic": "ROIC",
@@ -390,6 +392,12 @@
       "profit": "NETO",
       "roe": "ROE"
     }
+  },
+  "compare": {
+    "title": "Análisis de Pares: {industry}",
+    "subtitle": "Comparación directa de múltiplos y desempeño dentro de la misma subindustria GICS.",
+    "emptyTitle": "Comparación de Pares",
+    "emptyDesc": "Por favor, accede a esta página desde una empresa para iniciar la comparación con su industria."
   },
   "calendar": {
     "title": "Calendario de Resultados",
@@ -471,6 +479,11 @@
     "companiesIn": "Empresas en {industry}",
     "backToSectors": "Volver a Sectores",
     "backToIndustries": "Volver a Industrias",
+    "other": "Otros",
+    "otherIndustries": "Otras Industrias",
+    "companiesCount": "{count, plural, one {# empresa} other {# empresas}}",
+    "searchResults": "Resultados de la búsqueda",
+    "searchEmpty": "No se encontraron empresas para tu búsqueda.",
     "metrics": {
       "revenue": "Facturación",
       "netMargin": "Margen Neto",
@@ -481,6 +494,16 @@
       "businessModel": "El Negocio",
       "revenueStreams": "Cómo ganan dinero",
       "leadership": "Liderazgo",
+      "mainMarket": "Mercado Principal",
+      "globalPresence": "Presencia Global",
+      "bullCase": "Tesis Alcista (Bull)",
+      "bearCase": "Tesis Bajista (Bear)",
+      "swotTitle": "Análisis FODA",
+      "swotStrengths": "F - Fortalezas",
+      "swotWeaknesses": "D - Debilidades",
+      "swotOpportunities": "O - Oportunidades",
+      "swotThreats": "A - Amenazas",
+      "extraInfo": "Info Relevante",
       "compareTitle": "Comparar con Competidores",
       "compareDesc": "Evalúa el desempeño financiero lado a lado.",
       "viewFinancials": "Ver Análisis Financiero Completo"

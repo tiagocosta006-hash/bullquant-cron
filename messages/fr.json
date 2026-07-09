@@ -381,7 +381,9 @@
       "roic": "ROIC",
       "grossMargin": "Marge Brute",
       "operatingMargin": "Marge Op.",
-      "profitMargin": "Marge Nette"
+      "profitMargin": "Marge Nette",
+      "noDividends": "Cette entreprise ne verse pas de dividendes.",
+      "returnOnEquity": "Rentabilité des Capitaux Propres (ROE)"
     },
     "ratios": {
       "roic": "ROIC",
@@ -390,6 +392,12 @@
       "profit": "NET",
       "roe": "ROE"
     }
+  },
+  "compare": {
+    "title": "Analyse des Pairs : {industry}",
+    "subtitle": "Comparaison directe des multiples et de la performance au sein de la même sous-industrie GICS.",
+    "emptyTitle": "Comparaison de Pairs",
+    "emptyDesc": "Veuillez accéder à cette page depuis une entreprise pour démarrer la comparaison avec son secteur."
   },
   "calendar": {
     "title": "Calendrier des Résultats",
@@ -471,6 +479,11 @@
     "companiesIn": "Entreprises dans {industry}",
     "backToSectors": "Retour aux Secteurs",
     "backToIndustries": "Retour aux Industries",
+    "other": "Autres",
+    "otherIndustries": "Autres Industries",
+    "companiesCount": "{count, plural, one {# entreprise} other {# entreprises}}",
+    "searchResults": "Résultats de la recherche",
+    "searchEmpty": "Aucune entreprise trouvée pour votre recherche.",
     "metrics": {
       "revenue": "Chiffre d'affaires",
       "netMargin": "Marge Nette",
@@ -481,6 +494,16 @@
       "businessModel": "L'Activité",
       "revenueStreams": "Comment ils gagnent de l'argent",
       "leadership": "Direction",
+      "mainMarket": "Marché Principal",
+      "globalPresence": "Présence Mondiale",
+      "bullCase": "Thèse Haussière (Bull)",
+      "bearCase": "Thèse Baissière (Bear)",
+      "swotTitle": "Analyse SWOT",
+      "swotStrengths": "F - Forces",
+      "swotWeaknesses": "F - Faiblesses",
+      "swotOpportunities": "O - Opportunités",
+      "swotThreats": "M - Menaces",
+      "extraInfo": "Info Pertinente",
       "compareTitle": "Comparer avec les Concurrents",
       "compareDesc": "Évaluez la performance financière côte à côte.",
       "viewFinancials": "Voir l'Analyse Financière Complète"

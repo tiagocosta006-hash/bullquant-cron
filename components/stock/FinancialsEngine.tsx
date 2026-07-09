@@ -315,7 +315,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
           type="BAR" 
           config={{ dataKeys: [{ key: 'dividendPerShare', name: 'Dividend/Share', color: 'var(--chart-1)', type: 'bar' }] }} 
           cagr={calcCAGR('dividendPerShare')}
-          emptyMessage="Esta empresa não distribui dividendos."
+          emptyMessage={t('charts.noDividends')}
         />
 
         {/* 4-in-1 Ratios Card */}
@@ -345,7 +345,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
             return (
               <>
                 {ratioTab === "ROIC" && <DecisionChart currencySymbol={currencySymbol} title={t('charts.roic')} data={chartData} type="COMPOSED" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'roic', color: 'var(--chart-1)', type: 'bar' }], referenceLine: { y: 0.15, color: 'var(--bull)', label: '15%' } }} />}
-                {ratioTab === "ROE" && <DecisionChart currencySymbol={currencySymbol} title="Return on Equity" data={chartData} type="BAR" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'returnOnEquity', color: 'var(--chart-1)', type: 'bar' }] }} />}
+                {ratioTab === "ROE" && <DecisionChart currencySymbol={currencySymbol} title={t('charts.returnOnEquity')} data={chartData} type="BAR" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'returnOnEquity', color: 'var(--chart-1)', type: 'bar' }] }} />}
                 {ratioTab === "GROSS" && <DecisionChart currencySymbol={currencySymbol} title={t('charts.grossMargin')} data={chartData} type="LINE" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'grossMargin', color: 'var(--chart-1)', type: 'line' }] }} />}
                 {ratioTab === "OPERATING" && <DecisionChart currencySymbol={currencySymbol} title={t('charts.operatingMargin')} data={chartData} type="LINE" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'operatingMargin', color: 'var(--chart-1)', type: 'line' }] }} />}
                 {ratioTab === "PROFIT" && <DecisionChart currencySymbol={currencySymbol} title={t('charts.profitMargin')} data={chartData} type="LINE" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'profitMargin', color: 'var(--chart-1)', type: 'line' }] }} />}

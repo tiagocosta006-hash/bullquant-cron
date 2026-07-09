@@ -381,7 +381,9 @@
       "roic": "投资资本回报率 (ROIC)",
       "grossMargin": "毛利率",
       "operatingMargin": "营业利润率",
-      "profitMargin": "净利率"
+      "profitMargin": "净利率",
+      "noDividends": "该公司不派发股息。",
+      "returnOnEquity": "净资产收益率 (ROE)"
     },
     "ratios": {
       "roic": "ROIC",
@@ -390,6 +392,12 @@
       "profit": "净利",
       "roe": "ROE"
     }
+  },
+  "compare": {
+    "title": "同行分析: {industry}",
+    "subtitle": "同一GICS子行业内倍数和业绩的直接比较。",
+    "emptyTitle": "同行比较",
+    "emptyDesc": "请从公司页面访问此页面以开始与其行业进行比较。"
   },
   "calendar": {
     "title": "财报日历",
@@ -471,6 +479,11 @@
     "companiesIn": "{industry}中的公司",
     "backToSectors": "返回部门",
     "backToIndustries": "返回行业",
+    "other": "其他",
+    "otherIndustries": "其他行业",
+    "companiesCount": "{count, plural, other {#家公司}}",
+    "searchResults": "搜索结果",
+    "searchEmpty": "未找到符合搜索条件的公司。",
     "metrics": {
       "revenue": "营收",
       "netMargin": "净利率",
@@ -481,6 +494,16 @@
       "businessModel": "业务模式",
       "revenueStreams": "盈利方式",
       "leadership": "管理层",
+      "mainMarket": "主要市场",
+      "globalPresence": "全球业务",
+      "bullCase": "看涨论点 (Bull)",
+      "bearCase": "看跌论点 (Bear)",
+      "swotTitle": "SWOT分析",
+      "swotStrengths": "S - 优势",
+      "swotWeaknesses": "W - 劣势",
+      "swotOpportunities": "O - 机会",
+      "swotThreats": "T - 威胁",
+      "extraInfo": "相关信息",
       "compareTitle": "与同行比较",
       "compareDesc": "并排评估财务表现。",
       "viewFinancials": "查看完整财务分析"

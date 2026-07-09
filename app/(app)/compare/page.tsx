@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { GitCompareArrows } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { PeerComparisonDashboard } from '@/components/compare/PeerComparisonDashboard'
@@ -9,6 +10,7 @@ export default async function ComparePage({
 }: {
   searchParams: Promise<{ ticker?: string }>
 }) {
+  const t = await getTranslations('compare')
   const resolvedParams = await searchParams
   const { ticker } = resolvedParams
 
@@ -19,8 +21,8 @@ export default async function ComparePage({
         <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
           <GitCompareArrows className="h-7 w-7" />
         </div>
-        <h1 className="text-2xl font-extrabold tracking-tight mb-3">Batalha de Pares (Peer Comparison)</h1>
-        <p className="text-muted-foreground">Por favor, aceda a esta página a partir de uma empresa para iniciar a comparação com a sua indústria.</p>
+        <h1 className="text-2xl font-extrabold tracking-tight mb-3">{t('emptyTitle')}</h1>
+        <p className="text-muted-foreground">{t('emptyDesc')}</p>
       </div>
     )
   }
@@ -62,8 +64,8 @@ export default async function ComparePage({
     <div className="space-y-8">
       <PageHeader
         icon={<GitCompareArrows className="h-6 w-6" />}
-        title={`Análise de Pares: ${baseCompany.industry}`}
-        subtitle="Comparação direta de múltiplos e desempenho dentro da mesma sub-indústria GICS."
+        title={t('title', { industry: baseCompany.industry ?? '' })}
+        subtitle={t('subtitle')}
       />
 
       <PeerComparisonDashboard

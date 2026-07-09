@@ -381,7 +381,9 @@
       "roic": "ROIC",
       "grossMargin": "粗利益率",
       "operatingMargin": "営業利益率",
-      "profitMargin": "純利益率"
+      "profitMargin": "純利益率",
+      "noDividends": "この企業は配当を行っていません。",
+      "returnOnEquity": "自己資本利益率 (ROE)"
     },
     "ratios": {
       "roic": "ROIC",
@@ -390,6 +392,12 @@
       "profit": "純利",
       "roe": "ROE"
     }
+  },
+  "compare": {
+    "title": "ピア分析: {industry}",
+    "subtitle": "同じGICSサブ業種内での倍率とパフォーマンスの直接比較。",
+    "emptyTitle": "ピア比較",
+    "emptyDesc": "比較を開始するには、企業ページからこのページにアクセスしてください。"
   },
   "calendar": {
     "title": "決算カレンダー",
@@ -471,6 +479,11 @@
     "companiesIn": "{industry}の企業",
     "backToSectors": "セクターに戻る",
     "backToIndustries": "業種に戻る",
+    "other": "その他",
+    "otherIndustries": "その他の業種",
+    "companiesCount": "{count, plural, other {#社}}",
+    "searchResults": "検索結果",
+    "searchEmpty": "検索条件に一致する企業が見つかりませんでした。",
     "metrics": {
       "revenue": "売上高",
       "netMargin": "純利益率",
@@ -481,6 +494,16 @@
       "businessModel": "事業内容",
       "revenueStreams": "収益源",
       "leadership": "経営陣",
+      "mainMarket": "主要市場",
+      "globalPresence": "グローバル展開",
+      "bullCase": "強気シナリオ (Bull)",
+      "bearCase": "弱気シナリオ (Bear)",
+      "swotTitle": "SWOT分析",
+      "swotStrengths": "S - 強み",
+      "swotWeaknesses": "W - 弱み",
+      "swotOpportunities": "O - 機会",
+      "swotThreats": "T - 脅威",
+      "extraInfo": "関連情報",
       "compareTitle": "競合と比較",
       "compareDesc": "財務パフォーマンスを並べて評価。",
       "viewFinancials": "完全な財務分析を見る"

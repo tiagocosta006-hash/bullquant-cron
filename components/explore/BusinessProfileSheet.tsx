@@ -142,7 +142,7 @@ export function BusinessProfileSheet({ open, onOpenChange, company }: BusinessPr
                 <section>
                   <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2 mb-3">
                     <Globe size={16} className="text-primary" />
-                    Mercado Principal
+                    {t("sheet.mainMarket")}
                   </h3>
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/60 border border-border">
                     <div className="w-10 h-10 rounded-full bg-primary/12 flex items-center justify-center text-primary shrink-0">
@@ -150,7 +150,7 @@ export function BusinessProfileSheet({ open, onOpenChange, company }: BusinessPr
                     </div>
                     <div className="min-w-0">
                       <p className="text-foreground font-medium truncate" title={company.geographicFocus}>{company.geographicFocus}</p>
-                      <p className="text-xs text-muted-foreground">Atuação Global</p>
+                      <p className="text-xs text-muted-foreground">{t("sheet.globalPresence")}</p>
                     </div>
                   </div>
                 </section>
@@ -166,7 +166,7 @@ export function BusinessProfileSheet({ open, onOpenChange, company }: BusinessPr
                       <TrendingUp size={48} className="text-bull" />
                     </div>
                     <h3 className="text-bull font-bold flex items-center gap-2 mb-2">
-                      <span>🐂</span> Tese do Touro (Bull)
+                      <span>🐂</span> {t("sheet.bullCase")}
                     </h3>
                     <p className="text-sm text-foreground/80 relative z-10 leading-relaxed">
                       {company.bullCase}
@@ -179,7 +179,7 @@ export function BusinessProfileSheet({ open, onOpenChange, company }: BusinessPr
                       <TrendingDown size={48} className="text-bear" />
                     </div>
                     <h3 className="text-bear font-bold flex items-center gap-2 mb-2">
-                      <span>🐻</span> Tese do Urso (Bear)
+                      <span>🐻</span> {t("sheet.bearCase")}
                     </h3>
                     <p className="text-sm text-foreground/80 relative z-10 leading-relaxed">
                       {company.bearCase}
@@ -194,29 +194,29 @@ export function BusinessProfileSheet({ open, onOpenChange, company }: BusinessPr
               <section>
                 <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                   <Activity size={18} className="text-primary" />
-                  Análise SWOT
+                  {t("sheet.swotTitle")}
                 </h3>
                 <div className="grid grid-cols-2 gap-px bg-border rounded-xl overflow-hidden border border-border">
                   <div className="bg-card p-4 space-y-2">
-                    <h4 className="font-bold text-bull text-sm">S - Forças</h4>
+                    <h4 className="font-bold text-bull text-sm">{t("sheet.swotStrengths")}</h4>
                     <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-3">
                       {(company.swot as any).forcas?.map((item: string, i: number) => <li key={i}>{item}</li>)}
                     </ul>
                   </div>
                   <div className="bg-card p-4 space-y-2">
-                    <h4 className="font-bold text-bear text-sm">W - Fraquezas</h4>
+                    <h4 className="font-bold text-bear text-sm">{t("sheet.swotWeaknesses")}</h4>
                     <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-3">
                       {(company.swot as any).fraquezas?.map((item: string, i: number) => <li key={i}>{item}</li>)}
                     </ul>
                   </div>
                   <div className="bg-card p-4 space-y-2">
-                    <h4 className="font-bold text-primary text-sm">O - Oportunidades</h4>
+                    <h4 className="font-bold text-primary text-sm">{t("sheet.swotOpportunities")}</h4>
                     <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-3">
                       {(company.swot as any).oportunidades?.map((item: string, i: number) => <li key={i}>{item}</li>)}
                     </ul>
                   </div>
                   <div className="bg-card p-4 space-y-2">
-                    <h4 className="font-bold text-chart-4 text-sm">T - Ameaças</h4>
+                    <h4 className="font-bold text-chart-4 text-sm">{t("sheet.swotThreats")}</h4>
                     <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-3">
                       {(company.swot as any).ameacas?.map((item: string, i: number) => <li key={i}>{item}</li>)}
                     </ul>
@@ -229,7 +229,7 @@ export function BusinessProfileSheet({ open, onOpenChange, company }: BusinessPr
             {company.extraInfo && (
               <section className="p-4 rounded-xl bg-muted/60 border border-border">
                 <h3 className="text-sm font-semibold text-muted-foreground mb-2 flex items-center gap-2">
-                  <span>💡</span> Info Relevante
+                  <span>💡</span> {t("sheet.extraInfo")}
                 </h3>
                 <p className="text-sm text-foreground/80 leading-relaxed">
                   {company.extraInfo}

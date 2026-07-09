@@ -381,7 +381,9 @@
       "roic": "ROIC",
       "grossMargin": "Margine Lordo",
       "operatingMargin": "Margine Op.",
-      "profitMargin": "Margine Netto"
+      "profitMargin": "Margine Netto",
+      "noDividends": "Questa azienda non distribuisce dividendi.",
+      "returnOnEquity": "Rendimento del Capitale Proprio (ROE)"
     },
     "ratios": {
       "roic": "ROIC",
@@ -390,6 +392,12 @@
       "profit": "NETTO",
       "roe": "ROE"
     }
+  },
+  "compare": {
+    "title": "Analisi dei Pari: {industry}",
+    "subtitle": "Confronto diretto di multipli e performance all'interno della stessa sotto-industria GICS.",
+    "emptyTitle": "Confronto tra Pari",
+    "emptyDesc": "Accedi a questa pagina da un'azienda per iniziare il confronto con il suo settore."
   },
   "calendar": {
     "title": "Calendario degli Utili",
@@ -471,6 +479,11 @@
     "companiesIn": "Aziende in {industry}",
     "backToSectors": "Torna ai Settori",
     "backToIndustries": "Torna alle Industrie",
+    "other": "Altri",
+    "otherIndustries": "Altre Industrie",
+    "companiesCount": "{count, plural, one {# azienda} other {# aziende}}",
+    "searchResults": "Risultati della ricerca",
+    "searchEmpty": "Nessuna azienda trovata per la tua ricerca.",
     "metrics": {
       "revenue": "Fatturato",
       "netMargin": "Margine Netto",
@@ -481,6 +494,16 @@
       "businessModel": "Il Business",
       "revenueStreams": "Come guadagnano",
       "leadership": "Leadership",
+      "mainMarket": "Mercato Principale",
+      "globalPresence": "Presenza Globale",
+      "bullCase": "Tesi Rialzista (Bull)",
+      "bearCase": "Tesi Ribassista (Bear)",
+      "swotTitle": "Analisi SWOT",
+      "swotStrengths": "S - Punti di Forza",
+      "swotWeaknesses": "W - Punti Deboli",
+      "swotOpportunities": "O - Opportunità",
+      "swotThreats": "T - Minacce",
+      "extraInfo": "Info Rilevanti",
       "compareTitle": "Confronta con i Concorrenti",
       "compareDesc": "Valuta le performance finanziarie fianco a fianco.",
       "viewFinancials": "Vedi Analisi Finanziaria Completa"

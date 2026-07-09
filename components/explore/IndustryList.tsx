@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { ChevronRight } from "lucide-react"
 
 interface IndustryListProps {
@@ -8,6 +9,8 @@ interface IndustryListProps {
 }
 
 export function IndustryList({ industries, onSelect }: IndustryListProps) {
+  const t = useTranslations("explore")
+
   // Ordenar por número de empresas (descendente) e alfabeticamente em caso de empate
   const sortedIndustries = Object.entries(industries).sort((a, b) => {
     if (b[1] !== a[1]) return b[1] - a[1]
@@ -24,9 +27,9 @@ export function IndustryList({ industries, onSelect }: IndustryListProps) {
         >
           <div>
             <h4 className="font-medium text-foreground group-hover:text-primary transition-colors">
-              {industryName === "Unknown" ? "Outras Indústrias" : industryName}
+              {industryName === "Unknown" ? t("otherIndustries") : industryName}
             </h4>
-            <p className="text-xs text-muted-foreground mt-0.5">{count} {count === 1 ? 'empresa' : 'empresas'}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{t("companiesCount", { count })}</p>
           </div>
           <ChevronRight size={18} className="text-muted-foreground/50 group-hover:text-primary transition-colors" />
         </button>

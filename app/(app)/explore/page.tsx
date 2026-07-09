@@ -122,7 +122,7 @@ export default function ExplorePage() {
       {/* Main Content Area */}
       {isSearching ? (
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-foreground/90">Resultados da pesquisa</h2>
+          <h2 className="text-xl font-semibold text-foreground/90">{t("searchResults")}</h2>
           {loading ? (
             <div className="flex py-12 justify-center"><Loader2 className="animate-spin text-primary" /></div>
           ) : companies.length > 0 ? (
@@ -131,7 +131,7 @@ export default function ExplorePage() {
             </div>
           ) : (
             <div className="glass p-8 text-center rounded-xl text-muted-foreground">
-              Nenhuma empresa encontrada para a tua pesquisa.
+              {t("searchEmpty")}
             </div>
           )}
         </div>
@@ -151,7 +151,7 @@ export default function ExplorePage() {
 
           <div>
             <h2 className="text-2xl font-semibold text-foreground mb-4">
-              {t("industriesFor", { sector: selectedSector === "Unknown" ? "Outros" : selectedSector })}
+              {t("industriesFor", { sector: selectedSector === "Unknown" ? t("other") : selectedSector })}
             </h2>
             {facets && facets[selectedSector] && (
               <IndustryList
@@ -172,7 +172,7 @@ export default function ExplorePage() {
 
           <div>
             <h2 className="text-2xl font-semibold text-foreground mb-6">
-              {t("companiesIn", { industry: selectedIndustry === "Unknown" ? "Outras Indústrias" : selectedIndustry })}
+              {t("companiesIn", { industry: selectedIndustry === "Unknown" ? t("otherIndustries") : selectedIndustry })}
             </h2>
 
             {loading ? (

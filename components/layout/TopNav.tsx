@@ -74,6 +74,8 @@ export function TopNav({
               <Link
                 key={href}
                 href={href}
+                aria-label={label}
+                title={label}
                 className={cn(
                   "flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium transition-colors",
                   isActive(href)

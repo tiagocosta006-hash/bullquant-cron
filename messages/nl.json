@@ -381,7 +381,9 @@
       "roic": "ROIC",
       "grossMargin": "Brutomarge",
       "operatingMargin": "Operationele Marge",
-      "profitMargin": "Winstmarge"
+      "profitMargin": "Winstmarge",
+      "noDividends": "Dit bedrijf keert geen dividend uit.",
+      "returnOnEquity": "Rendement op Eigen Vermogen (ROE)"
     },
     "ratios": {
       "roic": "ROIC",
@@ -390,6 +392,12 @@
       "profit": "NETTO",
       "roe": "ROE"
     }
+  },
+  "compare": {
+    "title": "Peervergelijking: {industry}",
+    "subtitle": "Directe vergelijking van multiples en prestaties binnen dezelfde GICS-subsector.",
+    "emptyTitle": "Peervergelijking",
+    "emptyDesc": "Ga naar deze pagina vanuit een bedrijf om de vergelijking met de sector te starten."
   },
   "calendar": {
     "title": "Cijferkalender",
@@ -471,6 +479,11 @@
     "companiesIn": "Bedrijven in {industry}",
     "backToSectors": "Terug naar Sectoren",
     "backToIndustries": "Terug naar Industrieën",
+    "other": "Overige",
+    "otherIndustries": "Overige Sectoren",
+    "companiesCount": "{count, plural, one {# bedrijf} other {# bedrijven}}",
+    "searchResults": "Zoekresultaten",
+    "searchEmpty": "Geen bedrijven gevonden voor je zoekopdracht.",
     "metrics": {
       "revenue": "Omzet",
       "netMargin": "Nettomarge",
@@ -481,6 +494,16 @@
       "businessModel": "Het Bedrijf",
       "revenueStreams": "Hoe ze geld verdienen",
       "leadership": "Leiderschap",
+      "mainMarket": "Belangrijkste Markt",
+      "globalPresence": "Wereldwijde Aanwezigheid",
+      "bullCase": "Bull Case",
+      "bearCase": "Bear Case",
+      "swotTitle": "SWOT-Analyse",
+      "swotStrengths": "S - Sterktes",
+      "swotWeaknesses": "W - Zwaktes",
+      "swotOpportunities": "O - Kansen",
+      "swotThreats": "T - Bedreigingen",
+      "extraInfo": "Relevante Info",
       "compareTitle": "Vergelijk met Concurrenten",
       "compareDesc": "Beoordeel financiële prestaties naast elkaar.",
       "viewFinancials": "Bekijk Volledige Financiële Analyse"

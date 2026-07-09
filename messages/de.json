@@ -381,7 +381,9 @@
       "roic": "ROIC",
       "grossMargin": "Bruttomarge",
       "operatingMargin": "Operative Marge",
-      "profitMargin": "Gewinnmarge"
+      "profitMargin": "Gewinnmarge",
+      "noDividends": "Dieses Unternehmen zahlt keine Dividenden.",
+      "returnOnEquity": "Eigenkapitalrendite (ROE)"
     },
     "ratios": {
       "roic": "ROIC",
@@ -390,6 +392,12 @@
       "profit": "NETTO",
       "roe": "ROE"
     }
+  },
+  "compare": {
+    "title": "Peer-Analyse: {industry}",
+    "subtitle": "Direkter Vergleich von Multiplikatoren und Performance innerhalb derselben GICS-Subbranche.",
+    "emptyTitle": "Peer-Vergleich",
+    "emptyDesc": "Bitte rufe diese Seite über ein Unternehmen auf, um den Vergleich mit seiner Branche zu starten."
   },
   "calendar": {
     "title": "Ergebniskalender",
@@ -471,6 +479,11 @@
     "companiesIn": "Unternehmen in {industry}",
     "backToSectors": "Zurück zu Sektoren",
     "backToIndustries": "Zurück zu Branchen",
+    "other": "Sonstige",
+    "otherIndustries": "Weitere Branchen",
+    "companiesCount": "{count, plural, one {# Unternehmen} other {# Unternehmen}}",
+    "searchResults": "Suchergebnisse",
+    "searchEmpty": "Keine Unternehmen für deine Suche gefunden.",
     "metrics": {
       "revenue": "Umsatz",
       "netMargin": "Nettomarge",
@@ -481,6 +494,16 @@
       "businessModel": "Das Geschäft",
       "revenueStreams": "Wie sie Geld verdienen",
       "leadership": "Führung",
+      "mainMarket": "Hauptmarkt",
+      "globalPresence": "Globale Präsenz",
+      "bullCase": "Bullische These (Bull)",
+      "bearCase": "Bärische These (Bear)",
+      "swotTitle": "SWOT-Analyse",
+      "swotStrengths": "S - Stärken",
+      "swotWeaknesses": "W - Schwächen",
+      "swotOpportunities": "O - Chancen",
+      "swotThreats": "T - Risiken",
+      "extraInfo": "Relevante Infos",
       "compareTitle": "Mit Wettbewerbern vergleichen",
       "compareDesc": "Finanzielle Leistung nebeneinander bewerten.",
       "viewFinancials": "Vollständige Finanzanalyse ansehen"

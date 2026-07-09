@@ -20,7 +20,17 @@
         "title": "AI 洞察",
         "desc": "通过人工智能总结近期重要动态。"
       }
-    }
+    },
+    "stats": {
+      "years": "10年",
+      "yearsLabel": "每家公司的基本面数据",
+      "companies": "500家",
+      "companiesLabel": "标普500公司",
+      "price": "0元",
+      "priceLabel": "免费方案"
+    },
+    "ctaTitle": "开始发现别人错过的价值。",
+    "ctaSubtitle": "创建免费账户，几秒内分析任何标普500公司。"
   },
   "insider": {
     "title": "内部交易",
@@ -95,8 +105,14 @@
       "calendar": "财务业绩日程",
       "dcf": "评估合理价格",
       "transcripts": "投资者会议",
-      "screener": "高级筛选寻找公司"
-    }
+      "screener": "高级筛选寻找公司",
+      "explore": "按业务类型发现和探索公司"
+    },
+    "compare": "对比",
+    "navigate": "导航",
+    "searchAction": "搜索",
+    "more": "更多",
+    "explore": "探索"
   },
   "login": {
     "title": "登录",
@@ -147,13 +163,15 @@
     "login": "登录",
     "register": "注册",
     "dcf": "DCF",
-    "calendar": "日历"
+    "calendar": "日历",
+    "theme": "切换主题"
   },
   "search": {
     "placeholder": "搜索股票代码 (如 AAPL)...",
     "noResults": "未找到公司。",
     "recentTitle": "最近搜索",
-    "clearAll": "清除全部"
+    "clearAll": "清除全部",
+    "companies": "公司"
   },
   "settings": {
     "title": "设置",
@@ -286,6 +304,16 @@
       "naGeneric": "暂无数据。",
       "naMargin": "未报告 — 金融机构常见。",
       "naPrice": "不可用：正在加载最新价格。"
+    },
+    "tabs": {
+      "overview": "概览",
+      "financials": "财务",
+      "kpis": "KPI",
+      "valuation": "估值",
+      "company": "公司",
+      "news": "新闻",
+      "valuationEmpty": "该公司暂无已保存的DCF分析。",
+      "valuationCta": "打开DCF计算器"
     }
   },
   "dcf": {
@@ -426,6 +454,36 @@
       "earningsYield": "盈利收益率",
       "action": "操作",
       "viewStock": "查看分析"
+    }
+  },
+  "footer": {
+    "rights": "© {year} {brand}。保留所有权利。",
+    "terms": "服务条款",
+    "privacy": "隐私政策",
+    "refund": "退款政策"
+  },
+  "explore": {
+    "title": "探索企业",
+    "subtitle": "按行业和业务类型发现新机会。",
+    "searchPlaceholder": "搜索公司、股票代码或业务领域...",
+    "sectorsTitle": "经济部门",
+    "industriesFor": "行业：{sector}",
+    "companiesIn": "{industry}中的公司",
+    "backToSectors": "返回部门",
+    "backToIndustries": "返回行业",
+    "metrics": {
+      "revenue": "营收",
+      "netMargin": "净利率",
+      "roic": "ROIC"
+    },
+    "noDescription": "暂无简介。",
+    "sheet": {
+      "businessModel": "业务模式",
+      "revenueStreams": "盈利方式",
+      "leadership": "管理层",
+      "compareTitle": "与同行比较",
+      "compareDesc": "并排评估财务表现。",
+      "viewFinancials": "查看完整财务分析"
     }
   }
 }

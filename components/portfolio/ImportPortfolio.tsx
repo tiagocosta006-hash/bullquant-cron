@@ -106,7 +106,7 @@ export function ImportPortfolio({ onClose, onImported }: ImportPortfolioProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-card border border-border rounded-2xl shadow-lg w-full max-w-2xl max-h-[85vh] overflow-y-auto p-6">
+      <div className="glass rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold">{t('title')}</h2>
           <button onClick={onClose} aria-label={t('close')} className="text-muted-foreground hover:text-foreground">

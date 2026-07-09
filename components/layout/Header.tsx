@@ -3,6 +3,7 @@ import { SearchBar } from '@/components/search/SearchBar';
 import { LogOut, UserCircle, Calculator, CalendarDays } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { Button, buttonVariants } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { createClient } from '@/lib/supabase/server';
 import { logout } from '@/app/(auth)/actions';
 import { getTranslations } from 'next-intl/server';
@@ -13,7 +14,7 @@ export async function Header() {
   const t = await getTranslations('header');
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="glass-topbar sticky top-0 z-50 w-full">
       <div className="container flex h-16 max-w-screen-2xl items-center px-4 md:px-8 mx-auto">
         <div className="mr-6">
           <Logo href="/" size="md" />
@@ -24,6 +25,7 @@ export async function Header() {
           </div>
 
           <nav className="flex items-center space-x-2">
+            <ThemeToggle />
             <Link
               href="/calendar"
               className="flex items-center space-x-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mr-2"

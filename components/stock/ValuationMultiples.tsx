@@ -85,7 +85,7 @@ export function ValuationMultiples({ ticker, isPro }: ValuationMultiplesProps) {
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-border bg-card p-6 flex items-center justify-center min-h-[300px]">
+      <div className="glass rounded-xl p-6 flex items-center justify-center min-h-[300px]">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     )
@@ -96,7 +96,7 @@ export function ValuationMultiples({ ticker, isPro }: ValuationMultiplesProps) {
   }
 
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden">
+    <div className="glass rounded-xl overflow-hidden">
       <div className="p-4 md:p-6 border-b border-border">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -160,7 +160,7 @@ export function ValuationMultiples({ ticker, isPro }: ValuationMultiplesProps) {
             <LineChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <XAxis 
                 dataKey="date" 
-                tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
                 tickFormatter={(val) => {
                   const d = new Date(val);
                   return `${d.getMonth()+1}/${d.getFullYear().toString().slice(-2)}`
@@ -170,7 +170,7 @@ export function ValuationMultiples({ ticker, isPro }: ValuationMultiplesProps) {
                 tickLine={false}
               />
               <YAxis 
-                tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={(val) => activeTab === 'fcf' ? `${(val*100).toFixed(0)}%` : val}
@@ -179,7 +179,7 @@ export function ValuationMultiples({ ticker, isPro }: ValuationMultiplesProps) {
               <Tooltip content={<CustomTooltip />} />
               {activeTab === "pe" && (
                 <Line 
-                  type="monotone" 
+                  type="linear" 
                   dataKey="pe" 
                   stroke="#3b82f6" 
                   strokeWidth={2}
@@ -189,7 +189,7 @@ export function ValuationMultiples({ ticker, isPro }: ValuationMultiplesProps) {
               )}
               {activeTab === "ps" && (
                 <Line 
-                  type="monotone" 
+                  type="linear" 
                   dataKey="ps" 
                   stroke="#10b981" 
                   strokeWidth={2}
@@ -199,7 +199,7 @@ export function ValuationMultiples({ ticker, isPro }: ValuationMultiplesProps) {
               )}
               {activeTab === "fcf" && (
                 <Line 
-                  type="monotone" 
+                  type="linear" 
                   dataKey="fcfYield" 
                   stroke="#f59e0b" 
                   strokeWidth={2}

@@ -20,7 +20,17 @@
         "title": "AI-Inzichten",
         "desc": "Een door AI gegenereerde samenvatting van recente ontwikkelingen."
       }
-    }
+    },
+    "stats": {
+      "years": "10 jaar",
+      "yearsLabel": "aan fundamentals per bedrijf",
+      "companies": "500",
+      "companiesLabel": "S&P 500-bedrijven",
+      "price": "€ 0",
+      "priceLabel": "met het gratis plan"
+    },
+    "ctaTitle": "Zie de waarde die anderen missen.",
+    "ctaSubtitle": "Maak je gratis account aan en analyseer elk S&P 500-bedrijf in seconden."
   },
   "insider": {
     "title": "Handel met Voorkennis",
@@ -95,8 +105,14 @@
       "calendar": "Financiële resultaten",
       "dcf": "Evalueer de juiste prijs",
       "transcripts": "Investeerdersvergaderingen",
-      "screener": "Vind bedrijven"
-    }
+      "screener": "Vind bedrijven",
+      "explore": "Vind en verken bedrijven georganiseerd op bedrijfstype"
+    },
+    "compare": "Vergelijken",
+    "navigate": "Navigeren",
+    "searchAction": "Zoeken",
+    "more": "Meer",
+    "explore": "Verkennen"
   },
   "login": {
     "title": "Inloggen",
@@ -147,13 +163,15 @@
     "login": "Inloggen",
     "register": "Registreren",
     "dcf": "DCF",
-    "calendar": "Kalender"
+    "calendar": "Kalender",
+    "theme": "Thema wisselen"
   },
   "search": {
     "placeholder": "Zoek ticker (bijv. AAPL)...",
     "noResults": "Geen resultaten gevonden.",
     "recentTitle": "Recente Zoekopdrachten",
-    "clearAll": "Alles Wissen"
+    "clearAll": "Alles Wissen",
+    "companies": "Bedrijven"
   },
   "settings": {
     "title": "Instellingen",
@@ -286,6 +304,16 @@
       "naGeneric": "Niet beschikbaar.",
       "naMargin": "Niet gerapporteerd.",
       "naPrice": "Niet beschikbaar."
+    },
+    "tabs": {
+      "overview": "Overzicht",
+      "financials": "Financiën",
+      "kpis": "KPI's",
+      "valuation": "Waardering",
+      "company": "Bedrijf",
+      "news": "Nieuws",
+      "valuationEmpty": "Nog geen opgeslagen DCF-analyses voor dit bedrijf.",
+      "valuationCta": "DCF-calculator openen"
     }
   },
   "dcf": {
@@ -426,6 +454,36 @@
       "earningsYield": "Earnings Yield",
       "action": "Bekijk",
       "viewStock": "Analyse"
+    }
+  },
+  "footer": {
+    "rights": "© {year} {brand}. Alle rechten voorbehouden.",
+    "terms": "Servicevoorwaarden",
+    "privacy": "Privacy",
+    "refund": "Restitutiebeleid"
+  },
+  "explore": {
+    "title": "Bedrijven Verkennen",
+    "subtitle": "Ontdek nieuwe kansen, georganiseerd op sector en bedrijfstype.",
+    "searchPlaceholder": "Zoek bedrijf, ticker of bedrijfsgebied...",
+    "sectorsTitle": "Economische Sectoren",
+    "industriesFor": "Industrieën: {sector}",
+    "companiesIn": "Bedrijven in {industry}",
+    "backToSectors": "Terug naar Sectoren",
+    "backToIndustries": "Terug naar Industrieën",
+    "metrics": {
+      "revenue": "Omzet",
+      "netMargin": "Nettomarge",
+      "roic": "ROIC"
+    },
+    "noDescription": "Geen samenvatting beschikbaar.",
+    "sheet": {
+      "businessModel": "Het Bedrijf",
+      "revenueStreams": "Hoe ze geld verdienen",
+      "leadership": "Leiderschap",
+      "compareTitle": "Vergelijk met Concurrenten",
+      "compareDesc": "Beoordeel financiële prestaties naast elkaar.",
+      "viewFinancials": "Bekijk Volledige Financiële Analyse"
     }
   }
 }

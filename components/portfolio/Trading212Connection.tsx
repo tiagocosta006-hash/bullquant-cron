@@ -102,7 +102,7 @@ export function Trading212Connection({ onSynced }: Trading212ConnectionProps) {
 
   if (!connection) {
     return (
-      <div className="bg-card border border-border/60 rounded-2xl p-4">
+      <div className="glass rounded-2xl p-4">
         {!isFormOpen ? (
           <Button variant="outline" onClick={() => setIsFormOpen(true)} className="gap-2">
             <Link2 className="w-4 h-4" />
@@ -140,7 +140,7 @@ export function Trading212Connection({ onSynced }: Trading212ConnectionProps) {
   }
 
   return (
-    <div className="bg-card border border-border/60 rounded-2xl p-4 flex flex-col gap-2">
+    <div className="glass rounded-2xl p-4 flex flex-col gap-2">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2 text-sm font-medium">
           <CheckCircle2 className="w-4 h-4 text-bull" />

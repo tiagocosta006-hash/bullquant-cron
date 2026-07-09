@@ -83,7 +83,7 @@ export function InsiderActivity({ ticker, currencySymbol = "$" }: { ticker: stri
     <div>
       <div className="mb-4 flex items-end justify-between gap-4">
         <div>
-          <h2 className="font-heading text-xl font-bold tracking-tight text-foreground">
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
             {t("title")}
           </h2>
           <p className="mt-0.5 text-sm text-muted-foreground">{t("subtitle")}</p>

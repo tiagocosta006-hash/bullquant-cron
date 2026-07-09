@@ -20,7 +20,17 @@
         "title": "Résumé IA",
         "desc": "Un résumé par l'IA des récents développements de chaque entreprise."
       }
-    }
+    },
+    "stats": {
+      "years": "10 ans",
+      "yearsLabel": "de fondamentaux par entreprise",
+      "companies": "500",
+      "companiesLabel": "entreprises du S&P 500",
+      "price": "0 €",
+      "priceLabel": "avec le plan gratuit"
+    },
+    "ctaTitle": "Commencez à voir la valeur que les autres ne voient pas.",
+    "ctaSubtitle": "Créez votre compte gratuit et analysez toute entreprise du S&P 500 en quelques secondes."
   },
   "insider": {
     "title": "Délit d'initié (Insider Trading)",
@@ -95,8 +105,14 @@
       "calendar": "Résultats financiers",
       "dcf": "Évaluer le juste prix",
       "transcripts": "Réunions d'investisseurs",
-      "screener": "Trouver des entreprises"
-    }
+      "screener": "Trouver des entreprises",
+      "explore": "Découvrez et explorez les entreprises organisées par type d'activité"
+    },
+    "compare": "Comparer",
+    "navigate": "Naviguer",
+    "searchAction": "Rechercher",
+    "more": "Plus",
+    "explore": "Explorer"
   },
   "login": {
     "title": "Se Connecter",
@@ -147,13 +163,15 @@
     "login": "Connexion",
     "register": "Inscription",
     "dcf": "DCF",
-    "calendar": "Calendrier"
+    "calendar": "Calendrier",
+    "theme": "Changer de thème"
   },
   "search": {
     "placeholder": "Chercher un ticker (ex: AAPL)...",
     "noResults": "Aucun résultat.",
     "recentTitle": "Recherches Récentes",
-    "clearAll": "Tout Effacer"
+    "clearAll": "Tout Effacer",
+    "companies": "Entreprises"
   },
   "settings": {
     "title": "Paramètres",
@@ -286,6 +304,16 @@
       "naGeneric": "Non disponible.",
       "naMargin": "Non reporté.",
       "naPrice": "Non disponible."
+    },
+    "tabs": {
+      "overview": "Aperçu",
+      "financials": "Fondamentaux",
+      "kpis": "KPIs",
+      "valuation": "Valorisation",
+      "company": "Entreprise",
+      "news": "Actualités",
+      "valuationEmpty": "Aucune analyse DCF enregistrée pour cette entreprise.",
+      "valuationCta": "Ouvrir le calculateur DCF"
     }
   },
   "dcf": {
@@ -426,6 +454,36 @@
       "earningsYield": "Earnings Yield",
       "action": "Voir",
       "viewStock": "Analyse"
+    }
+  },
+  "footer": {
+    "rights": "© {year} {brand}. Tous droits réservés.",
+    "terms": "Conditions d'utilisation",
+    "privacy": "Confidentialité",
+    "refund": "Politique de remboursement"
+  },
+  "explore": {
+    "title": "Explorer les Entreprises",
+    "subtitle": "Découvrez de nouvelles opportunités organisées par secteur et type d'activité.",
+    "searchPlaceholder": "Rechercher entreprise, ticker ou secteur d'activité...",
+    "sectorsTitle": "Secteurs Économiques",
+    "industriesFor": "Industries : {sector}",
+    "companiesIn": "Entreprises dans {industry}",
+    "backToSectors": "Retour aux Secteurs",
+    "backToIndustries": "Retour aux Industries",
+    "metrics": {
+      "revenue": "Chiffre d'affaires",
+      "netMargin": "Marge Nette",
+      "roic": "ROIC"
+    },
+    "noDescription": "Aucun résumé disponible.",
+    "sheet": {
+      "businessModel": "L'Activité",
+      "revenueStreams": "Comment ils gagnent de l'argent",
+      "leadership": "Direction",
+      "compareTitle": "Comparer avec les Concurrents",
+      "compareDesc": "Évaluez la performance financière côte à côte.",
+      "viewFinancials": "Voir l'Analyse Financière Complète"
     }
   }
 }

@@ -180,10 +180,10 @@ export function StockKPIs({ fundamentals, isPro, ticker }: StockKPIsProps) {
   // Se não há KPIs, mostra o paywall / extração
   if (kpiData.length === 0) {
     return (
-      <div className="mt-8 relative overflow-hidden rounded-2xl border border-border/40 bg-card/40 backdrop-blur-md p-8 md:p-12 text-center shadow-lg">
+      <div className="glass mt-8 relative overflow-hidden rounded-2xl p-8 md:p-12 text-center">
         <div className="absolute top-0 right-0 p-32 bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
         <div className="relative z-10 flex flex-col items-center max-w-2xl mx-auto space-y-6">
-          <div className="p-4 bg-primary/10 rounded-full text-primary border border-primary/20 shadow-[0_0_30px_-5px_rgba(var(--primary),0.3)]">
+          <div className="p-4 bg-primary/10 rounded-full text-primary border border-primary/20 shadow-[0_0_30px_-5px_color-mix(in_srgb,var(--primary)_30%,transparent)]">
             <BrainCircuit className="w-10 h-10" />
           </div>
           <div>
@@ -242,7 +242,7 @@ export function StockKPIs({ fundamentals, isPro, ticker }: StockKPIsProps) {
         {kpiData.map((kpi, idx) => (
           <div 
             key={idx} 
-            className="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-card/40 backdrop-blur-md border border-border/40 p-4 transition-all duration-300 hover:bg-card/60 hover:shadow-[0_0_30px_-5px_rgba(var(--primary),0.1)] hover:border-primary/30"
+            className="glass group relative flex flex-col justify-between overflow-hidden rounded-2xl p-4 transition-transform duration-300 hover:-translate-y-0.5"
           >
             {/* Cabecalho do Cartao */}
             <div className="mb-4 z-10 flex justify-between items-start">
@@ -279,14 +279,14 @@ export function StockKPIs({ fundamentals, isPro, ticker }: StockKPIsProps) {
                     dataKey="period" 
                     axisLine={false} 
                     tickLine={false} 
-                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} 
+                    tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                     dy={10}
                   />
                   <YAxis 
                     domain={[(dataMin: number) => dataMin > 0 ? dataMin * 0.9 : dataMin * 1.1, (dataMax: number) => dataMax > 0 ? dataMax * 1.1 : dataMax * 0.9]} 
                     axisLine={false} 
                     tickLine={false} 
-                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} 
+                    tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                     tickFormatter={(val) => new Intl.NumberFormat('en-US', { notation: "compact", maximumFractionDigits: 1 }).format(val)}
                     width={40}
                   />
@@ -295,7 +295,7 @@ export function StockKPIs({ fundamentals, isPro, ticker }: StockKPIsProps) {
                     cursor={{ stroke: 'var(--primary)', strokeOpacity: 0.2, strokeWidth: 2, strokeDasharray: '4 4' }}
                   />
                   <Line 
-                    type="monotone" 
+                    type="linear" 
                     dataKey="value" 
                     stroke="var(--primary)" 
                     strokeWidth={2}
@@ -326,8 +326,8 @@ export function StockKPIs({ fundamentals, isPro, ticker }: StockKPIsProps) {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="p-5 bg-muted/50 rounded-lg border border-border text-sm my-2 font-serif italic text-foreground/90 border-l-4 border-l-primary relative overflow-hidden">
-            <span className="text-6xl text-primary/10 absolute -top-2 left-2 font-serif pointer-events-none">"</span>
+          <div className="p-5 bg-muted/50 rounded-lg border border-border text-sm my-2 text-foreground/90 border-l-4 border-l-primary relative overflow-hidden">
+            <span className="text-6xl text-primary/10 absolute -top-2 left-2 pointer-events-none">"</span>
             <span className="relative z-10 leading-relaxed text-[15px]">{sourceDialog?.quote}</span>
           </div>
 

@@ -25,7 +25,7 @@ export function PortfolioTable({ items, prices, onRemove }: PortfolioTableProps)
   const hasAnyPosition = items.some(item => item.quantity !== null && item.avgBuyPrice !== null)
 
   return (
-    <div className="rounded-xl border bg-card overflow-hidden">
+    <div className="glass rounded-xl overflow-hidden">
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/50">

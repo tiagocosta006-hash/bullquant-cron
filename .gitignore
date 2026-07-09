@@ -56,5 +56,8 @@ database_health_report.md
 # claude code — skills são tooling instalável (8M+), não código de produto
 /.claude/skills/
 
+# foundations lab: o HTML final é gerado pelo build (node design/foundations/build-foundations.js)
+design/foundations/bullvision-foundations.html
+
 # claude code — definições pessoais/locais, não partilhar com a equipa
 /.claude/settings.local.json

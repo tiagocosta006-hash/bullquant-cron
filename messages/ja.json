@@ -20,7 +20,17 @@
         "title": "AIインサイト",
         "desc": "最近の動向に関するAIによる要約。"
       }
-    }
+    },
+    "stats": {
+      "years": "10年分",
+      "yearsLabel": "の企業ファンダメンタルズ",
+      "companies": "500社",
+      "companiesLabel": "S&P 500企業",
+      "price": "0円",
+      "priceLabel": "無料プラン"
+    },
+    "ctaTitle": "他の人が見逃す価値を見つけよう。",
+    "ctaSubtitle": "無料アカウントを作成して、S&P 500企業を数秒で分析。"
   },
   "insider": {
     "title": "インサイダー取引",
@@ -95,8 +105,14 @@
       "calendar": "財務結果",
       "dcf": "適正価格を評価",
       "transcripts": "投資家会議",
-      "screener": "企業を見つける"
-    }
+      "screener": "企業を見つける",
+      "explore": "業種別に企業を発見・探索"
+    },
+    "compare": "比較",
+    "navigate": "ナビゲーション",
+    "searchAction": "検索",
+    "more": "その他",
+    "explore": "探索"
   },
   "login": {
     "title": "ログイン",
@@ -147,13 +163,15 @@
     "login": "ログイン",
     "register": "登録",
     "dcf": "DCF",
-    "calendar": "カレンダー"
+    "calendar": "カレンダー",
+    "theme": "テーマ切替"
   },
   "search": {
     "placeholder": "ティッカーを検索 (例: AAPL)...",
     "noResults": "結果がありません。",
     "recentTitle": "最近の検索",
-    "clearAll": "すべてクリア"
+    "clearAll": "すべてクリア",
+    "companies": "企業"
   },
   "settings": {
     "title": "設定",
@@ -286,6 +304,16 @@
       "naGeneric": "利用不可。",
       "naMargin": "報告されていません。",
       "naPrice": "利用不可。"
+    },
+    "tabs": {
+      "overview": "概要",
+      "financials": "財務",
+      "kpis": "KPI",
+      "valuation": "バリュエーション",
+      "company": "企業情報",
+      "news": "ニュース",
+      "valuationEmpty": "この企業の保存済みDCF分析はまだありません。",
+      "valuationCta": "DCF計算機を開く"
     }
   },
   "dcf": {
@@ -426,6 +454,36 @@
       "earningsYield": "Earnings Yield",
       "action": "表示",
       "viewStock": "分析"
+    }
+  },
+  "footer": {
+    "rights": "© {year} {brand} 無断転載を禁じます。",
+    "terms": "利用規約",
+    "privacy": "プライバシー",
+    "refund": "返金ポリシー"
+  },
+  "explore": {
+    "title": "企業を探索",
+    "subtitle": "セクターと業種別に新しい機会を発見。",
+    "searchPlaceholder": "企業、ティッカー、業種を検索...",
+    "sectorsTitle": "経済セクター",
+    "industriesFor": "業種：{sector}",
+    "companiesIn": "{industry}の企業",
+    "backToSectors": "セクターに戻る",
+    "backToIndustries": "業種に戻る",
+    "metrics": {
+      "revenue": "売上高",
+      "netMargin": "純利益率",
+      "roic": "ROIC"
+    },
+    "noDescription": "概要はありません。",
+    "sheet": {
+      "businessModel": "事業内容",
+      "revenueStreams": "収益源",
+      "leadership": "経営陣",
+      "compareTitle": "競合と比較",
+      "compareDesc": "財務パフォーマンスを並べて評価。",
+      "viewFinancials": "完全な財務分析を見る"
     }
   }
 }

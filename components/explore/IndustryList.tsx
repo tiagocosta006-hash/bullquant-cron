@@ -20,15 +20,15 @@ export function IndustryList({ industries, onSelect }: IndustryListProps) {
         <button
           key={industryName}
           onClick={() => onSelect(industryName)}
-          className="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-card hover:bg-card-hover hover:border-white/10 transition-colors text-left group"
+          className="glass flex items-center justify-between p-4 rounded-xl text-left group transition-transform hover:-translate-y-0.5"
         >
           <div>
-            <h4 className="font-medium text-white group-hover:text-primary transition-colors">
+            <h4 className="font-medium text-foreground group-hover:text-primary transition-colors">
               {industryName === "Unknown" ? "Outras Indústrias" : industryName}
             </h4>
-            <p className="text-xs text-white/50 mt-0.5">{count} {count === 1 ? 'empresa' : 'empresas'}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{count} {count === 1 ? 'empresa' : 'empresas'}</p>
           </div>
-          <ChevronRight size={18} className="text-white/20 group-hover:text-primary transition-colors" />
+          <ChevronRight size={18} className="text-muted-foreground/50 group-hover:text-primary transition-colors" />
         </button>
       ))}
     </div>

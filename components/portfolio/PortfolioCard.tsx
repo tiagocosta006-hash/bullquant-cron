@@ -39,7 +39,7 @@ export function PortfolioCard({ item, price, onRemove }: PortfolioCardProps) {
         <X className="w-3.5 h-3.5" />
       </button>
       <Link href={`/stock/${item.company.ticker}`} className="block">
-        <div className="bg-card border border-border/60 hover:border-primary/50 hover:shadow-md transition-all p-5 rounded-2xl flex flex-col h-full relative overflow-hidden">
+        <div className="glass hover:-translate-y-0.5 transition-transform p-5 rounded-2xl flex flex-col h-full relative overflow-hidden">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="bg-primary/5 p-2 rounded-lg border border-primary/10 flex items-center justify-center shrink-0 w-12 h-12">

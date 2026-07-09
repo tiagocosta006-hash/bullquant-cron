@@ -1,21 +1,39 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
+import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { BRAND } from "@/lib/brand";
 
-const inter = Inter({
-  variable: "--font-sans",
-  subsets: ["latin"],
+const scotchDisplay = localFont({
+  variable: "--font-heading",
   display: "swap",
+  src: [
+    { path: "../public/fonts/scotch-display/ScotchDisplay-SemiBold.ttf", weight: "600", style: "normal" },
+    { path: "../public/fonts/scotch-display/ScotchDisplay-SemiBoldItalic.ttf", weight: "600", style: "italic" },
+    { path: "../public/fonts/scotch-display/ScotchDisplay-Bold.ttf", weight: "700", style: "normal" },
+    { path: "../public/fonts/scotch-display/ScotchDisplay-BoldItalic.ttf", weight: "700", style: "italic" },
+  ],
 });
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-heading",
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
+const sfUIText = localFont({
+  variable: "--font-sans",
   display: "swap",
+  src: [
+    { path: "../public/fonts/sf-ui-text/SFUIText-Light.woff2", weight: "300", style: "normal" },
+    { path: "../public/fonts/sf-ui-text/SFUIText-LightItalic.woff2", weight: "300", style: "italic" },
+    { path: "../public/fonts/sf-ui-text/SFUIText-Regular.woff2", weight: "400", style: "normal" },
+    { path: "../public/fonts/sf-ui-text/SFUIText-RegularItalic.woff2", weight: "400", style: "italic" },
+    { path: "../public/fonts/sf-ui-text/SFUIText-Medium.woff2", weight: "500", style: "normal" },
+    { path: "../public/fonts/sf-ui-text/SFUIText-MediumItalic.woff2", weight: "500", style: "italic" },
+    { path: "../public/fonts/sf-ui-text/SFUIText-Semibold.woff2", weight: "600", style: "normal" },
+    { path: "../public/fonts/sf-ui-text/SFUIText-SemiboldItalic.woff2", weight: "600", style: "italic" },
+    { path: "../public/fonts/sf-ui-text/SFUIText-Bold.woff2", weight: "700", style: "normal" },
+    { path: "../public/fonts/sf-ui-text/SFUIText-BoldItalic.woff2", weight: "700", style: "italic" },
+    { path: "../public/fonts/sf-ui-text/SFUIText-Heavy.woff2", weight: "800", style: "normal" },
+    { path: "../public/fonts/sf-ui-text/SFUIText-HeavyItalic.woff2", weight: "800", style: "italic" },
+  ],
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -33,8 +51,8 @@ export const metadata: Metadata = {
   description:
     "Análise fundamental de ações com 10 anos de dados, DCF integrada e AI Insights. Em português, gratuito. Uma plataforma Bullocracy.",
   icons: {
-    icon: [{ url: "/brand/icon.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/brand/icon.svg" }],
+    icon: [{ url: "/brand/bull-metrics-icon.png", type: "image/png" }],
+    apple: [{ url: "/brand/bull-metrics-icon.png" }],
   },
   openGraph: {
     title: `${BRAND.name} — Value Investing, com visão`,
@@ -58,8 +76,18 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased dark`}
+      className={`${scotchDisplay.variable} ${sfUIText.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        {/* Tema: claro por defeito, escuro persistido — aplicado antes do paint (anti-FOUC) */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}})()",
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground">
         <NextIntlClientProvider messages={messages}>
           <main className="flex-1 flex flex-col">{children}</main>

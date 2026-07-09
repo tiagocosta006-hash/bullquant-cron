@@ -297,7 +297,7 @@ function MonthView({ cursor, byDay, loading, todayStr }: ViewProps) {
   }, [monthStart, monthEnd, cursor])
 
   return (
-    <div className="rounded-xl border border-border overflow-hidden bg-card">
+    <div className="glass rounded-xl overflow-hidden">
       <div className="grid grid-cols-7 bg-muted/50">
         {weekdays.map(w => (
           <div key={w} className="p-2 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -307,7 +307,7 @@ function MonthView({ cursor, byDay, loading, todayStr }: ViewProps) {
       </div>
       <div className="grid grid-cols-7">
         {cells.map((day, idx) => {
-          if (!day) return <div key={`empty-${idx}`} className="min-h-[7rem] border-t border-l border-border bg-muted/20" />
+          if (!day) return <div key={`empty-${idx}`} className="min-h-[9rem] border-t border-l border-border bg-muted/20" />
           const dayStr = fmtDate(day)
           const dayEvents = byDay.get(dayStr) ?? []
           const isToday = dayStr === todayStr
@@ -315,14 +315,14 @@ function MonthView({ cursor, byDay, loading, todayStr }: ViewProps) {
           return (
             <div
               key={dayStr}
-              className={`min-h-[7rem] border-t border-l border-border p-1.5 flex flex-col transition-colors ${
+              className={`min-h-[9rem] border-t border-l border-border p-2 flex flex-col transition-colors ${
                 isWeekend ? "bg-muted/20" : ""
               } ${isToday ? "ring-1 ring-inset ring-primary/40" : ""}`}
             >
               <div
-                className={`text-xs font-medium mb-1 ${
+                className={`text-sm font-medium mb-1.5 ${
                   isToday
-                    ? "self-start rounded-full bg-primary text-primary-foreground w-5 h-5 flex items-center justify-center font-bold"
+                    ? "self-start rounded-full bg-primary text-primary-foreground w-6 h-6 flex items-center justify-center font-bold"
                     : "text-muted-foreground"
                 }`}
               >
@@ -330,11 +330,11 @@ function MonthView({ cursor, byDay, loading, todayStr }: ViewProps) {
               </div>
               {loading ? (
                 <div className="space-y-1">
-                  <div className="h-4 rounded bg-muted animate-pulse" />
-                  {idx % 3 === 0 && <div className="h-4 rounded bg-muted animate-pulse w-2/3" />}
+                  <div className="h-5 rounded bg-muted animate-pulse" />
+                  {idx % 3 === 0 && <div className="h-5 rounded bg-muted animate-pulse w-2/3" />}
                 </div>
               ) : (
-                <div className="space-y-0.5 overflow-hidden">
+                <div className="space-y-1 overflow-hidden">
                   {dayEvents.slice(0, 4).map((e) => (
                     <EventChip key={e.id} e={e} />
                   ))}
@@ -342,7 +342,7 @@ function MonthView({ cursor, byDay, loading, todayStr }: ViewProps) {
                     <Dialog>
                       {/* @ts-ignore - shadcn base-ui migration */}
                       <DialogTrigger asChild>
-                        <button className="text-[10px] text-muted-foreground px-1 text-left hover:underline w-full mt-0.5">
+                        <button className="text-xs text-muted-foreground px-1.5 text-left hover:underline w-full mt-0.5">
                           +{dayEvents.length - 4} {t("more")}
                         </button>
                       </DialogTrigger>
@@ -377,7 +377,7 @@ function WeekView({ cursor, byDay, loading, todayStr }: ViewProps) {
   const days = Array.from({ length: 7 }, (_, i) => addDays(wStart, i))
 
   return (
-    <div className="rounded-xl border border-border overflow-hidden bg-card">
+    <div className="glass rounded-xl overflow-hidden">
       <div className="grid grid-cols-7 bg-muted/50">
         {days.map(day => (
           <div key={day.toISOString()} className="p-2 text-center flex flex-col items-center">
@@ -484,7 +484,7 @@ function DayHourSection({ title, icon: Icon, events }: { title: string, icon: Re
   if (!events || events.length === 0) return null
   
   return (
-    <div className="rounded-xl border border-border overflow-hidden bg-card">
+    <div className="glass rounded-xl overflow-hidden">
       <div className="bg-muted/30 px-4 py-3 border-b border-border flex items-center gap-2">
         <div className="p-1.5 rounded-md bg-background border border-border/50 text-foreground">
           <Icon className="h-4 w-4" />
@@ -582,23 +582,23 @@ function EventChip({ e }: { e: EarningsItem }) {
     <Dialog>
       <DialogTrigger
         title={`${e.name} · Q${e.fiscalQuarter} ${e.fiscalYear}`}
-        className="w-full text-left group flex items-center gap-1.5 rounded px-1 py-0.5 text-[11px] font-semibold truncate transition-colors hover:bg-muted"
+        className="w-full text-left group flex items-center gap-2 rounded-md px-1.5 py-1 text-sm font-semibold truncate transition-colors hover:bg-muted"
       >
         {e.logoUrl ? (
-          <div className="relative h-3.5 w-3.5 shrink-0 flex items-center justify-center">
+          <div className="relative h-5 w-5 shrink-0 flex items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={e.logoUrl} alt="" referrerPolicy="no-referrer" className="h-full w-full rounded-sm object-contain bg-white" onError={(ev) => {
               (ev.target as HTMLImageElement).style.display = "none";
               (ev.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
             }}/>
-            <span className={`text-[8px] font-bold text-primary absolute hidden`}>{e.ticker[0]}</span>
+            <span className={`text-[10px] font-bold text-primary absolute hidden`}>{e.ticker[0]}</span>
           </div>
         ) : HourIcon ? (
-          <HourIcon className="h-3 w-3 shrink-0 opacity-60" />
+          <HourIcon className="h-4 w-4 shrink-0 opacity-60" />
         ) : null}
         <span className="truncate text-foreground">{e.ticker}</span>
         {reported && (
-          beat ? <TrendingUp className="h-3 w-3 shrink-0 text-bull" /> : <TrendingDown className="h-3 w-3 shrink-0 text-bear" />
+          beat ? <TrendingUp className="h-3.5 w-3.5 shrink-0 text-bull" /> : <TrendingDown className="h-3.5 w-3.5 shrink-0 text-bear" />
         )}
       </DialogTrigger>
 

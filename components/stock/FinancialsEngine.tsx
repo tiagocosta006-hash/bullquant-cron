@@ -211,7 +211,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
           title={t('charts.revenue')} 
           data={chartData} 
           type="BAR" 
-          config={{ isCurrency: true, dataKeys: [{ key: 'revenue', color: '#3b82f6', type: 'bar' }] }} 
+          config={{ isCurrency: true, dataKeys: [{ key: 'revenue', color: 'var(--chart-1)', type: 'bar' }] }} 
           cagr={calcCAGR('revenue')}
         />
 
@@ -231,7 +231,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
           title={t('charts.epsDiluted')} 
           data={chartData} 
           type="BAR" 
-          config={{ dataKeys: [{ key: 'epsDiluted', color: '#8b5cf6', type: 'bar' }] }} 
+          config={{ dataKeys: [{ key: 'epsDiluted', color: 'var(--chart-1)', type: 'bar' }] }} 
           cagr={calcCAGR('epsDiluted')}
         />
 
@@ -243,9 +243,9 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
             config={{ 
               isCurrency: true,
               dataKeys: [
-                { key: 'freeCashFlow', name: 'FCF', color: '#3b82f6', type: 'bar' },
-                { key: 'operatingCashFlow', name: 'OCF', color: '#10b981', type: 'line' },
-                { key: 'capex', name: 'CapEx', color: '#f43f5e', type: 'line' }
+                { key: 'freeCashFlow', name: 'FCF', color: 'var(--chart-1)', type: 'bar' },
+                { key: 'operatingCashFlow', name: 'OCF', color: 'var(--chart-5)', type: 'line' },
+                { key: 'capex', name: 'CapEx', color: 'var(--chart-4)', type: 'line' }
               ],
               defaultHiddenKeys: ['operatingCashFlow', 'capex']
             }} 
@@ -258,7 +258,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
           title={t('charts.netIncome')} 
           data={chartData} 
           type="BAR" 
-          config={{ isCurrency: true, dataKeys: [{ key: 'netIncome', color: '#14b8a6', type: 'bar' }] }} 
+          config={{ isCurrency: true, dataKeys: [{ key: 'netIncome', color: 'var(--chart-1)', type: 'bar' }] }} 
           cagr={calcCAGR('netIncome')}
         />
 
@@ -267,7 +267,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
             title={t('charts.ebitda')} 
             data={chartData} 
             type="BAR" 
-            config={{ isCurrency: true, dataKeys: [{ key: 'ebitda', color: '#f59e0b', type: 'bar' }] }} 
+            config={{ isCurrency: true, dataKeys: [{ key: 'ebitda', color: 'var(--chart-1)', type: 'bar' }] }} 
             cagr={calcCAGR('ebitda')}
           />
         )}
@@ -279,11 +279,11 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
           config={{ 
             isCurrency: true,
             dataKeys: isBank ? [
-              { key: 'operatingExpenses', name: 'OpEx', color: '#f43f5e', type: 'bar' }
+              { key: 'operatingExpenses', name: 'OpEx', color: 'var(--chart-4)', type: 'bar' }
             ] : [
-              { key: 'researchAndDevelopment', name: 'R&D', color: '#0ea5e9', type: 'bar', stackId: 'a' },
-              { key: 'sellingGeneralAndAdmin', name: 'SG&A', color: '#f43f5e', type: 'bar', stackId: 'a' },
-              { key: 'capex', name: 'CapEx', color: '#eab308', type: 'bar', stackId: 'a' }
+              { key: 'researchAndDevelopment', name: 'R&D', color: 'var(--chart-5)', type: 'bar', stackId: 'a' },
+              { key: 'sellingGeneralAndAdmin', name: 'SG&A', color: 'var(--chart-4)', type: 'bar', stackId: 'a' },
+              { key: 'capex', name: 'CapEx', color: 'var(--chart-1)', type: 'bar', stackId: 'a' }
             ] 
           }} 
         />
@@ -295,8 +295,8 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
           config={{ 
             isCurrency: true,
             dataKeys: [
-              { key: 'cash', name: 'Cash', color: '#10b981', type: 'bar' },
-              { key: 'totalDebt', name: 'Debt', color: '#f43f5e', type: 'bar' }
+              { key: 'cash', name: 'Cash', color: 'var(--bull)', type: 'bar' },
+              { key: 'totalDebt', name: 'Debt', color: 'var(--bear)', type: 'bar' }
             ] 
           }} 
         />
@@ -305,7 +305,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
           title={t('charts.sharesOutstanding')} 
           data={chartData} 
           type="BAR" 
-          config={{ dataKeys: [{ key: 'sharesOutstanding', color: '#6366f1', type: 'bar' }], inverseColors: true, isLargeNumber: true }} 
+          config={{ dataKeys: [{ key: 'sharesOutstanding', color: 'var(--chart-4)', type: 'bar' }], inverseColors: true, isLargeNumber: true }} 
           cagr={calcCAGR('sharesOutstanding')}
         />
 
@@ -313,14 +313,13 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
           title={t('charts.dividends')} 
           data={chartData} 
           type="BAR" 
-          config={{ dataKeys: [{ key: 'dividendPerShare', name: 'Dividend/Share', color: '#ec4899', type: 'bar' }] }} 
+          config={{ dataKeys: [{ key: 'dividendPerShare', name: 'Dividend/Share', color: 'var(--chart-1)', type: 'bar' }] }} 
           cagr={calcCAGR('dividendPerShare')}
           emptyMessage="Esta empresa não distribui dividendos."
         />
 
         {/* 4-in-1 Ratios Card */}
-        <div className="bg-card border border-border/40 rounded-xl shadow-sm h-[320px] flex flex-col group">
-          {(() => {
+        {(() => {
             const tabs = (
               <div className="flex bg-muted/50 p-1 rounded-md border border-border/40">
                 {(["ROIC", "ROE", "GROSS", "OPERATING", "PROFIT"] as const)
@@ -344,16 +343,15 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
             );
 
             return (
-              <div className="h-full w-full">
-                {ratioTab === "ROIC" && <DecisionChart currencySymbol={currencySymbol} title={t('charts.roic')} data={chartData} type="COMPOSED" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'roic', color: '#3b82f6', type: 'bar' }], referenceLine: { y: 0.15, color: '#10b981', label: '15%' } }} />}
-                {ratioTab === "ROE" && <DecisionChart currencySymbol={currencySymbol} title="Return on Equity" data={chartData} type="BAR" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'returnOnEquity', color: '#8b5cf6', type: 'bar' }] }} />}
-                {ratioTab === "GROSS" && <DecisionChart currencySymbol={currencySymbol} title={t('charts.grossMargin')} data={chartData} type="LINE" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'grossMargin', color: '#ec4899', type: 'line' }] }} />}
-                {ratioTab === "OPERATING" && <DecisionChart currencySymbol={currencySymbol} title={t('charts.operatingMargin')} data={chartData} type="LINE" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'operatingMargin', color: '#f59e0b', type: 'line' }] }} />}
-                {ratioTab === "PROFIT" && <DecisionChart currencySymbol={currencySymbol} title={t('charts.profitMargin')} data={chartData} type="LINE" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'profitMargin', color: '#14b8a6', type: 'line' }] }} />}
-              </div>
+              <>
+                {ratioTab === "ROIC" && <DecisionChart currencySymbol={currencySymbol} title={t('charts.roic')} data={chartData} type="COMPOSED" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'roic', color: 'var(--chart-1)', type: 'bar' }], referenceLine: { y: 0.15, color: 'var(--bull)', label: '15%' } }} />}
+                {ratioTab === "ROE" && <DecisionChart currencySymbol={currencySymbol} title="Return on Equity" data={chartData} type="BAR" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'returnOnEquity', color: 'var(--chart-1)', type: 'bar' }] }} />}
+                {ratioTab === "GROSS" && <DecisionChart currencySymbol={currencySymbol} title={t('charts.grossMargin')} data={chartData} type="LINE" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'grossMargin', color: 'var(--chart-1)', type: 'line' }] }} />}
+                {ratioTab === "OPERATING" && <DecisionChart currencySymbol={currencySymbol} title={t('charts.operatingMargin')} data={chartData} type="LINE" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'operatingMargin', color: 'var(--chart-1)', type: 'line' }] }} />}
+                {ratioTab === "PROFIT" && <DecisionChart currencySymbol={currencySymbol} title={t('charts.profitMargin')} data={chartData} type="LINE" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'profitMargin', color: 'var(--chart-1)', type: 'line' }] }} />}
+              </>
             );
           })()}
-        </div>
 
       </div>
     </div>

@@ -5,9 +5,10 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================
-   BullVision — Golden Terminal design system
+   Bull Metrics — fundações visuais (design/foundations)
+   Flat warm-neutral paper + dourado matte. Claro por defeito,
+   escuro a um toque. SF Pro em tudo; Scotch só em display.
    Layer 1 Primitives → Layer 2 Semantic → Layer 3 Component
-   Dark-first. Gold on near-black. Mono numerals.
    ============================================================ */
 
 @theme inline {
@@ -69,123 +70,135 @@
 
 /* ── Layer 1 · PRIMITIVES ─────────────────────────────────── */
 :root {
-  /* Gold (brand) */
-  --gold-300: #f2c861;
-  --gold-400: #ecb94a;
-  --gold-500: #e4aa33; /* signature */
-  --gold-600: #c88e27;
-  --gold-700: #a1701c;
+  /* Dourado — #E4AA33 é a assinatura Bullocracy (primitivo);
+     no produto o acento é o dourado MATTE (contido, não azeiteiro) */
+  --gold-signature: #e4aa33;
+  --gold-matte: #b8873b;      /* acento light */
+  --gold-matte-deep: #9c6f2c;
+  --gold-matte-bright: #d6a64a; /* acento dark */
 
-  /* Ink — warm near-black neutrals */
-  --ink-950: #0b0b0e; /* app canvas */
-  --ink-900: #111014; /* card */
-  --ink-850: #16151a; /* popover / card-hover */
-  --ink-800: #1c1b21; /* muted / secondary surface */
-  --ink-700: #27252d; /* border-strong */
-  --ink-600: #34323b;
+  /* Neutros quentes — papel (light) */
+  --paper-bg: #fafaf7;
+  --paper-surface: #ffffff;
+  --paper-surface-2: #f0efea;
+  --paper-border: #e7e5de;
+  --paper-border-strong: #d6d3ca;
+  --paper-text: #1a1a17;
+  --paper-text-2: #57544d;
+  --paper-text-3: #8b877d;
 
-  /* Parchment — warm light neutrals */
-  --parchment-50: #f7f5ef;
-  --parchment-100: #f2efe6; /* primary text on dark */
-  --parchment-300: #cbc7ba;
-  --grey-400: #a8a498; /* muted text */
-  --grey-500: #6f6c64;
+  /* Neutros quentes — noite (dark) */
+  --night-bg: #100f0d;
+  --night-surface: #191815;
+  --night-surface-2: #201e1a;
+  --night-border: #262420;
+  --night-border-strong: #38352f;
+  --night-text: #f2f1eb;
+  --night-text-2: #a9a59b;
+  --night-text-3: #7c786e;
 
-  /* Market */
-  --emerald: #2ebd85; /* bull */
-  --crimson: #f0565b; /* bear */
-  --azure: #5b9dd9; /* neutral accent */
-  --copper: #d98c4a;
+  /* Mercado (semântica sobe/desce — nunca para colorir séries) */
+  --market-up: #2e7d51;
+  --market-down: #c0392b;
+  --market-up-dark: #3dd07e;
+  --market-down-dark: #ff5a4d;
 
-  --radius: 0.625rem;
+  --radius: 0.75rem;
+  --spring: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ── Layer 2 · SEMANTIC (light, fallback) ─────────────────── */
+/* ── Layer 2 · SEMANTIC (light — default) ─────────────────── */
 :root {
-  --background: var(--parchment-50);
-  --foreground: #1a1812;
-  --card: #ffffff;
-  --card-foreground: #1a1812;
-  --popover: #ffffff;
-  --popover-foreground: #1a1812;
+  --background: var(--paper-bg);
+  --foreground: var(--paper-text);
+  --card: var(--paper-surface);
+  --card-foreground: var(--paper-text);
+  --popover: var(--paper-surface);
+  --popover-foreground: var(--paper-text);
 
-  --primary: var(--gold-600);
+  --primary: var(--gold-matte);
   --primary-foreground: #ffffff;
-  --secondary: #efece2;
-  --secondary-foreground: #2a2722;
-  --muted: #efece2;
-  --muted-foreground: #6f6c64;
-  --accent: #f0e7d2;
-  --accent-foreground: #2a2722;
+  --secondary: var(--paper-surface-2);
+  --secondary-foreground: var(--paper-text-2);
+  --muted: var(--paper-surface-2);
+  --muted-foreground: var(--paper-text-2);
+  --accent: var(--paper-surface-2);
+  --accent-foreground: var(--paper-text);
 
-  --destructive: var(--crimson);
-  --border: #e4e0d4;
-  --input: #e4e0d4;
-  --ring: var(--gold-600);
+  --destructive: var(--market-down);
+  --border: var(--paper-border);
+  --input: var(--paper-border-strong);
+  --ring: var(--gold-matte);
 
-  --bull: #1aa06a;
+  --bull: var(--market-up);
   --bull-foreground: #ffffff;
-  --bear: #d8434a;
+  --bear: var(--market-down);
   --bear-foreground: #ffffff;
 
-  --chart-1: var(--gold-500);
-  --chart-2: #1aa06a;
-  --chart-3: var(--azure);
-  --chart-4: var(--copper);
-  --chart-5: #8a8578;
+  /* uma cor por série: dourado primeiro; verde/vermelho só semântica */
+  --chart-1: var(--gold-matte);
+  --chart-2: var(--market-up);
+  --chart-3: var(--market-down);
+  --chart-4: #a15c3c;
+  --chart-5: #2f6fb0;
 
-  --sidebar: #ffffff;
-  --sidebar-foreground: #1a1812;
-  --sidebar-primary: var(--gold-600);
+  --sidebar: var(--paper-surface);
+  --sidebar-foreground: var(--paper-text);
+  --sidebar-primary: var(--gold-matte);
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f0e7d2;
-  --sidebar-accent-foreground: #2a2722;
-  --sidebar-border: #e4e0d4;
-  --sidebar-ring: var(--gold-600);
+  --sidebar-accent: var(--paper-surface-2);
+  --sidebar-accent-foreground: var(--paper-text);
+  --sidebar-border: var(--paper-border);
+  --sidebar-ring: var(--gold-matte);
+
+  /* cartografia de fundo (rgb components para alpha por linha) */
+  --line-ink: 26, 26, 23;
 }
 
-/* ── Layer 2 · SEMANTIC (dark — Golden Terminal, default) ── */
+/* ── Layer 2 · SEMANTIC (dark — a um toque) ───────────────── */
 .dark {
-  --background: var(--ink-950);
-  --foreground: var(--parchment-100);
-  --card: var(--ink-900);
-  --card-foreground: var(--parchment-100);
-  --popover: var(--ink-850);
-  --popover-foreground: var(--parchment-100);
+  --background: var(--night-bg);
+  --foreground: var(--night-text);
+  --card: var(--night-surface);
+  --card-foreground: var(--night-text);
+  --popover: var(--night-surface-2);
+  --popover-foreground: var(--night-text);
 
-  --primary: var(--gold-500);
-  --primary-foreground: #0b0b0e;
-  --secondary: var(--ink-800);
-  --secondary-foreground: var(--parchment-100);
-  --muted: var(--ink-800);
-  --muted-foreground: var(--grey-400);
-  --accent: var(--ink-800);
-  --accent-foreground: var(--parchment-100);
+  --primary: var(--gold-matte-bright);
+  --primary-foreground: #17130a;
+  --secondary: var(--night-surface-2);
+  --secondary-foreground: var(--night-text);
+  --muted: var(--night-surface-2);
+  --muted-foreground: var(--night-text-2);
+  --accent: var(--night-surface-2);
+  --accent-foreground: var(--night-text);
 
-  --destructive: var(--crimson);
-  --border: var(--ink-700);
-  --input: var(--ink-700);
-  --ring: var(--gold-500);
+  --destructive: var(--market-down-dark);
+  --border: var(--night-border);
+  --input: var(--night-border-strong);
+  --ring: var(--gold-matte-bright);
 
-  --bull: var(--emerald);
+  --bull: var(--market-up-dark);
   --bull-foreground: #06281c;
-  --bear: var(--crimson);
+  --bear: var(--market-down-dark);
   --bear-foreground: #2a0d0e;
 
-  --chart-1: var(--gold-500);
-  --chart-2: var(--emerald);
-  --chart-3: var(--azure);
-  --chart-4: var(--copper);
-  --chart-5: var(--parchment-300);
+  --chart-1: var(--gold-matte-bright);
+  --chart-2: var(--market-up-dark);
+  --chart-3: var(--market-down-dark);
+  --chart-4: #c17a3f;
+  --chart-5: #4d90d1;
 
-  --sidebar: var(--ink-900);
-  --sidebar-foreground: var(--parchment-100);
-  --sidebar-primary: var(--gold-500);
-  --sidebar-primary-foreground: #0b0b0e;
-  --sidebar-accent: var(--ink-800);
-  --sidebar-accent-foreground: var(--parchment-100);
-  --sidebar-border: var(--ink-700);
-  --sidebar-ring: var(--gold-500);
+  --sidebar: var(--night-surface);
+  --sidebar-foreground: var(--night-text);
+  --sidebar-primary: var(--gold-matte-bright);
+  --sidebar-primary-foreground: #17130a;
+  --sidebar-accent: var(--night-surface-2);
+  --sidebar-accent-foreground: var(--night-text);
+  --sidebar-border: var(--night-border);
+  --sidebar-ring: var(--gold-matte-bright);
+
+  --line-ink: 242, 241, 235;
 }
 
 @layer base {
@@ -194,42 +207,173 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "ss01", "cv01";
+    transition: background-color 0.5s ease, color 0.5s ease;
   }
   html {
     @apply font-sans;
   }
-  h1, h2, h3, h4, .font-heading {
-    @apply font-heading;
+  /* Fundações: títulos em SF Pro (pesado), NÃO na display serif.
+     Scotch (--font-heading) é só para momentos display via .font-heading. */
+  h1, h2, h3, h4 {
+    @apply font-sans tracking-tight;
   }
-  /* Tabular, mono numerals for all financial data */
+  /* Números financeiros: SF tabular (JetBrains Mono foi largada) */
   .nums {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
     letter-spacing: -0.01em;
   }
 }
 
-/* ── Layer 3 · COMPONENT utilities ────────────────────────── */
+/* ── Layer 3 · COMPONENT / fundações ──────────────────────── */
+
+/* Hairline dourada (marcador de destaque) */
 @layer components {
-  /* Hairline gold top-accent used on hero panels / featured cards */
   .gold-rule {
     background-image: linear-gradient(
       90deg,
       transparent,
-      var(--gold-500) 20%,
-      var(--gold-400) 50%,
-      var(--gold-500) 80%,
+      var(--primary) 20%,
+      color-mix(in srgb, var(--primary) 80%, #fff) 50%,
+      var(--primary) 80%,
       transparent
     );
   }
-  /* Subtle radial gold glow for hero backgrounds */
+  /* Sem glows (ai-slop) — mantido só por compatibilidade, quase impercetível */
   .gold-glow {
     background-image: radial-gradient(
       60% 60% at 50% 0%,
-      color-mix(in oklch, var(--gold-500) 14%, transparent),
+      color-mix(in oklch, var(--primary) 5%, transparent),
       transparent 70%
     );
+  }
+}
+
+/* Reveal — fade+slide+blur, reversível; respeita reduced-motion */
+.reveal {
+  opacity: 0;
+  transform: translateY(44px);
+  filter: blur(10px);
+  transition: opacity 0.9s var(--spring), transform 0.9s var(--spring), filter 0.9s var(--spring);
+  will-change: opacity, transform, filter;
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+  filter: none; /* none (não blur(0)) → sem backdrop-root, o glass refrata a página */
+}
+
+/* ── Liquid Glass (material iOS 26) — o material DEFAULT da app ──
+   Refração edge-confined por SDF: o JS (components/fx/LiquidGlass)
+   gera o mapa por elemento e define --lens: url(#glass-lens-N).
+   `.glass` sozinho (sem JS) continua a ler como vidro: translúcido,
+   blur leve, rim — a lente é o upgrade. Em @layer components para os
+   utilities Tailwind (rounded-*, p-*) poderem sobrepor os defaults.
+   Safari/Firefox caem no frost via -webkit-backdrop-filter.       */
+@layer components {
+  .glass {
+    --lens: ;
+    position: relative;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    isolation: isolate;
+    background: color-mix(in srgb, var(--card) 46%, transparent);
+    -webkit-backdrop-filter: blur(14px) saturate(180%) brightness(1.03);
+    backdrop-filter: var(--lens) blur(1.4px) saturate(178%) brightness(1.03) contrast(1.03);
+    border: 1px solid color-mix(in srgb, #ffffff 16%, transparent);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      inset 0 -10px 26px rgba(0, 0, 0, 0.05),
+      0 22px 55px rgba(40, 30, 10, 0.13);
+  }
+  .dark .glass {
+    background: color-mix(in srgb, var(--card) 44%, transparent);
+    border-color: color-mix(in srgb, #ffffff 12%, transparent);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -10px 26px rgba(0, 0, 0, 0.28),
+      0 22px 55px rgba(0, 0, 0, 0.5);
+  }
+  .glass::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 16%;
+    right: 16%;
+    height: 1px;
+    z-index: 3;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  }
+  .glass::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent 38%);
+    mix-blend-mode: soft-light;
+  }
+  .glass > * {
+    position: relative;
+    z-index: 2;
+  }
+  /* frost-only — sem lente (usos raros; o default é a lente) */
+  .glass-frost {
+    -webkit-backdrop-filter: blur(18px) saturate(170%) brightness(1.02);
+    backdrop-filter: blur(18px) saturate(170%) brightness(1.02);
+  }
+  /* fade — o efeito de vidro DESVANECE verticalmente em vez de acabar
+     de repente: o backdrop-filter (lente incluída, herdada via --lens)
+     vive num ::before mascarado com gradiente. Para banners/headers
+     full-width onde a borda dura do efeito ficava mal. */
+  .glass-fade {
+    background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+  }
+  .glass-fade::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    left: 0;
+    right: 0;
+    height: auto;
+    z-index: 0;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--background) 78%, transparent) 0%,
+      color-mix(in srgb, var(--background) 55%, transparent) 60%,
+      transparent 100%
+    );
+    -webkit-backdrop-filter: var(--lens) blur(10px) saturate(170%);
+    backdrop-filter: var(--lens) blur(10px) saturate(170%);
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, black 58%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 0%, black 58%, transparent 100%);
+  }
+  .glass-fade::after {
+    display: none;
+  }
+  /* topo sticky flat com hairline (fallback simples) */
+  .glass-topbar {
+    background: color-mix(in srgb, var(--background) 72%, transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(170%);
+    backdrop-filter: blur(18px) saturate(170%);
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
   }
 }
 
@@ -266,4 +410,35 @@
 }
 .dcf-slider:focus-visible::-webkit-slider-thumb {
   box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 40%, transparent);
+}
+
+/* Scrollbar do produto — fina, tema-consciente, sem o cinza do SO */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+:root {
+  --scrollbar-thumb: color-mix(in srgb, var(--foreground) 22%, transparent);
+}
+.dark {
+  --scrollbar-thumb: color-mix(in srgb, var(--foreground) 28%, transparent);
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, var(--primary) 55%, var(--foreground) 20%);
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
 }

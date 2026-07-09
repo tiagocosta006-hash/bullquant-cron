@@ -7,7 +7,7 @@ export function TranscriptsPlaceholder() {
   const t = useTranslations("transcripts");
 
   return (
-    <div className="rounded-xl border border-border bg-card p-6 shadow-sm overflow-hidden relative">
+    <div className="glass rounded-xl p-6 overflow-hidden relative">
       {/* "In Development" badge */}
       <div className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
         <HardHat className="h-3.5 w-3.5" />
@@ -19,7 +19,7 @@ export function TranscriptsPlaceholder() {
           <MessageSquareText className="h-5 w-5" />
         </div>
         <div>
-          <h2 className="font-heading text-xl font-bold tracking-tight text-foreground">
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
             {t("title")}
           </h2>
           <p className="mt-0.5 text-sm text-muted-foreground">{t("subtitle")}</p>

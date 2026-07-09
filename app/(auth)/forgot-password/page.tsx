@@ -13,9 +13,9 @@ export default async function ForgotPasswordPage({
   const t = await getTranslations('forgotPassword')
 
   return (
-    <div className="flex flex-1 flex-col justify-center px-6 py-20 lg:px-8 bg-background">
+    <div className="flex flex-col">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-10 text-center text-3xl font-extrabold tracking-tight text-foreground">
+        <h2 className="text-center text-3xl font-extrabold tracking-tight text-foreground">
           {t('title')}
         </h2>
         <p className="mt-2 text-center text-sm text-muted-foreground">
@@ -23,7 +23,7 @@ export default async function ForgotPasswordPage({
         </p>
       </div>
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
         <form className="space-y-6" action={forgotPassword}>
           <div>
             <label htmlFor="email" className="block text-sm font-medium leading-6 text-foreground mb-2">

@@ -14,7 +14,7 @@ export function PortfolioSummary({ positions, upToday, pnl }: PortfolioSummaryPr
   const isPositive = pnl ? pnl.pnlAbsolute >= 0 : true
 
   return (
-    <div className="bg-card border border-border/60 rounded-2xl p-5 md:p-6">
+    <div className="glass rounded-2xl p-5 md:p-6">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {pnl ? (
           <>

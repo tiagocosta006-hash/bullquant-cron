@@ -56,7 +56,7 @@ export function SavedValuations({ analyses, ticker, currency = "$" }: SavedValua
           return (
             <div 
               key={a.id} 
-              className="bg-card border border-border/50 rounded-xl p-5 shadow-sm flex flex-col gap-4 relative overflow-hidden group hover:border-primary/30 transition-colors"
+              className="glass rounded-xl p-5 flex flex-col gap-4 relative overflow-hidden group transition-colors"
             >
               {/* Header */}
               <div className="flex items-start justify-between">
@@ -79,7 +79,7 @@ export function SavedValuations({ analyses, ticker, currency = "$" }: SavedValua
                   <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/70 mb-0.5">
                     {t("fairValue")}
                   </p>
-                  <p className="font-heading text-xl font-bold text-foreground">
+                  <p className="text-xl font-bold text-foreground">
                     {currency}{a.fairValue.toFixed(2)}
                   </p>
                 </div>

@@ -166,7 +166,7 @@ export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$" }: St
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
       {/* 1. Valuation */}
-      <div className="bg-card p-5 rounded-xl border border-border shadow-sm flex flex-col gap-3">
+      <div className="glass p-5 rounded-xl flex flex-col gap-3">
         <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider">{t("valuation")}</h3>
         <Stat label="Market Cap" value={marketCap} currency loading={isLoading} naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
         <Stat label="P/E (TTM)" value={pe} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} />
@@ -176,7 +176,7 @@ export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$" }: St
       </div>
 
       {/* 2. Cash Flow */}
-      <div className="bg-card p-5 rounded-xl border border-border shadow-sm flex flex-col gap-3">
+      <div className="glass p-5 rounded-xl flex flex-col gap-3">
         <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider">{t("cashFlow")}</h3>
         <Stat label="Operating CF" value={ttm.operatingCashFlow} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
         <Stat label="Free Cash Flow" value={ttm.freeCashFlow} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
@@ -184,7 +184,7 @@ export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$" }: St
       </div>
 
       {/* 3. Margins & Growth */}
-      <div className="bg-card p-5 rounded-xl border border-border shadow-sm flex flex-col gap-3">
+      <div className="glass p-5 rounded-xl flex flex-col gap-3">
         <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t("marginAndGrowth")}</h3>
         <Stat label="Gross Margin" value={ttm.grossMargin} percent naLabel={naLabel} naReason={naMargin} />
         <Stat label="Oper. Margin" value={ttm.operatingMargin} percent naLabel={naLabel} naReason={naMargin} />
@@ -192,7 +192,7 @@ export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$" }: St
       </div>
 
       {/* 4. Balance */}
-      <div className="bg-card p-5 rounded-xl border border-border shadow-sm flex flex-col gap-3">
+      <div className="glass p-5 rounded-xl flex flex-col gap-3">
         <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider">{t("balance")}</h3>
         <Stat label="Cash" value={ttm.cash} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
         <Stat label="Total Assets" value={ttm.totalAssets} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
@@ -200,7 +200,7 @@ export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$" }: St
       </div>
 
       {/* 5. Dividend */}
-      <div className="bg-card p-5 rounded-xl border border-border shadow-sm flex flex-col gap-3">
+      <div className="glass p-5 rounded-xl flex flex-col gap-3">
         <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider">{t("dividend")}</h3>
         <Stat label="Div Yield" value={dividendYield} percent loading={isLoading} naLabel={naLabel} naReason={naGeneric} />
         <Stat

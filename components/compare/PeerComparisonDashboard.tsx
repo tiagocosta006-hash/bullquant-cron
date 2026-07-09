@@ -34,7 +34,8 @@ interface PeerComparisonDashboardProps {
   availablePeers: Company[]
 }
 
-const COLORS = ['#2563eb', '#16a34a', '#dc2626', '#ca8a04', '#9333ea']
+// categorical, ordem fixa (dourado primeiro = a empresa-base) — mapeado aos tokens de marca
+const COLORS = ['var(--chart-1)', 'var(--chart-5)', 'var(--bull)', 'var(--bear)', 'var(--chart-4)']
 
 export function PeerComparisonDashboard({ baseCompany, baseFundamentals, availablePeers }: PeerComparisonDashboardProps) {
   const [open, setOpen] = useState(false)
@@ -427,7 +428,7 @@ export function PeerComparisonDashboard({ baseCompany, baseFundamentals, availab
                     {[baseCompany, ...selectedPeers].map((company, idx) => (
                       <Line 
                         key={`${company.ticker}_rev`}
-                        type="monotone" 
+                        type="linear" 
                         dataKey={`${company.ticker}_revenue`} 
                         name={`${company.ticker} Receita`}
                         stroke={COLORS[idx]} 
@@ -459,7 +460,7 @@ export function PeerComparisonDashboard({ baseCompany, baseFundamentals, availab
                     {[baseCompany, ...selectedPeers].map((company, idx) => (
                       <Line 
                         key={`${company.ticker}_fcf`}
-                        type="monotone" 
+                        type="linear" 
                         dataKey={`${company.ticker}_fcf`} 
                         name={`${company.ticker} FCF`}
                         stroke={COLORS[idx]} 
@@ -491,7 +492,7 @@ export function PeerComparisonDashboard({ baseCompany, baseFundamentals, availab
                     {[baseCompany, ...selectedPeers].map((company, idx) => (
                       <Line 
                         key={`${company.ticker}_grossMargin`}
-                        type="monotone" 
+                        type="linear" 
                         dataKey={`${company.ticker}_grossMargin`} 
                         name={`${company.ticker} Margem Bruta`}
                         stroke={COLORS[idx]} 
@@ -503,7 +504,7 @@ export function PeerComparisonDashboard({ baseCompany, baseFundamentals, availab
                     {[baseCompany, ...selectedPeers].map((company, idx) => (
                       <Line 
                         key={`${company.ticker}_netMargin`}
-                        type="monotone" 
+                        type="linear" 
                         dataKey={`${company.ticker}_netMargin`} 
                         name={`${company.ticker} Margem Líquida`}
                         stroke={COLORS[idx]} 
@@ -558,7 +559,7 @@ export function PeerComparisonDashboard({ baseCompany, baseFundamentals, availab
                     {[baseCompany, ...selectedPeers].map((company, idx) => (
                       <Line 
                         key={`${company.ticker}_val`}
-                        type="monotone" 
+                        type="linear" 
                         dataKey={`${company.ticker}_${valuationMetric}`} 
                         name={`${company.ticker} ${valuationMetric === 'pe' ? 'P/E' : 'P/Sales'}`}
                         stroke={COLORS[idx]} 
@@ -588,12 +589,12 @@ export function PeerComparisonDashboard({ baseCompany, baseFundamentals, availab
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
                 <XAxis dataKey="ticker" className="text-xs font-semibold" tick={{ fill: 'currentColor' }} />
                 <YAxis className="text-xs" tick={{ fill: 'currentColor', opacity: 0.5 }} tickFormatter={(val) => `${val}x`} />
-                <RechartsTooltip content={renderMultipleTooltip} cursor={{ fill: 'hsl(var(--muted))', opacity: 0.2 }} />
+                <RechartsTooltip content={renderMultipleTooltip} cursor={{ fill: 'var(--muted)', opacity: 0.2 }} />
                 <Legend wrapperStyle={{ fontSize: '12px' }} />
-                <Bar dataKey="pe" name="P/E Ratio" fill="#2563eb" radius={[4, 4, 0, 0]} maxBarSize={60} />
-                <Bar dataKey="ps" name="Price / Sales" fill="#16a34a" radius={[4, 4, 0, 0]} maxBarSize={60} />
-                <Bar dataKey="pfcf" name="Price / FCF" fill="#ca8a04" radius={[4, 4, 0, 0]} maxBarSize={60} />
-                <Bar dataKey="evEbitda" name="EV / EBITDA" fill="#9333ea" radius={[4, 4, 0, 0]} maxBarSize={60} />
+                <Bar dataKey="pe" name="P/E Ratio" fill="var(--chart-1)" radius={[4, 4, 0, 0]} maxBarSize={60} />
+                <Bar dataKey="ps" name="Price / Sales" fill="var(--chart-5)" radius={[4, 4, 0, 0]} maxBarSize={60} />
+                <Bar dataKey="pfcf" name="Price / FCF" fill="var(--chart-4)" radius={[4, 4, 0, 0]} maxBarSize={60} />
+                <Bar dataKey="evEbitda" name="EV / EBITDA" fill="var(--bear)" radius={[4, 4, 0, 0]} maxBarSize={60} />
               </BarChart>
             </ResponsiveContainer>
           </div>

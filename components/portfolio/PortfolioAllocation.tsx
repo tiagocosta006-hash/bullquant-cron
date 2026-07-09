@@ -66,7 +66,7 @@ export function PortfolioAllocation({ items, prices }: PortfolioAllocationProps)
   if (bySector.length === 0) return null
 
   return (
-    <div className="bg-card border border-border/40 rounded-xl shadow-sm p-4 md:p-6">
+    <div className="glass rounded-xl p-4 md:p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-semibold text-muted-foreground">{t('title')}</h2>
         <div className="flex items-center gap-1 bg-muted/50 border border-border/60 rounded-lg p-1">

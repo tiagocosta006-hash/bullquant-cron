@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { updateProfile, setLocale } from '@/app/(app)/settings/actions'
 import { logout } from '@/app/(auth)/actions'
+import { PageHeader } from '@/components/layout/PageHeader'
 
 interface SettingsClientProps {
   user: {
@@ -59,33 +60,31 @@ export function SettingsClient({ user, locale }: SettingsClientProps) {
   }
 
   return (
-    <div className="container max-w-4xl py-12 mx-auto px-4 h-full flex flex-col">
-      <div className="mb-8">
-        <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-2">
-          <SettingsIcon className="h-8 w-8 text-primary" />
-          {t('title')}
-        </h1>
-        <p className="text-muted-foreground mt-2">{t('subtitle')}</p>
-      </div>
+    <div className="mx-auto flex h-full max-w-4xl flex-col space-y-8">
+      <PageHeader
+        icon={<SettingsIcon className="h-6 w-6" />}
+        title={t('title')}
+        subtitle={t('subtitle')}
+      />
 
       <Tabs defaultValue="profile" className="flex-1">
-        <TabsList className="mb-8 p-1 bg-muted/50 w-full justify-start h-auto flex-wrap">
-          <TabsTrigger value="profile" className="flex items-center gap-2 px-6 py-2.5 data-[state=active]:bg-background">
+        <TabsList className="glass mb-8 w-full justify-start h-auto flex-wrap rounded-full p-1.5">
+          <TabsTrigger value="profile" className="flex items-center gap-2 rounded-full px-6 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <UserCircle className="h-4 w-4" />
             {t('tabs.profile')}
           </TabsTrigger>
-          <TabsTrigger value="preferences" className="flex items-center gap-2 px-6 py-2.5 data-[state=active]:bg-background">
+          <TabsTrigger value="preferences" className="flex items-center gap-2 rounded-full px-6 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <Globe className="h-4 w-4" />
             {t('tabs.preferences')}
           </TabsTrigger>
-          <TabsTrigger value="subscription" className="flex items-center gap-2 px-6 py-2.5 data-[state=active]:bg-background">
+          <TabsTrigger value="subscription" className="flex items-center gap-2 rounded-full px-6 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <Star className="h-4 w-4" />
             {t('tabs.subscription')}
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="space-y-6">
-          <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
+          <div className="glass rounded-xl text-card-foreground">
             <div className="p-6">
               <h2 className="text-xl font-bold mb-6">{t('profile.title')}</h2>
               
@@ -135,7 +134,7 @@ export function SettingsClient({ user, locale }: SettingsClientProps) {
         </TabsContent>
 
         <TabsContent value="preferences" className="space-y-6">
-          <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6">
+          <div className="glass rounded-xl text-card-foreground p-6">
             <h2 className="text-xl font-bold mb-6">{t('preferences.title')}</h2>
             
             <div className="grid gap-8 max-w-xl">
@@ -191,7 +190,7 @@ export function SettingsClient({ user, locale }: SettingsClientProps) {
         </TabsContent>
 
         <TabsContent value="subscription" className="space-y-6">
-          <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6">
+          <div className="glass rounded-xl text-card-foreground p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold">{t('subscription.title')}</h2>
               <div className="bg-bull/10 text-bull border border-bull/20 px-3 py-1 rounded-full font-bold flex items-center text-sm">

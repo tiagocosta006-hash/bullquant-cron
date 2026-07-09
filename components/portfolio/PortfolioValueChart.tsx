@@ -70,7 +70,7 @@ export function PortfolioValueChart() {
   const tabs: TabType[] = ["1m", "6m", "1y", "max"]
 
   return (
-    <div className="w-full bg-card border border-border/40 rounded-xl shadow-sm p-4 md:p-6">
+    <div className="glass w-full rounded-xl p-4 md:p-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
         <div>
           <div className="flex items-center gap-1.5">

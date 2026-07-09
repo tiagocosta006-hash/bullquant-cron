@@ -20,7 +20,17 @@
         "title": "AI Brief",
         "desc": "An AI summary of each company's recent developments, classified by sentiment — never investment advice."
       }
-    }
+    },
+    "stats": {
+      "years": "10 years",
+      "yearsLabel": "of fundamentals per company",
+      "companies": "500",
+      "companiesLabel": "S&P 500 companies",
+      "price": "€0",
+      "priceLabel": "on the free plan"
+    },
+    "ctaTitle": "Start seeing the value others miss.",
+    "ctaSubtitle": "Create your free account and analyze any S&P 500 company in seconds."
   },
   "insider": {
     "title": "Company Insider Trading",
@@ -99,7 +109,11 @@
       "dcf": "Evaluate the fair price of any stock using cash flows",
       "transcripts": "Read investor meetings in full",
       "explore": "Discover and explore companies by business type"
-    }
+    },
+    "compare": "Compare",
+    "navigate": "Navigate",
+    "searchAction": "Search",
+    "more": "More"
   },
   "login": {
     "title": "Sign in to BullVision",
@@ -150,13 +164,15 @@
     "login": "Sign in",
     "register": "Sign up",
     "dcf": "DCF",
-    "calendar": "Calendar"
+    "calendar": "Calendar",
+    "theme": "Toggle theme"
   },
   "search": {
     "placeholder": "Search ticker (e.g., AAPL)...",
     "noResults": "No companies found.",
     "recentTitle": "Recent Searches",
-    "clearAll": "Clear All"
+    "clearAll": "Clear All",
+    "companies": "Companies"
   },
   "settings": {
     "title": "Settings",
@@ -392,6 +408,16 @@
       "naGeneric": "No data available for this company.",
       "naMargin": "Margin not reported — common for banks and insurers, which have no cost of goods (COGS).",
       "naPrice": "Unavailable: depends on the live price, which hasn't loaded yet."
+    },
+    "tabs": {
+      "overview": "Overview",
+      "financials": "Financials",
+      "kpis": "KPIs",
+      "valuation": "Valuation",
+      "company": "Company",
+      "news": "News",
+      "valuationEmpty": "No saved DCF analyses for this company yet.",
+      "valuationCta": "Open the DCF calculator"
     }
   },
   "dcf": {
@@ -551,6 +577,12 @@
       "action": "View",
       "viewStock": "View Analysis"
     }
+  },
+  "footer": {
+    "rights": "© {year} {brand}. All rights reserved.",
+    "terms": "Terms of Service",
+    "privacy": "Privacy",
+    "refund": "Refund Policy"
   },
   "explore": {
     "title": "Explore Businesses",

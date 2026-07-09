@@ -16,7 +16,7 @@ export function PortfolioManageBar({ onImportClick, onSynced }: PortfolioManageB
   const [isExpanded, setIsExpanded] = useState(false)
 
   return (
-    <div className="border border-border/60 rounded-xl bg-card/50">
+    <div className="glass rounded-xl">
       <button
         type="button"
         onClick={() => setIsExpanded(prev => !prev)}

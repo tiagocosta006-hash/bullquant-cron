@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react"
 import { useTranslations, useLocale } from "next-intl"
 import Link from "next/link"
 import { Clock, Briefcase, Loader2 } from "lucide-react"
+import { PageHeader } from "@/components/layout/PageHeader"
 import { PortfolioCard } from "@/components/portfolio/PortfolioCard"
 import { PortfolioTable } from "@/components/portfolio/PortfolioTable"
 import { PortfolioEmptyState } from "@/components/portfolio/PortfolioEmptyState"
@@ -230,14 +231,20 @@ export default function Home() {
   const suggestedTickers = POPULAR_TICKERS.filter(ticker => !items.some(item => item.company.ticker === ticker)).slice(0, 4)
 
   return (
-    <div className="container max-w-6xl mx-auto py-8 px-4 space-y-6">
-      <div>
-        <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
-          <Briefcase className="w-8 h-8 text-primary" />
-          {t('title')}
-        </h1>
-        <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        icon={<Briefcase className="h-6 w-6" />}
+        title={t('title')}
+        subtitle={t('subtitle')}
+        actions={
+          lastUpdate ? (
+            <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Clock className="h-3.5 w-3.5" />
+              {lastUpdate.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
+            </span>
+          ) : undefined
+        }
+      />
 
       {items.length === 0 ? (
         <>

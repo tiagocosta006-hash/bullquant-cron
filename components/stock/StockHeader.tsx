@@ -177,7 +177,7 @@ export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfB
       </div>
 
       {/* Right side: Real-time Price */}
-      <div className="flex flex-col md:items-end bg-card p-4 rounded-xl border border-border shadow-sm min-w-[200px]">
+      <div className="glass flex flex-col md:items-end p-4 rounded-xl min-w-[200px]">
         {isLoading ? (
           <div className="animate-pulse flex flex-col items-end gap-2 w-full">
             <div className="h-8 bg-muted rounded w-32"></div>

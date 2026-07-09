@@ -20,7 +20,17 @@
         "title": "AI Brief",
         "desc": "Resumo por IA dos desenvolvimentos recentes de cada empresa, classificados por sentimento — nunca conselho de investimento."
       }
-    }
+    },
+    "stats": {
+      "years": "10 anos",
+      "yearsLabel": "de fundamentais por empresa",
+      "companies": "500",
+      "companiesLabel": "empresas do S&P 500",
+      "price": "0 €",
+      "priceLabel": "no plano gratuito"
+    },
+    "ctaTitle": "Começa a ver o valor que os outros não veem.",
+    "ctaSubtitle": "Cria a tua conta gratuita e analisa qualquer empresa do S&P 500 em segundos."
   },
   "insider": {
     "title": "Transações de Insiders",
@@ -90,7 +100,7 @@
     "calendar": "Calendário",
     "dcf": "Calculadora DCF",
     "transcripts": "Transcrições",
-    "explore": "Explorar (Screener)",
+    "explore": "Explorar",
     "recentSearches": "Pesquisas Recentes",
     "desc": {
       "dashboard": "Visão geral, atalhos e exploração de empresas",
@@ -99,7 +109,11 @@
       "dcf": "Avalia o preço justo de qualquer ação usando fluxos de caixa",
       "transcripts": "Lê as reuniões com investidores na íntegra",
       "explore": "Encontra e explora empresas organizadas por tipo de negócio"
-    }
+    },
+    "compare": "Comparar",
+    "navigate": "Navegar",
+    "searchAction": "Pesquisar",
+    "more": "Mais"
   },
   "login": {
     "title": "Entrar no BullVision",
@@ -150,13 +164,15 @@
     "login": "Login",
     "register": "Registar",
     "dcf": "DCF",
-    "calendar": "Calendário"
+    "calendar": "Calendário",
+    "theme": "Alternar tema"
   },
   "search": {
     "placeholder": "Pesquisar ticker (ex: AAPL)...",
     "noResults": "Nenhuma empresa encontrada.",
     "recentTitle": "Pesquisas Recentes",
-    "clearAll": "Limpar Tudo"
+    "clearAll": "Limpar Tudo",
+    "companies": "Empresas"
   },
   "settings": {
     "title": "Configurações",
@@ -388,6 +404,16 @@
       "naGeneric": "Sem dados disponíveis para esta empresa.",
       "naMargin": "Margem não reportada — típico de bancos e seguradoras, que não têm custo de produção (COGS).",
       "naPrice": "Indisponível: depende do preço atual, que ainda não carregou."
+    },
+    "tabs": {
+      "overview": "Resumo",
+      "financials": "Fundamentais",
+      "kpis": "KPIs",
+      "valuation": "Valuation",
+      "company": "Empresa",
+      "news": "Notícias",
+      "valuationEmpty": "Ainda não guardaste análises DCF para esta empresa.",
+      "valuationCta": "Abrir a calculadora DCF"
     }
   },
   "dcf": {
@@ -547,6 +573,12 @@
       "action": "Ver",
       "viewStock": "Ver Análise"
     }
+  },
+  "footer": {
+    "rights": "© {year} {brand}. Todos os direitos reservados.",
+    "terms": "Termos de Serviço",
+    "privacy": "Privacidade",
+    "refund": "Política de Reembolso"
   },
   "explore": {
     "title": "Explorar Negócios",

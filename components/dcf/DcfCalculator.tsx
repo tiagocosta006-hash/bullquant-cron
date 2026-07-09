@@ -256,14 +256,14 @@ export function DcfCalculator() {
       {/* ── Painel esquerdo: inputs ── */}
       <Card className="p-6 gap-0 space-y-5">
         {/* Autopreencher */}
-        <div ref={wrapperRef} className="relative">
+        <div ref={wrapperRef} className="relative z-20">
           <label className="text-sm font-medium text-foreground mb-2 block">{t("autofillLabel")}</label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder={t("autofillPlaceholder")}
-              className="pl-10 bg-white/5 border-white/10"
+              className="pl-10 bg-input/30 border-input/30"
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value)
@@ -454,7 +454,7 @@ function NumberField({
         step={step}
         value={Number.isFinite(value) ? value : ""}
         onChange={(e) => onChange(e.target.value === "" ? 0 : Number(e.target.value))}
-        className="bg-white/5 border-white/10 tabular-nums"
+        className="bg-input/30 border-input/30 tabular-nums"
       />
     </div>
   )

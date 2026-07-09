@@ -12,7 +12,7 @@ export function PortfolioEmptyState({ addingTicker, onQuickAdd }: PortfolioEmpty
   const t = useTranslations("portfolio")
 
   return (
-    <div className="bg-card border border-border/60 rounded-2xl p-12 text-center shadow-sm">
+    <div className="glass rounded-2xl p-12 text-center">
       <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
         <Search className="w-8 h-8 text-primary" />
       </div>

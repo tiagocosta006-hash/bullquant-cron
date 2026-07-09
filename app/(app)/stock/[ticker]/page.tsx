@@ -14,6 +14,7 @@ import { CompanyProfile } from '@/components/stock/CompanyProfile'
 import { StockNews } from '@/components/stock/StockNews'
 import { ManagementTeam } from '@/components/stock/ManagementTeam'
 import { StockKPIs } from '@/components/stock/StockKPIs'
+import { StockTabs } from '@/components/stock/StockTabs'
 import { PremiumPdfButton } from '@/components/stock/pdf/PremiumPdfButton'
 import { ValuationMultiples } from '@/components/stock/ValuationMultiples'
 
@@ -157,8 +158,8 @@ export default async function StockPage({
   }))
 
   return (
-    <div className="container max-w-7xl mx-auto py-8 px-4 space-y-8">
-      {/* 1. Header (Info + Live Finnhub Price) */}
+    <div className="space-y-6">
+      {/* Header fixo da empresa (info + preço Finnhub ao vivo) */}
       <StockHeader company={{
         ticker: company.ticker,
         name: company.name,
@@ -176,44 +177,51 @@ export default async function StockPage({
       }
       />
 
-
-
-      {/* 2. Fundamentals Snapshot & Valuation */}
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight mb-4 text-foreground">{t('snapshotTitle')}</h2>
-          <StockSnapshot ticker={company.ticker} fundamentals={JSON.parse(JSON.stringify(fundamentalsToPass))} currencySymbol={currencySymbol} />
-        </div>
-        <StockKPIs fundamentals={JSON.parse(JSON.stringify(historicalAnnual))} isPro={isPro} ticker={company.ticker} />
-        <ValuationMultiples ticker={company.ticker} isPro={isPro} />
-      </div>
-
-      {/* 3. Price History Chart */}
-      <StockPriceChart ticker={company.ticker} currencySymbol={currencySymbol} />
-
-      {/* 3.5 Saved Valuations */}
-      {serializedDcfs.length > 0 && (
-        <SavedValuations 
-          analyses={serializedDcfs} 
-          ticker={company.ticker} 
-          currency={currencySymbol}
-        />
-      )}
-
-      {/* 4. Financials & Decision Engine */}
-      <FinancialsEngine ticker={company.ticker} sector={company.sector} currencySymbol={currencySymbol} />
-
-      {/* 5. Insider Activity (SEC Form 4) */}
-      <InsiderActivity ticker={company.ticker} currencySymbol={currencySymbol} />
-
-      {/* 6. Company News */}
-      <StockNews ticker={company.ticker} />
-
-      {/* 7. Management Team Assessment */}
-      <ManagementTeam ticker={company.ticker} />
-
-      {/* 8. Company Profile */}
-      <CompanyProfile company={company} />
+      {/* Conteúdo organizado por intenção, não por scroll infinito */}
+      <StockTabs
+        overview={
+          <>
+            <div>
+              <h2 className="text-xl font-bold tracking-tight mb-4 text-foreground">{t('snapshotTitle')}</h2>
+              <StockSnapshot ticker={company.ticker} fundamentals={JSON.parse(JSON.stringify(fundamentalsToPass))} currencySymbol={currencySymbol} />
+            </div>
+            <StockPriceChart ticker={company.ticker} currencySymbol={currencySymbol} />
+            <CompanyProfile company={company} />
+          </>
+        }
+        financials={
+          <FinancialsEngine ticker={company.ticker} sector={company.sector} currencySymbol={currencySymbol} />
+        }
+        kpis={
+          <StockKPIs fundamentals={JSON.parse(JSON.stringify(historicalAnnual))} isPro={isPro} ticker={company.ticker} />
+        }
+        valuation={
+          <>
+            <ValuationMultiples ticker={company.ticker} isPro={isPro} />
+            {serializedDcfs.length > 0 ? (
+              <SavedValuations
+                analyses={serializedDcfs}
+                ticker={company.ticker}
+                currency={currencySymbol}
+              />
+            ) : (
+              <div className="glass rounded-2xl p-8 text-center">
+                <p className="text-sm text-muted-foreground">{t('tabs.valuationEmpty')}</p>
+                <a href={`/dcf?ticker=${company.ticker}`} className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">
+                  {t('tabs.valuationCta')}
+                </a>
+              </div>
+            )}
+          </>
+        }
+        company={
+          <>
+            <ManagementTeam ticker={company.ticker} />
+            <InsiderActivity ticker={company.ticker} currencySymbol={currencySymbol} />
+          </>
+        }
+        news={<StockNews ticker={company.ticker} />}
+      />
     </div>
   )
 }

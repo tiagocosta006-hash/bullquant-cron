@@ -20,7 +20,17 @@
         "title": "KI-Zusammenfassung",
         "desc": "Eine KI-Zusammenfassung der jüngsten Entwicklungen."
       }
-    }
+    },
+    "stats": {
+      "years": "10 Jahre",
+      "yearsLabel": "Fundamentaldaten pro Unternehmen",
+      "companies": "500",
+      "companiesLabel": "S&P-500-Unternehmen",
+      "price": "0 €",
+      "priceLabel": "im Gratis-Plan"
+    },
+    "ctaTitle": "Sieh den Wert, den andere übersehen.",
+    "ctaSubtitle": "Erstelle dein kostenloses Konto und analysiere jedes S&P-500-Unternehmen in Sekunden."
   },
   "insider": {
     "title": "Insiderhandel",
@@ -95,8 +105,14 @@
       "calendar": "Finanzergebnisse",
       "dcf": "Fairen Preis bewerten",
       "transcripts": "Investorentreffen",
-      "screener": "Unternehmen finden"
-    }
+      "screener": "Unternehmen finden",
+      "explore": "Unternehmen nach Geschäftstyp entdecken und erkunden"
+    },
+    "compare": "Vergleichen",
+    "navigate": "Navigieren",
+    "searchAction": "Suchen",
+    "more": "Mehr",
+    "explore": "Entdecken"
   },
   "login": {
     "title": "Anmelden",
@@ -147,13 +163,15 @@
     "login": "Anmelden",
     "register": "Registrieren",
     "dcf": "DCF",
-    "calendar": "Kalender"
+    "calendar": "Kalender",
+    "theme": "Theme wechseln"
   },
   "search": {
     "placeholder": "Ticker suchen (z.B. AAPL)...",
     "noResults": "Keine Ergebnisse.",
     "recentTitle": "Letzte Suchen",
-    "clearAll": "Alles löschen"
+    "clearAll": "Alles löschen",
+    "companies": "Unternehmen"
   },
   "settings": {
     "title": "Einstellungen",
@@ -286,6 +304,16 @@
       "naGeneric": "Nicht verfügbar.",
       "naMargin": "Nicht gemeldet.",
       "naPrice": "Nicht verfügbar."
+    },
+    "tabs": {
+      "overview": "Überblick",
+      "financials": "Finanzen",
+      "kpis": "KPIs",
+      "valuation": "Bewertung",
+      "company": "Unternehmen",
+      "news": "News",
+      "valuationEmpty": "Noch keine gespeicherten DCF-Analysen für dieses Unternehmen.",
+      "valuationCta": "DCF-Rechner öffnen"
     }
   },
   "dcf": {
@@ -426,6 +454,36 @@
       "earningsYield": "Earnings Yield",
       "action": "Ansehen",
       "viewStock": "Analyse"
+    }
+  },
+  "footer": {
+    "rights": "© {year} {brand}. Alle Rechte vorbehalten.",
+    "terms": "Nutzungsbedingungen",
+    "privacy": "Datenschutz",
+    "refund": "Rückerstattungsrichtlinie"
+  },
+  "explore": {
+    "title": "Unternehmen Entdecken",
+    "subtitle": "Entdecke neue Chancen, organisiert nach Sektor und Geschäftstyp.",
+    "searchPlaceholder": "Unternehmen, Ticker oder Geschäftsbereich suchen...",
+    "sectorsTitle": "Wirtschaftssektoren",
+    "industriesFor": "Branchen: {sector}",
+    "companiesIn": "Unternehmen in {industry}",
+    "backToSectors": "Zurück zu Sektoren",
+    "backToIndustries": "Zurück zu Branchen",
+    "metrics": {
+      "revenue": "Umsatz",
+      "netMargin": "Nettomarge",
+      "roic": "ROIC"
+    },
+    "noDescription": "Keine Zusammenfassung verfügbar.",
+    "sheet": {
+      "businessModel": "Das Geschäft",
+      "revenueStreams": "Wie sie Geld verdienen",
+      "leadership": "Führung",
+      "compareTitle": "Mit Wettbewerbern vergleichen",
+      "compareDesc": "Finanzielle Leistung nebeneinander bewerten.",
+      "viewFinancials": "Vollständige Finanzanalyse ansehen"
     }
   }
 }

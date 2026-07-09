@@ -323,7 +323,7 @@ export function StockPriceChart({ ticker, currencySymbol = "$" }: { ticker: stri
             )}
 
             <Area 
-              type="monotone" 
+              type="linear" 
               dataKey="close" 
               stroke={isPositive ? '#10b981' : '#f43f5e'} 
               strokeWidth={2.5}

@@ -7,12 +7,12 @@ export const metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="container mx-auto px-4 py-16 max-w-4xl text-gray-900 dark:text-gray-100">
+    <div className="container mx-auto px-4 py-16 max-w-4xl text-foreground dark:text-foreground">
       <h1 className="text-4xl font-extrabold tracking-tight mb-8">Política de Privacidade</h1>
 
       <div className="space-y-8 leading-relaxed">
         <section>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+          <p className="text-sm text-muted-foreground dark:text-muted-foreground mb-6">
             Última atualização: {new Date().toLocaleDateString("pt-PT")}
           </p>
           <p>

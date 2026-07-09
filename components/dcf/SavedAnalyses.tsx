@@ -130,7 +130,7 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
           onChange={(e) => setLabel(e.target.value)}
           placeholder={t("saved.labelPlaceholder")}
           maxLength={60}
-          className="h-9 bg-white/5 border-white/10 text-sm"
+          className="h-9 bg-input/30 border-input/30 text-sm"
         />
         <Button onClick={handleSave} disabled={!canSave || isSaving} size="sm" className="shrink-0">
           {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bookmark className="h-4 w-4" />}

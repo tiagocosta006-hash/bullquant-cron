@@ -19,5 +19,5 @@ export const BRAND = {
    * Drop the real file here and it renders everywhere via <BrandMark/>.
    * Until the file exists, <BrandMark/> falls back to the inline SVG mark.
    */
-  logoSrc: "",
+  logoSrc: "/brand/bull-metrics-icon.png",
 } as const;

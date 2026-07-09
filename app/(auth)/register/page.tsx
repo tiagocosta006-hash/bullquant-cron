@@ -13,9 +13,9 @@ export default async function RegisterPage({
   const t = await getTranslations('register')
 
   return (
-    <div className="flex flex-1 flex-col justify-center px-6 py-20 lg:px-8 bg-background">
+    <div className="flex flex-col">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-10 text-center text-3xl font-extrabold tracking-tight text-foreground">
+        <h2 className="text-center text-3xl font-extrabold tracking-tight text-foreground">
           {t('title')}
         </h2>
         <p className="mt-2 text-center text-sm text-muted-foreground">
@@ -23,7 +23,7 @@ export default async function RegisterPage({
         </p>
       </div>
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
         <form className="space-y-6" action={signup}>
           <div>
             <label htmlFor="name" className="block text-sm font-medium leading-6 text-foreground mb-2">

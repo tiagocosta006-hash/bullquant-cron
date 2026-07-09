@@ -52,23 +52,23 @@ export function BusinessProfileSheet({ open, onOpenChange, company }: BusinessPr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="!w-[90vw] sm:!max-w-3xl lg:!max-w-4xl xl:!max-w-5xl !p-0 border-sidebar-border bg-sidebar overflow-hidden flex flex-col max-h-[90vh]">
+      <DialogContent className="glass !w-[90vw] sm:!max-w-3xl lg:!max-w-4xl xl:!max-w-5xl !p-0 overflow-hidden flex flex-col max-h-[90vh]">
         <div className="flex-1 overflow-y-auto">
           {/* Header */}
-          <div className="p-6 border-b border-white/10 bg-black/20">
+          <div className="p-6 border-b border-border">
             <div className="flex items-start justify-between mb-4">
-              <div className="w-16 h-16 shrink-0 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center overflow-hidden p-2">
+              <div className="w-16 h-16 shrink-0 bg-muted rounded-xl border border-border flex items-center justify-center overflow-hidden p-2">
                 {company.logoUrl ? (
                   <Image src={company.logoUrl} alt={company.name} width={48} height={48} className="object-contain" />
                 ) : (
-                  <span className="text-white/40 font-bold text-xl">{company.ticker.substring(0, 2)}</span>
+                  <span className="text-muted-foreground font-bold text-xl">{company.ticker.substring(0, 2)}</span>
                 )}
               </div>
             </div>
-            
-            <h2 className="text-2xl font-bold text-white mb-1">{company.name}</h2>
-            <div className="flex flex-wrap items-center gap-3 text-sm text-white/60">
-              <span className="font-mono bg-primary/20 text-primary px-2 py-0.5 rounded font-medium">
+
+            <h2 className="text-2xl font-bold text-foreground mb-1">{company.name}</h2>
+            <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+              <span className="nums font-semibold bg-primary/12 text-primary px-2 py-0.5 rounded">
                 {company.ticker}
               </span>
               <div className="flex items-center gap-1.5">
@@ -81,11 +81,11 @@ export function BusinessProfileSheet({ open, onOpenChange, company }: BusinessPr
           <div className="p-6 space-y-8">
             {/* O Negócio */}
             <section>
-              <h3 className="text-lg font-semibold text-white flex items-center gap-2 mb-3">
+              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-3">
                 <Activity size={18} className="text-primary" />
                 {t("sheet.businessModel")}
               </h3>
-              <p className="text-white/80 leading-relaxed">
+              <p className="text-foreground/80 leading-relaxed">
                 {company.description || t("noDescription")}
               </p>
             </section>
@@ -93,8 +93,8 @@ export function BusinessProfileSheet({ open, onOpenChange, company }: BusinessPr
             {/* Como ganham dinheiro */}
             {segmentsArr.length > 0 && (
               <section>
-                <h3 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
-                  <HandCoins size={18} className="text-emerald-400" />
+                <h3 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-4">
+                  <HandCoins size={18} className="text-bull" />
                   {t("sheet.revenueStreams")}
                 </h3>
                 <div className="space-y-3">
@@ -103,12 +103,12 @@ export function BusinessProfileSheet({ open, onOpenChange, company }: BusinessPr
                     return (
                       <div key={i} className="group">
                         <div className="flex justify-between text-sm mb-1">
-                          <span className="text-white/80 truncate pr-4">{seg.name}</span>
-                          <span className="text-white font-medium">{pct.toFixed(1)}%</span>
+                          <span className="text-foreground/80 truncate pr-4">{seg.name}</span>
+                          <span className="nums text-foreground font-medium">{pct.toFixed(1)}%</span>
                         </div>
-                        <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-emerald-500/80 rounded-full" 
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-primary rounded-full"
                             style={{ width: `${pct}%` }}
                           />
                         </div>
@@ -123,65 +123,65 @@ export function BusinessProfileSheet({ open, onOpenChange, company }: BusinessPr
             <div className="grid grid-cols-2 gap-4">
               {company.ceo && (
                 <section>
-                  <h3 className="text-sm font-semibold text-white/70 flex items-center gap-2 mb-3">
-                    <Users size={16} className="text-blue-400" />
+                  <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2 mb-3">
+                    <Users size={16} className="text-primary" />
                     {t("sheet.leadership")}
                   </h3>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/5">
-                    <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold shrink-0">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/60 border border-border">
+                    <div className="w-10 h-10 rounded-full bg-primary/12 flex items-center justify-center text-primary font-bold shrink-0">
                       {company.ceo.charAt(0)}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-white font-medium truncate">{company.ceo}</p>
-                      <p className="text-xs text-white/50">CEO</p>
+                      <p className="text-foreground font-medium truncate">{company.ceo}</p>
+                      <p className="text-xs text-muted-foreground">CEO</p>
                     </div>
                   </div>
                 </section>
               )}
               {company.geographicFocus && (
                 <section>
-                  <h3 className="text-sm font-semibold text-white/70 flex items-center gap-2 mb-3">
-                    <Globe size={16} className="text-cyan-400" />
+                  <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2 mb-3">
+                    <Globe size={16} className="text-primary" />
                     Mercado Principal
                   </h3>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/5">
-                    <div className="w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 shrink-0">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/60 border border-border">
+                    <div className="w-10 h-10 rounded-full bg-primary/12 flex items-center justify-center text-primary shrink-0">
                       <Globe size={20} />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-white font-medium truncate" title={company.geographicFocus}>{company.geographicFocus}</p>
-                      <p className="text-xs text-white/50">Atuação Global</p>
+                      <p className="text-foreground font-medium truncate" title={company.geographicFocus}>{company.geographicFocus}</p>
+                      <p className="text-xs text-muted-foreground">Atuação Global</p>
                     </div>
                   </div>
                 </section>
               )}
             </div>
 
-            {/* Bull vs Bear Case */}
+            {/* Bull vs Bear Case — cor semântica sobe/desce, nunca decorativa */}
             {(company.bullCase || company.bearCase) && (
               <section className="grid sm:grid-cols-2 gap-4">
                 {company.bullCase && (
-                  <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 relative overflow-hidden group">
+                  <div className="p-4 rounded-xl bg-bull/10 border border-bull/25 relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-2 opacity-10 transform translate-x-2 -translate-y-2 group-hover:scale-110 transition-transform">
-                      <TrendingUp size={48} className="text-emerald-500" />
+                      <TrendingUp size={48} className="text-bull" />
                     </div>
-                    <h3 className="text-emerald-400 font-bold flex items-center gap-2 mb-2">
+                    <h3 className="text-bull font-bold flex items-center gap-2 mb-2">
                       <span>🐂</span> Tese do Touro (Bull)
                     </h3>
-                    <p className="text-sm text-white/80 relative z-10 leading-relaxed">
+                    <p className="text-sm text-foreground/80 relative z-10 leading-relaxed">
                       {company.bullCase}
                     </p>
                   </div>
                 )}
                 {company.bearCase && (
-                  <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 relative overflow-hidden group">
+                  <div className="p-4 rounded-xl bg-bear/10 border border-bear/25 relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-2 opacity-10 transform translate-x-2 -translate-y-2 group-hover:scale-110 transition-transform">
-                      <TrendingDown size={48} className="text-red-500" />
+                      <TrendingDown size={48} className="text-bear" />
                     </div>
-                    <h3 className="text-red-400 font-bold flex items-center gap-2 mb-2">
+                    <h3 className="text-bear font-bold flex items-center gap-2 mb-2">
                       <span>🐻</span> Tese do Urso (Bear)
                     </h3>
-                    <p className="text-sm text-white/80 relative z-10 leading-relaxed">
+                    <p className="text-sm text-foreground/80 relative z-10 leading-relaxed">
                       {company.bearCase}
                     </p>
                   </div>
@@ -189,35 +189,35 @@ export function BusinessProfileSheet({ open, onOpenChange, company }: BusinessPr
               </section>
             )}
 
-            {/* SWOT Matrix */}
+            {/* SWOT Matrix — 4 quadrantes, identidade fixa (não é série de dados) */}
             {company.swot && (typeof company.swot === 'object') && (
               <section>
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <Activity size={18} className="text-purple-400" />
+                <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Activity size={18} className="text-primary" />
                   Análise SWOT
                 </h3>
-                <div className="grid grid-cols-2 gap-px bg-white/10 rounded-xl overflow-hidden border border-white/10">
-                  <div className="bg-sidebar p-4 space-y-2">
-                    <h4 className="font-bold text-emerald-400 text-sm">S - Forças</h4>
-                    <ul className="text-xs text-white/70 space-y-1 list-disc pl-3">
+                <div className="grid grid-cols-2 gap-px bg-border rounded-xl overflow-hidden border border-border">
+                  <div className="bg-card p-4 space-y-2">
+                    <h4 className="font-bold text-bull text-sm">S - Forças</h4>
+                    <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-3">
                       {(company.swot as any).forcas?.map((item: string, i: number) => <li key={i}>{item}</li>)}
                     </ul>
                   </div>
-                  <div className="bg-sidebar p-4 space-y-2">
-                    <h4 className="font-bold text-red-400 text-sm">W - Fraquezas</h4>
-                    <ul className="text-xs text-white/70 space-y-1 list-disc pl-3">
+                  <div className="bg-card p-4 space-y-2">
+                    <h4 className="font-bold text-bear text-sm">W - Fraquezas</h4>
+                    <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-3">
                       {(company.swot as any).fraquezas?.map((item: string, i: number) => <li key={i}>{item}</li>)}
                     </ul>
                   </div>
-                  <div className="bg-sidebar p-4 space-y-2">
-                    <h4 className="font-bold text-blue-400 text-sm">O - Oportunidades</h4>
-                    <ul className="text-xs text-white/70 space-y-1 list-disc pl-3">
+                  <div className="bg-card p-4 space-y-2">
+                    <h4 className="font-bold text-primary text-sm">O - Oportunidades</h4>
+                    <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-3">
                       {(company.swot as any).oportunidades?.map((item: string, i: number) => <li key={i}>{item}</li>)}
                     </ul>
                   </div>
-                  <div className="bg-sidebar p-4 space-y-2">
-                    <h4 className="font-bold text-orange-400 text-sm">T - Ameaças</h4>
-                    <ul className="text-xs text-white/70 space-y-1 list-disc pl-3">
+                  <div className="bg-card p-4 space-y-2">
+                    <h4 className="font-bold text-chart-4 text-sm">T - Ameaças</h4>
+                    <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-3">
                       {(company.swot as any).ameacas?.map((item: string, i: number) => <li key={i}>{item}</li>)}
                     </ul>
                   </div>
@@ -227,40 +227,40 @@ export function BusinessProfileSheet({ open, onOpenChange, company }: BusinessPr
 
             {/* Extra Info */}
             {company.extraInfo && (
-              <section className="p-4 rounded-xl bg-white/5 border border-white/10">
-                <h3 className="text-sm font-semibold text-white/70 mb-2 flex items-center gap-2">
+              <section className="p-4 rounded-xl bg-muted/60 border border-border">
+                <h3 className="text-sm font-semibold text-muted-foreground mb-2 flex items-center gap-2">
                   <span>💡</span> Info Relevante
                 </h3>
-                <p className="text-sm text-white/80 leading-relaxed">
+                <p className="text-sm text-foreground/80 leading-relaxed">
                   {company.extraInfo}
                 </p>
               </section>
             )}
-            
+
             {/* Acções / Navegação */}
-            <section className="pt-4 border-t border-white/10 space-y-3">
-              <Link 
+            <section className="pt-4 border-t border-border space-y-3">
+              <Link
                 href={`/compare?ticker=${company.ticker}`}
-                className="flex items-center justify-between w-full p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors group"
+                className="flex items-center justify-between w-full p-4 rounded-xl border border-border bg-muted/40 hover:bg-accent transition-colors group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-orange-500/20 text-orange-400">
+                  <div className="p-2 rounded-lg bg-primary/12 text-primary">
                     <Scale size={20} />
                   </div>
                   <div className="text-left">
-                    <p className="text-white font-medium">{t("sheet.compareTitle")}</p>
-                    <p className="text-xs text-white/50">{t("sheet.compareDesc")}</p>
+                    <p className="text-foreground font-medium">{t("sheet.compareTitle")}</p>
+                    <p className="text-xs text-muted-foreground">{t("sheet.compareDesc")}</p>
                   </div>
                 </div>
-                <ArrowRight size={18} className="text-white/30 group-hover:text-white transition-colors" />
+                <ArrowRight size={18} className="text-muted-foreground/60 group-hover:text-foreground transition-colors" />
               </Link>
             </section>
           </div>
         </div>
 
         {/* Footer Fix */}
-        <div className="p-6 border-t border-white/10 bg-black/20 shrink-0">
-          <Link 
+        <div className="p-6 border-t border-border shrink-0">
+          <Link
             href={`/stock/${company.ticker}`}
             className="flex items-center justify-center gap-2 w-full py-3.5 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
           >

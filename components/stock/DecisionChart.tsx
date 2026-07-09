@@ -17,7 +17,8 @@ import {
   ReferenceLine,
   CartesianGrid,
   Legend,
-  Cell
+  Cell,
+  Rectangle
 } from "recharts"
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { TooltipProvider, Tooltip as UITooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
@@ -46,14 +47,15 @@ type CustomTooltipProps = {
 const CustomTooltip = ({ active, payload, label, formatTooltipValue }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-[#18181b] border border-[#27272a] rounded-lg shadow-xl p-3 text-white min-w-[140px] z-50">
-        <p className="font-bold mb-2 text-[13px] text-gray-200">{label}</p>
+      <div className="bg-popover/95 supports-[backdrop-filter]:backdrop-blur border border-border rounded-xl shadow-xl p-3 text-popover-foreground min-w-[150px] z-50">
+        <p className="font-medium mb-1.5 text-xs text-muted-foreground">{label}</p>
         <div className="flex flex-col gap-1.5">
           {payload.map((entry, index: number) => (
             <div key={`item-${index}`} className="flex items-center text-[13px] gap-2">
-              <div className="w-2.5 h-2.5 rounded-[2px] shrink-0" style={{ backgroundColor: entry.color }} />
-              <span className="capitalize text-gray-300">{entry.name}:</span>
-              <span className="font-semibold ml-auto pl-4">{formatTooltipValue ? formatTooltipValue(entry.value) : entry.value}</span>
+              {/* chave de série: traço fino (não caixa) — regra dataviz */}
+              <span className="h-3 w-0.5 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
+              <span className="text-muted-foreground">{entry.name}</span>
+              <span className="nums font-semibold ml-auto pl-4">{formatTooltipValue ? formatTooltipValue(entry.value) : entry.value}</span>
             </div>
           ))}
         </div>
@@ -61,6 +63,24 @@ const CustomTooltip = ({ active, payload, label, formatTooltipValue }: CustomToo
     )
   }
   return null
+}
+
+/**
+ * Barra ativa: alarga LIGEIRAMENTE para os lados (altura intocada —
+ * o valor codificado não muda) e ganha um traço mais forte.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const renderActiveBar = (props: any) => {
+  const grow = Math.min(6, Math.max(3, (props.width ?? 12) * 0.18))
+  return (
+    <Rectangle
+      {...props}
+      x={props.x - grow / 2}
+      width={props.width + grow}
+      stroke={props.fill}
+      strokeOpacity={0.55}
+    />
+  )
 }
 
 interface DecisionChartProps {
@@ -190,21 +210,22 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
       <div className="w-full h-full outline-none focus:outline-none focus-visible:outline-none [&_*:focus]:outline-none [&_*:focus]:ring-0" tabIndex={-1}>
         <ResponsiveContainer width="100%" height={height} className="outline-none focus:outline-none">
           <ChartComponent data={displayData} margin={{ top: 20, right: 20, left: 10, bottom: 20 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
-            <XAxis 
-              dataKey="label" 
-              axisLine={false} 
-              tickLine={false} 
-              tick={{ fill: '#a1a1aa', fontSize: 10 }} 
+            {/* var(--border) direto — os tokens são hex, hsl(var(--border)) não resolvia */}
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.6} />
+            <XAxis
+              dataKey="label"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }}
               dy={15}
               interval={displayData.length > 15 ? "preserveEnd" : 0}
               height={40}
             />
-            <YAxis 
-              axisLine={false} 
-              tickLine={false} 
+            <YAxis
+              axisLine={false}
+              tickLine={false}
               tickFormatter={formatValue}
-              tick={{ fill: '#a1a1aa', fontSize: 11 }}
+              tick={{ fill: 'var(--muted-foreground)', fontSize: 11 }}
               width={55}
               domain={[(dataMin: number) => Math.min(0, dataMin), 'auto']}
             />
@@ -224,35 +245,47 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
                   />
                 )
               }}
-              cursor={{ fill: 'hsl(var(--muted))', opacity: 0.2 }}
+              cursor={{ fill: 'var(--muted)', opacity: 0.35 }}
             />
             {(type === 'STACKED_BAR' || config.dataKeys.length > 1) && (
               <Legend content={renderCustomLegend} />
             )}
             {config.referenceLine && (
-              <ReferenceLine y={config.referenceLine.y} stroke={config.referenceLine.color} strokeDasharray="3 3" label={{ position: 'top', value: config.referenceLine.label, fill: config.referenceLine.color, fontSize: 11 }} />
+              <ReferenceLine
+                y={config.referenceLine.y}
+                stroke={config.referenceLine.color}
+                strokeDasharray="3 3"
+                label={{
+                  position: 'insideBottomLeft',
+                  value: config.referenceLine.label,
+                  fill: config.referenceLine.color,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  dy: -6,
+                }}
+              />
             )}
             
             {config.dataKeys.map((k) => {
               const isHidden = hiddenKeys.has(k.key)
               if (k.type === 'line' || type === 'LINE') {
-                return <Line hide={isHidden} key={k.key} type="monotone" dataKey={k.key} name={k.name || k.key} stroke={k.color} strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                return <Line hide={isHidden} key={k.key} type="linear" dataKey={k.key} name={k.name || k.key} stroke={k.color} strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
               }
               if (k.type === 'area' || type === 'AREA') {
-                return <Area hide={isHidden} key={k.key} type="monotone" dataKey={k.key} name={k.name || k.key} fill={k.color} stroke={k.color} fillOpacity={0.2} strokeWidth={2} activeDot={{ r: 5 }} />
+                return <Area hide={isHidden} key={k.key} type="linear" dataKey={k.key} name={k.name || k.key} fill={k.color} stroke={k.color} fillOpacity={0.2} strokeWidth={2} activeDot={{ r: 5 }} />
               }
               return (
-                <Bar hide={isHidden} key={k.key} dataKey={k.key} name={k.name || k.key} fill={k.color} stackId={k.stackId} radius={type === 'STACKED_BAR' ? 0 : [4, 4, 0, 0]}>
+                <Bar hide={isHidden} key={k.key} dataKey={k.key} name={k.name || k.key} fill={k.color} stackId={k.stackId} radius={type === 'STACKED_BAR' ? 0 : [4, 4, 0, 0]} activeBar={renderActiveBar}>
                   {displayData.map((entry, index) => {
                     let cellColor = k.color
                     if (config.inverseColors) {
                       if (index > 0) {
                         const prev = Number(displayData[index - 1][k.key]) || 0
                         const curr = Number(entry[k.key]) || 0
-                        if (curr < prev) cellColor = '#10b981'
-                        else if (curr > prev) cellColor = '#f43f5e'
+                        if (curr < prev) cellColor = 'var(--bull)'
+                        else if (curr > prev) cellColor = 'var(--bear)'
                       } else {
-                        cellColor = '#a1a1aa'
+                        cellColor = 'var(--chart-4)'
                       }
                     }
                     return <Cell key={`cell-${index}`} fill={cellColor} />
@@ -319,7 +352,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
                       </span>
                     }
                   />
-                  <TooltipContent side="right" className="max-w-[300px] text-[13px] leading-relaxed p-3 bg-[#18181b] border-[#27272a] text-gray-200 shadow-xl">
+                  <TooltipContent side="right" className="max-w-[300px] text-[13px] leading-relaxed p-3 shadow-xl">
                     {infoTooltip}
                   </TooltipContent>
                 </UITooltip>
@@ -391,7 +424,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
   )
 
   return (
-    <div className="bg-card border border-border/40 rounded-xl p-4 shadow-sm h-[320px] flex flex-col group">
+    <div className="glass rounded-xl p-4 h-[320px] flex flex-col group">
       {content}
     </div>
   )

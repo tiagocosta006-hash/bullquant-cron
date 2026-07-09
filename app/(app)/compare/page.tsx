@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation'
+import { GitCompareArrows } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { PeerComparisonDashboard } from '@/components/compare/PeerComparisonDashboard'
+import { PageHeader } from '@/components/layout/PageHeader'
 
 export default async function ComparePage({
   searchParams,
@@ -11,10 +13,13 @@ export default async function ComparePage({
   const { ticker } = resolvedParams
 
   if (!ticker) {
-    // Se não houver ticker, redirecionamos ou mostramos um ecrã para escolher
+    // Se não houver ticker, mostramos um ecrã para escolher a partir de uma empresa
     return (
-      <div className="container max-w-7xl mx-auto py-16 px-4 text-center">
-        <h1 className="text-3xl font-bold tracking-tight mb-4">Batalha de Pares (Peer Comparison)</h1>
+      <div className="glass mx-auto max-w-2xl rounded-3xl p-12 text-center">
+        <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <GitCompareArrows className="h-7 w-7" />
+        </div>
+        <h1 className="text-2xl font-extrabold tracking-tight mb-3">Batalha de Pares (Peer Comparison)</h1>
         <p className="text-muted-foreground">Por favor, aceda a esta página a partir de uma empresa para iniciar a comparação com a sua indústria.</p>
       </div>
     )
@@ -54,15 +59,14 @@ export default async function ComparePage({
   // Como as indústrias podem ter entre 2 a 15 empresas, vamos passar os peers (nome, ticker) e o dashboard faz fetch dos fundamentais.
   
   return (
-    <div className="container max-w-7xl mx-auto py-8 px-4 space-y-8">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight">Análise de Pares: {baseCompany.industry}</h1>
-        <p className="text-muted-foreground">
-          Comparação direta de múltiplos e desempenho dentro da mesma sub-indústria GICS.
-        </p>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        icon={<GitCompareArrows className="h-6 w-6" />}
+        title={`Análise de Pares: ${baseCompany.industry}`}
+        subtitle="Comparação direta de múltiplos e desempenho dentro da mesma sub-indústria GICS."
+      />
 
-      <PeerComparisonDashboard 
+      <PeerComparisonDashboard
         baseCompany={baseCompany} 
         baseFundamentals={baseFundamentals}
         availablePeers={allPeers}

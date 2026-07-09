@@ -37,13 +37,13 @@ export function SectorGrid({ sectors, onSelect }: SectorGridProps) {
           <button
             key={sectorName}
             onClick={() => onSelect(sectorName)}
-            className="group flex flex-col items-start p-5 rounded-xl border border-white/5 bg-card hover:bg-card-hover hover:border-white/10 transition-all text-left"
+            className="glass group flex flex-col items-start p-5 rounded-xl text-left transition-transform hover:-translate-y-0.5"
           >
             <div className={`p-3 rounded-lg ${config.bg} ${config.color} mb-4 group-hover:scale-110 transition-transform`}>
               <Icon size={24} strokeWidth={1.5} />
             </div>
-            <h3 className="font-semibold text-white text-lg mb-1">{sectorName === "Unknown" ? "Outros" : sectorName}</h3>
-            <p className="text-sm text-white/50">{data.count} empresas</p>
+            <h3 className="font-semibold text-foreground text-lg mb-1">{sectorName === "Unknown" ? "Outros" : sectorName}</h3>
+            <p className="text-sm text-muted-foreground">{data.count} empresas</p>
           </button>
         )
       })}

@@ -36,7 +36,7 @@ export function StockCard({
 
   return (
     <Link href={`/stock/${ticker}`} className="block group">
-      <div className="bg-card/40 backdrop-blur-sm border border-border/60 hover:bg-card/80 hover:border-primary/40 hover:shadow-[0_4px_20px_rgb(0,0,0,0.25)] duration-200 transition-all p-3.5 rounded-xl flex flex-col h-full relative overflow-hidden">
+      <div className="glass hover:-translate-y-0.5 duration-200 transition-transform p-3.5 rounded-xl flex flex-col h-full relative overflow-hidden">
         {/* Gold top hairline on hover */}
         <div className="gold-rule absolute inset-x-0 top-0 h-px opacity-0 group-hover:opacity-100 transition-opacity" />
         <div className="flex items-center justify-between">
@@ -54,12 +54,12 @@ export function StockCard({
                   }}
                 />
               ) : null}
-              <span className={`font-heading font-bold text-sm text-primary ${logoUrl ? "hidden" : ""}`}>
+              <span className={`font-bold text-sm text-primary ${logoUrl ? "hidden" : ""}`}>
                 {ticker[0]}
               </span>
             </div>
             <div className="flex flex-col overflow-hidden min-w-0">
-              <span className="font-heading font-bold text-sm truncate group-hover:text-primary transition-colors">
+              <span className="font-bold text-sm truncate group-hover:text-primary transition-colors">
                 {ticker}
               </span>
               <span className="text-[11px] text-muted-foreground truncate">

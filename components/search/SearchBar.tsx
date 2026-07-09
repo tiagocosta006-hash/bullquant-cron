@@ -76,7 +76,7 @@ export function SearchBar() {
       <Input
         type="search"
         placeholder={t('placeholder')}
-        className="w-full rounded-full bg-white/5 border-white/10 pl-10 md:w-[300px] lg:w-[400px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:bg-white/10 transition-all backdrop-blur-md shadow-inner placeholder:text-muted-foreground/50 h-10"
+        className="w-full rounded-full bg-input/30 border-input/30 pl-10 md:w-[300px] lg:w-[400px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:bg-input/50 transition-all backdrop-blur-md shadow-inner placeholder:text-muted-foreground/50 h-10"
         value={query}
         onChange={(e) => {
           setQuery(e.target.value)

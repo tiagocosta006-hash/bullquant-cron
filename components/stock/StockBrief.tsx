@@ -55,9 +55,9 @@ export function StockBrief({ ticker }: { ticker: string }) {
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+      <div className="glass rounded-xl p-6">
         <div className="mb-6">
-          <h2 className="flex items-center gap-2 font-heading text-xl font-bold tracking-tight text-foreground">
+          <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-foreground">
             {BRAND.name} {t("title")}
             <Sparkles className="h-5 w-5 animate-pulse text-primary" />
           </h2>
@@ -79,9 +79,9 @@ export function StockBrief({ ticker }: { ticker: string }) {
   if (!data || data.events.length === 0) return null
 
   return (
-    <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+    <div className="glass rounded-xl p-6">
       <div className="mb-6">
-        <h2 className="flex items-center gap-2 font-heading text-xl font-bold tracking-tight text-foreground">
+        <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-foreground">
           {BRAND.name} {t("title")}
           <Sparkles className="h-5 w-5 text-primary" />
         </h2>

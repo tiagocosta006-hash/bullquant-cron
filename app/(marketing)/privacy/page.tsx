@@ -1,22 +1,22 @@
 import React from "react";
 
 export const metadata = {
-  title: "Política de Privacidade | Bullmetrics",
-  description: "Como a Bullmetrics trata e protege os seus dados pessoais.",
+  title: "Política de Privacidade | BullMetrics",
+  description: "Como a BullMetrics trata e protege os seus dados pessoais.",
 };
 
 export default function PrivacyPolicyPage() {
   return (
     <div className="container mx-auto px-4 py-16 max-w-4xl text-gray-900 dark:text-gray-100">
       <h1 className="text-4xl font-extrabold tracking-tight mb-8">Política de Privacidade</h1>
-      
+
       <div className="space-y-8 leading-relaxed">
         <section>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
             Última atualização: {new Date().toLocaleDateString("pt-PT")}
           </p>
           <p>
-            A <strong>Bullmetrics</strong> assume o compromisso de garantir a privacidade e segurança dos seus dados pessoais.
+            A <strong>BullMetrics</strong> assume o compromisso de garantir a privacidade e segurança dos seus dados pessoais.
             A presente Política de Privacidade estabelece as práticas da plataforma relativamente à recolha, uso, processamento
             e proteção de informações, em estrita conformidade com o Regulamento Geral sobre a Proteção de Dados (RGPD)
             europeu e a legislação nacional aplicável em Portugal.
@@ -26,9 +26,9 @@ export default function PrivacyPolicyPage() {
         <section>
           <h2 className="text-2xl font-bold mb-4">1. Identidade e Responsável pelo Tratamento</h2>
           <p>
-            A Bullmetrics é a entidade responsável pelo tratamento dos seus dados pessoais no âmbito da prestação dos
+            A BullMetrics é a entidade responsável pelo tratamento dos seus dados pessoais no âmbito da prestação dos
             serviços descritos nos nossos Termos de Serviço. Em caso de dúvidas ou necessidade de exercer os seus direitos,
-            pode contactar o Responsável pelo Tratamento através do e-mail corporativo: <strong>support@bullocracy.com</strong>.
+            pode contactar o Responsável pelo Tratamento através do e-mail corporativo: <strong>info@thebullocracy.com</strong>.
           </p>
         </section>
 
@@ -53,7 +53,7 @@ export default function PrivacyPolicyPage() {
         <section>
           <h2 className="text-2xl font-bold mb-4">3. Transparência na Partilha de Dados com Terceiros</h2>
           <p className="mb-4">
-            O seu direito à transparência é fundamental para a Bullmetrics. Não vendemos, alugamos ou comercializamos os seus
+            O seu direito à transparência é fundamental para a BullMetrics. Não vendemos, alugamos ou comercializamos os seus
             dados pessoais. Operamos, no entanto, com subprocessadores autorizados estritamente para manter a plataforma
             em funcionamento:
           </p>
@@ -63,7 +63,7 @@ export default function PrivacyPolicyPage() {
               eletrónico) são processadas e armazenadas através do Supabase.
             </li>
             <li>
-              <strong>Dados de Faturação e Transações Financeiras (Paddle):</strong> A Bullmetrics <strong>não recolhe nem armazena</strong> 
+              <strong>Dados de Faturação e Transações Financeiras (Paddle):</strong> A BullMetrics <strong>não recolhe nem armazena</strong>
               os seus dados bancários ou números de cartão de crédito. Todo o processo de checkout, subscrição, recolha
               de impostos e faturação é efetuado integralmente pelo nosso parceiro Paddle (na qualidade de Merchant of Record).
               Poderemos receber da Paddle informação de faturação para gerir o seu estatuto (Plano PRO).
@@ -99,9 +99,7 @@ export default function PrivacyPolicyPage() {
             <li><strong>Direito de Oposição e Limitação:</strong> Opor-se a certos tipos de tratamentos ou pedir a sua suspensão.</li>
           </ul>
           <p className="mt-4">
-            Para exercer qualquer um dos seus direitos, contacte-nos de forma inequívoca através do e-mail <strong>support@bullocracy.com</strong>.
-            Garantimos resposta atempada dentro dos prazos legais estipulados. Caso considere existir infração no tratamento,
-            assiste-lhe o direito de apresentar queixa à autoridade de controlo competente nacional (CNPD em Portugal).
+            Para exercer qualquer um dos seus direitos, contacte-nos de forma inequívoca através do e-mail <strong>info@thebullocracy.com</strong>.
           </p>
         </section>
       </div>

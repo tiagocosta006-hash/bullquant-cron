@@ -67,7 +67,7 @@ export async function forgotPassword(formData: FormData) {
     // Em produção (Vercel), isto força-nos a não esquecer de colocar a variável!
   }
 
-  const siteUrl = origin || 'http://localhost:3001'
+  const siteUrl = origin ? origin.replace(/\/$/, '') : 'http://localhost:3001'
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,

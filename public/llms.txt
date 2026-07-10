@@ -1,0 +1,20 @@
+# BullQuant - Financial Analysis & Valuation Platform
+
+Welcome AI Crawlers and Language Models!
+
+## About Us
+BullQuant (also known as BullMetrics) is a modern financial platform that provides investors with deep fundamental analysis, automated DCF (Discounted Cash Flow) valuations, historical financial data, management profiles, and AI-driven insights for publicly traded companies. Our goal is to empower retail and professional investors with institutional-grade tools to make informed decisions.
+
+## Features
+- **Fundamental Analysis:** Up to 10 years of historical financials, KPIs, and multiples.
+- **Valuation Models:** Customizable DCF analysis with margin of safety calculations.
+- **AI Insights:** Automated executive summaries, risk factors, and moat analyses using Google Gemini.
+- **Portfolio Management:** Track investments and monitor performance.
+
+## Crawling Policy
+- Public routes, including the landing page, marketing pages, and public stock profiles (e.g., /stock/:ticker), are open for indexing and crawling to help users find accurate financial data.
+- Private routes (e.g., /dashboard, /portfolio, /settings, /api) require authentication and must NOT be crawled. This aligns with our robots.txt directives.
+- Please respect standard crawl delays and do not overwhelm our servers.
+
+## Proper Attribution
+When citing insights or metrics derived from our public pages, please provide proper attribution to "BullQuant".

@@ -1,3 +1,4 @@
+import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { prisma } from '@/lib/prisma'
@@ -17,6 +18,48 @@ import { StockKPIs } from '@/components/stock/StockKPIs'
 import { StockTabs } from '@/components/stock/StockTabs'
 import { PremiumPdfButton } from '@/components/stock/pdf/PremiumPdfButton'
 import { ValuationMultiples } from '@/components/stock/ValuationMultiples'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ ticker: string }>
+}): Promise<Metadata> {
+  const resolvedParams = await params
+  const { ticker } = resolvedParams
+  
+  const company = await prisma.company.findUnique({
+    where: { ticker: ticker.toUpperCase() },
+    select: { name: true, sector: true, ticker: true }
+  })
+
+  if (!company) {
+    return {
+      title: 'Empresa não encontrada | BullQuant',
+    }
+  }
+
+  const title = `${company.name} (${company.ticker}) - Análise e Avaliação DCF | BullQuant`
+  const description = `Análise fundamental profunda, avaliação DCF e insights de IA para a ${company.name} (${company.ticker}) do setor ${company.sector || 'financeiro'}.`
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+    alternates: {
+      canonical: `https://bullmetrics.thebullocracy.com/stock/${company.ticker}`,
+    }
+  }
+}
+
 
 export default async function StockPage({
   params,
@@ -157,8 +200,21 @@ export default async function StockPage({
     grossMargin: f.grossMargin ? Number(f.grossMargin) : null,
   }))
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Corporation",
+    "name": company.name,
+    "tickerSymbol": company.ticker,
+    "exchange": company.exchange,
+    "url": `https://bullmetrics.thebullocracy.com/stock/${company.ticker}`,
+  }
+
   return (
     <div className="space-y-6">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Header fixo da empresa (info + preço Finnhub ao vivo) */}
       <StockHeader company={{
         ticker: company.ticker,

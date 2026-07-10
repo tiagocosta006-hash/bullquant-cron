@@ -155,6 +155,8 @@
     "subtitle": "Choose your new password.",
     "passwordLabel": "New Password",
     "passwordPlaceholder": "******",
+    "confirmPasswordLabel": "Confirm Password",
+    "confirmPasswordPlaceholder": "Repeat your new password",
     "submitButton": "Update Password",
     "submitLoading": "Updating..."
   },
@@ -198,7 +200,19 @@
       "languageDesc": "Choose the language you want to use in Bullmetrics.",
       "theme": "Visual Theme",
       "themeDesc": "Switch between Dark and Light mode.",
-      "logoutBtn": "Sign Out"
+      "logoutBtn": "Sign Out",
+      "securityTitle": "Security",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmNewPassword": "Confirm New Password",
+      "changePasswordBtn": "Change Password",
+      "passwordSuccess": "Password updated successfully!",
+      "deleteAccountTitle": "Delete Account Permanently",
+      "deleteAccountDesc": "This action is irreversible. All your data, portfolios, and valuations will be deleted forever.",
+      "deleteAccountBtn": "Delete Account",
+      "deleteAccountConfirmLabel": "Type DELETE to confirm",
+      "deleteAccountCancel": "Cancel",
+      "deleteAccountSubmit": "Delete Forever"
     },
     "preferences": {
       "title": "App Preferences",

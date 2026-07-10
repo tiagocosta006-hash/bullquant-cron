@@ -6,10 +6,21 @@ import { useTranslations } from 'next-intl'
 import { UserCircle, Mail, Star, LogOut, Settings as SettingsIcon, Globe, Palette, Loader2 } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { updateProfile, setLocale } from '@/app/(app)/settings/actions'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog"
+import { updateProfile, setLocale, updatePasswordSettings, deleteAccount } from '@/app/(app)/settings/actions'
 import { logout } from '@/app/(auth)/actions'
 import { PageHeader } from '@/components/layout/PageHeader'
 
@@ -30,6 +41,16 @@ export function SettingsClient({ user, locale }: SettingsClientProps) {
   const [name, setName] = useState(user.name || '')
   const [isSaving, setIsSaving] = useState(false)
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
+  
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [isSavingPassword, setIsSavingPassword] = useState(false)
+  const [passwordMessage, setPasswordMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
+  
+  const [deleteConfirmText, setDeleteConfirmText] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
+
   // Track the initial name normalised to empty string so comparison is consistent
   const initialName = user.name || ''
 
@@ -49,6 +70,34 @@ export function SettingsClient({ user, locale }: SettingsClientProps) {
     }
     
     setIsSaving(false)
+  }
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSavingPassword(true)
+    setPasswordMessage(null)
+    
+    const formData = new FormData()
+    formData.append('currentPassword', currentPassword)
+    formData.append('newPassword', newPassword)
+    formData.append('confirmPassword', confirmPassword)
+    
+    const result = await updatePasswordSettings(formData)
+    if (result?.error) {
+      setPasswordMessage({ text: result.error, type: 'error' })
+    } else {
+      setPasswordMessage({ text: t('profile.passwordSuccess', { fallback: 'Password atualizada com sucesso!' }), type: 'success' })
+      setCurrentPassword('')
+      setNewPassword('')
+      setConfirmPassword('')
+    }
+    
+    setIsSavingPassword(false)
+  }
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true)
+    await deleteAccount()
   }
 
   const handleLanguageChange = async (newLocale: string | null) => {
@@ -120,15 +169,105 @@ export function SettingsClient({ user, locale }: SettingsClientProps) {
               </form>
             </div>
             
-            <div className="border-t p-6 bg-muted/30">
-              <h3 className="text-lg font-semibold text-destructive mb-2">{t('profile.dangerZone')}</h3>
-              <p className="text-sm text-muted-foreground mb-4">{t('profile.logoutDesc')}</p>
-              <form action={logout}>
-                <Button variant="destructive" type="submit" className="gap-2">
-                  <LogOut className="h-4 w-4" />
-                  {t('profile.logoutBtn')}
+            <div className="border-t p-6 bg-muted/10">
+              <h3 className="text-lg font-semibold mb-6">{t('profile.securityTitle')}</h3>
+              <form onSubmit={handleUpdatePassword} className="space-y-6 max-w-xl">
+                <div className="space-y-2">
+                  <Label htmlFor="currentPassword">{t('profile.currentPassword')}</Label>
+                  <PasswordInput 
+                    id="currentPassword" 
+                    value={currentPassword} 
+                    onChange={(e) => setCurrentPassword(e.target.value)} 
+                    required 
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="newPassword">{t('profile.newPassword')}</Label>
+                    <PasswordInput 
+                      id="newPassword" 
+                      value={newPassword} 
+                      onChange={(e) => setNewPassword(e.target.value)} 
+                      required 
+                      minLength={6}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">{t('profile.confirmNewPassword')}</Label>
+                    <PasswordInput 
+                      id="confirmPassword" 
+                      value={confirmPassword} 
+                      onChange={(e) => setConfirmPassword(e.target.value)} 
+                      required 
+                      minLength={6}
+                    />
+                  </div>
+                </div>
+
+                {passwordMessage && (
+                  <p className={`text-sm font-medium ${passwordMessage.type === 'error' ? 'text-destructive' : 'text-bull'}`}>
+                    {passwordMessage.text}
+                  </p>
+                )}
+
+                <Button type="submit" disabled={isSavingPassword || !currentPassword || !newPassword || !confirmPassword}>
+                  {isSavingPassword ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  {t('profile.changePasswordBtn')}
                 </Button>
               </form>
+            </div>
+            
+            <div className="border-t p-6 bg-muted/30">
+              <h3 className="text-lg font-semibold text-destructive mb-2">{t('profile.dangerZone')}</h3>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex-1 max-w-xl">
+                  <p className="text-sm text-muted-foreground">{t('profile.logoutDesc')}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <form action={logout}>
+                    <Button variant="outline" type="submit" className="gap-2">
+                      <LogOut className="h-4 w-4" />
+                      {t('profile.logoutBtn')}
+                    </Button>
+                  </form>
+                  <Dialog>
+                    <DialogTrigger render={<Button variant="destructive" />}>
+                      {t('profile.deleteAccountBtn')}
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>{t('profile.deleteAccountTitle')}</DialogTitle>
+                        <DialogDescription>
+                          {t('profile.deleteAccountDesc')}
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                          <Label>{t('profile.deleteAccountConfirmLabel')}</Label>
+                          <Input 
+                            value={deleteConfirmText}
+                            onChange={(e) => setDeleteConfirmText(e.target.value)}
+                            placeholder="APAGAR / DELETE"
+                          />
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <DialogClose render={<Button variant="outline" />}>
+                          {t('profile.deleteAccountCancel')}
+                        </DialogClose>
+                        <Button 
+                          variant="destructive" 
+                          onClick={handleDeleteAccount}
+                          disabled={(deleteConfirmText !== 'APAGAR' && deleteConfirmText !== 'DELETE') || isDeleting}
+                        >
+                          {isDeleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                          {t('profile.deleteAccountSubmit')}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </div>
             </div>
           </div>
         </TabsContent>

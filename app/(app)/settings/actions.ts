@@ -1,8 +1,10 @@
 "use server"
 
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { prisma } from '@/lib/prisma'
 
 export async function setLocale(locale: string) {
@@ -43,4 +45,88 @@ export async function updateProfile(formData: FormData) {
 
   revalidatePath('/', 'layout')
   return { success: true }
+}
+
+export async function updatePasswordSettings(formData: FormData) {
+  const currentPassword = formData.get('currentPassword') as string
+  const newPassword = formData.get('newPassword') as string
+  const confirmPassword = formData.get('confirmPassword') as string
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return { error: 'Todos os campos são obrigatórios.' }
+  }
+
+  if (newPassword !== confirmPassword) {
+    return { error: 'As novas passwords não coincidem.' }
+  }
+
+  if (newPassword.length < 6) {
+    return { error: 'A nova password tem de ter pelo menos 6 caracteres.' }
+  }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user || !user.email) {
+    return { error: 'Não autorizado.' }
+  }
+
+  // Verificar password atual fazendo um login com a mesma
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: currentPassword,
+  })
+
+  if (signInError) {
+    return { error: 'A palavra-passe atual está incorreta.' }
+  }
+
+  // Atualizar para a nova password
+  const { error: updateError } = await supabase.auth.updateUser({
+    password: newPassword,
+  })
+
+  if (updateError) {
+    const msg = updateError.message?.toLowerCase() || '';
+    if (msg.includes('different from the old password')) {
+      return { error: 'A nova password tem de ser diferente da antiga.' }
+    }
+    if (msg.includes('weak_password')) {
+      return { error: 'A password é demasiado fraca. Tenta adicionar números ou símbolos.' }
+    }
+    return { error: 'Ocorreu um erro ao atualizar a palavra-passe.' }
+  }
+
+  return { success: true }
+}
+
+export async function deleteAccount() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Não autorizado.' }
+  }
+
+  const adminAuth = createAdminClient().auth
+
+  // Delete from Prisma first just in case there's no cascade
+  try {
+    await prisma.user.delete({
+      where: { id: user.id }
+    })
+  } catch (error) {
+    console.error("Error deleting user from Prisma:", error)
+  }
+
+  const { error: deleteError } = await adminAuth.admin.deleteUser(user.id)
+
+  if (deleteError) {
+    console.error("Error deleting user from Supabase Auth:", deleteError)
+    return { error: 'Ocorreu um erro ao apagar a conta.' }
+  }
+
+  await supabase.auth.signOut()
+  revalidatePath('/', 'layout')
+  redirect('/')
 }

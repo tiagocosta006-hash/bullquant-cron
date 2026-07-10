@@ -32,8 +32,7 @@ export async function updateSession(request: NextRequest) {
   const isAuthRoute = 
     request.nextUrl.pathname.startsWith('/login') || 
     request.nextUrl.pathname.startsWith('/register') ||
-    request.nextUrl.pathname.startsWith('/forgot-password') ||
-    request.nextUrl.pathname.startsWith('/reset-password')
+    request.nextUrl.pathname.startsWith('/forgot-password')
 
   const isPrivateRoute =
     request.nextUrl.pathname.startsWith('/settings') ||
@@ -41,7 +40,8 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/dcf') ||
     request.nextUrl.pathname.startsWith('/calendar') ||
     request.nextUrl.pathname.startsWith('/explore') ||
-    request.nextUrl.pathname.startsWith('/transcripts')
+    request.nextUrl.pathname.startsWith('/transcripts') ||
+    request.nextUrl.pathname.startsWith('/reset-password')
 
   // Redirecionar utilizadores autenticados para a página inicial se tentarem aceder a rotas de auth
   if (user && isAuthRoute) {

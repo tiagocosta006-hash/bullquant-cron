@@ -2,6 +2,19 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { createClient } from "@/lib/supabase/server"
 import { mergePosition } from "@/lib/finance/portfolio"
+import { z } from "zod"
+
+const addPortfolioSchema = z.object({
+  ticker: z.string().min(1).max(10).trim().toUpperCase(),
+  quantity: z.number().positive().optional(),
+  avgBuyPrice: z.number().positive().optional()
+}).refine(data => {
+  if ((data.quantity !== undefined && data.avgBuyPrice === undefined) ||
+      (data.quantity === undefined && data.avgBuyPrice !== undefined)) {
+    return false
+  }
+  return true
+}, { message: "quantity and avgBuyPrice must be provided together" })
 
 export async function POST(request: Request) {
   try {
@@ -12,21 +25,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const body = await request.json()
-    const { ticker, quantity, avgBuyPrice } = body
-
-    if (!ticker) {
-      return NextResponse.json({ error: "Ticker is required" }, { status: 400 })
+    let body;
+    try {
+      body = await request.json()
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 })
     }
 
+    const parseResult = addPortfolioSchema.safeParse(body)
+    if (!parseResult.success) {
+      return NextResponse.json({ error: parseResult.error.issues[0].message }, { status: 400 })
+    }
+
+    const { ticker, quantity, avgBuyPrice } = parseResult.data
     const hasPosition = quantity !== undefined && avgBuyPrice !== undefined
-    if (hasPosition && (!(quantity > 0) || !(avgBuyPrice > 0))) {
-      return NextResponse.json({ error: "quantity and avgBuyPrice must be positive numbers" }, { status: 400 })
-    }
 
     // Find the company
     const company = await prisma.company.findUnique({
-      where: { ticker: ticker.toUpperCase() }
+      where: { ticker }
     })
 
     if (!company) {

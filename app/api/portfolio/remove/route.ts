@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { createClient } from "@/lib/supabase/server"
+import { z } from "zod"
+
+const removePortfolioSchema = z.object({
+  ticker: z.string().min(1).max(10).trim().toUpperCase(),
+})
 
 export async function DELETE(request: Request) {
   try {
@@ -11,15 +16,22 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const body = await request.json()
-    const { ticker } = body
-
-    if (!ticker) {
-      return NextResponse.json({ error: "Ticker is required" }, { status: 400 })
+    let body;
+    try {
+      body = await request.json()
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 })
     }
 
+    const parseResult = removePortfolioSchema.safeParse(body)
+    if (!parseResult.success) {
+      return NextResponse.json({ error: parseResult.error.issues[0].message }, { status: 400 })
+    }
+
+    const { ticker } = parseResult.data
+
     const company = await prisma.company.findUnique({
-      where: { ticker: ticker.toUpperCase() }
+      where: { ticker }
     })
 
     if (!company) {

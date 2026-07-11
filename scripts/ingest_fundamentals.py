@@ -13,11 +13,12 @@ import os
 import sys
 import time
 import datetime
+import bisect
 import gzip
 import json
 import uuid
 import requests
-import yfinance as yf
+import yfinance as yf  # SÓ para splits (TODO(polygon): migrar; FX já é BCE)
 import psycopg2
 from urllib.parse import urlparse
 from psycopg2.extras import Json
@@ -70,6 +71,11 @@ EDGAR_HEADERS = {"User-Agent": "Bullmetrics admin@bullocracy.com"}
 SLEEP_BETWEEN = 0.2
 HISTORY_YEARS = 10
 REFRESH_CACHE = "--refresh-cache" in sys.argv
+
+# Moedas de reporte suportadas (ordem = prioridade de seleção de unidade).
+# DKK/SEK/NOK: a NVO (DKK) ficou meses gravada em coroas cruas porque a lista
+# antiga não as tinha — a inferência caía para "USD" e nada era convertido.
+VALID_CURRENCIES = ["USD", "EUR", "GBP", "CHF", "CAD", "JPY", "AUD", "DKK", "SEK", "NOK"]
 
 # ── Tags XBRL com fallbacks (ordem = prioridade) ─────────────────────────────
 
@@ -134,17 +140,29 @@ DURATION_TAGS = {
     "epsDiluted": [
         "EarningsPerShareDiluted",
         "DilutedEarningsLossPerShare",
+        # Loss-makers (WDAY/WBD-class): com prejuízo, diluído == básico e muitas
+        # empresas tagham APENAS a variante combinada — sem ela, EPS fica null.
+        "EarningsPerShareBasicAndDiluted",
         "NetIncomeLossPerOutstandingShare",
         "NetIncomeLossPerShareDiluted",
         # Fallback: empresas com discontinued ops tagham só o EPS de continuing
         # (ex.: COP FY2018 — sem isto, o guard NI/EPS de shares não corre e
         # shares taggadas em milhares passam despercebidas).
         "IncomeLossFromContinuingOperationsPerDilutedShare",
-        "IncomeLossFromContinuingOperationsPerBasicShare" 
+        "IncomeLossFromContinuingOperationsPerBasicShare",
+        # IFRS continuing-ops (SHEL-class): últimas na fila — só quando não há
+        # EPS total; preferível a null e o guard NI/EPS continua a validar.
+        "DilutedEarningsLossPerShareFromContinuingOperations",
+        "BasicEarningsLossPerShareFromContinuingOperations",
     ],
     "sharesOutstandingDur": [
         "WeightedAverageNumberOfDilutedSharesOutstanding",
         "WeightedAverageNumberOfSharesOutstandingBasic",
+        # Variante combinada dos loss-makers — AMBAS as grafias existem na
+        # taxonomia ("Share" singular é a oficial us-gaap; a plural aparece
+        # em extensões/versões antigas).
+        "WeightedAverageNumberOfShareOutstandingBasicAndDiluted",
+        "WeightedAverageNumberOfSharesOutstandingBasicAndDiluted",
         "NumberOfSharesOutstanding",
     ],
     "operatingCashFlow": [
@@ -207,11 +225,16 @@ INSTANT_TAGS = {
     "totalCurrentLiab": ["LiabilitiesCurrent", "CurrentLiabilities"],
     "totalLiabilities": ["Liabilities"],
     "longTermDebt": [
-        "LongTermDebtNoncurrent", 
-        "NoncurrentLiabilities",
+        "LongTermDebtNoncurrent",
+        # ⚠️ NUNCA reintroduzir "NoncurrentLiabilities" aqui: em IFRS é o TOTAL
+        # dos passivos não correntes (pensões, impostos diferidos, provisões…),
+        # não dívida — sobrestimava a dívida das europeias em múltiplos.
         "LongTermDebt",
+        "LongTermDebtAndCapitalLeaseObligationsIncludingCurrentMaturities",
         "ConvertibleDebtNoncurrent",
-        "ConvertibleDebt"
+        "ConvertibleDebt",
+        # IFRS: parcela non-current dos borrowings (SAP/RACE-class filers)
+        "NoncurrentPortionOfNoncurrentBorrowings",
     ],
     "longTermDebtCurrent": ["LongTermDebtCurrent", "CurrentBorrowings"],
     "shortTermDebt": ["ShortTermBorrowings", "ShortTermDebt", "ShorttermBorrowings"],
@@ -240,7 +263,15 @@ INSTANT_TAGS = {
         "CashAndCashEquivalents",
         "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
         "Cash",
+        # Bancos (JPM/WFC 2016-class): o caixa é "cash and due from banks";
+        # os depósitos QUE O BANCO TEM noutros bancos entram via
+        # interestBearingDeposits (só somado para Financials em build_row).
+        "CashAndDueFromBanks",
     ],
+    # Ativo de bancos: depósitos remunerados detidos noutros bancos — parte do
+    # caixa e equivalentes na convenção bancária. NÃO confundir com "Deposits"
+    # (passivo = depósitos de clientes), que nunca pode entrar em cash/dívida.
+    "interestBearingDeposits": ["InterestBearingDepositsInBanks"],
     "marketableSecuritiesCurrent": [
         "MarketableSecuritiesCurrent",
         "AvailableForSaleSecuritiesDebtSecuritiesCurrent",
@@ -328,10 +359,9 @@ def extract_tag_entries(us_gaap: dict, tag: str) -> list[dict]:
         return []
         
     units = node.get("units") or {}
-    valid_currencies = ["USD", "EUR", "GBP", "CHF", "CAD", "JPY", "AUD"]
-    
+
     # Priorizar extração de valores monetários (fiat) corretos
-    for currency in valid_currencies:
+    for currency in VALID_CURRENCIES:
         if currency in units:
             unit_entries = units[currency]
             if isinstance(unit_entries, list):
@@ -556,6 +586,12 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
                 val = best_for_period(entries, expected_end, prefer_annual_form=(fp == "FY"))
                 if val is not None:
                     inst_map[(fy, fp)][field] = val
+                    if field == "cash":
+                        # build_row precisa de saber QUAL tag deu o caixa: o
+                        # tag largo dos bancos (CashCashEquivalentsRestricted…)
+                        # JÁ inclui os depósitos remunerados — somar ibd por
+                        # cima duplicaria (JPM: 469B → 915B).
+                        inst_map[(fy, fp)]["cash_tag"] = tag
                     break
 
     return dur_map, inst_map
@@ -594,11 +630,76 @@ def get_period_info(us_gaap: dict, fy: int, fp: str) -> tuple[str | None, str | 
     return None, None
 
 
+# ── Evidência ao nível da empresa (política evidência-de-ausência) ───────────
+# Um facto de cash flow serve como PROVA de que a empresa paga dividendos —
+# nunca como valor a gravar (lição do auto-healer: não cruzar os três mapas).
+import re as _re
+
+_DIVIDEND_EVIDENCE = _re.compile(r"Dividend")
+# Excluir: dividendos recebidos/income (investing), NCI/preferred (não são a
+# common), e assumptions de option pricing (ExpectedDividend/Rate/Yield).
+_DIVIDEND_EXCLUDE = _re.compile(
+    r"Received|Income|Restriction|MinorityInterest|Noncontrolling|Preferred|"
+    r"ExpectedDividend|DividendRate|Yield"
+)
+_RND_EVIDENCE = _re.compile(r"ResearchAndDevelopment")
+# Excluir IPR&D de aquisições (intangível de balanço, não a linha de despesa).
+_RND_EXCLUDE = _re.compile(r"InProcess|Asset|Intangible|Capitali[sz]ed|Arrangement")
+
+
+# Tags cuja mera presença histórica prova que a empresa carrega dívida de
+# longo prazo (guard JPM-class: os grandes bancos deixaram de taggar LT debt
+# sem dimensões ~2014 — a API companyfacts descarta factos dimensionados).
+_LTD_EVIDENCE_TAGS = (
+    "LongTermDebt", "LongTermDebtNoncurrent", "LongTermDebtAndCapitalLeaseObligations",
+)
+
+
+def compute_company_evidence(facts_json: dict) -> dict:
+    """Varre TODO o companyfacts (us-gaap + ifrs-full) e devolve flags binárias:
+    - is_dividend_payer: existe qualquer facto de dividendos a common > 0
+    - has_rnd_ever: a empresa alguma vez reportou uma linha de R&D
+    - has_ltd_ever: a empresa alguma vez taggou dívida de longo prazo
+    Errar para o lado do True é seguro: True ⇒ campo em falta fica NULL (N/A),
+    nunca um zero/total fabricado."""
+    payer = False
+    has_rnd = False
+    has_ltd = False
+    facts = (facts_json or {}).get("facts") or {}
+    for ns_name in ("us-gaap", "ifrs-full"):
+        ns = facts.get(ns_name) or {}
+        for tag, node in ns.items():
+            if not payer and _DIVIDEND_EVIDENCE.search(tag) and not _DIVIDEND_EXCLUDE.search(tag):
+                for entries in (node.get("units") or {}).values():
+                    if isinstance(entries, list) and any(
+                        isinstance(e.get("val"), (int, float)) and e["val"] > 0 for e in entries
+                    ):
+                        payer = True
+                        break
+            if not has_rnd and _RND_EVIDENCE.search(tag) and not _RND_EXCLUDE.search(tag):
+                units = node.get("units") or {}
+                if any(isinstance(v, list) and v for v in units.values()):
+                    has_rnd = True
+            if not has_ltd and tag in _LTD_EVIDENCE_TAGS:
+                units = node.get("units") or {}
+                if any(isinstance(v, list) and any(
+                        isinstance(e.get("val"), (int, float)) and e["val"] > 0 for e in v)
+                       for v in units.values()):
+                    has_ltd = True
+            if payer and has_rnd and has_ltd:
+                return {"is_dividend_payer": True, "has_rnd_ever": True, "has_ltd_ever": True}
+    return {"is_dividend_payer": payer, "has_rnd_ever": has_rnd, "has_ltd_ever": has_ltd}
 
 
 
 def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str | None,
-              dur: dict, inst: dict, sector: str | None = None) -> dict:
+              dur: dict, inst: dict, sector: str | None = None,
+              evidence: dict | None = None) -> dict:
+    # evidence = compute_company_evidence(facts): flags binárias da empresa
+    # inteira que decidem se um DPS/R&D em falta é um verdadeiro zero (empresa
+    # nunca pagou/reportou) ou um buraco de extração que DEVE ficar NULL.
+    evidence = evidence or {"is_dividend_payer": True, "has_rnd_ever": True,
+                            "has_ltd_ever": False}
     shares = dur.get("sharesOutstandingDur") or inst.get("sharesOutstandingInst")
     # Guard: alguns filings têm shares em unidades erradas (milhares/milhões em
     # vez de unidades — ex.: HST "738" ou BRO "276000" em vez de ~276M).
@@ -621,7 +722,11 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         shares = None
 
     if eps_g is None and ni_g is not None and shares is not None and shares > 0:
-        eps_g = ni_g / shares
+        derived_eps = ni_g / shares
+        # Plausibilidade (como na síntese Q4): Decimal(10,4) rebenta acima de
+        # 999.999,9999 — um shares em unidades erradas nunca pode matar o insert.
+        if shares >= 100_000 and abs(derived_eps) < 100_000:
+            eps_g = derived_eps
     capex_raw = dur.get("capex")
     capex = abs(capex_raw) if capex_raw is not None else None
     op_cf = dur.get("operatingCashFlow")
@@ -686,7 +791,14 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         ltd_c = inst.get("longTermDebtCurrent")
         st = inst.get("shortTermDebt") or inst.get("commercialPaper")
         if ltd_nc is not None or ltd_c is not None or st is not None:
-            total_debt = (ltd_nc or 0) + (ltd_c or 0) + (st or 0)
+            # Guard JPM-class: se a empresa JÁ taggou dívida LT nalgum período
+            # mas não neste (bancos modernos só a tagham dimensionada, que a
+            # API descarta), somar só o curto prazo daria um "total" 8× errado
+            # (JPM: $52.9B de ST vs $463B reais). Antes NULL que errado.
+            if ltd_nc is None and ltd_c is None and evidence.get("has_ltd_ever"):
+                total_debt = None
+            else:
+                total_debt = (ltd_nc or 0) + (ltd_c or 0) + (st or 0)
     if total_debt is None:
         # Nível 2: valor de face da dívida emitida (empresas sem tags de componentes, ex: META)
         total_debt = inst.get("debtInstrumentCarryingAmount")
@@ -701,6 +813,15 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
     if cash is not None:
         marketable = inst.get("marketableSecuritiesCurrent") or 0
         cash = cash + marketable
+
+    # Bancos: caixa = cash & due from banks + depósitos remunerados detidos
+    # noutros bancos (ativo). SÓ quando o caixa veio do tag estreito
+    # CashAndDueFromBanks — o tag largo (CashCashEquivalentsRestricted…) já
+    # inclui estes depósitos e somar duplicaria (JPM: 469B → 915B).
+    if sector == "Financials" and inst.get("cash_tag") == "CashAndDueFromBanks":
+        ibd = inst.get("interestBearingDeposits")
+        if ibd is not None:
+            cash = (cash or 0) + ibd
 
     total_equity = inst.get("totalEquity")
 
@@ -731,6 +852,12 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
     ebitda_raw = dur.get("ebitda")
     if ebitda_raw is not None:
         ebitda = ebitda_raw
+    elif sector == "Financials":
+        # EBITDA não tem significado económico para bancos/seguradoras (juros
+        # SÃO o negócio, não um custo de financiamento a excluir). Sintetizá-lo
+        # produzia um número que nenhum analista usaria → NULL estrutural,
+        # whitelisted como SECTOR_NO_EBITDA_BANK; a UI esconde o card.
+        ebitda = None
     else:
         da = dur.get("depreciationAndAmortization") or 0
         interest_exp = dur.get("interestExpense")
@@ -746,18 +873,23 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
     # valores acima disso são bugs de escala (reduzir 1000x até plausível, senão N/A).
     dps = dur.get("dividendPerShare")
     if dps is None:
-        dps = 0.0
+        # Política evidência-de-ausência (fim do "paradoxo da Apple"):
+        #  - não-payer verificado (zero factos de dividendos em TODO o
+        #    companyfacts) → 0.0 é a verdade;
+        #  - payer com período em falta → NULL (N/A). Forçar 0.0 aqui
+        #    mascarava buracos de extração como "não paga dividendos".
+        dps = None if evidence["is_dividend_payer"] else 0.0
     else:
         for _ in range(3):
             if abs(dps) <= 1000:
                 break
             dps /= 1000
         if abs(dps) > 1000:
-            dps = 0.0
+            dps = None if evidence["is_dividend_payer"] else 0.0
         # Guard: dividendos são SEMPRE não-negativos. Um valor negativo é sempre
         # um bug de ingestão (ex: subtração errada de acumulado anual). Rejeitar.
         if dps is not None and dps < 0:
-            dps = 0.0
+            dps = None
 
     if fp == "FY":
         period_type = "ANNUAL"
@@ -767,17 +899,24 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         fiscal_quarter = int(fp[1]) if fp.startswith("Q") else None
 
 
-    # --- SECTOR SPECIFIC FALLBACKS ---
-    if dur.get("researchAndDevelopment") is None:
+    # --- POLÍTICA EVIDÊNCIA-DE-AUSÊNCIA (R&D) ---
+    # 0.0 só quando a empresa NUNCA reportou linha de R&D em filing nenhum
+    # (mídia, bancos, retalho…). Se já reportou e este período falha → NULL:
+    # forçar 0.0 mascarava buracos de extração como "não tem R&D".
+    if dur.get("researchAndDevelopment") is None and not evidence["has_rnd_ever"]:
         dur["researchAndDevelopment"] = 0.0
 
+    # --- SECTOR SPECIFIC FALLBACKS ---
     if sector == "Financials":
         if capex is None:
+            # Estrutural: bancos/seguradoras não têm capex material; por
+            # convenção FCF = OCF (card de FCF é escondido na UI de bancos).
             capex = 0.0
             if op_cf is not None:
                 fcf = op_cf
-        if gross_profit is None and revenue is not None:
-            gross_profit = revenue
+        # NOTA: a antiga fabricação "grossProfit = revenue" foi removida —
+        # margem bruta de 100% em bancos era um número inventado. COGS/gross
+        # profit ficam NULL estrutural (whitelist SECTOR_NO_COGS, UI esconde).
         if op_income is None:
             if net_income is not None:
                 tax = tax_expense or 0.0
@@ -852,64 +991,76 @@ def delete_period(cur, company_id: str, period_type: str, fy: int, fq):
             (company_id, period_type, fy, fq),
         )
 
-def apply_fx_conversion(company_currency: str, periods_data: list[dict]):
+# ── FX: taxas de referência do BCE via Frankfurter (sem key, sem ToS Yahoo) ──
+# https://api.frankfurter.dev — diário desde 1999, EUR/GBP/CHF/DKK/SEK/NOK/JPY…
+# Pedidos por ano-civil (ranges longos vêm re-amostrados semanalmente) com
+# cache em disco; anos passados são imutáveis → cache eterna.
+FX_API_BASE = "https://api.frankfurter.dev/v1"
+FX_CACHE_DIR = os.path.join(os.path.dirname(__file__), ".cache", "fx")
+FX_SERIES_START_YEAR = 2014  # HISTORY_YEARS=10 → períodos desde ~2015/16; folga de 1-2 anos
+_fx_series_memo: dict[str, tuple[list[str], list[float]]] = {}
+
+
+def _fetch_fx_year(currency: str, year: int) -> dict:
+    """Taxas diárias {iso_date: rate} de 1 ano-civil, com cache em disco."""
+    today = datetime.date.today()
+    path = os.path.join(FX_CACHE_DIR, f"{currency}USD_{year}.json")
+    if os.path.exists(path):
+        try:
+            with open(path, encoding="utf-8") as f:
+                data = json.load(f)
+            is_past_year = year < today.year
+            fresh_enough = data and max(data) >= (today - datetime.timedelta(days=7)).isoformat()
+            if is_past_year or fresh_enough:
+                return data
+        except Exception:
+            pass
+    end = min(datetime.date(year, 12, 31), today).isoformat()
+    url = f"{FX_API_BASE}/{year}-01-01..{end}?base={currency}&symbols=USD"
+    r = requests.get(url, timeout=30)
+    r.raise_for_status()
+    rates = {d: v["USD"] for d, v in (r.json().get("rates") or {}).items() if v.get("USD")}
+    os.makedirs(FX_CACHE_DIR, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(rates, f)
+    return rates
+
+
+def get_fx_series(currency: str) -> tuple[list[str], list[float]]:
+    """Série completa (datas ordenadas, taxas) de FX_SERIES_START_YEAR até hoje."""
+    if currency in _fx_series_memo:
+        return _fx_series_memo[currency]
+    merged: dict = {}
+    for year in range(FX_SERIES_START_YEAR, datetime.date.today().year + 1):
+        merged.update(_fetch_fx_year(currency, year))
+    dates = sorted(merged)
+    rates = [merged[d] for d in dates]
+    # BCE publica só dias úteis; gaps > ~10 dias indicam série incompleta.
+    for a, b in zip(dates, dates[1:]):
+        gap = (datetime.date.fromisoformat(b) - datetime.date.fromisoformat(a)).days
+        if gap > 10:
+            print(f"    Aviso FX: gap de {gap} dias na série {currency}USD ({a} → {b})")
+    _fx_series_memo[currency] = (dates, rates)
+    return dates, rates
+
+
+def apply_fx_conversion(company_currency: str, periods_data: list[dict]) -> bool:
+    """Converte os campos monetários para USD à taxa BCE mais próxima anterior
+    ao periodEnd. Devolve True em sucesso; False em falha — e nesse caso o
+    caller NÃO PODE gravar as rows (a GSK ficou meses em GBP cru precisamente
+    porque a falha era silenciosa e as rows iam para a BD na mesma)."""
     if not company_currency or company_currency == "USD":
-        return
-        
-    fx_ticker = f"{company_currency}USD=X"
+        return True
     try:
-        import datetime
-        # Convert string dates to date objects
-        parsed_dates = []
-        for p in periods_data:
-            end = p.get('periodEnd')
-            if end:
-                if isinstance(end, str):
-                    parsed_dates.append(datetime.date.fromisoformat(end))
-                else:
-                    parsed_dates.append(end)
-                    
-        if not parsed_dates:
-            return
-            
-        min_date = min(parsed_dates)
-        # Add a few days to max_date to ensure we cover the last day
-        max_date = max(parsed_dates) + datetime.timedelta(days=5)
-        
-        fx_data = yf.download(fx_ticker, start=min_date, end=max_date, progress=False)
-        if fx_data.empty:
-            print(f"    Erro FX: Sem dados cambiais para {fx_ticker}")
-            return
-            
-        # Helper to get closest rate
-        def get_rate(target_date):
-            # Convert target_date (date or datetime) to pandas Timestamp
-            import pandas as pd
-            target_ts = pd.Timestamp(target_date)
-            # Find the closest date in the index that is <= target_date
-            valid_dates = fx_data.index[fx_data.index <= target_ts]
-            if len(valid_dates) > 0:
-                closest = valid_dates[-1]
-                # For MultiIndex columns in yfinance >= 0.2.33, accessing 'Close' is slightly different.
-                # Usually fx_data['Close'] is a Series or DataFrame
-                try:
-                    close_col = fx_data['Close']
-                    if isinstance(close_col, pd.DataFrame):
-                        return float(close_col.iloc[fx_data.index.get_loc(closest)].iloc[0])
-                    return float(close_col.loc[closest])
-                except Exception as e:
-                    # Fallback for old yfinance
-                    return float(fx_data.loc[closest, 'Close'])
-            # If no date <= target, just get the absolute closest (first available)
-            if len(fx_data) > 0:
-                try:
-                    close_col = fx_data['Close']
-                    if isinstance(close_col, pd.DataFrame):
-                        return float(close_col.iloc[0].iloc[0])
-                    return float(close_col.iloc[0])
-                except:
-                    return float(fx_data.iloc[0]['Close'])
-            return 1.0
+        dates, rates = get_fx_series(company_currency)
+        if not dates:
+            print(f"    Erro FX: série vazia para {company_currency}USD")
+            return False
+
+        def get_rate(period_end) -> float:
+            iso = period_end if isinstance(period_end, str) else period_end.isoformat()
+            i = bisect.bisect_right(dates, iso) - 1
+            return rates[max(i, 0)]
 
         monetary_fields = [
             "revenue", "costOfRevenue", "grossProfit", "operatingExpenses",
@@ -923,15 +1074,14 @@ def apply_fx_conversion(company_currency: str, periods_data: list[dict]):
         for p in periods_data:
             if not p.get('periodEnd'):
                 continue
-                
             rate = get_rate(p['periodEnd'])
             for field in monetary_fields:
                 if p.get(field) is not None:
                     p[field] = float(p[field]) * rate
-                    
+
         return True
     except Exception as e:
-        print(f"    Erro ao aplicar conversão cambial {fx_ticker}: {e}")
+        print(f"    Erro FX Frankfurter {company_currency}→USD: {e}")
         return False
 
 
@@ -1024,6 +1174,30 @@ def insert_fundamental(cur, row: dict):
     )
 
 
+def derive_q4_dps(fy_dps: float, q_dps: list[float]) -> float | None:
+    """Q4 DPS = FY − ΣQ1..3, com alinhamento de base de split.
+
+    O "paradoxo da Apple": 10-Ks pós-split retaggam o DPS ANUAL histórico já
+    ajustado (AAPL FY2019 = 0.75 pós-split 4:1), mas os trimestres só existem
+    nos 10-Qs originais pré-split (0.73+0.73+0.77 = 2.23). Subtrair bases
+    mistas dava −1.48, que o código antigo mascarava com 0.0 — a origem dos
+    "buracos" Q4 de DPS da AAPL/ABBV.
+
+    Testa fatores de split comuns e devolve o Q4 NA BASE DO FY — a mesma base
+    das shares/EPS que a row Q4 sintética herda do FY, mantendo a coerência
+    per-período de que o apply_stock_splits depende."""
+    qsum = sum(q_dps)
+    if qsum <= 0:
+        return None
+    for f in (1, 2, 3, 4, 5, 6, 7, 10, 20, 0.5, 1 / 3, 0.25, 0.1):
+        ratio = (fy_dps * f) / qsum
+        if 1.05 <= ratio <= 2.5:  # com base alinhada, FY ≈ 4/3 × ΣQ1..3
+            q4 = fy_dps - qsum / f
+            if q4 >= 0:
+                return q4
+    return None  # bases irreconciliáveis (ex.: dividendo especial) → N/A
+
+
 def synthesize_q4(periods: set, period_ends: dict, period_filed: dict,
                   dur_map: dict, inst_map: dict) -> list[int]:
     """Sintetiza Q4 standalone: o EDGAR raramente o tagga (as empresas reportam
@@ -1044,7 +1218,6 @@ def synthesize_q4(periods: set, period_ends: dict, period_filed: dict,
         "operatingIncome", "interestExpense", "taxExpense", "netIncome",
         "operatingCashFlow", "capex", "researchAndDevelopment",
         "sellingGeneralAndAdmin", "ebitda", "depreciationAndAmortization",
-        "dividendPerShare",
     ]
     drop_years: list[int] = []
     fy_years = sorted({fy for (fy, fp) in periods if fp == "FY"})
@@ -1067,6 +1240,13 @@ def synthesize_q4(periods: set, period_ends: dict, period_filed: dict,
             fv = fy_dur.get(field)
             vals = [d.get(field) for d in q_durs]
             if fv is None or any(v is None for v in vals):
+                continue
+            # Per-share: FY pode vir retaggado pós-split e os quarters não —
+            # subtração direta de bases mistas é o bug do "paradoxo da Apple".
+            if field == "dividendPerShare":
+                q4_dps = derive_q4_dps(fv, vals)
+                if q4_dps is not None:
+                    derived[field] = q4_dps
                 continue
             val = fv - sum(vals)
             # capex é "sempre positivo" por convenção; derivado negativo
@@ -1131,7 +1311,39 @@ def synthesize_q4(periods: set, period_ends: dict, period_filed: dict,
     return drop_years
 
 
-def process_company(conn, company: dict) -> int:
+def dei_shares_near(dei: dict, period_end: str | None) -> float | None:
+    """Último recurso para shares outstanding: o facto da cover page
+    (dei:EntityCommonStockSharesOutstanding), point-in-time datado tipicamente
+    semanas após o period end. Aceita o registo mais próximo em
+    [period_end, period_end+100d]; recusa se houver valores DISTINTOS na mesma
+    data (multi-classe colapsada — somar às cegas seria errado)."""
+    if not period_end or not dei:
+        return None
+    node = dei.get("EntityCommonStockSharesOutstanding")
+    if not node:
+        return None
+    limit = (datetime.date.fromisoformat(period_end) + datetime.timedelta(days=100)).isoformat()
+    best_date = None
+    best_vals: set = set()
+    for entries in (node.get("units") or {}).values():
+        if not isinstance(entries, list):
+            continue
+        for e in entries:
+            d, v = e.get("end"), e.get("val")
+            if not d or v is None or d < period_end or d > limit:
+                continue
+            if best_date is None or d < best_date:
+                best_date, best_vals = d, {v}
+            elif d == best_date:
+                best_vals.add(v)
+    if best_date is None or len(best_vals) != 1:
+        return None
+    val = float(next(iter(best_vals)))
+    return val if val >= 100_000 else None
+
+
+def process_company(conn, company: dict, dry_run: bool = False,
+                    collector: dict | None = None) -> int:
     company_id = company["id"]
     cik = company["cik"]
 
@@ -1143,6 +1355,9 @@ def process_company(conn, company: dict) -> int:
     namespace = facts.get("us-gaap") or facts.get("ifrs-full") or {}
     if not namespace:
         return 0
+
+    dei_ns = facts.get("dei") or {}
+    evidence = compute_company_evidence(facts_json)
 
     min_fy = datetime.date.today().year - HISTORY_YEARS
     periods: set = set()
@@ -1186,7 +1401,15 @@ def process_company(conn, company: dict) -> int:
         if not dur and not inst:
             continue
 
-        rows.append(build_row(company_id, fy, fp, period_end, filed_at, dur, inst, company.get('sector')))
+        # Último recurso para shares: cover page (dei). Point-in-time real —
+        # para market cap é até MAIS correto que a weighted average em falta.
+        if dur.get("sharesOutstandingDur") is None and inst.get("sharesOutstandingInst") is None:
+            dei_val = dei_shares_near(dei_ns, period_end)
+            if dei_val is not None:
+                inst["sharesOutstandingInst"] = dei_val
+
+        rows.append(build_row(company_id, fy, fp, period_end, filed_at, dur, inst,
+                              company.get('sector'), evidence))
 
     ticker = company.get('ticker')
     
@@ -1195,17 +1418,22 @@ def process_company(conn, company: dict) -> int:
     core_tag = namespace.get("NetIncomeLoss") or namespace.get("ProfitLoss") or namespace.get("Assets") or namespace.get("Revenues") or namespace.get("Revenue")
     if core_tag:
         core_units = core_tag.get("units") or {}
-        for curr in ["USD", "EUR", "GBP", "CHF", "CAD", "JPY", "AUD"]:
+        for curr in VALID_CURRENCIES:
             if curr in core_units:
                 reporting_currency = curr
                 break
                 
+    fx_applied = False
     if reporting_currency != 'USD':
-        success = apply_fx_conversion(reporting_currency, rows)
-        if success:
-            # Tudo foi convertido para USD
-            for row in rows:
-                row["currency"] = "USD"
+        if not apply_fx_conversion(reporting_currency, rows):
+            # NUNCA gravar rows não convertidas: a GSK ficou em GBP cru porque
+            # esta falha era silenciosa e as rows entravam na BD na mesma.
+            print(f"FX {reporting_currency}→USD falhou — empresa saltada (nada gravado)", end=" ")
+            return 0
+        fx_applied = True
+        for row in rows:
+            row["currency"] = "USD"
+        if not dry_run:
             try:
                 with conn.cursor() as cur:
                     cur.execute('UPDATE companies SET currency = %s WHERE id = %s', ('USD', company_id))
@@ -1215,6 +1443,19 @@ def process_company(conn, company: dict) -> int:
 
     if ticker:
         apply_stock_splits(ticker, rows)
+
+    if dry_run:
+        if collector is not None:
+            collector[ticker] = {
+                "cik": cik,
+                "sector": company.get("sector"),
+                "reporting_currency": reporting_currency,
+                "fx_applied": fx_applied,
+                "evidence": evidence,
+                "drop_q4_years": sorted(drop_q4_years),
+                "rows": [{k: v for k, v in row.items() if k != "id"} for row in rows],
+            }
+        return len(rows)
 
     # Commit único por empresa (~40 períodos): contra Supabase remoto, o commit
     # por período dominava o tempo de execução (~3 round-trips × ~100ms cada).
@@ -1330,12 +1571,23 @@ def sync_dual_class(conn):
 
 def main():
     # Uso: python ingest_fundamentals.py [--tickers AAPL,MSFT,...]
+    #                                    [--dry-run out.json] [--refresh-cache]
     tickers = None
     if "--tickers" in sys.argv:
         idx = sys.argv.index("--tickers")
         if idx + 1 >= len(sys.argv):
             sys.exit("--tickers requer lista separada por vírgulas (ex: --tickers AAPL,AVB)")
         tickers = [t.strip().upper() for t in sys.argv[idx + 1].split(",") if t.strip()]
+
+    # --dry-run PATH: extração + build_row + Q4 + FX + splits completos, ZERO
+    # escritas na BD; as rows vão para um dump JSON que o diff_reingest.py
+    # compara com a BD atual antes de qualquer re-ingestão a sério.
+    dry_run_path = None
+    if "--dry-run" in sys.argv:
+        idx = sys.argv.index("--dry-run")
+        if idx + 1 >= len(sys.argv):
+            sys.exit("--dry-run requer o caminho do JSON de output")
+        dry_run_path = sys.argv[idx + 1]
 
     conn = psycopg2.connect(DIRECT_URL)
     conn.autocommit = False
@@ -1344,17 +1596,19 @@ def main():
         companies = get_companies_with_cik(cur, tickers)
 
     total = len(companies)
-    print(f"{total} empresas com CIK a processar.")
+    mode = "DRY-RUN (sem escritas)" if dry_run_path else "live"
+    print(f"{total} empresas com CIK a processar [{mode}].")
 
     total_periods = 0
     errors = 0
+    collector: dict = {}
 
     for i, company in enumerate(companies):
         ticker = company["ticker"]
         print(f"[{i+1}/{total}] {ticker}...", end=" ", flush=True)
 
         try:
-            n = process_company(conn, company)
+            n = process_company(conn, company, dry_run=bool(dry_run_path), collector=collector)
             print(f"{n} períodos")
             total_periods += n
         except psycopg2.OperationalError:
@@ -1362,7 +1616,7 @@ def main():
                 # Supabase drops idle connections after ~10 mins, reconnect and retry
                 conn = psycopg2.connect(DIRECT_URL)
                 conn.autocommit = False
-                n = process_company(conn, company)
+                n = process_company(conn, company, dry_run=bool(dry_run_path), collector=collector)
                 print(f"{n} períodos (reconectado)")
                 total_periods += n
             except Exception as e2:
@@ -1374,6 +1628,25 @@ def main():
 
         if last_fetch_was_network:
             time.sleep(SLEEP_BETWEEN)
+
+    if dry_run_path:
+        dump = {
+            "meta": {
+                "mode": "dry-run",
+                "min_fy": datetime.date.today().year - HISTORY_YEARS,
+                "history_years": HISTORY_YEARS,
+                "fx_source": "frankfurter/ECB",
+                "tickers_filter": tickers,
+            },
+            "companies": collector,
+        }
+        os.makedirs(os.path.dirname(os.path.abspath(dry_run_path)), exist_ok=True)
+        with open(dry_run_path, "w", encoding="utf-8") as f:
+            json.dump(dump, f, ensure_ascii=False, default=str)
+        print(f"\nDry-run: {total_periods} períodos de {len(collector)} empresas em {dry_run_path}. "
+              f"{errors} erros. Nada foi escrito na BD.")
+        conn.close()
+        return
 
     sync_dual_class(conn)
 

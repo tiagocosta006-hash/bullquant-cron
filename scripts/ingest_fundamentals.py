@@ -105,6 +105,18 @@ DURATION_TAGS = {
         "RealEstateRevenueNet",
         "RegulatedAndUnregulatedOperatingRevenue",
         "RegulatedOperatingRevenue",
+        # ── Aceites na revisão CFA 2026-07 (explain_holes; ver docs/audit) ──
+        "RevenueFromContractsWithCustomers",  # IFRS 15 (BCS/NOK pré-rebrand)
+        "RevenueFromSaleOfGoods",             # IFRS pharma (NVS/SNY pré-2018)
+        "OilAndGasRevenue",                   # E&P (EQT/FANG)
+        "GasGatheringTransportationMarketingAndProcessingRevenue",  # midstream (TRGP)
+        "HealthCareOrganizationPatientServiceRevenueLessProvisionForBadDebts",  # DVA/HCA
+        "HealthCareOrganizationPatientServiceRevenue",
+        "RevenueMineralSales",                # mineração (NEM)
+        # REJEITADOS (nunca adicionar): ProceedsFromSales* (investing inflow),
+        # OtherRevenue/RevenueFromDividends/Interest/Royalties (componentes
+        # parciais), RevenueAndOperatingIncome (semântica IFRS incerta),
+        # *ProForma* (não são resultados reais).
     ],
     "costOfRevenue": [
         "CostOfRevenue",
@@ -164,6 +176,9 @@ DURATION_TAGS = {
         "WeightedAverageNumberOfShareOutstandingBasicAndDiluted",
         "WeightedAverageNumberOfSharesOutstandingBasicAndDiluted",
         "NumberOfSharesOutstanding",
+        # IFRS (AZN-class): weighted average em nomes ifrs-full
+        "WeightedAverageShares",
+        "AdjustedWeightedAverageShares",
     ],
     "operatingCashFlow": [
         "NetCashProvidedByUsedInOperatingActivities",
@@ -182,10 +197,32 @@ DURATION_TAGS = {
         "PaymentsToAcquireEquityMethodInvestments",
         "PaymentsToExploreAndDevelopOilAndGasProperties",
         "PaymentsToAcquireCommercialRealEstate",  # REITs alternativo
+        # Utilities: CIP é o capex COMPLETO de construção e tem de vir ANTES
+        # de ProductiveAssets — na AEP este último é um componente lateral de
+        # $0.4B vs $7.6B reais de construção (first-hit escolheria o parcial).
+        "PaymentsForConstructionInProcess",         # utilities (AEP/ED)
         "PaymentsToAcquireProductiveAssets",
+        # ── Aceites na revisão CFA 2026-07 (explain_holes) ──
+        "PaymentsToAcquireOtherProductiveAssets",   # BAX/INCY/VZ
+        "PaymentsToAcquireProjects",                # utilities (D/ED)
+        "PaymentsToAcquireRealEstate",              # REITs (REG/TPL)
+        "PaymentsToAcquireOilAndGasPropertyAndEquipment",  # VLO
+        "PaymentsToAcquireMachineryAndEquipment",   # RL
+        "PaymentsToDevelopRealEstateAssets",        # REG
+        "PaymentsToDevelopSoftware",                # software capitalizado (ROP)
+        "PaymentsForSoftware",                      # VEEV
         "PaymentsForProceedsFromProductiveAssets",
         "PaymentsForCapitalImprovements",
         "PaymentsForLeasingCostsCommissionsAndTenantImprovements",
+        # IFRS lato (SHEL: $20.845B FY2017 = capital expenditure do 20-F ✓);
+        # último da fila — só dispara sem tags específicas de PP&E.
+        "PurchaseOfOtherLongtermAssetsClassifiedAsInvestingActivities",
+        # REJEITADOS (nunca adicionar): PurchaseOfTreasuryShares /
+        # PaymentsToAcquireOrRedeemEntitysShares (buybacks = financiamento!),
+        # PurchaseOfFinancialInstruments*/FinancialAssets* (carteira de
+        # investimentos), PaymentsForPostemploymentBenefits, PaymentsFor
+        # LegalSettlements, PaymentsToAcquireMortgageNotesReceivable (ativos
+        # financeiros), PaymentsForNuclearFuel (parcial; AEP já tem CIP).
     ],
     "intangibles": [
         "PaymentsToAcquireIntangibleAssets",
@@ -202,9 +239,11 @@ DURATION_TAGS = {
         "ResearchAndDevelopmentExpenseExcludingAcquiredInProcessCost",
         "ResearchAndDevelopmentExpenseSoftwareExcludingAcquiredInProcessCost"
     ],
+    # Só a tag COMBINADA vive aqui. Empresas que reportam S&M e G&A em linhas
+    # separadas (DAL/CHTR/ALGN…) são somadas no fallback de extract_all_metrics
+    # — ter G&A neste array fazia o first-hit devolver só metade do SG&A.
     "sellingGeneralAndAdmin": [
         "SellingGeneralAndAdministrativeExpense",
-        "GeneralAndAdministrativeExpense",
     ],
     "ebitda": ["EarningsBeforeInterestTaxesDepreciationAndAmortization"],
     # Só usado como fallback de operatingExpenses (não vai para a BD diretamente)
@@ -217,6 +256,11 @@ DURATION_TAGS = {
         "AmortisationExpense",
         "Depreciation",
         "AmortizationOfIntangibleAssets",
+        # IFRS cash-flow adjustment (SHEL) — D&A pura, SEM impairments; a
+        # variante *AndImpairmentLoss* foi rejeitada (inflaria o EBITDA nos
+        # anos de imparidade).
+        "AdjustmentsForDepreciationAndAmortisationExpense",
+        "DepreciationAmortizationAndAccretionNet",  # LEN
     ],
 }
 
@@ -230,20 +274,52 @@ INSTANT_TAGS = {
         # dos passivos não correntes (pensões, impostos diferidos, provisões…),
         # não dívida — sobrestimava a dívida das europeias em múltiplos.
         "LongTermDebt",
-        "LongTermDebtAndCapitalLeaseObligationsIncludingCurrentMaturities",
         "ConvertibleDebtNoncurrent",
         "ConvertibleDebt",
         # IFRS: parcela non-current dos borrowings (SAP/RACE-class filers)
         "NoncurrentPortionOfNoncurrentBorrowings",
+        # ── Aceites na revisão CFA 2026-07 ──
+        "UnsecuredLongTermDebt",           # ADI/CDNS/CME
+        "ConvertibleLongTermNotesPayable", # CRM/DDOG/AKAM
+        "LongTermLineOfCredit",            # revolver sacado LT (EME/PTC/TYL)
     ],
-    "longTermDebtCurrent": ["LongTermDebtCurrent", "CurrentBorrowings"],
-    "shortTermDebt": ["ShortTermBorrowings", "ShortTermDebt", "ShorttermBorrowings"],
+    "longTermDebtCurrent": [
+        "LongTermDebtCurrent",
+        "CurrentBorrowings",
+        # ── Aceites na revisão CFA 2026-07 ──
+        "NotesPayableCurrent",             # META/ORCL/PYPL
+        "ConvertibleNotesPayableCurrent",  # CIEN/DASH
+        "ConvertibleDebtCurrent",          # INCY/PANW/TER
+    ],
+    "shortTermDebt": [
+        "ShortTermBorrowings", "ShortTermDebt", "ShorttermBorrowings",
+        # ── Aceites na revisão CFA 2026-07 ──
+        "DebtCurrent",                     # total corrente (ADI/KMB/ORCL)
+        "OtherShortTermBorrowings",        # DECK/IBKR
+    ],
     "commercialPaper": ["CommercialPaper"],
     "totalDebt": [
         "DebtLongtermAndShorttermCombinedAmount",
         "Borrowings",
         "LongTermDebtAndCapitalLeaseObligations",
+        # ── Aceites na revisão CFA 2026-07 ──
+        "DebtAndCapitalLeaseObligations",  # AFL/F/HST: total incl. leases
+        # INCLUI maturidades correntes → é um total, nunca pode ir para o
+        # bucket longTermDebt (duplicaria a porção corrente na soma).
+        "LongTermDebtAndCapitalLeaseObligationsIncludingCurrentMaturities",
+        "NotesPayable",                    # total notes (DHI/EXR/IBKR)
+        # REJEITADOS (nunca adicionar): LineOfCreditFacility*BorrowingCapacity
+        # (CAPACIDADE, não dívida sacada), LoansAndAdvancesToCustomers/Banks
+        # (ATIVOS de bancos!), AdvancesToAffiliate (ativo), DebtInstrument
+        # FaceAmount (face ≠ carrying), LiabilitiesOtherThanLongtermDebt* (não
+        # é dívida), SecuredBorrowingsGross* (repos: funding, não term debt).
     ],
+    # Componentes de dívida de bancos/seguradoras (compostos em build_row SÓ
+    # para Financials, e só quando existe pelo menos um componente LT no mix):
+    "fhlbAdvances": ["AdvancesFromFederalHomeLoanBanks", "FederalHomeLoanBankAdvancesLongTerm"],
+    "subordinatedDebtBank": ["SubordinatedDebt", "JuniorSubordinatedNotes"],
+    "otherBorrowingsBank": ["OtherBorrowings"],
+    "lineOfCredit": ["LineOfCredit"],
     # Fallback de nível 2 em build_row (DEPOIS da soma current+noncurrent):
     # é valor de face da dívida emitida (ex: META bonds) — no MSFT dava $52.9B
     # vs $47.2B do balanço, por isso não pode vencer a soma dos componentes.
@@ -267,6 +343,12 @@ INSTANT_TAGS = {
         # os depósitos QUE O BANCO TEM noutros bancos entram via
         # interestBearingDeposits (só somado para Financials em build_row).
         "CashAndDueFromBanks",
+        # ── Aceites na revisão CFA 2026-07 ──
+        "CashAndCashEquivalentsAtCarryingValueIncludingDiscontinuedOperations",  # GE/MDLZ
+        "CashEquivalentsAtCarryingValue",          # O
+        "CashCashEquivalentsAndShortTermInvestments",  # GIS/TGT (já inclui STI)
+        # REJEITADO: CashAndSecuritiesSegregatedUnderFederalAndOtherRegulations
+        # (fundos segregados de clientes ≠ caixa da empresa).
     ],
     # Ativo de bancos: depósitos remunerados detidos noutros bancos — parte do
     # caixa e equivalentes na convenção bancária. NÃO confundir com "Deposits"
@@ -514,23 +596,35 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
                             break
 
     # IFRS Fallback para SG&A (Sales & Marketing + Administrative)
+    # SG&A por soma de componentes: quando a tag combinada não existe, somar a
+    # melhor linha de selling/marketing com a melhor de G&A/admin. Cobre tanto
+    # IFRS (SalesAndMarketing + Administrative) como US filers que reportam
+    # S&M e G&A separados (DAL/CHTR/ALGN) — antes o first-hit em G&A devolvia
+    # só METADE do SG&A.
+    SGA_SELLING_TAGS = ["SellingAndMarketingExpense", "SalesAndMarketingExpense",
+                        "SellingExpense", "MarketingExpense"]
+    SGA_ADMIN_TAGS = ["GeneralAndAdministrativeExpense", "AdministrativeExpense"]
+
+    def _best_of(tag_list, fp, expected_end):
+        for t in tag_list:
+            entries = extract_tag_entries(us_gaap, t)
+            if not entries:
+                continue
+            if fp == "FY":
+                pool = [e for e in entries if is_annual_duration(e)]
+            else:
+                pool = [e for e in entries if is_quarterly_duration(e)]
+            val = best_for_period(pool, expected_end, prefer_annual_form=(fp == "FY"))
+            if val is not None:
+                return val
+        return None
+
     for (fy, fp) in periods:
         if "sellingGeneralAndAdmin" not in dur_map[(fy, fp)]:
             expected_end = period_ends.get((fy, fp))
             if expected_end:
-                pool_sales = extract_tag_entries(us_gaap, "SalesAndMarketingExpense")
-                pool_admin = extract_tag_entries(us_gaap, "AdministrativeExpense")
-                
-                if fp == "FY":
-                    pool_s = [e for e in pool_sales if is_annual_duration(e)]
-                    pool_a = [e for e in pool_admin if is_annual_duration(e)]
-                else:
-                    pool_s = [e for e in pool_sales if is_quarterly_duration(e)]
-                    pool_a = [e for e in pool_admin if is_quarterly_duration(e)]
-                    
-                val_s = best_for_period(pool_s, expected_end, prefer_annual_form=(fp == "FY"))
-                val_a = best_for_period(pool_a, expected_end, prefer_annual_form=(fp == "FY"))
-                
+                val_s = _best_of(SGA_SELLING_TAGS, fp, expected_end)
+                val_a = _best_of(SGA_ADMIN_TAGS, fp, expected_end)
                 if val_s is not None or val_a is not None:
                     dur_map[(fy, fp)]["sellingGeneralAndAdmin"] = (val_s or 0) + (val_a or 0)
 
@@ -808,6 +902,21 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         unsecured = inst.get("unsecuredDebt")
         if secured is not None or unsecured is not None:
             total_debt = (secured or 0) + (unsecured or 0)
+    if total_debt is None and sector == "Financials":
+        # Nível 4 (bancos/seguradoras): borrowed funds por componentes — FHLB
+        # advances, subordinated debt, other borrowings, linha de crédito
+        # sacada + curto prazo/CP/porção corrente. Exige pelo menos um
+        # componente estrutural (core) para não recriar o total-só-ST que o
+        # guard JPM-class anula. Deposits de clientes NUNCA entram aqui.
+        core = [inst.get("fhlbAdvances"), inst.get("subordinatedDebtBank"),
+                inst.get("otherBorrowingsBank"), inst.get("lineOfCredit")]
+        if any(c is not None for c in core):
+            extras = [inst.get("shortTermDebt"), inst.get("commercialPaper"),
+                      inst.get("longTermDebtCurrent")]
+            composite = sum(c for c in core + extras if c is not None)
+            # Compósito 0 (ex.: ACGL com LoC=0 mas senior notes só
+            # dimensionadas) seria um zero fabricado — fica NULL honesto.
+            total_debt = composite if composite > 0 else None
 
     cash = inst.get("cash")
     if cash is not None:
@@ -1218,6 +1327,10 @@ def synthesize_q4(periods: set, period_ends: dict, period_filed: dict,
         "operatingIncome", "interestExpense", "taxExpense", "netIncome",
         "operatingCashFlow", "capex", "researchAndDevelopment",
         "sellingGeneralAndAdmin", "ebitda", "depreciationAndAmortization",
+        # ⚠️ NÃO REMOVER: sem isto o Q4 de DPS nunca é derivado e os payers
+        # ficam com buraco no Q4 (paradoxo da Apple). O ramo per-share abaixo
+        # depende desta entrada.
+        "dividendPerShare",
     ]
     drop_years: list[int] = []
     fy_years = sorted({fy for (fy, fp) in periods if fp == "FY"})
@@ -1352,7 +1465,12 @@ def process_company(conn, company: dict, dry_run: bool = False,
         return 0
 
     facts = facts_json.get("facts") or {}
-    namespace = facts.get("us-gaap") or facts.get("ifrs-full") or {}
+    ns_us = facts.get("us-gaap") or {}
+    ns_ifrs = facts.get("ifrs-full") or {}
+    # BTI/DEO-class: 20-F com us-gaap residual de 1 tag e o filing inteiro em
+    # ifrs-full — o "or" cego escolhia o namespace errado e a empresa ficava
+    # com ZERO períodos na BD. Escolher o namespace com mais tags.
+    namespace = ns_us if len(ns_us) >= len(ns_ifrs) else ns_ifrs
     if not namespace:
         return 0
 

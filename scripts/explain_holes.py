@@ -341,7 +341,9 @@ def diagnose_zero_rows(ticker: str, cik: str) -> dict:
         return {"ticker": ticker, "cik": cik, "problem": "companyfacts 404/erro no EDGAR"}
     facts = facts_json.get("facts") or {}
     ns_counts = {k: len(v) for k, v in facts.items()}
-    namespace = facts.get("us-gaap") or facts.get("ifrs-full") or {}
+    ns_us = facts.get("us-gaap") or {}
+    ns_ifrs = facts.get("ifrs-full") or {}
+    namespace = ns_us if len(ns_us) >= len(ns_ifrs) else ns_ifrs
     sample = ["NetIncomeLoss", "ProfitLoss", "Assets", "Revenues", "Revenue"]
     min_fy = 2026 - ing.HISTORY_YEARS
     discovered, no_fp, forms = set(), 0, collections.Counter()
@@ -440,7 +442,9 @@ def main():
             explanations[ticker] = {"error": "companyfacts indisponível"}
             continue
         facts = facts_json.get("facts") or {}
-        ns = facts.get("us-gaap") or facts.get("ifrs-full") or {}
+        ns_us = facts.get("us-gaap") or {}
+        ns_ifrs = facts.get("ifrs-full") or {}
+        ns = ns_us if len(ns_us) >= len(ns_ifrs) else ns_ifrs  # BTI/DEO-class
         dei = facts.get("dei") or {}
         evidence = ing.compute_company_evidence(facts_json)
 

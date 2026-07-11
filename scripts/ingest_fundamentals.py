@@ -13,10 +13,13 @@ import os
 import sys
 import time
 import datetime
+import gzip
+import json
 import uuid
 import requests
 import yfinance as yf
 import psycopg2
+from urllib.parse import urlparse
 from psycopg2.extras import Json
 from dotenv import load_dotenv
 
@@ -44,10 +47,29 @@ DIRECT_URL = os.getenv("DIRECT_URL")
 if not DIRECT_URL:
     sys.exit("DIRECT_URL não definida")
 
+
+def assert_local_db(url: str) -> None:
+    # load_dotenv NÃO faz override de variáveis já exportadas na shell — uma
+    # DIRECT_URL exportada a apontar à Supabase venceria o .env.dev em silêncio
+    # e este script escreveria em produção. Fora do cron (GITHUB_ACTIONS) só se
+    # aceita localhost; aplicar a produção exige um --allow-remote deliberado.
+    if os.environ.get("GITHUB_ACTIONS") == "true" or "--allow-remote" in sys.argv:
+        return
+    host = (urlparse(url).hostname or "").lower()
+    if host not in ("localhost", "127.0.0.1", "::1"):
+        sys.exit(
+            f"ERRO: DIRECT_URL aponta para '{host}', não localhost.\n"
+            "Se queres mesmo escrever numa BD remota, corre com --allow-remote."
+        )
+
+
+assert_local_db(DIRECT_URL)
+
 EDGAR_BASE = "https://data.sec.gov/api/xbrl/companyfacts"
 EDGAR_HEADERS = {"User-Agent": "Bullmetrics admin@bullocracy.com"}
 SLEEP_BETWEEN = 0.2
 HISTORY_YEARS = 10
+REFRESH_CACHE = "--refresh-cache" in sys.argv
 
 # ── Tags XBRL com fallbacks (ordem = prioridade) ─────────────────────────────
 
@@ -257,8 +279,26 @@ def get_companies_with_cik(cur, tickers: list[str] | None = None) -> list[dict]:
 session = requests.Session()
 session.headers.update(EDGAR_HEADERS)
 
-def fetch_edgar_facts(cik: str) -> dict | None:
+CACHE_DIR = os.path.join(os.path.dirname(__file__), ".cache", "companyfacts")
+
+# True quando o último fetch foi à rede (cache miss) — o loop principal só
+# dorme SLEEP_BETWEEN nesses casos; com cache quente a re-ingestão é local.
+last_fetch_was_network = False
+
+
+def fetch_edgar_facts(cik: str, refresh: bool = False) -> dict | None:
+    global last_fetch_was_network
     padded = cik.zfill(10)
+    cache_path = os.path.join(CACHE_DIR, f"CIK{padded}.json.gz")
+    if not refresh and os.path.exists(cache_path):
+        try:
+            with gzip.open(cache_path, "rt", encoding="utf-8") as f:
+                data = json.load(f)
+            last_fetch_was_network = False
+            return data
+        except Exception:
+            pass  # cache corrompida → refetch normal
+    last_fetch_was_network = True
     url = f"{EDGAR_BASE}/CIK{padded}.json"
     try:
         r = session.get(url, timeout=30)
@@ -269,7 +309,14 @@ def fetch_edgar_facts(cik: str) -> dict | None:
             time.sleep(60)
             r = session.get(url, timeout=30)
         r.raise_for_status()
-        return r.json()
+        data = r.json()
+        try:
+            os.makedirs(CACHE_DIR, exist_ok=True)
+            with gzip.open(cache_path, "wt", encoding="utf-8") as f:
+                json.dump(data, f)
+        except Exception:
+            pass  # cache é otimização; falhar a escrita nunca é fatal
+        return data
     except Exception as e:
         print(f"    EDGAR error: {e}")
         return None
@@ -1088,7 +1135,7 @@ def process_company(conn, company: dict) -> int:
     company_id = company["id"]
     cik = company["cik"]
 
-    facts_json = fetch_edgar_facts(cik)
+    facts_json = fetch_edgar_facts(cik, refresh=REFRESH_CACHE)
     if not facts_json:
         return 0
 
@@ -1325,7 +1372,8 @@ def main():
             print(f"ERRO: {e}")
             errors += 1
 
-        time.sleep(SLEEP_BETWEEN)
+        if last_fetch_was_network:
+            time.sleep(SLEEP_BETWEEN)
 
     sync_dual_class(conn)
 

@@ -83,6 +83,19 @@ como capex, capacidade de crédito como dívida, ativos de bancos
 repos como term debt, ProForma, D&A com imparidades, componentes parciais
 como totais. Regra de ouro mantida em todo o lado: **antes NULL que errado**.
 
+## Gates finais de QA (2026-07-12)
+
+- `vitest`: **71/71 verdes** (1 teste de WACC atualizado — o costOfDebt passou
+  a abs() por decisão do commit DCF b112ded e o teste estava desatualizado).
+- `tsc --noEmit`: limpo nos componentes tocados.
+- `verify_fundamentals.ts` (harness legacy): 12 FAIL = **2 classes semânticas
+  do próprio harness**, não regressões — (a) ancora caixa PURA vs a definição
+  deliberada da plataforma cash = caixa+investimentos CP (MSFT 30.2+64.3 =
+  94.6B ✓ exato); (b) shares point-in-time da cover vs weighted-average
+  diluída que o produto usa (desvios 1,5-5% = buybacks intra-ano). Follow-up:
+  atualizar as âncoras do harness às semânticas do produto. 316 WARN são o
+  ruído histórico de Σquarters do harness, pré-existente.
+
 ## Residual conhecido (documentado, não bloqueia)
 
 - Revenue de bancos IFRS (BCS/HSBC/UBS): composto interest+fees parcialmente

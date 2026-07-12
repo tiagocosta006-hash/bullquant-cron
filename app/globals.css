@@ -412,6 +412,21 @@
   box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 40%, transparent);
 }
 
+/* Em ecrãs de toque, aumenta a track e o thumb para um alvo confortável ao dedo */
+@media (pointer: coarse) {
+  .dcf-slider {
+    height: 10px;
+  }
+  .dcf-slider::-webkit-slider-thumb {
+    width: 26px;
+    height: 26px;
+  }
+  .dcf-slider::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+  }
+}
+
 /* Scrollbar do produto — fina, tema-consciente, sem o cinza do SO */
 * {
   scrollbar-width: thin;

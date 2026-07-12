@@ -344,7 +344,8 @@
     "header": {
       "followed": "Seguido",
       "addToPortfolio": "Adicionar ao Portfólio",
-      "updating": "A atualizar..."
+      "updating": "A atualizar...",
+      "comparePeers": "Comparar Pares"
     },
     "savedValuations": {
       "title": "As Minhas Avaliações (DCF)",

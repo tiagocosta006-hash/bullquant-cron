@@ -177,6 +177,7 @@ model DcfAnalysis {
   userId         String
   companyId      String
   label          String?
+  notes          String?  @db.Text
   fcfMode        String?
   fcf0           Decimal  @db.Decimal(20, 4)
   growthStage1   Decimal  @db.Decimal(8, 6)

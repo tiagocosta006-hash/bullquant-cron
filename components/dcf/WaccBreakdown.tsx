@@ -11,10 +11,11 @@ import type { WaccBreakdown } from "@/lib/finance/wacc"
 
 interface WaccBreakdownProps {
   breakdown: WaccBreakdown | null
+  fcfMode?: "FCFF" | "FCFE"
   onUseWacc?: (wacc: number) => void
 }
 
-export function WaccBreakdownCard({ breakdown, onUseWacc }: WaccBreakdownProps) {
+export function WaccBreakdownCard({ breakdown, fcfMode = "FCFF", onUseWacc }: WaccBreakdownProps) {
   const t = useTranslations("dcf")
   const [isOpen, setIsOpen] = React.useState(false)
 
@@ -28,19 +29,23 @@ export function WaccBreakdownCard({ breakdown, onUseWacc }: WaccBreakdownProps) 
     )
   }
 
+  const isFcfe = fcfMode === "FCFE"
+  const suggestedValue = isFcfe ? (breakdown.costOfEquity ?? breakdown.wacc) : breakdown.wacc
+  const suggestedLabel = isFcfe ? "Custo do Capital (Re)" : (t("wacc.suggested") || "WACC (CAPM)")
+
   return (
     <Card className="p-4 space-y-3">
-      {/* Header com WACC sugerido */}
+      {/* Header com taxa sugerida */}
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <p className="text-xs uppercase tracking-wide font-semibold text-muted-foreground">
-            {t("wacc.suggested") || "WACC (CAPM)"}
+            {suggestedLabel}
           </p>
-          <p className="text-2xl font-bold text-primary">{formatPercent(breakdown.wacc)}</p>
+          <p className="text-2xl font-bold text-primary">{formatPercent(suggestedValue)}</p>
         </div>
         <Button
           size="sm"
-          onClick={() => onUseWacc?.(breakdown.wacc)}
+          onClick={() => onUseWacc?.(suggestedValue)}
           className="h-9 text-xs bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
         >
           <Zap className="w-3 h-3 mr-1.5" />

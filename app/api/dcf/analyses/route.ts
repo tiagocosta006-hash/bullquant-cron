@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
     const analyses = rows.map((a) => ({
       id: a.id,
       label: a.label,
+      notes: a.notes,
       fcfMode: a.fcfMode ?? "FCFF",
       fcf0: Number(a.fcf0),
       growthStage1: Number(a.growthStage1),
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { ticker, label, inputs, result } = body ?? {}
+    const { ticker, label, notes, inputs, result } = body ?? {}
 
     if (!ticker || !inputs || !result) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 })
@@ -94,6 +95,7 @@ export async function POST(request: NextRequest) {
         userId: user.id,
         companyId: company.id,
         label: typeof label === "string" && label.trim() ? label.trim().slice(0, 60) : null,
+        notes: typeof notes === "string" && notes.trim() ? notes.trim().slice(0, 2000) : null,
         fcfMode,
         fcf0,
         growthStage1: num(inputs.growthStage1) ?? 0,

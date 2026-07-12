@@ -104,6 +104,11 @@ export async function GET(
       0
     const netDebt = totalDebt - cash
 
+    const interestExpense =
+      num(baseRecord?.interestExpense) ??
+      num(annuals.find((f) => num(f.interestExpense) !== null)?.interestExpense) ??
+      null
+
     // CAGR de FCFF para sugestão de crescimento
     let suggestedGrowth: number | null = null
     const fcffSeries = annuals
@@ -152,6 +157,8 @@ export async function GET(
       effectiveTaxRate,
       shares,
       netDebt,
+      totalDebt,
+      interestExpense,
       currentPrice,
       beta,
       suggestedGrowth,

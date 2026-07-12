@@ -526,9 +526,12 @@ def is_ytd_duration(entry, fp):
     d1 = datetime.date.fromisoformat(start)
     d2 = datetime.date.fromisoformat(end)
     days = (d2 - d1).days
+    # Limites inferiores acomodam calendários fiscais 4-4-5 (COST/AES):
+    # Q2 YTD = 24 semanas = 168 dias; Q3 YTD = 36 semanas = 252 dias — as
+    # janelas antigas (170/260) rejeitavam-nos e o capex/OCF ficava null.
     if fp == "Q1": return 80 <= days <= 110
-    if fp == "Q2": return 170 <= days <= 200
-    if fp == "Q3": return 260 <= days <= 290
+    if fp == "Q2": return 160 <= days <= 200
+    if fp == "Q3": return 245 <= days <= 290
     if fp in ("Q4", "FY"): return 350 <= days <= 380
     return False
 
@@ -1580,8 +1583,13 @@ def dei_shares_near(dei: dict, period_end: str | None) -> float | None:
     """Último recurso para shares outstanding: o facto da cover page
     (dei:EntityCommonStockSharesOutstanding), point-in-time datado tipicamente
     semanas após o period end. Aceita o registo mais próximo em
-    [period_end, period_end+100d]; recusa se houver valores DISTINTOS na mesma
-    data (multi-classe colapsada — somar às cegas seria errado)."""
+    [period_end, period_end+100d].
+
+    Multi-classe (GDDY A/B, WBD/Discovery A/B/C, BKR pré-2023): a cover page
+    tem UM valor por classe na mesma data — o total em circulação é a SOMA
+    (é isso que o market cap precisa). Distinção classes vs restatement do
+    mesmo facto: classes diferem materialmente (razão máx/mín ≥ 1.3); um
+    restatement de cover count difere < 1.3 → usar o maior, nunca somar."""
     if not period_end or not dei:
         return None
     node = dei.get("EntityCommonStockSharesOutstanding")
@@ -1601,10 +1609,14 @@ def dei_shares_near(dei: dict, period_end: str | None) -> float | None:
                 best_date, best_vals = d, {v}
             elif d == best_date:
                 best_vals.add(v)
-    if best_date is None or len(best_vals) != 1:
+    vals = sorted(float(v) for v in best_vals if v and v >= 100_000)
+    if not vals:
         return None
-    val = float(next(iter(best_vals)))
-    return val if val >= 100_000 else None
+    if len(vals) == 1:
+        return vals[0]
+    if len(vals) <= 4 and vals[0] > 0 and vals[-1] / vals[0] >= 1.3:
+        return sum(vals)  # classes distintas → total em circulação
+    return vals[-1]  # valores próximos = restatement → o mais alto/recente
 
 
 def process_company(conn, company: dict, dry_run: bool = False,

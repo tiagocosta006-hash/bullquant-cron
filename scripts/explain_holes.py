@@ -301,12 +301,16 @@ def classify_hole(ns: dict, dei: dict, spec: dict, field: str, fy: int, fp: str,
         out["missing_inputs"] = (["operatingIncome"] if not has_op else []) + ["depreciationAndAmortization?"]
         # continua para descoberta de candidatos de D&A abaixo
     elif field == "sharesOutstanding" and dei:
-        # fallback dei: cover-page shares (point-in-time)
+        # fallback dei: cover-page shares (point-in-time). Bound superior de
+        # 100d espelha o pipeline — sem ele, uma cover de 2024 "explicava"
+        # buracos de 2019 (eras multi-classe são dimensionadas → estruturais).
+        import datetime as _dt
+        _limit = (_dt.date.fromisoformat(expected_end) + _dt.timedelta(days=100)).isoformat()
         node = dei.get("EntityCommonStockSharesOutstanding")
         if node:
             for unit_key, entries in (node.get("units") or {}).items():
                 cands = [e for e in entries if isinstance(e.get("val"), (int, float))
-                         and (e.get("end") or "") >= expected_end]
+                         and expected_end <= (e.get("end") or "") <= _limit]
                 if cands:
                     cands.sort(key=lambda e: e.get("end") or "")
                     out["class"] = "TAG_AVAILABLE_NOT_MAPPED"

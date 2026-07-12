@@ -10,7 +10,7 @@
 | métrica | antes | depois |
 |---|---|---|
 | Violações de identidades contabilísticas | 2.174 | 328 (todas pré-existentes na baseline; **0 novas**; −85%) |
-| Buracos "6812/293" da auditoria original | 6.812 períodos / 293 empresas | **178 períodos / 45 empresas** (198 células = 0,06%), TODOS com evidência anexada em `scripts/out/hole_explanations.json` — backlog acionável |
+| Buracos "6812/293" da auditoria original | 6.812 períodos / 293 empresas | **101 períodos / 40 empresas** (119 células = 0,03%), TODOS com evidência anexada em `scripts/out/hole_explanations.json` — backlog acionável |
 | Células estruturais classificadas | 0 | 17.974 verificadas POR-CÉLULA contra as filings + 188 por regras setoriais |
 | Empresas com CIK e ZERO rows | 5 (BTI, TTE, DEO, ERIC, FDXF) | 1 (FDXF — não tem XBRL de todo; whitelisted) |
 | DPS/R&D forçados a 0.0 (máscara) | ~18.000 células | 0 — política evidência-de-ausência por ano-de-facto |

@@ -11,56 +11,147 @@
     {
       "reason": "SECTOR_NO_EBITDA_BANK",
       "rationale": "EBITDA não tem significado económico para bancos/seguradoras — juros SÃO o negócio, não um custo a excluir. Decisão CFA 2026-07; a UI esconde o card (isBank).",
-      "fields": ["ebitda"],
-      "match": { "sector": "Financials" }
+      "fields": [
+        "ebitda"
+      ],
+      "match": {
+        "sector": "Financials"
+      }
     },
     {
       "reason": "BANK_DEBT_NOT_TAGGED",
       "rationale": "Grandes bancos deixaram de taggar dívida LT sem dimensões (~2014); a API companyfacts descarta factos dimensionados. Total só com curto prazo seria 8× errado (JPM $52.9B vs $463B). Guard has_ltd_ever anula deliberadamente.",
-      "fields": ["totalDebt"],
-      "match": { "sector": "Financials" }
+      "fields": [
+        "totalDebt"
+      ],
+      "match": {
+        "sector": "Financials"
+      }
     },
     {
       "reason": "SEMIANNUAL_FILER",
       "rationale": "Emitentes IFRS com 6-K semestrais: os filings de meio-ano omitem linhas (EPS diluído, shares, capex, D&A). Q1/Q3 nem existem; nos Q2/Q4 mapeados faltam campos que a SEC nunca recebeu.",
-      "fields": ["*"],
+      "fields": [
+        "*"
+      ],
       "match": {
-        "tickers": ["SHEL", "UL", "SAP", "RACE", "NVO", "BTI", "DEO", "ERIC", "TTE", "NVS", "SNY", "GSK", "AZN", "BCS", "HSBC", "UBS", "NOK"],
+        "tickers": [
+          "SHEL",
+          "UL",
+          "SAP",
+          "RACE",
+          "NVO",
+          "BTI",
+          "DEO",
+          "ERIC",
+          "TTE",
+          "NVS",
+          "SNY",
+          "GSK",
+          "AZN",
+          "BCS",
+          "HSBC",
+          "UBS",
+          "NOK",
+          "ARM",
+          "BP",
+          "BUD",
+          "LOGI",
+          "RIO",
+          "RYAAY",
+          "SPOT",
+          "STLA",
+          "STM"
+        ],
         "periodType": "QUARTERLY"
       }
     },
     {
       "reason": "IFRS_ANNUAL_LINE_GAPS",
       "rationale": "20-F IFRS: linhas que o taxonomy local não obriga (SG&A combinada, EBITDA explícito, COGS separado) podem faltar também no ANUAL. Extração já tenta somas de componentes; o resto é estrutural.",
-      "fields": ["sellingGeneralAndAdmin", "ebitda", "researchAndDevelopment", "dividendPerShare", "epsDiluted", "sharesOutstanding", "capex", "freeCashFlow", "totalDebt", "cash"],
+      "fields": [
+        "sellingGeneralAndAdmin",
+        "ebitda",
+        "researchAndDevelopment",
+        "dividendPerShare",
+        "epsDiluted",
+        "sharesOutstanding",
+        "capex",
+        "freeCashFlow",
+        "totalDebt",
+        "cash"
+      ],
       "match": {
-        "tickers": ["SHEL", "UL", "SAP", "RACE", "NVO", "BTI", "DEO", "ERIC", "TTE", "NVS", "SNY", "GSK", "AZN", "BCS", "HSBC", "UBS", "NOK"],
+        "tickers": [
+          "SHEL",
+          "UL",
+          "SAP",
+          "RACE",
+          "NVO",
+          "BTI",
+          "DEO",
+          "ERIC",
+          "TTE",
+          "NVS",
+          "SNY",
+          "GSK",
+          "AZN",
+          "BCS",
+          "HSBC",
+          "UBS",
+          "NOK",
+          "ARM",
+          "BP",
+          "BUD",
+          "LOGI",
+          "RIO",
+          "RYAAY",
+          "SPOT",
+          "STLA",
+          "STM"
+        ],
         "periodType": "ANNUAL"
       }
     },
     {
       "reason": "NO_XBRL_FACTS",
       "rationale": "FDXF só tem namespace 'ffd' (4 tags) no companyfacts — sem us-gaap nem ifrs-full não há fundamentais para extrair.",
-      "fields": ["*"],
-      "match": { "tickers": ["FDXF"] }
+      "fields": [
+        "*"
+      ],
+      "match": {
+        "tickers": [
+          "FDXF"
+        ]
+      }
     },
     {
       "reason": "DPS_PAYING_YEAR_GAP",
       "rationale": "Política v2: em anos com evidência de dividendos a common, um DPS não extraível fica NULL (gap honesto) — nunca 0.0 fabricado. Residual esperado ≈ pequeno após síntese Q4.",
-      "fields": ["dividendPerShare"],
+      "fields": [
+        "dividendPerShare"
+      ],
       "match": {}
     },
     {
       "reason": "RND_REPORTER_GAP",
       "rationale": "Política evidência-de-ausência: empresa que já reportou R&D mas sem a linha neste período — NULL honesto (ex.: linha fundida em SG&A nesse ano).",
-      "fields": ["researchAndDevelopment"],
+      "fields": [
+        "researchAndDevelopment"
+      ],
       "match": {}
     },
     {
       "reason": "FCF_INPUT_STRUCTURAL",
       "rationale": "freeCashFlow é derivado (OCF−capex). Fica null quando um input é estruturalmente null no mesmo período — a causa está classificada no input, não no derivado.",
-      "fields": ["freeCashFlow", "capex", "operatingCashFlow"],
-      "match": { "sector": "Financials" }
+      "fields": [
+        "freeCashFlow",
+        "capex",
+        "operatingCashFlow"
+      ],
+      "match": {
+        "sector": "Financials"
+      }
     }
   ]
 }

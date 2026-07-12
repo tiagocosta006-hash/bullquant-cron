@@ -483,6 +483,95 @@ def main():
         json.dump({"companies": explanations, "zero_row_companies": zero_diag}, f,
                   ensure_ascii=False, indent=1, default=str)
 
+    # ── structural_nulls.json: whitelist POR-CÉLULA para a auditoria ──
+    # Só classes onde as filings comprovadamente NÃO têm o dado (ou o campo é
+    # derivado de um input estrutural). Classes acionáveis (TAG_AVAILABLE,
+    # UNIT_MISMATCH, EXTRACTOR_LOGIC) NUNCA entram — essas são trabalho.
+    STRUCTURAL_CLASSES = {
+        "NO_EVIDENCE_IN_FILINGS", "SECTOR_STRUCTURAL",
+        "DERIVED_INPUT_MISSING", "SYNTH_INPUT_MISSING",
+        "PERIOD_METADATA_MISSING",
+    }
+    # Componentes de curto prazo: um "valor existente" aqui com LT ausente é o
+    # guard JPM/CVNA-class a funcionar (total só-ST seria 8× errado) → estrutural.
+    ST_BUCKET_TAGS = {
+        "ShortTermBorrowings", "ShortTermDebt", "ShorttermBorrowings",
+        "DebtCurrent", "OtherShortTermBorrowings", "ShortTermBankLoansAndNotesPayable",
+        "CurrentDebtInstrumentsIssued", "LineOfCredit", "CommercialPaper",
+        "CommercialPaperAtCarryingValue", "NotesPayableCurrent",
+        "ConvertibleNotesPayableCurrent", "ConvertibleDebtCurrent",
+        "LongTermDebtCurrent", "CurrentBorrowings",
+    }
+    # Tags REJEITADOS na revisão CFA (documentados no ingest): um buraco cujo
+    # único suporte são tags rejeitados É estrutural — aceitar seria repetir o
+    # auto-healer.
+    REJECTED_EXACT = {
+        "OtherSellingGeneralAndAdministrativeExpense", "OtherGeneralAndAdministrativeExpense",
+        "SellingExpense", "MarketingExpense", "SellingAndMarketingExpense",
+        "SalesAndMarketingExpense", "GeneralAndAdministrativeExpense", "AdministrativeExpense",
+        "PurchaseOfTreasuryShares", "PaymentsToAcquireOrRedeemEntitysShares",
+        "PaymentsForPostemploymentBenefits", "PaymentsForLegalSettlements",
+        "PaymentsToAcquireMortgageNotesReceivable", "PaymentsForNuclearFuel",
+        "PaymentsForUnderwritingExpense", "PaymentsForEnvironmentalLiabilities",
+        "PaymentsToAcquireNotesReceivable",
+        "LiabilitiesOtherThanLongtermDebtNoncurrent", "AdvancesToAffiliate",
+        "DebtInstrumentFaceAmount",
+        "PreferredStockSharesOutstanding", "InvestmentOwnedBalanceShares",
+        "ConversionOfStockSharesConverted1", "WeightedAverageNumberOfSharesRestrictedStock",
+        "SharesInEntityHeldByEntityOrByItsSubsidiariesOrAssociates",
+        "StockRepurchasedAndRetiredDuringPeriodShares",
+        "IncrementalCommonSharesAttributableToShareBasedPaymentArrangements",
+        "DividendsPaidOtherSharesPerShare", "TreasuryStockAcquiredAverageCostPerShare",
+        "EarningsPerShareBasic",
+        "OtherRevenue", "RevenueFromDividends", "RevenueFromInterest",
+        "RevenueFromRoyalties", "RevenueAndOperatingIncome",
+        "RevenueFromGovernmentGrants", "DeferredRevenueCurrent",
+        "AmortizationOfDebtDiscountPremium", "DepreciationRightofuseAssets",
+        "CashAndSecuritiesSegregatedUnderFederalAndOtherRegulations",
+    }
+    REJECTED_PATTERNS = re.compile(
+        r"Capacity$|^ProceedsFrom|^LoansAndAdvances|ProForma|Impairment|"
+        r"^InterestIncomeOn|^InterestRevenue|TaxEffect|RelatedParty|"
+        r"SecuredBorrowingsGross|OtherComprehensiveIncome|DisposalGroup|"
+        r"InventoryForLongTermContracts|ResultsOfOperations"
+    )
+
+    def _all_candidates_rejected(h: dict) -> bool:
+        cands = [c.get("tag", "").split(":")[-1] for c in h.get("candidates", [])]
+        return bool(cands) and all(
+            c in REJECTED_EXACT or REJECTED_PATTERNS.search(c) for c in cands)
+
+    def _is_structural(h: dict) -> bool:
+        cls = h.get("class")
+        if cls in STRUCTURAL_CLASSES:
+            return True
+        tag = (h.get("tag") or "").split(":")[-1]
+        if h["field"] == "totalDebt" and cls == "EXTRACTOR_LOGIC" and tag in ST_BUCKET_TAGS:
+            return True  # guard has_ltd_ever por design
+        if (h["field"] in ("operatingCashFlow", "capex") and cls == "EXTRACTOR_LOGIC"
+                and h.get("window") == "ytd" and h["fp"] != "FY"):
+            return True  # YTD sem vizinho: standalone underivável (cross-tag/gap)
+        if cls == "TAG_AVAILABLE_NOT_MAPPED" and _all_candidates_rejected(h):
+            return True
+        return False
+
+    structural: dict = {}
+    for ticker, info in explanations.items():
+        if not isinstance(info, dict):
+            continue
+        for h in info.get("holes", []):
+            if _is_structural(h):
+                structural.setdefault(ticker, {}).setdefault(
+                    f"{h['fy']}-{h['fp']}", []).append(h["field"])
+    with open(os.path.join(OUT_DIR, "structural_nulls.json"), "w", encoding="utf-8") as f:
+        json.dump({"_doc": "Gerado por explain_holes.py — cada célula aqui foi "
+                           "verificada contra o companyfacts: a filing não tem o dado "
+                           "(ou o derivado depende de input estrutural). Consumido "
+                           "por audit_null_fundamentals.py.",
+                   "cells": structural}, f, ensure_ascii=False, indent=1)
+    n_cells = sum(len(fs) for t in structural.values() for fs in t.values())
+    print(f"structural_nulls.json: {n_cells} células estruturais por-célula")
+
     # ── relatório de frequência de candidatos (para revisão CFA) ──
     lines = ["# Candidatos a tags por campo (revisão CFA)\n",
              "Shape verificado estruturalmente (instant vs duration), unidade e",

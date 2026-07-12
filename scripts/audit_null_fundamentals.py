@@ -43,6 +43,7 @@ if not DIRECT_URL:
     sys.exit("ERRO: DIRECT_URL não definida no ficheiro env")
 
 WHITELIST_PATH = os.path.join(os.path.dirname(__file__), "null_whitelist.json")
+STRUCTURAL_CELLS_PATH = os.path.join(os.path.dirname(__file__), "out", "structural_nulls.json")
 
 METRICS = [
     "revenue", "netIncome", "epsDiluted", "ebitda",
@@ -58,6 +59,16 @@ def load_whitelist() -> list[dict]:
         return []
     with open(WHITELIST_PATH, encoding="utf-8") as f:
         return json.load(f).get("rules", [])
+
+
+def load_structural_cells() -> dict:
+    """Whitelist POR-CÉLULA gerada por explain_holes.py: cada entrada foi
+    verificada contra o companyfacts (a filing não contém o dado). Mais forte
+    que as regras genéricas — e auditável célula a célula."""
+    if not os.path.exists(STRUCTURAL_CELLS_PATH):
+        return {}
+    with open(STRUCTURAL_CELLS_PATH, encoding="utf-8") as f:
+        return json.load(f).get("cells", {})
 
 
 def rule_matches(rule: dict, ticker: str, sector: str | None, period_type: str,
@@ -80,6 +91,7 @@ def rule_matches(rule: dict, ticker: str, sector: str | None, period_type: str,
 def main():
     use_whitelist = "--all" not in sys.argv
     rules = load_whitelist() if use_whitelist else []
+    structural_cells = load_structural_cells() if use_whitelist else {}
 
     print("A ligar à base de dados para auditoria de métricas em falta...")
     conn = psycopg2.connect(DIRECT_URL)
@@ -118,9 +130,15 @@ def main():
         ticker, sector, period_type, fy, fq = row[0], row[1], row[2], row[3], row[4]
         period_str = f"FY{fy}" if period_type == "ANNUAL" else f"Q{fq} '{str(fy)[-2:]}"
 
+        fp_key = f"{fy}-{'FY' if period_type == 'ANNUAL' else 'Q' + str(fq)}"
+        cell_fields = set((structural_cells.get(ticker) or {}).get(fp_key) or [])
+
         missing = []
         for i, metric in enumerate(METRICS):
             if row[5 + i] is not None:
+                continue
+            if metric in cell_fields:
+                whitelisted["STRUCTURAL_VERIFIED (por-célula)"] += 1
                 continue
             rule = next((r for r in rules
                          if rule_matches(r, ticker, sector, period_type, fq, metric)), None)

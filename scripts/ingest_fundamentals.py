@@ -77,6 +77,11 @@ REFRESH_CACHE = "--refresh-cache" in sys.argv
 # antiga não as tinha — a inferência caía para "USD" e nada era convertido.
 VALID_CURRENCIES = ["USD", "EUR", "GBP", "CHF", "CAD", "JPY", "AUD", "DKK", "SEK", "NOK"]
 
+# Moeda de reporte da empresa EM PROCESSAMENTO (setada por process_company
+# antes da extração). Dual-taggers (BCS: USD e GBP no mesmo node) precisam da
+# moeda de reporte PRIMEIRO — USD-first global misturava moedas na mesma série.
+_PREFERRED_CURRENCY: str | None = None
+
 # ── Tags XBRL com fallbacks (ordem = prioridade) ─────────────────────────────
 
 DURATION_TAGS = {
@@ -106,6 +111,7 @@ DURATION_TAGS = {
         "RegulatedAndUnregulatedOperatingRevenue",
         "RegulatedOperatingRevenue",
         # ── Aceites na revisão CFA 2026-07 (explain_holes; ver docs/audit) ──
+        "FoodAndBeverageRevenue",             # CMG pré-ASC606 (2016)
         "RevenueFromContractsWithCustomers",  # IFRS 15 (BCS/NOK pré-rebrand)
         "RevenueFromSaleOfGoods",             # IFRS pharma (NVS/SNY pré-2018)
         "OilAndGasRevenue",                   # E&P (EQT/FANG)
@@ -236,6 +242,11 @@ DURATION_TAGS = {
         "CommonStockDividendsPerShareDeclared",
         "CommonStockDividendsPerShareCashPaid",
         "DividendsPerShare",
+        # ── IFRS (revisão CFA 2026-07): DPS de ordinárias dos 20-F ──
+        "DividendsPaidOrdinarySharesPerShare",              # BP/GSK/HSBC/NOK…
+        "DividendsRecognisedAsDistributionsToOwnersPerShare",
+        "DividendsProposedOrDeclaredBeforeFinancialStatementsAuthorisedForIssueButNotRecognisedAsDistributionToOwnersPerShare",
+        # REJEITADO: DividendsPaidOtherSharesPerShare ("other" ≠ ordinárias).
     ],
     "researchAndDevelopment": [
         "ResearchAndDevelopmentExpense",
@@ -285,6 +296,9 @@ INSTANT_TAGS = {
         "UnsecuredLongTermDebt",           # ADI/CDNS/CME
         "ConvertibleLongTermNotesPayable", # CRM/DDOG/AKAM
         "LongTermLineOfCredit",            # revolver sacado LT (EME/PTC/TYL)
+        "SecuredLongTermDebt",             # IDXX
+        "LongtermBorrowings",              # IFRS (SHEL/SPOT/TTE)
+        "NoncurrentDebtInstrumentsIssued", # IFRS bancos (UBS: notes emitidas)
     ],
     "longTermDebtCurrent": [
         "LongTermDebtCurrent",
@@ -299,8 +313,13 @@ INSTANT_TAGS = {
         # ── Aceites na revisão CFA 2026-07 ──
         "DebtCurrent",                     # total corrente (ADI/KMB/ORCL)
         "OtherShortTermBorrowings",        # DECK/IBKR
+        "ShortTermBankLoansAndNotesPayable",  # EVRG/EXPD
+        "CurrentDebtInstrumentsIssued",    # IFRS bancos (UBS)
+        # LoC sacada por último: total outstanding sob linhas de crédito —
+        # legítimo borrowing (ADSK/ALGN/CRWD sem outras tags de dívida).
+        "LineOfCredit",
     ],
-    "commercialPaper": ["CommercialPaper"],
+    "commercialPaper": ["CommercialPaper", "CommercialPaperAtCarryingValue"],
     "totalDebt": [
         "DebtLongtermAndShorttermCombinedAmount",
         "Borrowings",
@@ -439,15 +458,34 @@ def fetch_edgar_facts(cik: str, refresh: bool = False) -> dict | None:
         return None
 
 
-def extract_tag_entries(us_gaap: dict, tag: str) -> list[dict]:
+def extract_tag_entries(us_gaap: dict, tag: str, prefer_per_share: bool = False) -> list[dict]:
     node = us_gaap.get(tag)
     if not node:
         return []
-        
+
     units = node.get("units") or {}
 
-    # Priorizar extração de valores monetários (fiat) corretos
-    for currency in VALID_CURRENCIES:
+    # Campos per-share: alguns filers tagham o MESMO facto em "USD" e em
+    # "USD/shares" — e há PERÍODOS que só existem numa das unidades (ABBV Q4
+    # só em USD; outros só em USD/shares). CONCATENAR as unidades per-share
+    # com as monetárias dá visibilidade total; escolher só uma perdia 1.480
+    # células (exclusivo /shares) ou 95 (exclusivo USD).
+    if prefer_per_share:
+        merged: list[dict] = []
+        for unit_key, unit_entries in units.items():
+            if "/" in unit_key and isinstance(unit_entries, list):
+                merged.extend(e for e in unit_entries if "14A" not in (e.get("form") or ""))
+        for unit_key, unit_entries in units.items():
+            if "/" not in unit_key and isinstance(unit_entries, list):
+                merged.extend(e for e in unit_entries if "14A" not in (e.get("form") or ""))
+        if merged:
+            return merged
+
+    # Priorizar extração de valores monetários (fiat) corretos — começando
+    # pela moeda de REPORTE da empresa (dual-taggers como a BCS têm USD e GBP
+    # no mesmo node; USD-primeiro global misturava moedas e perdia períodos
+    # GBP-only).
+    for currency in ([_PREFERRED_CURRENCY] if _PREFERRED_CURRENCY else []) + VALID_CURRENCIES:
         if currency in units:
             unit_entries = units[currency]
             if isinstance(unit_entries, list):
@@ -538,8 +576,9 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
             if not expected_end:
                 continue
             candidates: list[float] = []  # valores por tag, na ordem de prioridade
+            per_share_field = field in ("epsDiluted", "dividendPerShare")
             for tag in tags:
-                entries = extract_tag_entries(us_gaap, tag)
+                entries = extract_tag_entries(us_gaap, tag, prefer_per_share=per_share_field)
                 if not entries:
                     candidates.append(None)
                     continue
@@ -1557,6 +1596,26 @@ def process_company(conn, company: dict, dry_run: bool = False,
     min_fy = datetime.date.today().year - HISTORY_YEARS
     periods: set = set()
 
+    # Inferir a moeda de reporte ANTES da extração (a seleção de unidades
+    # usa-a): dual-taggers (BCS: USD e GBP no mesmo node) precisam da moeda
+    # NATIVA primeiro — a nativa tem o histórico completo; a dual só alguns
+    # períodos. Critério: a moeda com MAIS entradas no core tag.
+    global _PREFERRED_CURRENCY
+    reporting_currency = "USD"
+    core_tag = (namespace.get("NetIncomeLoss") or namespace.get("ProfitLoss")
+                or namespace.get("Assets") or namespace.get("Revenues")
+                or namespace.get("Revenue"))
+    if core_tag:
+        core_units = core_tag.get("units") or {}
+        best_count = -1
+        for curr in VALID_CURRENCIES:
+            entries = core_units.get(curr)
+            n = len(entries) if isinstance(entries, list) else 0
+            if n > best_count and n > 0:
+                best_count = n
+                reporting_currency = curr
+    _PREFERRED_CURRENCY = reporting_currency
+
     # Descobrir todos os (fy, fp) disponíveis nos últimos 10 anos
     for sample_tags in [["NetIncomeLoss", "ProfitLoss", "Assets", "Revenues", "Revenue"]]:
         for tag in sample_tags:
@@ -1607,17 +1666,9 @@ def process_company(conn, company: dict, dry_run: bool = False,
                               company.get('sector'), evidence))
 
     ticker = company.get('ticker')
-    
-    # Inferir a moeda de reporte diretamente do XBRL em vez de confiar no Ticker (que pode ser USD no NYSE)
-    reporting_currency = "USD"
-    core_tag = namespace.get("NetIncomeLoss") or namespace.get("ProfitLoss") or namespace.get("Assets") or namespace.get("Revenues") or namespace.get("Revenue")
-    if core_tag:
-        core_units = core_tag.get("units") or {}
-        for curr in VALID_CURRENCIES:
-            if curr in core_units:
-                reporting_currency = curr
-                break
-                
+
+    # (moeda de reporte inferida no topo de process_company — ver
+    # _PREFERRED_CURRENCY; aqui só se aplica a conversão)
     fx_applied = False
     if reporting_currency != 'USD':
         if not apply_fx_conversion(reporting_currency, rows):

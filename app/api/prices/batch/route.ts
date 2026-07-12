@@ -104,7 +104,11 @@ export async function GET(request: NextRequest) {
       return acc
     }, {} as Record<string, PriceResult>)
 
-    return NextResponse.json(pricesRecord)
+    return NextResponse.json(pricesRecord, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300'
+      }
+    })
   } catch (error) {
     console.error(`Error fetching batch prices:`, error)
     return NextResponse.json(

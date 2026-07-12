@@ -5,15 +5,17 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { AuthError } from '@supabase/supabase-js'
 
-// Função auxiliar para traduzir erros do Supabase para Português
 function translateError(error: AuthError | { message?: string }) {
   const msg = error.message?.toLowerCase() || '';
   if (msg.includes('invalid login credentials')) return 'Email ou password incorretos.';
+  if (msg.includes('email not confirmed')) return 'Precisas de confirmar o teu email antes de entrar. Verifica a tua caixa de entrada (e a pasta de spam).';
   if (msg.includes('user already registered')) return 'Este email já se encontra registado.';
   if (msg.includes('password should be at least')) return 'A password deve ter pelo menos 6 caracteres.';
-  if (msg.includes('rate limit')) return 'Muitas tentativas. Por favor, aguarda um pouco e tenta novamente.';
+  if (msg.includes('rate limit') || msg.includes('too many requests')) return 'Fizeste demasiadas tentativas seguidas. Aguarda uns minutos e tenta de novo.';
   if (msg.includes('email link is invalid or has expired')) return 'O link expirou ou é inválido. Pede um novo link.';
-  return 'Ocorreu um erro inesperado. Tenta novamente.';
+  
+  // Se não conhecemos o erro, não o escondemos atrás de uma mensagem genérica opaca.
+  return `Erro de autenticação: ${error.message || 'Desconhecido'}`;
 }
 
 export async function login(formData: FormData) {

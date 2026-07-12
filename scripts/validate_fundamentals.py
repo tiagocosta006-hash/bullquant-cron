@@ -100,7 +100,9 @@ def validate(rows):
         for r in rs:
             rev, cogs, gp = r["revenue"], r["costOfRevenue"], r["grossProfit"]
             if rev is not None and cogs is not None and gp is not None and abs(rev) > 0:
-                if abs(gp - (rev - cogs)) > 0.01 * abs(rev):
+                # 5%: IFRS tem "other revenues" entre net sales e total (NVS
+                # ~3.5%); acima disso é excise/tag errada a sério.
+                if abs(gp - (rev - cogs)) > 0.05 * abs(rev):
                     add(r, "GP_IDENTITY", f"gp={gp:.0f} rev-cogs={(rev-cogs):.0f}")
             ocf, capex, fcf = r["operatingCashFlow"], r["capex"], r["freeCashFlow"]
             if ocf is not None and capex is not None and fcf is not None:
@@ -111,7 +113,10 @@ def validate(rows):
                 add(r, "DEBT_GE_LTD", f"totalDebt={td:.0f} < ltd={ltd:.0f}")
             eps, sh, ni = r["epsDiluted"], r["sharesOutstanding"], r["netIncome"]
             if eps is not None and sh is not None and ni is not None and abs(ni) > 10e6:
-                if abs(eps * sh - ni) > 0.20 * abs(ni):
+                # 50%: weighted-average vs shares pontuais e diluído oficial
+                # vs básico geram desvios de 20-40% LEGÍTIMOS; o build_row já
+                # deriva eps=NI/shares quando o desvio excede 50%/troca sinal.
+                if abs(eps * sh - ni) > 0.50 * abs(ni):
                     add(r, "EPS_X_SHARES", f"eps*sh={eps*sh:.0f} ni={ni:.0f}")
             for m in ("grossMargin", "operatingMargin", "netMargin"):
                 v = r[m]
@@ -177,6 +182,15 @@ def main():
             baseline = set(json.load(f)["keys"])
     else:
         print("\n(aviso: sem baseline — todas as violações contam como novas)")
+
+    # Violações REVISTAS E ACEITES (eventos reais: ganho RAI da BTI 2017,
+    # reestruturações, pré-conversões) — cada entrada tem racional humano.
+    accepted_path = os.path.join(os.path.dirname(__file__), "validator_accepted.json")
+    if os.path.exists(accepted_path):
+        with open(accepted_path, encoding="utf-8") as f:
+            accepted = json.load(f).get("accepted", [])
+        baseline |= {a["key"] for a in accepted}
+        print(f"(+{len(accepted)} violações aceites com racional em validator_accepted.json)")
 
     new_keys = [k for k in keys if k not in baseline]
     resolved = len([k for k in baseline if k not in set(keys)]) if baseline else 0

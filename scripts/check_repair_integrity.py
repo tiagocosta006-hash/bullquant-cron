@@ -45,6 +45,8 @@ check("NoncurrentLiabilities FORA de longTermDebt (IFRS ≠ dívida)",
 capex = ing.DURATION_TAGS["capex"]
 check("capex: ConstructionInProcess ANTES de ProductiveAssets (AEP 7.6B vs 0.4B)",
       capex.index("PaymentsForConstructionInProcess") < capex.index("PaymentsToAcquireProductiveAssets"))
+check("capex: Projects DEPOIS de ProceedsFromProductiveAssets (Dominion 12.4B vs 0.2B)",
+      capex.index("PaymentsToAcquireProjects") > capex.index("PaymentsForProceedsFromProductiveAssets"))
 
 check("capex sem tags de buyback/treasury",
       not any(re.search(r"Treasury|RepurchaseOfCommonStock|OrRedeem", t) for t in capex))
@@ -69,6 +71,8 @@ check("evidência traz dividend_fact_years",
       "dividend_fact_years" in ing.compute_company_evidence({}))
 check("guard JPM-class no totalDebt (has_ltd_ever)",
       'has_ltd_ever' in src_build)
+check("guard CVNA-class ativo (total direto < LTD é descartado)",
+      "ltd_probe" in src_build and "total_debt < ltd_probe" in src_build)
 check("EBITDA de Financials é NULL estrutural",
       'elif sector == "Financials":' in src_build)
 check("fabricação grossProfit=revenue de bancos REMOVIDA",

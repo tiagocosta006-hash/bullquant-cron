@@ -202,18 +202,21 @@ DURATION_TAGS = {
         # $0.4B vs $7.6B reais de construção (first-hit escolheria o parcial).
         "PaymentsForConstructionInProcess",         # utilities (AEP/ED)
         "PaymentsToAcquireProductiveAssets",
+        "PaymentsForProceedsFromProductiveAssets",  # Dominion: $12.4B FY2024
+        "PaymentsForCapitalImprovements",
+        "PaymentsForLeasingCostsCommissionsAndTenantImprovements",
         # ── Aceites na revisão CFA 2026-07 (explain_holes) ──
+        # ⚠️ Ordem importa: estes tags são de ÂMBITO ESTREITO e ficam DEPOIS de
+        # toda a cauda legacy — na Dominion, "Projects" é um item lateral de
+        # $202M YTD e roubava o lugar aos $12.4B de ProceedsFromProductiveAssets.
         "PaymentsToAcquireOtherProductiveAssets",   # BAX/INCY/VZ
-        "PaymentsToAcquireProjects",                # utilities (D/ED)
+        "PaymentsToAcquireProjects",                # utilities (ED)
         "PaymentsToAcquireRealEstate",              # REITs (REG/TPL)
         "PaymentsToAcquireOilAndGasPropertyAndEquipment",  # VLO
         "PaymentsToAcquireMachineryAndEquipment",   # RL
         "PaymentsToDevelopRealEstateAssets",        # REG
         "PaymentsToDevelopSoftware",                # software capitalizado (ROP)
         "PaymentsForSoftware",                      # VEEV
-        "PaymentsForProceedsFromProductiveAssets",
-        "PaymentsForCapitalImprovements",
-        "PaymentsForLeasingCostsCommissionsAndTenantImprovements",
         # IFRS lato (SHEL: $20.845B FY2017 = capital expenditure do 20-F ✓);
         # último da fila — só dispara sem tags específicas de PP&E.
         "PurchaseOfOtherLongtermAssetsClassifiedAsInvestingActivities",
@@ -302,12 +305,13 @@ INSTANT_TAGS = {
         "DebtLongtermAndShorttermCombinedAmount",
         "Borrowings",
         "LongTermDebtAndCapitalLeaseObligations",
-        # ── Aceites na revisão CFA 2026-07 ──
-        "DebtAndCapitalLeaseObligations",  # AFL/F/HST: total incl. leases
-        # INCLUI maturidades correntes → é um total, nunca pode ir para o
-        # bucket longTermDebt (duplicaria a porção corrente na soma).
+        # ── Aceites na revisão CFA 2026-07, PROTEGIDOS pelo guard CVNA-class
+        # (um "total" direto < LTD é parcial e é descartado em build_row):
+        # sem o guard, AOS (NotesPayable $120M vs LTD $300M) e AEP (=0
+        # residual) corrompiam; com ele, JPM recupera $401B que só existe aqui.
         "LongTermDebtAndCapitalLeaseObligationsIncludingCurrentMaturities",
-        "NotesPayable",                    # total notes (DHI/EXR/IBKR)
+        "DebtAndCapitalLeaseObligations",
+        "NotesPayable",
         # REJEITADOS (nunca adicionar): LineOfCreditFacility*BorrowingCapacity
         # (CAPACIDADE, não dívida sacada), LoansAndAdvancesToCustomers/Banks
         # (ATIVOS de bancos!), AdvancesToAffiliate (ativo), DebtInstrument
@@ -850,6 +854,22 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         # 999.999,9999 — um shares em unidades erradas nunca pode matar o insert.
         if shares >= 100_000 and abs(derived_eps) < 100_000:
             eps_g = derived_eps
+
+    # Identidade EPS×shares≈NI vence EPS extraído incoerente. Apanha:
+    #  - escala errada (HAL 2020: eps taggado em milionésimos → ×10⁶ off);
+    #  - EPS de continuing-ops com sinal/magnitude incompatível com o NI TOTAL
+    #    que a plataforma mostra (LYV: eps −0.02 vs NI +$60M). O EPS coerente
+    #    com o NI apresentado é NI/shares diluídas — a própria definição.
+    if (eps_g is not None and ni_g is not None and shares is not None
+            and shares >= 100_000 and abs(ni_g) > 10_000_000):
+        implied_ni = eps_g * shares
+        sign_flip = (implied_ni > 0) != (ni_g > 0)
+        off_ratio = abs(implied_ni - ni_g) / abs(ni_g)
+        if sign_flip or off_ratio > 0.5:
+            derived_eps = ni_g / shares
+            if abs(derived_eps) < 100_000:
+                eps_g = derived_eps
+
     capex_raw = dur.get("capex")
     capex = abs(capex_raw) if capex_raw is not None else None
     op_cf = dur.get("operatingCashFlow")
@@ -865,6 +885,18 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
     cost_of_rev = dur.get("costOfRevenue")
     if gross_profit is None and revenue is not None and cost_of_rev is not None:
         gross_profit = revenue - cost_of_rev
+
+    # Correção de revenue bruto-de-excise (IFRS sem tag de excise mapeável):
+    # quando gp, cogs e revenue estão TODOS taggados e rev−cogs diverge do gp
+    # em >5%, o net revenue verdadeiro é gp+cogs por definição (DEO: "sales"
+    # $27.9B incl. excise vs net sales $20.3B = 12.2+8.1). Só encolhe, nunca
+    # cresce, e exige coerência (gp+cogs entre 50% e 98% do bruto).
+    if (revenue is not None and cost_of_rev is not None and gross_profit is not None
+            and revenue > 0):
+        net_rev = gross_profit + cost_of_rev
+        if (abs(gross_profit - (revenue - cost_of_rev)) > 0.05 * revenue
+                and 0.5 * revenue < net_rev < 0.98 * revenue):
+            revenue = net_rev
 
     # ── Level 1 Accounting Integrity ──
     if revenue is not None and gross_profit is not None and gross_profit > revenue:
@@ -907,6 +939,13 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
     curr_liab = inst.get("totalCurrentLiab")
     
     total_debt = inst.get("totalDebt")
+    # Guard CVNA-class: um "total" direto MENOR que a própria LTD só pode ser
+    # uma linha parcial (ex.: LongTermDebtAndCapitalLeaseObligations a cobrir
+    # apenas leases, $96M vs LTD $342M) — descartar e deixar a cascata somar.
+    if total_debt is not None:
+        ltd_probe = inst.get("longTermDebt")
+        if ltd_probe is not None and total_debt < ltd_probe - 1e6:
+            total_debt = None
     if total_debt is None:
         # Nível 1: somar current + noncurrent (longTermDebt + longTermDebtCurrent + shortTermDebt/commercialPaper)
         # Bug fix: distinguir "tag ausente" (None) de "tag presente com valor 0" — CMG tem LongTermDebt=0.0

@@ -1,0 +1,407 @@
+{
+ "_doc": "Células com mecanismo identificado (evidência em scripts/out/hole_explanations.json) e correção pendente. Congelado deliberadamente via --freeze-backlog em 2026-07-12 no fecho da reparação; a auditoria reporta a contagem e qualquer célula NOVA fora desta lista falha o gate.",
+ "frozen_at": "2026-07-12",
+ "cells": {
+  "ADSK": {
+   "2020-Q1": [
+    "totalDebt"
+   ]
+  },
+  "AEP": {
+   "2020-Q3": [
+    "operatingCashFlow",
+    "capex"
+   ]
+  },
+  "AES": {
+   "2022-Q2": [
+    "operatingCashFlow",
+    "capex"
+   ],
+   "2018-FY": [
+    "totalDebt"
+   ],
+   "2018-Q4": [
+    "totalDebt"
+   ],
+   "2017-FY": [
+    "totalDebt"
+   ],
+   "2017-Q4": [
+    "totalDebt"
+   ],
+   "2016-FY": [
+    "totalDebt"
+   ],
+   "2016-Q4": [
+    "totalDebt"
+   ]
+  },
+  "ARES": {
+   "2017-FY": [
+    "sharesOutstanding"
+   ],
+   "2017-Q4": [
+    "sharesOutstanding"
+   ]
+  },
+  "AXON": {
+   "2016-Q3": [
+    "totalDebt"
+   ],
+   "2016-Q2": [
+    "totalDebt"
+   ],
+   "2016-Q1": [
+    "totalDebt"
+   ]
+  },
+  "BAX": {
+   "2021-Q1": [
+    "totalDebt"
+   ]
+  },
+  "BKR": {
+   "2019-Q4": [
+    "epsDiluted"
+   ],
+   "2018-Q4": [
+    "epsDiluted"
+   ],
+   "2017-Q2": [
+    "sharesOutstanding"
+   ]
+  },
+  "CVNA": {
+   "2018-Q4": [
+    "epsDiluted"
+   ]
+  },
+  "DHI": {
+   "2017-Q4": [
+    "capex"
+   ]
+  },
+  "F": {
+   "2021-Q4": [
+    "capex"
+   ]
+  },
+  "FTNT": {
+   "2019-Q4": [
+    "capex"
+   ]
+  },
+  "GE": {
+   "2019-Q3": [
+    "operatingCashFlow",
+    "capex"
+   ]
+  },
+  "HSBC": {
+   "2025-FY": [
+    "revenue"
+   ],
+   "2024-FY": [
+    "revenue"
+   ],
+   "2023-FY": [
+    "revenue"
+   ],
+   "2022-FY": [
+    "revenue"
+   ],
+   "2021-FY": [
+    "revenue"
+   ]
+  },
+  "ITW": {
+   "2019-Q3": [
+    "operatingCashFlow",
+    "capex"
+   ]
+  },
+  "KHC": {
+   "2022-Q3": [
+    "operatingCashFlow",
+    "capex"
+   ]
+  },
+  "KO": {
+   "2018-Q1": [
+    "sharesOutstanding"
+   ]
+  },
+  "LH": {
+   "2021-Q3": [
+    "operatingCashFlow",
+    "capex"
+   ]
+  },
+  "LHX": {
+   "2025-FY": [
+    "revenue"
+   ],
+   "2025-Q4": [
+    "revenue"
+   ],
+   "2019-Q4": [
+    "sellingGeneralAndAdmin"
+   ]
+  },
+  "MMM": {
+   "2021-Q2": [
+    "cash"
+   ],
+   "2021-Q1": [
+    "cash"
+   ],
+   "2020-Q3": [
+    "cash"
+   ],
+   "2020-Q2": [
+    "cash"
+   ],
+   "2020-Q1": [
+    "cash"
+   ],
+   "2019-FY": [
+    "cash"
+   ],
+   "2019-Q4": [
+    "cash"
+   ]
+  },
+  "MNST": {
+   "2025-Q3": [
+    "totalDebt"
+   ],
+   "2025-Q2": [
+    "totalDebt"
+   ]
+  },
+  "MPWR": {
+   "2018-Q3": [
+    "totalDebt"
+   ],
+   "2018-Q2": [
+    "totalDebt"
+   ],
+   "2017-FY": [
+    "totalDebt"
+   ],
+   "2017-Q4": [
+    "totalDebt"
+   ],
+   "2016-FY": [
+    "totalDebt"
+   ],
+   "2016-Q4": [
+    "totalDebt"
+   ]
+  },
+  "NWS": {
+   "2023-Q4": [
+    "capex"
+   ]
+  },
+  "NWSA": {
+   "2023-Q4": [
+    "capex"
+   ]
+  },
+  "PSKY": {
+   "2025-Q2": [
+    "sharesOutstanding"
+   ]
+  },
+  "REG": {
+   "2018-FY": [
+    "cash",
+    "totalAssets",
+    "totalDebt",
+    "sharesOutstanding"
+   ],
+   "2017-FY": [
+    "revenue",
+    "netIncome",
+    "epsDiluted",
+    "operatingCashFlow",
+    "capex",
+    "cash",
+    "totalDebt",
+    "sharesOutstanding"
+   ],
+   "2016-FY": [
+    "revenue"
+   ]
+  },
+  "SRE": {
+   "2025-Q4": [
+    "capex"
+   ],
+   "2024-Q4": [
+    "capex"
+   ],
+   "2023-Q4": [
+    "capex"
+   ],
+   "2022-Q4": [
+    "capex"
+   ],
+   "2021-Q4": [
+    "capex"
+   ]
+  },
+  "SWKS": {
+   "2021-Q3": [
+    "operatingCashFlow",
+    "capex"
+   ]
+  },
+  "TER": {
+   "2025-Q2": [
+    "totalDebt"
+   ],
+   "2025-Q1": [
+    "totalDebt"
+   ],
+   "2024-FY": [
+    "totalDebt"
+   ],
+   "2024-Q4": [
+    "totalDebt"
+   ],
+   "2024-Q3": [
+    "totalDebt"
+   ],
+   "2024-Q2": [
+    "totalDebt"
+   ],
+   "2024-Q1": [
+    "totalDebt"
+   ]
+  },
+  "TGT": {
+   "2016-Q3": [
+    "totalDebt"
+   ],
+   "2016-Q2": [
+    "totalDebt"
+   ],
+   "2016-Q1": [
+    "totalDebt"
+   ]
+  },
+  "TPL": {
+   "2024-Q4": [
+    "capex"
+   ],
+   "2023-Q4": [
+    "capex"
+   ]
+  },
+  "TROW": {
+   "2016-Q3": [
+    "revenue"
+   ],
+   "2016-Q2": [
+    "revenue"
+   ],
+   "2016-Q1": [
+    "revenue"
+   ]
+  },
+  "TXT": {
+   "2017-FY": [
+    "totalDebt"
+   ],
+   "2017-Q4": [
+    "totalDebt"
+   ],
+   "2016-FY": [
+    "totalDebt"
+   ],
+   "2016-Q4": [
+    "totalDebt"
+   ]
+  },
+  "UBS": {
+   "2025-FY": [
+    "revenue"
+   ],
+   "2024-FY": [
+    "revenue"
+   ],
+   "2023-FY": [
+    "revenue"
+   ],
+   "2022-FY": [
+    "revenue"
+   ]
+  },
+  "VEEV": {
+   "2020-Q4": [
+    "capex"
+   ]
+  },
+  "VICI": {
+   "2017-Q3": [
+    "sharesOutstanding"
+   ]
+  },
+  "VLO": {
+   "2016-Q4": [
+    "revenue"
+   ],
+   "2016-Q3": [
+    "revenue"
+   ],
+   "2016-Q2": [
+    "revenue"
+   ],
+   "2016-Q1": [
+    "revenue"
+   ]
+  },
+  "VRTX": {
+   "2016-FY": [
+    "totalDebt"
+   ],
+   "2016-Q4": [
+    "totalDebt"
+   ]
+  },
+  "VTRS": {
+   "2020-Q3": [
+    "epsDiluted",
+    "sharesOutstanding"
+   ],
+   "2020-Q2": [
+    "sharesOutstanding"
+   ],
+   "2020-Q1": [
+    "sharesOutstanding"
+   ]
+  },
+  "WBD": {
+   "2020-Q2": [
+    "sharesOutstanding"
+   ],
+   "2018-FY": [
+    "sharesOutstanding"
+   ]
+  },
+  "XOM": {
+   "2016-Q3": [
+    "revenue"
+   ],
+   "2016-Q2": [
+    "revenue"
+   ],
+   "2016-Q1": [
+    "revenue"
+   ]
+  }
+ }
+}

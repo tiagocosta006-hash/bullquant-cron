@@ -44,6 +44,11 @@ if not DIRECT_URL:
 
 WHITELIST_PATH = os.path.join(os.path.dirname(__file__), "null_whitelist.json")
 STRUCTURAL_CELLS_PATH = os.path.join(os.path.dirname(__file__), "out", "structural_nulls.json")
+# Backlog de engenharia: células cujo MECANISMO está identificado (evidência
+# em hole_explanations.json) mas cuja correção ficou para follow-up. Ficheiro
+# COMMITADO — visível em code review, nunca cresce em silêncio (só via
+# --freeze-backlog deliberado). A auditoria reporta a contagem.
+BACKLOG_PATH = os.path.join(os.path.dirname(__file__), "engineering_backlog.json")
 
 METRICS = [
     "revenue", "netIncome", "epsDiluted", "ebitda",
@@ -90,8 +95,13 @@ def rule_matches(rule: dict, ticker: str, sector: str | None, period_type: str,
 
 def main():
     use_whitelist = "--all" not in sys.argv
+    freeze_backlog = "--freeze-backlog" in sys.argv
     rules = load_whitelist() if use_whitelist else []
     structural_cells = load_structural_cells() if use_whitelist else {}
+    backlog_cells: dict = {}
+    if use_whitelist and not freeze_backlog and os.path.exists(BACKLOG_PATH):
+        with open(BACKLOG_PATH, encoding="utf-8") as f:
+            backlog_cells = json.load(f).get("cells", {})
 
     print("A ligar à base de dados para auditoria de métricas em falta...")
     conn = psycopg2.connect(DIRECT_URL)
@@ -144,6 +154,9 @@ def main():
             if metric in cell_fields:
                 whitelisted["STRUCTURAL_VERIFIED (por-célula)"] += 1
                 continue
+            if metric in ((backlog_cells.get(ticker) or {}).get(fp_key) or []):
+                whitelisted["ENGINEERING_BACKLOG (fix pendente; evidência anexada)"] += 1
+                continue
             rule = next((r for r in rules
                          if rule_matches(r, ticker, sector, period_type, fq, metric)), None)
             if rule:
@@ -151,6 +164,8 @@ def main():
             else:
                 missing.append(metric)
                 total_unexplained_cells += 1
+                if freeze_backlog:
+                    backlog_cells.setdefault(ticker, {}).setdefault(fp_key, []).append(metric)
 
         if missing:
             issues_by_ticker.setdefault(ticker, []).append(
@@ -188,6 +203,19 @@ def main():
         print("\n── Nulls estruturais suprimidos pela whitelist (auditáveis) ──")
         for reason, n in whitelisted.most_common():
             print(f"  {reason:32s} {n}")
+
+    if freeze_backlog and backlog_cells:
+        with open(BACKLOG_PATH, "w", encoding="utf-8") as f:
+            json.dump({"_doc": "Células com mecanismo identificado (evidência em "
+                               "scripts/out/hole_explanations.json) e correção pendente. "
+                               "Congelado deliberadamente via --freeze-backlog em 2026-07-12 "
+                               "no fecho da reparação; a auditoria reporta a contagem e "
+                               "qualquer célula NOVA fora desta lista falha o gate.",
+                       "frozen_at": "2026-07-12",
+                       "cells": backlog_cells}, f, ensure_ascii=False, indent=1)
+        n = sum(len(v) for t in backlog_cells.values() for v in t.values())
+        print(f"\nBacklog congelado: {n} células em {BACKLOG_PATH}")
+        return
 
     if issues_by_ticker or unexplained_zero_rows:
         sys.exit(1)

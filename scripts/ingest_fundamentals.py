@@ -736,6 +736,13 @@ _DIVIDEND_EXCLUDE = _re.compile(
     r"Received|Income|Restriction|MinorityInterest|Noncontrolling|Preferred|"
     r"ExpectedDividend|DividendRate|Yield"
 )
+# Tags inequivocamente de dividendos a COMMON — só estas contam para os ANOS.
+# Tags genéricas (Dividends, PaymentsOfDividends, DividendsPayable) incluem
+# preferenciais (ACGL paga preferred desde 2011 sem nunca pagar common até ao
+# especial de 2024) e por isso só sustentam o booleano conservador.
+_DIVIDEND_COMMON_EVIDENCE = _re.compile(
+    r"CommonStockDividend|DividendsCommonStock|DividendsPerShare|OrdinaryShares"
+)
 _RND_EVIDENCE = _re.compile(r"ResearchAndDevelopment")
 # Excluir IPR&D de aquisições (intangível de balanço, não a linha de despesa).
 _RND_EXCLUDE = _re.compile(r"InProcess|Asset|Intangible|Capitali[sz]ed|Arrangement")
@@ -750,26 +757,36 @@ _LTD_EVIDENCE_TAGS = (
 
 
 def compute_company_evidence(facts_json: dict) -> dict:
-    """Varre TODO o companyfacts (us-gaap + ifrs-full) e devolve flags binárias:
+    """Varre TODO o companyfacts (us-gaap + ifrs-full) e devolve evidência:
     - is_dividend_payer: existe qualquer facto de dividendos a common > 0
+    - dividend_fact_years: ANOS (do "end" do facto) com dividendos > 0 — a
+      granularidade que decide se um DPS em falta é 0.0 (ano sem qualquer
+      facto de dividendo: META pré-2024, ACGL fora do especial de 2024,
+      empresas que cortaram) ou NULL (gap num ano comprovadamente pagador)
     - has_rnd_ever: a empresa alguma vez reportou uma linha de R&D
     - has_ltd_ever: a empresa alguma vez taggou dívida de longo prazo
-    Errar para o lado do True é seguro: True ⇒ campo em falta fica NULL (N/A),
+    Errar para o lado de "pagador" é seguro: ⇒ campo em falta fica NULL (N/A),
     nunca um zero/total fabricado."""
-    payer = False
+    common_years: set = set()
+    generic_payer = False
     has_rnd = False
     has_ltd = False
     facts = (facts_json or {}).get("facts") or {}
     for ns_name in ("us-gaap", "ifrs-full"):
         ns = facts.get(ns_name) or {}
         for tag, node in ns.items():
-            if not payer and _DIVIDEND_EVIDENCE.search(tag) and not _DIVIDEND_EXCLUDE.search(tag):
+            if _DIVIDEND_EVIDENCE.search(tag) and not _DIVIDEND_EXCLUDE.search(tag):
+                is_common_tag = bool(_DIVIDEND_COMMON_EVIDENCE.search(tag))
                 for entries in (node.get("units") or {}).values():
-                    if isinstance(entries, list) and any(
-                        isinstance(e.get("val"), (int, float)) and e["val"] > 0 for e in entries
-                    ):
-                        payer = True
-                        break
+                    if not isinstance(entries, list):
+                        continue
+                    for e in entries:
+                        v = e.get("val")
+                        end = e.get("end") or ""
+                        if isinstance(v, (int, float)) and v > 0 and len(end) >= 4:
+                            generic_payer = True
+                            if is_common_tag:
+                                common_years.add(int(end[:4]))
             if not has_rnd and _RND_EVIDENCE.search(tag) and not _RND_EXCLUDE.search(tag):
                 units = node.get("units") or {}
                 if any(isinstance(v, list) and v for v in units.values()):
@@ -780,20 +797,32 @@ def compute_company_evidence(facts_json: dict) -> dict:
                         isinstance(e.get("val"), (int, float)) and e["val"] > 0 for e in v)
                        for v in units.values()):
                     has_ltd = True
-            if payer and has_rnd and has_ltd:
-                return {"is_dividend_payer": True, "has_rnd_ever": True, "has_ltd_ever": True}
-    return {"is_dividend_payer": payer, "has_rnd_ever": has_rnd, "has_ltd_ever": has_ltd}
+    # anos: precisos quando há evidência common; None (= "assumir pagador em
+    # todos os anos" → NULL) quando só há evidência genérica/ambígua; [] = nunca.
+    if common_years:
+        div_years = sorted(common_years)
+    elif generic_payer:
+        div_years = None
+    else:
+        div_years = []
+    return {
+        "is_dividend_payer": generic_payer or bool(common_years),
+        "dividend_fact_years": div_years,
+        "has_rnd_ever": has_rnd,
+        "has_ltd_ever": has_ltd,
+    }
 
 
 
 def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str | None,
               dur: dict, inst: dict, sector: str | None = None,
               evidence: dict | None = None) -> dict:
-    # evidence = compute_company_evidence(facts): flags binárias da empresa
-    # inteira que decidem se um DPS/R&D em falta é um verdadeiro zero (empresa
-    # nunca pagou/reportou) ou um buraco de extração que DEVE ficar NULL.
-    evidence = evidence or {"is_dividend_payer": True, "has_rnd_ever": True,
-                            "has_ltd_ever": False}
+    # evidence = compute_company_evidence(facts): evidência da empresa inteira
+    # que decide se um DPS/R&D em falta é um verdadeiro zero (empresa não
+    # pagava/não reporta) ou um buraco de extração que DEVE ficar NULL.
+    # Default (sem evidência): assumir pagador/reporta → NULL, nunca 0 fabricado.
+    evidence = evidence or {"is_dividend_payer": True, "dividend_fact_years": None,
+                            "has_rnd_ever": True, "has_ltd_ever": False}
     shares = dur.get("sharesOutstandingDur") or inst.get("sharesOutstandingInst")
     # Guard: alguns filings têm shares em unidades erradas (milhares/milhões em
     # vez de unidades — ex.: HST "738" ou BRO "276000" em vez de ~276M).
@@ -977,24 +1006,33 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         else:
             ebitda = None
 
+    # Política evidência-de-ausência ao ANO (v2, fim do "paradoxo da Apple"):
+    # o período cai num ano com QUALQUER facto de dividendo >0 no XBRL?
+    #  - não → 0.0 é a verdade (META pré-2024, cortes, especiais fora do ano);
+    #  - sim → um DPS em falta é gap de extração e fica NULL (N/A). Forçar
+    #    0.0 nesses anos mascarava buracos como "não paga dividendos".
+    div_years = evidence.get("dividend_fact_years")
+    if div_years is None:
+        in_paying_year = True  # sem evidência calculada: nunca fabricar zeros
+    else:
+        try:
+            in_paying_year = int(str(period_end)[:4]) in set(div_years)
+        except (ValueError, TypeError):
+            in_paying_year = bool(div_years)
+
     # Guard: alguns filings tagham DPS em unidades erradas (ex.: STX "2770000"
     # em vez de 2.77 — milionésimos). Nenhuma empresa do S&P 500 paga >$1000/ação;
     # valores acima disso são bugs de escala (reduzir 1000x até plausível, senão N/A).
     dps = dur.get("dividendPerShare")
     if dps is None:
-        # Política evidência-de-ausência (fim do "paradoxo da Apple"):
-        #  - não-payer verificado (zero factos de dividendos em TODO o
-        #    companyfacts) → 0.0 é a verdade;
-        #  - payer com período em falta → NULL (N/A). Forçar 0.0 aqui
-        #    mascarava buracos de extração como "não paga dividendos".
-        dps = None if evidence["is_dividend_payer"] else 0.0
+        dps = None if in_paying_year else 0.0
     else:
         for _ in range(3):
             if abs(dps) <= 1000:
                 break
             dps /= 1000
         if abs(dps) > 1000:
-            dps = None if evidence["is_dividend_payer"] else 0.0
+            dps = None if in_paying_year else 0.0
         # Guard: dividendos são SEMPRE não-negativos. Um valor negativo é sempre
         # um bug de ingestão (ex: subtração errada de acumulado anual). Rejeitar.
         if dps is not None and dps < 0:

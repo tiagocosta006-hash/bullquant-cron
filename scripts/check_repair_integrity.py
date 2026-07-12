@@ -63,8 +63,10 @@ check("build_row aceita evidence",
       "evidence" in inspect.signature(ing.build_row).parameters)
 
 src_build = inspect.getsource(ing.build_row)
-check("política DPS: payer em falta → NULL (sem força-0.0 cega)",
-      'evidence["is_dividend_payer"]' in src_build)
+check("política DPS v2: evidência por ano-de-facto (sem força-0.0 cega)",
+      "dividend_fact_years" in src_build and "in_paying_year" in src_build)
+check("evidência traz dividend_fact_years",
+      "dividend_fact_years" in ing.compute_company_evidence({}))
 check("guard JPM-class no totalDebt (has_ltd_ever)",
       'has_ltd_ever' in src_build)
 check("EBITDA de Financials é NULL estrutural",

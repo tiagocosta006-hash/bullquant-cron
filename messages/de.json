@@ -292,7 +292,8 @@
         "1y": "1J",
         "5y": "5J",
         "max": "MAX"
-      }
+      },
+      "notApplicable": "Kennzahl für diesen Sektor nicht anwendbar (N/A)."
     },
     "snapshot": {
       "valuation": "Bewertung",
@@ -391,7 +392,8 @@
       "operating": "OPERAT.",
       "profit": "NETTO",
       "roe": "ROE"
-    }
+    },
+    "reitFcfTooltip": "Bei REITs umfasst CapEx Instandhaltungs- und Vermietungskosten und dient damit als Näherung für den AFFO."
   },
   "compare": {
     "title": "Peer-Analyse: {industry}",

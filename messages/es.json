@@ -292,7 +292,8 @@
         "1y": "1A",
         "5y": "5A",
         "max": "MAX"
-      }
+      },
+      "notApplicable": "Métrica no aplicable (N/A) a este sector."
     },
     "snapshot": {
       "valuation": "Valoración",
@@ -391,7 +392,8 @@
       "operating": "OPERAT.",
       "profit": "NETO",
       "roe": "ROE"
-    }
+    },
+    "reitFcfTooltip": "En los REIT, el CapEx refleja los costes de mantenimiento y arrendamiento inmobiliario, sirviendo como aproximación al AFFO."
   },
   "compare": {
     "title": "Análisis de Pares: {industry}",

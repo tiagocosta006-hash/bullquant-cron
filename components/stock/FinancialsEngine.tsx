@@ -88,34 +88,46 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
 
     // TTM Calculation
     if (period === "TTM") {
+      // Soma null-aware (mesma semântica do StockSnapshot): janela toda a
+      // null → null (N/A honesto), parcial → soma dos presentes. O antigo
+      // `|| 0` transformava buracos legítimos (bancos sem grossProfit,
+      // não-pagadores) em zeros indistinguíveis de zeros reais.
+      const sumWindow = (rows: FundamentalRow[], key: keyof FundamentalRow): number | null => {
+        const vals = rows.map(r => r[key]).filter((v): v is number => typeof v === "number")
+        return vals.length === 0 ? null : vals.reduce((a, b) => a + b, 0)
+      }
       const ttmData = []
       // Start from the 4th quarter available to calculate a full TTM
       for (let i = 3; i < quarterlies.length; i++) {
         const current = quarterlies[i]
         const last4 = quarterlies.slice(i - 3, i + 1)
-        
+
         // Sum flows
-        const revenue = last4.reduce((acc, q) => acc + (q.revenue || 0), 0)
-        const netIncome = last4.reduce((acc, q) => acc + (q.netIncome || 0), 0)
-        const ebitda = last4.reduce((acc, q) => acc + (q.ebitda || 0), 0)
-        const operatingCashFlow = last4.reduce((acc, q) => acc + (q.operatingCashFlow || 0), 0)
-        const capex = last4.reduce((acc, q) => acc + (q.capex || 0), 0)
-        const freeCashFlow = operatingCashFlow - capex
-        const epsDiluted = last4.reduce((acc, q) => acc + (q.epsDiluted || 0), 0)
-        const opEx = last4.reduce((acc, q) => acc + (q.operatingExpenses || 0), 0)
-        const rAndD = last4.reduce((acc, q) => acc + (q.researchAndDevelopment || 0), 0)
-        const sga = last4.reduce((acc, q) => acc + (q.sellingGeneralAndAdmin || 0), 0)
-        
+        const revenue = sumWindow(last4, "revenue")
+        const netIncome = sumWindow(last4, "netIncome")
+        const ebitda = sumWindow(last4, "ebitda")
+        const operatingCashFlow = sumWindow(last4, "operatingCashFlow")
+        const capex = sumWindow(last4, "capex")
+        const freeCashFlow = operatingCashFlow === null ? null : operatingCashFlow - (capex ?? 0)
+        const epsDiluted = sumWindow(last4, "epsDiluted")
+        const opEx = sumWindow(last4, "operatingExpenses")
+        const rAndD = sumWindow(last4, "researchAndDevelopment")
+        const sga = sumWindow(last4, "sellingGeneralAndAdmin")
+
         // Latest for balance sheet/ratios
         const cash = current.cash
         const totalDebt = current.totalDebt
         const sharesOutstanding = current.sharesOutstanding
-        const grossMargin = last4.reduce((acc, q) => acc + (q.grossProfit || 0), 0) / revenue
-        const operatingMargin = last4.reduce((acc, q) => acc + (q.operatingIncome || 0), 0) / revenue
-        const profitMargin = netIncome / revenue
-        const roic = current.roic 
+        // Margens só com denominador real — dividir por 0 dava NaN%/Infinity
+        // nos gráficos; numerador todo-null fica N/A em vez de 0%.
+        const grossTtm = sumWindow(last4, "grossProfit")
+        const opIncTtm = sumWindow(last4, "operatingIncome")
+        const grossMargin = revenue !== null && revenue > 0 && grossTtm !== null ? grossTtm / revenue : null
+        const operatingMargin = revenue !== null && revenue > 0 && opIncTtm !== null ? opIncTtm / revenue : null
+        const profitMargin = revenue !== null && revenue > 0 && netIncome !== null ? netIncome / revenue : null
+        const roic = current.roic
         const returnOnEquity = current.returnOnEquity
-        const dividendPerShare = last4.reduce((acc, q) => acc + (q.dividendPerShare || 0), 0)
+        const dividendPerShare = sumWindow(last4, "dividendPerShare")
 
         // Segments
         const segments: Record<string, number> = {}
@@ -155,7 +167,8 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
     const rowN = processedData[processedData.length - 1] as Record<string, unknown>
     const start = Number(row0[key] ?? 0)
     const end = Number(rowN[key] ?? 0)
-    if (!start || !end || start <= 0) return null
+    // end <= 0: Math.pow(negativo, 1/n) devolve NaN — melhor N/A que "NaN%"
+    if (!start || !end || start <= 0 || end <= 0) return null
     const years = period === "ANNUAL" ? processedData.length - 1 : (processedData.length - 1) / 4
     if (years <= 0) return null
     return Math.pow(end / start, 1 / years) - 1
@@ -182,7 +195,8 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
     profitMargin: d.profitMargin !== undefined ? d.profitMargin : d.netMargin,
     operatingExpenses: (d.operatingExpenses !== null && d.operatingExpenses !== undefined) ? d.operatingExpenses : (d.sellingGeneralAndAdmin !== null && d.sellingGeneralAndAdmin !== undefined ? d.sellingGeneralAndAdmin : null),
     ...d.revenueSegments,
-    capexInv: d.capex ? -d.capex : 0 // Negative capex for composed chart
+    // null fica null (gap no gráfico) — 0 fabricado era indistinguível de capex zero real
+    capexInv: d.capex != null ? -d.capex : null // Negative capex for composed chart
   }))
 
   const segmentColors = ['#f97316', '#fcd34d', '#fde047', '#86efac', '#38bdf8', '#c084fc']
@@ -250,7 +264,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
               defaultHiddenKeys: ['operatingCashFlow', 'capex']
             }} 
             cagr={calcCAGR('freeCashFlow')}
-            infoTooltip={isReit ? "Para Fundos Imobiliários (REITs), o CapEx reflete os custos de manutenção imobiliária e de arrendamento, resultando numa proxy para o AFFO." : undefined}
+            infoTooltip={isReit ? t('reitFcfTooltip') : undefined}
           />
         )}
 

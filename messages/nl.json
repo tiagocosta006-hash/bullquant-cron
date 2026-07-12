@@ -292,7 +292,8 @@
         "1y": "1J",
         "5y": "5J",
         "max": "MAX"
-      }
+      },
+      "notApplicable": "Metriek niet van toepassing (N/A) op deze sector."
     },
     "snapshot": {
       "valuation": "Waardering",
@@ -391,7 +392,8 @@
       "operating": "OPERAT.",
       "profit": "NETTO",
       "roe": "ROE"
-    }
+    },
+    "reitFcfTooltip": "Bij REIT's weerspiegelt CapEx de onderhouds- en verhuurkosten van vastgoed en dient zo als benadering van de AFFO."
   },
   "compare": {
     "title": "Peervergelijking: {industry}",

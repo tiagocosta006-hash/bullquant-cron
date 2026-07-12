@@ -128,7 +128,7 @@ export function DashboardClient({ tabs, activeTab, activeSector, sectors, initia
       {/* Atalhos em vidro */}
       <div>
         <SectionLabel>{t("quickActionsTitle")}</SectionLabel>
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <QuickAction href="/portfolio" icon={Briefcase} title={t("actions.portfolio")} desc={t("actions.portfolioDesc")} />
           <QuickAction href="/dcf" icon={Calculator} title={t("actions.dcf")} desc={t("actions.dcfDesc")} />
           <QuickAction href="/calendar" icon={CalendarDays} title={t("actions.calendar")} desc={t("actions.calendarDesc")} />
@@ -177,7 +177,7 @@ export function DashboardClient({ tabs, activeTab, activeSector, sectors, initia
           <p className="mb-3 text-xs text-muted-foreground">{t("eodNotice")}</p>
         )}
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 w-full">
           {companies.map((company) => {
             const priceData = prices[company.ticker];
             // Fallback ao preço/variação EOD (já vindos do servidor) enquanto o batch em tempo real não chega.
@@ -208,7 +208,7 @@ export function DashboardClient({ tabs, activeTab, activeSector, sectors, initia
 
         {hasMore && (
           <div className="mt-6 flex justify-center">
-            <Button variant="outline" onClick={handleLoadMore} disabled={isLoadingMore} className="gap-2">
+            <Button variant="outline" onClick={handleLoadMore} disabled={isLoadingMore} className="gap-2 min-h-[48px] px-6 rounded-full w-full sm:w-auto">
               {isLoadingMore && <Loader2 className="w-4 h-4 animate-spin" />}
               {t("loadMore")}
             </Button>

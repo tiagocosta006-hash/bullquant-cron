@@ -59,9 +59,11 @@ describe("WACC via CAPM", () => {
       expect(rd).toBe(null)
     })
 
-    it("returns null when interest is negative", () => {
+    it("uses absolute value when interest is negative (convenção de sinal varia entre DREs)", () => {
+      // costOfDebt passou a usar Math.abs(interestExpense) — a despesa com
+      // juros vem negativa nalgumas DREs; |−10|/100 × (1−0.21) = 0.079.
       const rd = costOfDebt(-10, 100)
-      expect(rd).toBe(null)
+      expect(rd).toBeCloseTo(0.079, 10)
     })
 
     it("returns null when interest expense is null", () => {

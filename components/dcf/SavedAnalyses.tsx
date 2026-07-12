@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl"
 import { Bookmark, Trash2, Loader2, RotateCcw } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { formatPrice, formatPercent } from "@/lib/finance/format"
 import { cn } from "@/lib/utils"
@@ -24,6 +25,7 @@ export type SavedDcfInputs = {
 export type SavedAnalysis = SavedDcfInputs & {
   id: string
   label: string | null
+  notes?: string | null
   fairValue: number
   priceAtSave: number | null
   marginOfSafety: number | null
@@ -45,6 +47,7 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
   const [isLoading, setIsLoading] = React.useState(false)
   const [isSaving, setIsSaving] = React.useState(false)
   const [label, setLabel] = React.useState("")
+  const [notes, setNotes] = React.useState("")
   const [error, setError] = React.useState<string | null>(null)
 
   const fetchAnalyses = React.useCallback(async () => {
@@ -83,6 +86,7 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
         body: JSON.stringify({
           ticker,
           label: label.trim() || undefined,
+          notes: notes.trim() || undefined,
           inputs: current.inputs,
           result: {
             fairValue: current.fairValue,
@@ -96,6 +100,7 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
         return
       }
       setLabel("")
+      setNotes("")
       await fetchAnalyses()
     } catch {
       setError(t("saved.saveError"))
@@ -124,18 +129,27 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
       </div>
 
       {/* Guardar cenário atual */}
-      <div className="flex items-center gap-2">
-        <Input
-          value={label}
-          onChange={(e) => setLabel(e.target.value)}
-          placeholder={t("saved.labelPlaceholder")}
-          maxLength={60}
-          className="h-9 bg-input/30 border-input/30 text-sm"
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <Input
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
+            placeholder={t("saved.labelPlaceholder")}
+            maxLength={60}
+            className="h-9 bg-input/30 border-input/30 text-sm"
+          />
+          <Button onClick={handleSave} disabled={!canSave || isSaving} size="sm" className="shrink-0 h-9">
+            {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bookmark className="h-4 w-4" />}
+            <span className="ml-1.5">{t("saved.saveButton")}</span>
+          </Button>
+        </div>
+        <Textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Notas ou observações adicionais (opcional)..."
+          className="min-h-[60px] text-xs bg-input/30 border-input/30 resize-none"
+          maxLength={2000}
         />
-        <Button onClick={handleSave} disabled={!canSave || isSaving} size="sm" className="shrink-0">
-          {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bookmark className="h-4 w-4" />}
-          <span className="ml-1.5">{t("saved.saveButton")}</span>
-        </Button>
       </div>
       {error && <p className="text-xs text-destructive">{error}</p>}
 
@@ -159,7 +173,7 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
                   <p className="text-sm font-medium truncate">
                     {a.label || formatDate(a.createdAt)}
                   </p>
-                  <p className="text-xs text-muted-foreground tabular-nums">
+                  <p className="text-xs text-muted-foreground tabular-nums mt-1">
                     {t("saved.fairValueShort")} {formatPrice(a.fairValue, currency)}
                     {a.marginOfSafety != null && (
                       <span className={cn("ml-2 font-medium", under ? "text-bull" : "text-bear")}>
@@ -168,6 +182,11 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
                       </span>
                     )}
                   </p>
+                  {a.notes && (
+                    <p className="text-xs italic text-muted-foreground/80 mt-1.5 line-clamp-2" title={a.notes}>
+                      "{a.notes}"
+                    </p>
+                  )}
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   <Button

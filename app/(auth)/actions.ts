@@ -7,20 +7,20 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { AuthError } from '@supabase/supabase-js'
 import { sendWelcomeEmail, sendPasswordResetEmail } from '@/lib/resend'
 
-// Função auxiliar para traduzir erros do Supabase para Português
 function translateError(error: AuthError | { message?: string }) {
   const msg = error.message?.toLowerCase() || '';
   if (msg.includes('invalid login credentials')) return 'Email ou password incorretos.';
+  if (msg.includes('email not confirmed')) return 'Precisas de confirmar o teu email antes de entrar. Verifica a tua caixa de entrada (e a pasta de spam).';
   if (msg.includes('user already registered')) return 'Este email já se encontra registado.';
   if (msg.includes('password should be at least')) return 'A password deve ter pelo menos 6 caracteres.';
   if (msg.includes('different from the old password')) return 'A nova password tem de ser diferente da antiga.';
   if (msg.includes('weak_password')) return 'A password é demasiado fraca. Tenta adicionar números ou símbolos.';
   if (msg.includes('invalid email')) return 'O formato do email não é válido.';
-  if (msg.includes('rate limit')) return 'Muitas tentativas. Por favor, aguarda um pouco e tenta novamente.';
+  if (msg.includes('rate limit') || msg.includes('too many requests')) return 'Fizeste demasiadas tentativas seguidas. Aguarda uns minutos e tenta de novo.';
   if (msg.includes('email link is invalid or has expired')) return 'O link expirou ou é inválido. Pede um novo link.';
   
-  // Em vez de "erro inesperado" que soa a plataforma instável:
-  return 'Não foi possível concluir o pedido. Verifica os teus dados e tenta novamente.';
+  // Em vez de "erro inesperado" que soa a plataforma instável, mas também não escondendo totalmente o erro técnico.
+  return `Não foi possível concluir o pedido (${error.message || 'Desconhecido'}). Verifica os dados e tenta novamente.`;
 }
 
 export async function login(formData: FormData) {

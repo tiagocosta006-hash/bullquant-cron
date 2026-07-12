@@ -292,7 +292,8 @@
         "1y": "1年",
         "5y": "5年",
         "max": "最大"
-      }
+      },
+      "notApplicable": "この業種には適用されない指標です（N/A）。"
     },
     "snapshot": {
       "valuation": "評価",
@@ -391,7 +392,8 @@
       "operating": "営業",
       "profit": "純利",
       "roe": "ROE"
-    }
+    },
+    "reitFcfTooltip": "REITの場合、CapExは不動産の維持費・賃貸費用を反映し、AFFOの近似値となります。"
   },
   "compare": {
     "title": "ピア分析: {industry}",

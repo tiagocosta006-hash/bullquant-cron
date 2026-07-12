@@ -410,7 +410,8 @@
         "1y": "1Y",
         "5y": "5Y",
         "max": "MAX"
-      }
+      },
+      "notApplicable": "Metric not applicable (N/A) to this sector."
     },
     "snapshot": {
       "valuation": "Valuation",
@@ -527,7 +528,8 @@
       "operating": "OPERAT.",
       "profit": "PROFIT",
       "roe": "ROE"
-    }
+    },
+    "reitFcfTooltip": "For REITs, CapEx reflects property maintenance and leasing costs, making this a proxy for AFFO."
   },
   "compare": {
     "title": "Peer Analysis: {industry}",

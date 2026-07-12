@@ -42,11 +42,10 @@ export function costOfDebt(
   if (interestExpense == null || totalDebt == null || totalDebt <= 0) {
     return null
   }
-  if (interestExpense < 0) {
-    return null
-  }
 
-  const costOfDebtPretax = interestExpense / totalDebt
+  // Despesa com juros pode vir negativa da DRE, usamos o valor absoluto.
+  const absInterestExpense = Math.abs(interestExpense)
+  const costOfDebtPretax = absInterestExpense / totalDebt
   const costOfDebtAfterTax = costOfDebtPretax * (1 - effectiveTaxRate)
   return costOfDebtAfterTax
 }
@@ -133,9 +132,9 @@ export function computeWacc(opts: {
     beta: opts.beta,
     equityRiskPremium: erp,
     costOfEquity: re,
-    interestExpense: opts.interestExpense,
+    interestExpense: opts.interestExpense != null ? Math.abs(opts.interestExpense) : null,
     totalDebt: totalDebt > 0 ? totalDebt : null,
-    costOfDebtPretax: opts.interestExpense != null && totalDebt > 0 ? opts.interestExpense / totalDebt : null,
+    costOfDebtPretax: opts.interestExpense != null && totalDebt > 0 ? Math.abs(opts.interestExpense) / totalDebt : null,
     costOfDebtAfterTax: rd,
     effectiveTaxRate: tc,
     marketCap,

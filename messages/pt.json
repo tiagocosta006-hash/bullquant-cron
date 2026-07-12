@@ -406,7 +406,8 @@
         "1y": "1A",
         "5y": "5A",
         "max": "MÁX"
-      }
+      },
+      "notApplicable": "Métrica não aplicável (N/A) a este setor."
     },
     "snapshot": {
       "valuation": "Valuation",
@@ -523,7 +524,8 @@
       "operating": "OPERAC.",
       "profit": "LÍQUIDA",
       "roe": "ROE"
-    }
+    },
+    "reitFcfTooltip": "Para Fundos Imobiliários (REITs), o CapEx reflete os custos de manutenção imobiliária e de arrendamento, resultando numa proxy para o AFFO."
   },
   "compare": {
     "title": "Análise de Pares: {industry}",

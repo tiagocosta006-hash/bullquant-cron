@@ -233,6 +233,7 @@ function QuickAction({
   return (
     <Link
       href={href}
+      prefetch={false}
       className="glass group relative flex items-start gap-3 rounded-2xl p-4 transition-transform hover:-translate-y-0.5"
     >
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">

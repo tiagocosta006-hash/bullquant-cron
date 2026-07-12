@@ -131,7 +131,11 @@ def main():
         period_str = f"FY{fy}" if period_type == "ANNUAL" else f"Q{fq} '{str(fy)[-2:]}"
 
         fp_key = f"{fy}-{'FY' if period_type == 'ANNUAL' else 'Q' + str(fq)}"
-        cell_fields = set((structural_cells.get(ticker) or {}).get(fp_key) or [])
+        # Irmãs dual-class (sem CIK próprio) herdam a classificação por-célula
+        # da primária — os dados são cópia exata via sync_dual_class.
+        DUAL_SIBLING = {"GOOG": "GOOGL", "FOX": "FOXA", "NWS": "NWSA"}
+        lookup = DUAL_SIBLING.get(ticker, ticker)
+        cell_fields = set((structural_cells.get(lookup) or {}).get(fp_key) or [])
 
         missing = []
         for i, metric in enumerate(METRICS):

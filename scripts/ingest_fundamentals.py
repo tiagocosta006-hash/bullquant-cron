@@ -671,6 +671,42 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
                 if val_s is not None or val_a is not None:
                     dur_map[(fy, fp)]["sellingGeneralAndAdmin"] = (val_s or 0) + (val_a or 0)
 
+    # DPS declarado como facto INSTANT na data da DECLARAÇÃO (ABBV mudou de
+    # estilo em 2020; AME etc.): sem duration para o trimestre, mapear cada
+    # declaração ao trimestre fiscal que a contém — datas dentro de
+    # (fim do trimestre anterior, fim deste] e a menos de 95 dias do fim.
+    # Duas declarações no mesmo trimestre (regular + especial) somam-se.
+    dps_missing = [(fy, fp) for (fy, fp) in periods
+                   if fp.startswith("Q")
+                   and dur_map[(fy, fp)].get("dividendPerShare") is None
+                   and period_ends.get((fy, fp))]
+    if dps_missing:
+        declared: set = set()
+        for tag in DURATION_TAGS["dividendPerShare"]:
+            node = us_gaap.get(tag) or {}
+            for unit_key, unit_entries in (node.get("units") or {}).items():
+                if "/" not in unit_key or not isinstance(unit_entries, list):
+                    continue
+                for e in unit_entries:
+                    if "start" in e or not e.get("end") or e.get("val") is None:
+                        continue
+                    if "14A" in (e.get("form") or ""):
+                        continue
+                    declared.add((e["end"], float(e["val"])))
+        if declared:
+            q_ends = sorted({period_ends[p] for p in periods
+                             if p[1].startswith("Q") and period_ends.get(p)})
+            for (fy, fp) in dps_missing:
+                p_end = period_ends[(fy, fp)]
+                idx = q_ends.index(p_end) if p_end in q_ends else -1
+                prev_end = q_ends[idx - 1] if idx > 0 else None
+                floor = (datetime.date.fromisoformat(p_end)
+                         - datetime.timedelta(days=95)).isoformat()
+                lower = max(prev_end, floor) if prev_end else floor
+                vals = [v for d, v in declared if lower < d <= p_end]
+                if vals:
+                    dur_map[(fy, fp)]["dividendPerShare"] = sum(vals)
+
     # Apply differencing for cash flow metrics
     original_ytd = {}
     for (fy, fp) in periods:

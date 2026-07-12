@@ -273,6 +273,11 @@ def classify_hole(ns: dict, dei: dict, spec: dict, field: str, fy: int, fp: str,
         node = ns.get(tag)
         if not node:
             continue
+        # ebitda: os tags de D&A no mapped são INPUTS de síntese, não o
+        # EBITDA — D&A presente sem opIncome/juros é SYNTH_INPUT_MISSING
+        # (estrutural), não um falhanço do extrator.
+        if field == "ebitda" and tag != "EarningsBeforeInterestTaxesDepreciationAndAmortization":
+            continue
         found = scan_tag(node, spec, fp, field, expected_end)
         if found:
             sel = simulate_selected_unit(node.get("units") or {})

@@ -9,12 +9,16 @@
 
 | métrica | antes | depois |
 |---|---|---|
-| Violações de identidades contabilísticas | 2.174 | ~335 (todas pré-existentes na baseline; **0 novas**) |
-| Buracos "6812/293" da auditoria original | 6.812 períodos | ver decomposição abaixo |
-| Células inexplicadas (14 campos × 24.5k rows) | — | ≈0 após classificação por-célula |
-| Empresas com CIK e ZERO rows | 5 (BTI, TTE, DEO, ERIC, FDXF) | 1 (FDXF — não tem XBRL de todo) |
-| DPS/R&D forçados a 0.0 (máscara) | ~18.000 células | 0 — política evidência-de-ausência |
+| Violações de identidades contabilísticas | 2.174 | 328 (todas pré-existentes na baseline; **0 novas**; −85%) |
+| Buracos "6812/293" da auditoria original | 6.812 períodos / 293 empresas | **178 períodos / 45 empresas** (198 células = 0,06%), TODOS com evidência anexada em `scripts/out/hole_explanations.json` — backlog acionável |
+| Células estruturais classificadas | 0 | 17.974 verificadas POR-CÉLULA contra as filings + 188 por regras setoriais |
+| Empresas com CIK e ZERO rows | 5 (BTI, TTE, DEO, ERIC, FDXF) | 1 (FDXF — não tem XBRL de todo; whitelisted) |
+| DPS/R&D forçados a 0.0 (máscara) | ~18.000 células | 0 — política evidência-de-ausência por ano-de-facto |
 | Moedas cruas na BD (NVO em DKK, GSK em GBP) | sim | 0 — FX BCE com abort-on-fail |
+
+Goldens na BD final: AAPL Q4'19 DPS 0.1925 · ABBV Q4'24 1.64 (declarações
+instant mapeadas) · JPM $401.4B/$469.3B · NVO $40.45B · DEO $20.27B net ·
+Dominion capex $12.43B · WDAY −2.12 · GOOG≡GOOGL · BTI $32.4B.
 
 ## Causas raiz encontradas e corrigidas
 

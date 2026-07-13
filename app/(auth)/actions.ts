@@ -39,12 +39,18 @@ export async function login(formData: FormData) {
   redirect('/dashboard')
 }
 
+import { headers } from 'next/headers'
+
 export async function signup(formData: FormData) {
   const adminAuth = createAdminClient().auth
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const name = formData.get('name') as string
-  const origin = process.env.NEXT_PUBLIC_SITE_URL
+  
+  const headersList = await headers()
+  const host = headersList.get('x-forwarded-host') || headersList.get('host')
+  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
+  const origin = host ? `${protocol}://${host}` : process.env.NEXT_PUBLIC_SITE_URL
   const siteUrl = origin ? origin.replace(/\/$/, '') : 'http://localhost:3001'
 
   // Generate signup link (creates user, bypasses Supabase default email)

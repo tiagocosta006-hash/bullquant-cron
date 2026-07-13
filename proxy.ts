@@ -13,14 +13,24 @@ const ratelimit = new Ratelimit({
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   
-  // 1. Rate Limiting for API routes
-  if (pathname.startsWith('/api')) {
+  const isApiRoute = pathname.startsWith('/api')
+  const isAuthRoute = ['/login', '/register', '/forgot-password', '/reset-password'].includes(pathname) && request.method === 'POST'
+
+  // 1. Rate Limiting for API routes and Auth actions
+  if (isApiRoute || isAuthRoute) {
     const ip = request.headers.get('x-forwarded-for') || '127.0.0.1'
     
     try {
       const { success, limit, reset, remaining } = await ratelimit.limit(`ratelimit_${ip}`)
       
       if (!success) {
+        if (isAuthRoute) {
+          const url = request.nextUrl.clone()
+          url.searchParams.set('error', 'Fizeste demasiadas tentativas. Aguarda uns minutos.')
+          // Use 303 to force a GET request and avoid a POST infinite loop
+          return NextResponse.redirect(url, 303)
+        }
+
         return NextResponse.json(
           { error: 'Muitos pedidos. Por favor aguarde um momento.' },
           { 

@@ -5,7 +5,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { AuthError } from '@supabase/supabase-js'
-import { sendWelcomeEmail, sendPasswordResetEmail } from '@/lib/resend'
+import { sendPasswordResetEmail } from '@/lib/resend'
+import { prisma } from '@/lib/prisma'
 
 function translateError(error: AuthError | { message?: string }) {
   const msg = error.message?.toLowerCase() || '';
@@ -41,22 +42,45 @@ export async function login(formData: FormData) {
 
 export async function signup(formData: FormData) {
   const supabase = await createClient()
-  const data = {
+  const payload = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
     options: { data: { name: formData.get('name') as string } }
   }
 
-  const { error } = await supabase.auth.signUp(data)
+  const { data: authData, error } = await supabase.auth.signUp(payload)
   if (error) {
     redirect(`/register?error=${encodeURIComponent(translateError(error))}`)
   }
 
-  // Enviar email de Boas-Vindas
-  await sendWelcomeEmail(data.email, data.options.data.name || 'Investidor')
+  // A Supabase devolve sucesso falso (com identities vazio) se o email já existir, 
+  // para proteger contra Enumeração de Emails. Temos de intercetar isto manualmente:
+  if (authData?.user && authData.user.identities && authData.user.identities.length === 0) {
+    redirect(`/register?error=${encodeURIComponent('Este email já se encontra registado.')}`)
+  }
+
+  // Sincronizar o utilizador para o Prisma imediatamente
+  if (authData?.user) {
+    try {
+      await prisma.user.create({
+        data: {
+          id: authData.user.id, // O ID no Prisma irá coincidir exatamente com o UUID da Supabase
+          email: authData.user.email!,
+          name: payload.options.data.name,
+        }
+      })
+    } catch (dbError) {
+      console.error('Falha ao sincronizar utilizador no Prisma:', dbError)
+      // Não bloqueamos o processo caso o utilizador já exista na BD,
+      // mas garantimos que fica registado se for um novo utilizador puro.
+    }
+  }
+
+  // Nota: Removemos o envio do email de Boas-Vindas prematuro.
+  // Como o utilizador ainda tem de confirmar o email, receberia dois emails em simultâneo.
 
   revalidatePath('/', 'layout')
-  redirect('/login?message=Conta criada com sucesso! Podes fazer login agora.')
+  redirect('/login?message=Conta criada com sucesso! Verifica o teu email para a ativar.')
 }
 
 export async function logout() {
@@ -71,32 +95,20 @@ export async function forgotPassword(formData: FormData) {
   const email = formData.get('email') as string
   const origin = process.env.NEXT_PUBLIC_SITE_URL
 
-  if (!origin) {
-    console.error('CRITICAL ERROR: NEXT_PUBLIC_SITE_URL is not defined in environment variables.')
-    // Podemos fazer fallback para localhost APENAS se estivermos em modo de desenvolvimento (local)
-    // Em produção (Vercel), isto força-nos a não esquecer de colocar a variável!
+  if (!origin && process.env.NODE_ENV === 'production') {
+    console.error('CRITICAL ERROR: NEXT_PUBLIC_SITE_URL is not defined in production.')
+    redirect('/forgot-password?error=Erro de configuração do servidor. Contacte o suporte.')
   }
 
-  const siteUrl = origin ? origin.replace(/\/$/, '') : 'http://localhost:3001'
+  const siteUrl = origin ? origin.replace(/\/$/, '') : 'http://localhost:3000'
 
-  // Opção A: Gerar o link de recuperação de password via Admin SDK para enviar via Resend
-  const adminAuth = createAdminClient().auth
-  const { data, error } = await adminAuth.admin.generateLink({
-    type: 'recovery',
-    email,
-    options: {
-      redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
-    }
+  // Pedir à Supabase para gerir o envio do email de recuperação (usando o SMTP do Resend que configuraste)
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
   })
 
   if (error) {
     redirect(`/forgot-password?error=${encodeURIComponent(translateError(error))}`)
-  }
-
-  // Enviar email com link seguro
-  if (data?.properties?.hashed_token) {
-    const customLink = `${siteUrl}/auth/callback?token_hash=${data.properties.hashed_token}&type=recovery&next=/reset-password`
-    await sendPasswordResetEmail(email, customLink)
   }
 
   redirect('/forgot-password?message=Verifica o teu email para redefinir a password.')

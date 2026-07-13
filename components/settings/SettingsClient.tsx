@@ -20,7 +20,7 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog"
-import { updateProfile, setLocale, updatePasswordSettings, deleteAccount } from '@/app/(app)/settings/actions'
+import { updateProfile, setLocale, updatePasswordSettings, updateEmailSettings, deleteAccount } from '@/app/(app)/settings/actions'
 import { logout } from '@/app/(auth)/actions'
 import { PageHeader } from '@/components/layout/PageHeader'
 
@@ -50,6 +50,11 @@ export function SettingsClient({ user, locale }: SettingsClientProps) {
   
   const [deleteConfirmText, setDeleteConfirmText] = useState('')
   const [isDeleting, setIsDeleting] = useState(false)
+
+  const [currentPasswordForEmail, setCurrentPasswordForEmail] = useState('')
+  const [newEmail, setNewEmail] = useState('')
+  const [isSavingEmail, setIsSavingEmail] = useState(false)
+  const [emailMessage, setEmailMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
 
   // Track the initial name normalised to empty string so comparison is consistent
   const initialName = user.name || ''
@@ -98,6 +103,27 @@ export function SettingsClient({ user, locale }: SettingsClientProps) {
   const handleDeleteAccount = async () => {
     setIsDeleting(true)
     await deleteAccount()
+  }
+
+  const handleUpdateEmail = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSavingEmail(true)
+    setEmailMessage(null)
+    
+    const formData = new FormData()
+    formData.append('currentPassword', currentPasswordForEmail)
+    formData.append('newEmail', newEmail)
+    
+    const result = await updateEmailSettings(formData)
+    if (result?.error) {
+      setEmailMessage({ text: result.error, type: 'error' })
+    } else {
+      setEmailMessage({ text: 'Foi enviado um email de confirmação para o novo e antigo endereço. Por favor, verifica as caixas de correio.', type: 'success' })
+      setCurrentPasswordForEmail('')
+      setNewEmail('')
+    }
+    
+    setIsSavingEmail(false)
   }
 
   const handleLanguageChange = async (newLocale: string | null) => {
@@ -170,7 +196,47 @@ export function SettingsClient({ user, locale }: SettingsClientProps) {
             </div>
             
             <div className="border-t p-6 bg-muted/10">
-              <h3 className="text-lg font-semibold mb-6">{t('profile.securityTitle')}</h3>
+              <h3 className="text-lg font-semibold mb-6">Alterar Email</h3>
+              <form onSubmit={handleUpdateEmail} className="space-y-6 max-w-xl mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="newEmail">Novo Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input 
+                        id="newEmail" 
+                        type="email"
+                        value={newEmail} 
+                        onChange={(e) => setNewEmail(e.target.value)} 
+                        className="pl-9"
+                        required 
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="currentPasswordForEmail">Palavra-passe Atual</Label>
+                    <PasswordInput 
+                      id="currentPasswordForEmail" 
+                      value={currentPasswordForEmail} 
+                      onChange={(e) => setCurrentPasswordForEmail(e.target.value)} 
+                      required 
+                    />
+                  </div>
+                </div>
+
+                {emailMessage && (
+                  <p className={`text-sm font-medium ${emailMessage.type === 'error' ? 'text-destructive' : 'text-bull'}`}>
+                    {emailMessage.text}
+                  </p>
+                )}
+
+                <Button type="submit" disabled={isSavingEmail || !currentPasswordForEmail || !newEmail || newEmail === user.email}>
+                  {isSavingEmail ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Confirmar Alteração
+                </Button>
+              </form>
+
+              <h3 className="text-lg font-semibold mb-6 border-t pt-8">{t('profile.securityTitle')}</h3>
               <form onSubmit={handleUpdatePassword} className="space-y-6 max-w-xl">
                 <div className="space-y-2">
                   <Label htmlFor="currentPassword">{t('profile.currentPassword')}</Label>

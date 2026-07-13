@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { prisma } from '@/lib/prisma'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -33,6 +34,22 @@ export async function GET(request: Request) {
   }
 
   if (!authError) {
+    // Se o utilizador acabou de alterar e confirmar o email, sincronizamos com o Prisma
+    if (type === 'email_change') {
+      try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user?.email) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { email: user.email }
+          })
+        }
+      } catch (err) {
+        console.error('Erro ao sincronizar novo email com o Prisma:', err)
+      }
+    }
+
     const forwardedHost = request.headers.get('x-forwarded-host')
     const isLocalEnv = process.env.NODE_ENV === 'development'
     

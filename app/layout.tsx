@@ -51,6 +51,15 @@ export const metadata: Metadata = {
   },
   description:
     "Análise fundamental de ações com 10 anos de dados, DCF integrada e AI Insights. Em português, gratuito. Uma plataforma Bullocracy.",
+  keywords: [
+    "DCF calculator platform",
+    "stock valuation",
+    "DCF metrics investing",
+    "value investing",
+    "análise fundamental",
+    "calculadora dcf",
+    "intrinsic value"
+  ],
   icons: {
     icon: [{ url: "/brand/bull-metrics-icon.png", type: "image/png" }],
     apple: [{ url: "/brand/bull-metrics-icon.png" }],

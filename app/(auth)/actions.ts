@@ -40,23 +40,38 @@ export async function login(formData: FormData) {
 }
 
 export async function signup(formData: FormData) {
-  const supabase = await createClient()
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-    options: { data: { name: formData.get('name') as string } }
-  }
+  const adminAuth = createAdminClient().auth
+  const email = formData.get('email') as string
+  const password = formData.get('password') as string
+  const name = formData.get('name') as string
+  const origin = process.env.NEXT_PUBLIC_SITE_URL
+  const siteUrl = origin ? origin.replace(/\/$/, '') : 'http://localhost:3001'
 
-  const { error } = await supabase.auth.signUp(data)
+  // Generate signup link (creates user, bypasses Supabase default email)
+  const { data: linkData, error } = await adminAuth.admin.generateLink({
+    type: 'signup',
+    email,
+    password,
+    options: {
+      data: { name },
+      redirectTo: `${siteUrl}/auth/callback?next=/dashboard`
+    }
+  })
+
   if (error) {
     redirect(`/register?error=${encodeURIComponent(translateError(error))}`)
   }
 
-  // Enviar email de Boas-Vindas
-  await sendWelcomeEmail(data.email, data.options.data.name || 'Investidor')
+  let confirmationLink = undefined
+  if (linkData?.properties?.hashed_token) {
+    confirmationLink = `${siteUrl}/auth/callback?token_hash=${linkData.properties.hashed_token}&type=signup&next=/dashboard`
+  }
+
+  // Enviar email de Boas-Vindas COM o link de confirmação
+  await sendWelcomeEmail(email, name || 'Investidor', confirmationLink)
 
   revalidatePath('/', 'layout')
-  redirect('/login?message=Conta criada com sucesso! Podes fazer login agora.')
+  redirect('/login?message=Conta criada com sucesso! Verifica o teu email para a ativar.')
 }
 
 export async function logout() {

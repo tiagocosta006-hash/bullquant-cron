@@ -128,25 +128,28 @@ const getEmailTemplate = (content: string) => `
 `;
 
 /**
- * Envia o email de Boas-vindas (após registo/confirmação)
+ * Envia o email de Boas-vindas e Confirmação de Registo
  */
-export const sendWelcomeEmail = async (email: string, name: string) => {
+export const sendWelcomeEmail = async (email: string, name: string, confirmationLink?: string) => {
   if (!resend) {
     console.warn('RESEND_API_KEY não encontrada. Email ignorado.');
     return;
   }
   
+  const link = confirmationLink || 'https://bullmetrics.thebullocracy.com/dashboard';
+  const buttonText = confirmationLink ? 'Confirmar o meu Email' : 'Aceder à Plataforma';
+
   return await resend.emails.send({
     from: FROM_EMAIL,
     to: [email],
     subject: 'Bem-vindo à BullMetrics!',
-    text: `Olá ${name}, bem-vindo à BullMetrics!\n\nEstamos muito felizes por te ter connosco. A plataforma foi desenhada para te dar acesso a métricas profissionais e análises fundamentais potenciadas por Inteligência Artificial.\n\nA tua jornada para melhores investimentos começa agora.\n\nAceder à Plataforma: https://bullmetrics.thebullocracy.com/dashboard`,
+    text: `Olá ${name}, bem-vindo à BullMetrics!\n\nEstamos muito felizes por te ter connosco. A plataforma foi desenhada para te dar acesso a métricas profissionais e análises fundamentais potenciadas por Inteligência Artificial.\n\nA tua jornada para melhores investimentos começa agora.\n\n${buttonText}: ${link}`,
     html: getEmailTemplate(`
       <h2>Olá ${name}, bem-vindo à BullMetrics!</h2>
       <p>Estamos muito felizes por te ter connosco. A plataforma foi desenhada para te dar acesso a métricas profissionais e análises fundamentais potenciadas por Inteligência Artificial.</p>
       <p>A tua jornada para melhores investimentos começa agora.</p>
       <div style="text-align: center;">
-        <a href="https://bullmetrics.thebullocracy.com/dashboard" class="btn">Aceder à Plataforma</a>
+        <a href="${link}" class="btn">${buttonText}</a>
       </div>
     `),
   });

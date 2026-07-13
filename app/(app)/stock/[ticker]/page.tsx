@@ -27,95 +27,92 @@ export default async function StockPage({
   const { ticker } = resolvedParams
   const t = await getTranslations('stock')
 
-  // Fetch the company
-  const company = await prisma.company.findUnique({
-    where: {
-      ticker: ticker.toUpperCase(),
-    },
-  })
+  // LEVEL 1: Fetch company and auth user in parallel
+  const supabase = await createClient()
+  const [company, { data: { user } }] = await Promise.all([
+    prisma.company.findUnique({
+      where: { ticker: ticker.toUpperCase() },
+    }),
+    supabase.auth.getUser()
+  ])
 
   // If company doesn't exist in our DB, 404
   if (!company) {
     notFound()
   }
 
-  // Fetch user to get their saved DCFs and PRO plan status
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  let isPro = false
-  let serializedDcfs: SerializedDcfAnalysis[] = []
-  
-  if (user) {
-    // Check PRO plan
-    const dbUser = await prisma.user.findUnique({
-      where: { id: user.id }
-    })
-    isPro = dbUser?.plan === 'PRO'
-
-    const rawDcfs = await prisma.dcfAnalysis.findMany({
+  // LEVEL 2: Fetch all dependent data in parallel
+  const [
+    dbUser,
+    rawDcfs,
+    latestFundamentals,
+    historicalAnnual,
+    latestAnnual,
+    aiInsightRaw,
+    latestPrice
+  ] = await Promise.all([
+    // 1. User PRO plan
+    user ? prisma.user.findUnique({ where: { id: user.id } }) : Promise.resolve(null),
+    
+    // 2. Saved DCFs
+    user ? prisma.dcfAnalysis.findMany({
       where: { companyId: company.id, userId: user.id },
       orderBy: { createdAt: 'desc' },
+    }) : Promise.resolve([]),
+    
+    // 3. Latest Quarterly Fundamentals (TTM)
+    prisma.fundamental.findMany({
+      where: { companyId: company.id, periodType: 'QUARTERLY' },
+      orderBy: { periodEnd: 'desc' },
+      take: 4,
+    }),
+    
+    // 4. Historical Annual Fundamentals
+    prisma.fundamental.findMany({
+      where: { companyId: company.id, periodType: 'ANNUAL' },
+      orderBy: { fiscalYear: 'desc' },
+      take: 10,
+    }),
+
+    // 5. Fallback Latest Annual (if quarters are missing)
+    prisma.fundamental.findFirst({
+      where: { companyId: company.id, periodType: 'ANNUAL' },
+      orderBy: { periodEnd: 'desc' },
+    }),
+
+    // 6. AI Insights for PDF
+    prisma.aIInsightCache.findUnique({
+      where: { companyId: company.id }
+    }),
+
+    // 7. Latest Price
+    prisma.price.findFirst({
+      where: { ticker: company.ticker },
+      orderBy: { date: 'desc' }
     })
-    serializedDcfs = rawDcfs.map(dcf => ({
-      id: dcf.id,
-      label: dcf.label,
-      fairValue: Number(dcf.fairValue),
-      priceAtSave: dcf.priceAtSave ? Number(dcf.priceAtSave) : null,
-      marginOfSafety: dcf.marginOfSafety ? Number(dcf.marginOfSafety) : null,
-      createdAt: dcf.createdAt.toISOString(),
-      wacc: Number(dcf.wacc),
-      growthStage1: Number(dcf.growthStage1),
-      terminalGrowth: Number(dcf.terminalGrowth),
-    }))
-  }
+  ])
 
-  // Fetch the latest fundamentals for TTM calculation
-  const latestFundamentals = await prisma.fundamental.findMany({
-    where: {
-      companyId: company.id,
-      periodType: 'QUARTERLY'
-    },
-    orderBy: {
-      periodEnd: 'desc',
-    },
-    take: 4,
-  })
+  const isPro = dbUser?.plan === 'PRO'
 
-  // Fetch the historical annual fundamentals for the Business KPIs chart
-  const historicalAnnual = await prisma.fundamental.findMany({
-    where: {
-      companyId: company.id,
-      periodType: 'ANNUAL'
-    },
-    orderBy: {
-      fiscalYear: 'desc',
-    },
-    take: 10,
-  })
+  const serializedDcfs: SerializedDcfAnalysis[] = rawDcfs.map(dcf => ({
+    id: dcf.id,
+    label: dcf.label,
+    fairValue: Number(dcf.fairValue),
+    priceAtSave: dcf.priceAtSave ? Number(dcf.priceAtSave) : null,
+    marginOfSafety: dcf.marginOfSafety ? Number(dcf.marginOfSafety) : null,
+    createdAt: dcf.createdAt.toISOString(),
+    wacc: Number(dcf.wacc),
+    growthStage1: Number(dcf.growthStage1),
+    terminalGrowth: Number(dcf.terminalGrowth),
+  }))
 
   let fundamentalsToPass = latestFundamentals
-
   if (fundamentalsToPass.length < 4) {
-    // Fallback to the latest ANNUAL record if we don't have enough quarters
-    const latestAnnual = await prisma.fundamental.findFirst({
-      where: {
-        companyId: company.id,
-        periodType: 'ANNUAL'
-      },
-      orderBy: {
-        periodEnd: 'desc',
-      },
-    })
     fundamentalsToPass = latestAnnual ? [latestAnnual] : []
   }
 
   const currencySymbol = getCurrencySymbol(company.currency)
 
-  // Fetch AI Insights safely for PDF
-  const aiInsightRaw = await prisma.aIInsightCache.findUnique({
-    where: { companyId: company.id }
-  })
   let parsedAiInsight = null;
   if (aiInsightRaw) {
     try {
@@ -129,11 +126,6 @@ export default async function StockPage({
       console.error("Failed to parse AI Insight JSON for PDF", e);
     }
   }
-
-  const latestPrice = await prisma.price.findFirst({
-    where: { ticker: company.ticker },
-    orderBy: { date: 'desc' }
-  })
 
   // Format data for PDF
   const pdfCompanyData = {

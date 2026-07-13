@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { updatePassword } from '../actions'
 import { SubmitButton } from '@/components/auth/SubmitButton'
-import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { getTranslations } from 'next-intl/server'
 
 export default async function ResetPasswordPage({
@@ -30,12 +30,26 @@ export default async function ResetPasswordPage({
               {t('passwordLabel')}
             </label>
             <div className="mt-2">
-              <Input
+              <PasswordInput
                 id="password"
                 name="password"
-                type="password"
                 required
                 placeholder={t('passwordPlaceholder')}
+                minLength={6}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium leading-6 text-foreground mb-2">
+              {t('confirmPasswordLabel')}
+            </label>
+            <div className="mt-2">
+              <PasswordInput
+                id="confirmPassword"
+                name="confirmPassword"
+                required
+                placeholder={t('confirmPasswordPlaceholder')}
                 minLength={6}
               />
             </div>

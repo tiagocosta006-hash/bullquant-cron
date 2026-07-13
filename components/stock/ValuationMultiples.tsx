@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useTranslations } from "next-intl"
 import { Lock, Loader2, LineChart as LineChartIcon } from "lucide-react"
 import {
-  LineChart, Line, YAxis, XAxis, Tooltip, ResponsiveContainer
+  LineChart, Line, YAxis, XAxis, Tooltip, ResponsiveContainer, ReferenceLine
 } from "recharts"
 import { Button } from "@/components/ui/button"
 
@@ -82,6 +82,20 @@ export function ValuationMultiples({ ticker, isPro }: ValuationMultiplesProps) {
     }
     fetchValuation()
   }, [ticker])
+
+  const { avgPe, avgPs, avgFcf } = useMemo(() => {
+    if (!data || data.length === 0) return { avgPe: undefined, avgPs: undefined, avgFcf: undefined }
+    
+    const validPe = data.filter(d => d.pe !== undefined && d.pe !== null).map(d => d.pe as number)
+    const validPs = data.filter(d => d.ps !== undefined && d.ps !== null).map(d => d.ps as number)
+    const validFcf = data.filter(d => d.fcfYield !== undefined && d.fcfYield !== null).map(d => d.fcfYield as number)
+    
+    const avgPe = validPe.length > 0 ? validPe.reduce((a, b) => a + b, 0) / validPe.length : undefined
+    const avgPs = validPs.length > 0 ? validPs.reduce((a, b) => a + b, 0) / validPs.length : undefined
+    const avgFcf = validFcf.length > 0 ? validFcf.reduce((a, b) => a + b, 0) / validFcf.length : undefined
+    
+    return { avgPe, avgPs, avgFcf }
+  }, [data])
 
   if (loading) {
     return (
@@ -177,6 +191,30 @@ export function ValuationMultiples({ ticker, isPro }: ValuationMultiplesProps) {
                 domain={['auto', 'auto']}
               />
               <Tooltip content={<CustomTooltip />} />
+              {activeTab === "pe" && avgPe !== undefined && (
+                <ReferenceLine 
+                  y={avgPe} 
+                  stroke="var(--muted-foreground)" 
+                  strokeDasharray="3 3" 
+                  label={{ position: 'insideTopLeft', value: `Avg: ${avgPe.toFixed(1)}x`, fill: 'var(--muted-foreground)', fontSize: 12, offset: 10 }} 
+                />
+              )}
+              {activeTab === "ps" && avgPs !== undefined && (
+                <ReferenceLine 
+                  y={avgPs} 
+                  stroke="var(--muted-foreground)" 
+                  strokeDasharray="3 3" 
+                  label={{ position: 'insideTopLeft', value: `Avg: ${avgPs.toFixed(1)}x`, fill: 'var(--muted-foreground)', fontSize: 12, offset: 10 }} 
+                />
+              )}
+              {activeTab === "fcf" && avgFcf !== undefined && (
+                <ReferenceLine 
+                  y={avgFcf} 
+                  stroke="var(--muted-foreground)" 
+                  strokeDasharray="3 3" 
+                  label={{ position: 'insideTopLeft', value: `Avg: ${(avgFcf * 100).toFixed(1)}%`, fill: 'var(--muted-foreground)', fontSize: 12, offset: 10 }} 
+                />
+              )}
               {activeTab === "pe" && (
                 <Line 
                   type="linear" 

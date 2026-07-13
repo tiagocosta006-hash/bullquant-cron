@@ -35,7 +35,7 @@ export function StockCard({
   const isPositive = changePercent ? changePercent >= 0 : true;
 
   return (
-    <Link href={`/stock/${ticker}`} className="block group">
+    <Link href={`/stock/${ticker}`} prefetch={false} className="block group">
       <div className="glass hover:-translate-y-0.5 duration-200 transition-transform p-3.5 rounded-xl flex flex-col h-full relative overflow-hidden">
         {/* Gold top hairline on hover */}
         <div className="gold-rule absolute inset-x-0 top-0 h-px opacity-0 group-hover:opacity-100 transition-opacity" />

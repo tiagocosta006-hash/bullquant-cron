@@ -28,14 +28,14 @@ const nextConfig: NextConfig = {
             value: 'camera=(), microphone=(), geolocation=()',
           },
           {
-            key: 'Content-Security-Policy-Report-Only',
+            key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: https://static2.finnhub.io",
-              "font-src 'self'",
-              "connect-src 'self'",
+              "img-src 'self' data: blob: https://static2.finnhub.io https://*.supabase.co",
+              "font-src 'self' data:",
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vitals.vercel-insights.com",
               "frame-ancestors 'none'",
             ].join('; '),
           },

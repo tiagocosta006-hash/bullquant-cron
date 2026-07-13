@@ -61,3 +61,7 @@ design/foundations/bullvision-foundations.html
 
 # claude code — definições pessoais/locais, não partilhar com a equipa
 /.claude/settings.local.json
+
+# caches e outputs da reparação de fundamentais (nunca versionar)
+scripts/.cache/
+scripts/out/

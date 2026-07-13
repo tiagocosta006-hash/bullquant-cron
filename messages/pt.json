@@ -155,6 +155,8 @@
     "subtitle": "Escolhe a tua nova password.",
     "passwordLabel": "Nova Password",
     "passwordPlaceholder": "******",
+    "confirmPasswordLabel": "Confirmar Password",
+    "confirmPasswordPlaceholder": "Repete a tua nova password",
     "submitButton": "Atualizar Password",
     "submitLoading": "A atualizar..."
   },
@@ -192,7 +194,19 @@
       "save": "Guardar Alterações",
       "dangerZone": "Zona de Perigo",
       "logoutDesc": "Termina a tua sessão atual no Bullmetrics com segurança.",
-      "logoutBtn": "Sair da Conta"
+      "logoutBtn": "Sair da Conta",
+      "securityTitle": "Segurança",
+      "currentPassword": "Password Atual",
+      "newPassword": "Nova Password",
+      "confirmNewPassword": "Confirmar Nova Password",
+      "changePasswordBtn": "Alterar Password",
+      "passwordSuccess": "Password atualizada com sucesso!",
+      "deleteAccountTitle": "Apagar Conta Definitivamente",
+      "deleteAccountDesc": "Esta ação é irreversível. Todos os teus dados, portfólios e avaliações serão apagados para sempre.",
+      "deleteAccountBtn": "Apagar Conta",
+      "deleteAccountConfirmLabel": "Escreve APAGAR para confirmar",
+      "deleteAccountCancel": "Cancelar",
+      "deleteAccountSubmit": "Apagar para Sempre"
     },
     "preferences": {
       "title": "Preferências de Utilização",
@@ -393,7 +407,8 @@
         "1y": "1A",
         "5y": "5A",
         "max": "MÁX"
-      }
+      },
+      "notApplicable": "Métrica não aplicável (N/A) a este setor."
     },
     "snapshot": {
       "valuation": "Valuation",
@@ -510,7 +525,8 @@
       "operating": "OPERAC.",
       "profit": "LÍQUIDA",
       "roe": "ROE"
-    }
+    },
+    "reitFcfTooltip": "Para Fundos Imobiliários (REITs), o CapEx reflete os custos de manutenção imobiliária e de arrendamento, resultando numa proxy para o AFFO."
   },
   "compare": {
     "title": "Análise de Pares: {industry}",

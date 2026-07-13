@@ -39,7 +39,7 @@ type TimeFilter = typeof TIME_FILTERS[number]
 
 type CustomTooltipProps = {
   active?: boolean
-  payload?: { name: string; value: number; color: string }[]
+  payload?: { name: string; value: number | null; color: string }[]
   label?: string
   formatTooltipValue?: (val: number | string | null) => string
 }
@@ -126,6 +126,9 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
   const formatValue = (val: number | string | null) => {
     if (val === null || val === undefined) return "N/A"
     const num = Number(val)
+    // NaN/Infinity (ex.: margem com revenue 0 em dados antigos) nunca pode
+    // chegar ao ecrã como "NaN%" — é N/A.
+    if (!Number.isFinite(num)) return "N/A"
     if (config.isPercentage) return `${(num * 100).toFixed(0)}%`
     
     const absVal = Math.abs(num)
@@ -143,6 +146,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
   const formatTooltipValue = (val: number | string | null) => {
     if (val === null || val === undefined) return "N/A"
     const num = Number(val)
+    if (!Number.isFinite(num)) return "N/A"
     if (config.isPercentage) return `${(num * 100).toFixed(2)}%`
     
     const absVal = Math.abs(num)
@@ -199,7 +203,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
       <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-1.5 bg-muted/10 rounded-lg border border-dashed border-border/30 m-2">
         <p className="text-[13px] font-medium text-foreground/70">{t('noData')}</p>
         <p className="text-[11px] opacity-50 text-center px-4">
-          {emptyMessage || "Métrica não aplicável (N/A) a este setor."}
+          {emptyMessage || t('notApplicable')}
         </p>
       </div>
     )
@@ -233,7 +237,8 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
               content={(props) => {
                 const items = (props.payload ?? []).map((p) => ({
                   name: String(p.name ?? ''),
-                  value: Number(p.value ?? 0),
+                  // null preservado → tooltip mostra "N/A", não um $0.00 falso
+                  value: p.value == null ? null : Number(p.value),
                   color: typeof p.color === 'string' ? p.color : '#ffffff',
                 }))
                 return (
@@ -304,7 +309,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
       <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-1.5 bg-muted/10 rounded-lg border border-dashed border-border/30 m-2">
         <p className="text-[13px] font-medium text-foreground/70">{t('noData')}</p>
         <p className="text-[11px] opacity-50 text-center px-4">
-          {emptyMessage || "Métrica não aplicável (N/A) a este setor."}
+          {emptyMessage || t('notApplicable')}
         </p>
       </div>
     )
@@ -359,7 +364,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
               </TooltipProvider>
             )}
           </div>
-          {cagr !== undefined && cagr !== null && (
+          {cagr !== undefined && cagr !== null && Number.isFinite(cagr) && (
             <p className="text-xs font-semibold text-muted-foreground mt-0.5">
               CAGR: <span className={cagr >= 0 ? "text-bull" : "text-bear"}>{cagr > 0 ? '+' : ''}{(cagr * 100).toFixed(1)}%</span>
             </p>

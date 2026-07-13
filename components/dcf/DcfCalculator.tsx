@@ -1,11 +1,12 @@
 "use client"
 
 import * as React from "react"
-import { Search, Loader2, Wand2 } from "lucide-react"
+import { Search, Loader2, Wand2, Info } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useDebounce } from "@/hooks/useDebounce"
 import { runDcf, solveReverseDcf, type DcfInputs } from "@/lib/finance/dcf"
 import { computeWacc, type WaccBreakdown } from "@/lib/finance/wacc"
@@ -39,6 +40,8 @@ type DcfDataResponse = {
   effectiveTaxRate: number
   shares: number | null
   netDebt: number | null
+  totalDebt: number | null
+  interestExpense: number | null
   currentPrice: number | null
   beta: number | null
   suggestedGrowth: number | null
@@ -139,17 +142,42 @@ export function DcfCalculator() {
       setLoadedTicker(ticker.toUpperCase())
       setAnnualFcfSeries(data.annualFcfSeries)
       setFcfMode("FCFF") // default, pode ser alterado depois
-      if (data.currentPrice != null) setCurrentPrice(round2(data.currentPrice))
+      if (data.currentPrice != null) {
+        setCurrentPrice(round2(data.currentPrice))
+      } else {
+        setCurrentPrice(DEFAULTS.currentPrice)
+      }
+      
       // Usar fcff0 (com fallback fcfe0 se FCFF derivado for nulo)
       const baseFcf = data.fcff0 ?? data.fcfe0
-      if (baseFcf != null) setFcf0M(round2(baseFcf / MILLION))
-      if (data.shares != null) setSharesM(round2(data.shares / MILLION))
-      if (data.netDebt != null) setNetDebtM(round2(data.netDebt / MILLION))
+      if (baseFcf != null) {
+        setFcf0M(round2(baseFcf / MILLION))
+      } else {
+        setFcf0M(DEFAULTS.fcf0M)
+      }
+      
+      if (data.shares != null) {
+        setSharesM(round2(data.shares / MILLION))
+      } else {
+        setSharesM(DEFAULTS.sharesM)
+      }
+      
+      if (data.netDebt != null) {
+        setNetDebtM(round2(data.netDebt / MILLION))
+      } else {
+        setNetDebtM(DEFAULTS.netDebtM)
+      }
+      
       if (data.suggestedGrowth != null) {
         const g = round2(data.suggestedGrowth * 100)
         setGrowth1(g)
         setGrowth2(round2(g / 2))
+      } else {
+        setGrowth1(DEFAULTS.growth1)
+        setGrowth2(DEFAULTS.growth2)
       }
+
+      setTerminalGrowth(DEFAULTS.terminalGrowth)
 
       // Calcular WACC via CAPM se temos beta
       setBeta(data.beta)
@@ -159,15 +187,19 @@ export function DcfCalculator() {
           currentPrice: data.currentPrice,
           shares: data.shares,
           netDebt: data.netDebt ?? 0,
-          interestExpense: null, // será derivado depois se necessário
+          totalDebt: data.totalDebt,
+          interestExpense: data.interestExpense,
           effectiveTaxRate: data.effectiveTaxRate,
         })
         setWaccBreakdown(breakdown)
         if (breakdown) {
           setWacc(round2(breakdown.wacc * 100))
+        } else {
+          setWacc(DEFAULTS.wacc)
         }
       } else {
         setWaccBreakdown(null)
+        setWacc(DEFAULTS.wacc)
       }
     } catch {
       setLoadError(t("loadError"))
@@ -342,7 +374,20 @@ export function DcfCalculator() {
 
         {/* Toggle FCFF/FCFE */}
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-muted-foreground">{t("fcfMode") || "FCF Base"}:</span>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger className="flex items-center gap-1 cursor-help">
+                <span className="text-xs font-medium text-muted-foreground">{t("fcfMode") || "FCF Base"}:</span>
+                <Info className="w-3.5 h-3.5 text-muted-foreground" />
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-xs text-xs">
+                <p className="font-semibold mb-1">Qual a diferença?</p>
+                <p className="mb-1"><span className="font-semibold text-primary">FCFF (Free Cash Flow to Firm):</span> Dinheiro disponível para acionistas e credores (descontado ao WACC).</p>
+                <p><span className="font-semibold text-primary">FCFE (Free Cash Flow to Equity):</span> Dinheiro disponível apenas para os acionistas após pagamento de juros (descontado ao Custo do Capital Próprio).</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
           <div className="flex gap-1 bg-muted/50 rounded-lg p-1">
             {["FCFF", "FCFE"].map((mode) => (
               <button
@@ -412,7 +457,7 @@ export function DcfCalculator() {
       {/* ── Painel direito: resultados ── */}
       <div className="space-y-4 lg:sticky lg:top-6 self-start">
         <DcfResults result={result} currency={currency} mode={fcfMode} />
-        <WaccBreakdownCard breakdown={waccBreakdown} onUseWacc={handleUseWacc} />
+        <WaccBreakdownCard breakdown={waccBreakdown} fcfMode={fcfMode} onUseWacc={handleUseWacc} />
         <SavedAnalyses
           ticker={loadedTicker}
           currency={currency}

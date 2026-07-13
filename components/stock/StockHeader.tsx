@@ -125,9 +125,9 @@ export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfB
           ) : null}
           <span className={`font-extrabold text-2xl text-primary absolute ${company.logoUrl ? "hidden" : ""}`}>{company.ticker[0]}</span>
         </div>
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight">{company.name}</h1>
-          <div className="flex items-center gap-4 mt-1">
+        <div className="min-w-0">
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">{company.name}</h1>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
             <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <span className="bg-muted px-2 py-0.5 rounded-md border border-border/60">{company.ticker}</span>
               <span>·</span>
@@ -167,7 +167,7 @@ export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfB
               className="px-3 py-1 text-xs font-bold rounded-full transition-all flex items-center gap-1.5 shadow-sm active:scale-95 bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border/50"
             >
               <Scale className="w-3.5 h-3.5" />
-              Comparar Pares
+              {t('header.comparePeers')}
             </Link>
 
             {/* PDF Report Button */}
@@ -177,7 +177,7 @@ export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfB
       </div>
 
       {/* Right side: Real-time Price */}
-      <div className="glass flex flex-col md:items-end p-4 rounded-xl min-w-[200px]">
+      <div className="glass flex flex-col md:items-end p-4 rounded-xl w-full md:w-auto md:min-w-[200px]">
         {isLoading ? (
           <div className="animate-pulse flex flex-col items-end gap-2 w-full">
             <div className="h-8 bg-muted rounded w-32"></div>

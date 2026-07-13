@@ -298,6 +298,9 @@ function MonthView({ cursor, byDay, loading, todayStr }: ViewProps) {
 
   return (
     <div className="glass rounded-xl overflow-hidden">
+      {/* Em mobile o mês (7 colunas) scrolla na horizontal para as células não ficarem esmagadas */}
+      <div className="overflow-x-auto" data-native-scroll>
+        <div className="min-w-[42rem] md:min-w-0">
       <div className="grid grid-cols-7 bg-muted/50">
         {weekdays.map(w => (
           <div key={w} className="p-2 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -307,7 +310,7 @@ function MonthView({ cursor, byDay, loading, todayStr }: ViewProps) {
       </div>
       <div className="grid grid-cols-7">
         {cells.map((day, idx) => {
-          if (!day) return <div key={`empty-${idx}`} className="min-h-[9rem] border-t border-l border-border bg-muted/20" />
+          if (!day) return <div key={`empty-${idx}`} className="min-h-[7rem] md:min-h-[9rem] border-t border-l border-border bg-muted/20" />
           const dayStr = fmtDate(day)
           const dayEvents = byDay.get(dayStr) ?? []
           const isToday = dayStr === todayStr
@@ -315,7 +318,7 @@ function MonthView({ cursor, byDay, loading, todayStr }: ViewProps) {
           return (
             <div
               key={dayStr}
-              className={`min-h-[9rem] border-t border-l border-border p-2 flex flex-col transition-colors ${
+              className={`min-h-[7rem] md:min-h-[9rem] border-t border-l border-border p-2 flex flex-col transition-colors ${
                 isWeekend ? "bg-muted/20" : ""
               } ${isToday ? "ring-1 ring-inset ring-primary/40" : ""}`}
             >
@@ -366,6 +369,8 @@ function MonthView({ cursor, byDay, loading, todayStr }: ViewProps) {
           )
         })}
       </div>
+        </div>
+      </div>
     </div>
   )
 }
@@ -378,6 +383,9 @@ function WeekView({ cursor, byDay, loading, todayStr }: ViewProps) {
 
   return (
     <div className="glass rounded-xl overflow-hidden">
+      {/* Em mobile a semana (7 colunas) scrolla na horizontal */}
+      <div className="overflow-x-auto" data-native-scroll>
+        <div className="min-w-[42rem] md:min-w-0">
       <div className="grid grid-cols-7 bg-muted/50">
         {days.map(day => (
           <div key={day.toISOString()} className="p-2 text-center flex flex-col items-center">
@@ -419,6 +427,8 @@ function WeekView({ cursor, byDay, loading, todayStr }: ViewProps) {
             </div>
           )
         })}
+      </div>
+        </div>
       </div>
     </div>
   )

@@ -362,7 +362,8 @@
     "header": {
       "followed": "Following",
       "addToPortfolio": "Add to Portfolio",
-      "updating": "Updating..."
+      "updating": "Updating...",
+      "comparePeers": "Compare Peers"
     },
     "savedValuations": {
       "title": "My Saved Valuations",

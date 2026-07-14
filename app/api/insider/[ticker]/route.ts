@@ -64,7 +64,10 @@ export async function GET(
         .reduce((s, t) => s + (t.value ?? 0), 0),
     };
 
-    return NextResponse.json({ transactions, summary });
+    return NextResponse.json(
+      { transactions, summary },
+      { headers: { "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=86400" } },
+    );
   } catch (error) {
     // Tabela ainda não migrada/populada → degrada graciosamente
     console.error("Error fetching insider transactions:", error);

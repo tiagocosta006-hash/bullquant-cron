@@ -163,7 +163,10 @@ export async function GET(
       }
     }
 
-    return NextResponse.json(results)
+    // Rota pesada (histórico completo + série de múltiplos) — a CDN absorve os hits
+    return NextResponse.json(results, {
+      headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" },
+    })
   } catch (error) {
     console.error("Error fetching valuation:", error)
     return NextResponse.json(

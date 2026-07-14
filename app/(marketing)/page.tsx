@@ -13,7 +13,7 @@ import { BrandMark } from "@/components/brand/BrandMark";
 import { LiquidGlass } from "@/components/fx/LiquidGlass";
 import { Reveal } from "@/components/fx/Reveal";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/server";
+import { getUser } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
 /**
@@ -23,10 +23,7 @@ import { redirect } from "next/navigation";
  * features, números e CTA final. Todo o texto via i18n.
  */
 export default async function LandingPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
 
   if (user) {
     redirect("/dashboard");

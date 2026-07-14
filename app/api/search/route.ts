@@ -29,7 +29,9 @@ export async function GET(request: Request) {
       }
     })
 
-    return NextResponse.json(companies)
+    return NextResponse.json(companies, {
+      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' },
+    })
   } catch (error) {
     console.error('Search API error:', error)
     return NextResponse.json({ error: 'Failed to search' }, { status: 500 })

@@ -16,9 +16,9 @@ export async function GET(
       '6m':  130,
       '1y':  252,
       '5y':  1260,
-      'max': 99999,
     }
-    const take = periodMap[period] ?? 1260
+    // 'max' = histórico completo (sem take); o select {date, close} mantém o payload contido
+    const take = period === 'max' ? undefined : (periodMap[period] ?? 1260)
     
     // Fetch historical prices for the ticker, ordered by date descending to get the latest
     const prices = await prisma.price.findMany({
@@ -48,7 +48,10 @@ export async function GET(
       close: Number(p.close),
     }))
 
-    return NextResponse.json(formattedPrices)
+    // EOD: muda 1x/dia — a CDN da Vercel serve os hits sem invocar a function
+    return NextResponse.json(formattedPrices, {
+      headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' },
+    })
   } catch (error) {
     console.error("Error fetching price history:", error)
     return NextResponse.json(

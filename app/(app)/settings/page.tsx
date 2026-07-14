@@ -1,12 +1,11 @@
-import { createClient } from '@/lib/supabase/server'
+import { getUser } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { SettingsClient } from '@/components/settings/SettingsClient'
 import { cookies } from 'next/headers'
 
 export default async function SettingsPage() {
-  const supabase = await createClient()
-  const { data: { user: authUser } } = await supabase.auth.getUser()
+  const authUser = await getUser()
 
   if (!authUser) {
     redirect('/login')

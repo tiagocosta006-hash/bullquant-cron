@@ -3,7 +3,7 @@ import { MobileDock } from "@/components/layout/MobileDock";
 import { ContourCanvas } from "@/components/fx/ContourCanvas";
 import { InertiaScroll } from "@/components/fx/InertiaScroll";
 import { PlanToggle } from "@/components/dev/PlanToggle";
-import { createClient } from "@/lib/supabase/server";
+import { getUser } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -16,10 +16,7 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
 
   let userName: string | null = null;
   let devSlot: React.ReactNode = null;

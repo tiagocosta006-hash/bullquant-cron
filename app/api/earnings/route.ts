@@ -64,7 +64,15 @@ export async function GET(request: NextRequest) {
       employees: e.company.employees
     }))
 
-    return NextResponse.json(data)
+    // O calendário geral é público e igual para todos; o ramo watchlist é
+    // por-utilizador e NUNCA pode ir para a cache partilhada da CDN.
+    return NextResponse.json(data, {
+      headers: {
+        'Cache-Control': watchlistOnly
+          ? 'private, no-store'
+          : 'public, s-maxage=1800, stale-while-revalidate=86400',
+      },
+    })
   } catch (error) {
     console.error('Error fetching earnings:', error)
     return NextResponse.json({ error: 'Failed to fetch earnings' }, { status: 500 })

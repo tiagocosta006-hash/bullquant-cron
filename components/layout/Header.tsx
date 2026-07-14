@@ -4,13 +4,12 @@ import { LogOut, UserCircle, Calculator, CalendarDays } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
-import { createClient } from '@/lib/supabase/server';
+import { getUser } from '@/lib/supabase/server';
 import { logout } from '@/app/(auth)/actions';
 import { getTranslations } from 'next-intl/server';
 
 export async function Header() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getUser()
   const t = await getTranslations('header');
 
   return (

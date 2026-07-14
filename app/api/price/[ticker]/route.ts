@@ -52,7 +52,10 @@ export async function GET(
       previousClose: data.pc // Fecho anterior
     }
 
-    return NextResponse.json(priceData)
+    // Absorve os fetches duplicados do mesmo quote (header/snapshot/chart) na CDN
+    return NextResponse.json(priceData, {
+      headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60' },
+    })
   } catch (error) {
     console.error(`Error fetching price for ${ticker}:`, error)
     return NextResponse.json(

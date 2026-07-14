@@ -16,14 +16,18 @@ export async function GET(
       return NextResponse.json({ error: "Company not found" }, { status: 404 })
     }
 
+    // Mais recentes primeiro para o take, revertido para asc no fim (o que os
+    // gráficos esperam). 60 períodos cobre 10 anos de trimestres + anuais.
     const fundamentals = await prisma.fundamental.findMany({
       where: {
         companyId: company.id,
       },
       orderBy: {
-        periodEnd: 'asc',
-      }
+        periodEnd: 'desc',
+      },
+      take: 60,
     })
+    fundamentals.reverse()
 
     if (fundamentals.length === 0) {
       return NextResponse.json({ error: "No fundamentals found" }, { status: 404 })
@@ -41,7 +45,9 @@ export async function GET(
       return obj
     })
 
-    return NextResponse.json(serialized)
+    return NextResponse.json(serialized, {
+      headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' },
+    })
   } catch (error) {
     console.error("Error fetching fundamentals:", error)
     return NextResponse.json(

@@ -1,8 +1,9 @@
+import { cache } from 'react'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { prisma } from '@/lib/prisma'
-import { createClient } from '@/lib/supabase/server'
+import { getUser } from '@/lib/supabase/server'
 import { StockHeader } from '@/components/stock/StockHeader'
 import { StockSnapshot } from '@/components/stock/StockSnapshot'
 import { StockPriceChart } from '@/components/stock/StockPriceChart'
@@ -19,6 +20,14 @@ import { StockTabs } from '@/components/stock/StockTabs'
 import { PremiumPdfButton } from '@/components/stock/pdf/PremiumPdfButton'
 import { ValuationMultiples } from '@/components/stock/ValuationMultiples'
 
+// Partilhado entre generateMetadata e a página (React.cache = 1 query por pedido,
+// em vez de 2 findUnique idênticos).
+const getCompany = cache(async (ticker: string) =>
+  prisma.company.findUnique({
+    where: { ticker: ticker.toUpperCase() },
+  })
+)
+
 export async function generateMetadata({
   params,
 }: {
@@ -26,11 +35,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const resolvedParams = await params
   const { ticker } = resolvedParams
-  
-  const company = await prisma.company.findUnique({
-    where: { ticker: ticker.toUpperCase() },
-    select: { name: true, sector: true, ticker: true }
-  })
+
+  const company = await getCompany(ticker)
 
   if (!company) {
     return {
@@ -71,12 +77,9 @@ export default async function StockPage({
   const t = await getTranslations('stock')
 
   // LEVEL 1: Fetch company and auth user in parallel
-  const supabase = await createClient()
-  const [company, { data: { user } }] = await Promise.all([
-    prisma.company.findUnique({
-      where: { ticker: ticker.toUpperCase() },
-    }),
-    supabase.auth.getUser()
+  const [company, user] = await Promise.all([
+    getCompany(ticker),
+    getUser(),
   ])
 
   // If company doesn't exist in our DB, 404

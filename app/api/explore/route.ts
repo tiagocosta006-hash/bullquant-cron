@@ -41,7 +41,11 @@ export async function GET(request: Request) {
         sectors[sec].industries[ind]++
       }
 
-      return NextResponse.json({ sectors })
+      // private: a rota é auth-gated — s-maxage na CDN deixaria não-autenticados
+      // ler cópias cacheadas, contornando o 401. Cache só no browser.
+      return NextResponse.json({ sectors }, {
+        headers: { "Cache-Control": "private, max-age=120" },
+      })
     }
 
     // Devolve a lista de empresas filtradas
@@ -120,7 +124,9 @@ export async function GET(request: Request) {
       }
     })
 
-    return NextResponse.json({ companies: formatted })
+    return NextResponse.json({ companies: formatted }, {
+      headers: { "Cache-Control": "private, max-age=120" },
+    })
   } catch (error) {
     console.error("Explore API Error:", error)
     return NextResponse.json({ error: "Failed to fetch explore data" }, { status: 500 })

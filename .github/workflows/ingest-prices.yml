@@ -25,5 +25,4 @@ jobs:
       - name: Run ingest
         env:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
-          POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
-        run: python scripts/ingest_prices.py
+        run: python scripts/fast_prices.py

@@ -37,9 +37,34 @@ export function StockPriceChart({ ticker, currencySymbol = "$" }: { ticker: stri
   useEffect(() => {
     async function fetchPrices() {
       try {
-        const res = await fetch(`/api/prices/${ticker}`)
-        if (res.ok) {
-          const data = await res.json()
+        const [histRes, liveRes] = await Promise.all([
+          fetch(`/api/prices/${ticker}`),
+          fetch(`/api/price/${ticker}`)
+        ])
+        
+        if (histRes.ok) {
+          const data: PricePoint[] = await histRes.json()
+          
+          // Se o Finnhub estiver a funcionar, injetamos o preço AO VIVO no final do gráfico histórico!
+          if (liveRes.ok) {
+            const liveData = await liveRes.json()
+            if (liveData && liveData.currentPrice && data.length > 0) {
+              const lastHistoricalDate = new Date(data[data.length - 1].date)
+              const today = new Date()
+              
+              // Evitar injetar se já estivermos a mostrar um dado do próprio dia (embora raro)
+              if (today.getDate() !== lastHistoricalDate.getDate() || today.getMonth() !== lastHistoricalDate.getMonth()) {
+                data.push({
+                  date: today.toISOString(),
+                  close: liveData.currentPrice
+                })
+              } else {
+                // Se for o mesmo dia, apenas substitui o valor final pelo mais atualizado!
+                data[data.length - 1].close = liveData.currentPrice
+              }
+            }
+          }
+          
           setAllData(data)
         }
       } catch (error) {

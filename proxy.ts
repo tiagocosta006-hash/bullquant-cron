@@ -11,16 +11,28 @@ function getClientIp(request: NextRequest): string {
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const isAuthRoute =
+    ['/login', '/register', '/forgot-password', '/reset-password'].includes(pathname) &&
+    request.method === 'POST'
 
-  // Rate limiting por IP em toda a API. /api/search é NÃO-autenticado, por isso
-  // leva um bucket mais apertado; o resto da API leva o limite geral.
-  if (pathname.startsWith('/api/')) {
+  // Rate limiting por IP. /api/search é NÃO-autenticado, por isso leva um
+  // bucket mais apertado; o resto da API leva o limite geral; as rotas de
+  // auth (login/registo/reset) levam um bucket próprio contra brute-force.
+  if (pathname.startsWith('/api/') || isAuthRoute) {
     const ip = getClientIp(request)
-    const bucket = pathname.startsWith('/api/search') ? 'search' : 'api'
+    const bucket = isAuthRoute ? 'auth' : pathname.startsWith('/api/search') ? 'search' : 'api'
     const result = await checkRateLimit(ip, bucket)
 
     if (!result.success) {
       const retryAfter = Math.max(1, Math.ceil((result.reset - Date.now()) / 1000))
+
+      if (isAuthRoute) {
+        const url = request.nextUrl.clone()
+        url.searchParams.set('error', 'Fizeste demasiadas tentativas. Aguarda uns minutos.')
+        // 303 força um GET a seguir, evitando um loop infinito de POST.
+        return NextResponse.redirect(url, 303)
+      }
+
       return NextResponse.json(
         { error: 'rate_limit', message: 'Demasiados pedidos. Tenta novamente daqui a instantes.' },
         {

@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { AuthError } from '@supabase/supabase-js'
 import { sendWelcomeEmail, sendPasswordResetEmail } from '@/lib/resend'
+import { prisma } from '@/lib/prisma'
 
 function translateError(error: AuthError | { message?: string }) {
   const msg = error.message?.toLowerCase() || '';
@@ -46,7 +47,7 @@ export async function signup(formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const name = formData.get('name') as string
-  
+
   const headersList = await headers()
   const host = headersList.get('x-forwarded-host') || headersList.get('host')
   const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
@@ -66,6 +67,25 @@ export async function signup(formData: FormData) {
 
   if (error) {
     redirect(`/register?error=${encodeURIComponent(translateError(error))}`)
+  }
+
+  // Auto-cura: sincroniza já para o Prisma, para o caso de o trigger SQL
+  // on_auth_user_created falhar ou atrasar (ver scripts/delete_ghost.ts para
+  // limpar utilizadores "fantasma" que ficaram só na Supabase).
+  if (linkData?.user) {
+    try {
+      await prisma.user.create({
+        data: {
+          id: linkData.user.id,
+          email: linkData.user.email!,
+          name,
+        }
+      })
+    } catch (dbError) {
+      console.error('Falha ao sincronizar utilizador no Prisma:', dbError)
+      // Não bloqueamos o processo — se o trigger já criou o registo, isto falha
+      // por conflito de chave, o que é esperado e inofensivo.
+    }
   }
 
   let confirmationLink = undefined
@@ -92,32 +112,20 @@ export async function forgotPassword(formData: FormData) {
   const email = formData.get('email') as string
   const origin = process.env.NEXT_PUBLIC_SITE_URL
 
-  if (!origin) {
-    console.error('CRITICAL ERROR: NEXT_PUBLIC_SITE_URL is not defined in environment variables.')
-    // Podemos fazer fallback para localhost APENAS se estivermos em modo de desenvolvimento (local)
-    // Em produção (Vercel), isto força-nos a não esquecer de colocar a variável!
+  if (!origin && process.env.NODE_ENV === 'production') {
+    console.error('CRITICAL ERROR: NEXT_PUBLIC_SITE_URL is not defined in production.')
+    redirect('/forgot-password?error=Erro de configuração do servidor. Contacte o suporte.')
   }
 
-  const siteUrl = origin ? origin.replace(/\/$/, '') : 'http://localhost:3001'
+  const siteUrl = origin ? origin.replace(/\/$/, '') : 'http://localhost:3000'
 
-  // Opção A: Gerar o link de recuperação de password via Admin SDK para enviar via Resend
-  const adminAuth = createAdminClient().auth
-  const { data, error } = await adminAuth.admin.generateLink({
-    type: 'recovery',
-    email,
-    options: {
-      redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
-    }
+  // Pedir à Supabase para gerir o envio do email de recuperação (usando o SMTP do Resend que configuraste)
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
   })
 
   if (error) {
     redirect(`/forgot-password?error=${encodeURIComponent(translateError(error))}`)
-  }
-
-  // Enviar email com link seguro
-  if (data?.properties?.hashed_token) {
-    const customLink = `${siteUrl}/auth/callback?token_hash=${data.properties.hashed_token}&type=recovery&next=/reset-password`
-    await sendPasswordResetEmail(email, customLink)
   }
 
   redirect('/forgot-password?message=Verifica o teu email para redefinir a password.')

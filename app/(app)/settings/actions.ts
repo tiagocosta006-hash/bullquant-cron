@@ -100,6 +100,47 @@ export async function updatePasswordSettings(formData: FormData) {
   return { success: true }
 }
 
+export async function updateEmailSettings(formData: FormData) {
+  const currentPassword = formData.get('currentPassword') as string
+  const newEmail = formData.get('newEmail') as string
+
+  if (!currentPassword || !newEmail) {
+    return { error: 'A password e o novo email são obrigatórios.' }
+  }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user || !user.email) {
+    return { error: 'Não autorizado.' }
+  }
+
+  // Verificar password atual fazendo um login com a mesma
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: currentPassword,
+  })
+
+  if (signInError) {
+    return { error: 'A palavra-passe atual está incorreta.' }
+  }
+
+  // Pedir alteração de email à Supabase
+  const { error: updateError } = await supabase.auth.updateUser({
+    email: newEmail,
+  })
+
+  if (updateError) {
+    const msg = updateError.message?.toLowerCase() || '';
+    if (msg.includes('already registered')) {
+      return { error: 'Este email já está registado noutra conta.' }
+    }
+    return { error: 'Ocorreu um erro ao atualizar o email. Verifica se o email é válido.' }
+  }
+
+  return { success: true }
+}
+
 export async function deleteAccount() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

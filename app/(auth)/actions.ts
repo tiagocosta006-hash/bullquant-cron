@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { AuthError } from '@supabase/supabase-js'
-import { sendPasswordResetEmail } from '@/lib/resend'
+import { sendWelcomeEmail, sendPasswordResetEmail } from '@/lib/resend'
 import { prisma } from '@/lib/prisma'
 
 function translateError(error: AuthError | { message?: string }) {

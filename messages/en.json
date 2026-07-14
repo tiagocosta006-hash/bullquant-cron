@@ -3,7 +3,7 @@
     "eyebrow": "Fundamental analysis · Value investing",
     "titleLead": "See the value",
     "titleAccent": "others miss.",
-    "subtitle": "Your premier DCF calculator platform with 10 years of fundamentals and AI Insights — completely free. The ultimate stock valuation tool for long-term investors.",
+    "subtitle": "10 years of fundamentals, a DCF calculator that autofills, and AI Insights — free. Serious analysis for long-term investors.",
     "primaryCta": "Create free account",
     "secondaryCta": "See example: AAPL",
     "trust": "S&P 500 coverage · SEC EDGAR data · No credit card",
@@ -14,7 +14,7 @@
       },
       "dcf": {
         "title": "Built-in DCF",
-        "desc": "The most complete platform for DCF metrics investing. Estimate intrinsic value in seconds. Autofill from the company and tune with sliders."
+        "desc": "Estimate intrinsic value in seconds. Autofill from the company and tune with sliders."
       },
       "ai": {
         "title": "AI Brief",

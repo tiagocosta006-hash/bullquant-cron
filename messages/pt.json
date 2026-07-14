@@ -3,7 +3,7 @@
     "eyebrow": "Análise fundamental · Value investing",
     "titleLead": "Vê o valor que",
     "titleAccent": "os outros não veem.",
-    "subtitle": "A tua DCF calculator platform com 10 anos de fundamentais e AI Insights — em português e de graça. A derradeira ferramenta de stock valuation para quem investe a longo prazo.",
+    "subtitle": "10 anos de fundamentais, uma calculadora DCF que se autopreenche e AI Insights — em português e de graça. Análise séria para quem investe a longo prazo.",
     "primaryCta": "Criar conta grátis",
     "secondaryCta": "Ver exemplo: AAPL",
     "trust": "Cobertura S&P 500 · Dados da SEC EDGAR · Sem cartão de crédito",
@@ -14,7 +14,7 @@
       },
       "dcf": {
         "title": "DCF integrada",
-        "desc": "A mais completa plataforma de DCF metrics investing. Estima o valor intrínseco em segundos. Autopreenche a partir da empresa e ajusta com sliders."
+        "desc": "Estima o valor intrínseco em segundos. Autopreenche a partir da empresa e ajusta com sliders."
       },
       "ai": {
         "title": "AI Brief",

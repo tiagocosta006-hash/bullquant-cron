@@ -24,11 +24,21 @@ export function Reveal({
       el.classList.add("in");
       return;
     }
+    let wasInViewport = false;
+
     const io = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => entry.target.classList.toggle("in", entry.isIntersecting));
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.14) {
+            wasInViewport = true;
+            entry.target.classList.add("in");
+          } else if (wasInViewport && entry.intersectionRatio === 0) {
+            wasInViewport = false;
+            entry.target.classList.remove("in");
+          }
+        });
       },
-      { threshold: 0.14, rootMargin: "0px 0px -8% 0px" },
+      { threshold: [0, 0.14], rootMargin: "0px 0px -8% 0px" },
     );
     io.observe(el);
     return () => io.disconnect();

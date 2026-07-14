@@ -49,8 +49,29 @@ export default async function LandingPage() {
   // Dados do terminal-demonstração (mock estático — tickers/números são dados, não UI)
   const demoSpark = "M0 34 L20 30 L40 31 L60 24 L80 26 L100 18 L120 20 L140 12 L160 14 L180 7 L200 4";
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "name": "BullQuant",
+        "url": "https://bullmetrics.thebullocracy.com/",
+      },
+      {
+        "@type": "Organization",
+        "name": "BullQuant",
+        "url": "https://bullmetrics.thebullocracy.com/",
+        "logo": "https://bullmetrics.thebullocracy.com/brand/logo.png"
+      }
+    ]
+  };
+
   return (
     <div className="relative flex-1 overflow-x-clip">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section className="mx-auto flex min-h-[86vh] max-w-6xl flex-col justify-center px-6 pb-10 pt-20 md:px-8">
         <Reveal>

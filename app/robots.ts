@@ -5,17 +5,20 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: ['/', '/stock/', '/screener', '/dashboard', '/dcf', '/calendar'],
+        allow: ['/', '/stock/', '/explore', '/calendar'],
         disallow: [
           '/api/',
           '/auth/',
           '/settings',
           '/portfolio',
+          '/dashboard',
+          '/dcf',
+          '/screener',
           '/reset-password',
           '/forgot-password',
         ],
       },
     ],
-    sitemap: 'https://bullvision.app/sitemap.xml',
+    sitemap: 'https://bullmetrics.thebullocracy.com/sitemap.xml',
   }
 }

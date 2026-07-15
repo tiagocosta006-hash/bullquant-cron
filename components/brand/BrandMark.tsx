@@ -29,7 +29,9 @@ export function BrandMark({
     <img
       src={BRAND.logoSrc}
       alt={title}
-      className={cn("object-contain", className)}
+      // rounded proporcional: o PNG tem fundo preto retangular — sem isto os
+      // cantos aparecem a 90° enquanto a arte é arredondada
+      className={cn("rounded-[22%] object-contain", className)}
       onError={() => setErrored(true)}
     />
   );

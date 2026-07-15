@@ -60,8 +60,9 @@ export const metadata: Metadata = {
     "intrinsic value"
   ],
   icons: {
-    icon: [{ url: "/brand/bull-metrics-icon.png", type: "image/png" }],
-    apple: [{ url: "/brand/bull-metrics-icon.png" }],
+    // versão com cantos arredondados transparentes (gerada de bull-metrics-icon.png)
+    icon: [{ url: "/brand/bull-metrics-icon-rounded.png", type: "image/png" }],
+    apple: [{ url: "/brand/bull-metrics-icon-rounded.png" }],
   },
   openGraph: {
     title: `${BRAND.name} — Value Investing, com visão`,

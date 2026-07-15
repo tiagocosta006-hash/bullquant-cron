@@ -52,6 +52,8 @@ export function TopNav({
   const t = useTranslations("sidebar");
   const tHeader = useTranslations("header");
   const [cmdOpen, setCmdOpen] = useState(false);
+  // controlado: fecha ao navegar (os Links portalados não fechavam o popover)
+  const [menuOpen, setMenuOpen] = useState(false);
   const isMac = useIsMac();
 
   const primary = [
@@ -117,32 +119,35 @@ export function TopNav({
           <ThemeToggle />
 
           {/* menu de perfil: avatar de iniciais + conta, links e logout */}
-          <Popover>
+          <Popover open={menuOpen} onOpenChange={setMenuOpen}>
             <PopoverTrigger
               render={
                 <button
                   type="button"
                   title={userName || t("more")}
                   aria-label={userName || t("more")}
-                  className="ml-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/10 text-xs font-extrabold text-primary transition-colors hover:bg-primary/20"
+                  className="ml-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/10 text-xs font-extrabold leading-none text-primary transition-colors hover:bg-primary/20"
                 >
                   {userName ? initials(userName) : <MoreHorizontal className="h-5 w-5" />}
                 </button>
               }
             />
-            <PopoverContent align="end" className="w-64 p-1.5">
+            {/* positionMethod fixed: o trigger vive numa pill fixed — com o
+                default (absolute) o popup deslizava com o scroll da página */}
+            <PopoverContent align="end" positionMethod="fixed" className="w-64 p-1.5">
               {userName && (
                 <div className="mb-1 border-b border-border/60 pb-1.5">
                   {/* o cartão do perfil também leva às Definições (atalho) */}
                   <Link
                     href="/settings"
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-accent"
+                    onClick={() => setMenuOpen(false)}
+                    className="group/profile flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-accent active:scale-[0.98]"
                   >
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/15 bg-primary/10 text-xs font-extrabold text-primary">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/15 bg-primary/10 text-xs font-extrabold leading-none text-primary">
                       {initials(userName)}
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-foreground">{userName}</p>
+                      <p className="truncate text-sm font-semibold text-foreground transition-colors group-hover/profile:text-primary">{userName}</p>
                       {userEmail && (
                         <p className="truncate text-xs text-muted-foreground">{userEmail}</p>
                       )}
@@ -159,6 +164,7 @@ export function TopNav({
                 <Link
                   key={href}
                   href={href}
+                  onClick={() => setMenuOpen(false)}
                   className={cn(
                     "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                     isActive(href)
@@ -170,7 +176,7 @@ export function TopNav({
                   {label}
                 </Link>
               ))}
-              <form action={logout}>
+              <form action={logout} onSubmit={() => setMenuOpen(false)}>
                 <button
                   type="submit"
                   className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"

@@ -7,9 +7,9 @@ import {
   LayoutDashboard,
   SearchCode,
   Briefcase,
+  Star,
   CalendarDays,
   Calculator,
-  MessageSquareText,
   GitCompareArrows,
   Search,
   TrendingUp,
@@ -98,14 +98,15 @@ export function CommandMenu({
     go(`/stock/${c.ticker}`);
   };
 
+  // Sem Transcrições: a página ainda é um placeholder "em breve".
   const nav = [
     { href: "/dashboard", icon: LayoutDashboard, label: t("dashboard") },
     { href: "/explore", icon: SearchCode, label: t("explore") },
     { href: "/compare", icon: GitCompareArrows, label: t("compare") },
     { href: "/portfolio", icon: Briefcase, label: t("portfolio") },
+    { href: "/watchlist", icon: Star, label: t("watchlist") },
     { href: "/calendar", icon: CalendarDays, label: t("calendar") },
     { href: "/dcf", icon: Calculator, label: t("dcf") },
-    { href: "/transcripts", icon: MessageSquareText, label: t("transcripts") },
   ];
 
   return (

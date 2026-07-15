@@ -4,6 +4,7 @@ import { X } from "lucide-react"
 import { formatPrice, formatPercent } from "@/lib/finance/format"
 import { calculatePositionPnl } from "@/lib/finance/portfolio"
 import { PriceChangeBadge } from "@/components/finance/PriceChangeBadge"
+import { CompanyLogo } from "@/components/ui/CompanyLogo"
 import type { PortfolioItem, PriceData } from "./types"
 
 interface PortfolioCardProps {
@@ -42,14 +43,12 @@ export function PortfolioCard({ item, price, onRemove }: PortfolioCardProps) {
         <div className="glass hover:-translate-y-0.5 transition-transform p-5 rounded-2xl flex flex-col h-full relative overflow-hidden">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="bg-primary/5 p-2 rounded-lg border border-primary/10 flex items-center justify-center shrink-0 w-12 h-12">
-                {item.company.logoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={`${item.company.logoUrl}?v=1`} alt={item.company.name} referrerPolicy="no-referrer" className="w-8 h-8 object-contain rounded bg-white p-0.5" />
-                ) : (
-                  <span className="font-bold text-primary">{item.company.ticker[0]}</span>
-                )}
-              </div>
+              <CompanyLogo
+                src={item.company.logoUrl}
+                alt={item.company.name}
+                fallback={item.company.ticker}
+                size={48}
+              />
               <div>
                 <h3 className="font-bold text-lg group-hover:text-primary transition-colors line-clamp-1">{item.company.ticker}</h3>
                 <p className="text-sm text-muted-foreground line-clamp-1">{item.company.name}</p>

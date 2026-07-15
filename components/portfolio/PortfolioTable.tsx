@@ -12,6 +12,7 @@ import {
 import { formatPrice, formatPercent } from "@/lib/finance/format"
 import { calculatePositionPnl } from "@/lib/finance/portfolio"
 import { PriceChangeBadge } from "@/components/finance/PriceChangeBadge"
+import { CompanyLogo } from "@/components/ui/CompanyLogo"
 import type { PortfolioItem, PriceData } from "./types"
 
 interface PortfolioTableProps {
@@ -55,14 +56,13 @@ export function PortfolioTable({ items, prices, onRemove }: PortfolioTableProps)
               <TableRow key={item.id} className="group hover:bg-muted/50 transition-colors">
                 <TableCell className="font-medium">
                   <Link href={`/stock/${item.company.ticker}`} className="flex items-center gap-3">
-                    {item.company.logoUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={`${item.company.logoUrl}?v=1`} alt={item.company.name} referrerPolicy="no-referrer" className="w-8 h-8 object-contain rounded bg-white p-0.5" />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold">
-                        {item.company.ticker.slice(0, 2)}
-                      </div>
-                    )}
+                    <CompanyLogo
+                      src={item.company.logoUrl}
+                      alt={item.company.name}
+                      fallback={item.company.ticker}
+                      size={32}
+                      imgClassName="p-0.5"
+                    />
                     <div className="flex flex-col">
                       <span className="text-sm font-semibold">{item.company.ticker}</span>
                       <span className="text-xs text-muted-foreground line-clamp-1 max-w-[150px]">{item.company.name}</span>

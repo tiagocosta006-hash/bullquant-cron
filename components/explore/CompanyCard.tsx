@@ -1,8 +1,7 @@
 "use client"
 
-import Link from "next/link"
-import Image from "next/image"
 import { useTranslations } from "next-intl"
+import { CompanyLogo } from "@/components/ui/CompanyLogo"
 
 interface CompanyCardProps {
   company: {
@@ -35,13 +34,12 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
 
         {/* Header */}
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-12 h-12 shrink-0 bg-muted rounded-lg border border-border flex items-center justify-center overflow-hidden">
-            {company.logoUrl ? (
-              <Image src={company.logoUrl} alt={company.name} width={32} height={32} className="object-contain" />
-            ) : (
-              <span className="text-muted-foreground font-bold">{company.ticker.substring(0, 2)}</span>
-            )}
-          </div>
+          <CompanyLogo
+            src={company.logoUrl}
+            alt={company.name}
+            fallback={company.ticker}
+            size={48}
+          />
           <div>
             <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">{company.name}</h3>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">

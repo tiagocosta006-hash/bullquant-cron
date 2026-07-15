@@ -5,6 +5,7 @@ import { TrendingUp, TrendingDown, Clock, Check, Plus, Scale } from "lucide-reac
 import { useTranslations, useLocale } from "next-intl"
 import Link from "next/link"
 import { getCurrencySymbol } from "@/lib/finance/format"
+import { CompanyLogo } from "@/components/ui/CompanyLogo"
 
 type CompanyProp = {
   ticker: string;
@@ -110,21 +111,14 @@ export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfB
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border/40">
       {/* Left side: Company Info */}
       <div className="flex items-center gap-4">
-        <div className="bg-primary/10 p-3 rounded-xl border border-primary/20 shadow-sm flex items-center justify-center shrink-0 w-16 h-16 relative overflow-hidden">
-          {company.logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img 
-              src={company.logoUrl} 
-              alt={company.name} 
-              className="w-12 h-12 object-contain rounded-lg bg-white p-1" 
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
-                (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
-              }}
-            />
-          ) : null}
-          <span className={`font-extrabold text-2xl text-primary absolute ${company.logoUrl ? "hidden" : ""}`}>{company.ticker[0]}</span>
-        </div>
+        <CompanyLogo
+          src={company.logoUrl}
+          alt={company.name}
+          fallback={company.ticker}
+          size={64}
+          className="rounded-xl"
+          imgClassName="p-2"
+        />
         <div className="min-w-0">
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">{company.name}</h1>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">

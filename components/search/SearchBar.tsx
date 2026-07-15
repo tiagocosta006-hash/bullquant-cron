@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import { useDebounce } from "@/hooks/useDebounce"
 import { useTranslations } from "next-intl"
 import { useRecentSearches, type RecentSearch } from "@/hooks/useRecentSearches"
+import { CompanyLogo } from "@/components/ui/CompanyLogo"
 
 
 export function SearchBar() {
@@ -101,13 +102,14 @@ export function SearchBar() {
                   className="w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors flex items-center justify-between group/item"
                 >
                   <div className="flex items-center gap-3">
-                    {company.logoUrl ? (
-                      <img src={company.logoUrl} alt={company.ticker} className="w-8 h-8 rounded-full bg-white p-0.5 object-contain" />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center bg-muted text-[10px] font-bold text-muted-foreground border border-border/50">
-                        {company.ticker.substring(0, 2)}
-                      </div>
-                    )}
+                    <CompanyLogo
+                      src={company.logoUrl}
+                      alt={company.ticker}
+                      fallback={company.ticker}
+                      size={32}
+                      className="rounded-full"
+                      imgClassName="p-0.5"
+                    />
                     <div>
                       <div className="font-bold text-foreground group-hover/item:text-primary transition-colors">
                         {company.ticker}

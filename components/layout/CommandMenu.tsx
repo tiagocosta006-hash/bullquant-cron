@@ -24,6 +24,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
+import { CompanyLogo } from "@/components/ui/CompanyLogo";
 
 interface SearchResult {
   ticker: string;
@@ -123,8 +124,7 @@ export function CommandMenu({
               // value inclui ticker + nome para o filtro do cmdk apanhar ambos
               <CommandItem key={c.ticker} value={`${c.ticker} ${c.name}`} onSelect={() => goCompany(c)}>
                 {c.logoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={c.logoUrl} alt="" className="h-5 w-5 rounded bg-white object-contain p-0.5" />
+                  <CompanyLogo src={c.logoUrl} alt="" fallback={c.ticker} size={20} className="rounded" imgClassName="p-0.5" />
                 ) : (
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 )}

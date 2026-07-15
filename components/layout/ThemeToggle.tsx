@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { applyTheme, currentTheme } from "@/lib/theme";
 
 /**
  * ThemeToggle — claro por defeito, escuro a um toque (fundações).
@@ -15,18 +16,13 @@ export function ThemeToggle() {
   const [dark, setDark] = useState<boolean | null>(null);
 
   useEffect(() => {
-    setDark(document.documentElement.classList.contains("dark"));
+    setDark(currentTheme() === "dark");
   }, []);
 
   const toggle = () => {
-    const next = !document.documentElement.classList.contains("dark");
-    document.documentElement.classList.toggle("dark", next);
-    try {
-      localStorage.setItem("theme", next ? "dark" : "light");
-    } catch {
-      /* storage indisponível — o toggle continua a funcionar na sessão */
-    }
-    setDark(next);
+    const next = currentTheme() === "dark" ? "light" : "dark";
+    applyTheme(next);
+    setDark(next === "dark");
   };
 
   return (

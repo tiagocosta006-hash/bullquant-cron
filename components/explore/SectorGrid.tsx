@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { Building2, Cpu, HeartPulse, ShoppingBag, ShoppingCart, Zap, Landmark, Factory, Plane, Wheat, Home, BoxSelect } from "lucide-react"
+import { Building2, Cpu, HeartPulse, ShoppingBag, ShoppingCart, Zap, Landmark, Factory, UtilityPole, Wheat, Home, BoxSelect } from "lucide-react"
 
 // Mapeamento simples de setores para ícones e cores
 const SECTOR_CONFIG: Record<string, { icon: React.ElementType, color: string, bg: string }> = {
@@ -14,7 +14,7 @@ const SECTOR_CONFIG: Record<string, { icon: React.ElementType, color: string, bg
   "Industrials": { icon: Factory, color: "text-slate-400", bg: "bg-slate-400/10" },
   "Materials": { icon: BoxSelect, color: "text-amber-600", bg: "bg-amber-600/10" },
   "Real Estate": { icon: Home, color: "text-cyan-500", bg: "bg-cyan-500/10" },
-  "Utilities": { icon: Plane, color: "text-teal-500", bg: "bg-teal-500/10" },
+  "Utilities": { icon: UtilityPole, color: "text-teal-500", bg: "bg-teal-500/10" },
   "Communication Services": { icon: Building2, color: "text-purple-500", bg: "bg-purple-500/10" },
   "Unknown": { icon: Wheat, color: "text-zinc-500", bg: "bg-zinc-500/10" }
 }
@@ -30,8 +30,10 @@ export function SectorGrid({ sectors, onSelect }: SectorGridProps) {
   // Ordenar por número de empresas (descendente)
   const sortedSectors = Object.entries(sectors).sort((a, b) => b[1].count - a[1].count)
 
+  // flex-wrap com grow: a última fila estica e preenche a largura toda,
+  // para qualquer contagem de setores (11 numa grelha fixa deixava buraco)
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div className="flex flex-wrap gap-4">
       {sortedSectors.map(([sectorName, data]) => {
         const config = SECTOR_CONFIG[sectorName] || SECTOR_CONFIG["Unknown"]
         const Icon = config.icon
@@ -40,7 +42,7 @@ export function SectorGrid({ sectors, onSelect }: SectorGridProps) {
           <button
             key={sectorName}
             onClick={() => onSelect(sectorName)}
-            className="glass group flex flex-col items-start p-5 rounded-xl text-left transition-transform hover:-translate-y-0.5"
+            className="glass group flex grow basis-[230px] flex-col items-start p-5 rounded-xl text-left transition-transform hover:-translate-y-0.5"
           >
             <div className={`p-3 rounded-lg ${config.bg} ${config.color} mb-4 group-hover:scale-110 transition-transform`}>
               <Icon size={24} strokeWidth={1.5} />

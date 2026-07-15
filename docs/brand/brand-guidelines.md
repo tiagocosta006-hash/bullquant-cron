@@ -114,7 +114,7 @@ Dark-first. Gold is the **only** brand-saturated hue — everything else is warm
 
 - **Radius:** `--radius: 0.625rem` (10px) base; scales to `sm/md/lg/xl`. Tighter than a consumer app — it's a terminal.
 - **Borders:** 1px hairlines in `--ink-700`; gold hairline (`.gold-rule`) for featured/hover accents only.
-- **Elevation:** prefer borders + subtle dark shadows over heavy glows. One ambient gold glow (`.gold-glow`) is allowed per hero.
+- **Elevation:** prefer borders + subtle dark shadows over glows. No ambient glows (`.gold-glow` was removed); icon chips are flat `bg-primary/10 border border-primary/15`.
 - **Motion:** 150–200ms, ease. Functional only (hover, active, load). No bouncing, no confetti.
 - **Density:** information-dense but breathable. Generous in marketing, compact in the terminal.
 

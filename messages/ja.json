@@ -101,18 +101,20 @@
     "recentSearches": "最近の検索",
     "desc": {
       "dashboard": "概要",
-      "portfolio": "フォローしている企業",
+      "portfolio": "実際のポジションとそのライブパフォーマンス",
       "calendar": "財務結果",
       "dcf": "適正価格を評価",
       "transcripts": "投資家会議",
       "screener": "企業を見つける",
-      "explore": "業種別に企業を発見・探索"
+      "explore": "業種別に企業を発見・探索",
+      "watchlist": "ポジションなしで観察中の企業"
     },
     "compare": "比較",
     "navigate": "ナビゲーション",
     "searchAction": "検索",
     "more": "その他",
-    "explore": "探索"
+    "explore": "探索",
+    "watchlist": "ウォッチリスト"
   },
   "login": {
     "title": "ログイン",
@@ -215,12 +217,12 @@
     "loginRequired": "ポートフォリオにアクセスするにはログインしてください。",
     "loginButton": "ログイン",
     "title": "マイポートフォリオ",
-    "subtitle": "お気に入りの企業をリアルタイムで追跡します。",
+    "subtitle": "実際のポジションをリアルタイムで追跡。",
     "positions": "ポジション",
     "upToday": "本日の上昇",
     "emptyState": {
-      "title": "ウォッチリストは空です",
-      "description": "企業を追加し始めましょう。",
+      "title": "ポートフォリオは空です",
+      "description": "ポジション（数量と購入価格）を追加して実際のパフォーマンスを追跡するか、人気の銘柄から始めましょう。",
       "quickAdd": "追加",
       "adding": "追加中..."
     },
@@ -234,9 +236,20 @@
       "createAccount": "無料アカウント作成"
     },
     "card": {
-      "currentPrice": "現在の価格"
+      "currentPrice": "現在の価格",
+      "remove": "ポートフォリオから削除",
+      "addPosition": "ポジションを追加"
     },
-    "lastUpdate": "最終更新:"
+    "lastUpdate": "最終更新:",
+    "addPosition": {
+      "title": "ポジションを追加 — {ticker}",
+      "description": "数量と平均購入価格を入力してください。ポジションなしでフォローするにはウォッチリストを使います。",
+      "quantityLabel": "数量",
+      "priceLabel": "平均購入価格（USD）",
+      "cancel": "キャンセル",
+      "confirm": "追加",
+      "error": "ポジションを追加できませんでした。もう一度お試しください。"
+    }
   },
   "stock": {
     "underConstruction": "工事中",
@@ -247,7 +260,8 @@
     "header": {
       "followed": "フォロー中",
       "addToPortfolio": "ポートフォリオに追加",
-      "updating": "更新中..."
+      "updating": "更新中...",
+      "follow": "フォロー"
     },
     "savedValuations": {
       "title": "保存されたDCF評価",
@@ -530,5 +544,23 @@
     "changeEmail": "修正する",
     "openGmail": "Gmail を開く",
     "openOutlook": "Outlook を開く"
+  },
+  "watchlist": {
+    "title": "ウォッチリスト",
+    "subtitle": "観察中の企業——ポジションなし、レーダーだけ。",
+    "loginRequired": "ログインしてウォッチリストを作成しましょう。",
+    "loginButton": "ログイン",
+    "empty": {
+      "title": "ウォッチリストは空です",
+      "description": "企業をフォローして動向をチェック——価格はライブで更新されます。人気の銘柄から始めましょう。",
+      "quickAdd": "フォロー",
+      "adding": "追加中..."
+    },
+    "stats": {
+      "following": "フォロー中",
+      "upToday": "本日上昇"
+    },
+    "suggestionsTitle": "フォローのおすすめ",
+    "lastUpdate": "最終更新："
   }
 }

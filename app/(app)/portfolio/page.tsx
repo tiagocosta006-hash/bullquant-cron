@@ -15,6 +15,7 @@ import { PortfolioValueChart } from "@/components/portfolio/PortfolioValueChart"
 import { PortfolioAllocation } from "@/components/portfolio/PortfolioAllocation"
 import { PortfolioManageBar } from "@/components/portfolio/PortfolioManageBar"
 import { ImportPortfolio } from "@/components/portfolio/ImportPortfolio"
+import { AddPositionDialog } from "@/components/portfolio/AddPositionDialog"
 import { calculatePositionPnl, aggregatePnl } from "@/lib/finance/portfolio"
 import type { PortfolioItem, PriceData, SortKey, ViewMode } from "@/components/portfolio/types"
 
@@ -31,6 +32,8 @@ export default function Home() {
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
   const [authError, setAuthError] = useState(false)
   const [addingTicker, setAddingTicker] = useState<string | null>(null)
+  // Posições exigem quantidade + preço médio → o quick-add abre um diálogo.
+  const [positionTicker, setPositionTicker] = useState<string | null>(null)
   const [sortKey, setSortKey] = useState<SortKey>("addedAt")
   const [sectorFilter, setSectorFilter] = useState("ALL")
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
@@ -76,24 +79,16 @@ export default function Home() {
     }
   }
 
-  const handleQuickAdd = async (ticker: string) => {
+  const handleQuickAdd = (ticker: string) => {
     if (items.some(item => item.company.ticker === ticker)) return
-    setAddingTicker(ticker)
-    try {
-      const res = await fetch('/api/portfolio/add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ticker })
-      })
-      if (res.ok) {
-        // A API não devolve a `company`; refetch é necessário para ter logo/nome/exchange/sector.
-        await fetchPortfolio()
-      }
-    } catch (err) {
-      console.error("Failed to add ticker", err)
-    } finally {
-      setAddingTicker(null)
-    }
+    setPositionTicker(ticker)
+  }
+
+  const handlePositionAdded = async () => {
+    setPositionTicker(null)
+    setAddingTicker(null)
+    // A API não devolve a `company`; refetch é necessário para ter logo/nome/exchange/sector.
+    await fetchPortfolio()
   }
 
   const handleRemove = async (ticker: string) => {
@@ -299,6 +294,13 @@ export default function Home() {
           onImported={fetchPortfolio}
         />
       )}
+
+      <AddPositionDialog
+        ticker={positionTicker}
+        open={positionTicker !== null}
+        onOpenChange={(open) => { if (!open) setPositionTicker(null) }}
+        onAdded={handlePositionAdded}
+      />
 
       {items.length > 0 && items.length < 4 && suggestedTickers.length > 0 && (
         <PortfolioSuggestions tickers={suggestedTickers} addingTicker={addingTicker} onQuickAdd={handleQuickAdd} />

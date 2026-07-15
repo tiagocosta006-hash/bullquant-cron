@@ -101,18 +101,20 @@
     "recentSearches": "Ricerche Recenti",
     "desc": {
       "dashboard": "Panoramica",
-      "portfolio": "Le aziende che segui",
+      "portfolio": "Le tue posizioni reali e la loro performance dal vivo",
       "calendar": "Risultati finanziari",
       "dcf": "Valuta il prezzo giusto",
       "transcripts": "Riunioni degli investitori",
       "screener": "Trova aziende",
-      "explore": "Trova ed esplora aziende organizzate per tipo di business"
+      "explore": "Trova ed esplora aziende organizzate per tipo di business",
+      "watchlist": "Le aziende che stai solo osservando, senza posizione"
     },
     "compare": "Confronta",
     "navigate": "Naviga",
     "searchAction": "Cerca",
     "more": "Altro",
-    "explore": "Esplora"
+    "explore": "Esplora",
+    "watchlist": "Watchlist"
   },
   "login": {
     "title": "Accedi",
@@ -215,12 +217,12 @@
     "loginRequired": "Accedi per vedere il tuo portafoglio.",
     "loginButton": "Accedi",
     "title": "Il Mio Portafoglio",
-    "subtitle": "Segui le aziende in tempo reale.",
+    "subtitle": "Le tue posizioni reali, con performance in tempo reale.",
     "positions": "Posizioni",
     "upToday": "In rialzo oggi",
     "emptyState": {
-      "title": "Il portafoglio è vuoto",
-      "description": "Inizia ad aggiungere aziende.",
+      "title": "Il tuo portafoglio è vuoto",
+      "description": "Aggiungi le tue posizioni (quantità e prezzo di acquisto) per seguire la performance reale, o inizia con una delle opzioni popolari.",
       "quickAdd": "Aggiungi",
       "adding": "Aggiunta..."
     },
@@ -234,9 +236,20 @@
       "createAccount": "Crea Account"
     },
     "card": {
-      "currentPrice": "Prezzo Attuale"
+      "currentPrice": "Prezzo Attuale",
+      "remove": "Rimuovi dal portafoglio",
+      "addPosition": "Aggiungi posizione"
     },
-    "lastUpdate": "Ultimo agg.:"
+    "lastUpdate": "Ultimo agg.:",
+    "addPosition": {
+      "title": "Aggiungi posizione — {ticker}",
+      "description": "Indica la quantità e il prezzo medio di acquisto. Per seguire senza posizione, usa la watchlist.",
+      "quantityLabel": "Quantità",
+      "priceLabel": "Prezzo medio di acquisto (USD)",
+      "cancel": "Annulla",
+      "confirm": "Aggiungi",
+      "error": "Impossibile aggiungere la posizione. Riprova."
+    }
   },
   "stock": {
     "underConstruction": "In costruzione",
@@ -247,7 +260,8 @@
     "header": {
       "followed": "Seguito",
       "addToPortfolio": "Aggiungi al Portafoglio",
-      "updating": "Aggiornamento..."
+      "updating": "Aggiornamento...",
+      "follow": "Segui"
     },
     "savedValuations": {
       "title": "Le mie valutazioni DCF",
@@ -530,5 +544,23 @@
     "changeEmail": "Correggi",
     "openGmail": "Apri Gmail",
     "openOutlook": "Apri Outlook"
+  },
+  "watchlist": {
+    "title": "Watchlist",
+    "subtitle": "Le aziende che stai osservando — nessuna posizione, solo radar.",
+    "loginRequired": "Accedi per creare la tua watchlist.",
+    "loginButton": "Accedi",
+    "empty": {
+      "title": "La tua watchlist è vuota",
+      "description": "Segui le aziende per tenerle d'occhio — i prezzi si aggiornano dal vivo. Inizia con una delle opzioni popolari.",
+      "quickAdd": "Segui",
+      "adding": "Aggiunta in corso..."
+    },
+    "stats": {
+      "following": "Seguite",
+      "upToday": "In rialzo oggi"
+    },
+    "suggestionsTitle": "Suggerimenti da seguire",
+    "lastUpdate": "Ultimo aggiornamento:"
   }
 }

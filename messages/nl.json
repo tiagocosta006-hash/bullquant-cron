@@ -101,18 +101,20 @@
     "recentSearches": "Recente Zoekopdrachten",
     "desc": {
       "dashboard": "Overzicht",
-      "portfolio": "Gevolgde bedrijven",
+      "portfolio": "Je echte posities en hun live prestaties",
       "calendar": "Financiële resultaten",
       "dcf": "Evalueer de juiste prijs",
       "transcripts": "Investeerdersvergaderingen",
       "screener": "Vind bedrijven",
-      "explore": "Vind en verken bedrijven georganiseerd op bedrijfstype"
+      "explore": "Vind en verken bedrijven georganiseerd op bedrijfstype",
+      "watchlist": "Bedrijven die je alleen volgt, zonder positie"
     },
     "compare": "Vergelijken",
     "navigate": "Navigeren",
     "searchAction": "Zoeken",
     "more": "Meer",
-    "explore": "Verkennen"
+    "explore": "Verkennen",
+    "watchlist": "Watchlist"
   },
   "login": {
     "title": "Inloggen",
@@ -215,12 +217,12 @@
     "loginRequired": "Log in om je Portfolio te bekijken.",
     "loginButton": "Inloggen",
     "title": "Mijn Portfolio",
-    "subtitle": "Volg je bedrijven in realtime.",
+    "subtitle": "Je echte posities, met live prestaties.",
     "positions": "Posities",
     "upToday": "Vandaag Gestegen",
     "emptyState": {
       "title": "Je portfolio is leeg",
-      "description": "Begin met het toevoegen van bedrijven.",
+      "description": "Voeg je posities toe (aantal en aankoopprijs) om echte prestaties te volgen, of begin met een van de populaire opties.",
       "quickAdd": "Toevoegen",
       "adding": "Toevoegen..."
     },
@@ -234,9 +236,20 @@
       "createAccount": "Account Aanmaken"
     },
     "card": {
-      "currentPrice": "Huidige Prijs"
+      "currentPrice": "Huidige Prijs",
+      "remove": "Verwijderen uit portfolio",
+      "addPosition": "Positie toevoegen"
     },
-    "lastUpdate": "Laatste update:"
+    "lastUpdate": "Laatste update:",
+    "addPosition": {
+      "title": "Positie toevoegen — {ticker}",
+      "description": "Geef het aantal en de gemiddelde aankoopprijs op. Om te volgen zonder positie, gebruik de watchlist.",
+      "quantityLabel": "Aantal",
+      "priceLabel": "Gemiddelde aankoopprijs (USD)",
+      "cancel": "Annuleren",
+      "confirm": "Toevoegen",
+      "error": "Kon de positie niet toevoegen. Probeer opnieuw."
+    }
   },
   "stock": {
     "underConstruction": "In aanbouw",
@@ -247,7 +260,8 @@
     "header": {
       "followed": "Gevolgd",
       "addToPortfolio": "Toevoegen aan Portfolio",
-      "updating": "Updaten..."
+      "updating": "Updaten...",
+      "follow": "Volgen"
     },
     "savedValuations": {
       "title": "Mijn DCF-waarderingen",
@@ -530,5 +544,23 @@
     "changeEmail": "Corrigeren",
     "openGmail": "Gmail openen",
     "openOutlook": "Outlook openen"
+  },
+  "watchlist": {
+    "title": "Watchlist",
+    "subtitle": "Bedrijven die je in de gaten houdt — geen positie, alleen radar.",
+    "loginRequired": "Log in om je watchlist te maken.",
+    "loginButton": "Inloggen",
+    "empty": {
+      "title": "Je watchlist is leeg",
+      "description": "Volg bedrijven om ze in de gaten te houden — prijzen worden live bijgewerkt. Begin met een van de populaire opties.",
+      "quickAdd": "Volgen",
+      "adding": "Toevoegen..."
+    },
+    "stats": {
+      "following": "Gevolgd",
+      "upToday": "Vandaag omhoog"
+    },
+    "suggestionsTitle": "Suggesties om te volgen",
+    "lastUpdate": "Laatste update:"
   }
 }

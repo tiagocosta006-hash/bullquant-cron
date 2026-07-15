@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { useTranslations } from "next-intl"
-import { X } from "lucide-react"
+import { X, Briefcase } from "lucide-react"
 import { formatPrice, formatPercent } from "@/lib/finance/format"
 import { calculatePositionPnl } from "@/lib/finance/portfolio"
 import { PriceChangeBadge } from "@/components/finance/PriceChangeBadge"
@@ -11,9 +11,11 @@ interface PortfolioCardProps {
   item: PortfolioItem
   price: PriceData | undefined
   onRemove: (ticker: string) => void
+  /** quando definido (watchlist), mostra um botão para criar posição no portfólio */
+  onAddPosition?: (ticker: string) => void
 }
 
-export function PortfolioCard({ item, price, onRemove }: PortfolioCardProps) {
+export function PortfolioCard({ item, price, onRemove, onAddPosition }: PortfolioCardProps) {
   const t = useTranslations("portfolio")
   const hasResolved = price !== undefined
   const hasValidPrice = hasResolved && price.error === undefined && price.currentPrice !== undefined
@@ -39,6 +41,21 @@ export function PortfolioCard({ item, price, onRemove }: PortfolioCardProps) {
       >
         <X className="w-3.5 h-3.5" />
       </button>
+      {onAddPosition && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            onAddPosition(item.company.ticker)
+          }}
+          aria-label={t('card.addPosition')}
+          title={t('card.addPosition')}
+          className="absolute top-3 right-11 z-10 p-1.5 rounded-full bg-background/80 border border-border/60 text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-primary hover:border-primary/40 transition-all"
+        >
+          <Briefcase className="w-3.5 h-3.5" />
+        </button>
+      )}
       <Link href={`/stock/${item.company.ticker}`} className="block">
         <div className="glass hover:-translate-y-0.5 transition-transform p-5 rounded-2xl flex flex-col h-full relative overflow-hidden">
           <div className="flex items-start justify-between mb-4">

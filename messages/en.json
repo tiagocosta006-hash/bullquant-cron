@@ -104,16 +104,18 @@
     "recentSearches": "Recent Searches",
     "desc": {
       "dashboard": "Overview, shortcuts and company explorer",
-      "portfolio": "The companies you follow and their live prices",
+      "portfolio": "Your real positions and their live performance",
       "calendar": "Upcoming earnings reports for US companies",
       "dcf": "Evaluate the fair price of any stock using cash flows",
       "transcripts": "Read investor meetings in full",
-      "explore": "Discover and explore companies by business type"
+      "explore": "Discover and explore companies by business type",
+      "watchlist": "Companies you're just watching, without a position"
     },
     "compare": "Compare",
     "navigate": "Navigate",
     "searchAction": "Search",
-    "more": "More"
+    "more": "More",
+    "watchlist": "Watchlist"
   },
   "login": {
     "title": "Sign in to BullVision",
@@ -236,12 +238,12 @@
     "loginRequired": "You need to sign in to access your Watchlist.",
     "loginButton": "Sign In",
     "title": "My Portfolio",
-    "subtitle": "Track your favourite companies in real time.",
+    "subtitle": "Your real positions, with live performance.",
     "positions": "Positions",
     "upToday": "Up Today",
     "emptyState": {
-      "title": "Your Watchlist is empty",
-      "description": "Start adding companies to track their performance in real time, or explore some of the popular options below.",
+      "title": "Your portfolio is empty",
+      "description": "Add your positions (quantity and buy price) to track real performance, or start with one of the popular options.",
       "quickAdd": "Add",
       "adding": "Adding..."
     },
@@ -256,7 +258,8 @@
     },
     "card": {
       "currentPrice": "Current Price",
-      "remove": "Remove from Watchlist"
+      "remove": "Remove from portfolio",
+      "addPosition": "Add position"
     },
     "table": {
       "company": "Company",
@@ -354,7 +357,16 @@
       "syncSummary": "{synced} positions synced, {unsupported} not supported.",
       "syncError": "Could not sync with Trading212."
     },
-    "lastUpdate": "Last update:"
+    "lastUpdate": "Last update:",
+    "addPosition": {
+      "title": "Add position — {ticker}",
+      "description": "Enter the quantity and average buy price. To follow without a position, use the watchlist.",
+      "quantityLabel": "Quantity",
+      "priceLabel": "Average buy price (USD)",
+      "cancel": "Cancel",
+      "confirm": "Add",
+      "error": "Couldn't add the position. Please try again."
+    }
   },
   "stock": {
     "underConstruction": "Under construction",
@@ -366,7 +378,8 @@
       "followed": "Following",
       "addToPortfolio": "Add to Portfolio",
       "updating": "Updating...",
-      "comparePeers": "Compare Peers"
+      "comparePeers": "Compare Peers",
+      "follow": "Follow"
     },
     "savedValuations": {
       "title": "My Saved Valuations",
@@ -667,5 +680,23 @@
     "changeEmail": "Fix it",
     "openGmail": "Open Gmail",
     "openOutlook": "Open Outlook"
+  },
+  "watchlist": {
+    "title": "Watchlist",
+    "subtitle": "Companies you're watching — no position, just radar.",
+    "loginRequired": "Log in to build your watchlist.",
+    "loginButton": "Log in",
+    "empty": {
+      "title": "Your watchlist is empty",
+      "description": "Follow companies to keep an eye on them — prices update live. Start with one of the popular options.",
+      "quickAdd": "Follow",
+      "adding": "Adding..."
+    },
+    "stats": {
+      "following": "Following",
+      "upToday": "Up today"
+    },
+    "suggestionsTitle": "Suggestions to follow",
+    "lastUpdate": "Last update:"
   }
 }

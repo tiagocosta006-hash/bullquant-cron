@@ -51,18 +51,18 @@ export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfB
     }
   }
 
-  const fetchPortfolioState = async () => {
+  const fetchWatchlistState = async () => {
     try {
-      const res = await fetch(`/api/portfolio/check?ticker=${company.ticker}`)
+      const res = await fetch(`/api/watchlist/check?ticker=${company.ticker}`)
       if (res.ok) {
         const data = await res.json()
-        setIsFollowing(data.isFollowing)
+        setIsFollowing(data.inWatchlist)
       } else if (res.status === 401) {
         // User not logged in
         setIsFollowing(null)
       }
     } catch (err) {
-      console.error("Failed to fetch portfolio state", err)
+      console.error("Failed to fetch watchlist state", err)
     }
   }
 
@@ -70,7 +70,7 @@ export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfB
   useEffect(() => {
     const init = async () => {
       await fetchPrice()
-      await fetchPortfolioState()
+      await fetchWatchlistState()
     }
     init()
     const interval = setInterval(fetchPrice, 60000)
@@ -83,21 +83,12 @@ export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfB
     
     setIsUpdatingFollow(true)
     try {
-      if (isFollowing) {
-        const res = await fetch('/api/portfolio/remove', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ticker: company.ticker })
-        })
-        if (res.ok) setIsFollowing(false)
-      } else {
-        const res = await fetch('/api/portfolio/add', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ticker: company.ticker })
-        })
-        if (res.ok) setIsFollowing(true)
-      }
+      const res = await fetch('/api/watchlist', {
+        method: isFollowing ? 'DELETE' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticker: company.ticker })
+      })
+      if (res.ok) setIsFollowing(!isFollowing)
     } catch (err) {
       console.error("Failed to toggle follow state", err)
     } finally {
@@ -149,7 +140,7 @@ export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfB
                 ) : (
                   <>
                     <Plus className="w-3.5 h-3.5" />
-                    {t('header.addToPortfolio')}
+                    {t('header.follow')}
                   </>
                 )}
               </button>

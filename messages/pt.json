@@ -104,16 +104,18 @@
     "recentSearches": "Pesquisas Recentes",
     "desc": {
       "dashboard": "Visão geral, atalhos e exploração de empresas",
-      "portfolio": "As empresas que segues e os seus preços ao vivo",
+      "portfolio": "As tuas posições reais e o seu desempenho ao vivo",
       "calendar": "Próximos relatórios de ganhos das empresas americanas",
       "dcf": "Avalia o preço justo de qualquer ação usando fluxos de caixa",
       "transcripts": "Lê as reuniões com investidores na íntegra",
-      "explore": "Encontra e explora empresas organizadas por tipo de negócio"
+      "explore": "Encontra e explora empresas organizadas por tipo de negócio",
+      "watchlist": "As empresas que estás só a observar, sem posição"
     },
     "compare": "Comparar",
     "navigate": "Navegar",
     "searchAction": "Pesquisar",
-    "more": "Mais"
+    "more": "Mais",
+    "watchlist": "Watchlist"
   },
   "login": {
     "title": "Entrar no BullVision",
@@ -232,12 +234,12 @@
     "loginRequired": "Precisas de iniciar sessão para aceder à tua Watchlist.",
     "loginButton": "Iniciar Sessão",
     "title": "O Meu Portfólio",
-    "subtitle": "Acompanha as tuas empresas favoritas em tempo real.",
+    "subtitle": "As tuas posições reais, com desempenho em tempo real.",
     "positions": "Posições",
     "upToday": "Em Alta",
     "emptyState": {
-      "title": "A tua Watchlist está vazia",
-      "description": "Começa a adicionar empresas para acompanhar o seu desempenho em tempo real, ou explora algumas das opções populares abaixo.",
+      "title": "O teu portfólio está vazio",
+      "description": "Adiciona as tuas posições (quantidade e preço de compra) para acompanhares o desempenho real, ou começa por uma das opções populares.",
       "quickAdd": "Adicionar",
       "adding": "A adicionar..."
     },
@@ -252,7 +254,8 @@
     },
     "card": {
       "currentPrice": "Preço Atual",
-      "remove": "Remover da Watchlist"
+      "remove": "Remover do portfólio",
+      "addPosition": "Adicionar posição"
     },
     "table": {
       "company": "Empresa",
@@ -350,7 +353,16 @@
       "syncSummary": "{synced} posições sincronizadas, {unsupported} não suportadas.",
       "syncError": "Não foi possível sincronizar com a Trading212."
     },
-    "lastUpdate": "Última atualização:"
+    "lastUpdate": "Última atualização:",
+    "addPosition": {
+      "title": "Adicionar posição — {ticker}",
+      "description": "Indica a quantidade e o preço médio de compra. Para acompanhar sem posição, usa a watchlist.",
+      "quantityLabel": "Quantidade",
+      "priceLabel": "Preço médio de compra (USD)",
+      "cancel": "Cancelar",
+      "confirm": "Adicionar",
+      "error": "Não foi possível adicionar a posição. Tenta novamente."
+    }
   },
   "stock": {
     "underConstruction": "Em construção",
@@ -362,7 +374,8 @@
       "followed": "Seguido",
       "addToPortfolio": "Adicionar ao Portfólio",
       "updating": "A atualizar...",
-      "comparePeers": "Comparar Pares"
+      "comparePeers": "Comparar Pares",
+      "follow": "Seguir"
     },
     "savedValuations": {
       "title": "As Minhas Avaliações (DCF)",
@@ -663,5 +676,23 @@
     "changeEmail": "Corrigir",
     "openGmail": "Abrir Gmail",
     "openOutlook": "Abrir Outlook"
+  },
+  "watchlist": {
+    "title": "Watchlist",
+    "subtitle": "As empresas que estás a observar — sem posição, só radar.",
+    "loginRequired": "Inicia sessão para criares a tua lista de observação.",
+    "loginButton": "Iniciar sessão",
+    "empty": {
+      "title": "A tua watchlist está vazia",
+      "description": "Segue empresas para as manteres debaixo de olho — os preços atualizam ao vivo. Começa por uma das opções populares.",
+      "quickAdd": "Seguir",
+      "adding": "A adicionar..."
+    },
+    "stats": {
+      "following": "A seguir",
+      "upToday": "Em alta hoje"
+    },
+    "suggestionsTitle": "Sugestões para seguir",
+    "lastUpdate": "Última atualização:"
   }
 }

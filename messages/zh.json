@@ -101,18 +101,20 @@
     "recentSearches": "最近搜索",
     "desc": {
       "dashboard": "总览与探索",
-      "portfolio": "你关注的公司",
+      "portfolio": "你的真实持仓及其实时表现",
       "calendar": "财务业绩日程",
       "dcf": "评估合理价格",
       "transcripts": "投资者会议",
       "screener": "高级筛选寻找公司",
-      "explore": "按业务类型发现和探索公司"
+      "explore": "按业务类型发现和探索公司",
+      "watchlist": "你正在观察但没有持仓的公司"
     },
     "compare": "对比",
     "navigate": "导航",
     "searchAction": "搜索",
     "more": "更多",
-    "explore": "探索"
+    "explore": "探索",
+    "watchlist": "自选股"
   },
   "login": {
     "title": "登录",
@@ -215,12 +217,12 @@
     "loginRequired": "您需要登录才能访问投资组合。",
     "loginButton": "登录",
     "title": "我的投资组合",
-    "subtitle": "实时跟踪您喜欢的公司。",
+    "subtitle": "你的真实持仓，实时跟踪表现。",
     "positions": "持仓",
     "upToday": "今日上涨",
     "emptyState": {
-      "title": "您的观察列表为空",
-      "description": "开始添加公司以跟踪表现。",
+      "title": "你的投资组合是空的",
+      "description": "添加你的持仓（数量和买入价）以跟踪真实表现，或从热门选项开始。",
       "quickAdd": "添加",
       "adding": "添加中..."
     },
@@ -234,9 +236,20 @@
       "createAccount": "创建免费账户"
     },
     "card": {
-      "currentPrice": "当前价格"
+      "currentPrice": "当前价格",
+      "remove": "从投资组合中移除",
+      "addPosition": "添加持仓"
     },
-    "lastUpdate": "最后更新:"
+    "lastUpdate": "最后更新:",
+    "addPosition": {
+      "title": "添加持仓 — {ticker}",
+      "description": "输入数量和平均买入价。如只想关注而不持仓，请使用自选股。",
+      "quantityLabel": "数量",
+      "priceLabel": "平均买入价（USD）",
+      "cancel": "取消",
+      "confirm": "添加",
+      "error": "无法添加持仓，请重试。"
+    }
   },
   "stock": {
     "underConstruction": "建设中",
@@ -247,7 +260,8 @@
     "header": {
       "followed": "已关注",
       "addToPortfolio": "加入投资组合",
-      "updating": "更新中..."
+      "updating": "更新中...",
+      "follow": "关注"
     },
     "savedValuations": {
       "title": "我保存的 DCF 估值",
@@ -530,5 +544,23 @@
     "changeEmail": "更正",
     "openGmail": "打开 Gmail",
     "openOutlook": "打开 Outlook"
+  },
+  "watchlist": {
+    "title": "自选股",
+    "subtitle": "你正在观察的公司——没有持仓，只是雷达。",
+    "loginRequired": "登录以创建你的自选股列表。",
+    "loginButton": "登录",
+    "empty": {
+      "title": "你的自选股是空的",
+      "description": "关注公司以随时掌握动态——价格实时更新。从热门选项开始吧。",
+      "quickAdd": "关注",
+      "adding": "添加中..."
+    },
+    "stats": {
+      "following": "关注中",
+      "upToday": "今日上涨"
+    },
+    "suggestionsTitle": "关注建议",
+    "lastUpdate": "最后更新："
   }
 }

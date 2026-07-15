@@ -4,17 +4,13 @@ import { createClient } from "@/lib/supabase/server"
 import { mergePosition } from "@/lib/finance/portfolio"
 import { z } from "zod"
 
+// O portfólio guarda POSIÇÕES REAIS: quantidade e preço médio são obrigatórios.
+// Para "seguir" uma empresa sem posição existe a watchlist (/api/watchlist).
 const addPortfolioSchema = z.object({
   ticker: z.string().min(1).max(10).trim().toUpperCase(),
-  quantity: z.number().positive().optional(),
-  avgBuyPrice: z.number().positive().optional()
-}).refine(data => {
-  if ((data.quantity !== undefined && data.avgBuyPrice === undefined) ||
-      (data.quantity === undefined && data.avgBuyPrice !== undefined)) {
-    return false
-  }
-  return true
-}, { message: "quantity and avgBuyPrice must be provided together" })
+  quantity: z.number().positive(),
+  avgBuyPrice: z.number().positive()
+})
 
 export async function POST(request: Request) {
   try {
@@ -38,7 +34,6 @@ export async function POST(request: Request) {
     }
 
     const { ticker, quantity, avgBuyPrice } = parseResult.data
-    const hasPosition = quantity !== undefined && avgBuyPrice !== undefined
 
     // Find the company
     const company = await prisma.company.findUnique({
@@ -68,18 +63,14 @@ export async function POST(request: Request) {
       }
     })
 
-    // Se já existe posição (própria ou vinda desta chamada), funde por média ponderada.
-    let positionFields: { quantity?: number; avgBuyPrice?: number } = {}
-    if (hasPosition) {
-      if (existing?.quantity && existing?.avgBuyPrice) {
-        positionFields = mergePosition(
-          { quantity: Number(existing.quantity), avgBuyPrice: Number(existing.avgBuyPrice) },
-          { quantity, avgBuyPrice }
-        )
-      } else {
-        positionFields = { quantity, avgBuyPrice }
-      }
-    }
+    // Se já existe posição, funde por média ponderada.
+    const positionFields =
+      existing?.quantity && existing?.avgBuyPrice
+        ? mergePosition(
+            { quantity: Number(existing.quantity), avgBuyPrice: Number(existing.avgBuyPrice) },
+            { quantity, avgBuyPrice }
+          )
+        : { quantity, avgBuyPrice }
 
     // Add to portfolio using upsert to prevent race conditions (double-click)
     const item = await prisma.portfolioItem.upsert({
@@ -89,7 +80,7 @@ export async function POST(request: Request) {
           companyId: company.id
         }
       },
-      update: hasPosition ? positionFields : {},
+      update: positionFields,
       create: {
         portfolioId: portfolio.id,
         companyId: company.id,

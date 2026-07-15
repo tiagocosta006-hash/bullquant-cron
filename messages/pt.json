@@ -608,7 +608,7 @@
   "pricing": {
     "badge": "Simples e transparente",
     "title": "Investe com mais confiança.",
-    "subtitle": "Começa gratuitamente. Sem cartão de crédito. Faz upgrade quando precisares de mais.",
+    "subtitle": "Começa gratuitamente ou experimenta o plano PRO por 7 dias grátis. Cancela a qualquer momento.",
     "monthly": "Mês",
     "free": {
       "name": "Gratuito",
@@ -622,7 +622,7 @@
       "price": "€7",
       "period": "por mês",
       "description": "Para o investidor sério que quer ir mais fundo na análise.",
-      "cta": "Começar PRO",
+      "cta": "Começar trial de 7 dias",
       "badge": "Mais popular"
     },
     "features": {
@@ -658,7 +658,7 @@
         },
         {
           "q": "Existe um período experimental?",
-          "a": "O plano gratuito já é uma forma de experimentares a plataforma sem compromisso. Não há trial com cartão de crédito."
+          "a": "Sim, oferecemos 7 dias grátis para testares a plataforma PRO. Durante esses 7 dias terás acesso a todas as funcionalidades avançadas, exceto à comunidade privada."
         },
         {
           "q": "Quem processa os pagamentos?",

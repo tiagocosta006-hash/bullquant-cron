@@ -612,7 +612,7 @@
   "pricing": {
     "badge": "Simple and transparent",
     "title": "Invest with more confidence.",
-    "subtitle": "Start for free. No credit card. Upgrade when you need more.",
+    "subtitle": "Start for free or try the PRO plan with a 7-day free trial. Cancel anytime.",
     "monthly": "Month",
     "free": {
       "name": "Free",
@@ -626,7 +626,7 @@
       "price": "€7",
       "period": "per month",
       "description": "For the serious investor who wants to go deeper in their analysis.",
-      "cta": "Start PRO",
+      "cta": "Start 7-day free trial",
       "badge": "Most popular"
     },
     "features": {
@@ -662,7 +662,7 @@
         },
         {
           "q": "Is there a free trial?",
-          "a": "The free plan is already a way to try the platform without commitment. There is no credit-card trial."
+          "a": "Yes, we offer a 7-day free trial for you to test the PRO platform. During those 7 days, you'll have access to all advanced features, except the private community."
         },
         {
           "q": "Who processes the payments?",

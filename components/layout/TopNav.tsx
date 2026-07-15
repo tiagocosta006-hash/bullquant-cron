@@ -132,21 +132,27 @@ export function TopNav({
             />
             <PopoverContent align="end" className="w-64 p-1.5">
               {userName && (
-                <div className="mb-1 flex items-center gap-3 border-b border-border/60 px-3 pb-2.5 pt-1.5">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/15 bg-primary/10 text-xs font-extrabold text-primary">
-                    {initials(userName)}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-foreground">{userName}</p>
-                    {userEmail && (
-                      <p className="truncate text-xs text-muted-foreground">{userEmail}</p>
+                <div className="mb-1 border-b border-border/60 pb-1.5">
+                  {/* o cartão do perfil também leva às Definições (atalho) */}
+                  <Link
+                    href="/settings"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-accent"
+                  >
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/15 bg-primary/10 text-xs font-extrabold text-primary">
+                      {initials(userName)}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-foreground">{userName}</p>
+                      {userEmail && (
+                        <p className="truncate text-xs text-muted-foreground">{userEmail}</p>
+                      )}
+                    </div>
+                    {plan && (
+                      <span className="ml-auto shrink-0 rounded-full border border-bull/20 bg-bull/10 px-2 py-0.5 text-[10px] font-bold text-bull">
+                        {plan}
+                      </span>
                     )}
-                  </div>
-                  {plan && (
-                    <span className="ml-auto shrink-0 rounded-full border border-bull/20 bg-bull/10 px-2 py-0.5 text-[10px] font-bold text-bull">
-                      {plan}
-                    </span>
-                  )}
+                  </Link>
                 </div>
               )}
               {overflow.map(({ href, icon: Icon, label }) => (

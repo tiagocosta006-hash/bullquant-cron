@@ -127,7 +127,9 @@
     "submitButton": "Entrar",
     "submitLoading": "A entrar...",
     "noAccount": "Não tens conta?",
-    "registerLink": "Regista-te grátis"
+    "registerLink": "Regista-te grátis",
+    "devLoginButton": "Entrar como dev (local)",
+    "devLoginLoading": "A entrar..."
   },
   "register": {
     "title": "Criar Conta",

@@ -127,7 +127,9 @@
     "submitButton": "Sign in",
     "submitLoading": "Signing in...",
     "noAccount": "Don't have an account?",
-    "registerLink": "Sign up for free"
+    "registerLink": "Sign up for free",
+    "devLoginButton": "Sign in as dev (local)",
+    "devLoginLoading": "Signing in..."
   },
   "register": {
     "title": "Create Account",

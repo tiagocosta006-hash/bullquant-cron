@@ -127,7 +127,9 @@
     "submitButton": "Connexion",
     "submitLoading": "Connexion...",
     "noAccount": "Pas de compte?",
-    "registerLink": "S'inscrire"
+    "registerLink": "S'inscrire",
+    "devLoginButton": "Connexion dev (local)",
+    "devLoginLoading": "Connexion..."
   },
   "register": {
     "title": "Créer un Compte",

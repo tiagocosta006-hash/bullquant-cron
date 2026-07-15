@@ -127,7 +127,9 @@
     "submitButton": "Anmelden",
     "submitLoading": "Anmelden...",
     "noAccount": "Kein Konto?",
-    "registerLink": "Registrieren"
+    "registerLink": "Registrieren",
+    "devLoginButton": "Als Dev anmelden (lokal)",
+    "devLoginLoading": "Anmeldung..."
   },
   "register": {
     "title": "Konto erstellen",

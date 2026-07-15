@@ -127,7 +127,9 @@
     "submitButton": "ログイン",
     "submitLoading": "ログイン中...",
     "noAccount": "アカウントがありませんか？",
-    "registerLink": "無料登録"
+    "registerLink": "無料登録",
+    "devLoginButton": "開発者としてログイン（ローカル）",
+    "devLoginLoading": "ログイン中..."
   },
   "register": {
     "title": "アカウント作成",

@@ -127,7 +127,9 @@
     "submitButton": "Accedi",
     "submitLoading": "Accesso...",
     "noAccount": "Non hai un account?",
-    "registerLink": "Registrati"
+    "registerLink": "Registrati",
+    "devLoginButton": "Accedi come dev (locale)",
+    "devLoginLoading": "Accesso..."
   },
   "register": {
     "title": "Crea Account",

@@ -194,6 +194,61 @@ export async function resendConfirmation(formData: FormData) {
   redirect(`/verify-email?email=${encodeURIComponent(email)}&resent=1`)
 }
 
+// Login de desenvolvimento: um clique, SÓ em NODE_ENV=development.
+// A conta usa a password FORTE do .env.local (DEV_LOGIN_*) — a BD/auth é
+// partilhada com produção, por isso nunca credenciais fracas nem expor
+// este fluxo fora de dev. Cria/repara a conta na primeira utilização.
+export async function devLogin() {
+  const email = process.env.DEV_LOGIN_EMAIL
+  const password = process.env.DEV_LOGIN_PASSWORD
+  if (process.env.NODE_ENV !== 'development' || !email || !password) {
+    redirect('/login')
+  }
+
+  const supabase = await createClient()
+  const first = await supabase.auth.signInWithPassword({ email, password })
+
+  if (first.error) {
+    // Primeira vez (ou password mudou no .env.local): cria/repara via admin.
+    const adminAuth = createAdminClient().auth
+    const { data: created, error: createError } = await adminAuth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { name: 'Dev Local' },
+    })
+
+    let userId = created?.user?.id
+    if (createError) {
+      // Já existe → encontra o id e força a password do .env.local.
+      const { data: list } = await adminAuth.admin.listUsers({ perPage: 200 })
+      const existing = list?.users?.find((u) => u.email === email)
+      if (!existing) {
+        redirect(`/login?error=${encodeURIComponent(`Dev login: ${createError.message}`)}`)
+      }
+      userId = existing!.id
+      await adminAuth.admin.updateUserById(userId, { password, email_confirm: true })
+    }
+
+    // Auto-cura Prisma (mesmo padrão do signup).
+    if (userId) {
+      try {
+        await prisma.user.create({ data: { id: userId, email, name: 'Dev Local' } })
+      } catch {
+        // conflito esperado se o trigger já criou o registo
+      }
+    }
+
+    const retry = await supabase.auth.signInWithPassword({ email, password })
+    if (retry.error) {
+      redirect(`/login?error=${encodeURIComponent(`Dev login: ${retry.error.message}`)}`)
+    }
+  }
+
+  revalidatePath('/', 'layout')
+  redirect('/dashboard')
+}
+
 export async function logout() {
   const supabase = await createClient()
   await supabase.auth.signOut()

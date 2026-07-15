@@ -127,7 +127,9 @@
     "submitButton": "登录",
     "submitLoading": "登录中...",
     "noAccount": "没有账户？",
-    "registerLink": "免费注册"
+    "registerLink": "免费注册",
+    "devLoginButton": "以开发者身份登录（本地）",
+    "devLoginLoading": "登录中..."
   },
   "register": {
     "title": "创建账户",

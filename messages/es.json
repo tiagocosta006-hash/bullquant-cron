@@ -127,7 +127,9 @@
     "submitButton": "Entrar",
     "submitLoading": "Entrando...",
     "noAccount": "¿No tienes cuenta?",
-    "registerLink": "Crear cuenta"
+    "registerLink": "Crear cuenta",
+    "devLoginButton": "Entrar como dev (local)",
+    "devLoginLoading": "Entrando..."
   },
   "register": {
     "title": "Crear Cuenta",

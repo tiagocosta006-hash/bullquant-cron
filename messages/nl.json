@@ -127,7 +127,9 @@
     "submitButton": "Inloggen",
     "submitLoading": "Inloggen...",
     "noAccount": "Nog geen account?",
-    "registerLink": "Maak een account aan"
+    "registerLink": "Maak een account aan",
+    "devLoginButton": "Inloggen als dev (lokaal)",
+    "devLoginLoading": "Inloggen..."
   },
   "register": {
     "title": "Account Aanmaken",

@@ -35,6 +35,13 @@ export async function Header() {
               <span className="hidden md:inline-block">{t('calendar')}</span>
             </Link>
             <Link
+              href="/pricing"
+              className="flex items-center space-x-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mr-2"
+              title={t('pricing')}
+            >
+              <span className="hidden md:inline-block">{t('pricing')}</span>
+            </Link>
+            <Link
               href="/dcf"
               className="flex items-center space-x-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mr-2"
               title={t('dcf')}

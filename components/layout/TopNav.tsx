@@ -23,7 +23,6 @@ import { Logo } from "@/components/brand/Logo";
 import { LiquidGlass } from "@/components/fx/LiquidGlass";
 import { CommandMenu } from "@/components/layout/CommandMenu";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
-import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { logout } from "@/app/(auth)/actions";
 import { useIsMac } from "@/hooks/useIsMac";

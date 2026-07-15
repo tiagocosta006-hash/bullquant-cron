@@ -121,18 +121,18 @@ export default function WatchlistPage() {
   }
 
   useEffect(() => {
-    fetchWatchlist()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const init = async () => { await fetchWatchlist() }
+    init()
   }, [])
 
   useEffect(() => {
     if (items.length > 0) {
       const tickers = items.map((item) => item.company.ticker)
-      fetchPrices(tickers)
+      const initPrices = async () => { await fetchPrices(tickers) }
+      initPrices()
       const interval = setInterval(() => fetchPrices(tickers), 60000)
       return () => clearInterval(interval)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items])
 
   if (isLoading) {

@@ -84,11 +84,14 @@
     },
     "tabs": {
       "sp500": "标普500",
-      "trending": "热门关注",
-      "growth": "高增长",
-      "dividend": "股息增长",
-      "buyback": "股票回购",
-      "ai": "人工智能"
+      "gainers": "Top Gainers",
+      "losers": "Top Losers",
+      "marketCap": "Largest Market Cap"
+    },
+    "eodNotice": "Market cap and change based on the last trading day's close — not real-time.",
+    "loadMore": "Load more",
+    "sectorFilter": {
+      "all": "All sectors"
     }
   },
   "sidebar": {
@@ -97,7 +100,6 @@
     "calendar": "财报日历",
     "dcf": "DCF 估值",
     "transcripts": "电话会议",
-    "screener": "选股器",
     "recentSearches": "最近搜索",
     "desc": {
       "dashboard": "总览与探索",
@@ -105,7 +107,6 @@
       "calendar": "财务业绩日程",
       "dcf": "评估合理价格",
       "transcripts": "投资者会议",
-      "screener": "高级筛选寻找公司",
       "explore": "按业务类型发现和探索公司",
       "watchlist": "你正在观察但没有持仓的公司"
     },
@@ -160,7 +161,9 @@
     "passwordLabel": "新密码",
     "passwordPlaceholder": "******",
     "submitButton": "更新密码",
-    "submitLoading": "更新中..."
+    "submitLoading": "更新中...",
+    "confirmPasswordLabel": "Confirm Password",
+    "confirmPasswordPlaceholder": "Repeat your new password"
   },
   "header": {
     "settingsTitle": "账户设置",
@@ -200,7 +203,19 @@
       "changeEmailTitle": "更改邮箱",
       "newEmail": "新邮箱",
       "confirmEmailChangeBtn": "确认更改",
-      "emailChangeSuccess": "确认邮件已发送到新旧两个地址，请查收。"
+      "emailChangeSuccess": "确认邮件已发送到新旧两个地址，请查收。",
+      "changePasswordBtn": "Change Password",
+      "confirmNewPassword": "Confirm New Password",
+      "currentPassword": "Current Password",
+      "deleteAccountBtn": "Delete Account",
+      "deleteAccountCancel": "Cancel",
+      "deleteAccountConfirmLabel": "Type DELETE to confirm",
+      "deleteAccountDesc": "This action is irreversible. All your data, portfolios, and valuations will be deleted forever.",
+      "deleteAccountSubmit": "Delete Forever",
+      "deleteAccountTitle": "Delete Account Permanently",
+      "newPassword": "New Password",
+      "passwordSuccess": "Password updated successfully!",
+      "securityTitle": "Security"
     },
     "preferences": {
       "title": "应用首选项",
@@ -279,6 +294,102 @@
       "cancel": "取消",
       "confirm": "添加",
       "error": "无法添加持仓，请重试。"
+    },
+    "allocation": {
+      "barsView": "Bar view",
+      "donutView": "Donut view",
+      "title": "Allocation by Sector",
+      "unknownSector": "Unknown sector"
+    },
+    "import": {
+      "back": "Back",
+      "chooseFile": "Choose CSV file",
+      "close": "Close",
+      "columns": {
+        "avgBuyPrice": "Average buy price",
+        "ignore": "Ignore",
+        "quantity": "Quantity",
+        "ticker": "Ticker"
+      },
+      "confirmImport": "Import {count} rows",
+      "description": "Upload a CSV file exported from your broker with the ticker, quantity, and average buy price for each position.",
+      "done": "Done",
+      "emptyFile": "The file is empty or could not be read.",
+      "mapDescription": "Tell us what each column in your file corresponds to:",
+      "mapIncomplete": "Select the ticker, quantity, and average price columns to continue.",
+      "moreRows": "+ {count} rows not shown",
+      "parseError": "Could not parse the file. Make sure it's a valid CSV.",
+      "status": {
+        "added": "Added",
+        "invalid": "Invalid row",
+        "merged": "Merged with existing position",
+        "unsupported": "Company not supported"
+      },
+      "submitError": "Could not import the portfolio. Please try again.",
+      "title": "Import Portfolio",
+      "trigger": "Import Portfolio"
+    },
+    "manage": {
+      "importCsv": "Import CSV",
+      "title": "Add or sync positions"
+    },
+    "position": {
+      "avgCost": "avg. cost",
+      "pnl": "P&L",
+      "shares": "shares"
+    },
+    "summary": {
+      "marketValue": "Market Value",
+      "totalPnl": "Total P&L",
+      "watchlistOnly": "Add quantity and buy price to your positions to see market value and P&L."
+    },
+    "table": {
+      "action": "Action",
+      "change": "Change",
+      "company": "Company",
+      "grossMargin": "Gross Margin",
+      "pnl": "P&L",
+      "roic": "ROIC",
+      "sector": "Sector"
+    },
+    "toolbar": {
+      "allSectors": "All sectors",
+      "gridView": "Grid view",
+      "sort": {
+        "addedAt": "Recently added",
+        "changePercent": "Biggest movers",
+        "name": "Name (A-Z)",
+        "sector": "Sector"
+      },
+      "sortBy": "Sort by",
+      "tableView": "Table view"
+    },
+    "trading212": {
+      "apiKeyPlaceholder": "API Key",
+      "apiSecretPlaceholder": "API Secret",
+      "cancel": "Cancel",
+      "connectDescription": "Connect your Trading212 account (Invest or Stocks ISA) to automatically sync your positions. Generate an API Key under Settings → API in the Trading212 app.",
+      "connectError": "Could not connect to Trading212. Please try again.",
+      "connectSubmit": "Connect",
+      "connectTrigger": "Connect to Trading212",
+      "connectedLabel": "Connected to Trading212",
+      "disconnect": "Disconnect",
+      "invalidCredentials": "Invalid API Key or Secret.",
+      "lastSynced": "Last synced:",
+      "syncError": "Could not sync with Trading212.",
+      "syncNow": "Sync now",
+      "syncSummary": "{synced} positions synced, {unsupported} not supported."
+    },
+    "valueChart": {
+      "approximationTooltip": "Estimate based on each position's current quantity applied to historical prices — does not reflect actual buy/sell history.",
+      "noData": "Not enough data to show the trend yet.",
+      "tabs": {
+        "1m": "1M",
+        "1y": "1Y",
+        "6m": "6M",
+        "max": "Max"
+      },
+      "title": "Portfolio Value Over Time"
     }
   },
   "stock": {
@@ -291,7 +402,8 @@
       "followed": "已关注",
       "addToPortfolio": "加入投资组合",
       "updating": "更新中...",
-      "follow": "关注"
+      "follow": "关注",
+      "comparePeers": "Compare Peers"
     },
     "savedValuations": {
       "title": "我保存的 DCF 估值",
@@ -379,8 +491,6 @@
     "millionsSuffix": "百万",
     "growth1": "1-5年 增长率",
     "growth2": "6-10年 增长率",
-    "wacc": "WACC (折现率)",
-    "waccHint": "要求的最低回报率。",
     "terminalGrowth": "永续增长率",
     "terminalGrowthHint": "第10年后的长期增长率。",
     "reverseDcf": "计算隐含增长率 (反向 DCF)",
@@ -406,7 +516,27 @@
     },
     "errorWacc": "WACC 必须大于永续增长率。",
     "errorShares": "请输入总股本以计算每股价值。",
-    "errorFcf": "请输入有效的初始自由现金流。"
+    "errorFcf": "请输入有效的初始自由现金流。",
+    "fcfMode": "Methodology",
+    "mode": "Method",
+    "wacc": {
+      "beta": "Beta",
+      "betaUnavailable": "Beta unavailable — enter WACC manually",
+      "breakdownTitle": "Breakdown",
+      "capitalStructure": "Capital Structure",
+      "costOfDebt": "Cost of Debt",
+      "costOfDebtLabel": "Rd (Pre-tax)",
+      "costOfEquity": "Cost of Equity",
+      "equityRiskPremium": "ERP (Equity Risk Premium)",
+      "hint": "Required return. Higher means a more conservative value.",
+      "label": "WACC (Discount Rate)",
+      "riskFreeRate": "Rf (Risk-Free Rate)",
+      "suggested": "Suggested WACC (CAPM)",
+      "taxRate": "Tax Rate",
+      "useButton": "Use",
+      "weightDebt": "Debt Weight",
+      "weightEquity": "Equity Weight"
+    }
   },
   "financials": {
     "engineTitle": "财务数据",

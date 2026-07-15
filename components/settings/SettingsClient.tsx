@@ -73,7 +73,8 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
   // Tema (classe .dark no <html>, lida no mount para evitar mismatch)
   const [theme, setTheme] = useState<Theme | null>(null)
   useEffect(() => {
-    setTheme(currentTheme())
+    const init = () => setTheme(currentTheme())
+    init()
   }, [])
 
   // Toggle de plano (beta)

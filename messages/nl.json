@@ -84,11 +84,14 @@
     },
     "tabs": {
       "sp500": "S&P 500",
-      "trending": "Trending",
-      "growth": "Groei",
-      "dividend": "Dividenden",
-      "buyback": "Aandeleninkoop",
-      "ai": "Kunstmatige Intelligentie"
+      "gainers": "Top Gainers",
+      "losers": "Top Losers",
+      "marketCap": "Largest Market Cap"
+    },
+    "eodNotice": "Market cap and change based on the last trading day's close — not real-time.",
+    "loadMore": "Load more",
+    "sectorFilter": {
+      "all": "All sectors"
     }
   },
   "sidebar": {
@@ -97,7 +100,6 @@
     "calendar": "Kalender",
     "dcf": "DCF Calculator",
     "transcripts": "Transcripties",
-    "screener": "Screener",
     "recentSearches": "Recente Zoekopdrachten",
     "desc": {
       "dashboard": "Overzicht",
@@ -105,7 +107,6 @@
       "calendar": "Financiële resultaten",
       "dcf": "Evalueer de juiste prijs",
       "transcripts": "Investeerdersvergaderingen",
-      "screener": "Vind bedrijven",
       "explore": "Vind en verken bedrijven georganiseerd op bedrijfstype",
       "watchlist": "Bedrijven die je alleen volgt, zonder positie"
     },
@@ -160,7 +161,9 @@
     "passwordLabel": "Nieuw Wachtwoord",
     "passwordPlaceholder": "******",
     "submitButton": "Bijwerken",
-    "submitLoading": "Bijwerken..."
+    "submitLoading": "Bijwerken...",
+    "confirmPasswordLabel": "Confirm Password",
+    "confirmPasswordPlaceholder": "Repeat your new password"
   },
   "header": {
     "settingsTitle": "Instellingen",
@@ -200,7 +203,19 @@
       "changeEmailTitle": "E-mail wijzigen",
       "newEmail": "Nieuwe e-mail",
       "confirmEmailChangeBtn": "Wijziging bevestigen",
-      "emailChangeSuccess": "Er is een bevestigingsmail verzonden naar het nieuwe en het oude adres. Controleer je inboxen."
+      "emailChangeSuccess": "Er is een bevestigingsmail verzonden naar het nieuwe en het oude adres. Controleer je inboxen.",
+      "changePasswordBtn": "Change Password",
+      "confirmNewPassword": "Confirm New Password",
+      "currentPassword": "Current Password",
+      "deleteAccountBtn": "Delete Account",
+      "deleteAccountCancel": "Cancel",
+      "deleteAccountConfirmLabel": "Type DELETE to confirm",
+      "deleteAccountDesc": "This action is irreversible. All your data, portfolios, and valuations will be deleted forever.",
+      "deleteAccountSubmit": "Delete Forever",
+      "deleteAccountTitle": "Delete Account Permanently",
+      "newPassword": "New Password",
+      "passwordSuccess": "Password updated successfully!",
+      "securityTitle": "Security"
     },
     "preferences": {
       "title": "Voorkeuren",
@@ -279,6 +294,102 @@
       "cancel": "Annuleren",
       "confirm": "Toevoegen",
       "error": "Kon de positie niet toevoegen. Probeer opnieuw."
+    },
+    "allocation": {
+      "barsView": "Bar view",
+      "donutView": "Donut view",
+      "title": "Allocation by Sector",
+      "unknownSector": "Unknown sector"
+    },
+    "import": {
+      "back": "Back",
+      "chooseFile": "Choose CSV file",
+      "close": "Close",
+      "columns": {
+        "avgBuyPrice": "Average buy price",
+        "ignore": "Ignore",
+        "quantity": "Quantity",
+        "ticker": "Ticker"
+      },
+      "confirmImport": "Import {count} rows",
+      "description": "Upload a CSV file exported from your broker with the ticker, quantity, and average buy price for each position.",
+      "done": "Done",
+      "emptyFile": "The file is empty or could not be read.",
+      "mapDescription": "Tell us what each column in your file corresponds to:",
+      "mapIncomplete": "Select the ticker, quantity, and average price columns to continue.",
+      "moreRows": "+ {count} rows not shown",
+      "parseError": "Could not parse the file. Make sure it's a valid CSV.",
+      "status": {
+        "added": "Added",
+        "invalid": "Invalid row",
+        "merged": "Merged with existing position",
+        "unsupported": "Company not supported"
+      },
+      "submitError": "Could not import the portfolio. Please try again.",
+      "title": "Import Portfolio",
+      "trigger": "Import Portfolio"
+    },
+    "manage": {
+      "importCsv": "Import CSV",
+      "title": "Add or sync positions"
+    },
+    "position": {
+      "avgCost": "avg. cost",
+      "pnl": "P&L",
+      "shares": "shares"
+    },
+    "summary": {
+      "marketValue": "Market Value",
+      "totalPnl": "Total P&L",
+      "watchlistOnly": "Add quantity and buy price to your positions to see market value and P&L."
+    },
+    "table": {
+      "action": "Action",
+      "change": "Change",
+      "company": "Company",
+      "grossMargin": "Gross Margin",
+      "pnl": "P&L",
+      "roic": "ROIC",
+      "sector": "Sector"
+    },
+    "toolbar": {
+      "allSectors": "All sectors",
+      "gridView": "Grid view",
+      "sort": {
+        "addedAt": "Recently added",
+        "changePercent": "Biggest movers",
+        "name": "Name (A-Z)",
+        "sector": "Sector"
+      },
+      "sortBy": "Sort by",
+      "tableView": "Table view"
+    },
+    "trading212": {
+      "apiKeyPlaceholder": "API Key",
+      "apiSecretPlaceholder": "API Secret",
+      "cancel": "Cancel",
+      "connectDescription": "Connect your Trading212 account (Invest or Stocks ISA) to automatically sync your positions. Generate an API Key under Settings → API in the Trading212 app.",
+      "connectError": "Could not connect to Trading212. Please try again.",
+      "connectSubmit": "Connect",
+      "connectTrigger": "Connect to Trading212",
+      "connectedLabel": "Connected to Trading212",
+      "disconnect": "Disconnect",
+      "invalidCredentials": "Invalid API Key or Secret.",
+      "lastSynced": "Last synced:",
+      "syncError": "Could not sync with Trading212.",
+      "syncNow": "Sync now",
+      "syncSummary": "{synced} positions synced, {unsupported} not supported."
+    },
+    "valueChart": {
+      "approximationTooltip": "Estimate based on each position's current quantity applied to historical prices — does not reflect actual buy/sell history.",
+      "noData": "Not enough data to show the trend yet.",
+      "tabs": {
+        "1m": "1M",
+        "1y": "1Y",
+        "6m": "6M",
+        "max": "Max"
+      },
+      "title": "Portfolio Value Over Time"
     }
   },
   "stock": {
@@ -291,7 +402,8 @@
       "followed": "Gevolgd",
       "addToPortfolio": "Toevoegen aan Portfolio",
       "updating": "Updaten...",
-      "follow": "Volgen"
+      "follow": "Volgen",
+      "comparePeers": "Compare Peers"
     },
     "savedValuations": {
       "title": "Mijn DCF-waarderingen",
@@ -379,8 +491,6 @@
     "millionsSuffix": "Miljoen",
     "growth1": "Groei Jaar 1-5",
     "growth2": "Groei Jaar 6-10",
-    "wacc": "WACC (Disconteringsvoet)",
-    "waccHint": "Vereist rendement.",
     "terminalGrowth": "Eeuwigdurende Groei",
     "terminalGrowthHint": "Langetermijngroei.",
     "reverseDcf": "Omgekeerde DCF",
@@ -406,7 +516,27 @@
     },
     "errorWacc": "WACC moet groter zijn dan groei.",
     "errorShares": "Voer de aandelen in.",
-    "errorFcf": "Voer een geldige FCF in."
+    "errorFcf": "Voer een geldige FCF in.",
+    "fcfMode": "Methodology",
+    "mode": "Method",
+    "wacc": {
+      "beta": "Beta",
+      "betaUnavailable": "Beta unavailable — enter WACC manually",
+      "breakdownTitle": "Breakdown",
+      "capitalStructure": "Capital Structure",
+      "costOfDebt": "Cost of Debt",
+      "costOfDebtLabel": "Rd (Pre-tax)",
+      "costOfEquity": "Cost of Equity",
+      "equityRiskPremium": "ERP (Equity Risk Premium)",
+      "hint": "Required return. Higher means a more conservative value.",
+      "label": "WACC (Discount Rate)",
+      "riskFreeRate": "Rf (Risk-Free Rate)",
+      "suggested": "Suggested WACC (CAPM)",
+      "taxRate": "Tax Rate",
+      "useButton": "Use",
+      "weightDebt": "Debt Weight",
+      "weightEquity": "Equity Weight"
+    }
   },
   "financials": {
     "engineTitle": "Financiële Data",

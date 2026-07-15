@@ -137,7 +137,10 @@
     "submitButton": "S'inscrire",
     "submitLoading": "Création...",
     "hasAccount": "Déjà un compte?",
-    "loginLink": "Se connecter"
+    "loginLink": "Se connecter",
+    "confirmPasswordLabel": "Confirmer le mot de passe",
+    "passwordMismatch": "Les mots de passe ne correspondent pas.",
+    "emailInUse": "Cet e-mail est déjà enregistré."
   },
   "forgotPassword": {
     "title": "Mot de passe oublié",
@@ -510,5 +513,22 @@
       "compareDesc": "Évaluez la performance financière côte à côte.",
       "viewFinancials": "Voir l'Analyse Financière Complète"
     }
+  },
+  "verifyEmail": {
+    "title": "Confirme ton e-mail",
+    "unconfirmed": "Ton compte n'est pas encore confirmé.",
+    "sentTo": "Nous avons envoyé un lien de confirmation à <strong>{email}</strong>.",
+    "sentGeneric": "Nous t'avons envoyé un lien de confirmation par e-mail.",
+    "instruction": "Ouvre l'e-mail et clique sur le lien pour activer ton compte. Ensuite, connecte-toi.",
+    "spamHint": "Rien reçu ? Attends une minute et vérifie ton dossier spam.",
+    "resent": "Nous avons renvoyé l'e-mail de confirmation. Vérifie ta boîte de réception.",
+    "noEmail": "E-mail manquant. Retourne à l'inscription et réessaie.",
+    "resendButton": "Renvoyer l'e-mail",
+    "resending": "Envoi en cours...",
+    "backToLogin": "Retour à la connexion",
+    "wrongEmail": "Mauvais e-mail ?",
+    "changeEmail": "Corriger",
+    "openGmail": "Ouvrir Gmail",
+    "openOutlook": "Ouvrir Outlook"
   }
 }

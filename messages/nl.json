@@ -137,7 +137,10 @@
     "submitButton": "Registreren",
     "submitLoading": "Aanmaken...",
     "hasAccount": "Heb je al een account?",
-    "loginLink": "Inloggen"
+    "loginLink": "Inloggen",
+    "confirmPasswordLabel": "Bevestig wachtwoord",
+    "passwordMismatch": "De wachtwoorden komen niet overeen.",
+    "emailInUse": "Dit e-mailadres is al geregistreerd."
   },
   "forgotPassword": {
     "title": "Wachtwoord Herstellen",
@@ -510,5 +513,22 @@
       "compareDesc": "Beoordeel financiële prestaties naast elkaar.",
       "viewFinancials": "Bekijk Volledige Financiële Analyse"
     }
+  },
+  "verifyEmail": {
+    "title": "Bevestig je e-mail",
+    "unconfirmed": "Je account is nog niet bevestigd.",
+    "sentTo": "We hebben een bevestigingslink gestuurd naar <strong>{email}</strong>.",
+    "sentGeneric": "We hebben je een bevestigingslink per e-mail gestuurd.",
+    "instruction": "Open de e-mail en klik op de link om je account te activeren. Daarna kun je inloggen.",
+    "spamHint": "Niets ontvangen? Wacht een minuut en controleer je spammap.",
+    "resent": "We hebben de bevestigingsmail opnieuw verzonden. Controleer je inbox.",
+    "noEmail": "E-mail ontbreekt. Ga terug naar registratie en probeer opnieuw.",
+    "resendButton": "E-mail opnieuw verzenden",
+    "resending": "Verzenden...",
+    "backToLogin": "Terug naar inloggen",
+    "wrongEmail": "Verkeerde e-mail?",
+    "changeEmail": "Corrigeren",
+    "openGmail": "Gmail openen",
+    "openOutlook": "Outlook openen"
   }
 }

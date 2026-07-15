@@ -137,7 +137,10 @@
     "submitButton": "登録",
     "submitLoading": "作成中...",
     "hasAccount": "既にアカウントをお持ちですか？",
-    "loginLink": "ログイン"
+    "loginLink": "ログイン",
+    "confirmPasswordLabel": "パスワード（確認）",
+    "passwordMismatch": "パスワードが一致しません。",
+    "emailInUse": "このメールアドレスは既に登録されています。"
   },
   "forgotPassword": {
     "title": "パスワードのリセット",
@@ -510,5 +513,22 @@
       "compareDesc": "財務パフォーマンスを並べて評価。",
       "viewFinancials": "完全な財務分析を見る"
     }
+  },
+  "verifyEmail": {
+    "title": "メールを確認してください",
+    "unconfirmed": "アカウントはまだ確認されていません。",
+    "sentTo": "<strong>{email}</strong> 宛に確認リンクを送信しました。",
+    "sentGeneric": "確認リンクをメールで送信しました。",
+    "instruction": "メールを開いてリンクをクリックすると、アカウントが有効になります。その後ログインしてください。",
+    "spamHint": "届いていませんか？1分ほど待って、迷惑メールフォルダも確認してください。",
+    "resent": "確認メールを再送しました。受信トレイをご確認ください。",
+    "noEmail": "メールアドレスがありません。登録画面に戻ってやり直してください。",
+    "resendButton": "メールを再送する",
+    "resending": "再送中...",
+    "backToLogin": "ログインに戻る",
+    "wrongEmail": "メールアドレスが違う？",
+    "changeEmail": "修正する",
+    "openGmail": "Gmail を開く",
+    "openOutlook": "Outlook を開く"
   }
 }

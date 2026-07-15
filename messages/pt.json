@@ -138,7 +138,10 @@
     "submitButton": "Registar",
     "submitLoading": "A registar...",
     "hasAccount": "Já tens conta?",
-    "loginLink": "Faz Login"
+    "loginLink": "Faz Login",
+    "confirmPasswordLabel": "Confirmar Password",
+    "passwordMismatch": "As passwords não coincidem.",
+    "emailInUse": "Este email já está registado."
   },
   "forgotPassword": {
     "title": "Recuperar Password",
@@ -643,5 +646,22 @@
       "compareDesc": "Avalia o desempenho financeiro lado a lado.",
       "viewFinancials": "Ver Análise Financeira Completa"
     }
+  },
+  "verifyEmail": {
+    "title": "Confirma o teu email",
+    "unconfirmed": "A tua conta ainda não está confirmada.",
+    "sentTo": "Enviámos um link de confirmação para <strong>{email}</strong>.",
+    "sentGeneric": "Enviámos-te um link de confirmação por email.",
+    "instruction": "Abre o email e clica no link para ativares a conta. Depois é só entrares.",
+    "spamHint": "Não recebeste? Espera um minuto e verifica a pasta de spam ou lixo.",
+    "resent": "Reenviámos o email de confirmação. Verifica a caixa de entrada.",
+    "noEmail": "Falta o email. Volta ao registo e tenta de novo.",
+    "resendButton": "Reenviar email",
+    "resending": "A reenviar...",
+    "backToLogin": "Voltar ao login",
+    "wrongEmail": "Email errado?",
+    "changeEmail": "Corrigir",
+    "openGmail": "Abrir Gmail",
+    "openOutlook": "Abrir Outlook"
   }
 }

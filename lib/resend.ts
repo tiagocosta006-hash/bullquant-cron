@@ -127,6 +127,36 @@ const getEmailTemplate = (content: string) => `
 </html>
 `;
 
+/** Indica se o envio de emails (Resend) está configurado neste ambiente. */
+export const isEmailEnabled = () => resend !== null
+
+/**
+ * Envia o email de Confirmação de conta (com a marca BullMetrics).
+ * `confirmLink` é o link gerado pelo Supabase (Admin generateLink) que, ao ser
+ * aberto, confirma o email e devolve o utilizador autenticado à app.
+ */
+export const sendConfirmationEmail = async (email: string, name: string, confirmLink: string) => {
+  if (!resend) {
+    console.warn('RESEND_API_KEY não encontrada. Email de confirmação ignorado.');
+    return;
+  }
+
+  return await resend.emails.send({
+    from: FROM_EMAIL,
+    to: [email],
+    subject: 'Confirma a tua conta — BullMetrics',
+    text: `Olá ${name},\n\nFalta só um passo para ativares a tua conta na BullMetrics.\nConfirma o teu email abrindo este link:\n\n${confirmLink}\n\nSe não foste tu a criar esta conta, ignora este email.`,
+    html: getEmailTemplate(`
+      <h2>Olá ${name}, confirma a tua conta</h2>
+      <p>Falta só um passo para começares a usar a BullMetrics. Clica no botão abaixo para confirmar o teu email e ativar a conta.</p>
+      <div style="text-align: center;">
+        <a href="${confirmLink}" class="btn">Confirmar Email</a>
+      </div>
+      <p style="margin-top: 24px; font-size: 14px;">Se não foste tu a criar esta conta, podes ignorar este email com segurança.</p>
+    `),
+  });
+};
+
 /**
  * Envia o email de Boas-vindas e Confirmação de Registo
  */

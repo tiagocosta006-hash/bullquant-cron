@@ -137,7 +137,10 @@
     "submitButton": "Registrieren",
     "submitLoading": "Erstellen...",
     "hasAccount": "Bereits ein Konto?",
-    "loginLink": "Anmelden"
+    "loginLink": "Anmelden",
+    "confirmPasswordLabel": "Passwort bestätigen",
+    "passwordMismatch": "Die Passwörter stimmen nicht überein.",
+    "emailInUse": "Diese E-Mail ist bereits registriert."
   },
   "forgotPassword": {
     "title": "Passwort zurücksetzen",
@@ -510,5 +513,22 @@
       "compareDesc": "Finanzielle Leistung nebeneinander bewerten.",
       "viewFinancials": "Vollständige Finanzanalyse ansehen"
     }
+  },
+  "verifyEmail": {
+    "title": "Bestätige deine E-Mail",
+    "unconfirmed": "Dein Konto ist noch nicht bestätigt.",
+    "sentTo": "Wir haben einen Bestätigungslink an <strong>{email}</strong> gesendet.",
+    "sentGeneric": "Wir haben dir einen Bestätigungslink per E-Mail gesendet.",
+    "instruction": "Öffne die E-Mail und klicke auf den Link, um dein Konto zu aktivieren. Danach einfach einloggen.",
+    "spamHint": "Nichts erhalten? Warte eine Minute und prüfe deinen Spam-Ordner.",
+    "resent": "Wir haben die Bestätigungs-E-Mail erneut gesendet. Prüfe deinen Posteingang.",
+    "noEmail": "E-Mail fehlt. Geh zurück zur Registrierung und versuche es erneut.",
+    "resendButton": "E-Mail erneut senden",
+    "resending": "Wird gesendet...",
+    "backToLogin": "Zurück zum Login",
+    "wrongEmail": "Falsche E-Mail?",
+    "changeEmail": "Korrigieren",
+    "openGmail": "Gmail öffnen",
+    "openOutlook": "Outlook öffnen"
   }
 }

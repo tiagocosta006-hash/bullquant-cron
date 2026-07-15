@@ -7,7 +7,7 @@ import { getTranslations } from 'next-intl/server'
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ message?: string; error?: string }>
+  searchParams: Promise<{ message?: string; error?: string; email?: string }>
 }) {
   const resolvedParams = await searchParams
   const t = await getTranslations('login')
@@ -36,6 +36,7 @@ export default async function LoginPage({
                 type="email"
                 required
                 placeholder={t('emailPlaceholder')}
+                defaultValue={resolvedParams.email}
               />
             </div>
           </div>

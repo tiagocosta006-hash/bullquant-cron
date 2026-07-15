@@ -137,7 +137,10 @@
     "submitButton": "注册",
     "submitLoading": "注册中...",
     "hasAccount": "已有账户？",
-    "loginLink": "登录"
+    "loginLink": "登录",
+    "confirmPasswordLabel": "确认密码",
+    "passwordMismatch": "两次输入的密码不一致。",
+    "emailInUse": "该邮箱已被注册。"
   },
   "forgotPassword": {
     "title": "重置密码",
@@ -510,5 +513,22 @@
       "compareDesc": "并排评估财务表现。",
       "viewFinancials": "查看完整财务分析"
     }
+  },
+  "verifyEmail": {
+    "title": "确认你的邮箱",
+    "unconfirmed": "你的账户尚未确认。",
+    "sentTo": "我们已向 <strong>{email}</strong> 发送了确认链接。",
+    "sentGeneric": "我们已通过邮件向你发送了确认链接。",
+    "instruction": "打开邮件并点击链接以激活账户，然后即可登录。",
+    "spamHint": "没收到？请稍等一分钟并检查垃圾邮件文件夹。",
+    "resent": "我们已重新发送确认邮件，请查收。",
+    "noEmail": "缺少邮箱。请返回注册页面重试。",
+    "resendButton": "重新发送邮件",
+    "resending": "发送中...",
+    "backToLogin": "返回登录",
+    "wrongEmail": "邮箱写错了？",
+    "changeEmail": "更正",
+    "openGmail": "打开 Gmail",
+    "openOutlook": "打开 Outlook"
   }
 }

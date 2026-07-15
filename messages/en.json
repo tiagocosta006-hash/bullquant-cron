@@ -138,7 +138,10 @@
     "submitButton": "Sign up",
     "submitLoading": "Signing up...",
     "hasAccount": "Already have an account?",
-    "loginLink": "Sign in"
+    "loginLink": "Sign in",
+    "confirmPasswordLabel": "Confirm Password",
+    "passwordMismatch": "Passwords don't match.",
+    "emailInUse": "This email is already registered."
   },
   "forgotPassword": {
     "title": "Reset Password",
@@ -647,5 +650,22 @@
       "compareDesc": "Evaluate financial performance side-by-side.",
       "viewFinancials": "View Full Financial Analysis"
     }
+  },
+  "verifyEmail": {
+    "title": "Confirm your email",
+    "unconfirmed": "Your account isn't confirmed yet.",
+    "sentTo": "We sent a confirmation link to <strong>{email}</strong>.",
+    "sentGeneric": "We sent you a confirmation link by email.",
+    "instruction": "Open the email and click the link to activate your account. Then just log in.",
+    "spamHint": "Didn't get it? Wait a minute and check your spam or junk folder.",
+    "resent": "We resent the confirmation email. Check your inbox.",
+    "noEmail": "Email is missing. Go back to sign up and try again.",
+    "resendButton": "Resend email",
+    "resending": "Resending...",
+    "backToLogin": "Back to login",
+    "wrongEmail": "Wrong email?",
+    "changeEmail": "Fix it",
+    "openGmail": "Open Gmail",
+    "openOutlook": "Open Outlook"
   }
 }

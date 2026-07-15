@@ -137,7 +137,10 @@
     "submitButton": "Registrati",
     "submitLoading": "Creazione...",
     "hasAccount": "Hai già un account?",
-    "loginLink": "Accedi"
+    "loginLink": "Accedi",
+    "confirmPasswordLabel": "Conferma password",
+    "passwordMismatch": "Le password non coincidono.",
+    "emailInUse": "Questa email è già registrata."
   },
   "forgotPassword": {
     "title": "Reimposta Password",
@@ -510,5 +513,22 @@
       "compareDesc": "Valuta le performance finanziarie fianco a fianco.",
       "viewFinancials": "Vedi Analisi Finanziaria Completa"
     }
+  },
+  "verifyEmail": {
+    "title": "Conferma la tua email",
+    "unconfirmed": "Il tuo account non è ancora confermato.",
+    "sentTo": "Abbiamo inviato un link di conferma a <strong>{email}</strong>.",
+    "sentGeneric": "Ti abbiamo inviato un link di conferma via email.",
+    "instruction": "Apri l'email e clicca sul link per attivare il tuo account. Poi accedi.",
+    "spamHint": "Non l'hai ricevuta? Aspetta un minuto e controlla la cartella spam.",
+    "resent": "Abbiamo reinviato l'email di conferma. Controlla la posta in arrivo.",
+    "noEmail": "Manca l'email. Torna alla registrazione e riprova.",
+    "resendButton": "Reinvia email",
+    "resending": "Invio in corso...",
+    "backToLogin": "Torna al login",
+    "wrongEmail": "Email sbagliata?",
+    "changeEmail": "Correggi",
+    "openGmail": "Apri Gmail",
+    "openOutlook": "Apri Outlook"
   }
 }

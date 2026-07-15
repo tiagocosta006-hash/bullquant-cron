@@ -286,7 +286,8 @@
     "card": {
       "currentPrice": "Prix Actuel",
       "remove": "Retirer du portefeuille",
-      "addPosition": "Ajouter une position"
+      "addPosition": "Ajouter une position",
+      "edit": "Modifier la position"
     },
     "lastUpdate": "Dernière m.a.j :",
     "addPosition": {
@@ -296,7 +297,15 @@
       "priceLabel": "Prix d'achat moyen (USD)",
       "cancel": "Annuler",
       "confirm": "Ajouter",
-      "error": "Impossible d'ajouter la position. Réessaie."
+      "error": "Impossible d'ajouter la position. Réessaie.",
+      "editTitle": "Modifier la position — {ticker}",
+      "dateLabel": "Date d'achat",
+      "brokerLabel": "Courtier",
+      "currencyLabel": "Devise",
+      "feesLabel": "Frais",
+      "notesLabel": "Notes",
+      "notesPlaceholder": "Remarques sur cette position…",
+      "save": "Enregistrer"
     },
     "allocation": {
       "barsView": "Bar view",
@@ -339,7 +348,9 @@
     "position": {
       "avgCost": "avg. cost",
       "pnl": "P&L",
-      "shares": "shares"
+      "shares": "shares",
+      "fees": "Frais",
+      "notes": "Notes"
     },
     "summary": {
       "marketValue": "Market Value",

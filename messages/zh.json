@@ -286,7 +286,8 @@
     "card": {
       "currentPrice": "当前价格",
       "remove": "从投资组合中移除",
-      "addPosition": "添加持仓"
+      "addPosition": "添加持仓",
+      "edit": "编辑持仓"
     },
     "lastUpdate": "最后更新:",
     "addPosition": {
@@ -296,7 +297,15 @@
       "priceLabel": "平均买入价（USD）",
       "cancel": "取消",
       "confirm": "添加",
-      "error": "无法添加持仓，请重试。"
+      "error": "无法添加持仓，请重试。",
+      "editTitle": "编辑持仓 — {ticker}",
+      "dateLabel": "买入日期",
+      "brokerLabel": "券商",
+      "currencyLabel": "货币",
+      "feesLabel": "费用",
+      "notesLabel": "备注",
+      "notesPlaceholder": "关于该持仓的备注…",
+      "save": "保存"
     },
     "allocation": {
       "barsView": "Bar view",
@@ -339,7 +348,9 @@
     "position": {
       "avgCost": "avg. cost",
       "pnl": "P&L",
-      "shares": "shares"
+      "shares": "shares",
+      "fees": "费用",
+      "notes": "备注"
     },
     "summary": {
       "marketValue": "Market Value",

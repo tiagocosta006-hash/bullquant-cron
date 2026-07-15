@@ -286,7 +286,8 @@
     "card": {
       "currentPrice": "Huidige Prijs",
       "remove": "Verwijderen uit portfolio",
-      "addPosition": "Positie toevoegen"
+      "addPosition": "Positie toevoegen",
+      "edit": "Positie bewerken"
     },
     "lastUpdate": "Laatste update:",
     "addPosition": {
@@ -296,7 +297,15 @@
       "priceLabel": "Gemiddelde aankoopprijs (USD)",
       "cancel": "Annuleren",
       "confirm": "Toevoegen",
-      "error": "Kon de positie niet toevoegen. Probeer opnieuw."
+      "error": "Kon de positie niet toevoegen. Probeer opnieuw.",
+      "editTitle": "Positie bewerken — {ticker}",
+      "dateLabel": "Aankoopdatum",
+      "brokerLabel": "Broker",
+      "currencyLabel": "Valuta",
+      "feesLabel": "Kosten",
+      "notesLabel": "Notities",
+      "notesPlaceholder": "Notities over deze positie…",
+      "save": "Opslaan"
     },
     "allocation": {
       "barsView": "Bar view",
@@ -339,7 +348,9 @@
     "position": {
       "avgCost": "avg. cost",
       "pnl": "P&L",
-      "shares": "shares"
+      "shares": "shares",
+      "fees": "Kosten",
+      "notes": "Notities"
     },
     "summary": {
       "marketValue": "Market Value",

@@ -286,7 +286,8 @@
     "card": {
       "currentPrice": "Preço Atual",
       "remove": "Remover do portfólio",
-      "addPosition": "Adicionar posição"
+      "addPosition": "Adicionar posição",
+      "edit": "Editar posição"
     },
     "table": {
       "company": "Empresa",
@@ -312,7 +313,9 @@
     "position": {
       "shares": "ações",
       "avgCost": "custo médio",
-      "pnl": "Ganho/Perda"
+      "pnl": "Ganho/Perda",
+      "fees": "Taxas",
+      "notes": "Notas"
     },
     "summary": {
       "marketValue": "Valor de Mercado",
@@ -392,7 +395,15 @@
       "priceLabel": "Preço médio de compra (USD)",
       "cancel": "Cancelar",
       "confirm": "Adicionar",
-      "error": "Não foi possível adicionar a posição. Tenta novamente."
+      "error": "Não foi possível adicionar a posição. Tenta novamente.",
+      "editTitle": "Editar posição — {ticker}",
+      "dateLabel": "Data de compra",
+      "brokerLabel": "Corretora",
+      "currencyLabel": "Moeda",
+      "feesLabel": "Taxas",
+      "notesLabel": "Notas",
+      "notesPlaceholder": "Observações sobre esta posição…",
+      "save": "Guardar"
     }
   },
   "stock": {

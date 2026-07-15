@@ -149,6 +149,13 @@ model PortfolioItem {
   addedAt     DateTime  @default(now())
   quantity    Decimal?  @db.Decimal(20, 6)
   avgBuyPrice Decimal?  @db.Decimal(12, 4)
+  // Detalhes opcionais da posição (entrada manual; o sync Trading212 não os
+  // escreve — têm de continuar nullable para o upsert do sync não partir)
+  buyDate     DateTime?
+  broker      String?
+  currency    String?
+  fees        Decimal?  @db.Decimal(12, 4)
+  notes       String?   @db.Text
   company     Company   @relation(fields: [companyId], references: [id])
   portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
 

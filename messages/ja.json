@@ -286,7 +286,8 @@
     "card": {
       "currentPrice": "現在の価格",
       "remove": "ポートフォリオから削除",
-      "addPosition": "ポジションを追加"
+      "addPosition": "ポジションを追加",
+      "edit": "ポジションを編集"
     },
     "lastUpdate": "最終更新:",
     "addPosition": {
@@ -296,7 +297,15 @@
       "priceLabel": "平均購入価格（USD）",
       "cancel": "キャンセル",
       "confirm": "追加",
-      "error": "ポジションを追加できませんでした。もう一度お試しください。"
+      "error": "ポジションを追加できませんでした。もう一度お試しください。",
+      "editTitle": "ポジションを編集 — {ticker}",
+      "dateLabel": "購入日",
+      "brokerLabel": "証券会社",
+      "currencyLabel": "通貨",
+      "feesLabel": "手数料",
+      "notesLabel": "メモ",
+      "notesPlaceholder": "このポジションに関するメモ…",
+      "save": "保存"
     },
     "allocation": {
       "barsView": "Bar view",
@@ -339,7 +348,9 @@
     "position": {
       "avgCost": "avg. cost",
       "pnl": "P&L",
-      "shares": "shares"
+      "shares": "shares",
+      "fees": "手数料",
+      "notes": "メモ"
     },
     "summary": {
       "marketValue": "Market Value",

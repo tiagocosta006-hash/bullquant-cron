@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { useTranslations } from "next-intl"
-import { X } from "lucide-react"
+import { X, Pencil } from "lucide-react"
 import {
   Table,
   TableBody,
@@ -19,9 +19,10 @@ interface PortfolioTableProps {
   items: PortfolioItem[]
   prices: Record<string, PriceData>
   onRemove: (ticker: string) => void
+  onEdit?: (ticker: string) => void
 }
 
-export function PortfolioTable({ items, prices, onRemove }: PortfolioTableProps) {
+export function PortfolioTable({ items, prices, onRemove, onEdit }: PortfolioTableProps) {
   const t = useTranslations("portfolio")
   const hasAnyPosition = items.some(item => item.quantity !== null && item.avgBuyPrice !== null)
 
@@ -48,8 +49,9 @@ export function PortfolioTable({ items, prices, onRemove }: PortfolioTableProps)
             const fundamental = item.company.fundamentals?.[0]
             const quantity = item.quantity !== null ? Number(item.quantity) : null
             const avgBuyPrice = item.avgBuyPrice !== null ? Number(item.avgBuyPrice) : null
+            const fees = item.fees !== null && item.fees !== undefined ? Number(item.fees) : 0
             const pnl = quantity !== null && avgBuyPrice !== null && hasValidPrice
-              ? calculatePositionPnl(quantity, avgBuyPrice, price.currentPrice as number)
+              ? calculatePositionPnl(quantity, avgBuyPrice, price.currentPrice as number, fees)
               : null
 
             return (
@@ -98,10 +100,22 @@ export function PortfolioTable({ items, prices, onRemove }: PortfolioTableProps)
                   </TableCell>
                 )}
                 <TableCell className="text-right">
+                  {onEdit && (
+                    <button
+                      type="button"
+                      onClick={() => onEdit(item.company.ticker)}
+                      aria-label={t('card.edit')}
+                      title={t('card.edit')}
+                      className="inline-flex items-center justify-center rounded-md h-9 w-9 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => onRemove(item.company.ticker)}
                     aria-label={t('card.remove')}
+                    title={t('card.remove')}
                     className="inline-flex items-center justify-center rounded-md h-9 w-9 text-muted-foreground hover:text-bear hover:bg-bear/10 transition-colors"
                   >
                     <X className="h-4 w-4" />

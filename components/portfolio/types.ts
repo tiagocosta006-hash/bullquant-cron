@@ -19,6 +19,12 @@ export type PortfolioItem = {
   company: Company
   quantity: number | string | null
   avgBuyPrice: number | string | null
+  // detalhes opcionais da posição (Decimal do Prisma chega como string no JSON)
+  buyDate?: string | null
+  broker?: string | null
+  currency?: string | null
+  fees?: number | string | null
+  notes?: string | null
 }
 
 export type PriceData = {

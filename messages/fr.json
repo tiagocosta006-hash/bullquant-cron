@@ -196,21 +196,51 @@
       "save": "Enregistrer",
       "dangerZone": "Zone Dangereuse",
       "logoutDesc": "Déconnectez-vous en toute sécurité.",
-      "logoutBtn": "Se Déconnecter"
+      "logoutBtn": "Se Déconnecter",
+      "changeEmailTitle": "Changer d'e-mail",
+      "newEmail": "Nouvel e-mail",
+      "confirmEmailChangeBtn": "Confirmer le changement",
+      "emailChangeSuccess": "Un e-mail de confirmation a été envoyé à la nouvelle et à l'ancienne adresse. Vérifie tes boîtes de réception."
     },
     "preferences": {
       "title": "Préférences",
       "language": "Langue",
       "languageDesc": "Choisissez votre langue.",
       "theme": "Thème Visuel",
-      "themeDesc": "Basculez entre le mode clair et sombre."
+      "themeDesc": "Basculez entre le mode clair et sombre.",
+      "themeLight": "Clair",
+      "themeDark": "Sombre"
     },
     "subscription": {
       "title": "Votre Plan",
       "desc": "Vous êtes sur le plan gratuit.",
       "premiumSoonTitle": "Accès PRO prochainement",
       "premiumSoonDesc": "Nous préparons des fonctionnalités avancées.",
-      "upgradeBtn": "Passer en PRO"
+      "upgradeBtn": "Passer en PRO",
+      "aiUsageLabel": "Analyses IA aujourd'hui",
+      "aiUnlimited": "Illimitées",
+      "compare": {
+        "title": "Free vs PRO",
+        "free": "Free",
+        "pro": "PRO",
+        "priceLabel": "Prix",
+        "priceFree": "0 €",
+        "pricePro": "7 €/mois",
+        "priceNote": "Prix provisoire — le prix final sera annoncé au lancement.",
+        "quotesLabel": "Cotations et 10 ans de fondamentaux",
+        "aiLabel": "Analyses IA",
+        "aiFree": "{limit}/jour",
+        "aiPro": "Illimitées",
+        "kpisLabel": "KPIs métier (IA approfondie)",
+        "pdfLabel": "Rapports PDF PRO"
+      },
+      "beta": {
+        "title": "Mode bêta",
+        "desc": "Pendant la bêta, tu peux basculer entre Free et PRO sans payer, pour tout tester.",
+        "toPro": "Activer PRO (bêta)",
+        "toFree": "Revenir au plan Free",
+        "error": "Impossible de changer de plan. Réessaie."
+      }
     }
   },
   "portfolio": {

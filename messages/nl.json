@@ -196,21 +196,51 @@
       "save": "Opslaan",
       "dangerZone": "Gevarenzone",
       "logoutDesc": "Veilig uitloggen.",
-      "logoutBtn": "Uitloggen"
+      "logoutBtn": "Uitloggen",
+      "changeEmailTitle": "E-mail wijzigen",
+      "newEmail": "Nieuwe e-mail",
+      "confirmEmailChangeBtn": "Wijziging bevestigen",
+      "emailChangeSuccess": "Er is een bevestigingsmail verzonden naar het nieuwe en het oude adres. Controleer je inboxen."
     },
     "preferences": {
       "title": "Voorkeuren",
       "language": "Taal",
       "languageDesc": "Kies je voorkeurstaal.",
       "theme": "Visueel Thema",
-      "themeDesc": "Wissel tussen lichte en donkere modus."
+      "themeDesc": "Wissel tussen lichte en donkere modus.",
+      "themeLight": "Licht",
+      "themeDark": "Donker"
     },
     "subscription": {
       "title": "Jouw Plan",
       "desc": "Je hebt momenteel het gratis plan.",
       "premiumSoonTitle": "PRO-toegang binnenkort beschikbaar",
       "premiumSoonDesc": "We bereiden geavanceerde functies voor.",
-      "upgradeBtn": "Upgrade naar PRO"
+      "upgradeBtn": "Upgrade naar PRO",
+      "aiUsageLabel": "AI-analyses vandaag",
+      "aiUnlimited": "Onbeperkt",
+      "compare": {
+        "title": "Free vs PRO",
+        "free": "Free",
+        "pro": "PRO",
+        "priceLabel": "Prijs",
+        "priceFree": "€ 0",
+        "pricePro": "€ 7/maand",
+        "priceNote": "Voorlopige prijs — de definitieve prijs wordt bij de lancering aangekondigd.",
+        "quotesLabel": "Koersen en 10 jaar fundamentals",
+        "aiLabel": "AI-analyses",
+        "aiFree": "{limit}/dag",
+        "aiPro": "Onbeperkt",
+        "kpisLabel": "Business-KPI's (diepe AI)",
+        "pdfLabel": "PRO PDF-rapporten"
+      },
+      "beta": {
+        "title": "Bètamodus",
+        "desc": "Tijdens de bèta kun je gratis wisselen tussen Free en PRO om alle functies te testen.",
+        "toPro": "PRO activeren (bèta)",
+        "toFree": "Terug naar het Free-plan",
+        "error": "Kon het plan niet wijzigen. Probeer opnieuw."
+      }
     }
   },
   "portfolio": {

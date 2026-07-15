@@ -211,23 +211,51 @@
       "deleteAccountBtn": "Apagar Conta",
       "deleteAccountConfirmLabel": "Escreve APAGAR para confirmar",
       "deleteAccountCancel": "Cancelar",
-      "deleteAccountSubmit": "Apagar para Sempre"
+      "deleteAccountSubmit": "Apagar para Sempre",
+      "changeEmailTitle": "Alterar Email",
+      "newEmail": "Novo Email",
+      "confirmEmailChangeBtn": "Confirmar Alteração",
+      "emailChangeSuccess": "Foi enviado um email de confirmação para o novo e o antigo endereço. Verifica as caixas de correio."
     },
     "preferences": {
       "title": "Preferências de Utilização",
-      "settings": "Definições",
-      "settingsDesc": "Gere o teu perfil, subscrição e preferências da app.",
       "language": "Idioma",
       "languageDesc": "Escolhe a língua em que queres usar o Bullmetrics.",
       "theme": "Tema Visual",
-      "themeDesc": "Alterna entre modo escuro (Dark) e modo claro (Light)."
+      "themeDesc": "Alterna entre modo escuro (Dark) e modo claro (Light).",
+      "themeLight": "Claro",
+      "themeDark": "Escuro"
     },
     "subscription": {
       "title": "O Teu Plano Atual",
       "desc": "Estás atualmente no plano gratuito. Tens acesso ilimitado a cotações, mas o número de análises de IA e DCF diárias é limitado.",
       "premiumSoonTitle": "Acesso Premium em Breve",
       "premiumSoonDesc": "Estamos a preparar funcionalidades avançadas de inteligência artificial exclusivas para subscritores PRO.",
-      "upgradeBtn": "Fazer Upgrade para PRO"
+      "upgradeBtn": "Fazer Upgrade para PRO",
+      "aiUsageLabel": "Análises de IA hoje",
+      "aiUnlimited": "Ilimitadas",
+      "compare": {
+        "title": "Free vs PRO",
+        "free": "Free",
+        "pro": "PRO",
+        "priceLabel": "Preço",
+        "priceFree": "0 €",
+        "pricePro": "7 €/mês",
+        "priceNote": "Preço provisório — o valor final será anunciado no lançamento.",
+        "quotesLabel": "Cotações e 10 anos de fundamentais",
+        "aiLabel": "Análises de IA",
+        "aiFree": "{limit}/dia",
+        "aiPro": "Ilimitadas",
+        "kpisLabel": "KPIs de negócio (IA profunda)",
+        "pdfLabel": "Relatórios PDF PRO"
+      },
+      "beta": {
+        "title": "Modo beta",
+        "desc": "Durante a beta podes alternar entre Free e PRO sem pagamento, para testares todas as funcionalidades.",
+        "toPro": "Ativar PRO (beta)",
+        "toFree": "Voltar ao plano Free",
+        "error": "Não foi possível alterar o plano. Tenta novamente."
+      }
     }
   },
   "portfolio": {

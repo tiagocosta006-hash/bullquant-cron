@@ -196,21 +196,51 @@
       "save": "保存",
       "dangerZone": "危険ゾーン",
       "logoutDesc": "安全にログアウトします。",
-      "logoutBtn": "ログアウト"
+      "logoutBtn": "ログアウト",
+      "changeEmailTitle": "メールアドレスの変更",
+      "newEmail": "新しいメールアドレス",
+      "confirmEmailChangeBtn": "変更を確認",
+      "emailChangeSuccess": "新旧両方のアドレスに確認メールを送信しました。受信トレイをご確認ください。"
     },
     "preferences": {
       "title": "環境設定",
       "language": "言語",
       "languageDesc": "言語を選択してください。",
       "theme": "テーマ",
-      "themeDesc": "ライトモードとダークモードを切り替えます。"
+      "themeDesc": "ライトモードとダークモードを切り替えます。",
+      "themeLight": "ライト",
+      "themeDark": "ダーク"
     },
     "subscription": {
       "title": "現在のプラン",
       "desc": "現在、無料プランを利用しています。",
       "premiumSoonTitle": "PROアクセスは近日公開",
       "premiumSoonDesc": "高度な機能を準備中です。",
-      "upgradeBtn": "PROにアップグレード"
+      "upgradeBtn": "PROにアップグレード",
+      "aiUsageLabel": "本日のAI分析",
+      "aiUnlimited": "無制限",
+      "compare": {
+        "title": "Free vs PRO",
+        "free": "Free",
+        "pro": "PRO",
+        "priceLabel": "価格",
+        "priceFree": "0 €",
+        "pricePro": "7 €/月",
+        "priceNote": "暫定価格——正式価格はリリース時に発表されます。",
+        "quotesLabel": "株価と10年分のファンダメンタルズ",
+        "aiLabel": "AI分析",
+        "aiFree": "{limit}回/日",
+        "aiPro": "無制限",
+        "kpisLabel": "ビジネスKPI（ディープAI）",
+        "pdfLabel": "PRO PDFレポート"
+      },
+      "beta": {
+        "title": "ベータモード",
+        "desc": "ベータ期間中は支払いなしでFreeとPROを切り替えて、すべての機能を試せます。",
+        "toPro": "PROを有効化（ベータ）",
+        "toFree": "Freeプランに戻る",
+        "error": "プランを変更できませんでした。もう一度お試しください。"
+      }
     }
   },
   "portfolio": {

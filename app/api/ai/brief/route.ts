@@ -5,12 +5,9 @@ import { createClient } from '@/lib/supabase/server'
 import { generateObject } from 'ai'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { z } from 'zod'
+import { DAILY_FREE_AI_LIMIT } from '@/lib/limits'
 
 export const maxDuration = 60; // Vercel function timeout (60s is good for AI)
-
-// Limite diário de gerações de IA no plano FREE (CLAUDE.md §10, feature 6).
-// Só gerações reais contam; servir da cache não consome quota.
-const DAILY_FREE_LIMIT = 5
 
 export async function GET(request: Request) {
   try {
@@ -57,7 +54,7 @@ export async function GET(request: Request) {
       const usedToday = await prisma.aIUsageLog.count({
         where: { userId: user.id, usedAt: { gte: startOfDay } },
       })
-      if (usedToday >= DAILY_FREE_LIMIT) {
+      if (usedToday >= DAILY_FREE_AI_LIMIT) {
         return NextResponse.json(
           {
             error: 'rate_limit',

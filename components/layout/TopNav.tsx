@@ -28,17 +28,27 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { logout } from "@/app/(auth)/actions";
 import { useIsMac } from "@/hooks/useIsMac";
 
+/** Iniciais para o avatar: 2 letras do nome (ex: "Alex Martins" → "AM"). */
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/)
+  return ((parts[0]?.[0] ?? "?") + (parts[1]?.[0] ?? "")).toUpperCase()
+}
+
 /**
  * TopNav — a navegação ÚNICA do terminal: uma pill Liquid Glass
  * flutuante (o conteúdo dobra-se nas bordas ao passar por baixo).
- * Substitui sidebar + header: 5 destinos primários, ⌘K universal,
- * overflow (comparar/transcrições/definições) num popover.
+ * Substitui sidebar + header: 6 destinos primários, ⌘K universal,
+ * menu de avatar (conta/comparar/transcrições/definições/logout).
  */
 export function TopNav({
   userName,
+  userEmail,
+  plan,
   devSlot,
 }: {
   userName?: string | null;
+  userEmail?: string | null;
+  plan?: string | null;
   devSlot?: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -109,19 +119,37 @@ export function TopNav({
           {devSlot}
           <ThemeToggle />
 
-          {/* overflow: comparar, transcrições, definições */}
+          {/* menu de perfil: avatar de iniciais + conta, links e logout */}
           <Popover>
             <PopoverTrigger
               render={
-                <Button variant="ghost" size="icon" title={t("more")}>
-                  <MoreHorizontal className="h-5 w-5" />
-                </Button>
+                <button
+                  type="button"
+                  title={userName || t("more")}
+                  aria-label={userName || t("more")}
+                  className="ml-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/10 text-xs font-extrabold text-primary transition-colors hover:bg-primary/20"
+                >
+                  {userName ? initials(userName) : <MoreHorizontal className="h-5 w-5" />}
+                </button>
               }
             />
-            <PopoverContent align="end" className="w-56 p-1.5">
+            <PopoverContent align="end" className="w-64 p-1.5">
               {userName && (
-                <div className="border-b border-border/60 px-3 py-2 text-xs font-medium text-muted-foreground">
-                  {userName}
+                <div className="mb-1 flex items-center gap-3 border-b border-border/60 px-3 pb-2.5 pt-1.5">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/15 bg-primary/10 text-xs font-extrabold text-primary">
+                    {initials(userName)}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-foreground">{userName}</p>
+                    {userEmail && (
+                      <p className="truncate text-xs text-muted-foreground">{userEmail}</p>
+                    )}
+                  </div>
+                  {plan && (
+                    <span className="ml-auto shrink-0 rounded-full border border-bull/20 bg-bull/10 px-2 py-0.5 text-[10px] font-bold text-bull">
+                      {plan}
+                    </span>
+                  )}
                 </div>
               )}
               {overflow.map(({ href, icon: Icon, label }) => (

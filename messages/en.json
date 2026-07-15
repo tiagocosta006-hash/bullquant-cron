@@ -199,12 +199,6 @@
       "save": "Save Changes",
       "dangerZone": "Danger Zone",
       "logoutDesc": "Securely sign out of your Bullmetrics session.",
-      "settings": "Settings",
-      "settingsDesc": "Manage your profile, subscription, and app preferences.",
-      "language": "Language",
-      "languageDesc": "Choose the language you want to use in Bullmetrics.",
-      "theme": "Visual Theme",
-      "themeDesc": "Switch between Dark and Light mode.",
       "logoutBtn": "Sign Out",
       "securityTitle": "Security",
       "currentPassword": "Current Password",
@@ -217,21 +211,51 @@
       "deleteAccountBtn": "Delete Account",
       "deleteAccountConfirmLabel": "Type DELETE to confirm",
       "deleteAccountCancel": "Cancel",
-      "deleteAccountSubmit": "Delete Forever"
+      "deleteAccountSubmit": "Delete Forever",
+      "changeEmailTitle": "Change Email",
+      "newEmail": "New Email",
+      "confirmEmailChangeBtn": "Confirm Change",
+      "emailChangeSuccess": "A confirmation email was sent to both the new and old address. Check your inboxes."
     },
     "preferences": {
       "title": "App Preferences",
       "language": "Interface Language",
       "languageDesc": "Choose the language you want to use in Bullmetrics.",
       "theme": "Visual Theme",
-      "themeDesc": "Switch between Dark and Light mode."
+      "themeDesc": "Switch between Dark and Light mode.",
+      "themeLight": "Light",
+      "themeDark": "Dark"
     },
     "subscription": {
       "title": "Your Current Plan",
       "desc": "You are currently on the free plan. You have unlimited access to quotes, but daily AI analyses and DCFs are limited.",
       "premiumSoonTitle": "Premium Access Coming Soon",
       "premiumSoonDesc": "We are preparing advanced artificial intelligence features exclusively for PRO subscribers.",
-      "upgradeBtn": "Upgrade to PRO"
+      "upgradeBtn": "Upgrade to PRO",
+      "aiUsageLabel": "AI analyses today",
+      "aiUnlimited": "Unlimited",
+      "compare": {
+        "title": "Free vs PRO",
+        "free": "Free",
+        "pro": "PRO",
+        "priceLabel": "Price",
+        "priceFree": "€0",
+        "pricePro": "€7/month",
+        "priceNote": "Provisional price — the final price will be announced at launch.",
+        "quotesLabel": "Quotes and 10 years of fundamentals",
+        "aiLabel": "AI analyses",
+        "aiFree": "{limit}/day",
+        "aiPro": "Unlimited",
+        "kpisLabel": "Business KPIs (deep AI)",
+        "pdfLabel": "PRO PDF reports"
+      },
+      "beta": {
+        "title": "Beta mode",
+        "desc": "During the beta you can switch between Free and PRO without paying, to test every feature.",
+        "toPro": "Enable PRO (beta)",
+        "toFree": "Back to the Free plan",
+        "error": "Couldn't change the plan. Please try again."
+      }
     }
   },
   "portfolio": {

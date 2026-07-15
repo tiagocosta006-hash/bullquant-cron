@@ -196,21 +196,51 @@
       "save": "Salva",
       "dangerZone": "Zona Pericolosa",
       "logoutDesc": "Esci in modo sicuro.",
-      "logoutBtn": "Esci"
+      "logoutBtn": "Esci",
+      "changeEmailTitle": "Cambia Email",
+      "newEmail": "Nuova Email",
+      "confirmEmailChangeBtn": "Conferma modifica",
+      "emailChangeSuccess": "È stata inviata un'email di conferma al nuovo e al vecchio indirizzo. Controlla le caselle di posta."
     },
     "preferences": {
       "title": "Preferenze",
       "language": "Lingua",
       "languageDesc": "Scegli la tua lingua.",
       "theme": "Tema Visivo",
-      "themeDesc": "Cambia tra modalità chiara e scura."
+      "themeDesc": "Cambia tra modalità chiara e scura.",
+      "themeLight": "Chiaro",
+      "themeDark": "Scuro"
     },
     "subscription": {
       "title": "Il Tuo Piano",
       "desc": "Sei sul piano gratuito.",
       "premiumSoonTitle": "Accesso PRO in arrivo",
       "premiumSoonDesc": "Stiamo preparando funzionalità avanzate.",
-      "upgradeBtn": "Passa a PRO"
+      "upgradeBtn": "Passa a PRO",
+      "aiUsageLabel": "Analisi IA oggi",
+      "aiUnlimited": "Illimitate",
+      "compare": {
+        "title": "Free vs PRO",
+        "free": "Free",
+        "pro": "PRO",
+        "priceLabel": "Prezzo",
+        "priceFree": "0 €",
+        "pricePro": "7 €/mese",
+        "priceNote": "Prezzo provvisorio — il prezzo finale sarà annunciato al lancio.",
+        "quotesLabel": "Quotazioni e 10 anni di fondamentali",
+        "aiLabel": "Analisi IA",
+        "aiFree": "{limit}/giorno",
+        "aiPro": "Illimitate",
+        "kpisLabel": "KPI di business (IA profonda)",
+        "pdfLabel": "Report PDF PRO"
+      },
+      "beta": {
+        "title": "Modalità beta",
+        "desc": "Durante la beta puoi alternare tra Free e PRO senza pagare, per testare tutte le funzionalità.",
+        "toPro": "Attiva PRO (beta)",
+        "toFree": "Torna al piano Free",
+        "error": "Impossibile cambiare piano. Riprova."
+      }
     }
   },
   "portfolio": {

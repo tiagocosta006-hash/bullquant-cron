@@ -196,21 +196,51 @@
       "save": "Guardar",
       "dangerZone": "Zona de Peligro",
       "logoutDesc": "Cierra tu sesión de forma segura.",
-      "logoutBtn": "Cerrar Sesión"
+      "logoutBtn": "Cerrar Sesión",
+      "changeEmailTitle": "Cambiar Email",
+      "newEmail": "Nuevo Email",
+      "confirmEmailChangeBtn": "Confirmar cambio",
+      "emailChangeSuccess": "Se envió un email de confirmación a la dirección nueva y a la antigua. Revisa las bandejas de entrada."
     },
     "preferences": {
       "title": "Preferencias",
       "language": "Idioma",
       "languageDesc": "Elige tu idioma preferido.",
       "theme": "Tema Visual",
-      "themeDesc": "Cambia entre modo claro y oscuro."
+      "themeDesc": "Cambia entre modo claro y oscuro.",
+      "themeLight": "Claro",
+      "themeDark": "Oscuro"
     },
     "subscription": {
       "title": "Tu Plan",
       "desc": "Estás en el plan gratuito.",
       "premiumSoonTitle": "Acceso PRO próximamente",
       "premiumSoonDesc": "Estamos preparando funciones avanzadas de inteligencia artificial.",
-      "upgradeBtn": "Subir a PRO"
+      "upgradeBtn": "Subir a PRO",
+      "aiUsageLabel": "Análisis de IA hoy",
+      "aiUnlimited": "Ilimitados",
+      "compare": {
+        "title": "Free vs PRO",
+        "free": "Free",
+        "pro": "PRO",
+        "priceLabel": "Precio",
+        "priceFree": "0 €",
+        "pricePro": "7 €/mes",
+        "priceNote": "Precio provisional — el precio final se anunciará en el lanzamiento.",
+        "quotesLabel": "Cotizaciones y 10 años de fundamentales",
+        "aiLabel": "Análisis de IA",
+        "aiFree": "{limit}/día",
+        "aiPro": "Ilimitados",
+        "kpisLabel": "KPIs de negocio (IA profunda)",
+        "pdfLabel": "Informes PDF PRO"
+      },
+      "beta": {
+        "title": "Modo beta",
+        "desc": "Durante la beta puedes alternar entre Free y PRO sin pagar, para probar todas las funciones.",
+        "toPro": "Activar PRO (beta)",
+        "toFree": "Volver al plan Free",
+        "error": "No se pudo cambiar el plan. Inténtalo de nuevo."
+      }
     }
   },
   "portfolio": {

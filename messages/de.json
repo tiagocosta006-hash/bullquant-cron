@@ -196,21 +196,51 @@
       "save": "Speichern",
       "dangerZone": "Gefahrenzone",
       "logoutDesc": "Melden Sie sich sicher ab.",
-      "logoutBtn": "Abmelden"
+      "logoutBtn": "Abmelden",
+      "changeEmailTitle": "E-Mail ändern",
+      "newEmail": "Neue E-Mail",
+      "confirmEmailChangeBtn": "Änderung bestätigen",
+      "emailChangeSuccess": "Eine Bestätigungs-E-Mail wurde an die neue und die alte Adresse gesendet. Prüfe deine Postfächer."
     },
     "preferences": {
       "title": "Präferenzen",
       "language": "Sprache",
       "languageDesc": "Wählen Sie Ihre Sprache.",
       "theme": "Visuelles Design",
-      "themeDesc": "Zwischen hellem und dunklem Modus wechseln."
+      "themeDesc": "Zwischen hellem und dunklem Modus wechseln.",
+      "themeLight": "Hell",
+      "themeDark": "Dunkel"
     },
     "subscription": {
       "title": "Ihr Plan",
       "desc": "Sie nutzen den kostenlosen Plan.",
       "premiumSoonTitle": "PRO-Zugang in Kürze",
       "premiumSoonDesc": "Wir bereiten erweiterte Funktionen vor.",
-      "upgradeBtn": "Auf PRO upgraden"
+      "upgradeBtn": "Auf PRO upgraden",
+      "aiUsageLabel": "KI-Analysen heute",
+      "aiUnlimited": "Unbegrenzt",
+      "compare": {
+        "title": "Free vs PRO",
+        "free": "Free",
+        "pro": "PRO",
+        "priceLabel": "Preis",
+        "priceFree": "0 €",
+        "pricePro": "7 €/Monat",
+        "priceNote": "Vorläufiger Preis — der endgültige Preis wird zum Launch bekannt gegeben.",
+        "quotesLabel": "Kurse und 10 Jahre Fundamentaldaten",
+        "aiLabel": "KI-Analysen",
+        "aiFree": "{limit}/Tag",
+        "aiPro": "Unbegrenzt",
+        "kpisLabel": "Geschäfts-KPIs (tiefe KI)",
+        "pdfLabel": "PRO-PDF-Berichte"
+      },
+      "beta": {
+        "title": "Beta-Modus",
+        "desc": "Während der Beta kannst du ohne Bezahlung zwischen Free und PRO wechseln, um alles zu testen.",
+        "toPro": "PRO aktivieren (Beta)",
+        "toFree": "Zurück zum Free-Plan",
+        "error": "Plan konnte nicht geändert werden. Versuche es erneut."
+      }
     }
   },
   "portfolio": {

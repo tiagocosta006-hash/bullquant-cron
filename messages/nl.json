@@ -115,7 +115,8 @@
     "searchAction": "Zoeken",
     "more": "Meer",
     "explore": "Verkennen",
-    "watchlist": "Watchlist"
+    "watchlist": "Watchlist",
+    "dcfShort": "DCF"
   },
   "login": {
     "title": "Inloggen",

@@ -115,7 +115,8 @@
     "searchAction": "搜索",
     "more": "更多",
     "explore": "探索",
-    "watchlist": "自选股"
+    "watchlist": "自选股",
+    "dcfShort": "DCF"
   },
   "login": {
     "title": "登录",

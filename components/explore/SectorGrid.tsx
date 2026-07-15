@@ -30,10 +30,10 @@ export function SectorGrid({ sectors, onSelect }: SectorGridProps) {
   // Ordenar por número de empresas (descendente)
   const sortedSectors = Object.entries(sectors).sort((a, b) => b[1].count - a[1].count)
 
-  // flex-wrap com grow: a última fila estica e preenche a largura toda,
-  // para qualquer contagem de setores (11 numa grelha fixa deixava buraco)
+  // Grelha de cards IGUAIS: com os 11 setores GICS + "Outros" são 12 cards,
+  // que dividem certo em 2, 3 e 4 colunas (sem buracos nem cards gigantes).
   return (
-    <div className="flex flex-wrap gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {sortedSectors.map(([sectorName, data]) => {
         const config = SECTOR_CONFIG[sectorName] || SECTOR_CONFIG["Unknown"]
         const Icon = config.icon
@@ -42,7 +42,7 @@ export function SectorGrid({ sectors, onSelect }: SectorGridProps) {
           <button
             key={sectorName}
             onClick={() => onSelect(sectorName)}
-            className="glass group flex grow basis-[230px] flex-col items-start p-5 rounded-xl text-left transition-transform hover:-translate-y-0.5"
+            className="glass group flex flex-col items-start p-5 rounded-xl text-left transition-transform hover:-translate-y-0.5"
           >
             <div className={`p-3 rounded-lg ${config.bg} ${config.color} mb-4 group-hover:scale-110 transition-transform`}>
               <Icon size={24} strokeWidth={1.5} />

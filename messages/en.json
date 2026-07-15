@@ -115,7 +115,8 @@
     "navigate": "Navigate",
     "searchAction": "Search",
     "more": "More",
-    "watchlist": "Watchlist"
+    "watchlist": "Watchlist",
+    "dcfShort": "DCF"
   },
   "login": {
     "title": "Sign in to BullVision",

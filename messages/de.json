@@ -115,7 +115,8 @@
     "searchAction": "Suchen",
     "more": "Mehr",
     "explore": "Entdecken",
-    "watchlist": "Watchlist"
+    "watchlist": "Watchlist",
+    "dcfShort": "DCF"
   },
   "login": {
     "title": "Anmelden",

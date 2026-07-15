@@ -28,7 +28,7 @@ export function MobileDock() {
     { href: "/portfolio", icon: Briefcase, label: t("portfolio") },
     { href: "/watchlist", icon: Star, label: t("watchlist") },
     { href: "/calendar", icon: CalendarDays, label: t("calendar") },
-    { href: "/dcf", icon: Calculator, label: t("dcf") },
+    { href: "/dcf", icon: Calculator, label: t("dcfShort") },
   ];
 
   return (

@@ -115,7 +115,8 @@
     "searchAction": "検索",
     "more": "その他",
     "explore": "探索",
-    "watchlist": "ウォッチリスト"
+    "watchlist": "ウォッチリスト",
+    "dcfShort": "DCF"
   },
   "login": {
     "title": "ログイン",

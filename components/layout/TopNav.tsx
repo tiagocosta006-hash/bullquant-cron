@@ -43,12 +43,10 @@ export function TopNav({
   userName,
   userEmail,
   plan,
-  devSlot,
 }: {
   userName?: string | null;
   userEmail?: string | null;
   plan?: string | null;
-  devSlot?: React.ReactNode;
 }) {
   const pathname = usePathname();
   const t = useTranslations("sidebar");
@@ -62,7 +60,8 @@ export function TopNav({
     { href: "/portfolio", icon: Briefcase, label: t("portfolio") },
     { href: "/watchlist", icon: Star, label: t("watchlist") },
     { href: "/calendar", icon: CalendarDays, label: t("calendar") },
-    { href: "/dcf", icon: Calculator, label: t("dcf") },
+    // rótulo curto na nav (o título da página continua "Calculadora DCF")
+    { href: "/dcf", icon: Calculator, label: t("dcfShort") },
   ];
   const overflow = [
     { href: "/compare", icon: GitCompareArrows, label: t("compare") },
@@ -94,8 +93,8 @@ export function TopNav({
                     : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
                 )}
               >
-                <Icon className="h-4 w-4" strokeWidth={2} />
-                <span className="hidden lg:inline">{label}</span>
+                <Icon className="h-4 w-4 shrink-0" strokeWidth={2} />
+                <span className="hidden whitespace-nowrap lg:inline">{label}</span>
               </Link>
             ))}
           </nav>
@@ -115,7 +114,6 @@ export function TopNav({
             </span>
           </button>
 
-          {devSlot}
           <ThemeToggle />
 
           {/* menu de perfil: avatar de iniciais + conta, links e logout */}

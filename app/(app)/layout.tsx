@@ -2,7 +2,6 @@ import { TopNav } from "@/components/layout/TopNav";
 import { MobileDock } from "@/components/layout/MobileDock";
 import { ContourCanvas } from "@/components/fx/ContourCanvas";
 import { InertiaScroll } from "@/components/fx/InertiaScroll";
-import { PlanToggle } from "@/components/dev/PlanToggle";
 import { getUser } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 
@@ -21,7 +20,6 @@ export default async function AppLayout({
   let userName: string | null = null;
   let userEmail: string | null = null;
   let plan: string | null = null;
-  let devSlot: React.ReactNode = null;
   if (user) {
     userName = user.user_metadata?.name || user.email?.split("@")[0] || null;
     userEmail = user.email ?? null;
@@ -30,16 +28,13 @@ export default async function AppLayout({
       select: { plan: true },
     });
     plan = dbUser?.plan ?? null;
-    if (process.env.NODE_ENV === "development" && dbUser) {
-      devSlot = <PlanToggle initialPlan={dbUser.plan} />;
-    }
   }
 
   return (
     <div className="relative min-h-screen">
       <InertiaScroll />
       <ContourCanvas />
-      <TopNav userName={userName} userEmail={userEmail} plan={plan} devSlot={devSlot} />
+      <TopNav userName={userName} userEmail={userEmail} plan={plan} />
       <main className="mx-auto w-full max-w-7xl px-4 pb-28 pt-24 md:px-6 md:pb-12">
         {children}
       </main>

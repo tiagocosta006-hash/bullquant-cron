@@ -115,7 +115,8 @@
     "searchAction": "Cerca",
     "more": "Altro",
     "explore": "Esplora",
-    "watchlist": "Watchlist"
+    "watchlist": "Watchlist",
+    "dcfShort": "DCF"
   },
   "login": {
     "title": "Accedi",

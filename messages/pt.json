@@ -115,7 +115,8 @@
     "navigate": "Navegar",
     "searchAction": "Pesquisar",
     "more": "Mais",
-    "watchlist": "Watchlist"
+    "watchlist": "Watchlist",
+    "dcfShort": "DCF"
   },
   "login": {
     "title": "Entrar no BullVision",

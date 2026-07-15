@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { UserCircle, Mail, Star, LogOut, Settings as SettingsIcon, Globe, Palette, Loader2 } from 'lucide-react'
+import { UserCircle, Mail, Star, LogOut, Settings as SettingsIcon, Globe, Palette, Loader2, Check } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
@@ -398,28 +398,95 @@ export function SettingsClient({ user, locale }: SettingsClientProps) {
           <div className="glass rounded-xl text-card-foreground p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold">{t('subscription.title')}</h2>
-              <div className="bg-bull/10 text-bull border border-bull/20 px-3 py-1 rounded-full font-bold flex items-center text-sm">
+              <div className={`px-3 py-1 rounded-full font-bold flex items-center text-sm ${user.plan === 'PRO' ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-bull/10 text-bull border border-bull/20'}`}>
                 <Star className="h-3 w-3 mr-1.5 fill-current" />
                 {user.plan === 'PRO' ? 'PRO' : t('planFree')}
               </div>
             </div>
 
-            <p className="text-sm text-muted-foreground mb-6">
-              {t('subscription.desc')}
-            </p>
-            
-            <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg p-6 border border-primary/20 text-center">
-              <Star className="h-12 w-12 text-primary mx-auto mb-4" />
-              <h3 className="text-lg font-bold text-foreground mb-2">
-                {t('subscription.premiumSoonTitle')}
-              </h3>
-              <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
-                {t('subscription.premiumSoonDesc')}
-              </p>
-              <Button disabled className="w-full sm:w-auto">
-                {t('subscription.upgradeBtn')}
-              </Button>
-            </div>
+            {user.plan === 'PRO' ? (
+              /* ── Estado PRO activo ── */
+              <div className="space-y-4">
+                <div className="rounded-lg border border-primary/20 bg-primary/5 p-5">
+                  <p className="font-semibold text-primary mb-1">Plano PRO Activo</p>
+                  <p className="text-sm text-muted-foreground">
+                    Tens acesso completo a todas as funcionalidades PRO. Para gerir a tua subscrição (cancelar, actualizar dados de pagamento), utiliza o portal de faturação abaixo.
+                  </p>
+                </div>
+                <a
+                  href="https://thebullocracy.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+                >
+                  Gerir subscrição via Paddle →
+                </a>
+              </div>
+            ) : (
+              /* ── Estado FREE — mostrar comparação de planos ── */
+              <div className="space-y-6">
+                <p className="text-sm text-muted-foreground">{t('subscription.desc')}</p>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {/* Gratuito */}
+                  <div className="rounded-xl border border-border bg-muted/20 p-5 flex flex-col">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Gratuito</p>
+                    <div className="flex items-end gap-1 mb-1">
+                      <span className="text-3xl font-extrabold">€0</span>
+                      <span className="mb-0.5 text-sm text-muted-foreground">/ para sempre</span>
+                    </div>
+                    <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+                      {["S&P 500 completo", "10 anos de fundamentais", "DCF com autopreenche", "5 AI Briefs/dia", "Watchlist até 10 empresas"].map(f => (
+                        <li key={f} className="flex items-center gap-2">
+                          <Check className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mt-auto pt-5">
+                      <div className="w-full rounded-lg border border-border bg-muted/30 py-2 text-center text-sm font-medium text-muted-foreground">
+                        Plano atual
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* PRO */}
+                  <div className="relative rounded-xl border border-primary/40 bg-gradient-to-br from-primary/8 to-card/60 p-5 flex flex-col shadow-[0_0_30px_-8px_hsl(var(--primary)/0.2)]">
+                    <div className="absolute -top-3 left-4">
+                      <div className="flex items-center gap-1 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold text-primary-foreground">
+                        <Star className="h-2.5 w-2.5 fill-current" />
+                        Mais popular
+                      </div>
+                    </div>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">PRO</p>
+                    <div className="flex items-end gap-1 mb-1">
+                      <span className="text-3xl font-extrabold">€7</span>
+                      <span className="mb-0.5 text-sm text-muted-foreground">/ mês</span>
+                    </div>
+                    <ul className="mt-4 space-y-2 text-sm">
+                      {["Watchlist ilimitada", "AI Brief ilimitado", "DCF analyses ilimitadas", "Screener avançado", "Exportar CSV", "Comunidade privada", "Suporte 24/7"].map(f => (
+                        <li key={f} className="flex items-center gap-2">
+                          <Check className="h-3.5 w-3.5 shrink-0 text-primary" />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mt-auto pt-5">
+                      <a
+                        href="/pricing"
+                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_4px_20px_-4px_hsl(var(--primary)/0.5)] transition-opacity hover:opacity-90"
+                      >
+                        {t('subscription.upgradeBtn')}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-center text-xs text-muted-foreground/60">
+                  Pagamentos seguros via Paddle · Cancela a qualquer momento
+                </p>
+              </div>
+            )}
           </div>
         </TabsContent>
       </Tabs>

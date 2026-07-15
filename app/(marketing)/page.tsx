@@ -7,6 +7,8 @@ import {
   Calculator,
   Sparkles,
   Search,
+  Check,
+  Zap,
 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { BrandMark } from "@/components/brand/BrandMark";
@@ -20,7 +22,7 @@ import { redirect } from "next/navigation";
  * Landing — página de entrada editorial: hero a ocupar o ecrã com o
  * único momento Scotch (itálico) no acento do título, um "terminal"
  * de demonstração emoldurado em Liquid Glass a lensar a cartografia,
- * features, números e CTA final. Todo o texto via i18n.
+ * features, números, pricing e CTA final. Todo o texto via i18n.
  */
 export default async function LandingPage() {
   const supabase = await createClient();
@@ -33,6 +35,7 @@ export default async function LandingPage() {
   }
 
   const t = await getTranslations("marketing");
+  const tp = await getTranslations("pricing");
 
   const features = [
     { icon: LineChart, key: "fundamentals" },
@@ -45,6 +48,9 @@ export default async function LandingPage() {
     { value: t("stats.companies"), label: t("stats.companiesLabel") },
     { value: t("stats.price"), label: t("stats.priceLabel") },
   ];
+
+  const freeFeatures = tp.raw("features.free") as string[];
+  const proFeatures = tp.raw("features.pro") as string[];
 
   // Dados do terminal-demonstração (mock estático — tickers/números são dados, não UI)
   const demoSpark = "M0 34 L20 30 L40 31 L60 24 L80 26 L100 18 L120 20 L140 12 L160 14 L180 7 L200 4";
@@ -180,6 +186,82 @@ export default async function LandingPage() {
               <div className="mt-2 text-sm font-medium text-muted-foreground">{label}</div>
             </div>
           ))}
+        </Reveal>
+      </section>
+
+      {/* ── Pricing ──────────────────────────────────────────── */}
+      <section className="mx-auto max-w-5xl px-6 pb-24 md:px-8">
+        <Reveal>
+          <div className="mb-12 text-center">
+            <div className="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-border bg-card/60 px-3.5 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              {tp("badge")}
+            </div>
+            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">{tp("title")}</h2>
+            <p className="mt-3 text-muted-foreground">{tp("subtitle")}</p>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-2">
+            {/* Gratuito */}
+            <LiquidGlass className="flex flex-col rounded-3xl p-7">
+              <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">{tp("free.name")}</p>
+              <div className="mt-3 flex items-end gap-1">
+                <span className="text-4xl font-extrabold tracking-tight">{tp("free.price")}</span>
+                <span className="mb-1 text-sm text-muted-foreground">/ {tp("free.period")}</span>
+              </div>
+              <p className="mt-2 mb-6 text-sm text-muted-foreground">{tp("free.description")}</p>
+              <ul className="mb-8 flex flex-col gap-2.5">
+                {freeFeatures.map((f) => (
+                  <li key={f} className="flex items-center gap-2.5 text-sm">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-border bg-muted">
+                      <Check className="h-3 w-3 text-muted-foreground" />
+                    </span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-auto">
+                <Link href="/register" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full")}>
+                  {tp("free.cta")} <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </div>
+            </LiquidGlass>
+
+            {/* PRO */}
+            <div className="relative flex flex-col rounded-3xl border border-primary/40 bg-gradient-to-br from-primary/8 via-card/80 to-card/60 p-7 shadow-[0_0_50px_-10px_hsl(var(--primary)/0.2)] backdrop-blur">
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                <div className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-1 text-xs font-bold text-primary-foreground shadow-lg">
+                  <Zap className="h-3 w-3 fill-current" />
+                  {tp("pro.badge")}
+                </div>
+              </div>
+              <p className="text-sm font-semibold uppercase tracking-widest text-primary">{tp("pro.name")}</p>
+              <div className="mt-3 flex items-end gap-1">
+                <span className="text-4xl font-extrabold tracking-tight">{tp("pro.price")}</span>
+                <span className="mb-1 text-sm text-muted-foreground">/ {tp("pro.period")}</span>
+              </div>
+              <p className="mt-2 mb-6 text-sm text-muted-foreground">{tp("pro.description")}</p>
+              <ul className="mb-8 flex flex-col gap-2.5">
+                {proFeatures.map((f) => (
+                  <li key={f} className="flex items-center gap-2.5 text-sm">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-primary/15">
+                      <Check className="h-3 w-3 text-primary" />
+                    </span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-auto">
+                <Link href="/register" className={cn(buttonVariants({ size: "lg" }), "w-full shadow-[0_4px_24px_-6px_hsl(var(--primary)/0.5)]")}>
+                  {tp("pro.cta")} <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-5 text-center text-xs text-muted-foreground/60">
+            {tp("trust")}
+          </div>
         </Reveal>
       </section>
 

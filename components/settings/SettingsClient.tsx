@@ -30,6 +30,7 @@ interface SettingsClientProps {
     email: string
     name: string | null
     plan: string
+    hasSubscription?: boolean
   }
   locale: string
 }
@@ -55,6 +56,9 @@ export function SettingsClient({ user, locale }: SettingsClientProps) {
   const [newEmail, setNewEmail] = useState('')
   const [isSavingEmail, setIsSavingEmail] = useState(false)
   const [emailMessage, setEmailMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
+
+  const [isGeneratingPortal, setIsGeneratingPortal] = useState(false)
+  const [portalError, setPortalError] = useState<string | null>(null)
 
   // Track the initial name normalised to empty string so comparison is consistent
   const initialName = user.name || ''
@@ -103,6 +107,30 @@ export function SettingsClient({ user, locale }: SettingsClientProps) {
   const handleDeleteAccount = async () => {
     setIsDeleting(true)
     await deleteAccount()
+    // It will redirect automatically from action
+  }
+
+  const handleManageSubscription = async () => {
+    setIsGeneratingPortal(true)
+    setPortalError(null)
+
+    try {
+      const response = await fetch('/api/paddle/portal', {
+        method: 'POST',
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok && data.url) {
+        window.location.href = data.url
+      } else {
+        setPortalError(data.error || 'Ocorreu um erro ao gerar o link do portal.')
+        setIsGeneratingPortal(false)
+      }
+    } catch (error) {
+      setPortalError('Falha na comunicação com o servidor.')
+      setIsGeneratingPortal(false)
+    }
   }
 
   const handleUpdateEmail = async (e: React.FormEvent) => {
@@ -413,14 +441,18 @@ export function SettingsClient({ user, locale }: SettingsClientProps) {
                     Tens acesso completo a todas as funcionalidades PRO. Para gerir a tua subscrição (cancelar, actualizar dados de pagamento), utiliza o portal de faturação abaixo.
                   </p>
                 </div>
-                <a
-                  href="https://thebullocracy.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+                <Button
+                  onClick={handleManageSubscription}
+                  disabled={isGeneratingPortal || !user.hasSubscription}
+                  className="gap-2"
                 >
+                  {isGeneratingPortal ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                   Gerir subscrição via Paddle →
-                </a>
+                </Button>
+                {portalError && <p className="text-sm text-destructive font-medium">{portalError}</p>}
+                {!user.hasSubscription && !portalError && (
+                  <p className="text-xs text-muted-foreground">ID de subscrição não encontrado na base de dados.</p>
+                )}
               </div>
             ) : (
               /* ── Estado FREE — mostrar comparação de planos ── */

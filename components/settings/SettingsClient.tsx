@@ -297,19 +297,11 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
             </div>
             
             <div className="border-t p-6 bg-muted/10">
-<<<<<<< HEAD
               <h3 className="text-lg font-semibold mb-6">{t('profile.changeEmailTitle')}</h3>
               <form onSubmit={handleUpdateEmail} className="space-y-6 max-w-xl mb-12">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="newEmail">{t('profile.newEmail')}</Label>
-=======
-              <h3 className="text-lg font-semibold mb-6">Alterar Email</h3>
-              <form onSubmit={handleUpdateEmail} className="space-y-6 max-w-xl mb-12">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="newEmail">Novo Email</Label>
->>>>>>> feat/pricing-page
                     <div className="relative">
                       <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input 
@@ -323,11 +315,7 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
                     </div>
                   </div>
                   <div className="space-y-2">
-<<<<<<< HEAD
                     <Label htmlFor="currentPasswordForEmail">{t('profile.currentPassword')}</Label>
-=======
-                    <Label htmlFor="currentPasswordForEmail">Palavra-passe Atual</Label>
->>>>>>> feat/pricing-page
                     <PasswordInput 
                       id="currentPasswordForEmail" 
                       value={currentPasswordForEmail} 
@@ -345,11 +333,7 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
 
                 <Button type="submit" disabled={isSavingEmail || !currentPasswordForEmail || !newEmail || newEmail === user.email}>
                   {isSavingEmail ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-<<<<<<< HEAD
                   {t('profile.confirmEmailChangeBtn')}
-=======
-                  Confirmar Alteração
->>>>>>> feat/pricing-page
                 </Button>
               </form>
 
@@ -522,7 +506,6 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
               </div>
             </div>
 
-<<<<<<< HEAD
             {/* Uso de IA de hoje */}
             <div className="max-w-xl">
               <div className="flex items-baseline justify-between mb-2">
@@ -539,64 +522,6 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
                   />
                 </div>
               )}
-            </div>
-
-            {/* Comparação Free vs Pro */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">{t('subscription.compare.title')}</h3>
-              <div className="overflow-x-auto">
-                <table className="w-full max-w-2xl text-sm">
-                  <thead>
-                    <tr className="border-b border-border/60 text-left">
-                      <th className="py-2.5 pr-4 font-medium text-muted-foreground" />
-                      <th className={`py-2.5 px-4 font-bold ${!isPro ? 'text-primary' : ''}`}>{t('subscription.compare.free')}</th>
-                      <th className={`py-2.5 px-4 font-bold ${isPro ? 'text-primary' : ''}`}>{t('subscription.compare.pro')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b border-border/40">
-                      <td className="py-2.5 pr-4 font-medium">{t('subscription.compare.priceLabel')}</td>
-                      <td className="nums py-2.5 px-4">{t('subscription.compare.priceFree')}</td>
-                      <td className="nums py-2.5 px-4">{t('subscription.compare.pricePro')}</td>
-                    </tr>
-                    <tr className="border-b border-border/40">
-                      <td className="py-2.5 pr-4 font-medium">{t('subscription.compare.quotesLabel')}</td>
-                      <td className="py-2.5 px-4"><Check className="h-4 w-4 text-bull" /></td>
-                      <td className="py-2.5 px-4"><Check className="h-4 w-4 text-bull" /></td>
-                    </tr>
-                    <tr className="border-b border-border/40">
-                      <td className="py-2.5 pr-4 font-medium">{t('subscription.compare.aiLabel')}</td>
-                      <td className="py-2.5 px-4">{t('subscription.compare.aiFree', { limit: aiDailyLimit })}</td>
-                      <td className="py-2.5 px-4">{t('subscription.compare.aiPro')}</td>
-                    </tr>
-                    <tr className="border-b border-border/40">
-                      <td className="py-2.5 pr-4 font-medium">{t('subscription.compare.kpisLabel')}</td>
-                      <td className="py-2.5 px-4"><X className="h-4 w-4 text-muted-foreground/60" /></td>
-                      <td className="py-2.5 px-4"><Check className="h-4 w-4 text-bull" /></td>
-                    </tr>
-                    <tr>
-                      <td className="py-2.5 pr-4 font-medium">{t('subscription.compare.pdfLabel')}</td>
-                      <td className="py-2.5 px-4"><X className="h-4 w-4 text-muted-foreground/60" /></td>
-                      <td className="py-2.5 px-4"><Check className="h-4 w-4 text-bull" /></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <p className="mt-2 text-xs text-muted-foreground">{t('subscription.compare.priceNote')}</p>
-            </div>
-
-            {/* Upgrade real (pagamentos ainda por integrar) */}
-            <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg p-6 border border-primary/20 text-center">
-              <Star className="h-10 w-10 text-primary mx-auto mb-3" />
-              <h3 className="text-lg font-bold text-foreground mb-2">
-                {t('subscription.premiumSoonTitle')}
-              </h3>
-              <p className="text-sm text-muted-foreground mb-5 max-w-md mx-auto">
-                {t('subscription.premiumSoonDesc')}
-              </p>
-              <Button disabled className="w-full sm:w-auto">
-                {t('subscription.upgradeBtn')}
-              </Button>
             </div>
 
             {/* Beta: alternar de plano sem pagamento */}
@@ -616,7 +541,8 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
                   {isPro ? t('subscription.beta.toFree') : t('subscription.beta.toPro')}
                 </Button>
               </div>
-=======
+            )}
+
             {user.plan === 'PRO' ? (
               /* ── Estado PRO activo ── */
               <div className="space-y-4">
@@ -703,7 +629,6 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
                   Pagamentos seguros via Paddle · Cancela a qualquer momento
                 </p>
               </div>
->>>>>>> feat/pricing-page
             )}
           </div>
         </TabsContent>

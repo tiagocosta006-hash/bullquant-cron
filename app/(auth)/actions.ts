@@ -131,27 +131,15 @@ export async function signup(formData: FormData) {
 
   // ── Fallback (sem Resend, ex.: localhost): email de confirmação do Supabase ──
   const supabase = await createClient()
-<<<<<<< HEAD
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: { data: { name }, emailRedirectTo: redirectTo },
   })
-
-=======
-  const payload = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-    options: { data: { name: formData.get('name') as string } }
-  }
-
-  const { data: authData, error } = await supabase.auth.signUp(payload)
->>>>>>> feat/pricing-page
   if (error) {
     registerError(translateError(error))
   }
 
-<<<<<<< HEAD
   // O Supabase ofusca contas já existentes: devolve um user sem identidades
   // novas (sem erro) para não revelar quem está registado. Tratamos como "já existe".
   if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
@@ -258,36 +246,6 @@ export async function devLogin() {
 
   revalidatePath('/', 'layout')
   redirect('/dashboard')
-=======
-  // A Supabase devolve sucesso falso (com identities vazio) se o email já existir, 
-  // para proteger contra Enumeração de Emails. Temos de intercetar isto manualmente:
-  if (authData?.user && authData.user.identities && authData.user.identities.length === 0) {
-    redirect(`/register?error=${encodeURIComponent('Este email já se encontra registado.')}`)
-  }
-
-  // Sincronizar o utilizador para o Prisma imediatamente
-  if (authData?.user) {
-    try {
-      await prisma.user.create({
-        data: {
-          id: authData.user.id, // O ID no Prisma irá coincidir exatamente com o UUID da Supabase
-          email: authData.user.email!,
-          name: payload.options.data.name,
-        }
-      })
-    } catch (dbError) {
-      console.error('Falha ao sincronizar utilizador no Prisma:', dbError)
-      // Não bloqueamos o processo caso o utilizador já exista na BD,
-      // mas garantimos que fica registado se for um novo utilizador puro.
-    }
-  }
-
-  // Nota: Removemos o envio do email de Boas-Vindas prematuro.
-  // Como o utilizador ainda tem de confirmar o email, receberia dois emails em simultâneo.
-
-  revalidatePath('/', 'layout')
-  redirect('/login?message=Conta criada com sucesso! Verifica o teu email para a ativar.')
->>>>>>> feat/pricing-page
 }
 
 export async function logout() {

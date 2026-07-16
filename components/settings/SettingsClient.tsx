@@ -447,7 +447,7 @@ export function SettingsClient({ user, locale }: SettingsClientProps) {
                   className="gap-2"
                 >
                   {isGeneratingPortal ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                  Gerir subscrição via Paddle →
+                  Gerir subscrição (Alterar/Cancelar) →
                 </Button>
                 {portalError && <p className="text-sm text-destructive font-medium">{portalError}</p>}
                 {!user.hasSubscription && !portalError && (

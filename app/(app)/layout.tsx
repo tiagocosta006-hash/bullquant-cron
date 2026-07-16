@@ -23,14 +23,20 @@ export default async function AppLayout({
 
   let userName: string | null = null;
   let devSlot: React.ReactNode = null;
+  let userPlan = "FREE";
+
   if (user) {
     userName = user.user_metadata?.name || user.email?.split("@")[0] || null;
-    if (process.env.NODE_ENV === "development") {
-      const dbUser = await prisma.user.findUnique({
-        where: { id: user.id },
-        select: { plan: true },
-      });
-      if (dbUser) devSlot = <PlanToggle initialPlan={dbUser.plan} />;
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { plan: true },
+    });
+    
+    if (dbUser) {
+      userPlan = dbUser.plan;
+      if (process.env.NODE_ENV === "development") {
+        devSlot = <PlanToggle initialPlan={dbUser.plan} />;
+      }
     }
   }
 
@@ -38,7 +44,7 @@ export default async function AppLayout({
     <div className="relative min-h-screen">
       <InertiaScroll />
       <ContourCanvas />
-      <TopNav userName={userName} devSlot={devSlot} />
+      <TopNav userName={userName} devSlot={devSlot} userPlan={userPlan} />
       <main className="mx-auto w-full max-w-7xl px-4 pb-28 pt-24 md:px-6 md:pb-12">
         {children}
       </main>

@@ -36,7 +36,7 @@ const nextConfig: NextConfig = {
               "img-src 'self' data: blob: https://static2.finnhub.io https://*.supabase.co",
               "font-src 'self' data:",
               "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vitals.vercel-insights.com https://*.paddle.com",
-              "frame-src 'self' https://sandbox-checkout.paddle.com https://checkout.paddle.com",
+              "frame-src 'self' https://paddle.com https://*.paddle.com",
               "frame-ancestors 'none'",
             ].join('; '),
           },

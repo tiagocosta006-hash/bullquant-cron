@@ -30,7 +30,98 @@
       "priceLabel": "con il piano gratuito"
     },
     "ctaTitle": "Inizia a vedere il valore che gli altri non vedono.",
-    "ctaSubtitle": "Crea il tuo account gratuito e analizza qualsiasi azienda dell'S&P 500 in pochi secondi."
+    "ctaSubtitle": "Crea il tuo account gratuito e analizza qualsiasi azienda dell'S&P 500 in pochi secondi.",
+    "ticker": {
+      "label": "Chiusure del giorno precedente — S&P 500"
+    },
+    "showcase": {
+      "caption": "Dieci anni di fondamentali, DCF e AI Brief — in un unico terminale, senza fogli di calcolo.",
+      "alt": "Demo del terminale Bull Metrics"
+    },
+    "manifesto": {
+      "l1": "Investire non è indovinare.",
+      "l2": "È confrontare prezzo e valore.",
+      "l3": "Noi ti mostriamo il valore."
+    },
+    "stories": {
+      "fundamentals": {
+        "eyebrow": "Fondamentali",
+        "title": "Dieci anni di storia,",
+        "titleAccent": "in un colpo d'occhio.",
+        "desc": "Ricavi, margini, ROIC, free cash flow e buyback — 40 trimestri da SEC EDGAR, pensati per essere letti in pochi secondi.",
+        "b1": "9 grafici essenziali per azienda, con CAGR automatico",
+        "b2": "Trimestrale, TTM o annuale — scegli tu la lente",
+        "b3": "Dati ufficiali della SEC, aggiornati ogni settimana",
+        "chartAria": "Grafico di esempio: ricavi annuali a barre e free cash flow a linea, in crescita per dieci anni",
+        "legendRevenue": "Ricavi",
+        "legendFcf": "FCF"
+      },
+      "dcf": {
+        "eyebrow": "Valutazione",
+        "title": "Quanto vale",
+        "titleAccent": "davvero?",
+        "desc": "La calcolatrice DCF si compila da sola con i dati dell'azienda e ricalcola in tempo reale mentre regoli crescita, WACC e valore terminale.",
+        "b1": "Precompilata con i fondamentali reali dell'azienda",
+        "b2": "Un margine di sicurezza chiaro — sopra o sotto il prezzo",
+        "b3": "Salva gli scenari e riprendili quando vuoi",
+        "growth": "Crescita annua (anni 1–5)",
+        "wacc": "WACC",
+        "terminal": "Crescita terminale",
+        "price": "Prezzo attuale",
+        "fairValue": "Fair Value",
+        "perShare": "per azione",
+        "margin": "Margine di sicurezza",
+        "undervalued": "Sottovalutata",
+        "overvalued": "Sopravvalutata",
+        "disclaimer": "Esempio illustrativo con un'azienda fittizia. Un DCF dipende dalle tue ipotesi — non è consulenza finanziaria."
+      },
+      "ai": {
+        "eyebrow": "AI Insights",
+        "title": "La storia dietro",
+        "titleAccent": "i numeri.",
+        "desc": "L'AI Brief riassume gli sviluppi recenti di ogni azienda e li classifica per sentiment — leggi in un minuto ciò che conta.",
+        "b1": "Sintesi esecutiva, catalizzatori e rischi",
+        "b2": "In linguaggio chiaro, senza gergo",
+        "b3": "Sempre segnalato: mai consulenza finanziaria",
+        "cardTitle": "AI Brief · Azienda di esempio",
+        "summary": "Trimestre solido: ricavi sopra le attese, margini in espansione e programma di buyback rafforzato. Il management ha alzato la guidance per il resto dell'anno.",
+        "catalystsLabel": "Catalizzatori",
+        "catalyst1": "Guidance rivista al rialzo",
+        "catalyst2": "Programma di buyback",
+        "riskLabel": "Rischi",
+        "risk1": "Concentrazione dei clienti",
+        "disclaimer": "Generato dall'IA da notizie recenti. Mai consulenza finanziaria."
+      }
+    },
+    "tour": {
+      "alt": "Un tour delle funzionalità di Bull Metrics"
+    },
+    "bento": {
+      "title": "Tutto in un terminale.",
+      "subtitle": "Watchlist, calendario degli utili, liste curate e ricerca istantanea — senza saltare tra le schede.",
+      "portfolio": {
+        "title": "Portafoglio & watchlist",
+        "desc": "Segui le tue aziende con prezzi e variazione giornaliera."
+      },
+      "calendar": {
+        "title": "Calendario degli utili",
+        "desc": "Stime, beat/miss e le date che contano."
+      },
+      "screener": {
+        "title": "Liste curate",
+        "desc": "Growth, Dividend Growth, Buyback Machines e altro."
+      },
+      "search": {
+        "title": "Ricerca istantanea",
+        "desc": "Qualsiasi azienda dell'S&P 500 a un ⌘K di distanza."
+      }
+    },
+    "numbers": {
+      "years": "anni di fondamentali",
+      "companies": "aziende dell'S&P 500",
+      "quarters": "trimestri di dati",
+      "free": "con il piano gratuito"
+    }
   },
   "insider": {
     "title": "Insider Trading",

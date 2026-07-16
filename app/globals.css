@@ -374,6 +374,57 @@
   }
 }
 
+/* ── Landing: intro do hero (time-based, sem scroll) ──────────
+   Stagger por elemento via --hero-delay inline. `both` mantém o
+   estado inicial durante o delay e o final depois. */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+.hero-in {
+  animation: hero-rise 0.85s var(--spring) both;
+  animation-delay: var(--hero-delay, 0s);
+}
+
+/* ── Landing: ticker marquee (ambient motion do hero) ─────────
+   A track contém a lista DUAS vezes; -50% dá um loop perfeito.
+   Bordas desvanecem com mask; hover pausa para leitura. */
+@keyframes marquee-x {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+}
+.marquee-track {
+  width: max-content;
+  animation: marquee-x var(--marquee-duration, 52s) linear infinite;
+  will-change: transform;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-in {
+    animation: none;
+  }
+  .marquee-track {
+    animation: none;
+  }
+}
+
 /* Slider da calculadora DCF (range nativo estilizado) */
 .dcf-slider {
   -webkit-appearance: none;

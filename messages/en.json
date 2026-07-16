@@ -30,7 +30,98 @@
       "priceLabel": "on the free plan"
     },
     "ctaTitle": "Start seeing the value others miss.",
-    "ctaSubtitle": "Create your free account and analyze any S&P 500 company in seconds."
+    "ctaSubtitle": "Create your free account and analyze any S&P 500 company in seconds.",
+    "ticker": {
+      "label": "Previous close — S&P 500"
+    },
+    "showcase": {
+      "caption": "Ten years of fundamentals, DCF and AI Brief — one terminal, no spreadsheets.",
+      "alt": "Bull Metrics terminal demo"
+    },
+    "manifesto": {
+      "l1": "Investing isn't guessing.",
+      "l2": "It's comparing price with value.",
+      "l3": "We show you the value."
+    },
+    "stories": {
+      "fundamentals": {
+        "eyebrow": "Fundamentals",
+        "title": "Ten years of history,",
+        "titleAccent": "at a glance.",
+        "desc": "Revenue, margins, ROIC, free cash flow and buybacks — 40 quarters from SEC EDGAR, designed to be read in seconds.",
+        "b1": "9 essential charts per company, with automatic CAGR",
+        "b2": "Quarterly, TTM or annual — you pick the lens",
+        "b3": "Official SEC data, updated every week",
+        "chartAria": "Example chart: annual revenue as bars and free cash flow as a line, growing over ten years",
+        "legendRevenue": "Revenue",
+        "legendFcf": "FCF"
+      },
+      "dcf": {
+        "eyebrow": "Valuation",
+        "title": "What is it",
+        "titleAccent": "really worth?",
+        "desc": "The DCF calculator autofills with company data and recalculates in real time as you adjust growth, WACC and terminal value.",
+        "b1": "Autofilled with the company's real fundamentals",
+        "b2": "A clear margin of safety — above or below the price",
+        "b3": "Save scenarios and come back to them anytime",
+        "growth": "Annual growth (years 1–5)",
+        "wacc": "WACC",
+        "terminal": "Terminal growth",
+        "price": "Current price",
+        "fairValue": "Fair Value",
+        "perShare": "per share",
+        "margin": "Margin of safety",
+        "undervalued": "Undervalued",
+        "overvalued": "Overvalued",
+        "disclaimer": "Illustrative example with a fictional company. A DCF depends on your assumptions — not investment advice."
+      },
+      "ai": {
+        "eyebrow": "AI Insights",
+        "title": "The story behind",
+        "titleAccent": "the numbers.",
+        "desc": "The AI Brief summarises each company's recent developments and classifies them by sentiment — read what matters in a minute.",
+        "b1": "Executive summary, catalysts and risks",
+        "b2": "In plain language, no jargon",
+        "b3": "Always flagged: never investment advice",
+        "cardTitle": "AI Brief · Example company",
+        "summary": "Solid quarter: revenue above expectations, margins expanding and the buyback programme reinforced. Management raised guidance for the rest of the year.",
+        "catalystsLabel": "Catalysts",
+        "catalyst1": "Guidance raised",
+        "catalyst2": "Buyback programme",
+        "riskLabel": "Risks",
+        "risk1": "Customer concentration",
+        "disclaimer": "AI-generated from recent news. Never investment advice."
+      }
+    },
+    "tour": {
+      "alt": "A tour of Bull Metrics features"
+    },
+    "bento": {
+      "title": "Everything in one terminal.",
+      "subtitle": "Watchlist, earnings calendar, curated lists and instant search — without juggling tabs.",
+      "portfolio": {
+        "title": "Portfolio & watchlist",
+        "desc": "Follow your companies with prices and daily change."
+      },
+      "calendar": {
+        "title": "Earnings calendar",
+        "desc": "Estimates, beat/miss and the dates that matter."
+      },
+      "screener": {
+        "title": "Curated lists",
+        "desc": "Growth, Dividend Growth, Buyback Machines and more."
+      },
+      "search": {
+        "title": "Instant search",
+        "desc": "Any S&P 500 company one ⌘K away."
+      }
+    },
+    "numbers": {
+      "years": "years of fundamentals",
+      "companies": "S&P 500 companies",
+      "quarters": "quarters of data",
+      "free": "on the free plan"
+    }
   },
   "insider": {
     "title": "Company Insider Trading",

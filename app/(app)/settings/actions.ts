@@ -167,7 +167,13 @@ export async function togglePlanBeta() {
   const newPlan = dbUser.plan === 'PRO' ? 'FREE' : 'PRO'
   await prisma.user.update({
     where: { id: user.id },
-    data: { plan: newPlan },
+    data: { 
+      plan: newPlan,
+      paddleCustomerId: null,
+      paddleSubscriptionId: null,
+      paddleStatus: null,
+      paddlePriceId: null
+    },
   })
 
   revalidatePath('/', 'layout')

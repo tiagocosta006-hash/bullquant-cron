@@ -40,8 +40,17 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ url: portalSession.urls.general.overview });
     
-  } catch (error) {
+  } catch (error: any) {
     console.error("Erro ao gerar sessão do portal:", error);
+    
+    // Se for erro do Paddle a queixar-se que o cliente não existe, é 99% de certeza 
+    // um conflito de Sandbox ID num ambiente Live.
+    if (error?.type === 'api_error' || error?.message?.includes('not found') || error?.code === 'not_found') {
+      return NextResponse.json({ 
+        error: "Subscrição não encontrada. Isto acontece porque a tua conta tem dados antigos de testes (Sandbox) mas o sistema já está no modo Real. Por favor, cancela a tua subscrição antiga ou contacta o suporte." 
+      }, { status: 404 });
+    }
+
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 });
   }
 }

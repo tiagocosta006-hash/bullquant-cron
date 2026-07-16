@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const rawRequestBody = await request.text();
 
     // Validar a assinatura e converter para um evento do Paddle
-    const eventData = paddle.webhooks.unmarshal(rawRequestBody, secretKey, signature);
+    const eventData = await paddle.webhooks.unmarshal(rawRequestBody, secretKey, signature);
     
     // Devolver status 200 IMEDIATAMENTE (requisito do Paddle de responder em menos de 5s)
     // Para não bloquear a resposta, vamos processar o evento de forma assíncrona.

@@ -10,7 +10,12 @@ import { Reveal } from "@/components/fx/Reveal";
 import { cn } from "@/lib/utils";
 import { usePaddle } from "@/components/providers/PaddleProvider";
 
-export function PricingCards() {
+interface PricingCardsProps {
+  userEmail?: string;
+  userId?: string;
+}
+
+export function PricingCards({ userEmail, userId }: PricingCardsProps = {}) {
   const t = useTranslations("pricing");
   const { paddle } = usePaddle();
 
@@ -63,7 +68,8 @@ export function PricingCards() {
           quantity: 1,
         },
       ],
-      // We can prefill customer email if we have it from Supabase session
+      customer: userEmail ? { email: userEmail } : undefined,
+      customData: userId ? { userId } : undefined,
     });
   };
 

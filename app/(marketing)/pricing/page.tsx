@@ -21,9 +21,14 @@ export const metadata = {
     "Plano gratuito para sempre ou PRO a €7/mês. Análise fundamental completa do S&P 500, DCF integrada e AI Insights.",
 };
 
+import { createClient } from "@/lib/supabase/server";
+
 export default async function PricingPage() {
   const t = await getTranslations("pricing");
   const tm = await getTranslations("marketing");
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
   const freeFeatures = t.raw("features.free") as string[];
   const proFeatures = t.raw("features.pro") as string[];
@@ -55,7 +60,7 @@ export default async function PricingPage() {
 
       {/* ── Cards de Preço ───────────────────────────────────── */}
       <section className="mx-auto max-w-5xl px-6 pb-6 md:px-8">
-        <PricingCards />
+        <PricingCards userEmail={user?.email} userId={user?.id} />
 
         {/* Trust badge */}
         <Reveal className="mt-6 flex justify-center">

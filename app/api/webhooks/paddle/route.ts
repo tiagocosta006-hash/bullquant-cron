@@ -69,10 +69,20 @@ async function processPaddleEvent(event: any) {
 
 async function handleTransactionCompleted(transaction: any) {
   const customerId = transaction.customerId;
+  const userId = transaction.customData?.userId;
   if (!customerId) return;
 
   try {
-    // Ir buscar o email do cliente ao Paddle
+    if (userId) {
+      // Priorizar associação pelo userId seguro (passado via Checkout)
+      await prisma.user.update({
+        where: { id: userId },
+        data: { paddleCustomerId: customerId },
+      });
+      return;
+    }
+
+    // Fallback: Ir buscar o email do cliente ao Paddle se não houver userId
     const customer = await paddle.customers.get(customerId);
     const email = customer.email;
 
@@ -92,6 +102,7 @@ async function handleSubscriptionChange(subscription: any) {
   const customerId = subscription.customerId;
   const subscriptionId = subscription.id;
   const status = subscription.status; // active, past_due, trialing, etc.
+  const userId = subscription.customData?.userId;
   
   let priceId = null;
   if (subscription.items && subscription.items.length > 0) {
@@ -99,15 +110,28 @@ async function handleSubscriptionChange(subscription: any) {
   }
 
   try {
-    // Obter o cliente no Paddle para descobrir o email
+    const isPro = status === "active" || status === "trialing";
+    const plan = isPro ? "PRO" : "FREE";
+
+    if (userId) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          paddleCustomerId: customerId,
+          paddleSubscriptionId: subscriptionId,
+          paddleStatus: status,
+          paddlePriceId: priceId,
+          plan: plan,
+        },
+      });
+      return;
+    }
+
+    // Fallback ao email se não vier customData
     const customer = await paddle.customers.get(customerId);
     const email = customer.email;
 
     if (email) {
-      // Definimos o plan como PRO se o status for ativo ou trialing
-      const isPro = status === "active" || status === "trialing";
-      const plan = isPro ? "PRO" : "FREE";
-
       await prisma.user.update({
         where: { email },
         data: {

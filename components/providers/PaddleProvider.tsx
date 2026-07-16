@@ -25,7 +25,7 @@ export function PaddleProvider({ children }: { children: ReactNode }) {
     }
 
     initializePaddle({
-      environment: "sandbox", // Set to "production" when live
+      environment: (process.env.NEXT_PUBLIC_PADDLE_ENV as "sandbox" | "production") || "sandbox",
       token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN,
     }).then((paddleInstance) => {
       if (paddleInstance && isMounted) {

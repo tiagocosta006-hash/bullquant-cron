@@ -25,9 +25,13 @@ export async function POST(request: Request) {
     }
 
     // Iniciar Paddle SDK
+    const paddleEnv = process.env.NEXT_PUBLIC_PADDLE_ENV === 'production' 
+      ? Environment.production 
+      : Environment.sandbox;
+
     const paddle = new Paddle(
       process.env.PADDLE_API_KEY || "",
-      { environment: Environment.sandbox, logLevel: LogLevel.error }
+      { environment: paddleEnv, logLevel: LogLevel.error }
     );
 
     // Pedir URL de sessão ao Paddle

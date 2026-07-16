@@ -3,9 +3,13 @@ import { Environment, LogLevel, Paddle, EventName } from "@paddle/paddle-node-sd
 import { prisma } from "@/lib/prisma";
 
 // Inicializar o SDK do Paddle
+const paddleEnv = process.env.NEXT_PUBLIC_PADDLE_ENV === 'production' 
+  ? Environment.production 
+  : Environment.sandbox;
+
 const paddle = new Paddle(
   process.env.PADDLE_API_KEY || "",
-  { environment: Environment.sandbox, logLevel: LogLevel.error }
+  { environment: paddleEnv, logLevel: LogLevel.error }
 );
 
 export async function POST(request: Request) {

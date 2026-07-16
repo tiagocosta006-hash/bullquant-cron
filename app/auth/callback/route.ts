@@ -49,7 +49,6 @@ export async function GET(request: Request) {
         console.error('Falha ao enviar email de boas-vindas:', e)
       }
     }
-
     // Se o utilizador acabou de alterar e confirmar o email, sincronizamos com o Prisma
     if (type === 'email_change') {
       try {

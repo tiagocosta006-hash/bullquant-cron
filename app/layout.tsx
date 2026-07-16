@@ -5,6 +5,7 @@ import "./globals.css";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { BRAND } from "@/lib/brand";
+import { PaddleProvider } from "@/components/providers/PaddleProvider";
 
 const scotchDisplay = localFont({
   variable: "--font-heading",
@@ -111,7 +112,9 @@ export default async function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground">
         <NextIntlClientProvider messages={messages}>
-          <main className="flex-1 flex flex-col">{children}</main>
+          <PaddleProvider>
+            <main className="flex-1 flex flex-col">{children}</main>
+          </PaddleProvider>
         </NextIntlClientProvider>
       </body>
     </html>

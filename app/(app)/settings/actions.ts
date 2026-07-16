@@ -173,7 +173,6 @@ export async function togglePlanBeta() {
   revalidatePath('/', 'layout')
   return { success: true, plan: newPlan }
 }
-
 export async function deleteAccount() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

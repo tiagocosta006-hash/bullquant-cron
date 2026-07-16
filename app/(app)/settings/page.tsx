@@ -58,6 +58,7 @@ export default async function SettingsPage() {
     email: dbUser.email,
     name: dbUser.name,
     plan: dbUser.plan,
+    hasSubscription: !!dbUser.paddleCustomerId,
   }
 
   return (

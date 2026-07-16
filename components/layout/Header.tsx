@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { SearchBar } from '@/components/search/SearchBar';
-import { LogOut, UserCircle, Calculator, CalendarDays } from 'lucide-react';
+import { LogOut, UserCircle, Calculator, CalendarDays, Zap } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
@@ -18,8 +18,8 @@ export async function Header() {
         <div className="mr-6">
           <Logo href="/" size="md" />
         </div>
-        <div className="flex flex-1 items-center justify-between space-x-4 md:justify-end">
-          <div className="w-full flex-1 md:w-auto md:flex-none">
+        <div className="flex flex-1 items-center justify-between space-x-4">
+          <div className="w-full flex-1 max-w-sm md:w-auto md:flex-none">
             <SearchBar />
           </div>
 
@@ -32,6 +32,14 @@ export async function Header() {
             >
               <CalendarDays className="h-5 w-5" />
               <span className="hidden md:inline-block">{t('calendar')}</span>
+            </Link>
+            <Link
+              href="/pricing"
+              className="flex items-center space-x-1.5 text-sm font-bold text-primary bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-colors mr-3 px-3 py-1.5 rounded-full"
+              title={t('pricing')}
+            >
+              <Zap className="h-3.5 w-3.5 fill-current" />
+              <span className="hidden md:inline-block">{t('pricing')}</span>
             </Link>
             <Link
               href="/dcf"

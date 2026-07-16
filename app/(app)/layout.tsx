@@ -19,7 +19,9 @@ export default async function AppLayout({
 
   let userName: string | null = null;
   let userEmail: string | null = null;
-  let plan: string | null = null;
+  let devSlot: React.ReactNode = null;
+  let plan = "FREE";
+
   if (user) {
     userName = user.user_metadata?.name || user.email?.split("@")[0] || null;
     userEmail = user.email ?? null;
@@ -27,14 +29,20 @@ export default async function AppLayout({
       where: { id: user.id },
       select: { plan: true },
     });
-    plan = dbUser?.plan ?? null;
+    
+    if (dbUser) {
+      plan = dbUser.plan;
+      if (process.env.NODE_ENV === "development") {
+        devSlot = <PlanToggle initialPlan={dbUser.plan} />;
+      }
+    }
   }
 
   return (
     <div className="relative min-h-screen">
       <InertiaScroll />
       <ContourCanvas />
-      <TopNav userName={userName} userEmail={userEmail} plan={plan} />
+      <TopNav userName={userName} userEmail={userEmail} plan={plan} devSlot={devSlot} />
       <main className="mx-auto w-full max-w-7xl px-4 pb-28 pt-24 md:px-6 md:pb-12">
         {children}
       </main>

@@ -3,7 +3,7 @@
     "eyebrow": "Análise fundamental · Value investing",
     "titleLead": "Vê o valor que",
     "titleAccent": "os outros não veem.",
-    "subtitle": "10 anos de fundamentais, uma calculadora DCF que se autopreenche e AI Insights — em português e de graça. Análise séria para quem investe a longo prazo.",
+    "subtitle": "A tua DCF calculator platform com 10 anos de fundamentais e AI Insights — em português e de graça. A derradeira ferramenta de stock valuation para quem investe a longo prazo.",
     "primaryCta": "Criar conta grátis",
     "secondaryCta": "Ver exemplo: AAPL",
     "trust": "Cobertura S&P 500 · Dados da SEC EDGAR · Sem cartão de crédito",
@@ -14,7 +14,7 @@
       },
       "dcf": {
         "title": "DCF integrada",
-        "desc": "Estima o valor intrínseco em segundos. Autopreenche a partir da empresa e ajusta com sliders."
+        "desc": "A mais completa plataforma de DCF metrics investing. Estima o valor intrínseco em segundos. Autopreenche a partir da empresa e ajusta com sliders."
       },
       "ai": {
         "title": "AI Brief",
@@ -173,6 +173,7 @@
     "logoutTitle": "Sair",
     "login": "Login",
     "register": "Registar",
+    "pricing": "Preços",
     "dcf": "DCF",
     "calendar": "Calendário",
     "theme": "Alternar tema"
@@ -661,7 +662,79 @@
     "rights": "© {year} {brand}. Todos os direitos reservados.",
     "terms": "Termos de Serviço",
     "privacy": "Privacidade",
-    "refund": "Política de Reembolso"
+    "refund": "Política de Reembolso",
+    "pricing": "Preços"
+  },
+  "pricing": {
+    "badge": "Simples e transparente",
+    "title": "Investe com mais confiança.",
+    "subtitle": "Começa gratuitamente ou experimenta o plano PRO por 7 dias grátis. Cancela a qualquer momento.",
+    "monthly": "Mês",
+    "free": {
+      "name": "Gratuito",
+      "price": "€0",
+      "period": "para sempre",
+      "description": "Tudo o que precisas para começar a analisar empresas.",
+      "cta": "Criar conta grátis"
+    },
+    "pro": {
+      "name": "PRO",
+      "price": "€7",
+      "period": "por mês",
+      "description": "Para o investidor sério que quer ir mais fundo na análise.",
+      "cta": "Começar trial de 7 dias",
+      "badge": "Mais popular"
+    },
+    "features": {
+      "title": "O que está incluído",
+      "free": [
+        "Acesso completo ao S&P 500",
+        "10 anos de dados fundamentais",
+        "Calculadora DCF com autopreenche",
+        "Gráficos financeiros interativos",
+        "Watchlist até 10 empresas",
+        "5 análises AI Brief por dia",
+        "Calendário de resultados",
+        "Dados de Insider Trading"
+      ],
+      "pro": [
+        "Tudo do plano Gratuito",
+        "Watchlist ilimitada",
+        "AI Brief ilimitado",
+        "Guardar análises DCF ilimitadas",
+        "Screener avançado com filtros customizados",
+        "Exportar dados financeiros em CSV",
+        "Acesso antecipado a novas funcionalidades",
+        "Comunidade privada de value investors",
+        "Apoio prioritário 24/7 por email"
+      ]
+    },
+    "faq": {
+      "title": "Perguntas frequentes",
+      "items": [
+        {
+          "q": "Posso cancelar a qualquer momento?",
+          "a": "Sim, sem qualquer penalização. O acesso PRO mantém-se até ao fim do período pago e depois reverte para o plano gratuito."
+        },
+        {
+          "q": "Existe um período experimental?",
+          "a": "Sim, oferecemos 7 dias grátis para testares a plataforma PRO. Durante esses 7 dias terás acesso a todas as funcionalidades avançadas, exceto à comunidade privada."
+        },
+        {
+          "q": "Quem processa os pagamentos?",
+          "a": "Os pagamentos são processados pelo Paddle, que atua como Merchant of Record e é responsável pela faturação, impostos e conformidade legal em toda a UE."
+        },
+        {
+          "q": "A subscrição renova automaticamente?",
+          "a": "Sim, mensalmente. Receberás sempre um email de aviso antes de qualquer cobrança e podes cancelar a qualquer momento."
+        },
+        {
+          "q": "Os meus dados financeiros estão seguros?",
+          "a": "Nunca guardamos dados de cartão — toda a informação de pagamento é gerida exclusivamente pelo Paddle com encriptação de nível bancário."
+        }
+      ]
+    },
+    "trust": "Pagamentos seguros via Paddle · Cancela a qualquer momento · Conformidade IVA UE"
   },
   "explore": {
     "title": "Explorar Negócios",

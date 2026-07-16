@@ -16,6 +16,7 @@ import {
   Search,
   Settings,
   LogOut,
+  Zap,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn, userInitials } from "@/lib/utils";
@@ -37,10 +38,12 @@ export function TopNav({
   userName,
   userEmail,
   plan,
+  devSlot,
 }: {
   userName?: string | null;
   userEmail?: string | null;
   plan?: string | null;
+  devSlot?: React.ReactNode;
 }) {
   const pathname = usePathname();
   const t = useTranslations("sidebar");
@@ -96,6 +99,18 @@ export function TopNav({
           </nav>
 
           <div className="flex-1" />
+
+          {/* Botão de Upgrade para contas FREE */}
+          {plan === "FREE" && (
+            <Link
+              href="/pricing"
+              className="hidden items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20 hover:border-primary/50 md:flex mr-1"
+              title="Dar Upgrade"
+            >
+              <Zap className="h-3.5 w-3.5 fill-current" />
+              <span>Upgrade</span>
+            </Link>
+          )}
 
           {/* pesquisa universal ⌘K */}
           <button

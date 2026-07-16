@@ -3,7 +3,7 @@
     "eyebrow": "Fundamental analysis · Value investing",
     "titleLead": "See the value",
     "titleAccent": "others miss.",
-    "subtitle": "10 years of fundamentals, a DCF calculator that autofills, and AI Insights — free. Serious analysis for long-term investors.",
+    "subtitle": "Your premier DCF calculator platform with 10 years of fundamentals and AI Insights — completely free. The ultimate stock valuation tool for long-term investors.",
     "primaryCta": "Create free account",
     "secondaryCta": "See example: AAPL",
     "trust": "S&P 500 coverage · SEC EDGAR data · No credit card",
@@ -14,7 +14,7 @@
       },
       "dcf": {
         "title": "Built-in DCF",
-        "desc": "Estimate intrinsic value in seconds. Autofill from the company and tune with sliders."
+        "desc": "The most complete platform for DCF metrics investing. Estimate intrinsic value in seconds. Autofill from the company and tune with sliders."
       },
       "ai": {
         "title": "AI Brief",
@@ -173,6 +173,7 @@
     "logoutTitle": "Sign out",
     "login": "Sign in",
     "register": "Sign up",
+    "pricing": "Pricing",
     "dcf": "DCF",
     "calendar": "Calendar",
     "theme": "Toggle theme"
@@ -661,7 +662,79 @@
     "rights": "© {year} {brand}. All rights reserved.",
     "terms": "Terms of Service",
     "privacy": "Privacy",
-    "refund": "Refund Policy"
+    "refund": "Refund Policy",
+    "pricing": "Pricing"
+  },
+  "pricing": {
+    "badge": "Simple and transparent",
+    "title": "Invest with more confidence.",
+    "subtitle": "Start for free or try the PRO plan with a 7-day free trial. Cancel anytime.",
+    "monthly": "Month",
+    "free": {
+      "name": "Free",
+      "price": "€0",
+      "period": "forever",
+      "description": "Everything you need to start analyzing companies.",
+      "cta": "Create free account"
+    },
+    "pro": {
+      "name": "PRO",
+      "price": "€7",
+      "period": "per month",
+      "description": "For the serious investor who wants to go deeper in their analysis.",
+      "cta": "Start 7-day free trial",
+      "badge": "Most popular"
+    },
+    "features": {
+      "title": "What's included",
+      "free": [
+        "Full S&P 500 access",
+        "10 years of fundamental data",
+        "DCF calculator with autofill",
+        "Interactive financial charts",
+        "Watchlist up to 10 companies",
+        "5 AI Brief analyses per day",
+        "Earnings calendar",
+        "Insider Trading data"
+      ],
+      "pro": [
+        "Everything in Free",
+        "Unlimited watchlist",
+        "Unlimited AI Brief",
+        "Unlimited saved DCF analyses",
+        "Advanced screener with custom filters",
+        "Export financial data as CSV",
+        "Early access to new features",
+        "Private value investors community",
+        "Priority 24/7 email support"
+      ]
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "items": [
+        {
+          "q": "Can I cancel at any time?",
+          "a": "Yes, with no penalty. Your PRO access continues until the end of the paid period, then reverts to the free plan."
+        },
+        {
+          "q": "Is there a free trial?",
+          "a": "Yes, we offer a 7-day free trial for you to test the PRO platform. During those 7 days, you'll have access to all advanced features, except the private community."
+        },
+        {
+          "q": "Who processes the payments?",
+          "a": "Payments are processed by Paddle, acting as Merchant of Record and handling invoicing, taxes, and legal compliance across the EU."
+        },
+        {
+          "q": "Does the subscription renew automatically?",
+          "a": "Yes, monthly. You will always receive an advance email notice before any charge, and you can cancel at any time."
+        },
+        {
+          "q": "Is my financial data safe?",
+          "a": "We never store card data — all payment information is managed exclusively by Paddle with bank-grade encryption."
+        }
+      ]
+    },
+    "trust": "Secure payments via Paddle · Cancel anytime · EU VAT compliant"
   },
   "explore": {
     "title": "Explore Businesses",

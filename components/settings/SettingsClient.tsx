@@ -32,6 +32,7 @@ interface SettingsClientProps {
     email: string
     name: string | null
     plan: string
+    hasSubscription?: boolean
   }
   locale: string
   aiUsedToday: number
@@ -71,6 +72,8 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
   // Toggle de plano (beta)
   const [isTogglingPlan, setIsTogglingPlan] = useState(false)
   const [planMessage, setPlanMessage] = useState<string | null>(null)
+  const [isGeneratingPortal, setIsGeneratingPortal] = useState(false)
+  const [portalError, setPortalError] = useState<string | null>(null)
 
   // Track the initial name normalised to empty string so comparison is consistent
   const initialName = user.name || ''
@@ -119,6 +122,51 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
   const handleDeleteAccount = async () => {
     setIsDeleting(true)
     await deleteAccount()
+    // It will redirect automatically from action
+  }
+
+  const handleManageSubscription = async () => {
+    setIsGeneratingPortal(true)
+    setPortalError(null)
+
+    try {
+      const response = await fetch('/api/paddle/portal', {
+        method: 'POST',
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok && data.url) {
+        window.location.href = data.url
+      } else {
+        setPortalError(data.error || 'Ocorreu um erro ao gerar o link do portal.')
+        setIsGeneratingPortal(false)
+      }
+    } catch (error) {
+      setPortalError('Falha na comunicação com o servidor.')
+      setIsGeneratingPortal(false)
+    }
+  }
+
+  const handleUpdateEmail = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSavingEmail(true)
+    setEmailMessage(null)
+    
+    const formData = new FormData()
+    formData.append('currentPassword', currentPasswordForEmail)
+    formData.append('newEmail', newEmail)
+    
+    const result = await updateEmailSettings(formData)
+    if (result?.error) {
+      setEmailMessage({ text: result.error, type: 'error' })
+    } else {
+      setEmailMessage({ text: 'Foi enviado um email de confirmação para o novo e antigo endereço. Por favor, verifica as caixas de correio.', type: 'success' })
+      setCurrentPasswordForEmail('')
+      setNewEmail('')
+    }
+    
+    setIsSavingEmail(false)
   }
 
   const handleUpdateEmail = async (e: React.FormEvent) => {
@@ -249,11 +297,19 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
             </div>
             
             <div className="border-t p-6 bg-muted/10">
+<<<<<<< HEAD
               <h3 className="text-lg font-semibold mb-6">{t('profile.changeEmailTitle')}</h3>
               <form onSubmit={handleUpdateEmail} className="space-y-6 max-w-xl mb-12">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="newEmail">{t('profile.newEmail')}</Label>
+=======
+              <h3 className="text-lg font-semibold mb-6">Alterar Email</h3>
+              <form onSubmit={handleUpdateEmail} className="space-y-6 max-w-xl mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="newEmail">Novo Email</Label>
+>>>>>>> feat/pricing-page
                     <div className="relative">
                       <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input 
@@ -267,7 +323,11 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
                     </div>
                   </div>
                   <div className="space-y-2">
+<<<<<<< HEAD
                     <Label htmlFor="currentPasswordForEmail">{t('profile.currentPassword')}</Label>
+=======
+                    <Label htmlFor="currentPasswordForEmail">Palavra-passe Atual</Label>
+>>>>>>> feat/pricing-page
                     <PasswordInput 
                       id="currentPasswordForEmail" 
                       value={currentPasswordForEmail} 
@@ -285,7 +345,11 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
 
                 <Button type="submit" disabled={isSavingEmail || !currentPasswordForEmail || !newEmail || newEmail === user.email}>
                   {isSavingEmail ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+<<<<<<< HEAD
                   {t('profile.confirmEmailChangeBtn')}
+=======
+                  Confirmar Alteração
+>>>>>>> feat/pricing-page
                 </Button>
               </form>
 
@@ -452,12 +516,13 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
           <div className="glass rounded-xl text-card-foreground p-6 space-y-8">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold">{t('subscription.title')}</h2>
-              <div className="bg-bull/10 text-bull border border-bull/20 px-3 py-1 rounded-full font-bold flex items-center text-sm">
+              <div className={`px-3 py-1 rounded-full font-bold flex items-center text-sm ${user.plan === 'PRO' ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-bull/10 text-bull border border-bull/20'}`}>
                 <Star className="h-3 w-3 mr-1.5 fill-current" />
                 {isPro ? 'PRO' : t('planFree')}
               </div>
             </div>
 
+<<<<<<< HEAD
             {/* Uso de IA de hoje */}
             <div className="max-w-xl">
               <div className="flex items-baseline justify-between mb-2">
@@ -551,6 +616,94 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
                   {isPro ? t('subscription.beta.toFree') : t('subscription.beta.toPro')}
                 </Button>
               </div>
+=======
+            {user.plan === 'PRO' ? (
+              /* ── Estado PRO activo ── */
+              <div className="space-y-4">
+                <div className="rounded-lg border border-primary/20 bg-primary/5 p-5">
+                  <p className="font-semibold text-primary mb-1">Plano PRO Activo</p>
+                  <p className="text-sm text-muted-foreground">
+                    Tens acesso completo a todas as funcionalidades PRO. Para gerir a tua subscrição (cancelar, actualizar dados de pagamento), utiliza o portal de faturação abaixo.
+                  </p>
+                </div>
+                <Button
+                  onClick={handleManageSubscription}
+                  disabled={isGeneratingPortal || !user.hasSubscription}
+                  className="gap-2"
+                >
+                  {isGeneratingPortal ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  Gerir subscrição (Alterar/Cancelar) →
+                </Button>
+                {portalError && <p className="text-sm text-destructive font-medium">{portalError}</p>}
+                {!user.hasSubscription && !portalError && (
+                  <p className="text-xs text-muted-foreground">ID de subscrição não encontrado na base de dados.</p>
+                )}
+              </div>
+            ) : (
+              /* ── Estado FREE — mostrar comparação de planos ── */
+              <div className="space-y-6">
+                <p className="text-sm text-muted-foreground">{t('subscription.desc')}</p>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {/* Gratuito */}
+                  <div className="rounded-xl border border-border bg-muted/20 p-5 flex flex-col">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Gratuito</p>
+                    <div className="flex items-end gap-1 mb-1">
+                      <span className="text-3xl font-extrabold">€0</span>
+                      <span className="mb-0.5 text-sm text-muted-foreground">/ para sempre</span>
+                    </div>
+                    <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+                      {["S&P 500 completo", "10 anos de fundamentais", "DCF com autopreenche", "5 AI Briefs/dia", "Watchlist até 10 empresas"].map(f => (
+                        <li key={f} className="flex items-center gap-2">
+                          <Check className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mt-auto pt-5">
+                      <div className="w-full rounded-lg border border-border bg-muted/30 py-2 text-center text-sm font-medium text-muted-foreground">
+                        Plano atual
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* PRO */}
+                  <div className="relative rounded-xl border border-primary/40 bg-gradient-to-br from-primary/8 to-card/60 p-5 flex flex-col shadow-[0_0_30px_-8px_hsl(var(--primary)/0.2)]">
+                    <div className="absolute -top-3 left-4">
+                      <div className="flex items-center gap-1 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold text-primary-foreground">
+                        <Star className="h-2.5 w-2.5 fill-current" />
+                        Mais popular
+                      </div>
+                    </div>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">PRO</p>
+                    <div className="flex items-end gap-1 mb-1">
+                      <span className="text-3xl font-extrabold">€7</span>
+                      <span className="mb-0.5 text-sm text-muted-foreground">/ mês</span>
+                    </div>
+                    <ul className="mt-4 space-y-2 text-sm">
+                      {["Watchlist ilimitada", "AI Brief ilimitado", "DCF analyses ilimitadas", "Screener avançado", "Exportar CSV", "Comunidade privada", "Suporte 24/7"].map(f => (
+                        <li key={f} className="flex items-center gap-2">
+                          <Check className="h-3.5 w-3.5 shrink-0 text-primary" />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mt-auto pt-5">
+                      <a
+                        href="/pricing"
+                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_4px_20px_-4px_hsl(var(--primary)/0.5)] transition-opacity hover:opacity-90"
+                      >
+                        {t('subscription.upgradeBtn')}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-center text-xs text-muted-foreground/60">
+                  Pagamentos seguros via Paddle · Cancela a qualquer momento
+                </p>
+              </div>
+>>>>>>> feat/pricing-page
             )}
           </div>
         </TabsContent>

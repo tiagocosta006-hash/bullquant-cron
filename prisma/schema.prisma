@@ -22,6 +22,12 @@ model User {
   portfolio         Portfolio?
   watchlistItems    WatchlistItem[]
 
+  // Paddle Billing Fields
+  paddleCustomerId     String?   @unique
+  paddleSubscriptionId String?   @unique
+  paddleStatus         String?
+  paddlePriceId        String?
+
   @@map("users")
 }
 

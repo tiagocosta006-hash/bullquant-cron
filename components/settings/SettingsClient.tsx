@@ -23,6 +23,7 @@ import {
 import { updateProfile, setLocale, updatePasswordSettings, updateEmailSettings, deleteAccount } from '@/app/(app)/settings/actions'
 import { logout } from '@/app/(auth)/actions'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { usePaddle } from '@/components/providers/PaddleProvider'
 import { applyTheme, currentTheme, type Theme } from '@/lib/theme'
 import { userInitials } from '@/lib/utils'
 
@@ -72,6 +73,26 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
 
   const [isGeneratingPortal, setIsGeneratingPortal] = useState(false)
   const [portalError, setPortalError] = useState<string | null>(null)
+
+  // Preço localizado (Paddle)
+  const { paddle } = usePaddle()
+  const [proPrice, setProPrice] = useState('€7')
+
+  useEffect(() => {
+    const priceId = process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_PRO
+    if (!paddle || !priceId) return
+
+    paddle.PricePreview({
+      items: [{ priceId, quantity: 1 }]
+    })
+      .then((preview) => {
+        if (preview.data.details.lineItems.length > 0) {
+          // Removes decimals if it's .00 for a cleaner look, or just use the exact formatted total
+          setProPrice(preview.data.details.lineItems[0].formattedTotals.total)
+        }
+      })
+      .catch(console.error)
+  }, [paddle])
 
   // Track the initial name normalised to empty string so comparison is consistent
   const initialName = user.name || ''
@@ -551,7 +572,7 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
                     </div>
                     <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">PRO</p>
                     <div className="flex items-end gap-1 mb-1">
-                      <span className="text-3xl font-extrabold">€7</span>
+                      <span className="text-3xl font-extrabold">{proPrice}</span>
                       <span className="mb-0.5 text-sm text-muted-foreground">/ mês</span>
                     </div>
                     <ul className="mt-4 space-y-2 text-sm">

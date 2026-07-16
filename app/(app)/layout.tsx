@@ -32,9 +32,6 @@ export default async function AppLayout({
     
     if (dbUser) {
       plan = dbUser.plan;
-      if (process.env.NODE_ENV === "development") {
-        devSlot = <PlanToggle initialPlan={dbUser.plan} />;
-      }
     }
   }
 

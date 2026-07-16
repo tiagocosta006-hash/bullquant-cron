@@ -24,6 +24,7 @@ import { updateProfile, setLocale, updatePasswordSettings, updateEmailSettings, 
 import { logout } from '@/app/(auth)/actions'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { applyTheme, currentTheme, type Theme } from '@/lib/theme'
+import { userInitials } from '@/lib/utils'
 
 interface SettingsClientProps {
   user: {
@@ -36,16 +37,6 @@ interface SettingsClientProps {
   aiUsedToday: number
   aiDailyLimit: number
   betaEnabled: boolean
-}
-
-/** Iniciais para o avatar: 2 letras do nome (ou 1.ª letra do email). */
-export function userInitials(name: string | null | undefined, email: string) {
-  const source = (name || '').trim()
-  if (source) {
-    const parts = source.split(/\s+/)
-    return (parts[0][0] + (parts[1]?.[0] ?? '')).toUpperCase()
-  }
-  return email.charAt(0).toUpperCase()
 }
 
 export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEnabled }: SettingsClientProps) {

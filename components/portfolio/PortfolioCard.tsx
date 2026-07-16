@@ -33,7 +33,9 @@ export function PortfolioCard({ item, price, onRemove, onAddPosition, onEdit }: 
     : null
 
   const details = [
-    item.buyDate ? new Date(item.buyDate).toLocaleDateString(locale, { day: "2-digit", month: "short", year: "numeric" }) : null,
+    // timeZone UTC: a data é guardada como meia-noite UTC — sem isto, fusos
+    // negativos mostravam o dia anterior
+    item.buyDate ? new Date(item.buyDate).toLocaleDateString(locale, { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" }) : null,
     item.broker || null,
     fees > 0 ? `${t("position.fees")} ${formatPrice(fees)}${item.currency ? ` ${item.currency}` : ""}` : null,
   ].filter(Boolean)
@@ -51,7 +53,7 @@ export function PortfolioCard({ item, price, onRemove, onAddPosition, onEdit }: 
         }}
         aria-label={t('card.remove')}
         title={t('card.remove')}
-        className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-background/80 border border-border/60 text-muted-foreground/70 hover:text-bear hover:border-bear/40 hover:text-opacity-100 transition-all"
+        className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-background/80 border border-border/60 text-muted-foreground/70 hover:text-bear hover:border-bear/40 transition-all"
       >
         <X className="w-3.5 h-3.5" />
       </button>

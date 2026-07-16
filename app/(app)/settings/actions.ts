@@ -142,43 +142,6 @@ export async function updateEmailSettings(formData: FormData) {
 }
 
 // Beta: alterna FREE↔PRO sem pagamento, para testes durante o período beta.
-// Kill-switch para o lançamento: definir BETA_PLAN_TOGGLE=0 no ambiente.
-export async function togglePlanBeta() {
-  if (process.env.BETA_PLAN_TOGGLE === '0') {
-    return { error: 'notAvailable' }
-  }
-
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    return { error: 'notAuthorized' }
-  }
-
-  const dbUser = await prisma.user.findUnique({
-    where: { id: user.id },
-    select: { plan: true },
-  })
-
-  if (!dbUser) {
-    return { error: 'notAuthorized' }
-  }
-
-  const newPlan = dbUser.plan === 'PRO' ? 'FREE' : 'PRO'
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { 
-      plan: newPlan,
-      paddleCustomerId: null,
-      paddleSubscriptionId: null,
-      paddleStatus: null,
-      paddlePriceId: null
-    },
-  })
-
-  revalidatePath('/', 'layout')
-  return { success: true, plan: newPlan }
-}
 export async function deleteAccount() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

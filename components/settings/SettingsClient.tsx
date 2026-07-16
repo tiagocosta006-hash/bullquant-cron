@@ -20,7 +20,7 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog"
-import { updateProfile, setLocale, updatePasswordSettings, updateEmailSettings, deleteAccount, togglePlanBeta } from '@/app/(app)/settings/actions'
+import { updateProfile, setLocale, updatePasswordSettings, updateEmailSettings, deleteAccount } from '@/app/(app)/settings/actions'
 import { logout } from '@/app/(auth)/actions'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { applyTheme, currentTheme, type Theme } from '@/lib/theme'
@@ -69,9 +69,7 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
     init()
   }, [])
 
-  // Toggle de plano (beta)
-  const [isTogglingPlan, setIsTogglingPlan] = useState(false)
-  const [planMessage, setPlanMessage] = useState<string | null>(null)
+
   const [isGeneratingPortal, setIsGeneratingPortal] = useState(false)
   const [portalError, setPortalError] = useState<string | null>(null)
 
@@ -183,19 +181,6 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
       applyTheme(value)
       setTheme(value)
     }
-  }
-
-  const handleTogglePlan = async () => {
-    setIsTogglingPlan(true)
-    setPlanMessage(null)
-    const result = await togglePlanBeta()
-    if (result?.error) {
-      setPlanMessage(t('subscription.beta.error'))
-    } else {
-      // revalidatePath já correu na action; refresh para o badge/props atualizarem
-      router.refresh()
-    }
-    setIsTogglingPlan(false)
   }
 
   const isPro = user.plan === 'PRO'
@@ -504,24 +489,7 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
               )}
             </div>
 
-            {/* Beta: alternar de plano sem pagamento */}
-            {betaEnabled && (
-              <div className="rounded-lg border border-dashed border-border p-5">
-                <div className="mb-1 flex items-center gap-2">
-                  <FlaskConical className="h-4 w-4 text-primary" />
-                  <h3 className="text-sm font-bold">{t('subscription.beta.title')}</h3>
-                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">Beta</span>
-                </div>
-                <p className="mb-4 text-sm text-muted-foreground">{t('subscription.beta.desc')}</p>
-                {planMessage && (
-                  <p className="mb-3 text-sm font-medium text-destructive">{planMessage}</p>
-                )}
-                <Button variant="outline" onClick={handleTogglePlan} disabled={isTogglingPlan}>
-                  {isTogglingPlan ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  {isPro ? t('subscription.beta.toFree') : t('subscription.beta.toPro')}
-                </Button>
-              </div>
-            )}
+
 
             {user.plan === 'PRO' ? (
               /* ── Estado PRO activo ── */

@@ -148,26 +148,6 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
     }
   }
 
-  const handleUpdateEmail = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSavingEmail(true)
-    setEmailMessage(null)
-    
-    const formData = new FormData()
-    formData.append('currentPassword', currentPasswordForEmail)
-    formData.append('newEmail', newEmail)
-    
-    const result = await updateEmailSettings(formData)
-    if (result?.error) {
-      setEmailMessage({ text: result.error, type: 'error' })
-    } else {
-      setEmailMessage({ text: 'Foi enviado um email de confirmação para o novo e antigo endereço. Por favor, verifica as caixas de correio.', type: 'success' })
-      setCurrentPasswordForEmail('')
-      setNewEmail('')
-    }
-    
-    setIsSavingEmail(false)
-  }
 
   const handleUpdateEmail = async (e: React.FormEvent) => {
     e.preventDefault()

@@ -181,9 +181,8 @@ export function StockKPIs({ fundamentals, isPro, ticker }: StockKPIsProps) {
   if (kpiData.length === 0) {
     return (
       <div className="glass mt-8 relative overflow-hidden rounded-2xl p-8 md:p-12 text-center">
-        <div className="absolute top-0 right-0 p-32 bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
         <div className="relative z-10 flex flex-col items-center max-w-2xl mx-auto space-y-6">
-          <div className="p-4 bg-primary/10 rounded-full text-primary border border-primary/20 shadow-[0_0_30px_-5px_color-mix(in_srgb,var(--primary)_30%,transparent)]">
+          <div className="p-4 bg-primary/10 rounded-2xl text-primary border border-primary/15">
             <BrainCircuit className="w-10 h-10" />
           </div>
           <div>

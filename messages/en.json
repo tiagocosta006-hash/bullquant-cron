@@ -104,16 +104,19 @@
     "recentSearches": "Recent Searches",
     "desc": {
       "dashboard": "Overview, shortcuts and company explorer",
-      "portfolio": "The companies you follow and their live prices",
+      "portfolio": "Your real positions and their live performance",
       "calendar": "Upcoming earnings reports for US companies",
       "dcf": "Evaluate the fair price of any stock using cash flows",
       "transcripts": "Read investor meetings in full",
-      "explore": "Discover and explore companies by business type"
+      "explore": "Discover and explore companies by business type",
+      "watchlist": "Companies you're just watching, without a position"
     },
     "compare": "Compare",
     "navigate": "Navigate",
     "searchAction": "Search",
-    "more": "More"
+    "more": "More",
+    "watchlist": "Watchlist",
+    "dcfShort": "DCF"
   },
   "login": {
     "title": "Sign in to BullVision",
@@ -125,7 +128,9 @@
     "submitButton": "Sign in",
     "submitLoading": "Signing in...",
     "noAccount": "Don't have an account?",
-    "registerLink": "Sign up for free"
+    "registerLink": "Sign up for free",
+    "devLoginButton": "Sign in as dev (local)",
+    "devLoginLoading": "Signing in..."
   },
   "register": {
     "title": "Create Account",
@@ -138,7 +143,10 @@
     "submitButton": "Sign up",
     "submitLoading": "Signing up...",
     "hasAccount": "Already have an account?",
-    "loginLink": "Sign in"
+    "loginLink": "Sign in",
+    "confirmPasswordLabel": "Confirm Password",
+    "passwordMismatch": "Passwords don't match.",
+    "emailInUse": "This email is already registered."
   },
   "forgotPassword": {
     "title": "Reset Password",
@@ -194,12 +202,6 @@
       "save": "Save Changes",
       "dangerZone": "Danger Zone",
       "logoutDesc": "Securely sign out of your Bullmetrics session.",
-      "settings": "Settings",
-      "settingsDesc": "Manage your profile, subscription, and app preferences.",
-      "language": "Language",
-      "languageDesc": "Choose the language you want to use in Bullmetrics.",
-      "theme": "Visual Theme",
-      "themeDesc": "Switch between Dark and Light mode.",
       "logoutBtn": "Sign Out",
       "securityTitle": "Security",
       "currentPassword": "Current Password",
@@ -212,33 +214,63 @@
       "deleteAccountBtn": "Delete Account",
       "deleteAccountConfirmLabel": "Type DELETE to confirm",
       "deleteAccountCancel": "Cancel",
-      "deleteAccountSubmit": "Delete Forever"
+      "deleteAccountSubmit": "Delete Forever",
+      "changeEmailTitle": "Change Email",
+      "newEmail": "New Email",
+      "confirmEmailChangeBtn": "Confirm Change",
+      "emailChangeSuccess": "A confirmation email was sent to both the new and old address. Check your inboxes."
     },
     "preferences": {
       "title": "App Preferences",
       "language": "Interface Language",
       "languageDesc": "Choose the language you want to use in Bullmetrics.",
       "theme": "Visual Theme",
-      "themeDesc": "Switch between Dark and Light mode."
+      "themeDesc": "Switch between Dark and Light mode.",
+      "themeLight": "Light",
+      "themeDark": "Dark"
     },
     "subscription": {
       "title": "Your Current Plan",
       "desc": "You are currently on the free plan. You have unlimited access to quotes, but daily AI analyses and DCFs are limited.",
       "premiumSoonTitle": "Premium Access Coming Soon",
       "premiumSoonDesc": "We are preparing advanced artificial intelligence features exclusively for PRO subscribers.",
-      "upgradeBtn": "Upgrade to PRO"
+      "upgradeBtn": "Upgrade to PRO",
+      "aiUsageLabel": "AI analyses today",
+      "aiUnlimited": "Unlimited",
+      "compare": {
+        "title": "Free vs PRO",
+        "free": "Free",
+        "pro": "PRO",
+        "priceLabel": "Price",
+        "priceFree": "€0",
+        "pricePro": "€7/month",
+        "priceNote": "Provisional price — the final price will be announced at launch.",
+        "quotesLabel": "Quotes and 10 years of fundamentals",
+        "aiLabel": "AI analyses",
+        "aiFree": "{limit}/day",
+        "aiPro": "Unlimited",
+        "kpisLabel": "Business KPIs (deep AI)",
+        "pdfLabel": "PRO PDF reports"
+      },
+      "beta": {
+        "title": "Beta mode",
+        "desc": "During the beta you can switch between Free and PRO without paying, to test every feature.",
+        "toPro": "Enable PRO (beta)",
+        "toFree": "Back to the Free plan",
+        "error": "Couldn't change the plan. Please try again."
+      }
     }
   },
   "portfolio": {
     "loginRequired": "You need to sign in to access your Watchlist.",
     "loginButton": "Sign In",
     "title": "My Portfolio",
-    "subtitle": "Track your favourite companies in real time.",
+    "subtitle": "Your real positions, with live performance.",
     "positions": "Positions",
     "upToday": "Up Today",
     "emptyState": {
-      "title": "Your Watchlist is empty",
-      "description": "Start adding companies to track their performance in real time, or explore some of the popular options below.",
+      "title": "Your portfolio is empty",
+      "description": "Add your positions (quantity and buy price) to track real performance, or start with one of the popular options.",
       "quickAdd": "Add",
       "adding": "Adding..."
     },
@@ -253,7 +285,9 @@
     },
     "card": {
       "currentPrice": "Current Price",
-      "remove": "Remove from Watchlist"
+      "remove": "Remove from portfolio",
+      "addPosition": "Add position",
+      "edit": "Edit position"
     },
     "table": {
       "company": "Company",
@@ -279,7 +313,9 @@
     "position": {
       "shares": "shares",
       "avgCost": "avg. cost",
-      "pnl": "P&L"
+      "pnl": "P&L",
+      "fees": "Fees",
+      "notes": "Notes"
     },
     "summary": {
       "marketValue": "Market Value",
@@ -351,7 +387,24 @@
       "syncSummary": "{synced} positions synced, {unsupported} not supported.",
       "syncError": "Could not sync with Trading212."
     },
-    "lastUpdate": "Last update:"
+    "lastUpdate": "Last update:",
+    "addPosition": {
+      "title": "Add position — {ticker}",
+      "description": "Enter the quantity and average buy price. To follow without a position, use the watchlist.",
+      "quantityLabel": "Quantity",
+      "priceLabel": "Average buy price (USD)",
+      "cancel": "Cancel",
+      "confirm": "Add",
+      "error": "Couldn't add the position. Please try again.",
+      "editTitle": "Edit position — {ticker}",
+      "dateLabel": "Buy date",
+      "brokerLabel": "Broker",
+      "currencyLabel": "Currency",
+      "feesLabel": "Fees",
+      "notesLabel": "Notes",
+      "notesPlaceholder": "Notes about this position…",
+      "save": "Save"
+    }
   },
   "stock": {
     "underConstruction": "Under construction",
@@ -363,7 +416,8 @@
       "followed": "Following",
       "addToPortfolio": "Add to Portfolio",
       "updating": "Updating...",
-      "comparePeers": "Compare Peers"
+      "comparePeers": "Compare Peers",
+      "follow": "Follow"
     },
     "savedValuations": {
       "title": "My Saved Valuations",
@@ -647,5 +701,40 @@
       "compareDesc": "Evaluate financial performance side-by-side.",
       "viewFinancials": "View Full Financial Analysis"
     }
+  },
+  "verifyEmail": {
+    "title": "Confirm your email",
+    "unconfirmed": "Your account isn't confirmed yet.",
+    "sentTo": "We sent a confirmation link to <strong>{email}</strong>.",
+    "sentGeneric": "We sent you a confirmation link by email.",
+    "instruction": "Open the email and click the link to activate your account. Then just log in.",
+    "spamHint": "Didn't get it? Wait a minute and check your spam or junk folder.",
+    "resent": "We resent the confirmation email. Check your inbox.",
+    "noEmail": "Email is missing. Go back to sign up and try again.",
+    "resendButton": "Resend email",
+    "resending": "Resending...",
+    "backToLogin": "Back to login",
+    "wrongEmail": "Wrong email?",
+    "changeEmail": "Fix it",
+    "openGmail": "Open Gmail",
+    "openOutlook": "Open Outlook"
+  },
+  "watchlist": {
+    "title": "Watchlist",
+    "subtitle": "Companies you're watching — no position, just radar.",
+    "loginRequired": "Log in to build your watchlist.",
+    "loginButton": "Log in",
+    "empty": {
+      "title": "Your watchlist is empty",
+      "description": "Follow companies to keep an eye on them — prices update live. Start with one of the popular options.",
+      "quickAdd": "Follow",
+      "adding": "Adding..."
+    },
+    "stats": {
+      "following": "Following",
+      "upToday": "Up today"
+    },
+    "suggestionsTitle": "Suggestions to follow",
+    "lastUpdate": "Last update:"
   }
 }

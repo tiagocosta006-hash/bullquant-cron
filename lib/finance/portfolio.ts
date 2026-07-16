@@ -23,13 +23,18 @@ export type PositionPnl = {
   pnlPercent: number
 }
 
-/** P&L não realizado de uma posição, dado o preço atual de mercado. */
+/**
+ * P&L não realizado de uma posição, dado o preço atual de mercado.
+ * `fees` (comissões/taxas de compra) entram no custo base — o P&L reflete
+ * o custo real da posição.
+ */
 export function calculatePositionPnl(
   quantity: number,
   avgBuyPrice: number,
-  currentPrice: number
+  currentPrice: number,
+  fees = 0
 ): PositionPnl {
-  const costBasis = quantity * avgBuyPrice
+  const costBasis = quantity * avgBuyPrice + fees
   const marketValue = quantity * currentPrice
   const pnlAbsolute = marketValue - costBasis
   const pnlPercent = costBasis > 0 ? pnlAbsolute / costBasis : 0

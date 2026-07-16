@@ -20,6 +20,7 @@ model User {
   brokerConnections BrokerConnection[]
   dcfAnalyses       DcfAnalysis[]
   portfolio         Portfolio?
+  watchlistItems    WatchlistItem[]
 
   @@map("users")
 }
@@ -59,6 +60,7 @@ model Company {
   managementProfile      ManagementProfile?
   portfolioItems         PortfolioItem[]
   prices                 Price[]
+  watchlistItems         WatchlistItem[]
 
   @@index([ticker])
   @@index([exchange])
@@ -147,12 +149,34 @@ model PortfolioItem {
   addedAt     DateTime  @default(now())
   quantity    Decimal?  @db.Decimal(20, 6)
   avgBuyPrice Decimal?  @db.Decimal(12, 4)
+  // Detalhes opcionais da posição (entrada manual; o sync Trading212 não os
+  // escreve — têm de continuar nullable para o upsert do sync não partir)
+  buyDate     DateTime?
+  broker      String?
+  currency    String?
+  fees        Decimal?  @db.Decimal(12, 4)
+  notes       String?   @db.Text
   company     Company   @relation(fields: [companyId], references: [id])
   portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
 
   @@unique([portfolioId, companyId])
   @@index([portfolioId])
   @@map("portfolio_items")
+}
+
+// Watchlist (lista de observação) — separada do portfólio: seguir uma empresa
+// não implica ter posição, e uma empresa pode estar em ambas as listas.
+model WatchlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  companyId String
+  addedAt   DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, companyId])
+  @@index([userId])
+  @@map("watchlist_items")
 }
 
 model BrokerConnection {

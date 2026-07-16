@@ -104,16 +104,19 @@
     "recentSearches": "Pesquisas Recentes",
     "desc": {
       "dashboard": "Visão geral, atalhos e exploração de empresas",
-      "portfolio": "As empresas que segues e os seus preços ao vivo",
+      "portfolio": "As tuas posições reais e o seu desempenho ao vivo",
       "calendar": "Próximos relatórios de ganhos das empresas americanas",
       "dcf": "Avalia o preço justo de qualquer ação usando fluxos de caixa",
       "transcripts": "Lê as reuniões com investidores na íntegra",
-      "explore": "Encontra e explora empresas organizadas por tipo de negócio"
+      "explore": "Encontra e explora empresas organizadas por tipo de negócio",
+      "watchlist": "As empresas que estás só a observar, sem posição"
     },
     "compare": "Comparar",
     "navigate": "Navegar",
     "searchAction": "Pesquisar",
-    "more": "Mais"
+    "more": "Mais",
+    "watchlist": "Watchlist",
+    "dcfShort": "DCF"
   },
   "login": {
     "title": "Entrar no BullVision",
@@ -125,7 +128,9 @@
     "submitButton": "Entrar",
     "submitLoading": "A entrar...",
     "noAccount": "Não tens conta?",
-    "registerLink": "Regista-te grátis"
+    "registerLink": "Regista-te grátis",
+    "devLoginButton": "Entrar como dev (local)",
+    "devLoginLoading": "A entrar..."
   },
   "register": {
     "title": "Criar Conta",
@@ -138,7 +143,10 @@
     "submitButton": "Registar",
     "submitLoading": "A registar...",
     "hasAccount": "Já tens conta?",
-    "loginLink": "Faz Login"
+    "loginLink": "Faz Login",
+    "confirmPasswordLabel": "Confirmar Password",
+    "passwordMismatch": "As passwords não coincidem.",
+    "emailInUse": "Este email já está registado."
   },
   "forgotPassword": {
     "title": "Recuperar Password",
@@ -206,35 +214,63 @@
       "deleteAccountBtn": "Apagar Conta",
       "deleteAccountConfirmLabel": "Escreve APAGAR para confirmar",
       "deleteAccountCancel": "Cancelar",
-      "deleteAccountSubmit": "Apagar para Sempre"
+      "deleteAccountSubmit": "Apagar para Sempre",
+      "changeEmailTitle": "Alterar Email",
+      "newEmail": "Novo Email",
+      "confirmEmailChangeBtn": "Confirmar Alteração",
+      "emailChangeSuccess": "Foi enviado um email de confirmação para o novo e o antigo endereço. Verifica as caixas de correio."
     },
     "preferences": {
       "title": "Preferências de Utilização",
-      "settings": "Definições",
-      "settingsDesc": "Gere o teu perfil, subscrição e preferências da app.",
       "language": "Idioma",
       "languageDesc": "Escolhe a língua em que queres usar o Bullmetrics.",
       "theme": "Tema Visual",
-      "themeDesc": "Alterna entre modo escuro (Dark) e modo claro (Light)."
+      "themeDesc": "Alterna entre modo escuro (Dark) e modo claro (Light).",
+      "themeLight": "Claro",
+      "themeDark": "Escuro"
     },
     "subscription": {
       "title": "O Teu Plano Atual",
       "desc": "Estás atualmente no plano gratuito. Tens acesso ilimitado a cotações, mas o número de análises de IA e DCF diárias é limitado.",
       "premiumSoonTitle": "Acesso Premium em Breve",
       "premiumSoonDesc": "Estamos a preparar funcionalidades avançadas de inteligência artificial exclusivas para subscritores PRO.",
-      "upgradeBtn": "Fazer Upgrade para PRO"
+      "upgradeBtn": "Fazer Upgrade para PRO",
+      "aiUsageLabel": "Análises de IA hoje",
+      "aiUnlimited": "Ilimitadas",
+      "compare": {
+        "title": "Free vs PRO",
+        "free": "Free",
+        "pro": "PRO",
+        "priceLabel": "Preço",
+        "priceFree": "0 €",
+        "pricePro": "7 €/mês",
+        "priceNote": "Preço provisório — o valor final será anunciado no lançamento.",
+        "quotesLabel": "Cotações e 10 anos de fundamentais",
+        "aiLabel": "Análises de IA",
+        "aiFree": "{limit}/dia",
+        "aiPro": "Ilimitadas",
+        "kpisLabel": "KPIs de negócio (IA profunda)",
+        "pdfLabel": "Relatórios PDF PRO"
+      },
+      "beta": {
+        "title": "Modo beta",
+        "desc": "Durante a beta podes alternar entre Free e PRO sem pagamento, para testares todas as funcionalidades.",
+        "toPro": "Ativar PRO (beta)",
+        "toFree": "Voltar ao plano Free",
+        "error": "Não foi possível alterar o plano. Tenta novamente."
+      }
     }
   },
   "portfolio": {
     "loginRequired": "Precisas de iniciar sessão para aceder à tua Watchlist.",
     "loginButton": "Iniciar Sessão",
     "title": "O Meu Portfólio",
-    "subtitle": "Acompanha as tuas empresas favoritas em tempo real.",
+    "subtitle": "As tuas posições reais, com desempenho em tempo real.",
     "positions": "Posições",
     "upToday": "Em Alta",
     "emptyState": {
-      "title": "A tua Watchlist está vazia",
-      "description": "Começa a adicionar empresas para acompanhar o seu desempenho em tempo real, ou explora algumas das opções populares abaixo.",
+      "title": "O teu portfólio está vazio",
+      "description": "Adiciona as tuas posições (quantidade e preço de compra) para acompanhares o desempenho real, ou começa por uma das opções populares.",
       "quickAdd": "Adicionar",
       "adding": "A adicionar..."
     },
@@ -249,7 +285,9 @@
     },
     "card": {
       "currentPrice": "Preço Atual",
-      "remove": "Remover da Watchlist"
+      "remove": "Remover do portfólio",
+      "addPosition": "Adicionar posição",
+      "edit": "Editar posição"
     },
     "table": {
       "company": "Empresa",
@@ -275,7 +313,9 @@
     "position": {
       "shares": "ações",
       "avgCost": "custo médio",
-      "pnl": "Ganho/Perda"
+      "pnl": "Ganho/Perda",
+      "fees": "Taxas",
+      "notes": "Notas"
     },
     "summary": {
       "marketValue": "Valor de Mercado",
@@ -347,7 +387,24 @@
       "syncSummary": "{synced} posições sincronizadas, {unsupported} não suportadas.",
       "syncError": "Não foi possível sincronizar com a Trading212."
     },
-    "lastUpdate": "Última atualização:"
+    "lastUpdate": "Última atualização:",
+    "addPosition": {
+      "title": "Adicionar posição — {ticker}",
+      "description": "Indica a quantidade e o preço médio de compra. Para acompanhar sem posição, usa a watchlist.",
+      "quantityLabel": "Quantidade",
+      "priceLabel": "Preço médio de compra (USD)",
+      "cancel": "Cancelar",
+      "confirm": "Adicionar",
+      "error": "Não foi possível adicionar a posição. Tenta novamente.",
+      "editTitle": "Editar posição — {ticker}",
+      "dateLabel": "Data de compra",
+      "brokerLabel": "Corretora",
+      "currencyLabel": "Moeda",
+      "feesLabel": "Taxas",
+      "notesLabel": "Notas",
+      "notesPlaceholder": "Observações sobre esta posição…",
+      "save": "Guardar"
+    }
   },
   "stock": {
     "underConstruction": "Em construção",
@@ -359,7 +416,8 @@
       "followed": "Seguido",
       "addToPortfolio": "Adicionar ao Portfólio",
       "updating": "A atualizar...",
-      "comparePeers": "Comparar Pares"
+      "comparePeers": "Comparar Pares",
+      "follow": "Seguir"
     },
     "savedValuations": {
       "title": "As Minhas Avaliações (DCF)",
@@ -643,5 +701,40 @@
       "compareDesc": "Avalia o desempenho financeiro lado a lado.",
       "viewFinancials": "Ver Análise Financeira Completa"
     }
+  },
+  "verifyEmail": {
+    "title": "Confirma o teu email",
+    "unconfirmed": "A tua conta ainda não está confirmada.",
+    "sentTo": "Enviámos um link de confirmação para <strong>{email}</strong>.",
+    "sentGeneric": "Enviámos-te um link de confirmação por email.",
+    "instruction": "Abre o email e clica no link para ativares a conta. Depois é só entrares.",
+    "spamHint": "Não recebeste? Espera um minuto e verifica a pasta de spam ou lixo.",
+    "resent": "Reenviámos o email de confirmação. Verifica a caixa de entrada.",
+    "noEmail": "Falta o email. Volta ao registo e tenta de novo.",
+    "resendButton": "Reenviar email",
+    "resending": "A reenviar...",
+    "backToLogin": "Voltar ao login",
+    "wrongEmail": "Email errado?",
+    "changeEmail": "Corrigir",
+    "openGmail": "Abrir Gmail",
+    "openOutlook": "Abrir Outlook"
+  },
+  "watchlist": {
+    "title": "Watchlist",
+    "subtitle": "As empresas que estás a observar — sem posição, só radar.",
+    "loginRequired": "Inicia sessão para criares a tua lista de observação.",
+    "loginButton": "Iniciar sessão",
+    "empty": {
+      "title": "A tua watchlist está vazia",
+      "description": "Segue empresas para as manteres debaixo de olho — os preços atualizam ao vivo. Começa por uma das opções populares.",
+      "quickAdd": "Seguir",
+      "adding": "A adicionar..."
+    },
+    "stats": {
+      "following": "A seguir",
+      "upToday": "Em alta hoje"
+    },
+    "suggestionsTitle": "Sugestões para seguir",
+    "lastUpdate": "Última atualização:"
   }
 }

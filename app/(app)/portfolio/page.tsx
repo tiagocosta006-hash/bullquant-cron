@@ -15,6 +15,7 @@ import { PortfolioValueChart } from "@/components/portfolio/PortfolioValueChart"
 import { PortfolioAllocation } from "@/components/portfolio/PortfolioAllocation"
 import { PortfolioManageBar } from "@/components/portfolio/PortfolioManageBar"
 import { ImportPortfolio } from "@/components/portfolio/ImportPortfolio"
+import { AddPositionDialog } from "@/components/portfolio/AddPositionDialog"
 import { calculatePositionPnl, aggregatePnl } from "@/lib/finance/portfolio"
 import type { PortfolioItem, PriceData, SortKey, ViewMode } from "@/components/portfolio/types"
 
@@ -31,6 +32,10 @@ export default function Home() {
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
   const [authError, setAuthError] = useState(false)
   const [addingTicker, setAddingTicker] = useState<string | null>(null)
+  // Posições exigem quantidade + preço médio → o quick-add abre um diálogo.
+  const [positionTicker, setPositionTicker] = useState<string | null>(null)
+  // Edição de uma posição existente (diálogo em modo edit)
+  const [editItem, setEditItem] = useState<PortfolioItem | null>(null)
   const [sortKey, setSortKey] = useState<SortKey>("addedAt")
   const [sectorFilter, setSectorFilter] = useState("ALL")
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
@@ -76,24 +81,26 @@ export default function Home() {
     }
   }
 
-  const handleQuickAdd = async (ticker: string) => {
+  const handleQuickAdd = (ticker: string) => {
     if (items.some(item => item.company.ticker === ticker)) return
-    setAddingTicker(ticker)
-    try {
-      const res = await fetch('/api/portfolio/add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ticker })
-      })
-      if (res.ok) {
-        // A API não devolve a `company`; refetch é necessário para ter logo/nome/exchange/sector.
-        await fetchPortfolio()
-      }
-    } catch (err) {
-      console.error("Failed to add ticker", err)
-    } finally {
-      setAddingTicker(null)
-    }
+    setPositionTicker(ticker)
+  }
+
+  const handlePositionAdded = async () => {
+    setPositionTicker(null)
+    setAddingTicker(null)
+    // A API não devolve a `company`; refetch é necessário para ter logo/nome/exchange/sector.
+    await fetchPortfolio()
+  }
+
+  const handleEdit = (ticker: string) => {
+    const item = items.find(i => i.company.ticker === ticker)
+    if (item) setEditItem(item)
+  }
+
+  const handleEdited = async () => {
+    setEditItem(null)
+    await fetchPortfolio()
   }
 
   const handleRemove = async (ticker: string) => {
@@ -148,9 +155,10 @@ export default function Home() {
       .map(item => {
         const quantity = item.quantity !== null ? Number(item.quantity) : null
         const avgBuyPrice = item.avgBuyPrice !== null ? Number(item.avgBuyPrice) : null
+        const fees = item.fees !== null && item.fees !== undefined ? Number(item.fees) : 0
         const currentPrice = prices[item.company.ticker]?.currentPrice
         if (quantity === null || avgBuyPrice === null || currentPrice === undefined) return null
-        return calculatePositionPnl(quantity, avgBuyPrice, currentPrice)
+        return calculatePositionPnl(quantity, avgBuyPrice, currentPrice, fees)
       })
       .filter((p): p is NonNullable<typeof p> => p !== null)
 
@@ -284,11 +292,12 @@ export default function Home() {
                   item={item}
                   price={prices[item.company.ticker]}
                   onRemove={handleRemove}
+                  onEdit={handleEdit}
                 />
               ))}
             </div>
           ) : (
-            <PortfolioTable items={visibleItems} prices={prices} onRemove={handleRemove} />
+            <PortfolioTable items={visibleItems} prices={prices} onRemove={handleRemove} onEdit={handleEdit} />
           )}
         </>
       )}
@@ -299,6 +308,22 @@ export default function Home() {
           onImported={fetchPortfolio}
         />
       )}
+
+      <AddPositionDialog
+        ticker={positionTicker}
+        open={positionTicker !== null}
+        onOpenChange={(open) => { if (!open) setPositionTicker(null) }}
+        onAdded={handlePositionAdded}
+      />
+
+      <AddPositionDialog
+        mode="edit"
+        ticker={editItem?.company.ticker ?? null}
+        initial={editItem}
+        open={editItem !== null}
+        onOpenChange={(open) => { if (!open) setEditItem(null) }}
+        onAdded={handleEdited}
+      />
 
       {items.length > 0 && items.length < 4 && suggestedTickers.length > 0 && (
         <PortfolioSuggestions tickers={suggestedTickers} addingTicker={addingTicker} onQuickAdd={handleQuickAdd} />

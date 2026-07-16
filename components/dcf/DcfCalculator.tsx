@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { Search, Loader2, Wand2, Info } from "lucide-react"
+import { Popover as PopoverPrimitive } from "@base-ui/react/popover"
 import { useTranslations } from "next-intl"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -114,15 +115,15 @@ export function DcfCalculator() {
     fetchResults()
   }, [debouncedQuery])
 
-  React.useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
-      }
+  // Fecho por clique-fora/Escape é tratado pelo Popover (Base UI); cliques
+  // dentro do wrapper (o próprio input) não fecham a lista.
+  const handleResultsOpenChange = (open: boolean, eventDetails: { event: Event }) => {
+    if (!open) {
+      const target = eventDetails.event?.target as Node | null
+      if (target && wrapperRef.current?.contains(target)) return
     }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+    setIsOpen(open)
+  }
 
   const handleSelect = async (ticker: string) => {
     setQuery("")
@@ -307,29 +308,44 @@ export function DcfCalculator() {
             )}
           </div>
 
-          {isOpen && results.length > 0 && (
-            <div className="absolute top-full mt-2 w-full bg-popover border border-border/50 rounded-xl shadow-lg overflow-hidden z-50 backdrop-blur-xl">
-              <ul className="max-h-[260px] overflow-y-auto py-2">
-                {results.map((c) => (
-                  <li key={c.ticker}>
-                    <button
-                      type="button"
-                      onClick={() => handleSelect(c.ticker)}
-                      className="w-full px-4 py-2.5 text-left hover:bg-muted/50 transition-colors flex items-center justify-between"
-                    >
-                      <div>
-                        <div className="font-bold text-foreground">{c.ticker}</div>
-                        <div className="text-xs text-muted-foreground line-clamp-1">{c.name}</div>
-                      </div>
-                      <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-md">
-                        {c.exchange}
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          {/* Portalado (Base UI): o Card usa .glass com overflow hidden, que
+              clipava o dropdown absoluto antigo quando saía do card. */}
+          <PopoverPrimitive.Root open={isOpen && results.length > 0} onOpenChange={handleResultsOpenChange}>
+            <PopoverPrimitive.Portal>
+              <PopoverPrimitive.Positioner
+                anchor={wrapperRef}
+                side="bottom"
+                sideOffset={8}
+                align="start"
+                className="isolate z-[60]"
+              >
+                <PopoverPrimitive.Popup
+                  initialFocus={false}
+                  className="w-(--anchor-width) bg-popover border border-border/50 rounded-xl shadow-lg overflow-hidden backdrop-blur-xl outline-none"
+                >
+                  <ul data-native-scroll className="max-h-[260px] overflow-y-auto py-2">
+                    {results.map((c) => (
+                      <li key={c.ticker}>
+                        <button
+                          type="button"
+                          onClick={() => handleSelect(c.ticker)}
+                          className="w-full px-4 py-2.5 text-left hover:bg-muted/50 transition-colors flex items-center justify-between"
+                        >
+                          <div>
+                            <div className="font-bold text-foreground">{c.ticker}</div>
+                            <div className="text-xs text-muted-foreground line-clamp-1">{c.name}</div>
+                          </div>
+                          <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-md">
+                            {c.exchange}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </PopoverPrimitive.Popup>
+              </PopoverPrimitive.Positioner>
+            </PopoverPrimitive.Portal>
+          </PopoverPrimitive.Root>
         </div>
 
         {loadedTicker && (

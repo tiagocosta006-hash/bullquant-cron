@@ -23,7 +23,7 @@ export function PageHeader({
     <header className={cn("flex flex-wrap items-end justify-between gap-4", className)}>
       <div className="flex min-w-0 items-start gap-4">
         {icon && (
-          <div className="glass mt-1 hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-primary sm:flex">
+          <div className="mt-1 hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 border border-primary/15 text-primary sm:flex">
             {icon}
           </div>
         )}

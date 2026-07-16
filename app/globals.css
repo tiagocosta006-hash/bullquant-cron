@@ -207,6 +207,11 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  /* Transição de tema SÓ durante o toggle (classe posta por lib/theme.ts).
+     No load inicial o body não anima — senão um flash claro→escuro em dark
+     mode ficava visível durante 0.5s (FOUC amplificado). */
+  html.theme-transition body {
     transition: background-color 0.5s ease, color 0.5s ease;
   }
   html {
@@ -238,14 +243,6 @@
       color-mix(in srgb, var(--primary) 80%, #fff) 50%,
       var(--primary) 80%,
       transparent
-    );
-  }
-  /* Sem glows (ai-slop) — mantido só por compatibilidade, quase impercetível */
-  .gold-glow {
-    background-image: radial-gradient(
-      60% 60% at 50% 0%,
-      color-mix(in oklch, var(--primary) 5%, transparent),
-      transparent 70%
     );
   }
 }

@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   SearchCode,
   Briefcase,
+  Star,
   CalendarDays,
   Calculator,
   MessageSquareText,
@@ -17,12 +18,11 @@ import {
   LogOut,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { cn } from "@/lib/utils";
+import { cn, userInitials } from "@/lib/utils";
 import { Logo } from "@/components/brand/Logo";
 import { LiquidGlass } from "@/components/fx/LiquidGlass";
 import { CommandMenu } from "@/components/layout/CommandMenu";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
-import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { logout } from "@/app/(auth)/actions";
 import { useIsMac } from "@/hooks/useIsMac";
@@ -30,28 +30,34 @@ import { useIsMac } from "@/hooks/useIsMac";
 /**
  * TopNav — a navegação ÚNICA do terminal: uma pill Liquid Glass
  * flutuante (o conteúdo dobra-se nas bordas ao passar por baixo).
- * Substitui sidebar + header: 5 destinos primários, ⌘K universal,
- * overflow (comparar/transcrições/definições) num popover.
+ * Substitui sidebar + header: 6 destinos primários, ⌘K universal,
+ * menu de avatar (conta/comparar/transcrições/definições/logout).
  */
 export function TopNav({
   userName,
-  devSlot,
+  userEmail,
+  plan,
 }: {
   userName?: string | null;
-  devSlot?: React.ReactNode;
+  userEmail?: string | null;
+  plan?: string | null;
 }) {
   const pathname = usePathname();
   const t = useTranslations("sidebar");
   const tHeader = useTranslations("header");
   const [cmdOpen, setCmdOpen] = useState(false);
+  // controlado: fecha ao navegar (os Links portalados não fechavam o popover)
+  const [menuOpen, setMenuOpen] = useState(false);
   const isMac = useIsMac();
 
   const primary = [
     { href: "/dashboard", icon: LayoutDashboard, label: t("dashboard") },
     { href: "/explore", icon: SearchCode, label: t("explore") },
     { href: "/portfolio", icon: Briefcase, label: t("portfolio") },
+    { href: "/watchlist", icon: Star, label: t("watchlist") },
     { href: "/calendar", icon: CalendarDays, label: t("calendar") },
-    { href: "/dcf", icon: Calculator, label: t("dcf") },
+    // rótulo curto na nav (o título da página continua "Calculadora DCF")
+    { href: "/dcf", icon: Calculator, label: t("dcfShort") },
   ];
   const overflow = [
     { href: "/compare", icon: GitCompareArrows, label: t("compare") },
@@ -83,8 +89,8 @@ export function TopNav({
                     : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
                 )}
               >
-                <Icon className="h-4 w-4" strokeWidth={2} />
-                <span className="hidden lg:inline">{label}</span>
+                <Icon className="h-4 w-4 shrink-0" strokeWidth={2} />
+                <span className="hidden whitespace-nowrap lg:inline">{label}</span>
               </Link>
             ))}
           </nav>
@@ -104,28 +110,55 @@ export function TopNav({
             </span>
           </button>
 
-          {devSlot}
           <ThemeToggle />
 
-          {/* overflow: comparar, transcrições, definições */}
-          <Popover>
+          {/* menu de perfil: avatar de iniciais + conta, links e logout */}
+          <Popover open={menuOpen} onOpenChange={setMenuOpen}>
             <PopoverTrigger
               render={
-                <Button variant="ghost" size="icon" title={t("more")}>
-                  <MoreHorizontal className="h-5 w-5" />
-                </Button>
+                <button
+                  type="button"
+                  title={userName || t("more")}
+                  aria-label={userName || t("more")}
+                  className="ml-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/10 text-xs font-extrabold leading-none text-primary transition-colors hover:bg-primary/20"
+                >
+                  {userName ? userInitials(userName) : <MoreHorizontal className="h-5 w-5" />}
+                </button>
               }
             />
-            <PopoverContent align="end" className="w-56 p-1.5">
+            {/* positionMethod fixed: o trigger vive numa pill fixed — com o
+                default (absolute) o popup deslizava com o scroll da página */}
+            <PopoverContent align="end" positionMethod="fixed" className="w-64 p-1.5">
               {userName && (
-                <div className="border-b border-border/60 px-3 py-2 text-xs font-medium text-muted-foreground">
-                  {userName}
+                <div className="mb-1 border-b border-border/60 pb-1.5">
+                  {/* o cartão do perfil também leva às Definições (atalho) */}
+                  <Link
+                    href="/settings"
+                    onClick={() => setMenuOpen(false)}
+                    className="group/profile flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-accent active:scale-[0.98]"
+                  >
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/15 bg-primary/10 text-xs font-extrabold leading-none text-primary">
+                      {userInitials(userName)}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-foreground transition-colors group-hover/profile:text-primary">{userName}</p>
+                      {userEmail && (
+                        <p className="truncate text-xs text-muted-foreground">{userEmail}</p>
+                      )}
+                    </div>
+                    {plan && (
+                      <span className="ml-auto shrink-0 rounded-full border border-bull/20 bg-bull/10 px-2 py-0.5 text-[10px] font-bold text-bull">
+                        {plan}
+                      </span>
+                    )}
+                  </Link>
                 </div>
               )}
               {overflow.map(({ href, icon: Icon, label }) => (
                 <Link
                   key={href}
                   href={href}
+                  onClick={() => setMenuOpen(false)}
                   className={cn(
                     "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                     isActive(href)
@@ -137,7 +170,7 @@ export function TopNav({
                   {label}
                 </Link>
               ))}
-              <form action={logout}>
+              <form action={logout} onSubmit={() => setMenuOpen(false)}>
                 <button
                   type="submit"
                   className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"

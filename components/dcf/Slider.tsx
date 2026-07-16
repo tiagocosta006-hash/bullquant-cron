@@ -24,11 +24,53 @@ export function Slider({ label, value, onChange, min, max, step, display, hint }
   // posição do preenchimento (0-100%) para o gradiente da track
   const pct = max > min ? ((clampedValue - min) / (max - min)) * 100 : 0
 
+  // Edição inline do valor: clicar no número abre um input para escrever um
+  // valor exato — clamped ao range mas SEM snap ao step do slider.
+  const [editing, setEditing] = React.useState(false)
+  const [draft, setDraft] = React.useState("")
+
+  const startEditing = () => {
+    setDraft(String(clampedValue))
+    setEditing(true)
+  }
+
+  const commit = () => {
+    setEditing(false)
+    const parsed = Number.parseFloat(draft.replace(",", "."))
+    if (Number.isNaN(parsed)) return
+    onChange(Math.min(max, Math.max(min, parsed)))
+  }
+
   return (
     <div className="space-y-2">
       <div className="flex items-baseline justify-between">
         <label className="text-sm font-medium text-foreground">{label}</label>
-        <span className="text-sm font-bold tabular-nums text-primary">{display(clampedValue)}</span>
+        {editing ? (
+          <input
+            type="text"
+            inputMode="decimal"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onBlur={commit}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") commit()
+              if (e.key === "Escape") setEditing(false)
+            }}
+            onFocus={(e) => e.target.select()}
+            autoFocus
+            aria-label={label}
+            className="w-20 bg-transparent text-right text-sm font-bold tabular-nums text-primary border-b border-primary/40 outline-none"
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={startEditing}
+            title={`${label}: ${display(clampedValue)}`}
+            className="cursor-text rounded-sm text-sm font-bold tabular-nums text-primary underline-offset-4 hover:underline decoration-primary/40 decoration-dashed focus-visible:underline outline-none"
+          >
+            {display(clampedValue)}
+          </button>
+        )}
       </div>
       <input
         type="range"

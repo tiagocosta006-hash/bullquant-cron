@@ -1,8 +1,8 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import Image from "next/image"
 import Link from "next/link"
+import { CompanyLogo } from "@/components/ui/CompanyLogo"
 import { Building2, X, Users, ArrowRight, Activity, HandCoins, ExternalLink, Scale, Globe, TrendingUp, TrendingDown } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -57,13 +57,14 @@ export function BusinessProfileSheet({ open, onOpenChange, company }: BusinessPr
           {/* Header */}
           <div className="p-6 border-b border-border">
             <div className="flex items-start justify-between mb-4">
-              <div className="w-16 h-16 shrink-0 bg-muted rounded-xl border border-border flex items-center justify-center overflow-hidden p-2">
-                {company.logoUrl ? (
-                  <Image src={company.logoUrl} alt={company.name} width={48} height={48} className="object-contain" />
-                ) : (
-                  <span className="text-muted-foreground font-bold text-xl">{company.ticker.substring(0, 2)}</span>
-                )}
-              </div>
+              <CompanyLogo
+                src={company.logoUrl}
+                alt={company.name}
+                fallback={company.ticker}
+                size={64}
+                className="rounded-xl"
+                imgClassName="p-2"
+              />
             </div>
 
             <h2 className="text-2xl font-bold text-foreground mb-1">{company.name}</h2>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { formatLargeNumber } from "@/lib/finance/format";
+import { CompanyLogo } from "@/components/ui/CompanyLogo";
 
 interface StockCardProps {
   ticker: string;
@@ -41,23 +42,14 @@ export function StockCard({
         <div className="gold-rule absolute inset-x-0 top-0 h-px opacity-0 group-hover:opacity-100 transition-opacity" />
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5 overflow-hidden">
-            <div className="bg-primary/5 p-1 rounded-md border border-primary/10 flex items-center justify-center shrink-0 w-8 h-8 overflow-hidden">
-              {logoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={logoUrl}
-                  alt={ticker}
-                  className="w-full h-full object-contain"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                    (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
-                  }}
-                />
-              ) : null}
-              <span className={`font-bold text-sm text-primary ${logoUrl ? "hidden" : ""}`}>
-                {ticker[0]}
-              </span>
-            </div>
+            <CompanyLogo
+              src={logoUrl}
+              alt={ticker}
+              fallback={ticker}
+              size={32}
+              className="rounded-md"
+              imgClassName="p-0.5"
+            />
             <div className="flex flex-col overflow-hidden min-w-0">
               <span className="font-bold text-sm truncate group-hover:text-primary transition-colors">
                 {ticker}

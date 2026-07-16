@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl"
 import { ChevronLeft, ChevronRight, Sunrise, Moon, TrendingUp, TrendingDown, HelpCircle, Sun } from "lucide-react"
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { CompanyLogo } from "@/components/ui/CompanyLogo"
 
 interface EarningsItem {
   id: string
@@ -522,20 +523,8 @@ function DayEventCard({ e }: { e: EarningsItem }) {
       {/* @ts-ignore - shadcn base-ui migration */}
       <DialogTrigger asChild>
         <button className="flex items-center gap-3 p-3 rounded-lg border border-border/60 bg-background hover:bg-muted/50 hover:border-border transition-all text-left group">
-          {e.logoUrl ? (
-            <div className="relative h-10 w-10 shrink-0 flex items-center justify-center rounded-md border border-border/50 bg-white p-0.5 overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={e.logoUrl} alt="" className="h-full w-full object-contain" onError={(ev) => {
-                (ev.target as HTMLImageElement).style.display = "none";
-                (ev.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
-              }} />
-              <span className={`text-xs font-bold text-primary absolute hidden`}>{e.ticker[0]}</span>
-            </div>
-          ) : (
-            <div className="h-10 w-10 shrink-0 flex items-center justify-center rounded-md border border-border bg-muted text-muted-foreground font-bold">
-              {e.ticker[0]}
-            </div>
-          )}
+          <CompanyLogo src={e.logoUrl} alt="" fallback={e.ticker} size={40} className="rounded-md" />
+
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
               <span className="font-bold text-sm truncate">{e.ticker}</span>
@@ -553,10 +542,7 @@ function DayEventCard({ e }: { e: EarningsItem }) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {e.logoUrl && (
-              <div className="relative h-5 w-5 shrink-0 flex items-center justify-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={e.logoUrl} alt="" className="h-full w-full rounded-sm object-contain bg-white" />
-              </div>
+              <CompanyLogo src={e.logoUrl} alt="" fallback={e.ticker} size={20} className="rounded-sm" imgClassName="p-0" />
             )}
             {e.name} ({e.ticker})
           </DialogTitle>
@@ -595,14 +581,7 @@ function EventChip({ e }: { e: EarningsItem }) {
         className="w-full text-left group flex items-center gap-2 rounded-md px-1.5 py-1 text-sm font-semibold truncate transition-colors hover:bg-muted"
       >
         {e.logoUrl ? (
-          <div className="relative h-5 w-5 shrink-0 flex items-center justify-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={e.logoUrl} alt="" referrerPolicy="no-referrer" className="h-full w-full rounded-sm object-contain bg-white" onError={(ev) => {
-              (ev.target as HTMLImageElement).style.display = "none";
-              (ev.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
-            }}/>
-            <span className={`text-[10px] font-bold text-primary absolute hidden`}>{e.ticker[0]}</span>
-          </div>
+          <CompanyLogo src={e.logoUrl} alt="" fallback={e.ticker} size={20} className="rounded-sm" imgClassName="p-0" />
         ) : HourIcon ? (
           <HourIcon className="h-4 w-4 shrink-0 opacity-60" />
         ) : null}
@@ -616,10 +595,7 @@ function EventChip({ e }: { e: EarningsItem }) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {e.logoUrl && (
-              <div className="relative h-5 w-5 shrink-0 flex items-center justify-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={e.logoUrl} alt="" referrerPolicy="no-referrer" className="h-full w-full rounded-sm object-contain bg-white" />
-              </div>
+              <CompanyLogo src={e.logoUrl} alt="" fallback={e.ticker} size={20} className="rounded-sm" imgClassName="p-0" />
             )}
             {e.name} ({e.ticker})
           </DialogTitle>

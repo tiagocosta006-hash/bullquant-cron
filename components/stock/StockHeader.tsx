@@ -5,6 +5,7 @@ import { TrendingUp, TrendingDown, Clock, Check, Plus, Scale } from "lucide-reac
 import { useTranslations, useLocale } from "next-intl"
 import Link from "next/link"
 import { getCurrencySymbol } from "@/lib/finance/format"
+import { CompanyLogo } from "@/components/ui/CompanyLogo"
 
 type CompanyProp = {
   ticker: string;
@@ -50,18 +51,18 @@ export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfB
     }
   }
 
-  const fetchPortfolioState = async () => {
+  const fetchWatchlistState = async () => {
     try {
-      const res = await fetch(`/api/portfolio/check?ticker=${company.ticker}`)
+      const res = await fetch(`/api/watchlist/check?ticker=${company.ticker}`)
       if (res.ok) {
         const data = await res.json()
-        setIsFollowing(data.isFollowing)
+        setIsFollowing(data.inWatchlist)
       } else if (res.status === 401) {
         // User not logged in
         setIsFollowing(null)
       }
     } catch (err) {
-      console.error("Failed to fetch portfolio state", err)
+      console.error("Failed to fetch watchlist state", err)
     }
   }
 
@@ -69,7 +70,7 @@ export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfB
   useEffect(() => {
     const init = async () => {
       await fetchPrice()
-      await fetchPortfolioState()
+      await fetchWatchlistState()
     }
     init()
     const interval = setInterval(fetchPrice, 60000)
@@ -82,21 +83,12 @@ export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfB
     
     setIsUpdatingFollow(true)
     try {
-      if (isFollowing) {
-        const res = await fetch('/api/portfolio/remove', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ticker: company.ticker })
-        })
-        if (res.ok) setIsFollowing(false)
-      } else {
-        const res = await fetch('/api/portfolio/add', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ticker: company.ticker })
-        })
-        if (res.ok) setIsFollowing(true)
-      }
+      const res = await fetch('/api/watchlist', {
+        method: isFollowing ? 'DELETE' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticker: company.ticker })
+      })
+      if (res.ok) setIsFollowing(!isFollowing)
     } catch (err) {
       console.error("Failed to toggle follow state", err)
     } finally {
@@ -110,21 +102,14 @@ export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfB
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border/40">
       {/* Left side: Company Info */}
       <div className="flex items-center gap-4">
-        <div className="bg-primary/10 p-3 rounded-xl border border-primary/20 shadow-sm flex items-center justify-center shrink-0 w-16 h-16 relative overflow-hidden">
-          {company.logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img 
-              src={company.logoUrl} 
-              alt={company.name} 
-              className="w-12 h-12 object-contain rounded-lg bg-white p-1" 
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
-                (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
-              }}
-            />
-          ) : null}
-          <span className={`font-extrabold text-2xl text-primary absolute ${company.logoUrl ? "hidden" : ""}`}>{company.ticker[0]}</span>
-        </div>
+        <CompanyLogo
+          src={company.logoUrl}
+          alt={company.name}
+          fallback={company.ticker}
+          size={64}
+          className="rounded-xl"
+          imgClassName="p-2"
+        />
         <div className="min-w-0">
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">{company.name}</h1>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
@@ -155,7 +140,7 @@ export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfB
                 ) : (
                   <>
                     <Plus className="w-3.5 h-3.5" />
-                    {t('header.addToPortfolio')}
+                    {t('header.follow')}
                   </>
                 )}
               </button>

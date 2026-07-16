@@ -84,11 +84,14 @@
     },
     "tabs": {
       "sp500": "S&P 500",
-      "trending": "Tendance",
-      "growth": "Croissance",
-      "dividend": "Dividendes",
-      "buyback": "Rachats d'actions",
-      "ai": "Intelligence Artificielle"
+      "gainers": "Top Gainers",
+      "losers": "Top Losers",
+      "marketCap": "Largest Market Cap"
+    },
+    "eodNotice": "Market cap and change based on the last trading day's close — not real-time.",
+    "loadMore": "Load more",
+    "sectorFilter": {
+      "all": "All sectors"
     }
   },
   "sidebar": {
@@ -97,22 +100,23 @@
     "calendar": "Calendrier",
     "dcf": "Calculateur DCF",
     "transcripts": "Transcriptions",
-    "screener": "Recherche (Screener)",
     "recentSearches": "Recherches Récentes",
     "desc": {
       "dashboard": "Vue d'ensemble",
-      "portfolio": "Les entreprises que vous suivez",
+      "portfolio": "Tes positions réelles et leur performance en direct",
       "calendar": "Résultats financiers",
       "dcf": "Évaluer le juste prix",
       "transcripts": "Réunions d'investisseurs",
-      "screener": "Trouver des entreprises",
-      "explore": "Découvrez et explorez les entreprises organisées par type d'activité"
+      "explore": "Découvrez et explorez les entreprises organisées par type d'activité",
+      "watchlist": "Les entreprises que tu observes, sans position"
     },
     "compare": "Comparer",
     "navigate": "Naviguer",
     "searchAction": "Rechercher",
     "more": "Plus",
-    "explore": "Explorer"
+    "explore": "Explorer",
+    "watchlist": "Watchlist",
+    "dcfShort": "DCF"
   },
   "login": {
     "title": "Se Connecter",
@@ -124,7 +128,9 @@
     "submitButton": "Connexion",
     "submitLoading": "Connexion...",
     "noAccount": "Pas de compte?",
-    "registerLink": "S'inscrire"
+    "registerLink": "S'inscrire",
+    "devLoginButton": "Connexion dev (local)",
+    "devLoginLoading": "Connexion..."
   },
   "register": {
     "title": "Créer un Compte",
@@ -137,7 +143,10 @@
     "submitButton": "S'inscrire",
     "submitLoading": "Création...",
     "hasAccount": "Déjà un compte?",
-    "loginLink": "Se connecter"
+    "loginLink": "Se connecter",
+    "confirmPasswordLabel": "Confirmer le mot de passe",
+    "passwordMismatch": "Les mots de passe ne correspondent pas.",
+    "emailInUse": "Cet e-mail est déjà enregistré."
   },
   "forgotPassword": {
     "title": "Mot de passe oublié",
@@ -155,7 +164,9 @@
     "passwordLabel": "Nouveau mot de passe",
     "passwordPlaceholder": "******",
     "submitButton": "Mettre à jour",
-    "submitLoading": "Mise à jour..."
+    "submitLoading": "Mise à jour...",
+    "confirmPasswordLabel": "Confirm Password",
+    "confirmPasswordPlaceholder": "Repeat your new password"
   },
   "header": {
     "settingsTitle": "Paramètres",
@@ -191,33 +202,75 @@
       "save": "Enregistrer",
       "dangerZone": "Zone Dangereuse",
       "logoutDesc": "Déconnectez-vous en toute sécurité.",
-      "logoutBtn": "Se Déconnecter"
+      "logoutBtn": "Se Déconnecter",
+      "changeEmailTitle": "Changer d'e-mail",
+      "newEmail": "Nouvel e-mail",
+      "confirmEmailChangeBtn": "Confirmer le changement",
+      "emailChangeSuccess": "Un e-mail de confirmation a été envoyé à la nouvelle et à l'ancienne adresse. Vérifie tes boîtes de réception.",
+      "changePasswordBtn": "Change Password",
+      "confirmNewPassword": "Confirm New Password",
+      "currentPassword": "Current Password",
+      "deleteAccountBtn": "Delete Account",
+      "deleteAccountCancel": "Cancel",
+      "deleteAccountConfirmLabel": "Type DELETE to confirm",
+      "deleteAccountDesc": "This action is irreversible. All your data, portfolios, and valuations will be deleted forever.",
+      "deleteAccountSubmit": "Delete Forever",
+      "deleteAccountTitle": "Delete Account Permanently",
+      "newPassword": "New Password",
+      "passwordSuccess": "Password updated successfully!",
+      "securityTitle": "Security"
     },
     "preferences": {
       "title": "Préférences",
       "language": "Langue",
       "languageDesc": "Choisissez votre langue.",
       "theme": "Thème Visuel",
-      "themeDesc": "Basculez entre le mode clair et sombre."
+      "themeDesc": "Basculez entre le mode clair et sombre.",
+      "themeLight": "Clair",
+      "themeDark": "Sombre"
     },
     "subscription": {
       "title": "Votre Plan",
       "desc": "Vous êtes sur le plan gratuit.",
       "premiumSoonTitle": "Accès PRO prochainement",
       "premiumSoonDesc": "Nous préparons des fonctionnalités avancées.",
-      "upgradeBtn": "Passer en PRO"
+      "upgradeBtn": "Passer en PRO",
+      "aiUsageLabel": "Analyses IA aujourd'hui",
+      "aiUnlimited": "Illimitées",
+      "compare": {
+        "title": "Free vs PRO",
+        "free": "Free",
+        "pro": "PRO",
+        "priceLabel": "Prix",
+        "priceFree": "0 €",
+        "pricePro": "7 €/mois",
+        "priceNote": "Prix provisoire — le prix final sera annoncé au lancement.",
+        "quotesLabel": "Cotations et 10 ans de fondamentaux",
+        "aiLabel": "Analyses IA",
+        "aiFree": "{limit}/jour",
+        "aiPro": "Illimitées",
+        "kpisLabel": "KPIs métier (IA approfondie)",
+        "pdfLabel": "Rapports PDF PRO"
+      },
+      "beta": {
+        "title": "Mode bêta",
+        "desc": "Pendant la bêta, tu peux basculer entre Free et PRO sans payer, pour tout tester.",
+        "toPro": "Activer PRO (bêta)",
+        "toFree": "Revenir au plan Free",
+        "error": "Impossible de changer de plan. Réessaie."
+      }
     }
   },
   "portfolio": {
     "loginRequired": "Connectez-vous pour voir votre Portefeuille.",
     "loginButton": "Connexion",
     "title": "Mon Portefeuille",
-    "subtitle": "Suivez vos entreprises en temps réel.",
+    "subtitle": "Tes positions réelles, avec performance en temps réel.",
     "positions": "Positions",
     "upToday": "En hausse",
     "emptyState": {
-      "title": "Votre portefeuille est vide",
-      "description": "Commencez à ajouter des entreprises.",
+      "title": "Ton portefeuille est vide",
+      "description": "Ajoute tes positions (quantité et prix d'achat) pour suivre la performance réelle, ou commence par une des options populaires.",
       "quickAdd": "Ajouter",
       "adding": "Ajout..."
     },
@@ -231,9 +284,127 @@
       "createAccount": "Créer un Compte"
     },
     "card": {
-      "currentPrice": "Prix Actuel"
+      "currentPrice": "Prix Actuel",
+      "remove": "Retirer du portefeuille",
+      "addPosition": "Ajouter une position",
+      "edit": "Modifier la position"
     },
-    "lastUpdate": "Dernière m.a.j :"
+    "lastUpdate": "Dernière m.a.j :",
+    "addPosition": {
+      "title": "Ajouter une position — {ticker}",
+      "description": "Indique la quantité et le prix d'achat moyen. Pour suivre sans position, utilise la watchlist.",
+      "quantityLabel": "Quantité",
+      "priceLabel": "Prix d'achat moyen (USD)",
+      "cancel": "Annuler",
+      "confirm": "Ajouter",
+      "error": "Impossible d'ajouter la position. Réessaie.",
+      "editTitle": "Modifier la position — {ticker}",
+      "dateLabel": "Date d'achat",
+      "brokerLabel": "Courtier",
+      "currencyLabel": "Devise",
+      "feesLabel": "Frais",
+      "notesLabel": "Notes",
+      "notesPlaceholder": "Remarques sur cette position…",
+      "save": "Enregistrer"
+    },
+    "allocation": {
+      "barsView": "Bar view",
+      "donutView": "Donut view",
+      "title": "Allocation by Sector",
+      "unknownSector": "Unknown sector"
+    },
+    "import": {
+      "back": "Back",
+      "chooseFile": "Choose CSV file",
+      "close": "Close",
+      "columns": {
+        "avgBuyPrice": "Average buy price",
+        "ignore": "Ignore",
+        "quantity": "Quantity",
+        "ticker": "Ticker"
+      },
+      "confirmImport": "Import {count} rows",
+      "description": "Upload a CSV file exported from your broker with the ticker, quantity, and average buy price for each position.",
+      "done": "Done",
+      "emptyFile": "The file is empty or could not be read.",
+      "mapDescription": "Tell us what each column in your file corresponds to:",
+      "mapIncomplete": "Select the ticker, quantity, and average price columns to continue.",
+      "moreRows": "+ {count} rows not shown",
+      "parseError": "Could not parse the file. Make sure it's a valid CSV.",
+      "status": {
+        "added": "Added",
+        "invalid": "Invalid row",
+        "merged": "Merged with existing position",
+        "unsupported": "Company not supported"
+      },
+      "submitError": "Could not import the portfolio. Please try again.",
+      "title": "Import Portfolio",
+      "trigger": "Import Portfolio"
+    },
+    "manage": {
+      "importCsv": "Import CSV",
+      "title": "Add or sync positions"
+    },
+    "position": {
+      "avgCost": "avg. cost",
+      "pnl": "P&L",
+      "shares": "shares",
+      "fees": "Frais",
+      "notes": "Notes"
+    },
+    "summary": {
+      "marketValue": "Market Value",
+      "totalPnl": "Total P&L",
+      "watchlistOnly": "Add quantity and buy price to your positions to see market value and P&L."
+    },
+    "table": {
+      "action": "Action",
+      "change": "Change",
+      "company": "Company",
+      "grossMargin": "Gross Margin",
+      "pnl": "P&L",
+      "roic": "ROIC",
+      "sector": "Sector"
+    },
+    "toolbar": {
+      "allSectors": "All sectors",
+      "gridView": "Grid view",
+      "sort": {
+        "addedAt": "Recently added",
+        "changePercent": "Biggest movers",
+        "name": "Name (A-Z)",
+        "sector": "Sector"
+      },
+      "sortBy": "Sort by",
+      "tableView": "Table view"
+    },
+    "trading212": {
+      "apiKeyPlaceholder": "API Key",
+      "apiSecretPlaceholder": "API Secret",
+      "cancel": "Cancel",
+      "connectDescription": "Connect your Trading212 account (Invest or Stocks ISA) to automatically sync your positions. Generate an API Key under Settings → API in the Trading212 app.",
+      "connectError": "Could not connect to Trading212. Please try again.",
+      "connectSubmit": "Connect",
+      "connectTrigger": "Connect to Trading212",
+      "connectedLabel": "Connected to Trading212",
+      "disconnect": "Disconnect",
+      "invalidCredentials": "Invalid API Key or Secret.",
+      "lastSynced": "Last synced:",
+      "syncError": "Could not sync with Trading212.",
+      "syncNow": "Sync now",
+      "syncSummary": "{synced} positions synced, {unsupported} not supported."
+    },
+    "valueChart": {
+      "approximationTooltip": "Estimate based on each position's current quantity applied to historical prices — does not reflect actual buy/sell history.",
+      "noData": "Not enough data to show the trend yet.",
+      "tabs": {
+        "1m": "1M",
+        "1y": "1Y",
+        "6m": "6M",
+        "max": "Max"
+      },
+      "title": "Portfolio Value Over Time"
+    }
   },
   "stock": {
     "underConstruction": "En construction",
@@ -244,7 +415,9 @@
     "header": {
       "followed": "Suivi",
       "addToPortfolio": "Ajouter au Portefeuille",
-      "updating": "Mise à jour..."
+      "updating": "Mise à jour...",
+      "follow": "Suivre",
+      "comparePeers": "Compare Peers"
     },
     "savedValuations": {
       "title": "Mes Évaluations DCF",
@@ -332,8 +505,6 @@
     "millionsSuffix": "Millions",
     "growth1": "Croissance Années 1-5",
     "growth2": "Croissance Années 6-10",
-    "wacc": "WACC (Taux d'act.)",
-    "waccHint": "Taux de rendement requis.",
     "terminalGrowth": "Croissance Perpétuelle",
     "terminalGrowthHint": "Croissance à long terme.",
     "reverseDcf": "DCF Inversé",
@@ -359,7 +530,27 @@
     },
     "errorWacc": "Le WACC doit être > à la croissance.",
     "errorShares": "Entrez les actions.",
-    "errorFcf": "Entrez un FCF valide."
+    "errorFcf": "Entrez un FCF valide.",
+    "fcfMode": "Methodology",
+    "mode": "Method",
+    "wacc": {
+      "beta": "Beta",
+      "betaUnavailable": "Beta unavailable — enter WACC manually",
+      "breakdownTitle": "Breakdown",
+      "capitalStructure": "Capital Structure",
+      "costOfDebt": "Cost of Debt",
+      "costOfDebtLabel": "Rd (Pre-tax)",
+      "costOfEquity": "Cost of Equity",
+      "equityRiskPremium": "ERP (Equity Risk Premium)",
+      "hint": "Required return. Higher means a more conservative value.",
+      "label": "WACC (Discount Rate)",
+      "riskFreeRate": "Rf (Risk-Free Rate)",
+      "suggested": "Suggested WACC (CAPM)",
+      "taxRate": "Tax Rate",
+      "useButton": "Use",
+      "weightDebt": "Debt Weight",
+      "weightEquity": "Equity Weight"
+    }
   },
   "financials": {
     "engineTitle": "Données Financières",
@@ -510,5 +701,40 @@
       "compareDesc": "Évaluez la performance financière côte à côte.",
       "viewFinancials": "Voir l'Analyse Financière Complète"
     }
+  },
+  "verifyEmail": {
+    "title": "Confirme ton e-mail",
+    "unconfirmed": "Ton compte n'est pas encore confirmé.",
+    "sentTo": "Nous avons envoyé un lien de confirmation à <strong>{email}</strong>.",
+    "sentGeneric": "Nous t'avons envoyé un lien de confirmation par e-mail.",
+    "instruction": "Ouvre l'e-mail et clique sur le lien pour activer ton compte. Ensuite, connecte-toi.",
+    "spamHint": "Rien reçu ? Attends une minute et vérifie ton dossier spam.",
+    "resent": "Nous avons renvoyé l'e-mail de confirmation. Vérifie ta boîte de réception.",
+    "noEmail": "E-mail manquant. Retourne à l'inscription et réessaie.",
+    "resendButton": "Renvoyer l'e-mail",
+    "resending": "Envoi en cours...",
+    "backToLogin": "Retour à la connexion",
+    "wrongEmail": "Mauvais e-mail ?",
+    "changeEmail": "Corriger",
+    "openGmail": "Ouvrir Gmail",
+    "openOutlook": "Ouvrir Outlook"
+  },
+  "watchlist": {
+    "title": "Watchlist",
+    "subtitle": "Les entreprises que tu observes — pas de position, juste un radar.",
+    "loginRequired": "Connecte-toi pour créer ta liste de suivi.",
+    "loginButton": "Se connecter",
+    "empty": {
+      "title": "Ta watchlist est vide",
+      "description": "Suis des entreprises pour les garder à l'œil — les prix se mettent à jour en direct. Commence par une des options populaires.",
+      "quickAdd": "Suivre",
+      "adding": "Ajout..."
+    },
+    "stats": {
+      "following": "Suivies",
+      "upToday": "En hausse aujourd'hui"
+    },
+    "suggestionsTitle": "Suggestions à suivre",
+    "lastUpdate": "Dernière mise à jour :"
   }
 }

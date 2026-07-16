@@ -62,7 +62,7 @@ import { BRAND } from "@/lib/brand";
 {BRAND.name} {BRAND.parent}                    // strings (or i18n for UI copy)
 ```
 
-CSS accents: `.gold-rule` (gold hairline) · `.gold-glow` (one ambient hero glow).
+CSS accents: `.gold-rule` (gold hairline). No glows — icon chips are flat `bg-primary/10 border border-primary/15 text-primary`.
 
 ## Rules
 

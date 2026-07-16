@@ -84,11 +84,14 @@
     },
     "tabs": {
       "sp500": "标普500",
-      "trending": "热门关注",
-      "growth": "高增长",
-      "dividend": "股息增长",
-      "buyback": "股票回购",
-      "ai": "人工智能"
+      "gainers": "Top Gainers",
+      "losers": "Top Losers",
+      "marketCap": "Largest Market Cap"
+    },
+    "eodNotice": "Market cap and change based on the last trading day's close — not real-time.",
+    "loadMore": "Load more",
+    "sectorFilter": {
+      "all": "All sectors"
     }
   },
   "sidebar": {
@@ -97,22 +100,23 @@
     "calendar": "财报日历",
     "dcf": "DCF 估值",
     "transcripts": "电话会议",
-    "screener": "选股器",
     "recentSearches": "最近搜索",
     "desc": {
       "dashboard": "总览与探索",
-      "portfolio": "你关注的公司",
+      "portfolio": "你的真实持仓及其实时表现",
       "calendar": "财务业绩日程",
       "dcf": "评估合理价格",
       "transcripts": "投资者会议",
-      "screener": "高级筛选寻找公司",
-      "explore": "按业务类型发现和探索公司"
+      "explore": "按业务类型发现和探索公司",
+      "watchlist": "你正在观察但没有持仓的公司"
     },
     "compare": "对比",
     "navigate": "导航",
     "searchAction": "搜索",
     "more": "更多",
-    "explore": "探索"
+    "explore": "探索",
+    "watchlist": "自选股",
+    "dcfShort": "DCF"
   },
   "login": {
     "title": "登录",
@@ -124,7 +128,9 @@
     "submitButton": "登录",
     "submitLoading": "登录中...",
     "noAccount": "没有账户？",
-    "registerLink": "免费注册"
+    "registerLink": "免费注册",
+    "devLoginButton": "以开发者身份登录（本地）",
+    "devLoginLoading": "登录中..."
   },
   "register": {
     "title": "创建账户",
@@ -137,7 +143,10 @@
     "submitButton": "注册",
     "submitLoading": "注册中...",
     "hasAccount": "已有账户？",
-    "loginLink": "登录"
+    "loginLink": "登录",
+    "confirmPasswordLabel": "确认密码",
+    "passwordMismatch": "两次输入的密码不一致。",
+    "emailInUse": "该邮箱已被注册。"
   },
   "forgotPassword": {
     "title": "重置密码",
@@ -155,7 +164,9 @@
     "passwordLabel": "新密码",
     "passwordPlaceholder": "******",
     "submitButton": "更新密码",
-    "submitLoading": "更新中..."
+    "submitLoading": "更新中...",
+    "confirmPasswordLabel": "Confirm Password",
+    "confirmPasswordPlaceholder": "Repeat your new password"
   },
   "header": {
     "settingsTitle": "账户设置",
@@ -191,33 +202,75 @@
       "save": "保存更改",
       "dangerZone": "危险区域",
       "logoutDesc": "安全退出您的账户。",
-      "logoutBtn": "退出登录"
+      "logoutBtn": "退出登录",
+      "changeEmailTitle": "更改邮箱",
+      "newEmail": "新邮箱",
+      "confirmEmailChangeBtn": "确认更改",
+      "emailChangeSuccess": "确认邮件已发送到新旧两个地址，请查收。",
+      "changePasswordBtn": "Change Password",
+      "confirmNewPassword": "Confirm New Password",
+      "currentPassword": "Current Password",
+      "deleteAccountBtn": "Delete Account",
+      "deleteAccountCancel": "Cancel",
+      "deleteAccountConfirmLabel": "Type DELETE to confirm",
+      "deleteAccountDesc": "This action is irreversible. All your data, portfolios, and valuations will be deleted forever.",
+      "deleteAccountSubmit": "Delete Forever",
+      "deleteAccountTitle": "Delete Account Permanently",
+      "newPassword": "New Password",
+      "passwordSuccess": "Password updated successfully!",
+      "securityTitle": "Security"
     },
     "preferences": {
       "title": "应用首选项",
       "language": "界面语言",
       "languageDesc": "选择您的语言。",
       "theme": "视觉主题",
-      "themeDesc": "在浅色和深色模式之间切换。"
+      "themeDesc": "在浅色和深色模式之间切换。",
+      "themeLight": "浅色",
+      "themeDark": "深色"
     },
     "subscription": {
       "title": "当前计划",
       "desc": "您当前使用的是免费计划。",
       "premiumSoonTitle": "PRO 版本即将推出",
       "premiumSoonDesc": "我们正在为高级订阅者准备先进的 AI 功能。",
-      "upgradeBtn": "升级至 PRO"
+      "upgradeBtn": "升级至 PRO",
+      "aiUsageLabel": "今日 AI 分析",
+      "aiUnlimited": "无限制",
+      "compare": {
+        "title": "Free vs PRO",
+        "free": "Free",
+        "pro": "PRO",
+        "priceLabel": "价格",
+        "priceFree": "0 €",
+        "pricePro": "7 €/月",
+        "priceNote": "暂定价格——最终价格将在正式发布时公布。",
+        "quotesLabel": "行情与 10 年基本面数据",
+        "aiLabel": "AI 分析",
+        "aiFree": "{limit}/天",
+        "aiPro": "无限制",
+        "kpisLabel": "业务 KPI（深度 AI）",
+        "pdfLabel": "PRO PDF 报告"
+      },
+      "beta": {
+        "title": "测试模式",
+        "desc": "测试期间你可以免费在 Free 和 PRO 之间切换，体验所有功能。",
+        "toPro": "启用 PRO（测试版）",
+        "toFree": "回到 Free 计划",
+        "error": "无法更改计划，请重试。"
+      }
     }
   },
   "portfolio": {
     "loginRequired": "您需要登录才能访问投资组合。",
     "loginButton": "登录",
     "title": "我的投资组合",
-    "subtitle": "实时跟踪您喜欢的公司。",
+    "subtitle": "你的真实持仓，实时跟踪表现。",
     "positions": "持仓",
     "upToday": "今日上涨",
     "emptyState": {
-      "title": "您的观察列表为空",
-      "description": "开始添加公司以跟踪表现。",
+      "title": "你的投资组合是空的",
+      "description": "添加你的持仓（数量和买入价）以跟踪真实表现，或从热门选项开始。",
       "quickAdd": "添加",
       "adding": "添加中..."
     },
@@ -231,9 +284,127 @@
       "createAccount": "创建免费账户"
     },
     "card": {
-      "currentPrice": "当前价格"
+      "currentPrice": "当前价格",
+      "remove": "从投资组合中移除",
+      "addPosition": "添加持仓",
+      "edit": "编辑持仓"
     },
-    "lastUpdate": "最后更新:"
+    "lastUpdate": "最后更新:",
+    "addPosition": {
+      "title": "添加持仓 — {ticker}",
+      "description": "输入数量和平均买入价。如只想关注而不持仓，请使用自选股。",
+      "quantityLabel": "数量",
+      "priceLabel": "平均买入价（USD）",
+      "cancel": "取消",
+      "confirm": "添加",
+      "error": "无法添加持仓，请重试。",
+      "editTitle": "编辑持仓 — {ticker}",
+      "dateLabel": "买入日期",
+      "brokerLabel": "券商",
+      "currencyLabel": "货币",
+      "feesLabel": "费用",
+      "notesLabel": "备注",
+      "notesPlaceholder": "关于该持仓的备注…",
+      "save": "保存"
+    },
+    "allocation": {
+      "barsView": "Bar view",
+      "donutView": "Donut view",
+      "title": "Allocation by Sector",
+      "unknownSector": "Unknown sector"
+    },
+    "import": {
+      "back": "Back",
+      "chooseFile": "Choose CSV file",
+      "close": "Close",
+      "columns": {
+        "avgBuyPrice": "Average buy price",
+        "ignore": "Ignore",
+        "quantity": "Quantity",
+        "ticker": "Ticker"
+      },
+      "confirmImport": "Import {count} rows",
+      "description": "Upload a CSV file exported from your broker with the ticker, quantity, and average buy price for each position.",
+      "done": "Done",
+      "emptyFile": "The file is empty or could not be read.",
+      "mapDescription": "Tell us what each column in your file corresponds to:",
+      "mapIncomplete": "Select the ticker, quantity, and average price columns to continue.",
+      "moreRows": "+ {count} rows not shown",
+      "parseError": "Could not parse the file. Make sure it's a valid CSV.",
+      "status": {
+        "added": "Added",
+        "invalid": "Invalid row",
+        "merged": "Merged with existing position",
+        "unsupported": "Company not supported"
+      },
+      "submitError": "Could not import the portfolio. Please try again.",
+      "title": "Import Portfolio",
+      "trigger": "Import Portfolio"
+    },
+    "manage": {
+      "importCsv": "Import CSV",
+      "title": "Add or sync positions"
+    },
+    "position": {
+      "avgCost": "avg. cost",
+      "pnl": "P&L",
+      "shares": "shares",
+      "fees": "费用",
+      "notes": "备注"
+    },
+    "summary": {
+      "marketValue": "Market Value",
+      "totalPnl": "Total P&L",
+      "watchlistOnly": "Add quantity and buy price to your positions to see market value and P&L."
+    },
+    "table": {
+      "action": "Action",
+      "change": "Change",
+      "company": "Company",
+      "grossMargin": "Gross Margin",
+      "pnl": "P&L",
+      "roic": "ROIC",
+      "sector": "Sector"
+    },
+    "toolbar": {
+      "allSectors": "All sectors",
+      "gridView": "Grid view",
+      "sort": {
+        "addedAt": "Recently added",
+        "changePercent": "Biggest movers",
+        "name": "Name (A-Z)",
+        "sector": "Sector"
+      },
+      "sortBy": "Sort by",
+      "tableView": "Table view"
+    },
+    "trading212": {
+      "apiKeyPlaceholder": "API Key",
+      "apiSecretPlaceholder": "API Secret",
+      "cancel": "Cancel",
+      "connectDescription": "Connect your Trading212 account (Invest or Stocks ISA) to automatically sync your positions. Generate an API Key under Settings → API in the Trading212 app.",
+      "connectError": "Could not connect to Trading212. Please try again.",
+      "connectSubmit": "Connect",
+      "connectTrigger": "Connect to Trading212",
+      "connectedLabel": "Connected to Trading212",
+      "disconnect": "Disconnect",
+      "invalidCredentials": "Invalid API Key or Secret.",
+      "lastSynced": "Last synced:",
+      "syncError": "Could not sync with Trading212.",
+      "syncNow": "Sync now",
+      "syncSummary": "{synced} positions synced, {unsupported} not supported."
+    },
+    "valueChart": {
+      "approximationTooltip": "Estimate based on each position's current quantity applied to historical prices — does not reflect actual buy/sell history.",
+      "noData": "Not enough data to show the trend yet.",
+      "tabs": {
+        "1m": "1M",
+        "1y": "1Y",
+        "6m": "6M",
+        "max": "Max"
+      },
+      "title": "Portfolio Value Over Time"
+    }
   },
   "stock": {
     "underConstruction": "建设中",
@@ -244,7 +415,9 @@
     "header": {
       "followed": "已关注",
       "addToPortfolio": "加入投资组合",
-      "updating": "更新中..."
+      "updating": "更新中...",
+      "follow": "关注",
+      "comparePeers": "Compare Peers"
     },
     "savedValuations": {
       "title": "我保存的 DCF 估值",
@@ -332,8 +505,6 @@
     "millionsSuffix": "百万",
     "growth1": "1-5年 增长率",
     "growth2": "6-10年 增长率",
-    "wacc": "WACC (折现率)",
-    "waccHint": "要求的最低回报率。",
     "terminalGrowth": "永续增长率",
     "terminalGrowthHint": "第10年后的长期增长率。",
     "reverseDcf": "计算隐含增长率 (反向 DCF)",
@@ -359,7 +530,27 @@
     },
     "errorWacc": "WACC 必须大于永续增长率。",
     "errorShares": "请输入总股本以计算每股价值。",
-    "errorFcf": "请输入有效的初始自由现金流。"
+    "errorFcf": "请输入有效的初始自由现金流。",
+    "fcfMode": "Methodology",
+    "mode": "Method",
+    "wacc": {
+      "beta": "Beta",
+      "betaUnavailable": "Beta unavailable — enter WACC manually",
+      "breakdownTitle": "Breakdown",
+      "capitalStructure": "Capital Structure",
+      "costOfDebt": "Cost of Debt",
+      "costOfDebtLabel": "Rd (Pre-tax)",
+      "costOfEquity": "Cost of Equity",
+      "equityRiskPremium": "ERP (Equity Risk Premium)",
+      "hint": "Required return. Higher means a more conservative value.",
+      "label": "WACC (Discount Rate)",
+      "riskFreeRate": "Rf (Risk-Free Rate)",
+      "suggested": "Suggested WACC (CAPM)",
+      "taxRate": "Tax Rate",
+      "useButton": "Use",
+      "weightDebt": "Debt Weight",
+      "weightEquity": "Equity Weight"
+    }
   },
   "financials": {
     "engineTitle": "财务数据",
@@ -510,5 +701,40 @@
       "compareDesc": "并排评估财务表现。",
       "viewFinancials": "查看完整财务分析"
     }
+  },
+  "verifyEmail": {
+    "title": "确认你的邮箱",
+    "unconfirmed": "你的账户尚未确认。",
+    "sentTo": "我们已向 <strong>{email}</strong> 发送了确认链接。",
+    "sentGeneric": "我们已通过邮件向你发送了确认链接。",
+    "instruction": "打开邮件并点击链接以激活账户，然后即可登录。",
+    "spamHint": "没收到？请稍等一分钟并检查垃圾邮件文件夹。",
+    "resent": "我们已重新发送确认邮件，请查收。",
+    "noEmail": "缺少邮箱。请返回注册页面重试。",
+    "resendButton": "重新发送邮件",
+    "resending": "发送中...",
+    "backToLogin": "返回登录",
+    "wrongEmail": "邮箱写错了？",
+    "changeEmail": "更正",
+    "openGmail": "打开 Gmail",
+    "openOutlook": "打开 Outlook"
+  },
+  "watchlist": {
+    "title": "自选股",
+    "subtitle": "你正在观察的公司——没有持仓，只是雷达。",
+    "loginRequired": "登录以创建你的自选股列表。",
+    "loginButton": "登录",
+    "empty": {
+      "title": "你的自选股是空的",
+      "description": "关注公司以随时掌握动态——价格实时更新。从热门选项开始吧。",
+      "quickAdd": "关注",
+      "adding": "添加中..."
+    },
+    "stats": {
+      "following": "关注中",
+      "upToday": "今日上涨"
+    },
+    "suggestionsTitle": "关注建议",
+    "lastUpdate": "最后更新："
   }
 }

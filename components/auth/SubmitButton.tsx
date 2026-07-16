@@ -8,15 +8,16 @@ interface SubmitButtonProps {
   label: string
   loadingLabel?: string
   className?: string
+  disabled?: boolean
 }
 
-export function SubmitButton({ label, loadingLabel, className }: SubmitButtonProps) {
+export function SubmitButton({ label, loadingLabel, className, disabled }: SubmitButtonProps) {
   const { pending } = useFormStatus()
 
   return (
-    <Button 
-      type="submit" 
-      disabled={pending} 
+    <Button
+      type="submit"
+      disabled={pending || disabled}
       className={className}
     >
       {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

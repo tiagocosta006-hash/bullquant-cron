@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { JetBrains_Mono } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
@@ -61,8 +60,9 @@ export const metadata: Metadata = {
     "intrinsic value"
   ],
   icons: {
-    icon: [{ url: "/brand/bull-metrics-icon.png", type: "image/png" }],
-    apple: [{ url: "/brand/bull-metrics-icon.png" }],
+    // versão com cantos arredondados transparentes (gerada de bull-metrics-icon.png)
+    icon: [{ url: "/brand/bull-metrics-icon-rounded.png", type: "image/png" }],
+    apple: [{ url: "/brand/bull-metrics-icon-rounded.png" }],
   },
   openGraph: {
     title: `${BRAND.name} — Value Investing, com visão`,
@@ -77,10 +77,9 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   // Permite zoom do utilizador (acessibilidade) — não desativar.
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
-  ],
+  // Tema segue a classe `.dark` (não prefers-color-scheme): o script anti-FOUC
+  // e lib/theme.ts atualizam este meta com as cores reais paper/night.
+  themeColor: "#fafaf7",
 };
 
 export default async function RootLayout({
@@ -100,10 +99,15 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Tema: claro por defeito, escuro persistido — aplicado antes do paint (anti-FOUC) */}
-        <Script id="theme-init" strategy="beforeInteractive">
-          {"(function(){try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}})()"}
-        </Script>
+        {/* Tema: claro por defeito, escuro persistido — script inline CRU (não
+            next/script: beforeInteractive não garante execução antes do 1.º
+            paint no App Router, o que causava flash branco em dark mode). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var d=localStorage.getItem('theme')==='dark';if(d)document.documentElement.classList.add('dark');var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',d?'#100f0d':'#fafaf7')}catch(e){}})()",
+          }}
+        />
       </head>
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground">
         <NextIntlClientProvider messages={messages}>

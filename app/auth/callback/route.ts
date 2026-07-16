@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
+import { sendWelcomeEmail } from '@/lib/resend'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -8,6 +9,8 @@ export async function GET(request: Request) {
   // Sanitise: only allow same-origin relative paths (no "//evil.com" exploits)
   const rawNext = searchParams.get('next') ?? '/'
   const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/'
+  // welcome=1 marca uma confirmação de registo → boas-vindas só após confirmar.
+  const isWelcome = searchParams.get('welcome') === '1'
 
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type')
@@ -34,6 +37,19 @@ export async function GET(request: Request) {
   }
 
   if (!authError) {
+    // Registo acabado de confirmar → email de boas-vindas (no-op sem Resend).
+    if (isWelcome) {
+      try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user?.email) {
+          await sendWelcomeEmail(user.email, (user.user_metadata?.name as string) || 'Investidor')
+        }
+      } catch (e) {
+        console.error('Falha ao enviar email de boas-vindas:', e)
+      }
+    }
+
     // Se o utilizador acabou de alterar e confirmar o email, sincronizamos com o Prisma
     if (type === 'email_change') {
       try {

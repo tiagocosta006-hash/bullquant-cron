@@ -84,11 +84,14 @@
     },
     "tabs": {
       "sp500": "S&P 500",
-      "trending": "トレンド",
-      "growth": "成長",
-      "dividend": "配当",
-      "buyback": "自社株買い",
-      "ai": "人工知能"
+      "gainers": "Top Gainers",
+      "losers": "Top Losers",
+      "marketCap": "Largest Market Cap"
+    },
+    "eodNotice": "Market cap and change based on the last trading day's close — not real-time.",
+    "loadMore": "Load more",
+    "sectorFilter": {
+      "all": "All sectors"
     }
   },
   "sidebar": {
@@ -97,22 +100,23 @@
     "calendar": "カレンダー",
     "dcf": "DCF計算機",
     "transcripts": "トランスクリプト",
-    "screener": "スクリーナー",
     "recentSearches": "最近の検索",
     "desc": {
       "dashboard": "概要",
-      "portfolio": "フォローしている企業",
+      "portfolio": "実際のポジションとそのライブパフォーマンス",
       "calendar": "財務結果",
       "dcf": "適正価格を評価",
       "transcripts": "投資家会議",
-      "screener": "企業を見つける",
-      "explore": "業種別に企業を発見・探索"
+      "explore": "業種別に企業を発見・探索",
+      "watchlist": "ポジションなしで観察中の企業"
     },
     "compare": "比較",
     "navigate": "ナビゲーション",
     "searchAction": "検索",
     "more": "その他",
-    "explore": "探索"
+    "explore": "探索",
+    "watchlist": "ウォッチリスト",
+    "dcfShort": "DCF"
   },
   "login": {
     "title": "ログイン",
@@ -124,7 +128,9 @@
     "submitButton": "ログイン",
     "submitLoading": "ログイン中...",
     "noAccount": "アカウントがありませんか？",
-    "registerLink": "無料登録"
+    "registerLink": "無料登録",
+    "devLoginButton": "開発者としてログイン（ローカル）",
+    "devLoginLoading": "ログイン中..."
   },
   "register": {
     "title": "アカウント作成",
@@ -137,7 +143,10 @@
     "submitButton": "登録",
     "submitLoading": "作成中...",
     "hasAccount": "既にアカウントをお持ちですか？",
-    "loginLink": "ログイン"
+    "loginLink": "ログイン",
+    "confirmPasswordLabel": "パスワード（確認）",
+    "passwordMismatch": "パスワードが一致しません。",
+    "emailInUse": "このメールアドレスは既に登録されています。"
   },
   "forgotPassword": {
     "title": "パスワードのリセット",
@@ -155,7 +164,9 @@
     "passwordLabel": "新しいパスワード",
     "passwordPlaceholder": "******",
     "submitButton": "更新",
-    "submitLoading": "更新中..."
+    "submitLoading": "更新中...",
+    "confirmPasswordLabel": "Confirm Password",
+    "confirmPasswordPlaceholder": "Repeat your new password"
   },
   "header": {
     "settingsTitle": "設定",
@@ -191,33 +202,75 @@
       "save": "保存",
       "dangerZone": "危険ゾーン",
       "logoutDesc": "安全にログアウトします。",
-      "logoutBtn": "ログアウト"
+      "logoutBtn": "ログアウト",
+      "changeEmailTitle": "メールアドレスの変更",
+      "newEmail": "新しいメールアドレス",
+      "confirmEmailChangeBtn": "変更を確認",
+      "emailChangeSuccess": "新旧両方のアドレスに確認メールを送信しました。受信トレイをご確認ください。",
+      "changePasswordBtn": "Change Password",
+      "confirmNewPassword": "Confirm New Password",
+      "currentPassword": "Current Password",
+      "deleteAccountBtn": "Delete Account",
+      "deleteAccountCancel": "Cancel",
+      "deleteAccountConfirmLabel": "Type DELETE to confirm",
+      "deleteAccountDesc": "This action is irreversible. All your data, portfolios, and valuations will be deleted forever.",
+      "deleteAccountSubmit": "Delete Forever",
+      "deleteAccountTitle": "Delete Account Permanently",
+      "newPassword": "New Password",
+      "passwordSuccess": "Password updated successfully!",
+      "securityTitle": "Security"
     },
     "preferences": {
       "title": "環境設定",
       "language": "言語",
       "languageDesc": "言語を選択してください。",
       "theme": "テーマ",
-      "themeDesc": "ライトモードとダークモードを切り替えます。"
+      "themeDesc": "ライトモードとダークモードを切り替えます。",
+      "themeLight": "ライト",
+      "themeDark": "ダーク"
     },
     "subscription": {
       "title": "現在のプラン",
       "desc": "現在、無料プランを利用しています。",
       "premiumSoonTitle": "PROアクセスは近日公開",
       "premiumSoonDesc": "高度な機能を準備中です。",
-      "upgradeBtn": "PROにアップグレード"
+      "upgradeBtn": "PROにアップグレード",
+      "aiUsageLabel": "本日のAI分析",
+      "aiUnlimited": "無制限",
+      "compare": {
+        "title": "Free vs PRO",
+        "free": "Free",
+        "pro": "PRO",
+        "priceLabel": "価格",
+        "priceFree": "0 €",
+        "pricePro": "7 €/月",
+        "priceNote": "暫定価格——正式価格はリリース時に発表されます。",
+        "quotesLabel": "株価と10年分のファンダメンタルズ",
+        "aiLabel": "AI分析",
+        "aiFree": "{limit}回/日",
+        "aiPro": "無制限",
+        "kpisLabel": "ビジネスKPI（ディープAI）",
+        "pdfLabel": "PRO PDFレポート"
+      },
+      "beta": {
+        "title": "ベータモード",
+        "desc": "ベータ期間中は支払いなしでFreeとPROを切り替えて、すべての機能を試せます。",
+        "toPro": "PROを有効化（ベータ）",
+        "toFree": "Freeプランに戻る",
+        "error": "プランを変更できませんでした。もう一度お試しください。"
+      }
     }
   },
   "portfolio": {
     "loginRequired": "ポートフォリオにアクセスするにはログインしてください。",
     "loginButton": "ログイン",
     "title": "マイポートフォリオ",
-    "subtitle": "お気に入りの企業をリアルタイムで追跡します。",
+    "subtitle": "実際のポジションをリアルタイムで追跡。",
     "positions": "ポジション",
     "upToday": "本日の上昇",
     "emptyState": {
-      "title": "ウォッチリストは空です",
-      "description": "企業を追加し始めましょう。",
+      "title": "ポートフォリオは空です",
+      "description": "ポジション（数量と購入価格）を追加して実際のパフォーマンスを追跡するか、人気の銘柄から始めましょう。",
       "quickAdd": "追加",
       "adding": "追加中..."
     },
@@ -231,9 +284,127 @@
       "createAccount": "無料アカウント作成"
     },
     "card": {
-      "currentPrice": "現在の価格"
+      "currentPrice": "現在の価格",
+      "remove": "ポートフォリオから削除",
+      "addPosition": "ポジションを追加",
+      "edit": "ポジションを編集"
     },
-    "lastUpdate": "最終更新:"
+    "lastUpdate": "最終更新:",
+    "addPosition": {
+      "title": "ポジションを追加 — {ticker}",
+      "description": "数量と平均購入価格を入力してください。ポジションなしでフォローするにはウォッチリストを使います。",
+      "quantityLabel": "数量",
+      "priceLabel": "平均購入価格（USD）",
+      "cancel": "キャンセル",
+      "confirm": "追加",
+      "error": "ポジションを追加できませんでした。もう一度お試しください。",
+      "editTitle": "ポジションを編集 — {ticker}",
+      "dateLabel": "購入日",
+      "brokerLabel": "証券会社",
+      "currencyLabel": "通貨",
+      "feesLabel": "手数料",
+      "notesLabel": "メモ",
+      "notesPlaceholder": "このポジションに関するメモ…",
+      "save": "保存"
+    },
+    "allocation": {
+      "barsView": "Bar view",
+      "donutView": "Donut view",
+      "title": "Allocation by Sector",
+      "unknownSector": "Unknown sector"
+    },
+    "import": {
+      "back": "Back",
+      "chooseFile": "Choose CSV file",
+      "close": "Close",
+      "columns": {
+        "avgBuyPrice": "Average buy price",
+        "ignore": "Ignore",
+        "quantity": "Quantity",
+        "ticker": "Ticker"
+      },
+      "confirmImport": "Import {count} rows",
+      "description": "Upload a CSV file exported from your broker with the ticker, quantity, and average buy price for each position.",
+      "done": "Done",
+      "emptyFile": "The file is empty or could not be read.",
+      "mapDescription": "Tell us what each column in your file corresponds to:",
+      "mapIncomplete": "Select the ticker, quantity, and average price columns to continue.",
+      "moreRows": "+ {count} rows not shown",
+      "parseError": "Could not parse the file. Make sure it's a valid CSV.",
+      "status": {
+        "added": "Added",
+        "invalid": "Invalid row",
+        "merged": "Merged with existing position",
+        "unsupported": "Company not supported"
+      },
+      "submitError": "Could not import the portfolio. Please try again.",
+      "title": "Import Portfolio",
+      "trigger": "Import Portfolio"
+    },
+    "manage": {
+      "importCsv": "Import CSV",
+      "title": "Add or sync positions"
+    },
+    "position": {
+      "avgCost": "avg. cost",
+      "pnl": "P&L",
+      "shares": "shares",
+      "fees": "手数料",
+      "notes": "メモ"
+    },
+    "summary": {
+      "marketValue": "Market Value",
+      "totalPnl": "Total P&L",
+      "watchlistOnly": "Add quantity and buy price to your positions to see market value and P&L."
+    },
+    "table": {
+      "action": "Action",
+      "change": "Change",
+      "company": "Company",
+      "grossMargin": "Gross Margin",
+      "pnl": "P&L",
+      "roic": "ROIC",
+      "sector": "Sector"
+    },
+    "toolbar": {
+      "allSectors": "All sectors",
+      "gridView": "Grid view",
+      "sort": {
+        "addedAt": "Recently added",
+        "changePercent": "Biggest movers",
+        "name": "Name (A-Z)",
+        "sector": "Sector"
+      },
+      "sortBy": "Sort by",
+      "tableView": "Table view"
+    },
+    "trading212": {
+      "apiKeyPlaceholder": "API Key",
+      "apiSecretPlaceholder": "API Secret",
+      "cancel": "Cancel",
+      "connectDescription": "Connect your Trading212 account (Invest or Stocks ISA) to automatically sync your positions. Generate an API Key under Settings → API in the Trading212 app.",
+      "connectError": "Could not connect to Trading212. Please try again.",
+      "connectSubmit": "Connect",
+      "connectTrigger": "Connect to Trading212",
+      "connectedLabel": "Connected to Trading212",
+      "disconnect": "Disconnect",
+      "invalidCredentials": "Invalid API Key or Secret.",
+      "lastSynced": "Last synced:",
+      "syncError": "Could not sync with Trading212.",
+      "syncNow": "Sync now",
+      "syncSummary": "{synced} positions synced, {unsupported} not supported."
+    },
+    "valueChart": {
+      "approximationTooltip": "Estimate based on each position's current quantity applied to historical prices — does not reflect actual buy/sell history.",
+      "noData": "Not enough data to show the trend yet.",
+      "tabs": {
+        "1m": "1M",
+        "1y": "1Y",
+        "6m": "6M",
+        "max": "Max"
+      },
+      "title": "Portfolio Value Over Time"
+    }
   },
   "stock": {
     "underConstruction": "工事中",
@@ -244,7 +415,9 @@
     "header": {
       "followed": "フォロー中",
       "addToPortfolio": "ポートフォリオに追加",
-      "updating": "更新中..."
+      "updating": "更新中...",
+      "follow": "フォロー",
+      "comparePeers": "Compare Peers"
     },
     "savedValuations": {
       "title": "保存されたDCF評価",
@@ -332,8 +505,6 @@
     "millionsSuffix": "百万",
     "growth1": "成長率 1-5年",
     "growth2": "成長率 6-10年",
-    "wacc": "WACC (割引率)",
-    "waccHint": "要求利回り。",
     "terminalGrowth": "永久成長率",
     "terminalGrowthHint": "長期的な成長率。",
     "reverseDcf": "リバースDCF",
@@ -359,7 +530,27 @@
     },
     "errorWacc": "WACCは永久成長率より大きくなければなりません。",
     "errorShares": "株式数を入力してください。",
-    "errorFcf": "有効なFCFを入力してください。"
+    "errorFcf": "有効なFCFを入力してください。",
+    "fcfMode": "Methodology",
+    "mode": "Method",
+    "wacc": {
+      "beta": "Beta",
+      "betaUnavailable": "Beta unavailable — enter WACC manually",
+      "breakdownTitle": "Breakdown",
+      "capitalStructure": "Capital Structure",
+      "costOfDebt": "Cost of Debt",
+      "costOfDebtLabel": "Rd (Pre-tax)",
+      "costOfEquity": "Cost of Equity",
+      "equityRiskPremium": "ERP (Equity Risk Premium)",
+      "hint": "Required return. Higher means a more conservative value.",
+      "label": "WACC (Discount Rate)",
+      "riskFreeRate": "Rf (Risk-Free Rate)",
+      "suggested": "Suggested WACC (CAPM)",
+      "taxRate": "Tax Rate",
+      "useButton": "Use",
+      "weightDebt": "Debt Weight",
+      "weightEquity": "Equity Weight"
+    }
   },
   "financials": {
     "engineTitle": "財務データ",
@@ -510,5 +701,40 @@
       "compareDesc": "財務パフォーマンスを並べて評価。",
       "viewFinancials": "完全な財務分析を見る"
     }
+  },
+  "verifyEmail": {
+    "title": "メールを確認してください",
+    "unconfirmed": "アカウントはまだ確認されていません。",
+    "sentTo": "<strong>{email}</strong> 宛に確認リンクを送信しました。",
+    "sentGeneric": "確認リンクをメールで送信しました。",
+    "instruction": "メールを開いてリンクをクリックすると、アカウントが有効になります。その後ログインしてください。",
+    "spamHint": "届いていませんか？1分ほど待って、迷惑メールフォルダも確認してください。",
+    "resent": "確認メールを再送しました。受信トレイをご確認ください。",
+    "noEmail": "メールアドレスがありません。登録画面に戻ってやり直してください。",
+    "resendButton": "メールを再送する",
+    "resending": "再送中...",
+    "backToLogin": "ログインに戻る",
+    "wrongEmail": "メールアドレスが違う？",
+    "changeEmail": "修正する",
+    "openGmail": "Gmail を開く",
+    "openOutlook": "Outlook を開く"
+  },
+  "watchlist": {
+    "title": "ウォッチリスト",
+    "subtitle": "観察中の企業——ポジションなし、レーダーだけ。",
+    "loginRequired": "ログインしてウォッチリストを作成しましょう。",
+    "loginButton": "ログイン",
+    "empty": {
+      "title": "ウォッチリストは空です",
+      "description": "企業をフォローして動向をチェック——価格はライブで更新されます。人気の銘柄から始めましょう。",
+      "quickAdd": "フォロー",
+      "adding": "追加中..."
+    },
+    "stats": {
+      "following": "フォロー中",
+      "upToday": "本日上昇"
+    },
+    "suggestionsTitle": "フォローのおすすめ",
+    "lastUpdate": "最終更新："
   }
 }

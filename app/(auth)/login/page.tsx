@@ -1,13 +1,20 @@
 import Link from 'next/link'
-import { login } from '../actions'
+import { login, devLogin } from '../actions'
 import { SubmitButton } from '@/components/auth/SubmitButton'
 import { Input } from '@/components/ui/input'
 import { getTranslations } from 'next-intl/server'
 
+// Botão de login dev: só em localhost (NODE_ENV=development) e com as
+// credenciais DEV_LOGIN_* configuradas no .env.local.
+const showDevLogin =
+  process.env.NODE_ENV === 'development' &&
+  !!process.env.DEV_LOGIN_EMAIL &&
+  !!process.env.DEV_LOGIN_PASSWORD
+
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ message?: string; error?: string }>
+  searchParams: Promise<{ message?: string; error?: string; email?: string }>
 }) {
   const resolvedParams = await searchParams
   const t = await getTranslations('login')
@@ -36,6 +43,7 @@ export default async function LoginPage({
                 type="email"
                 required
                 placeholder={t('emailPlaceholder')}
+                defaultValue={resolvedParams.email}
               />
             </div>
           </div>
@@ -80,6 +88,16 @@ export default async function LoginPage({
             />
           </div>
         </form>
+
+        {showDevLogin && (
+          <form action={devLogin} className="mt-4">
+            <SubmitButton
+              label={t('devLoginButton')}
+              loadingLabel={t('devLoginLoading')}
+              className="w-full h-10 border border-dashed border-primary/40 bg-primary/5 text-primary hover:bg-primary/10 font-semibold"
+            />
+          </form>
+        )}
 
         <p className="mt-10 text-center text-sm text-muted-foreground">
           {t('noAccount')}{' '}

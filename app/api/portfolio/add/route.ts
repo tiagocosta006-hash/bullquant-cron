@@ -4,17 +4,19 @@ import { createClient } from "@/lib/supabase/server"
 import { mergePosition } from "@/lib/finance/portfolio"
 import { z } from "zod"
 
+// O portfólio guarda POSIÇÕES REAIS: quantidade e preço médio são obrigatórios.
+// Para "seguir" uma empresa sem posição existe a watchlist (/api/watchlist).
+// Detalhes opcionais: data de compra, corretora, moeda, taxas e notas.
 const addPortfolioSchema = z.object({
   ticker: z.string().min(1).max(10).trim().toUpperCase(),
-  quantity: z.number().positive().optional(),
-  avgBuyPrice: z.number().positive().optional()
-}).refine(data => {
-  if ((data.quantity !== undefined && data.avgBuyPrice === undefined) ||
-      (data.quantity === undefined && data.avgBuyPrice !== undefined)) {
-    return false
-  }
-  return true
-}, { message: "quantity and avgBuyPrice must be provided together" })
+  quantity: z.number().positive(),
+  avgBuyPrice: z.number().positive(),
+  buyDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  broker: z.string().max(60).optional(),
+  currency: z.string().max(6).optional(),
+  fees: z.number().min(0).optional(),
+  notes: z.string().max(1000).optional(),
+})
 
 export async function POST(request: Request) {
   try {
@@ -37,8 +39,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: parseResult.error.issues[0].message }, { status: 400 })
     }
 
-    const { ticker, quantity, avgBuyPrice } = parseResult.data
-    const hasPosition = quantity !== undefined && avgBuyPrice !== undefined
+    const { ticker, quantity, avgBuyPrice, buyDate, broker, currency, fees, notes } = parseResult.data
 
     // Find the company
     const company = await prisma.company.findUnique({
@@ -68,17 +69,25 @@ export async function POST(request: Request) {
       }
     })
 
-    // Se já existe posição (própria ou vinda desta chamada), funde por média ponderada.
-    let positionFields: { quantity?: number; avgBuyPrice?: number } = {}
-    if (hasPosition) {
-      if (existing?.quantity && existing?.avgBuyPrice) {
-        positionFields = mergePosition(
-          { quantity: Number(existing.quantity), avgBuyPrice: Number(existing.avgBuyPrice) },
-          { quantity, avgBuyPrice }
-        )
-      } else {
-        positionFields = { quantity, avgBuyPrice }
-      }
+    // Se já existe posição, funde por média ponderada.
+    const positionFields =
+      existing?.quantity && existing?.avgBuyPrice
+        ? mergePosition(
+            { quantity: Number(existing.quantity), avgBuyPrice: Number(existing.avgBuyPrice) },
+            { quantity, avgBuyPrice }
+          )
+        : { quantity, avgBuyPrice }
+
+    // Detalhes no reforço de posição: fees SOMAM; data mantém a primeira
+    // compra; corretora/moeda/notas mantêm o que existe (só preenchem vazios).
+    const detailFields = {
+      buyDate: existing?.buyDate ?? (buyDate ? new Date(`${buyDate}T00:00:00Z`) : undefined),
+      broker: existing?.broker ?? broker?.trim() ?? undefined,
+      currency: existing?.currency ?? currency?.trim().toUpperCase() ?? undefined,
+      fees: fees !== undefined
+        ? Number(existing?.fees ?? 0) + fees
+        : existing?.fees ?? undefined,
+      notes: existing?.notes ?? notes?.trim() ?? undefined,
     }
 
     // Add to portfolio using upsert to prevent race conditions (double-click)
@@ -89,11 +98,12 @@ export async function POST(request: Request) {
           companyId: company.id
         }
       },
-      update: hasPosition ? positionFields : {},
+      update: { ...positionFields, ...detailFields },
       create: {
         portfolioId: portfolio.id,
         companyId: company.id,
         ...positionFields,
+        ...detailFields,
       }
     })
 

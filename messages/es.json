@@ -36,12 +36,16 @@
     },
     "showcase": {
       "caption": "Diez años de fundamentales, DCF y AI Brief — en un solo terminal, sin hojas de cálculo.",
-      "alt": "Demostración del terminal Bull Metrics"
+      "alt": "Demostración del terminal Bull Metrics",
+      "caption2": "Precios en directo, watchlist y calendario de resultados — todo a un ⌘K.",
+      "caption3": "Gratis, en tu idioma y listo en menos de un minuto."
     },
     "manifesto": {
       "l1": "Invertir no es adivinar.",
       "l2": "Es comparar precio con valor.",
-      "l3": "Nosotros te mostramos el valor."
+      "l3": "El precio lo ves todos los días.",
+      "l4": "El valor se esconde en los fundamentales.",
+      "l5": "Nosotros te mostramos el valor."
     },
     "stories": {
       "fundamentals": {

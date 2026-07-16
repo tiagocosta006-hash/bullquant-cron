@@ -36,12 +36,16 @@
     },
     "showcase": {
       "caption": "Dix ans de fondamentaux, DCF et AI Brief — dans un seul terminal, sans tableurs.",
-      "alt": "Démonstration du terminal Bull Metrics"
+      "alt": "Démonstration du terminal Bull Metrics",
+      "caption2": "Prix en direct, watchlist et calendrier des résultats — à un ⌘K.",
+      "caption3": "Gratuit, et prêt en moins d'une minute."
     },
     "manifesto": {
       "l1": "Investir, ce n'est pas deviner.",
       "l2": "C'est comparer le prix à la valeur.",
-      "l3": "Nous vous montrons la valeur."
+      "l3": "Le prix, vous le voyez tous les jours.",
+      "l4": "La valeur se cache dans les fondamentaux.",
+      "l5": "Nous vous montrons la valeur."
     },
     "stories": {
       "fundamentals": {

@@ -18,9 +18,9 @@ const FCF = [11, 13, 15, 18, 22, 25, 28, 32, 37, 42];
 const FIRST_YEAR = 2016;
 
 const W = 560;
-const H = 300;
-const BASE = 264;
-const TOP = 20;
+const H = 400;
+const BASE = 356;
+const TOP = 26;
 const PAD = 8;
 const STEP = (W - PAD * 2) / REVENUE.length;
 const BAR_W = 30;
@@ -156,16 +156,16 @@ export function ChartScrollDraw({
           strokeWidth="2"
         />
 
-        {/* labels diretos (tokens de tinta, nunca a cor da série) */}
+        {/* labels diretos (tinta plena — cinzento não se lê em dark) */}
         <text
           data-pop
-          x={cx(FCF.length - 1) - 8}
-          y={yOf(FCF[FCF.length - 1]) - 12}
+          x={cx(FCF.length - 1) - 10}
+          y={yOf(FCF[FCF.length - 1]) - 16}
           textAnchor="end"
           className="nums"
-          fontSize="12"
+          fontSize="13"
           fontWeight="600"
-          fill="var(--muted-foreground)"
+          fill="var(--foreground)"
         >
           {`${legendFcf} · $${FCF[FCF.length - 1]}B`}
         </text>
@@ -175,31 +175,39 @@ export function ChartScrollDraw({
           y={yOf(REVENUE[REVENUE.length - 1]) - 10}
           textAnchor="middle"
           className="nums"
-          fontSize="12"
+          fontSize="13"
           fontWeight="600"
-          fill="var(--muted-foreground)"
+          fill="var(--foreground)"
         >
           {`$${REVENUE[REVENUE.length - 1]}B`}
         </text>
 
         {/* eixo temporal: primeiro/último ano */}
-        <text x={barX(0)} y={H - 14} fontSize="11" className="nums" fill="var(--muted-foreground)">
+        <text
+          x={barX(0)}
+          y={H - 14}
+          fontSize="12"
+          className="nums"
+          fill="var(--foreground)"
+          fillOpacity="0.7"
+        >
           {FIRST_YEAR}
         </text>
         <text
           x={barX(REVENUE.length - 1) + BAR_W}
           y={H - 14}
           textAnchor="end"
-          fontSize="11"
+          fontSize="12"
           className="nums"
-          fill="var(--muted-foreground)"
+          fill="var(--foreground)"
+          fillOpacity="0.7"
         >
           {FIRST_YEAR + REVENUE.length - 1}
         </text>
       </svg>
 
       {/* legenda — sempre presente com 2 séries */}
-      <div className="mt-3 flex items-center gap-5 px-1 text-xs text-muted-foreground">
+      <div className="mt-3 flex items-center gap-5 px-1 text-xs font-medium text-foreground/70">
         <span className="inline-flex items-center gap-2">
           <span className="h-2.5 w-2.5 rounded-[3px] bg-[var(--chart-1)]" aria-hidden />
           {legendRevenue}

@@ -7,17 +7,21 @@ import { cn } from "@/lib/utils";
 /**
  * ManifestoText — scrollytelling assinatura: a frase-manifesto fica
  * sticky ao centro e cada palavra "enche" de tinta (opacity 0.12 → 1)
- * com o progresso do scroll (scrub, reversível por natureza).
+ * com o progresso do scroll (scrub, reversível por natureza). O
+ * `backdrop` (ex.: TickerWall) vive atrás do texto, dentro do sticky.
  * A opacidade inicial só é aplicada dentro do gate de motion — sem JS
  * ou com reduced-motion o texto está sempre completo.
  */
 export function ManifestoText({
   lines,
   accentLine,
+  backdrop,
 }: {
   lines: string[];
   /** índice da linha destacada a dourado (SF, não Scotch — o Scotch é só do hero) */
   accentLine?: number;
+  /** fundo decorativo atrás do texto (renderizado aria-hidden) */
+  backdrop?: React.ReactNode;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
 
@@ -35,8 +39,8 @@ export function ManifestoText({
           ease: "none",
           scrollTrigger: {
             trigger: trackRef.current,
-            start: "top 20%",
-            end: "bottom 95%",
+            start: "top 22%",
+            end: "bottom 96%",
             scrub: 0.4,
           },
         });
@@ -46,8 +50,13 @@ export function ManifestoText({
   );
 
   return (
-    <div ref={trackRef} className="relative h-[230vh]">
-      <div className="sticky top-0 flex h-svh items-center justify-center px-6">
+    <div ref={trackRef} className="relative h-[300vh]">
+      <div className="sticky top-0 flex h-svh items-center justify-center overflow-hidden px-6">
+        {backdrop ? (
+          <div aria-hidden className="absolute inset-0 -z-10">
+            {backdrop}
+          </div>
+        ) : null}
         <p className="max-w-5xl text-balance text-center text-4xl font-extrabold leading-[1.08] tracking-[-0.03em] sm:text-6xl md:text-7xl">
           {lines.map((line, i) => (
             <span
@@ -57,7 +66,7 @@ export function ManifestoText({
               {line.split(" ").map((word, j) => (
                 <span key={j} data-word className="inline-block will-change-[opacity]">
                   {word}
-                  {j < line.split(" ").length - 1 ? " " : ""}
+                  {j < line.split(" ").length - 1 ? " " : ""}
                 </span>
               ))}
             </span>

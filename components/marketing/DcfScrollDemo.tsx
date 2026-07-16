@@ -139,11 +139,11 @@ export function DcfScrollDemo({
           </div>
 
           {/* resultado */}
-          <div className="flex flex-col justify-center gap-3 md:border-l md:border-border/60 md:pl-8">
+          <div className="flex min-w-0 flex-col justify-center gap-3 md:border-l md:border-border/60 md:pl-8">
             <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               {labels.fairValue} · {labels.perShare}
             </div>
-            <div ref={fairRef} className="nums text-5xl font-extrabold tracking-tight sm:text-6xl">
+            <div ref={fairRef} className="nums text-4xl font-extrabold tracking-tight sm:text-5xl xl:text-6xl">
               {formatPrice(INITIAL.fairValue)}
             </div>
             <div className="mt-1 flex items-center gap-3">

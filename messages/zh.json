@@ -36,12 +36,16 @@
     },
     "showcase": {
       "caption": "十年基本面、DCF 和 AI Brief — 集于一个终端,无需电子表格。",
-      "alt": "Bull Metrics 终端演示"
+      "alt": "Bull Metrics 终端演示",
+      "caption2": "实时价格、自选清单与财报日历 — 一个 ⌘K 即达。",
+      "caption3": "免费,一分钟内即可上手。"
     },
     "manifesto": {
       "l1": "投资不是猜测。",
       "l2": "而是比较价格与价值。",
-      "l3": "我们让你看见价值。"
+      "l3": "价格,你每天都看得到。",
+      "l4": "价值,藏在基本面里。",
+      "l5": "我们让你看见价值。"
     },
     "stories": {
       "fundamentals": {

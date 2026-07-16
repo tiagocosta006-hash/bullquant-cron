@@ -36,12 +36,16 @@
     },
     "showcase": {
       "caption": "Zehn Jahre Fundamentaldaten, DCF und AI Brief — in einem Terminal, ohne Tabellenkalkulationen.",
-      "alt": "Demo des Bull-Metrics-Terminals"
+      "alt": "Demo des Bull-Metrics-Terminals",
+      "caption2": "Live-Kurse, Watchlist und Earnings-Kalender — alles ein ⌘K entfernt.",
+      "caption3": "Gratis, und in unter einer Minute startklar."
     },
     "manifesto": {
       "l1": "Investieren ist kein Raten.",
       "l2": "Es heißt, Preis mit Wert zu vergleichen.",
-      "l3": "Wir zeigen dir den Wert."
+      "l3": "Den Preis siehst du jeden Tag.",
+      "l4": "Der Wert versteckt sich in den Fundamentaldaten.",
+      "l5": "Wir zeigen dir den Wert."
     },
     "stories": {
       "fundamentals": {

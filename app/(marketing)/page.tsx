@@ -11,7 +11,9 @@ import { ChartScrollDraw } from "@/components/marketing/ChartScrollDraw";
 import { Counter } from "@/components/marketing/Counter";
 import { DcfScrollDemo } from "@/components/marketing/DcfScrollDemo";
 import { FeatureStory } from "@/components/marketing/FeatureStory";
+import { GrowCta } from "@/components/marketing/GrowCta";
 import { ManifestoText } from "@/components/marketing/ManifestoText";
+import { TickerWall } from "@/components/marketing/TickerWall";
 import { LANDING_MEDIA } from "@/components/marketing/media";
 import { MediaFrame } from "@/components/marketing/MediaFrame";
 import { ScrollShowcase } from "@/components/marketing/ScrollShowcase";
@@ -202,23 +204,32 @@ export default async function LandingPage() {
 
       {/* ── 2 · Showcase cinematográfico (scrub + sticky) ───────── */}
       <section>
-        <ScrollShowcase caption={t("showcase.caption")}>
+        <ScrollShowcase
+          captions={[t("showcase.caption"), t("showcase.caption2"), t("showcase.caption3")]}
+        >
           <MediaFrame media={LANDING_MEDIA.showcaseTerminal} alt={t("showcase.alt")}>
             <TerminalMock />
           </MediaFrame>
         </ScrollShowcase>
       </section>
 
-      {/* ── 3 · Manifesto (palavra a palavra, sticky) ───────────── */}
+      {/* ── 3 · Manifesto (palavra a palavra, parede de tickers) ── */}
       <section>
         <ManifestoText
-          lines={[t("manifesto.l1"), t("manifesto.l2"), t("manifesto.l3")]}
-          accentLine={2}
+          lines={[
+            t("manifesto.l1"),
+            t("manifesto.l2"),
+            t("manifesto.l3"),
+            t("manifesto.l4"),
+            t("manifesto.l5"),
+          ]}
+          accentLine={4}
+          backdrop={<TickerWall items={ticker} />}
         />
       </section>
 
       {/* ── 4 · Story 1: fundamentais (gráfico desenha-se) ──────── */}
-      <section className="mx-auto max-w-6xl px-6 py-28 md:px-8 md:py-40">
+      <section className="mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
         <FeatureStory
           eyebrow={t("stories.fundamentals.eyebrow")}
           title={t("stories.fundamentals.title")}
@@ -241,7 +252,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── 5 · Story 2: DCF (o motor real, scriptado) ──────────── */}
-      <section className="mx-auto max-w-6xl px-6 py-28 md:px-8 md:py-40">
+      <section className="mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
         <FeatureStory
           reverse
           eyebrow={t("stories.dcf.eyebrow")}
@@ -268,7 +279,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── 6 · Story 3: AI Insights (brief escreve-se) ─────────── */}
-      <section className="mx-auto max-w-6xl px-6 py-28 md:px-8 md:py-40">
+      <section className="mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
         <FeatureStory
           eyebrow={t("stories.ai.eyebrow")}
           title={t("stories.ai.title")}
@@ -298,7 +309,7 @@ export default async function LandingPage() {
       ) : null}
 
       {/* ── 8 · Bento: tudo num terminal ────────────────────────── */}
-      <section className="mx-auto max-w-6xl px-6 py-28 md:px-8 md:py-36">
+      <section className="mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
         <Reveal className="mx-auto max-w-3xl text-center">
           <h2 className="text-balance text-4xl font-extrabold tracking-[-0.03em] sm:text-5xl md:text-6xl">
             {t("bento.title")}
@@ -325,7 +336,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── 9 · Números (counters) ──────────────────────────────── */}
-      <section className="mx-auto max-w-6xl px-6 py-28 md:px-8 md:py-36">
+      <section className="mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
         <Reveal className="grid gap-12 text-center sm:grid-cols-2 sm:text-left lg:grid-cols-4">
           {[
             { value: 10, suffix: "", label: t("numbers.years") },
@@ -358,16 +369,18 @@ export default async function LandingPage() {
           <p className="mt-6 max-w-[48ch] text-lg leading-relaxed text-muted-foreground">
             {t("ctaSubtitle")}
           </p>
-          <Link
-            href="/register"
-            className={cn(
-              buttonVariants({ size: "lg" }),
-              "mt-10 h-13 px-10 text-base font-semibold",
-            )}
-          >
-            {t("primaryCta")}
-          </Link>
-          <p className="mt-5 text-xs text-muted-foreground/80">{t("trust")}</p>
+          <GrowCta className="mt-10">
+            <Link
+              href="/register"
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "h-13 px-10 text-base font-semibold transition-transform hover:scale-[1.04]",
+              )}
+            >
+              {t("primaryCta")}
+            </Link>
+          </GrowCta>
+          <p className="mt-6 text-xs text-muted-foreground/80">{t("trust")}</p>
         </Reveal>
       </section>
     </div>

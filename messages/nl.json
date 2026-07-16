@@ -36,12 +36,16 @@
     },
     "showcase": {
       "caption": "Tien jaar fundamentals, DCF en AI Brief — in één terminal, zonder spreadsheets.",
-      "alt": "Demo van de Bull Metrics-terminal"
+      "alt": "Demo van de Bull Metrics-terminal",
+      "caption2": "Live koersen, watchlist en earnings-kalender — alles één ⌘K verderop.",
+      "caption3": "Gratis, en klaar in minder dan een minuut."
     },
     "manifesto": {
       "l1": "Beleggen is niet gokken.",
       "l2": "Het is prijs vergelijken met waarde.",
-      "l3": "Wij laten je de waarde zien."
+      "l3": "De prijs zie je elke dag.",
+      "l4": "De waarde verschuilt zich in de fundamentals.",
+      "l5": "Wij laten je de waarde zien."
     },
     "stories": {
       "fundamentals": {

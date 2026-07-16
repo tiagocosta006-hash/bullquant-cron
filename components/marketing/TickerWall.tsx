@@ -94,7 +94,7 @@ export function TickerWall({ items }: { items: TickerItem[] }) {
     <div
       ref={rootRef}
       aria-hidden
-      className="h-full w-full opacity-[0.16] [mask-image:radial-gradient(ellipse_62%_52%_at_50%_50%,transparent_26%,black_76%)] dark:opacity-[0.2]"
+      className="h-full w-full opacity-[0.09] blur-[0.5px] [mask-image:radial-gradient(ellipse_66%_58%_at_50%_50%,transparent_42%,black_88%)] dark:opacity-[0.13]"
     >
       <div className="grid h-full w-full grid-cols-3 place-content-between gap-x-6 gap-y-8 p-8 sm:grid-cols-5 xl:grid-cols-7">
         {cells.map((c) => {

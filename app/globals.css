@@ -425,6 +425,53 @@
   }
 }
 
+/* ── Landing: motivos de fundo por secção ─────────────────────
+   Padrões estáticos, muito ténues, derivados de --foreground (logo
+   theme-aware: linhas escuras em light, claras em dark). SEM glows.
+   Usados por components/marketing/SectionBg.tsx sobre bandas tonais. */
+@layer components {
+  /* papel-milimétrico (tema "dados/fundamentais") */
+  .motif-grid {
+    background-image:
+      linear-gradient(
+        to right,
+        color-mix(in srgb, var(--foreground) 6%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--foreground) 6%, transparent) 1px,
+        transparent 1px
+      );
+    background-size: 64px 64px;
+  }
+  /* matriz de pontos (tema "IA") */
+  .motif-dots {
+    background-image: radial-gradient(
+      color-mix(in srgb, var(--foreground) 10%, transparent) 1.2px,
+      transparent 1.4px
+    );
+    background-size: 26px 26px;
+  }
+  /* anéis concêntricos off-center (tema "valuation/alvo") */
+  .motif-rings {
+    background-image: repeating-radial-gradient(
+      circle at 72% 38%,
+      transparent 0 68px,
+      color-mix(in srgb, var(--foreground) 5%, transparent) 68px 70px
+    );
+  }
+  /* palco: leve profundidade vertical (topo/fundo mais fundos), sem cor */
+  .motif-stage {
+    background-image: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--foreground) 4%, transparent),
+      transparent 42%,
+      color-mix(in srgb, var(--foreground) 5%, transparent)
+    );
+  }
+}
+
 /* Slider da calculadora DCF (range nativo estilizado) */
 .dcf-slider {
   -webkit-appearance: none;

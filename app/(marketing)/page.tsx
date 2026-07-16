@@ -13,6 +13,7 @@ import { DcfScrollDemo } from "@/components/marketing/DcfScrollDemo";
 import { FeatureStory } from "@/components/marketing/FeatureStory";
 import { GrowCta } from "@/components/marketing/GrowCta";
 import { ManifestoText } from "@/components/marketing/ManifestoText";
+import { SectionBg } from "@/components/marketing/SectionBg";
 import { TickerWall } from "@/components/marketing/TickerWall";
 import { LANDING_MEDIA } from "@/components/marketing/media";
 import { MediaFrame } from "@/components/marketing/MediaFrame";
@@ -203,7 +204,8 @@ export default async function LandingPage() {
       </section>
 
       {/* ── 2 · Showcase cinematográfico (scrub + sticky) ───────── */}
-      <section>
+      <section className="relative isolate">
+        <SectionBg tone="raised" motif="stage" />
         <ScrollShowcase
           captions={[t("showcase.caption"), t("showcase.caption2"), t("showcase.caption3")]}
         >
@@ -214,7 +216,8 @@ export default async function LandingPage() {
       </section>
 
       {/* ── 3 · Manifesto (palavra a palavra, parede de tickers) ── */}
-      <section>
+      <section className="relative isolate">
+        <SectionBg tone="sunken" />
         <ManifestoText
           lines={[
             t("manifesto.l1"),
@@ -229,74 +232,83 @@ export default async function LandingPage() {
       </section>
 
       {/* ── 4 · Story 1: fundamentais (gráfico desenha-se) ──────── */}
-      <section className="mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
-        <FeatureStory
-          eyebrow={t("stories.fundamentals.eyebrow")}
-          title={t("stories.fundamentals.title")}
-          titleAccent={t("stories.fundamentals.titleAccent")}
-          desc={t("stories.fundamentals.desc")}
-          bullets={[
-            t("stories.fundamentals.b1"),
-            t("stories.fundamentals.b2"),
-            t("stories.fundamentals.b3"),
-          ]}
-        >
-          <LiquidGlass className="rounded-3xl p-6 sm:p-8">
-            <ChartScrollDraw
-              ariaLabel={t("stories.fundamentals.chartAria")}
-              legendRevenue={t("stories.fundamentals.legendRevenue")}
-              legendFcf={t("stories.fundamentals.legendFcf")}
-            />
-          </LiquidGlass>
-        </FeatureStory>
+      <section className="relative isolate">
+        <SectionBg tone="raised" motif="grid" />
+        <div className="relative mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
+          <FeatureStory
+            eyebrow={t("stories.fundamentals.eyebrow")}
+            title={t("stories.fundamentals.title")}
+            titleAccent={t("stories.fundamentals.titleAccent")}
+            desc={t("stories.fundamentals.desc")}
+            bullets={[
+              t("stories.fundamentals.b1"),
+              t("stories.fundamentals.b2"),
+              t("stories.fundamentals.b3"),
+            ]}
+          >
+            <LiquidGlass className="rounded-3xl p-6 sm:p-8">
+              <ChartScrollDraw
+                ariaLabel={t("stories.fundamentals.chartAria")}
+                legendRevenue={t("stories.fundamentals.legendRevenue")}
+                legendFcf={t("stories.fundamentals.legendFcf")}
+              />
+            </LiquidGlass>
+          </FeatureStory>
+        </div>
       </section>
 
       {/* ── 5 · Story 2: DCF (o motor real, scriptado) ──────────── */}
-      <section className="mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
-        <FeatureStory
-          reverse
-          eyebrow={t("stories.dcf.eyebrow")}
-          title={t("stories.dcf.title")}
-          titleAccent={t("stories.dcf.titleAccent")}
-          desc={t("stories.dcf.desc")}
-          bullets={[t("stories.dcf.b1"), t("stories.dcf.b2"), t("stories.dcf.b3")]}
-        >
-          <DcfScrollDemo
-            labels={{
-              growth: t("stories.dcf.growth"),
-              wacc: t("stories.dcf.wacc"),
-              terminal: t("stories.dcf.terminal"),
-              price: t("stories.dcf.price"),
-              fairValue: t("stories.dcf.fairValue"),
-              perShare: t("stories.dcf.perShare"),
-              margin: t("stories.dcf.margin"),
-              undervalued: t("stories.dcf.undervalued"),
-              overvalued: t("stories.dcf.overvalued"),
-              disclaimer: t("stories.dcf.disclaimer"),
-            }}
-          />
-        </FeatureStory>
+      <section className="relative isolate">
+        <SectionBg tone="raised" motif="rings" />
+        <div className="relative mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
+          <FeatureStory
+            reverse
+            eyebrow={t("stories.dcf.eyebrow")}
+            title={t("stories.dcf.title")}
+            titleAccent={t("stories.dcf.titleAccent")}
+            desc={t("stories.dcf.desc")}
+            bullets={[t("stories.dcf.b1"), t("stories.dcf.b2"), t("stories.dcf.b3")]}
+          >
+            <DcfScrollDemo
+              labels={{
+                growth: t("stories.dcf.growth"),
+                wacc: t("stories.dcf.wacc"),
+                terminal: t("stories.dcf.terminal"),
+                price: t("stories.dcf.price"),
+                fairValue: t("stories.dcf.fairValue"),
+                perShare: t("stories.dcf.perShare"),
+                margin: t("stories.dcf.margin"),
+                undervalued: t("stories.dcf.undervalued"),
+                overvalued: t("stories.dcf.overvalued"),
+                disclaimer: t("stories.dcf.disclaimer"),
+              }}
+            />
+          </FeatureStory>
+        </div>
       </section>
 
       {/* ── 6 · Story 3: AI Insights (brief escreve-se) ─────────── */}
-      <section className="mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
-        <FeatureStory
-          eyebrow={t("stories.ai.eyebrow")}
-          title={t("stories.ai.title")}
-          titleAccent={t("stories.ai.titleAccent")}
-          desc={t("stories.ai.desc")}
-          bullets={[t("stories.ai.b1"), t("stories.ai.b2"), t("stories.ai.b3")]}
-        >
-          <AiInsightCard
-            title={t("stories.ai.cardTitle")}
-            summary={t("stories.ai.summary")}
-            catalystsLabel={t("stories.ai.catalystsLabel")}
-            catalysts={[t("stories.ai.catalyst1"), t("stories.ai.catalyst2")]}
-            riskLabel={t("stories.ai.riskLabel")}
-            risk={t("stories.ai.risk1")}
-            disclaimer={t("stories.ai.disclaimer")}
-          />
-        </FeatureStory>
+      <section className="relative isolate">
+        <SectionBg tone="raised" motif="dots" />
+        <div className="relative mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
+          <FeatureStory
+            eyebrow={t("stories.ai.eyebrow")}
+            title={t("stories.ai.title")}
+            titleAccent={t("stories.ai.titleAccent")}
+            desc={t("stories.ai.desc")}
+            bullets={[t("stories.ai.b1"), t("stories.ai.b2"), t("stories.ai.b3")]}
+          >
+            <AiInsightCard
+              title={t("stories.ai.cardTitle")}
+              summary={t("stories.ai.summary")}
+              catalystsLabel={t("stories.ai.catalystsLabel")}
+              catalysts={[t("stories.ai.catalyst1"), t("stories.ai.catalyst2")]}
+              riskLabel={t("stories.ai.riskLabel")}
+              risk={t("stories.ai.risk1")}
+              disclaimer={t("stories.ai.disclaimer")}
+            />
+          </FeatureStory>
+        </div>
       </section>
 
       {/* ── 7 · Feature tour (só renderiza com media real) ──────── */}
@@ -335,31 +347,35 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* ── 9 · Números (counters) ──────────────────────────────── */}
-      <section className="mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
-        <Reveal className="grid gap-12 text-center sm:grid-cols-2 sm:text-left lg:grid-cols-4">
-          {[
-            { value: 10, suffix: "", label: t("numbers.years") },
-            { value: 500, suffix: "", label: t("numbers.companies") },
-            { value: 40, suffix: "", label: t("numbers.quarters") },
-            { value: 0, suffix: " €", label: t("numbers.free") },
-          ].map(({ value, suffix, label }) => (
-            <div key={label}>
-              <Counter
-                value={value}
-                suffix={suffix}
-                className="text-6xl font-extrabold tracking-tight text-primary sm:text-7xl"
-              />
-              <div className="mt-3 text-sm font-medium text-muted-foreground">{label}</div>
-            </div>
-          ))}
-        </Reveal>
+      {/* ── 9 · Números (counters, banda dourada) ───────────────── */}
+      <section className="relative isolate">
+        <SectionBg tone="gold" motif="grid" />
+        <div className="relative mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
+          <Reveal className="grid gap-12 text-center sm:grid-cols-2 sm:text-left lg:grid-cols-4">
+            {[
+              { value: 10, suffix: "", label: t("numbers.years") },
+              { value: 500, suffix: "", label: t("numbers.companies") },
+              { value: 40, suffix: "", label: t("numbers.quarters") },
+              { value: 0, suffix: " €", label: t("numbers.free") },
+            ].map(({ value, suffix, label }) => (
+              <div key={label}>
+                <Counter
+                  value={value}
+                  suffix={suffix}
+                  className="text-6xl font-extrabold tracking-tight text-primary sm:text-7xl"
+                />
+                <div className="mt-3 text-sm font-medium text-muted-foreground">{label}</div>
+              </div>
+            ))}
+          </Reveal>
+        </div>
       </section>
 
       {/* ── slot: pricing (feat/pricing-page injeta aqui) ───────── */}
 
       {/* ── 10 · CTA final ──────────────────────────────────────── */}
-      <section className="flex min-h-[90vh] items-center justify-center px-6 pb-16 md:px-8">
+      <section className="relative isolate flex min-h-[90vh] items-center justify-center px-6 pb-16 md:px-8">
+        <SectionBg tone="sunken" motif="stage" />
         <Reveal className="flex flex-col items-center text-center">
           <BrandMark className="h-16 w-16 rounded-2xl shadow-lg" />
           <span className="gold-rule mt-8 h-px w-28" aria-hidden />

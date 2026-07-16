@@ -110,60 +110,62 @@ export function DcfScrollDemo({
   return (
     <div ref={rootRef}>
       <LiquidGlass className="rounded-3xl p-6 sm:p-8">
-        <div className="grid gap-8 md:grid-cols-2">
-          {/* inputs (o slider avança sozinho com o scroll) */}
-          <div className="flex flex-col justify-center gap-6">
-            <div>
-              <div className="flex items-baseline justify-between text-sm">
-                <span className="font-medium text-muted-foreground">{labels.growth}</span>
-                <span ref={growthRef} className="nums font-semibold text-primary">
-                  {formatPercent(G_MIN)}
-                </span>
-              </div>
-              <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-muted">
-                <div ref={fillRef} className="h-full rounded-full bg-primary" style={{ width: "0%" }} />
-              </div>
-            </div>
-            <div className="flex items-baseline justify-between text-sm">
-              <span className="font-medium text-muted-foreground">{labels.wacc}</span>
-              <span className="nums font-semibold">{formatPercent(BASE_INPUTS.wacc)}</span>
-            </div>
-            <div className="flex items-baseline justify-between text-sm">
-              <span className="font-medium text-muted-foreground">{labels.terminal}</span>
-              <span className="nums font-semibold">{formatPercent(BASE_INPUTS.terminalGrowth)}</span>
-            </div>
-            <div className="flex items-baseline justify-between border-t border-border/60 pt-4 text-sm">
-              <span className="font-medium text-muted-foreground">{labels.price}</span>
-              <span className="nums font-semibold">{formatPrice(BASE_INPUTS.currentPrice)}</span>
-            </div>
+        {/* Fair Value — herói full-width (nunca corta, é a estrela do cartão) */}
+        <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          {labels.fairValue} · {labels.perShare}
+        </div>
+        <div className="mt-2 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+          <div
+            ref={fairRef}
+            className="nums text-6xl font-extrabold leading-none tracking-tight sm:text-7xl"
+          >
+            {formatPrice(INITIAL.fairValue)}
           </div>
-
-          {/* resultado */}
-          <div className="flex min-w-0 flex-col justify-center gap-3 md:border-l md:border-border/60 md:pl-8">
-            <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              {labels.fairValue} · {labels.perShare}
-            </div>
-            <div ref={fairRef} className="nums text-4xl font-extrabold tracking-tight sm:text-5xl xl:text-6xl">
-              {formatPrice(INITIAL.fairValue)}
-            </div>
-            <div className="mt-1 flex items-center gap-3">
-              <span ref={badgeRef} className={initialMos >= 0 ? BADGE_UP : BADGE_DOWN}>
-                {initialMos >= 0 ? labels.undervalued : labels.overvalued}
-              </span>
-              <span className="text-sm text-muted-foreground">{labels.margin}</span>
-              <span ref={marginRef} className="nums text-sm font-semibold">
-                {`${initialMos >= 0 ? "+" : ""}${formatPercent(initialMos)}`}
-              </span>
-            </div>
-            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
-              <div
-                ref={marginFillRef}
-                className={`h-full rounded-full ${initialMos >= 0 ? "bg-bull" : "bg-bear"}`}
-                style={{ width: marginWidth(initialMos) }}
-              />
-            </div>
+          <div className="flex items-center gap-3 pb-1">
+            <span ref={badgeRef} className={initialMos >= 0 ? BADGE_UP : BADGE_DOWN}>
+              {initialMos >= 0 ? labels.undervalued : labels.overvalued}
+            </span>
+            <span className="text-sm text-muted-foreground">{labels.margin}</span>
+            <span ref={marginRef} className="nums text-sm font-semibold">
+              {`${initialMos >= 0 ? "+" : ""}${formatPercent(initialMos)}`}
+            </span>
           </div>
         </div>
+        <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-muted">
+          <div
+            ref={marginFillRef}
+            className={`h-full rounded-full ${initialMos >= 0 ? "bg-bull" : "bg-bear"}`}
+            style={{ width: marginWidth(initialMos) }}
+          />
+        </div>
+
+        {/* inputs — grelha compacta por baixo (o slider avança com o scroll) */}
+        <div className="mt-8 grid gap-x-8 gap-y-5 border-t border-border/60 pt-6 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <div className="flex items-baseline justify-between text-sm">
+              <span className="font-medium text-muted-foreground">{labels.growth}</span>
+              <span ref={growthRef} className="nums font-semibold text-primary">
+                {formatPercent(G_MIN)}
+              </span>
+            </div>
+            <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-muted">
+              <div ref={fillRef} className="h-full rounded-full bg-primary" style={{ width: "0%" }} />
+            </div>
+          </div>
+          <div className="flex items-baseline justify-between text-sm">
+            <span className="font-medium text-muted-foreground">{labels.wacc}</span>
+            <span className="nums font-semibold">{formatPercent(BASE_INPUTS.wacc)}</span>
+          </div>
+          <div className="flex items-baseline justify-between text-sm">
+            <span className="font-medium text-muted-foreground">{labels.terminal}</span>
+            <span className="nums font-semibold">{formatPercent(BASE_INPUTS.terminalGrowth)}</span>
+          </div>
+          <div className="flex items-baseline justify-between text-sm sm:col-span-2">
+            <span className="font-medium text-muted-foreground">{labels.price}</span>
+            <span className="nums font-semibold">{formatPrice(BASE_INPUTS.currentPrice)}</span>
+          </div>
+        </div>
+
         <p className="mt-6 border-t border-border/60 pt-4 text-[11px] leading-relaxed text-muted-foreground/80">
           {labels.disclaimer}
         </p>

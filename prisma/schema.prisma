@@ -21,6 +21,12 @@ model User {
   dcfAnalyses       DcfAnalysis[]
   portfolio         Portfolio?
 
+  // Paddle Billing Fields
+  paddleCustomerId     String?   @unique
+  paddleSubscriptionId String?   @unique
+  paddleStatus         String?
+  paddlePriceId        String?
+
   @@map("users")
 }
 

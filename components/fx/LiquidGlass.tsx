@@ -164,8 +164,11 @@ export function LiquidGlass({ frost = false, fade = false, className, children, 
       fe.setAttributeNS(XLINK, "xlink:href", res.url);
     };
 
-    el.style.setProperty("--lens", `url(#${id})`);
+    // Fix Layout Thrashing (Forced Synchronous Layout):
+    // Primeiro executar a leitura de geometria (getBoundingClientRect dentro do refresh),
+    // e só depois fazer a escrita/invalidação de estilos (setProperty)
     refresh();
+    el.style.setProperty("--lens", `url(#${id})`);
 
     const ro = new ResizeObserver(() => {
       clearTimeout(t);

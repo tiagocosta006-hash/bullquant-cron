@@ -64,7 +64,10 @@ export const metadata: Metadata = {
     "análise financeira",
   ],
   verification: {
-    google: "HKTu1CXFZw_fDo60XEPT-UFCMFxTF2RNjpGIsw2jw0Q",
+    google: [
+      "HKTu1CXFZw_fDo60XEPT-UFCMFxTF2RNjpGIsw2jw0Q",
+      "uPh6Qu3O0murd4rv-qVq6FVyEj896IUmlqwGkPp6QAc",
+    ],
   },
   alternates: {
     canonical: BRAND.siteUrl,

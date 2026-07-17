@@ -119,7 +119,7 @@
     "dcfShort": "DCF"
   },
   "login": {
-    "title": "Entrar no BullVision",
+    "title": "Entrar no BullMetrics",
     "subtitle": "Acede ao teu portfólio e análises.",
     "emailLabel": "Email",
     "emailPlaceholder": "nome@email.com",
@@ -134,7 +134,7 @@
   },
   "register": {
     "title": "Criar Conta",
-    "subtitle": "Junta-te a milhares de investidores no BullVision.",
+    "subtitle": "Junta-te a milhares de investidores no BullMetrics.",
     "nameLabel": "Nome",
     "namePlaceholder": "O teu nome",
     "emailLabel": "Email",
@@ -202,7 +202,7 @@
       "namePlaceholder": "Como queres ser chamado",
       "save": "Guardar Alterações",
       "dangerZone": "Zona de Perigo",
-      "logoutDesc": "Termina a tua sessão atual no Bullmetrics com segurança.",
+      "logoutDesc": "Termina a tua sessão atual no BullMetrics com segurança.",
       "logoutBtn": "Sair da Conta",
       "securityTitle": "Segurança",
       "currentPassword": "Password Atual",
@@ -224,7 +224,7 @@
     "preferences": {
       "title": "Preferências de Utilização",
       "language": "Idioma",
-      "languageDesc": "Escolhe a língua em que queres usar o Bullmetrics.",
+      "languageDesc": "Escolhe a língua em que queres usar o BullMetrics.",
       "theme": "Tema Visual",
       "themeDesc": "Alterna entre modo escuro (Dark) e modo claro (Light).",
       "themeLight": "Claro",
@@ -279,7 +279,7 @@
       "title": "Sugestões para adicionares"
     },
     "landing": {
-      "title": "BullVision",
+      "title": "BullMetrics",
       "description": "Pesquisa pelo ticker de uma empresa na barra superior para começar ou regista-te para acederes à tua Watchlist.",
       "testExample": "Testar Exemplo",
       "createAccount": "Criar Conta Grátis"

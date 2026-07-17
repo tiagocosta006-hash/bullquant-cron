@@ -119,7 +119,7 @@
     "dcfShort": "DCF"
   },
   "login": {
-    "title": "Sign in to BullVision",
+    "title": "Sign in to BullMetrics",
     "subtitle": "Access your portfolio and analytics.",
     "emailLabel": "Email",
     "emailPlaceholder": "name@email.com",
@@ -134,7 +134,7 @@
   },
   "register": {
     "title": "Create Account",
-    "subtitle": "Join BullVision..",
+    "subtitle": "Join BullMetrics..",
     "nameLabel": "Name",
     "namePlaceholder": "Your name",
     "emailLabel": "Email",
@@ -202,7 +202,7 @@
       "namePlaceholder": "How you want to be called",
       "save": "Save Changes",
       "dangerZone": "Danger Zone",
-      "logoutDesc": "Securely sign out of your Bullmetrics session.",
+      "logoutDesc": "Securely sign out of your BullMetrics session.",
       "logoutBtn": "Sign Out",
       "securityTitle": "Security",
       "currentPassword": "Current Password",
@@ -224,7 +224,7 @@
     "preferences": {
       "title": "App Preferences",
       "language": "Interface Language",
-      "languageDesc": "Choose the language you want to use in Bullmetrics.",
+      "languageDesc": "Choose the language you want to use in BullMetrics.",
       "theme": "Visual Theme",
       "themeDesc": "Switch between Dark and Light mode.",
       "themeLight": "Light",
@@ -279,7 +279,7 @@
       "title": "Suggestions to add"
     },
     "landing": {
-      "title": "BullVision",
+      "title": "BullMetrics",
       "description": "Search for a company ticker in the top bar to get started, or sign up to access your Watchlist.",
       "testExample": "Try Example",
       "createAccount": "Create Free Account"

@@ -11,7 +11,7 @@ import { DelayedAnalytics } from "@/components/providers/DelayedAnalytics";
 
 const scotchDisplay = localFont({
   variable: "--font-heading",
-  display: "swap",
+  display: "optional",
   src: [
     { path: "../public/fonts/scotch-display/ScotchDisplay-SemiBold.ttf", weight: "600", style: "normal" },
     { path: "../public/fonts/scotch-display/ScotchDisplay-SemiBoldItalic.ttf", weight: "600", style: "italic" },
@@ -22,7 +22,8 @@ const scotchDisplay = localFont({
 
 const sfUIText = localFont({
   variable: "--font-sans",
-  display: "swap",
+  display: "optional",
+  preload: false,
   src: [
     { path: "../public/fonts/sf-ui-text/SFUIText-Light.woff2", weight: "300", style: "normal" },
     { path: "../public/fonts/sf-ui-text/SFUIText-LightItalic.woff2", weight: "300", style: "italic" },

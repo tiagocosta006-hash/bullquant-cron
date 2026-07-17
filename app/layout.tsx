@@ -6,6 +6,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { BRAND } from "@/lib/brand";
 import { PaddleProvider } from "@/components/providers/PaddleProvider";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const scotchDisplay = localFont({
   variable: "--font-heading",
@@ -68,6 +69,9 @@ export const metadata: Metadata = {
       "HKTu1CXFZw_fDo60XEPT-UFCMFxTF2RNjpGIsw2jw0Q",
       "uPh6Qu3O0murd4rv-qVq6FVyEj896IUmlqwGkPp6QAc",
     ],
+    other: {
+      "msvalidate.01": "21C2FF6F72DB70916C5EB5F19D885CF6",
+    },
   },
   alternates: {
     canonical: BRAND.siteUrl,
@@ -139,6 +143,7 @@ export default async function RootLayout({
             <main className="flex-1 flex flex-col">{children}</main>
           </PaddleProvider>
         </NextIntlClientProvider>
+        <GoogleAnalytics gaId="G-F89FT4052G" />
       </body>
     </html>
   );

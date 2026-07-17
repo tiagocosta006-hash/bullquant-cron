@@ -12,6 +12,7 @@ import { DelayedAnalytics } from "@/components/providers/DelayedAnalytics";
 const scotchDisplay = localFont({
   variable: "--font-heading",
   display: "optional",
+  preload: false,
   src: [
     { path: "../public/fonts/scotch-display/ScotchDisplay-SemiBold.ttf", weight: "600", style: "normal" },
     { path: "../public/fonts/scotch-display/ScotchDisplay-SemiBoldItalic.ttf", weight: "600", style: "italic" },

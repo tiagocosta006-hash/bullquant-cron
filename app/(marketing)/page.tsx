@@ -94,40 +94,38 @@ export default async function LandingPage() {
       />
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section className="mx-auto flex min-h-[86vh] max-w-6xl flex-col justify-center px-6 pb-10 pt-20 md:px-8">
-        <Reveal>
-          <div className="mb-8 inline-flex w-fit items-center gap-2 rounded-full border border-border bg-card/60 px-3.5 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            {t("eyebrow")}
-          </div>
+        <div className="mb-8 inline-flex w-fit items-center gap-2 rounded-full border border-border bg-card/60 px-3.5 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur">
+          <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+          {t("eyebrow")}
+        </div>
 
-          <h1 className="max-w-[17ch] text-balance text-5xl font-extrabold leading-[0.98] tracking-[-0.035em] sm:text-7xl md:text-8xl">
-            {t("titleLead")}{" "}
-            <span className="font-heading font-bold italic text-primary">
-              {t("titleAccent")}
-            </span>
-          </h1>
+        <h1 className="max-w-[17ch] text-balance text-5xl font-extrabold leading-[0.98] tracking-[-0.035em] sm:text-7xl md:text-8xl">
+          {t("titleLead")}{" "}
+          <span className="font-heading font-bold italic text-primary">
+            {t("titleAccent")}
+          </span>
+        </h1>
 
-          <p className="mt-7 max-w-[52ch] text-lg leading-relaxed text-muted-foreground sm:text-xl">
-            {t("subtitle")}
-          </p>
+        <p className="mt-7 max-w-[52ch] text-lg leading-relaxed text-muted-foreground sm:text-xl">
+          {t("subtitle")}
+        </p>
 
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/register"
-              className={cn(buttonVariants({ size: "lg" }), "h-13 px-8 text-base font-semibold")}
-            >
-              {t("primaryCta")}
-            </Link>
-            <Link
-              href="/stock/AAPL"
-              className={cn(buttonVariants({ size: "lg", variant: "outline" }), "h-13 px-8 text-base")}
-            >
-              {t("secondaryCta")} <ArrowRight className="ml-1.5 h-4 w-4" />
-            </Link>
-          </div>
+        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+          <Link
+            href="/register"
+            className={cn(buttonVariants({ size: "lg" }), "h-13 px-8 text-base font-semibold")}
+          >
+            {t("primaryCta")}
+          </Link>
+          <Link
+            href="/stock/AAPL"
+            className={cn(buttonVariants({ size: "lg", variant: "outline" }), "h-13 px-8 text-base")}
+          >
+            {t("secondaryCta")} <ArrowRight className="ml-1.5 h-4 w-4" />
+          </Link>
+        </div>
 
-          <p className="mt-6 text-xs text-muted-foreground">{t("trust")}</p>
-        </Reveal>
+        <p className="mt-6 text-xs text-muted-foreground">{t("trust")}</p>
       </section>
 
       {/* ── Terminal de demonstração em vidro ────────────────── */}

@@ -45,27 +45,49 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(BRAND.siteUrl),
   title: {
-    default: `${BRAND.name} — Value Investing, com visão`,
+    default: `${BRAND.name} — Análise Fundamental de Ações`,
     template: `%s · ${BRAND.name}`,
   },
   description:
     "Análise fundamental de ações com 10 anos de dados, DCF integrada e AI Insights. Em português, gratuito. Uma plataforma Bullocracy.",
   keywords: [
-    "DCF calculator platform",
+    "BullMetrics",
+    "análise fundamental de ações",
+    "calculadora DCF",
+    "value investing",
+    "avaliação de empresas",
     "stock valuation",
     "DCF metrics investing",
-    "value investing",
-    "análise fundamental",
-    "calculadora dcf",
-    "intrinsic value"
+    "intrinsic value",
+    "análise financeira",
   ],
+  alternates: {
+    canonical: BRAND.siteUrl,
+  },
   openGraph: {
-    title: `${BRAND.name} — Value Investing, com visão`,
+    title: `${BRAND.name} — Análise Fundamental de Ações`,
     description:
       "Vê o valor que os outros não veem. Fundamentais de 10 anos, DCF e AI Insights, em português.",
     siteName: BRAND.name,
+    url: BRAND.siteUrl,
     type: "website",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: `${BRAND.name} — Análise Fundamental de Ações`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${BRAND.name} — Análise Fundamental de Ações`,
+    description:
+      "Vê o valor que os outros não veem. Fundamentais de 10 anos, DCF e AI Insights, em português.",
+    images: ["/opengraph-image"],
   },
 };
 

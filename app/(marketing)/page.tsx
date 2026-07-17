@@ -17,6 +17,7 @@ import { Reveal } from "@/components/fx/Reveal";
 import { cn } from "@/lib/utils";
 import { getUser } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { BRAND } from "@/lib/brand";
 
 /**
  * Landing — página de entrada editorial: hero a ocupar o ecrã com o
@@ -57,14 +58,30 @@ export default async function LandingPage() {
     "@graph": [
       {
         "@type": "WebSite",
-        "name": "BullQuant",
-        "url": "https://bullmetrics.thebullocracy.com/",
+        "name": BRAND.name,
+        "url": BRAND.siteUrl,
+        "description": "Análise fundamental de ações com 10 anos de dados, DCF integrada e AI Insights. Em português, gratuito.",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": `${BRAND.siteUrl}/stock/{search_term_string}`
+          },
+          "query-input": "required name=search_term_string"
+        }
       },
       {
         "@type": "Organization",
-        "name": "BullQuant",
-        "url": "https://bullmetrics.thebullocracy.com/",
-        "logo": "https://bullmetrics.thebullocracy.com/brand/logo.png"
+        "name": BRAND.name,
+        "url": BRAND.siteUrl,
+        "logo": `${BRAND.siteUrl}/brand/logo.svg`,
+        "description": "Plataforma portuguesa de análise fundamental de ações com dados da SEC, DCF integrada e AI Insights.",
+        "foundingDate": "2024",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "email": "info@thebullocracy.com",
+          "contactType": "customer support"
+        }
       }
     ]
   };

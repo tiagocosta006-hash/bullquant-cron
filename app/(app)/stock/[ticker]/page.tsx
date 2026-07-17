@@ -11,6 +11,7 @@ import { SavedValuations, type SerializedDcfAnalysis } from '@/components/stock/
 import { FinancialsEngine } from '@/components/stock/FinancialsEngine'
 import { InsiderActivity } from '@/components/stock/InsiderActivity'
 import { getCurrencySymbol } from '@/lib/finance/format'
+import { BRAND } from '@/lib/brand'
 
 import { CompanyProfile } from '@/components/stock/CompanyProfile'
 import { StockNews } from '@/components/stock/StockNews'
@@ -40,12 +41,12 @@ export async function generateMetadata({
 
   if (!company) {
     return {
-      title: 'Empresa não encontrada | BullQuant',
+      title: `Empresa não encontrada | ${BRAND.name}`,
     }
   }
 
-  const title = `${company.name} (${company.ticker}) - Análise e Avaliação DCF | BullQuant`
-  const description = `Análise fundamental profunda, avaliação DCF e insights de IA para a ${company.name} (${company.ticker}) do setor ${company.sector || 'financeiro'}.`
+  const title = `${company.name} (${company.ticker}) - Análise e Avaliação DCF | ${BRAND.name}`
+  const description = `Análise fundamental profunda, avaliação DCF e insights de IA para a ${company.name} (${company.ticker}) do setor ${company.sector || 'financeiro'}. Dados históricos, margens e avaliação inteligente.`
 
   return {
     title,
@@ -61,7 +62,7 @@ export async function generateMetadata({
       description,
     },
     alternates: {
-      canonical: `https://bullmetrics.thebullocracy.com/stock/${company.ticker}`,
+      canonical: `${BRAND.siteUrl}/stock/${company.ticker}`,
     }
   }
 }
@@ -201,7 +202,7 @@ export default async function StockPage({
     "name": company.name,
     "tickerSymbol": company.ticker,
     "exchange": company.exchange,
-    "url": `https://bullmetrics.thebullocracy.com/stock/${company.ticker}`,
+    "url": `${BRAND.siteUrl}/stock/${company.ticker}`,
   }
 
   return (

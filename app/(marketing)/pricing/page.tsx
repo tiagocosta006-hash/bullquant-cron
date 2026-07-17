@@ -15,10 +15,15 @@ import { Reveal } from "@/components/fx/Reveal";
 import { cn } from "@/lib/utils";
 import { PricingCards } from "./PricingCards";
 
+import { BRAND } from "@/lib/brand";
+
 export const metadata = {
-  title: "Preços | BullMetrics",
+  title: `Preços | ${BRAND.name}`,
   description:
-    "Plano gratuito para sempre ou PRO a €7/mês. Análise fundamental completa do S&P 500, DCF integrada e AI Insights.",
+    `Plano gratuito para sempre ou PRO a €7/mês. Análise fundamental completa do S&P 500, DCF integrada e AI Insights em português com ${BRAND.name}.`,
+  alternates: {
+    canonical: `${BRAND.siteUrl}/pricing`,
+  },
 };
 
 import { createClient } from "@/lib/supabase/server";

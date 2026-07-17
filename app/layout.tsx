@@ -7,6 +7,7 @@ import { getMessages } from "next-intl/server";
 import { BRAND } from "@/lib/brand";
 import { PaddleProvider } from "@/components/providers/PaddleProvider";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { DelayedAnalytics } from "@/components/providers/DelayedAnalytics";
 
 const scotchDisplay = localFont({
   variable: "--font-heading",
@@ -144,7 +145,7 @@ export default async function RootLayout({
             <main className="flex-1 flex flex-col">{children}</main>
           </PaddleProvider>
         </NextIntlClientProvider>
-        <GoogleAnalytics gaId="G-F89FT4052G" />
+        <DelayedAnalytics />
       </body>
     </html>
   );

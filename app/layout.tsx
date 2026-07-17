@@ -60,11 +60,6 @@ export const metadata: Metadata = {
     "calculadora dcf",
     "intrinsic value"
   ],
-  icons: {
-    // versão com cantos arredondados transparentes (gerada de bull-metrics-icon.png)
-    icon: [{ url: "/brand/bull-metrics-icon-rounded.png", type: "image/png" }],
-    apple: [{ url: "/brand/bull-metrics-icon-rounded.png" }],
-  },
   openGraph: {
     title: `${BRAND.name} — Value Investing, com visão`,
     description:

@@ -63,6 +63,9 @@ export const metadata: Metadata = {
     "intrinsic value",
     "análise financeira",
   ],
+  verification: {
+    google: "HKTu1CXFZw_fDo60XEPT-UFCMFxTF2RNjpGIsw2jw0Q",
+  },
   alternates: {
     canonical: BRAND.siteUrl,
   },

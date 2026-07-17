@@ -1,4 +1,5 @@
 import { cache } from 'react'
+import dynamic from 'next/dynamic'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
@@ -6,9 +7,9 @@ import { prisma } from '@/lib/prisma'
 import { getUser } from '@/lib/supabase/server'
 import { StockHeader } from '@/components/stock/StockHeader'
 import { StockSnapshot } from '@/components/stock/StockSnapshot'
-import { StockPriceChart } from '@/components/stock/StockPriceChart'
+const StockPriceChart = dynamic(() => import('@/components/stock/StockPriceChart').then(mod => mod.StockPriceChart), { ssr: false })
 import { SavedValuations, type SerializedDcfAnalysis } from '@/components/stock/SavedValuations'
-import { FinancialsEngine } from '@/components/stock/FinancialsEngine'
+const FinancialsEngine = dynamic(() => import('@/components/stock/FinancialsEngine').then(mod => mod.FinancialsEngine), { ssr: false })
 import { InsiderActivity } from '@/components/stock/InsiderActivity'
 import { getCurrencySymbol } from '@/lib/finance/format'
 import { BRAND } from '@/lib/brand'
@@ -16,10 +17,10 @@ import { BRAND } from '@/lib/brand'
 import { CompanyProfile } from '@/components/stock/CompanyProfile'
 import { StockNews } from '@/components/stock/StockNews'
 import { ManagementTeam } from '@/components/stock/ManagementTeam'
-import { StockKPIs } from '@/components/stock/StockKPIs'
+const StockKPIs = dynamic(() => import('@/components/stock/StockKPIs').then(mod => mod.StockKPIs), { ssr: false })
 import { StockTabs } from '@/components/stock/StockTabs'
-import { PremiumPdfButton } from '@/components/stock/pdf/PremiumPdfButton'
-import { ValuationMultiples } from '@/components/stock/ValuationMultiples'
+const PremiumPdfButton = dynamic(() => import('@/components/stock/pdf/PremiumPdfButton').then(mod => mod.PremiumPdfButton), { ssr: false })
+const ValuationMultiples = dynamic(() => import('@/components/stock/ValuationMultiples').then(mod => mod.ValuationMultiples), { ssr: false })
 
 // Partilhado entre generateMetadata e a página (React.cache = 1 query por pedido,
 // em vez de 2 findUnique idênticos).

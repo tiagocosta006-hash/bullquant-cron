@@ -28,7 +28,8 @@ export function BrandMark({
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={BRAND.logoSrc}
-      alt={title}
+      alt=""
+      aria-hidden="true"
       // rounded proporcional: o PNG tem fundo preto retangular — sem isto os
       // cantos aparecem a 90° enquanto a arte é arredondada
       className={cn("rounded-[22%] object-contain", className)}

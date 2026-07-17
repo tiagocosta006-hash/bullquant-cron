@@ -126,7 +126,7 @@ export default async function LandingPage() {
             </Link>
           </div>
 
-          <p className="mt-6 text-xs text-muted-foreground/80">{t("trust")}</p>
+          <p className="mt-6 text-xs text-muted-foreground">{t("trust")}</p>
         </Reveal>
       </section>
 
@@ -201,7 +201,7 @@ export default async function LandingPage() {
               <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary">
                 <Icon className="h-5 w-5" strokeWidth={2} />
               </div>
-              <h3 className="text-base font-semibold">{t(`features.${key}.title`)}</h3>
+              <h2 className="text-base font-semibold">{t(`features.${key}.title`)}</h2>
               <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
                 {t(`features.${key}.desc`)}
               </p>
@@ -294,7 +294,7 @@ export default async function LandingPage() {
             </div>
           </div>
 
-          <div className="mt-5 text-center text-xs text-muted-foreground/60">
+          <div className="mt-5 text-center text-xs text-muted-foreground">
             {tp("trust")}
           </div>
         </Reveal>

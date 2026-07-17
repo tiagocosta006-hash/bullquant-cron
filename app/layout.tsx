@@ -127,6 +127,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <link rel="preconnect" href="https://cdn.paddle.com" />
         {/* Tema: claro por defeito, escuro persistido — script inline CRU (não
             next/script: beforeInteractive não garante execução antes do 1.º
             paint no App Router, o que causava flash branco em dark mode). */}

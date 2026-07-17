@@ -15,10 +15,10 @@ BullMetrics is built by Bullocracy, a product studio based in Portugal. Contact:
 - **Screener:** Filter companies by sector, financial metrics, and fundamentals.
 
 ## Public URLs
-- Homepage: https://bullmetrics.thebullocracy.com
-- Stock Analysis (example): https://bullmetrics.thebullocracy.com/stock/AAPL
-- Market Explorer: https://bullmetrics.thebullocracy.com/explore
-- Pricing: https://bullmetrics.thebullocracy.com/pricing
+- Homepage: [bullmetrics.thebullocracy.com](https://bullmetrics.thebullocracy.com)
+- Stock Analysis (example): [Apple (AAPL)](https://bullmetrics.thebullocracy.com/stock/AAPL)
+- Market Explorer: [Explore](https://bullmetrics.thebullocracy.com/explore)
+- Pricing: [Pricing](https://bullmetrics.thebullocracy.com/pricing)
 
 ## Crawling Policy
 - Public routes including the landing page, marketing pages, and public stock profiles (e.g., /stock/:ticker) are open for indexing and crawling.

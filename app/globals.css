@@ -117,7 +117,7 @@
   --popover-foreground: var(--paper-text);
 
   --primary: var(--gold-matte);
-  --primary-foreground: #ffffff;
+  --primary-foreground: #1a1a17; /* Contraste WCAG AA: 5.5:1 sobre gold-matte (#b8873b) */
   --secondary: var(--paper-surface-2);
   --secondary-foreground: var(--paper-text-2);
   --muted: var(--paper-surface-2);

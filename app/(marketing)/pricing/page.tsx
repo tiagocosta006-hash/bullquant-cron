@@ -45,8 +45,56 @@ export default async function PricingPage() {
     { icon: Sparkles, key: "ai" },
   ] as const;
 
+  // FAQPage JSON-LD — gera rich results (caixas de FAQ) no Google
+  // e alimenta os AI Overviews com respostas estruturadas.
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "FAQPage",
+        "mainEntity": faqItems.map(({ q, a }) => ({
+          "@type": "Question",
+          "name": q,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": a,
+          },
+        })),
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": BRAND.name,
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web",
+        "url": BRAND.siteUrl,
+        "offers": [
+          {
+            "@type": "Offer",
+            "name": "Plano Gratuito",
+            "price": "0",
+            "priceCurrency": "EUR",
+            "availability": "https://schema.org/InStock",
+          },
+          {
+            "@type": "Offer",
+            "name": "Plano PRO",
+            "price": "7",
+            "priceCurrency": "EUR",
+            "availability": "https://schema.org/InStock",
+            "billingIncrement": "P1M",
+          },
+        ],
+        "description": `Análise fundamental de ações com 10 anos de dados da SEC, calculadora DCF integrada e AI Insights. Em português, gratuito.`,
+      },
+    ],
+  };
+
   return (
     <div className="relative flex-1 overflow-x-clip">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section className="mx-auto flex max-w-4xl flex-col items-center px-6 pb-14 pt-20 text-center md:px-8">
         <Reveal>

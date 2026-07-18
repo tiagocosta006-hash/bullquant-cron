@@ -663,7 +663,8 @@
     "terms": "Termos de Serviço",
     "privacy": "Privacidade",
     "refund": "Política de Reembolso",
-    "pricing": "Preços"
+    "pricing": "Preços",
+    "about": "Sobre Nós"
   },
   "pricing": {
     "badge": "Simples e transparente",
@@ -809,5 +810,44 @@
     },
     "suggestionsTitle": "Sugestões para seguir",
     "lastUpdate": "Última atualização:"
+  },
+  "about": {
+    "badge": "A Nossa Missão",
+    "title": "A democratizar o acesso a dados financeiros.",
+    "intro": "A BullMetrics é uma plataforma de análise de dados fundamentais desenhada para todo o tipo de investidores.",
+    "problem": {
+      "title": "O Problema",
+      "text": "O acesso a dados financeiros de qualidade costuma ser demasiado caro, visualmente confuso e disperso por várias fontes. A BullMetrics nasceu para eliminar essas dificuldades. O objetivo é oferecer o rigor técnico dos profissionais numa interface pensada para o investidor."
+    },
+    "organization": {
+      "title": "A Bullocracy",
+      "text": "A BullMetrics é um produto construído pela Bullocracy, uma organização de jovens estudantes que procuram democratizar o acesso ao conhecimento sobre Política, Economia e Investimentos. Para isso, criamos conteúdos nas redes sociais, desde o YouTube ao TikTok, e criamos um espaço para que a nossa comunidade possa escrever artigos e opiniões para serem publicados no nosso site, thebullocracy.com, onde fomentamos o debate livre e a literacia financeira.",
+      "cta": "Visitar thebullocracy.com"
+    },
+    "team": {
+      "title": "A Equipa",
+      "description": "Toda a plataforma é desenhada por quem entende e quer entender cada vez mais de mercados, garantindo que as ferramentas refletem as necessidades reais da análise fundamental.",
+      "members": [
+        {
+          "name": "Rodrigo Martins",
+          "role": "Founder & Developer",
+          "bio": "Sou o Rodrigo Martins, estudante de Economia na Universidade do Minho, e criei o projeto para juntar o conhecimento financeiro académico ao desenvolvimento de software."
+        },
+        {
+          "name": "Tiago Costa",
+          "role": "Co-founder",
+          "bio": "Sou o Tiago Costa, [inserir texto para o Tiago]."
+        },
+        {
+          "name": "Alexandre",
+          "role": "Co-founder",
+          "bio": "Sou o Alexandre, [inserir texto para o Alexandre]."
+        }
+      ]
+    },
+    "philosophy": {
+      "title": "Compromisso com os dados",
+      "text": "A nossa análise baseia-se na matemática e nos relatórios oficiais extraídos diretamente da SEC. O BullMetrics foca-se na solidez dos números. Ignoramos a especulação de curto prazo e o ruído das notícias diárias. Acreditamos que as decisões financeiras exigem dados limpos, precisão técnica e transparência."
+    }
   }
 }

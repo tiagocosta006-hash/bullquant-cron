@@ -13,6 +13,9 @@ export async function Footer() {
         </div>
 
         <div className="flex gap-4 text-sm text-muted-foreground">
+          <Link href="/about" className="hover:text-foreground transition-colors">
+            {t('about')}
+          </Link>
           <Link href="/pricing" className="hover:text-foreground transition-colors">
             {t('pricing')}
           </Link>

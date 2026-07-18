@@ -663,7 +663,8 @@
     "terms": "Terms of Service",
     "privacy": "Privacy",
     "refund": "Refund Policy",
-    "pricing": "Pricing"
+    "pricing": "Pricing",
+    "about": "About Us"
   },
   "pricing": {
     "badge": "Simple and transparent",
@@ -809,5 +810,44 @@
     },
     "suggestionsTitle": "Suggestions to follow",
     "lastUpdate": "Last update:"
+  },
+  "about": {
+    "badge": "Our Mission",
+    "title": "Democratizing access to financial data.",
+    "intro": "BullMetrics is a fundamental data analysis platform designed for all types of investors.",
+    "problem": {
+      "title": "The Problem",
+      "text": "Access to high-quality financial data is often too expensive, visually confusing, and scattered across multiple sources. BullMetrics was born to eliminate these hurdles. Our goal is to offer the technical rigor of professional tools in an interface designed for the everyday investor."
+    },
+    "organization": {
+      "title": "The Bullocracy",
+      "text": "BullMetrics is built by The Bullocracy, an organization of young students seeking to democratize access to knowledge about Politics, Economics, and Investments. To achieve this, we create content on social media, from YouTube to TikTok, and provide a space for our community to write articles and opinions published on our website, thebullocracy.com, fostering free debate and financial literacy.",
+      "cta": "Visit thebullocracy.com"
+    },
+    "team": {
+      "title": "The Team",
+      "description": "The entire platform is designed by people who understand and want to learn more about the markets, ensuring our tools reflect the real needs of fundamental analysis.",
+      "members": [
+        {
+          "name": "Rodrigo Martins",
+          "role": "Founder & Developer",
+          "bio": "I'm Rodrigo Martins, an Economics student at the University of Minho. I created this project to combine academic financial knowledge with software development."
+        },
+        {
+          "name": "Tiago Costa",
+          "role": "Co-founder",
+          "bio": "I'm Tiago Costa, [insert text for Tiago]."
+        },
+        {
+          "name": "Alexandre",
+          "role": "Co-founder",
+          "bio": "I'm Alexandre, [insert text for Alexandre]."
+        }
+      ]
+    },
+    "philosophy": {
+      "title": "Commitment to Data",
+      "text": "Our analysis is based on mathematics and official reports extracted directly from the SEC. BullMetrics focuses on the solidity of numbers. We ignore short-term speculation and daily news noise. We believe financial decisions require clean data, technical precision, and transparency."
+    }
   }
 }

@@ -30,7 +30,13 @@
       "priceLabel": "on the free plan"
     },
     "ctaTitle": "Start seeing the value others miss.",
-    "ctaSubtitle": "Create your free account and analyze any S&P 500 company in seconds."
+    "ctaSubtitle": "Create your free account and analyze any S&P 500 company in seconds.",
+    "mission": {
+      "badge": "Our Mission",
+      "title": "Democratize access to financial data.",
+      "desc": "A platform developed by university students with the goal of delivering professional data to independent investors.",
+      "cta": "Meet the team behind it"
+    }
   },
   "insider": {
     "title": "Company Insider Trading",
@@ -813,7 +819,7 @@
   },
   "about": {
     "badge": "Our Mission",
-    "title": "Democratizing access to financial data.",
+    "title": "Democratizing access to financial <italic>data.</italic>",
     "intro": "BullMetrics is a fundamental data analysis platform designed for all types of investors.",
     "problem": {
       "title": "The Problem",
@@ -830,24 +836,39 @@
       "members": [
         {
           "name": "Rodrigo Martins",
-          "role": "Founder & Developer",
-          "bio": "I'm Rodrigo Martins, an Economics student at the University of Minho. I created this project to combine academic financial knowledge with software development."
+          "role": "Co-Founder & Web Analyst",
+          "bio": "Economics student at the University of Minho. Responsible for marketing strategy, site indexing, SEO, analytics metrics, and overall platform performance optimization, as well as the integration of BullMetrics into Bullocracy's content.",
+          "socials": {
+            "linkedin": "#",
+            "instagram": "#",
+            "email": "#"
+          }
         },
         {
           "name": "Tiago Costa",
-          "role": "Co-founder",
-          "bio": "I'm Tiago Costa, [insert text for Tiago]."
+          "role": "Co-Founder & Product Owner",
+          "bio": "Economics student at the University of Minho. Responsible for the conceptualization of the platform's ecosystem and features, defining the direction of tools, and focusing on product usability.",
+          "socials": {
+            "linkedin": "#",
+            "instagram": "#",
+            "email": "#"
+          }
         },
         {
-          "name": "Alexandre",
-          "role": "Co-founder",
-          "bio": "I'm Alexandre, [insert text for Alexandre]."
+          "name": "Alexandre Machado",
+          "role": "Lead Developer & UI/UX Designer",
+          "bio": "[Insert course/university]. Responsible for the technical development of the platform, designing the interface, and building the backend and frontend structure with a focus on code and software architecture.",
+          "socials": {
+            "linkedin": "#",
+            "instagram": "#",
+            "email": "#"
+          }
         }
       ]
     },
     "philosophy": {
-      "title": "Commitment to Data",
-      "text": "Our analysis is based on mathematics and official reports extracted directly from the SEC. BullMetrics focuses on the solidity of numbers. We ignore short-term speculation and daily news noise. We believe financial decisions require clean data, technical precision, and transparency."
+      "title": "Data Philosophy",
+      "text": "Our analysis is based on mathematics and official reports extracted directly from the SEC. BullMetrics focuses on the solidity of numbers. We believe that financial decisions require clean data, technical precision, and transparency, characteristics we value deeply at BullMetrics."
     }
   }
 }

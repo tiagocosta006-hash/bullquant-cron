@@ -222,6 +222,30 @@ export default async function LandingPage() {
         </Reveal>
       </section>
 
+      {/* ── Missão / Sobre Nós ───────────────────────────────── */}
+      <section className="mx-auto max-w-5xl px-6 pb-24 md:px-8">
+        <Reveal>
+          <LiquidGlass className="flex flex-col items-center gap-5 rounded-3xl p-8 text-center sm:p-12">
+            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-card/60 px-3.5 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              {t("mission.badge")}
+            </div>
+            <h2 className="max-w-[20ch] text-balance text-3xl font-extrabold tracking-tight sm:text-4xl">
+              {t("mission.title")}
+            </h2>
+            <p className="max-w-[42ch] text-muted-foreground">
+              {t("mission.desc")}
+            </p>
+            <Link
+              href="/about"
+              className={cn(buttonVariants({ variant: "outline", size: "lg" }), "mt-4 font-medium")}
+            >
+              {t("mission.cta")} <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </LiquidGlass>
+        </Reveal>
+      </section>
+
       {/* ── Pricing ──────────────────────────────────────────── */}
       <section className="mx-auto max-w-5xl px-6 pb-24 md:px-8">
         <Reveal>

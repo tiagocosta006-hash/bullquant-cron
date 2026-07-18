@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { SearchBar } from '@/components/search/SearchBar';
-import { LogOut, UserCircle, Calculator, CalendarDays, Zap, Info } from 'lucide-react';
+import { LogOut, UserCircle, Calculator, CalendarDays, Zap } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
@@ -25,14 +25,6 @@ export async function Header() {
 
           <nav className="flex items-center space-x-2">
             <ThemeToggle />
-            <Link
-              href="/about"
-              className="flex items-center space-x-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mr-2"
-              title={t('about')}
-            >
-              <Info className="h-5 w-5" />
-              <span className="hidden md:inline-block">{t('about')}</span>
-            </Link>
             <Link
               href="/calendar"
               className="flex items-center space-x-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mr-2"

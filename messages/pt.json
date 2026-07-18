@@ -30,7 +30,13 @@
       "priceLabel": "no plano gratuito"
     },
     "ctaTitle": "Começa a ver o valor que os outros não veem.",
-    "ctaSubtitle": "Cria a tua conta gratuita e analisa qualquer empresa do S&P 500 em segundos."
+    "ctaSubtitle": "Cria a tua conta gratuita e analisa qualquer empresa do S&P 500 em segundos.",
+    "mission": {
+      "badge": "A Missão",
+      "title": "Democratizar o acesso a dados financeiros.",
+      "desc": "Uma plataforma desenvolvida por jovens universitários com o objetivo de entregar dados profissionais a investidores independentes.",
+      "cta": "Conhece a equipa por trás"
+    }
   },
   "insider": {
     "title": "Transações de Insiders",
@@ -813,7 +819,7 @@
   },
   "about": {
     "badge": "A Nossa Missão",
-    "title": "A democratizar o acesso a dados financeiros.",
+    "title": "A democratizar o acesso a dados <italic>financeiros.</italic>",
     "intro": "A BullMetrics é uma plataforma de análise de dados fundamentais desenhada para todo o tipo de investidores.",
     "problem": {
       "title": "O Problema",
@@ -830,24 +836,39 @@
       "members": [
         {
           "name": "Rodrigo Martins",
-          "role": "Founder & Developer",
-          "bio": "Sou o Rodrigo Martins, estudante de Economia na Universidade do Minho, e criei o projeto para juntar o conhecimento financeiro académico ao desenvolvimento de software."
+          "role": "Co-Founder & Web Analyst",
+          "bio": "Estudante de Economia na Universidade do Minho. Responsável pela estratégia de marketing, indexação do site, SEO, métricas de analytics e otimização geral da performance da plataforma, bem como a integração da BullMetrics nos conteúdos da Bullocracy.",
+          "socials": {
+            "linkedin": "#",
+            "instagram": "#",
+            "email": "#"
+          }
         },
         {
           "name": "Tiago Costa",
-          "role": "Co-founder",
-          "bio": "Sou o Tiago Costa, [inserir texto para o Tiago]."
+          "role": "Co-Founder & Product Owner",
+          "bio": "Estudante de Economia na Universidade do Minho. Responsável pela conceptualização do ecossistema e das funcionalidades da plataforma, definindo o rumo das ferramentas e focando-se na usabilidade do produto.",
+          "socials": {
+            "linkedin": "#",
+            "instagram": "#",
+            "email": "#"
+          }
         },
         {
-          "name": "Alexandre",
-          "role": "Co-founder",
-          "bio": "Sou o Alexandre, [inserir texto para o Alexandre]."
+          "name": "Alexandre Machado",
+          "role": "Lead Developer & UI/UX Designer",
+          "bio": "[Inserir curso/universidade]. Responsável pelo desenvolvimento técnico da plataforma, desenhando a interface e construindo a estrutura de backend e frontend com foco em código e arquitetura de software.",
+          "socials": {
+            "linkedin": "#",
+            "instagram": "#",
+            "email": "#"
+          }
         }
       ]
     },
     "philosophy": {
-      "title": "Compromisso com os dados",
-      "text": "A nossa análise baseia-se na matemática e nos relatórios oficiais extraídos diretamente da SEC. O BullMetrics foca-se na solidez dos números. Ignoramos a especulação de curto prazo e o ruído das notícias diárias. Acreditamos que as decisões financeiras exigem dados limpos, precisão técnica e transparência."
+      "title": "A Filosofia dos Dados",
+      "text": "A nossa análise baseia-se na matemática e nos relatórios oficiais extraídos diretamente da SEC. A BullMetrics foca-se na solidez dos números. Acreditamos que as decisões financeiras exigem dados limpos, precisão técnica e transparência, características que valorizamos muito na BullMetrics."
     }
   }
 }

@@ -35,6 +35,7 @@
     "test_*.ts",
     "check_*.ts",
     "audit_*.ts",
-    "scratch_*.ts"
+    "scratch_*.ts",
+    "scripts"
   ]
 }

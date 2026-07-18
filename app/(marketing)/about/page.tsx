@@ -4,7 +4,15 @@ import { BRAND } from "@/lib/brand";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Target, Shield, Users, LineChart } from "lucide-react";
+import { TeamMemberModal } from "@/components/marketing/TeamMemberModal";
+import Image from "next/image";
+import { Cinzel } from "next/font/google";
 import { Metadata } from "next";
+
+const cinzel = Cinzel({
+  subsets: ["latin"],
+  weight: ["600", "700"],
+});
 
 export async function generateMetadata({
   params: { locale },
@@ -77,8 +85,9 @@ export default function AboutPage() {
             {t("badge")}
           </Badge>
           <h1 className="text-4xl sm:text-6xl font-heading tracking-tight text-balance">
-            {t("title").replace("financeiros.", "")}
-            <span className="italic text-muted-foreground"> financeiros.</span>
+            {t.rich("title", {
+              italic: (chunks) => <span className="italic text-muted-foreground">{chunks}</span>
+            })}
           </h1>
           <p className="text-xl text-muted-foreground leading-relaxed">
             {t("intro")}
@@ -86,28 +95,42 @@ export default function AboutPage() {
         </div>
 
         {/* 2. The Problem */}
-        <div className="grid sm:grid-cols-2 gap-12 items-center bg-secondary/30 border border-border/50 rounded-[2rem] p-8 sm:p-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150 fill-mode-both">
-          <div className="flex flex-col gap-4">
-            <div className="w-12 h-12 bg-background rounded-full flex items-center justify-center border border-border/50 shadow-sm mb-2">
-              <LineChart className="w-6 h-6 text-foreground" />
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-heading">{t("problem.title")}</h2>
-            <p className="text-muted-foreground leading-relaxed text-lg">
-              {t("problem.text")}
-            </p>
+        <div className="glass flex flex-col items-center text-center gap-6 rounded-[2rem] p-8 sm:p-12 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150 fill-mode-both">
+          <div className="w-16 h-16 bg-background rounded-full flex items-center justify-center border border-border/50 shadow-sm mb-4">
+            <LineChart className="w-8 h-8 text-foreground" />
           </div>
-          {/* 3. The Organization (Bullocracy) */}
-          <div className="flex flex-col gap-4">
-            <div className="w-12 h-12 bg-background rounded-full flex items-center justify-center border border-border/50 shadow-sm mb-2">
-              <Users className="w-6 h-6 text-foreground" />
+          <h2 className="text-3xl sm:text-5xl font-heading">{t("problem.title")}</h2>
+          <p className="text-muted-foreground leading-relaxed text-xl max-w-2xl">
+            {t("problem.text")}
+          </p>
+        </div>
+
+        {/* 3. The Organization (Bullocracy) */}
+        <div className="relative overflow-hidden bg-[#0A1526] text-slate-50 border border-slate-800/50 rounded-[2rem] p-8 sm:p-12 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 fill-mode-both shadow-2xl mt-4">
+          {/* Brilho decorativo no fundo para dar requinte ao azul */}
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary/20 blur-[100px] rounded-full pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-72 h-72 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none"></div>
+
+          <div className="flex flex-col items-center text-center gap-6 relative z-10 max-w-3xl mx-auto">
+            {/* Logo */}
+            <div className="mb-2">
+              <Image 
+                src="/brand/bullocracy-logo.png" 
+                alt="The Bullocracy Logo" 
+                width={110} 
+                height={110} 
+                className="object-contain drop-shadow-xl"
+                priority
+              />
             </div>
-            <h2 className="text-2xl sm:text-3xl font-heading">{t("organization.title")}</h2>
-            <p className="text-muted-foreground leading-relaxed text-lg">
+            
+            <h2 className={`text-4xl sm:text-6xl text-primary tracking-wide drop-shadow-sm ${cinzel.className}`}>THE BULLOCRACY</h2>
+            <p className="text-slate-300 leading-relaxed text-lg sm:text-xl">
               {t("organization.text")}
             </p>
-            <div className="pt-4">
+            <div className="pt-6">
               <a href="https://thebullocracy.com" target="_blank" rel="noopener noreferrer" className="inline-flex">
-                <Button variant="outline" className="rounded-full">
+                <Button size="lg" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-8 shadow-[0_4px_24px_-6px_hsl(var(--primary)/0.5)]">
                   {t("organization.cta")}
                   <ExternalLink className="w-4 h-4 ml-2" />
                 </Button>
@@ -115,6 +138,9 @@ export default function AboutPage() {
             </div>
           </div>
         </div>
+
+        {/* Divider */}
+        <div className="gold-rule h-[1px] w-full max-w-sm mx-auto opacity-30 animate-in fade-in duration-700 delay-300 fill-mode-both"></div>
 
         {/* 4. The Team */}
         <div className="flex flex-col gap-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 fill-mode-both">
@@ -134,21 +160,20 @@ export default function AboutPage() {
                 .join("")
                 .substring(0, 2);
 
-              return (
-                <div key={index} className="flex flex-col gap-6 p-8 bg-background border border-border/50 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
-                  {/* Placeholder for Photo */}
-                  <div className="w-24 h-24 rounded-full bg-secondary flex items-center justify-center border-4 border-background shadow-sm mx-auto">
-                    <span className="text-2xl font-heading text-muted-foreground">{initials}</span>
-                  </div>
-                  <div className="text-center flex flex-col gap-1">
-                    <h3 className="font-semibold text-xl">{name}</h3>
-                    <span className="text-sm text-primary font-medium">{t(`team.members.${index}.role`)}</span>
-                  </div>
-                  <p className="text-muted-foreground text-center text-sm leading-relaxed">
-                    {t(`team.members.${index}.bio`)}
-                  </p>
-                </div>
-              );
+              const member = {
+                name,
+                role: t(`team.members.${index}.role`),
+                bio: t(`team.members.${index}.bio`),
+                initials,
+                image: index === 0 ? "/team/rodrigo.jpg" : undefined,
+                socials: {
+                  linkedin: t.has(`team.members.${index}.socials.linkedin`) ? t(`team.members.${index}.socials.linkedin`) : "#",
+                  instagram: t.has(`team.members.${index}.socials.instagram`) ? t(`team.members.${index}.socials.instagram`) : "#",
+                  email: t.has(`team.members.${index}.socials.email`) ? t(`team.members.${index}.socials.email`) : "#",
+                }
+              };
+
+              return <TeamMemberModal key={index} member={member} />;
             })}
           </div>
         </div>

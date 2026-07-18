@@ -69,7 +69,7 @@ export default function AboutPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="container max-w-5xl py-24 sm:py-32 flex flex-col gap-24">
+      <div className="container mx-auto max-w-5xl py-24 sm:py-32 flex flex-col gap-24 px-4 sm:px-6">
         {/* 1. Hero Section */}
         <div className="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
           <Badge variant="secondary" className="px-4 py-1 text-sm bg-primary/10 text-primary border-primary/20">

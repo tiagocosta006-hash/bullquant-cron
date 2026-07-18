@@ -146,7 +146,7 @@ export default async function RootLayout({
             <main className="flex-1 flex flex-col">{children}</main>
           </PaddleProvider>
         </NextIntlClientProvider>
-        <DelayedAnalytics />
+        <GoogleAnalytics gaId="G-F89FT4052G" />
       </body>
     </html>
   );

@@ -7,7 +7,6 @@ import { getMessages } from "next-intl/server";
 import { BRAND } from "@/lib/brand";
 import { PaddleProvider } from "@/components/providers/PaddleProvider";
 import { GoogleAnalytics } from "@next/third-parties/google";
-import { DelayedAnalytics } from "@/components/providers/DelayedAnalytics";
 
 const scotchDisplay = localFont({
   variable: "--font-heading",

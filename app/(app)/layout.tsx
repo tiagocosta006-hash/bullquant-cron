@@ -4,6 +4,7 @@ import { ContourCanvas } from "@/components/fx/ContourCanvas";
 import { InertiaScroll } from "@/components/fx/InertiaScroll";
 import { getUser } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
+import { isPulseAdmin } from "@/lib/pulse/server";
 
 /**
  * Terminal — navegação ÚNICA: pill Liquid Glass flutuante no topo
@@ -34,7 +35,12 @@ export default async function AppLayout({
     <div className="relative min-h-screen">
       <InertiaScroll />
       <ContourCanvas />
-      <TopNav userName={userName} userEmail={userEmail} plan={plan} />
+      <TopNav
+        userName={userName}
+        userEmail={userEmail}
+        plan={plan}
+        isAdmin={isPulseAdmin(userEmail)}
+      />
       <main className="mx-auto w-full max-w-7xl px-4 pb-28 pt-24 md:px-6 md:pb-12">
         {children}
       </main>

@@ -7,6 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { AuthError } from '@supabase/supabase-js'
 import { sendWelcomeEmail, sendPasswordResetEmail, sendConfirmationEmail, isEmailEnabled } from '@/lib/resend'
 import { prisma } from '@/lib/prisma'
+import { recordServerEvent } from '@/lib/pulse/server'
 
 function translateError(error: AuthError | { message?: string }) {
   const msg = error.message?.toLowerCase() || '';
@@ -125,6 +126,7 @@ export async function signup(formData: FormData) {
       `${siteUrl}/auth/callback?token_hash=${linkData?.properties?.hashed_token}&type=signup&next=/dashboard&welcome=1`
     await sendConfirmationEmail(email, name || 'Investidor', confirmationLink)
 
+    if (linkData?.user) await recordServerEvent(await headers(), 'signup', '/register')
     revalidatePath('/', 'layout')
     redirect(`/verify-email?email=${encodeURIComponent(email)}`)
   }
@@ -156,6 +158,7 @@ export async function signup(formData: FormData) {
     } catch {
       // conflito de chave esperado se o trigger já criou o registo
     }
+    await recordServerEvent(await headers(), 'signup', '/register')
   }
 
   // Confirmação de email desligada no projeto → já vem sessão → entra direto.

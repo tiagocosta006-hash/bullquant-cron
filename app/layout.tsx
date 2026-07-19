@@ -4,6 +4,7 @@ import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
+import { PulseTracker } from "@/components/pulse/PulseTracker";
 import { BRAND } from "@/lib/brand";
 
 const scotchDisplay = localFont({
@@ -113,6 +114,7 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <main className="flex-1 flex flex-col">{children}</main>
         </NextIntlClientProvider>
+        <PulseTracker />
       </body>
     </html>
   );

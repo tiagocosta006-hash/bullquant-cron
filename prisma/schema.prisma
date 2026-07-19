@@ -330,6 +330,28 @@ model InsiderTransaction {
   @@map("insider_transactions")
 }
 
+// ── PULSE (analytics first-party) ─────────────
+// Sem cookies e sem PII: sessionId é um hash SHA-256 com salt que roda
+// diariamente (dia|salt|ip|ua) — o IP nunca é guardado. Ver docs/PULSE.md.
+model PulseEvent {
+  id        String   @id @default(cuid())
+  type      String // pageview | cta_click | signup | dcf_saved | watchlist_add
+  path      String
+  referrer  String? // só referrers externos
+  country   String? // header x-vercel-ip-country — nunca o IP
+  device    String   @default("desktop") // desktop | mobile | tablet
+  locale    String?
+  sessionId String
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([type, createdAt])
+  @@index([sessionId, createdAt])
+  @@index([path, createdAt])
+  @@map("pulse_events")
+}
+
 enum Plan {
   FREE
   PRO

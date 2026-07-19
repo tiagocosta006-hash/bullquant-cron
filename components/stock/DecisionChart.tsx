@@ -16,7 +16,6 @@ import {
   ResponsiveContainer,
   ReferenceLine,
   CartesianGrid,
-  Legend,
   Cell,
   Rectangle
 } from "recharts"
@@ -169,9 +168,16 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
 
 
 
+  // Legenda em linha única, com scroll horizontal em vez de wrap — séries
+  // com nomes longos (ex.: segmentos de receita) em cartões estreitos faziam
+  // o wrap para 2-3 linhas, e o Recharts <Legend content={...}> reserva
+  // espaço com base num cálculo interno que assume conteúdo de série,
+  // desalinhado do wrap real do nosso JSX custom. O resultado: a área do
+  // gráfico (eixos/barras) ficava espremida a poucos pixels de altura no
+  // cartão de altura fixa. Uma linha única de altura previsível resolve.
   const renderCustomLegend = () => {
     return (
-      <div className="flex flex-wrap items-center justify-center gap-4 pt-5 pb-1 select-none">
+      <div className="flex items-center gap-4 overflow-x-auto no-scrollbar select-none">
         {config.dataKeys.map((k) => {
           const isHidden = hiddenKeys.has(k.key)
           return (
@@ -185,7 +191,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
                   return next
                 })
               }}
-              className={`flex items-center gap-2 text-[13px] transition-all duration-200 outline-none focus:outline-none ${isHidden ? 'opacity-40 grayscale' : 'opacity-100 hover:opacity-80'}`}
+              className={`flex items-center gap-2 text-[13px] shrink-0 whitespace-nowrap transition-all duration-200 outline-none focus:outline-none ${isHidden ? 'opacity-40 grayscale' : 'opacity-100 hover:opacity-80'}`}
             >
               <div className="w-3 h-3 rounded-[2px] shrink-0" style={{ backgroundColor: k.color }} />
               <span className={`font-medium text-foreground ${isHidden ? 'line-through text-muted-foreground' : ''}`}>
@@ -209,97 +215,102 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
     )
 
     const ChartComponent = type === 'COMPOSED' || type === 'STACKED_BAR' ? ComposedChart : type === 'LINE' ? LineChart : type === 'AREA' ? AreaChart : BarChart
+    const showLegend = type === 'STACKED_BAR' || config.dataKeys.length > 1
 
     return (
-      <div className="w-full h-full outline-none focus:outline-none focus-visible:outline-none [&_*:focus]:outline-none [&_*:focus]:ring-0" tabIndex={-1}>
-        <ResponsiveContainer width="100%" height={height} className="outline-none focus:outline-none">
-          <ChartComponent data={displayData} margin={{ top: 20, right: 20, left: 10, bottom: 20 }}>
-            {/* var(--border) direto — os tokens são hex, hsl(var(--border)) não resolvia */}
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.6} />
-            <XAxis
-              dataKey="label"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }}
-              dy={15}
-              interval={displayData.length > 15 ? "preserveEnd" : 0}
-              height={40}
-            />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={formatValue}
-              tick={{ fill: 'var(--muted-foreground)', fontSize: 11 }}
-              width={55}
-              domain={[(dataMin: number) => Math.min(0, dataMin), 'auto']}
-            />
-            <Tooltip
-              content={(props) => {
-                const items = (props.payload ?? []).map((p) => ({
-                  name: String(p.name ?? ''),
-                  // null preservado → tooltip mostra "N/A", não um $0.00 falso
-                  value: p.value == null ? null : Number(p.value),
-                  color: typeof p.color === 'string' ? p.color : '#ffffff',
-                }))
-                return (
-                  <CustomTooltip
-                    active={props.active}
-                    payload={items}
-                    label={props.label != null ? String(props.label) : undefined}
-                    formatTooltipValue={formatTooltipValue}
-                  />
-                )
-              }}
-              cursor={{ fill: 'var(--muted)', opacity: 0.35 }}
-            />
-            {(type === 'STACKED_BAR' || config.dataKeys.length > 1) && (
-              <Legend content={renderCustomLegend} />
-            )}
-            {config.referenceLine && (
-              <ReferenceLine
-                y={config.referenceLine.y}
-                stroke={config.referenceLine.color}
-                strokeDasharray="3 3"
-                label={{
-                  position: 'insideBottomLeft',
-                  value: config.referenceLine.label,
-                  fill: config.referenceLine.color,
-                  fontSize: 11,
-                  fontWeight: 600,
-                  dy: -6,
-                }}
+      <div className="w-full h-full flex flex-col outline-none focus:outline-none focus-visible:outline-none [&_*:focus]:outline-none [&_*:focus]:ring-0" tabIndex={-1}>
+        <div className="flex-1 min-h-0">
+          <ResponsiveContainer width="100%" height={height} className="outline-none focus:outline-none">
+            <ChartComponent data={displayData} margin={{ top: 20, right: 20, left: 10, bottom: 20 }}>
+              {/* var(--border) direto — os tokens são hex, hsl(var(--border)) não resolvia */}
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.6} />
+              <XAxis
+                dataKey="label"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }}
+                dy={15}
+                interval={displayData.length > 15 ? "preserveEnd" : 0}
+                height={40}
               />
-            )}
-            
-            {config.dataKeys.map((k) => {
-              const isHidden = hiddenKeys.has(k.key)
-              if (k.type === 'line' || type === 'LINE') {
-                return <Line hide={isHidden} key={k.key} type="linear" dataKey={k.key} name={k.name || k.key} stroke={k.color} strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
-              }
-              if (k.type === 'area' || type === 'AREA') {
-                return <Area hide={isHidden} key={k.key} type="linear" dataKey={k.key} name={k.name || k.key} fill={k.color} stroke={k.color} fillOpacity={0.2} strokeWidth={2} activeDot={{ r: 5 }} />
-              }
-              return (
-                <Bar hide={isHidden} key={k.key} dataKey={k.key} name={k.name || k.key} fill={k.color} stackId={k.stackId} radius={type === 'STACKED_BAR' ? 0 : [4, 4, 0, 0]} activeBar={renderActiveBar}>
-                  {displayData.map((entry, index) => {
-                    let cellColor = k.color
-                    if (config.inverseColors) {
-                      if (index > 0) {
-                        const prev = Number(displayData[index - 1][k.key]) || 0
-                        const curr = Number(entry[k.key]) || 0
-                        if (curr < prev) cellColor = 'var(--bull)'
-                        else if (curr > prev) cellColor = 'var(--bear)'
-                      } else {
-                        cellColor = 'var(--chart-4)'
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={formatValue}
+                tick={{ fill: 'var(--muted-foreground)', fontSize: 11 }}
+                width={55}
+                domain={[(dataMin: number) => Math.min(0, dataMin), 'auto']}
+              />
+              <Tooltip
+                content={(props) => {
+                  const items = (props.payload ?? []).map((p) => ({
+                    name: String(p.name ?? ''),
+                    // null preservado → tooltip mostra "N/A", não um $0.00 falso
+                    value: p.value == null ? null : Number(p.value),
+                    color: typeof p.color === 'string' ? p.color : '#ffffff',
+                  }))
+                  return (
+                    <CustomTooltip
+                      active={props.active}
+                      payload={items}
+                      label={props.label != null ? String(props.label) : undefined}
+                      formatTooltipValue={formatTooltipValue}
+                    />
+                  )
+                }}
+                cursor={{ fill: 'var(--muted)', opacity: 0.35 }}
+              />
+              {config.referenceLine && (
+                <ReferenceLine
+                  y={config.referenceLine.y}
+                  stroke={config.referenceLine.color}
+                  strokeDasharray="3 3"
+                  label={{
+                    position: 'insideBottomLeft',
+                    value: config.referenceLine.label,
+                    fill: config.referenceLine.color,
+                    fontSize: 11,
+                    fontWeight: 600,
+                    dy: -6,
+                  }}
+                />
+              )}
+
+              {config.dataKeys.map((k) => {
+                const isHidden = hiddenKeys.has(k.key)
+                if (k.type === 'line' || type === 'LINE') {
+                  return <Line hide={isHidden} key={k.key} type="linear" dataKey={k.key} name={k.name || k.key} stroke={k.color} strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                }
+                if (k.type === 'area' || type === 'AREA') {
+                  return <Area hide={isHidden} key={k.key} type="linear" dataKey={k.key} name={k.name || k.key} fill={k.color} stroke={k.color} fillOpacity={0.2} strokeWidth={2} activeDot={{ r: 5 }} />
+                }
+                return (
+                  <Bar hide={isHidden} key={k.key} dataKey={k.key} name={k.name || k.key} fill={k.color} stackId={k.stackId} radius={type === 'STACKED_BAR' ? 0 : [4, 4, 0, 0]} activeBar={renderActiveBar}>
+                    {displayData.map((entry, index) => {
+                      let cellColor = k.color
+                      if (config.inverseColors) {
+                        if (index > 0) {
+                          const prev = Number(displayData[index - 1][k.key]) || 0
+                          const curr = Number(entry[k.key]) || 0
+                          if (curr < prev) cellColor = 'var(--bull)'
+                          else if (curr > prev) cellColor = 'var(--bear)'
+                        } else {
+                          cellColor = 'var(--chart-4)'
+                        }
                       }
-                    }
-                    return <Cell key={`cell-${index}`} fill={cellColor} />
-                  })}
-                </Bar>
-              )
-            })}
-          </ChartComponent>
-        </ResponsiveContainer>
+                      return <Cell key={`cell-${index}`} fill={cellColor} />
+                    })}
+                  </Bar>
+                )
+              })}
+            </ChartComponent>
+          </ResponsiveContainer>
+        </div>
+        {showLegend && (
+          <div className="shrink-0 pt-3 pb-1">
+            {renderCustomLegend()}
+          </div>
+        )}
       </div>
     )
   }

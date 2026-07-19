@@ -74,29 +74,57 @@ def fetch_earnings(ticker: str, frm: str, to: str) -> list[dict]:
 
 
 def upsert_earnings(cur, company_id: str, rows: list[dict]) -> int:
-    payload = []
+    # A Finnhub por vezes devolve linhas duplicadas para o mesmo (year, quarter)
+    # dum ticker (confirmado ao vivo p.ex. em BNY). Sem deduplicar, o INSERT
+    # ON CONFLICT abaixo falha com "cannot affect row a second time" e faz
+    # rollback ao ticker inteiro — bloqueando os *Actual permanentemente,
+    # já que a Finnhub costuma repetir o mesmo duplicado nos dias seguintes.
+    dedup: dict[tuple[int, int], dict] = {}
     for e in rows:
         year = e.get("year")
         quarter = e.get("quarter")
         date = e.get("date")
         if not year or not quarter or not date:
             continue  # sem chave de período válida → ignora
+
+        key = (int(year), int(quarter))
         hour = HOUR_MAP.get((e.get("hour") or "").lower(), "UNKNOWN")
-        payload.append((
+        entry = {
+            "date": date,
+            "hour": hour,
+            "epsEstimate": e.get("epsEstimate"),
+            "epsActual": e.get("epsActual"),
+            "revenueEstimate": e.get("revenueEstimate"),
+            "revenueActual": e.get("revenueActual"),
+        }
+
+        existing = dedup.get(key)
+        if existing is None:
+            dedup[key] = entry
+        else:
+            # merge campo-a-campo: só substitui valores ainda vazios
+            for field, value in entry.items():
+                if value not in (None, "UNKNOWN") and existing.get(field) in (None, "UNKNOWN"):
+                    existing[field] = value
+
+    if not dedup:
+        return 0
+
+    payload = [
+        (
             new_id(),
             company_id,
-            date,
-            hour,
-            int(year),
-            int(quarter),
-            e.get("epsEstimate"),
-            e.get("epsActual"),
-            e.get("revenueEstimate"),
-            e.get("revenueActual"),
-        ))
-
-    if not payload:
-        return 0
+            v["date"],
+            v["hour"],
+            year,
+            quarter,
+            v["epsEstimate"],
+            v["epsActual"],
+            v["revenueEstimate"],
+            v["revenueActual"],
+        )
+        for (year, quarter), v in dedup.items()
+    ]
 
     psycopg2.extras.execute_values(
         cur,

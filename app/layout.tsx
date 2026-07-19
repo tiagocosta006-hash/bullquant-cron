@@ -144,7 +144,9 @@ export default async function RootLayout({
           </PaddleProvider>
         </NextIntlClientProvider>
         <PulseTracker />
-        <GoogleAnalytics gaId="G-F89FT4052G" />
+        {/* GA só em produção — em dev tenta enviar para o GA e falha com
+            erros de rede na consola (o Pulse é o analytics de dev). */}
+        {process.env.NODE_ENV === "production" && <GoogleAnalytics gaId="G-F89FT4052G" />}
       </body>
     </html>
   );

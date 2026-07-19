@@ -58,6 +58,8 @@ model Company {
   updatedAt              DateTime             @updatedAt
   ceo                    String?
   aiInsightCache         AIInsightCache?
+  analystReport          AnalystReport?
+  filings                FilingCache[]
   companyBrief           CompanyBrief?
   dcfAnalyses            DcfAnalysis[]
   earnings               EarningsEvent[]
@@ -301,12 +303,48 @@ model ManagementProfile {
   @@map("management_profile")
 }
 
+// Relatório do Analista IA — dossier grounded (BD + 10-K) gerado por empresa.
+// Espelha o padrão de cache do AIInsightCache (TTL via expiresAt).
+model AnalystReport {
+  id           String   @id @default(cuid())
+  companyId    String   @unique
+  reportData   Json // secções + citações (executiveSummary, moat, riscos, KPIs, bull/bear…)
+  secUrl       String? // URL do 10-K/20-F usado como fonte
+  filingLabel  String? // ex: "10-K FY2024"
+  modelVersion String
+  generatedAt  DateTime @default(now())
+  expiresAt    DateTime
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, expiresAt])
+  @@map("analyst_reports")
+}
+
+// Cache do texto do filing SEC (10-K/20-F) — evita re-download de ~800KB por
+// pergunta do chat. Uma linha por (empresa, accession).
+model FilingCache {
+  id        String   @id @default(cuid())
+  companyId String
+  accession String
+  form      String // "10-K", "20-F", "40-F"
+  url       String
+  text      String   @db.Text
+  fetchedAt DateTime @default(now())
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, accession])
+  @@index([companyId, fetchedAt])
+  @@map("filing_cache")
+}
+
 model AIUsageLog {
-  id     String   @id @default(cuid())
-  userId String
-  ticker String
-  usedAt DateTime @default(now())
-  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id      String   @id @default(cuid())
+  userId  String
+  ticker  String
+  action  String   @default("legacy") // "brief" | "management" | "analyst_report" | "analyst_chat" | "peer_report" | "kpi_extraction"
+  credits Int      @default(1) // peso real da ação, não uma contagem de linhas — ver lib/ai/credits.ts
+  usedAt  DateTime @default(now())
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, usedAt])
   @@map("ai_usage_logs")

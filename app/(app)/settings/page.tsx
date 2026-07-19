@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { SettingsClient } from '@/components/settings/SettingsClient'
 import { cookies } from 'next/headers'
-import { DAILY_FREE_AI_LIMIT } from '@/lib/limits'
+import { getCreditsStatus } from '@/lib/ai/credits'
 
 export default async function SettingsPage() {
   const authUser = await getUser()
@@ -46,12 +46,8 @@ export default async function SettingsPage() {
   const cookieStore = await cookies()
   const locale = cookieStore.get('NEXT_LOCALE')?.value || 'pt'
 
-  // Uso de IA de hoje (só gerações reais contam — mesma janela das rotas de IA)
-  const startOfDay = new Date()
-  startOfDay.setHours(0, 0, 0, 0)
-  const aiUsedToday = await prisma.aIUsageLog.count({
-    where: { userId: authUser.id, usedAt: { gte: startOfDay } },
-  })
+  // Créditos de IA de hoje (só gerações reais contam — mesma fonte das rotas de IA)
+  const credits = await getCreditsStatus(authUser.id, dbUser.plan)
 
   const userProp = {
     id: dbUser.id,
@@ -65,8 +61,8 @@ export default async function SettingsPage() {
     <SettingsClient
       user={userProp}
       locale={locale}
-      aiUsedToday={aiUsedToday}
-      aiDailyLimit={DAILY_FREE_AI_LIMIT}
+      aiUsedToday={credits.used}
+      aiDailyLimit={credits.limit}
       betaEnabled={process.env.BETA_PLAN_TOGGLE !== '0'}
     />
   )

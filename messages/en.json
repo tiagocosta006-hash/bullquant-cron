@@ -243,7 +243,6 @@
       "premiumSoonDesc": "We are preparing advanced artificial intelligence features exclusively for PRO subscribers.",
       "upgradeBtn": "Upgrade to PRO",
       "aiUsageLabel": "AI analyses today",
-      "aiUnlimited": "Unlimited",
       "compare": {
         "title": "Free vs PRO",
         "free": "Free",
@@ -486,15 +485,70 @@
       "naMargin": "Margin not reported — common for banks and insurers, which have no cost of goods (COGS).",
       "naPrice": "Unavailable: depends on the live price, which hasn't loaded yet."
     },
+    "earnings": {
+      "title": "Latest Results",
+      "eps": "EPS",
+      "revenue": "Revenue",
+      "estimate": "Est"
+    },
     "tabs": {
       "overview": "Overview",
       "financials": "Financials",
-      "kpis": "KPIs",
+      "analista": "Analyst",
       "valuation": "Valuation",
       "company": "Company",
       "news": "News",
       "valuationEmpty": "No saved DCF analyses for this company yet.",
       "valuationCta": "Open the DCF calculator"
+    }
+  },
+  "analista": {
+    "title": "AI Analyst",
+    "badge": "AI · sourced",
+    "source": "Source: {label}",
+    "generateTitle": "{ticker} analysis by the AI Analyst",
+    "generateDesc": "Generate a grounded dossier — business model, moat, operating KPIs, risks and bull/bear cases — from our verified data and the official SEC 10-K, with source citations.",
+    "generateCta": "Generate Analysis",
+    "generating": "Reading the 10-K and analyzing... (~20s)",
+    "rateLimitTitle": "Daily limit reached",
+    "rateLimitDesc": "You've used today's AI analyses. Come back tomorrow or go Pro for unlimited analyses.",
+    "errorTitle": "Couldn't generate the analysis. Try again.",
+    "retry": "Try again",
+    "needsAuthTitle": "Session expired",
+    "needsAuthDesc": "Your session expired. Sign in again to generate the analysis.",
+    "login": "Sign in",
+    "viewSource": "View source citation",
+    "sourceTitle": "Citation source",
+    "sourceDesc": "Below is the exact quote the AI extracted for:",
+    "openSec": "View in the SEC 10-K",
+    "back": "Back",
+    "disclaimer": "AI-generated analysis from verified data and the 10-K. Not investment advice.",
+    "moatRatings": {
+      "wide": "Wide moat",
+      "narrow": "Narrow moat",
+      "none": "No clear moat"
+    },
+    "sections": {
+      "businessModel": "Business model",
+      "moat": "Competitive advantage (moat)",
+      "segments": "Revenue by segment",
+      "operatingKpis": "Operating KPIs",
+      "risks": "Key risks",
+      "bullCase": "Bull case",
+      "bearCase": "Bear case"
+    },
+    "chat": {
+      "title": "Ask the Analyst",
+      "placeholder": "Ask anything about the company...",
+      "proOnly": "Pro-only chat",
+      "proDesc": "Go Pro to chat with the AI Analyst and ask follow-up questions about the company and its 10-K.",
+      "error": "Something went wrong. Try again.",
+      "suggestions": [
+        "Explain the business in 30 seconds",
+        "What are the 3 biggest risks?",
+        "How did the operating margin evolve?",
+        "What drives the revenue?"
+      ]
     }
   },
   "dcf": {

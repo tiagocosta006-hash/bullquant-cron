@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { Check, Zap, ArrowRight, Loader2 } from "lucide-react";
 import { buttonVariants, Button } from "@/components/ui/button";
 import { LiquidGlass } from "@/components/fx/LiquidGlass";
@@ -17,6 +18,7 @@ interface PricingCardsProps {
 
 export function PricingCards({ userEmail, userId }: PricingCardsProps = {}) {
   const t = useTranslations("pricing");
+  const router = useRouter();
   const { paddle } = usePaddle();
 
   const [proPrice, setProPrice] = useState<string>(t("pro.price"));
@@ -61,6 +63,12 @@ export function PricingCards({ userEmail, userId }: PricingCardsProps = {}) {
   const handleCheckout = () => {
     if (!paddle || !priceId) return;
 
+    if (!userId) {
+      // Se não tiver conta, obrigar a criar conta primeiro
+      router.push("/register");
+      return;
+    }
+
     paddle.Checkout.open({
       items: [
         {
@@ -70,6 +78,9 @@ export function PricingCards({ userEmail, userId }: PricingCardsProps = {}) {
       ],
       customer: userEmail ? { email: userEmail } : undefined,
       customData: userId ? { userId } : undefined,
+      settings: {
+        successUrl: "https://bullmetrics.thebullocracy.com/dashboard",
+      }
     });
   };
 

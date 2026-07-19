@@ -869,6 +869,16 @@
     "philosophy": {
       "title": "Data Philosophy",
       "text": "Our analysis is based on mathematics and official reports extracted directly from the SEC. BullMetrics focuses on the solidity of numbers. We believe that financial decisions require clean data, technical precision, and transparency, characteristics we value deeply at BullMetrics."
+    },
+    "contact": {
+      "title": "Official Contacts",
+      "text": "Do you have questions, partnership proposals, or want to know more about our data architecture? The Bullocracy team is at your disposal.",
+      "email_label": "Institutional Email",
+      "email_value": "info@thebullocracy.com",
+      "location_label": "Location",
+      "location_value": "University of Minho, Braga",
+      "social_label": "Social Media",
+      "social_value": "@thebullocracy"
     }
   }
 }

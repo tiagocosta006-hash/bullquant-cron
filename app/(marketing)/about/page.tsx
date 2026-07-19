@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 import { BRAND } from "@/lib/brand";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Target, Shield, Users, LineChart } from "lucide-react";
+import { ExternalLink, Target, Shield, Users, LineChart, Mail, MapPin, MessageCircle } from "lucide-react";
 import { TeamMemberModal } from "@/components/marketing/TeamMemberModal";
 import Image from "next/image";
 import { Cinzel } from "next/font/google";
@@ -187,6 +187,51 @@ export default function AboutPage() {
           <p className="text-xl text-muted-foreground leading-relaxed">
             {t("philosophy.text")}
           </p>
+        </div>
+
+        {/* 6. Contacts */}
+        <div className="flex flex-col gap-12 pt-12 border-t border-border/50 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-700 fill-mode-both">
+          <div className="text-center max-w-2xl mx-auto flex flex-col gap-4">
+            <h2 className="text-3xl sm:text-4xl font-heading">{t("contact.title")}</h2>
+            <p className="text-lg text-muted-foreground">
+              {t("contact.text")}
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-3 gap-6 max-w-5xl mx-auto w-full">
+            {/* Email */}
+            <div className="glass flex flex-col items-center text-center p-8 rounded-2xl hover:bg-secondary/20 transition-colors">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <Mail className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="font-semibold text-lg mb-1">{t("contact.email_label")}</h3>
+              <a href={`mailto:${t("contact.email_value")}`} className="text-muted-foreground hover:text-primary transition-colors">
+                {t("contact.email_value")}
+              </a>
+            </div>
+
+            {/* Location */}
+            <div className="glass flex flex-col items-center text-center p-8 rounded-2xl hover:bg-secondary/20 transition-colors">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <MapPin className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="font-semibold text-lg mb-1">{t("contact.location_label")}</h3>
+              <p className="text-muted-foreground">
+                {t("contact.location_value")}
+              </p>
+            </div>
+
+            {/* Social / Community */}
+            <div className="glass flex flex-col items-center text-center p-8 rounded-2xl hover:bg-secondary/20 transition-colors">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <MessageCircle className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="font-semibold text-lg mb-1">{t("contact.social_label")}</h3>
+              <p className="text-muted-foreground">
+                {t("contact.social_value")}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </>

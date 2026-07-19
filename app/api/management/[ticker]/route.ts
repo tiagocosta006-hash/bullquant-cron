@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { generateObject } from 'ai'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { z } from 'zod'
-import { DAILY_FREE_AI_LIMIT } from '@/lib/limits'
+import { assertCreditsAvailable, chargeCredits } from '@/lib/ai/credits'
 
 export const maxDuration = 60; // Vercel function timeout (60s is good for AI)
 
@@ -44,27 +44,15 @@ export async function GET(
       return NextResponse.json({ profile: cached })
     }
 
-    // 1b. Rate limit check
+    // 1b. Créditos
     const dbUser = await prisma.user.findUnique({
       where: { id: user.id },
       select: { plan: true },
     })
-    
-    if (dbUser?.plan !== 'PRO') {
-      const startOfDay = new Date()
-      startOfDay.setHours(0, 0, 0, 0)
-      const usedToday = await prisma.aIUsageLog.count({
-        where: { userId: user.id, usedAt: { gte: startOfDay } },
-      })
-      if (usedToday >= DAILY_FREE_AI_LIMIT) {
-        return NextResponse.json(
-          {
-            error: 'rate_limit',
-            message: 'Limite diário de análises de IA atingido. Tenta novamente amanhã.',
-          },
-          { status: 429 },
-        )
-      }
+
+    const rateLimitError = await assertCreditsAvailable(user.id, dbUser?.plan ?? 'FREE', 'management')
+    if (rateLimitError) {
+      return NextResponse.json(rateLimitError, { status: 429 })
     }
 
     // 2. Generate AI Assessment
@@ -139,9 +127,7 @@ export async function GET(
     })
 
     // 4. Log AI Usage
-    await prisma.aIUsageLog.create({
-      data: { userId: user.id, ticker: company.ticker },
-    })
+    await chargeCredits(user.id, company.ticker, 'management')
 
     return NextResponse.json({ profile })
 

@@ -237,7 +237,6 @@
       "premiumSoonDesc": "Estamos a preparar funcionalidades avançadas de inteligência artificial exclusivas para subscritores PRO.",
       "upgradeBtn": "Fazer Upgrade para PRO",
       "aiUsageLabel": "Análises de IA hoje",
-      "aiUnlimited": "Ilimitadas",
       "compare": {
         "title": "Free vs PRO",
         "free": "Free",
@@ -483,12 +482,61 @@
     "tabs": {
       "overview": "Resumo",
       "financials": "Fundamentais",
-      "kpis": "KPIs",
+      "analista": "Analista",
       "valuation": "Valuation",
       "company": "Empresa",
       "news": "Notícias",
       "valuationEmpty": "Ainda não guardaste análises DCF para esta empresa.",
       "valuationCta": "Abrir a calculadora DCF"
+    }
+  },
+  "analista": {
+    "title": "Analista IA",
+    "badge": "IA · com fontes",
+    "source": "Fonte: {label}",
+    "generateTitle": "Análise de {ticker} pelo Analista IA",
+    "generateDesc": "Gera um dossier grounded — modelo de negócio, moat, KPIs operacionais, riscos e casos bull/bear — a partir dos nossos dados verificados e do 10-K oficial da SEC, com citações à fonte.",
+    "generateCta": "Gerar Análise",
+    "generating": "A ler o 10-K e a analisar... (~20s)",
+    "rateLimitTitle": "Limite diário atingido",
+    "rateLimitDesc": "Já usaste as tuas análises de IA de hoje. Volta amanhã ou passa a Pro para análises ilimitadas.",
+    "errorTitle": "Não foi possível gerar a análise. Tenta novamente.",
+    "retry": "Tentar de novo",
+    "needsAuthTitle": "Sessão expirada",
+    "needsAuthDesc": "A tua sessão expirou. Inicia sessão outra vez para gerar a análise.",
+    "login": "Iniciar sessão",
+    "viewSource": "Ver citação na fonte",
+    "sourceTitle": "Fonte da citação",
+    "sourceDesc": "Abaixo está a citação exata de onde a IA tirou:",
+    "openSec": "Ver no 10-K da SEC",
+    "back": "Voltar",
+    "disclaimer": "Análise gerada por IA a partir de dados verificados e do 10-K. Não é conselho de investimento.",
+    "moatRatings": {
+      "wide": "Moat largo",
+      "narrow": "Moat estreito",
+      "none": "Sem moat claro"
+    },
+    "sections": {
+      "businessModel": "Modelo de negócio",
+      "moat": "Vantagem competitiva (moat)",
+      "segments": "Receita por segmento",
+      "operatingKpis": "KPIs operacionais",
+      "risks": "Riscos principais",
+      "bullCase": "Caso otimista",
+      "bearCase": "Caso pessimista"
+    },
+    "chat": {
+      "title": "Pergunta ao Analista",
+      "placeholder": "Pergunta o que quiseres sobre a empresa...",
+      "proOnly": "Chat exclusivo Pro",
+      "proDesc": "Passa a Pro para conversar com o Analista IA e fazer perguntas de seguimento sobre a empresa e o 10-K.",
+      "error": "Ocorreu um erro. Tenta novamente.",
+      "suggestions": [
+        "Explica-me o negócio em 30 segundos",
+        "Quais são os 3 maiores riscos?",
+        "Como evoluiu a margem operacional?",
+        "O que impulsiona a receita?"
+      ]
     }
   },
   "dcf": {

@@ -5,12 +5,12 @@ import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { LiquidGlass } from "@/components/fx/LiquidGlass";
 
-const TAB_KEYS = ["overview", "financials", "kpis", "valuation", "company", "news"] as const;
+const TAB_KEYS = ["overview", "financials", "analista", "valuation", "company", "news"] as const;
 type TabKey = (typeof TAB_KEYS)[number];
 
 /**
  * StockTabs — a página de stock deixou de ser um scroll infinito de
- * 8 secções: organiza-se por intenção (Resumo · Fundamentais · KPIs ·
+ * 8 secções: organiza-se por intenção (Resumo · Fundamentais · Analista ·
  * Valuation · Empresa · Notícias) numa barra de tabs em vidro, presa
  * por baixo da TopNav. As secções ficam montadas (SSR/SEO intactos) e
  * alternam por visibilidade — os gráficos remedem ao voltar.
@@ -18,14 +18,14 @@ type TabKey = (typeof TAB_KEYS)[number];
 export function StockTabs({
   overview,
   financials,
-  kpis,
+  analista,
   valuation,
   company,
   news,
 }: Record<TabKey, React.ReactNode>) {
   const t = useTranslations("stock.tabs");
   const [active, setActive] = useState<TabKey>("overview");
-  const slots: Record<TabKey, React.ReactNode> = { overview, financials, kpis, valuation, company, news };
+  const slots: Record<TabKey, React.ReactNode> = { overview, financials, analista, valuation, company, news };
 
   return (
     <div>

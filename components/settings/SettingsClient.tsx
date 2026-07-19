@@ -492,22 +492,20 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
               </div>
             </div>
 
-            {/* Uso de IA de hoje */}
+            {/* Créditos de IA de hoje — Free e Pro têm limites reais (diferentes) */}
             <div className="max-w-xl">
               <div className="flex items-baseline justify-between mb-2">
                 <p className="text-sm font-medium text-foreground">{t('subscription.aiUsageLabel')}</p>
                 <p className="nums text-sm font-bold text-primary">
-                  {isPro ? t('subscription.aiUnlimited') : `${aiUsedToday}/${aiDailyLimit}`}
+                  {aiUsedToday}/{aiDailyLimit}
                 </p>
               </div>
-              {!isPro && (
-                <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-                  <div
-                    className="h-full rounded-full bg-primary transition-all"
-                    style={{ width: `${Math.min(100, (aiUsedToday / aiDailyLimit) * 100)}%` }}
-                  />
-                </div>
-              )}
+              <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full rounded-full bg-primary transition-all"
+                  style={{ width: `${Math.min(100, (aiUsedToday / aiDailyLimit) * 100)}%` }}
+                />
+              </div>
             </div>
 
 

@@ -17,7 +17,7 @@ import { BRAND } from '@/lib/brand'
 import { CompanyProfile } from '@/components/stock/CompanyProfile'
 import { StockNews } from '@/components/stock/StockNews'
 import { ManagementTeam } from '@/components/stock/ManagementTeam'
-const StockKPIs = dynamic(() => import('@/components/stock/StockKPIs').then(mod => mod.StockKPIs))
+const StockAnalyst = dynamic(() => import('@/components/stock/StockAnalyst').then(mod => mod.StockAnalyst))
 import { StockTabs } from '@/components/stock/StockTabs'
 const PremiumPdfButton = dynamic(() => import('@/components/stock/pdf/PremiumPdfButton').then(mod => mod.PremiumPdfButton))
 const ValuationMultiples = dynamic(() => import('@/components/stock/ValuationMultiples').then(mod => mod.ValuationMultiples))
@@ -254,8 +254,13 @@ export default async function StockPage({
         financials={
           <FinancialsEngine ticker={company.ticker} sector={company.sector} currencySymbol={currencySymbol} />
         }
-        kpis={
-          <StockKPIs fundamentals={JSON.parse(JSON.stringify(historicalAnnual))} isPro={isPro} ticker={company.ticker} />
+        analista={
+          <StockAnalyst
+            ticker={company.ticker}
+            fundamentals={JSON.parse(JSON.stringify(historicalAnnual))}
+            isPro={isPro}
+            currencySymbol={currencySymbol}
+          />
         }
         valuation={
           <>

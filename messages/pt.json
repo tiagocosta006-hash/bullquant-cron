@@ -172,7 +172,13 @@
       "q5": "Os números batem certo com os relatórios oficiais?",
       "a5": "Os dados vêm dos filings oficiais e as métricas derivadas (margens, ROIC, FCF) são calculadas com fórmulas padrão, documentadas. Quando um valor não existe, mostramos N/A, nunca inventamos."
     },
-    "floatingNote": "0 € · sem cartão"
+    "floatingNote": "0 € · sem cartão",
+    "mission": {
+      "badge": "A Missão",
+      "title": "Democratizar o acesso a dados financeiros.",
+      "desc": "Uma plataforma desenvolvida por jovens universitários com o objetivo de entregar dados profissionais a investidores independentes.",
+      "cta": "Conhece a equipa por trás"
+    }
   },
   "insider": {
     "title": "Transações de Insiders",
@@ -262,7 +268,7 @@
     "analytics": "Pulse"
   },
   "login": {
-    "title": "Entrar no BullVision",
+    "title": "Entrar no BullMetrics",
     "subtitle": "Acede ao teu portfólio e análises.",
     "emailLabel": "Email",
     "emailPlaceholder": "nome@email.com",
@@ -277,7 +283,7 @@
   },
   "register": {
     "title": "Criar Conta",
-    "subtitle": "Junta-te a milhares de investidores no BullVision.",
+    "subtitle": "Junta-te a milhares de investidores no BullMetrics.",
     "nameLabel": "Nome",
     "namePlaceholder": "O teu nome",
     "emailLabel": "Email",
@@ -316,6 +322,7 @@
     "logoutTitle": "Sair",
     "login": "Login",
     "register": "Registar",
+    "pricing": "Preços",
     "dcf": "DCF",
     "calendar": "Calendário",
     "theme": "Alternar tema",
@@ -345,7 +352,7 @@
       "namePlaceholder": "Como queres ser chamado",
       "save": "Guardar Alterações",
       "dangerZone": "Zona de Perigo",
-      "logoutDesc": "Termina a tua sessão atual no Bullmetrics com segurança.",
+      "logoutDesc": "Termina a tua sessão atual no BullMetrics com segurança.",
       "logoutBtn": "Sair da Conta",
       "securityTitle": "Segurança",
       "currentPassword": "Password Atual",
@@ -367,7 +374,7 @@
     "preferences": {
       "title": "Preferências de Utilização",
       "language": "Idioma",
-      "languageDesc": "Escolhe a língua em que queres usar o Bullmetrics.",
+      "languageDesc": "Escolhe a língua em que queres usar o BullMetrics.",
       "theme": "Tema Visual",
       "themeDesc": "Alterna entre modo escuro (Dark) e modo claro (Light).",
       "themeLight": "Claro",
@@ -380,7 +387,6 @@
       "premiumSoonDesc": "Estamos a preparar funcionalidades avançadas de inteligência artificial exclusivas para subscritores PRO.",
       "upgradeBtn": "Fazer Upgrade para PRO",
       "aiUsageLabel": "Análises de IA hoje",
-      "aiUnlimited": "Ilimitadas",
       "compare": {
         "title": "Free vs PRO",
         "free": "Free",
@@ -422,7 +428,7 @@
       "title": "Sugestões para adicionares"
     },
     "landing": {
-      "title": "BullVision",
+      "title": "BullMetrics",
       "description": "Pesquisa pelo ticker de uma empresa na barra superior para começar ou regista-te para acederes à tua Watchlist.",
       "testExample": "Testar Exemplo",
       "createAccount": "Criar Conta Grátis"
@@ -623,15 +629,70 @@
       "naMargin": "Margem não reportada, típico de bancos e seguradoras, que não têm custo de produção (COGS).",
       "naPrice": "Indisponível: depende do preço atual, que ainda não carregou."
     },
+    "earnings": {
+      "title": "Últimos Resultados",
+      "eps": "EPS",
+      "revenue": "Receita",
+      "estimate": "Est"
+    },
     "tabs": {
       "overview": "Resumo",
       "financials": "Fundamentais",
-      "kpis": "KPIs",
+      "analista": "Analista",
       "valuation": "Valuation",
       "company": "Empresa",
       "news": "Notícias",
       "valuationEmpty": "Ainda não guardaste análises DCF para esta empresa.",
       "valuationCta": "Abrir a calculadora DCF"
+    }
+  },
+  "analista": {
+    "title": "Analista IA",
+    "badge": "IA · com fontes",
+    "source": "Fonte: {label}",
+    "generateTitle": "Análise de {ticker} pelo Analista IA",
+    "generateDesc": "Gera um dossier grounded, modelo de negócio, moat, KPIs operacionais, riscos e casos bull/bear, a partir dos nossos dados verificados e do 10-K oficial da SEC, com citações à fonte.",
+    "generateCta": "Gerar Análise",
+    "generating": "A ler o 10-K e a analisar... (~20s)",
+    "rateLimitTitle": "Limite diário atingido",
+    "rateLimitDesc": "Já usaste as tuas análises de IA de hoje. Volta amanhã ou passa a Pro para análises ilimitadas.",
+    "errorTitle": "Não foi possível gerar a análise. Tenta novamente.",
+    "retry": "Tentar de novo",
+    "needsAuthTitle": "Sessão expirada",
+    "needsAuthDesc": "A tua sessão expirou. Inicia sessão outra vez para gerar a análise.",
+    "login": "Iniciar sessão",
+    "viewSource": "Ver citação na fonte",
+    "sourceTitle": "Fonte da citação",
+    "sourceDesc": "Abaixo está a citação exata de onde a IA tirou:",
+    "openSec": "Ver no 10-K da SEC",
+    "back": "Voltar",
+    "disclaimer": "Análise gerada por IA a partir de dados verificados e do 10-K. Não é conselho de investimento.",
+    "moatRatings": {
+      "wide": "Moat largo",
+      "narrow": "Moat estreito",
+      "none": "Sem moat claro"
+    },
+    "sections": {
+      "businessModel": "Modelo de negócio",
+      "moat": "Vantagem competitiva (moat)",
+      "segments": "Receita por segmento",
+      "operatingKpis": "KPIs operacionais",
+      "risks": "Riscos principais",
+      "bullCase": "Caso otimista",
+      "bearCase": "Caso pessimista"
+    },
+    "chat": {
+      "title": "Pergunta ao Analista",
+      "placeholder": "Pergunta o que quiseres sobre a empresa...",
+      "proOnly": "Chat exclusivo Pro",
+      "proDesc": "Passa a Pro para conversar com o Analista IA e fazer perguntas de seguimento sobre a empresa e o 10-K.",
+      "error": "Ocorreu um erro. Tenta novamente.",
+      "suggestions": [
+        "Explica-me o negócio em 30 segundos",
+        "Quais são os 3 maiores riscos?",
+        "Como evoluiu a margem operacional?",
+        "O que impulsiona a receita?"
+      ]
     }
   },
   "dcf": {
@@ -805,7 +866,80 @@
     "rights": "© {year} {brand}. Todos os direitos reservados.",
     "terms": "Termos de Serviço",
     "privacy": "Privacidade",
-    "refund": "Política de Reembolso"
+    "refund": "Política de Reembolso",
+    "pricing": "Preços",
+    "about": "Sobre Nós"
+  },
+  "pricing": {
+    "badge": "Simples e transparente",
+    "title": "Investe com mais confiança.",
+    "subtitle": "Começa gratuitamente ou experimenta o plano PRO por 7 dias grátis. Cancela a qualquer momento.",
+    "monthly": "Mês",
+    "free": {
+      "name": "Gratuito",
+      "price": "€0",
+      "period": "para sempre",
+      "description": "Tudo o que precisas para começar a analisar empresas.",
+      "cta": "Criar conta grátis"
+    },
+    "pro": {
+      "name": "PRO",
+      "price": "€7",
+      "period": "por mês",
+      "description": "Para o investidor sério que quer ir mais fundo na análise.",
+      "cta": "Começar trial de 7 dias",
+      "badge": "Mais popular"
+    },
+    "features": {
+      "title": "O que está incluído",
+      "free": [
+        "Acesso completo ao S&P 500",
+        "10 anos de dados fundamentais",
+        "Calculadora DCF com autopreenche",
+        "Gráficos financeiros interativos",
+        "Watchlist até 10 empresas",
+        "5 análises AI Brief por dia",
+        "Calendário de resultados",
+        "Dados de Insider Trading"
+      ],
+      "pro": [
+        "Tudo do plano Gratuito",
+        "Watchlist ilimitada",
+        "AI Brief ilimitado",
+        "Guardar análises DCF ilimitadas",
+        "Screener avançado com filtros customizados",
+        "Exportar dados financeiros em CSV",
+        "Acesso antecipado a novas funcionalidades",
+        "Comunidade privada de value investors",
+        "Apoio prioritário 24/7 por email"
+      ]
+    },
+    "faq": {
+      "title": "Perguntas frequentes",
+      "items": [
+        {
+          "q": "Posso cancelar a qualquer momento?",
+          "a": "Sim, sem qualquer penalização. O acesso PRO mantém-se até ao fim do período pago e depois reverte para o plano gratuito."
+        },
+        {
+          "q": "Existe um período experimental?",
+          "a": "Sim, oferecemos 7 dias grátis para testares a plataforma PRO. Durante esses 7 dias terás acesso a todas as funcionalidades avançadas, exceto à comunidade privada."
+        },
+        {
+          "q": "Quem processa os pagamentos?",
+          "a": "Os pagamentos são processados pelo Paddle, que atua como Merchant of Record e é responsável pela faturação, impostos e conformidade legal em toda a UE."
+        },
+        {
+          "q": "A subscrição renova automaticamente?",
+          "a": "Sim, mensalmente. Receberás sempre um email de aviso antes de qualquer cobrança e podes cancelar a qualquer momento."
+        },
+        {
+          "q": "Os meus dados financeiros estão seguros?",
+          "a": "Nunca guardamos dados de cartão, toda a informação de pagamento é gerida exclusivamente pelo Paddle com encriptação de nível bancário."
+        }
+      ]
+    },
+    "trust": "Pagamentos seguros via Paddle · Cancela a qualquer momento · Conformidade IVA UE"
   },
   "explore": {
     "title": "Explorar Negócios",
@@ -880,6 +1014,70 @@
     },
     "suggestionsTitle": "Sugestões para seguir",
     "lastUpdate": "Última atualização:"
+  },
+  "about": {
+    "badge": "A Nossa Missão",
+    "title": "A democratizar o acesso a dados <italic>financeiros.</italic>",
+    "intro": "A BullMetrics é uma plataforma de análise de dados fundamentais desenhada para todo o tipo de investidores.",
+    "problem": {
+      "title": "O Nosso Objetivo",
+      "text": "Dar ao investidor individual acesso fácil, estruturado e transparente às demonstrações financeiras das empresas. Ao automatizar a extração dos complexos relatórios da SEC, libertamos o teu tempo para aquilo que realmente importa: a análise de valor."
+    },
+    "organization": {
+      "title": "A Bullocracy",
+      "text": "A BullMetrics é um produto construído pela Bullocracy, uma organização de jovens estudantes que procuram democratizar o acesso ao conhecimento sobre Política, Economia e Investimentos. Para isso, criam conteúdos nas redes sociais, desde o YouTube ao TikTok, fomentando a criação um espaço para que a nossa comunidade possa escrever artigos e opiniões para serem publicados online, no site thebullocracy.com, onde estimulam o debate livre e a literacia financeira.",
+      "cta": "Visitar thebullocracy.com"
+    },
+    "team": {
+      "title": "A Equipa",
+      "description": "Toda a plataforma é desenhada por quem entende e quer entender cada vez mais de mercados, garantindo que as ferramentas refletem as necessidades reais da análise fundamental.",
+      "members": [
+        {
+          "name": "Rodrigo Martins",
+          "role": "Co-Founder & Web Analyst",
+          "bio": "Estudante de Economia na Universidade do Minho. Responsável pela estratégia de marketing, indexação do site, SEO, métricas de analytics e otimização geral da performance da plataforma, bem como a integração da BullMetrics nos conteúdos da Bullocracy.",
+          "socials": {
+            "linkedin": "https://www.linkedin.com/in/rodrigo-teixeira-martins/",
+            "instagram": "#",
+            "email": "rodrigotmartins30@gmail.com"
+          }
+        },
+        {
+          "name": "Tiago Costa",
+          "role": "Co-Founder & Product Owner",
+          "bio": "Estudante de Economia na Universidade do Minho. Responsável pela conceptualização do ecossistema e das funcionalidades da plataforma, definindo o rumo das ferramentas e focando-se na usabilidade do produto.",
+          "socials": {
+            "linkedin": "https://www.linkedin.com/in/tcosta06/",
+            "instagram": "#",
+            "email": "tiago.costa006@gmail.com"
+          }
+        },
+        {
+          "name": "Alexandre Machado",
+          "role": "Lead Developer & UI/UX Designer",
+          "bio": "[Inserir curso/universidade]. Responsável pelo desenvolvimento técnico da plataforma, desenhando a interface e construindo a estrutura de backend e frontend com foco em código e arquitetura de software.",
+          "socials": {
+            "linkedin": "#",
+            "instagram": "#",
+            "email": "#"
+          }
+        }
+      ]
+    },
+    "philosophy": {
+      "title": "A Filosofia dos Dados",
+      "text": "A nossa análise baseia-se na matemática e nos relatórios oficiais extraídos diretamente da SEC. A BullMetrics foca-se na solidez dos números. Acreditamos que as decisões financeiras exigem dados limpos, precisão técnica e transparência, características que valorizamos muito na BullMetrics."
+    },
+    "contact": {
+      "title": "Contactos Oficiais",
+      "text": "Tens dúvidas, propostas de parceria ou queres saber mais sobre toda a plataforma? A equipa da Bullocracy está à tua disposição.",
+      "email_label": "Email Institucional",
+      "email_value": "info@thebullocracy.com",
+      "location_label": "Localização",
+      "location_value": "Universidade do Minho, Braga",
+      "social_label": "Redes Sociais",
+      "social_value": "@thebullocracy"
+    }
   },
   "analytics": {
     "title": "Pulse",

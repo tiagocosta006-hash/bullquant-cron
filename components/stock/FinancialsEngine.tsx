@@ -183,23 +183,64 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
   }
 
   // Pre-process segments and KPIs for dynamic keys
-  let segmentKeys: string[] = []
-  const periodWithSegments = processedData.find(d => d.revenueSegments && Object.keys(d.revenueSegments).length > 0)
-  if (periodWithSegments) {
-    segmentKeys = Object.keys(periodWithSegments.revenueSegments as Record<string, number>)
-  }
-  
-  // Flatten segments into main object for Recharts
-  const chartData = processedData.map(d => ({
-    ...d,
-    profitMargin: d.profitMargin !== undefined ? d.profitMargin : d.netMargin,
-    operatingExpenses: (d.operatingExpenses !== null && d.operatingExpenses !== undefined) ? d.operatingExpenses : (d.sellingGeneralAndAdmin !== null && d.sellingGeneralAndAdmin !== undefined ? d.sellingGeneralAndAdmin : null),
-    ...d.revenueSegments,
-    // null fica null (gap no gráfico) — 0 fabricado era indistinguível de capex zero real
-    capexInv: d.capex != null ? -d.capex : null // Negative capex for composed chart
-  }))
+  // União de todas as categorias vistas em QUALQUER período, não só num de
+  // referência — empresas reorganizam segmentos ao longo do tempo (ex.: MSFT
+  // fundiu "Windows"+"Devices" em "Windows and Devices" e dividiu "Office
+  // Products and Cloud Services" em "Microsoft 365 Commercial/Consumer" a
+  // partir de FY2023) ou entram em novos negócios — usar só um período como
+  // referência escondia essas categorias nos restantes anos.
+  const segmentKeySet = new Set<string>()
+  processedData.forEach(d => {
+    if (d.revenueSegments) {
+      Object.keys(d.revenueSegments).forEach(k => segmentKeySet.add(k))
+    }
+  })
 
-  const segmentColors = ['#f97316', '#fcd34d', '#fde047', '#86efac', '#38bdf8', '#c084fc']
+  // Paleta categórica validada (CVD-safe, ΔE mínimo entre adjacentes ≥ 12) —
+  // nunca gerar uma cor a mais: uma 9ª série não recebe uma nova cor, funde-se
+  // em "Other" (regra da skill de dataviz). MAX_SEGMENT_SERIES == nº de cores.
+  const segmentColors = ['#2a78d6', '#1baf7a', '#eda100', '#008300', '#4a3aa7', '#e34948', '#e87ba4', '#eb6834']
+  const MAX_SEGMENT_SERIES = segmentColors.length
+
+  let segmentKeys = Array.from(segmentKeySet)
+  let foldedSegmentKeys: Set<string> | null = null
+  if (segmentKeys.length > MAX_SEGMENT_SERIES) {
+    const totals = new Map<string, number>()
+    segmentKeys.forEach(k => {
+      const total = processedData.reduce((sum, d) => sum + (d.revenueSegments?.[k] ?? 0), 0)
+      totals.set(k, total)
+    })
+    const bySize = [...segmentKeys].sort((a, b) => (totals.get(b) ?? 0) - (totals.get(a) ?? 0))
+    const kept = bySize.slice(0, MAX_SEGMENT_SERIES - 1)
+    foldedSegmentKeys = new Set(bySize.slice(MAX_SEGMENT_SERIES - 1))
+    segmentKeys = [...kept, 'Other']
+  }
+
+  // Flatten segments into main object for Recharts
+  const chartData = processedData.map(d => {
+    let segs = d.revenueSegments
+    if (foldedSegmentKeys && segs) {
+      const merged: Record<string, number> = {}
+      let otherSum = 0
+      Object.entries(segs).forEach(([k, v]) => {
+        if (foldedSegmentKeys!.has(k) || k === 'Other') {
+          otherSum += v
+        } else {
+          merged[k] = v
+        }
+      })
+      merged['Other'] = otherSum
+      segs = merged
+    }
+    return {
+      ...d,
+      profitMargin: d.profitMargin !== undefined ? d.profitMargin : d.netMargin,
+      operatingExpenses: (d.operatingExpenses !== null && d.operatingExpenses !== undefined) ? d.operatingExpenses : (d.sellingGeneralAndAdmin !== null && d.sellingGeneralAndAdmin !== undefined ? d.sellingGeneralAndAdmin : null),
+      ...segs,
+      // null fica null (gap no gráfico) — 0 fabricado era indistinguível de capex zero real
+      capexInv: d.capex != null ? -d.capex : null // Negative capex for composed chart
+    }
+  })
 
   return (
     <div className="mt-12 space-y-6">

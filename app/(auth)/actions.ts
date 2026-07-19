@@ -138,7 +138,6 @@ export async function signup(formData: FormData) {
     password,
     options: { data: { name }, emailRedirectTo: redirectTo },
   })
-
   if (error) {
     registerError(translateError(error))
   }

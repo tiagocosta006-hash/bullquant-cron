@@ -20,9 +20,10 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog"
-import { updateProfile, setLocale, updatePasswordSettings, updateEmailSettings, deleteAccount, togglePlanBeta } from '@/app/(app)/settings/actions'
+import { updateProfile, setLocale, updatePasswordSettings, updateEmailSettings, deleteAccount } from '@/app/(app)/settings/actions'
 import { logout } from '@/app/(auth)/actions'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { usePaddle } from '@/components/providers/PaddleProvider'
 import { applyTheme, currentTheme, type Theme } from '@/lib/theme'
 import { userInitials } from '@/lib/utils'
 
@@ -32,6 +33,7 @@ interface SettingsClientProps {
     email: string
     name: string | null
     plan: string
+    hasSubscription?: boolean
   }
   locale: string
   aiUsedToday: number
@@ -68,9 +70,29 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
     init()
   }, [])
 
-  // Toggle de plano (beta)
-  const [isTogglingPlan, setIsTogglingPlan] = useState(false)
-  const [planMessage, setPlanMessage] = useState<string | null>(null)
+
+  const [isGeneratingPortal, setIsGeneratingPortal] = useState(false)
+  const [portalError, setPortalError] = useState<string | null>(null)
+
+  // Preço localizado (Paddle)
+  const { paddle } = usePaddle()
+  const [proPrice, setProPrice] = useState('€7')
+
+  useEffect(() => {
+    const priceId = process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_PRO
+    if (!paddle || !priceId) return
+
+    paddle.PricePreview({
+      items: [{ priceId, quantity: 1 }]
+    })
+      .then((preview) => {
+        if (preview.data.details.lineItems.length > 0) {
+          // Removes decimals if it's .00 for a cleaner look, or just use the exact formatted total
+          setProPrice(preview.data.details.lineItems[0].formattedTotals.total)
+        }
+      })
+      .catch(console.error)
+  }, [paddle])
 
   // Track the initial name normalised to empty string so comparison is consistent
   const initialName = user.name || ''
@@ -119,7 +141,33 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
   const handleDeleteAccount = async () => {
     setIsDeleting(true)
     await deleteAccount()
+    // It will redirect automatically from action
   }
+
+  const handleManageSubscription = async () => {
+    setIsGeneratingPortal(true)
+    setPortalError(null)
+
+    try {
+      const response = await fetch('/api/paddle/portal', {
+        method: 'POST',
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok && data.url) {
+        window.open(data.url, '_blank', 'noopener,noreferrer')
+        setIsGeneratingPortal(false)
+      } else {
+        setPortalError(data.error || 'Ocorreu um erro ao gerar o link do portal.')
+        setIsGeneratingPortal(false)
+      }
+    } catch (error) {
+      setPortalError('Falha na comunicação com o servidor.')
+      setIsGeneratingPortal(false)
+    }
+  }
+
 
   const handleUpdateEmail = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -155,19 +203,6 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
       applyTheme(value)
       setTheme(value)
     }
-  }
-
-  const handleTogglePlan = async () => {
-    setIsTogglingPlan(true)
-    setPlanMessage(null)
-    const result = await togglePlanBeta()
-    if (result?.error) {
-      setPlanMessage(t('subscription.beta.error'))
-    } else {
-      // revalidatePath já correu na action; refresh para o badge/props atualizarem
-      router.refresh()
-    }
-    setIsTogglingPlan(false)
   }
 
   const isPro = user.plan === 'PRO'
@@ -452,104 +487,115 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
           <div className="glass rounded-xl text-card-foreground p-6 space-y-8">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold">{t('subscription.title')}</h2>
-              <div className="bg-bull/10 text-bull border border-bull/20 px-3 py-1 rounded-full font-bold flex items-center text-sm">
+              <div className={`px-3 py-1 rounded-full font-bold flex items-center text-sm ${user.plan === 'PRO' ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-bull/10 text-bull border border-bull/20'}`}>
                 <Star className="h-3 w-3 mr-1.5 fill-current" />
                 {isPro ? 'PRO' : t('planFree')}
               </div>
             </div>
 
-            {/* Uso de IA de hoje */}
+            {/* Créditos de IA de hoje — Free e Pro têm limites reais (diferentes) */}
             <div className="max-w-xl">
               <div className="flex items-baseline justify-between mb-2">
                 <p className="text-sm font-medium text-foreground">{t('subscription.aiUsageLabel')}</p>
                 <p className="nums text-sm font-bold text-primary">
-                  {isPro ? t('subscription.aiUnlimited') : `${aiUsedToday}/${aiDailyLimit}`}
+                  {aiUsedToday}/{aiDailyLimit}
                 </p>
               </div>
-              {!isPro && (
-                <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-                  <div
-                    className="h-full rounded-full bg-primary transition-all"
-                    style={{ width: `${Math.min(100, (aiUsedToday / aiDailyLimit) * 100)}%` }}
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Comparação Free vs Pro */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">{t('subscription.compare.title')}</h3>
-              <div className="overflow-x-auto">
-                <table className="w-full max-w-2xl text-sm">
-                  <thead>
-                    <tr className="border-b border-border/60 text-left">
-                      <th className="py-2.5 pr-4 font-medium text-muted-foreground" />
-                      <th className={`py-2.5 px-4 font-bold ${!isPro ? 'text-primary' : ''}`}>{t('subscription.compare.free')}</th>
-                      <th className={`py-2.5 px-4 font-bold ${isPro ? 'text-primary' : ''}`}>{t('subscription.compare.pro')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b border-border/40">
-                      <td className="py-2.5 pr-4 font-medium">{t('subscription.compare.priceLabel')}</td>
-                      <td className="nums py-2.5 px-4">{t('subscription.compare.priceFree')}</td>
-                      <td className="nums py-2.5 px-4">{t('subscription.compare.pricePro')}</td>
-                    </tr>
-                    <tr className="border-b border-border/40">
-                      <td className="py-2.5 pr-4 font-medium">{t('subscription.compare.quotesLabel')}</td>
-                      <td className="py-2.5 px-4"><Check className="h-4 w-4 text-bull" /></td>
-                      <td className="py-2.5 px-4"><Check className="h-4 w-4 text-bull" /></td>
-                    </tr>
-                    <tr className="border-b border-border/40">
-                      <td className="py-2.5 pr-4 font-medium">{t('subscription.compare.aiLabel')}</td>
-                      <td className="py-2.5 px-4">{t('subscription.compare.aiFree', { limit: aiDailyLimit })}</td>
-                      <td className="py-2.5 px-4">{t('subscription.compare.aiPro')}</td>
-                    </tr>
-                    <tr className="border-b border-border/40">
-                      <td className="py-2.5 pr-4 font-medium">{t('subscription.compare.kpisLabel')}</td>
-                      <td className="py-2.5 px-4"><X className="h-4 w-4 text-muted-foreground/60" /></td>
-                      <td className="py-2.5 px-4"><Check className="h-4 w-4 text-bull" /></td>
-                    </tr>
-                    <tr>
-                      <td className="py-2.5 pr-4 font-medium">{t('subscription.compare.pdfLabel')}</td>
-                      <td className="py-2.5 px-4"><X className="h-4 w-4 text-muted-foreground/60" /></td>
-                      <td className="py-2.5 px-4"><Check className="h-4 w-4 text-bull" /></td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full rounded-full bg-primary transition-all"
+                  style={{ width: `${Math.min(100, (aiUsedToday / aiDailyLimit) * 100)}%` }}
+                />
               </div>
-              <p className="mt-2 text-xs text-muted-foreground">{t('subscription.compare.priceNote')}</p>
             </div>
 
-            {/* Upgrade real (pagamentos ainda por integrar) */}
-            <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg p-6 border border-primary/20 text-center">
-              <Star className="h-10 w-10 text-primary mx-auto mb-3" />
-              <h3 className="text-lg font-bold text-foreground mb-2">
-                {t('subscription.premiumSoonTitle')}
-              </h3>
-              <p className="text-sm text-muted-foreground mb-5 max-w-md mx-auto">
-                {t('subscription.premiumSoonDesc')}
-              </p>
-              <Button disabled className="w-full sm:w-auto">
-                {t('subscription.upgradeBtn')}
-              </Button>
-            </div>
 
-            {/* Beta: alternar de plano sem pagamento */}
-            {betaEnabled && (
-              <div className="rounded-lg border border-dashed border-border p-5">
-                <div className="mb-1 flex items-center gap-2">
-                  <FlaskConical className="h-4 w-4 text-primary" />
-                  <h3 className="text-sm font-bold">{t('subscription.beta.title')}</h3>
-                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">Beta</span>
+
+            {user.plan === 'PRO' ? (
+              /* ── Estado PRO activo ── */
+              <div className="space-y-4">
+                <div className="rounded-lg border border-primary/20 bg-primary/5 p-5">
+                  <p className="font-semibold text-primary mb-1">Plano PRO Activo</p>
+                  <p className="text-sm text-muted-foreground">
+                    Tens acesso completo a todas as funcionalidades PRO. Para gerir a tua subscrição (cancelar, actualizar dados de pagamento), utiliza o portal de faturação abaixo.
+                  </p>
                 </div>
-                <p className="mb-4 text-sm text-muted-foreground">{t('subscription.beta.desc')}</p>
-                {planMessage && (
-                  <p className="mb-3 text-sm font-medium text-destructive">{planMessage}</p>
-                )}
-                <Button variant="outline" onClick={handleTogglePlan} disabled={isTogglingPlan}>
-                  {isTogglingPlan ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  {isPro ? t('subscription.beta.toFree') : t('subscription.beta.toPro')}
+                <Button
+                  onClick={handleManageSubscription}
+                  disabled={isGeneratingPortal || !user.hasSubscription}
+                  className="gap-2"
+                >
+                  {isGeneratingPortal ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  Gerir subscrição (Alterar/Cancelar) →
                 </Button>
+                {portalError && <p className="text-sm text-destructive font-medium">{portalError}</p>}
+                {!user.hasSubscription && !portalError && (
+                  <p className="text-xs text-muted-foreground">ID de subscrição não encontrado na base de dados.</p>
+                )}
+              </div>
+            ) : (
+              /* ── Estado FREE — mostrar comparação de planos ── */
+              <div className="space-y-6">
+                <p className="text-sm text-muted-foreground">{t('subscription.desc')}</p>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {/* Gratuito */}
+                  <div className="rounded-xl border border-border bg-muted/20 p-5 flex flex-col">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Gratuito</p>
+                    <div className="flex items-end gap-1 mb-1">
+                      <span className="text-3xl font-extrabold">€0</span>
+                      <span className="mb-0.5 text-sm text-muted-foreground">/ para sempre</span>
+                    </div>
+                    <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+                      {["S&P 500 completo", "10 anos de fundamentais", "DCF com autopreenche", "5 AI Briefs/dia", "Watchlist até 10 empresas"].map(f => (
+                        <li key={f} className="flex items-center gap-2">
+                          <Check className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mt-auto pt-5">
+                      <div className="w-full rounded-lg border border-border bg-muted/30 py-2 text-center text-sm font-medium text-muted-foreground">
+                        Plano atual
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* PRO */}
+                  <div className="relative rounded-xl border border-primary/40 bg-gradient-to-br from-primary/8 to-card/60 p-5 flex flex-col shadow-[0_0_30px_-8px_hsl(var(--primary)/0.2)]">
+                    <div className="absolute -top-3 left-4">
+                      <div className="flex items-center gap-1 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold text-primary-foreground">
+                        <Star className="h-2.5 w-2.5 fill-current" />
+                        Mais popular
+                      </div>
+                    </div>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">PRO</p>
+                    <div className="flex items-end gap-1 mb-1">
+                      <span className="text-3xl font-extrabold">{proPrice}</span>
+                      <span className="mb-0.5 text-sm text-muted-foreground">/ mês</span>
+                    </div>
+                    <ul className="mt-4 space-y-2 text-sm">
+                      {["Watchlist ilimitada", "AI Brief ilimitado", "DCF analyses ilimitadas", "Screener avançado", "Exportar CSV", "Comunidade privada", "Suporte 24/7"].map(f => (
+                        <li key={f} className="flex items-center gap-2">
+                          <Check className="h-3.5 w-3.5 shrink-0 text-primary" />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mt-auto pt-5">
+                      <a
+                        href="/pricing"
+                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_4px_20px_-4px_hsl(var(--primary)/0.5)] transition-opacity hover:opacity-90"
+                      >
+                        {t('subscription.upgradeBtn')}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-center text-xs text-muted-foreground/60">
+                  Pagamentos seguros via Paddle · Cancela a qualquer momento
+                </p>
               </div>
             )}
           </div>

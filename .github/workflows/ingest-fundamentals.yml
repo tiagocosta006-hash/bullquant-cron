@@ -3,7 +3,7 @@ name: Ingest Fundamentals
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 3 * * 0" # domingo 3h UTC
+    - cron: "0 3 * * *" # diário 3h UTC
 
 jobs:
   ingest:

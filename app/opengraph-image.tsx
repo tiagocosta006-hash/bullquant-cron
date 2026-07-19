@@ -1,104 +1,177 @@
-import { readFile } from "node:fs/promises";
-import path from "node:path";
-import { ImageResponse } from "next/og";
-import { BRAND } from "@/lib/brand";
+import { ImageResponse } from 'next/og'
 
-/**
- * OG image do site (1200×630) — papel quente + dourado matte, wordmark
- * SF e acento Scotch itálico (o mesmo momento display do hero). Gerada
- * em build/request via next/og; aplica-se a todas as rotas sem imagem
- * própria (o root metadata não tinha openGraph.images).
- */
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
-export const alt = "Bull Metrics — análise fundamental e value investing";
+// Dimensions standard para Open Graph
+export const size = { width: 1200, height: 630 }
+export const contentType = 'image/png'
 
-const PAPER = "#fafaf7";
-const INK = "#1a1a17";
-const INK_2 = "#57544d";
-const GOLD = "#b8873b";
-const BORDER = "#e7e5de";
-
-export default async function OpengraphImage() {
-  const fontsDir = path.join(process.cwd(), "public", "fonts");
-  const [sfHeavy, sfRegular, scotchBoldItalic, logo] = await Promise.all([
-    readFile(path.join(fontsDir, "sf-ui-text", "SFUIText-Heavy.woff")),
-    readFile(path.join(fontsDir, "sf-ui-text", "SFUIText-Regular.woff")),
-    readFile(path.join(fontsDir, "scotch-display", "ScotchDisplay-BoldItalic.ttf")),
-    readFile(path.join(process.cwd(), "public", "brand", "bull-metrics-icon.png")),
-  ]);
-
-  const logoSrc = `data:image/png;base64,${logo.toString("base64")}`;
-
+export default async function Image() {
   return new ImageResponse(
     (
       <div
         style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          backgroundColor: PAPER,
-          padding: "64px 72px",
-          fontFamily: "SF",
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+          background: '#100f0d',
+          padding: '80px 96px',
+          fontFamily: 'system-ui, -apple-system, sans-serif',
+          position: 'relative',
+          overflow: 'hidden',
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- next/og exige <img> */}
-          <img src={logoSrc} width={64} height={64} style={{ borderRadius: 16 }} alt="" />
-          <span style={{ fontSize: 30, fontWeight: 800, color: INK, letterSpacing: -0.5 }}>
-            {BRAND.name}
-          </span>
-        </div>
+        {/* Decorative circles (background glow) */}
+        <div
+          style={{
+            position: 'absolute',
+            top: -120,
+            right: -80,
+            width: 500,
+            height: 500,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(228,170,51,0.12) 0%, rgba(228,170,51,0) 70%)',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            bottom: -80,
+            right: 200,
+            width: 320,
+            height: 320,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(228,170,51,0.08) 0%, rgba(228,170,51,0) 70%)',
+          }}
+        />
 
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        {/* Wordmark */}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 0 }}>
           <span
             style={{
-              fontSize: 84,
+              fontSize: 96,
               fontWeight: 800,
-              color: INK,
-              letterSpacing: -3,
-              lineHeight: 1.02,
+              color: '#fafaf7',
+              letterSpacing: '-3px',
+              lineHeight: 1,
             }}
           >
-            Vê o valor que
+            Bull
           </span>
           <span
             style={{
-              fontFamily: "Scotch",
-              fontStyle: "italic",
-              fontSize: 84,
-              color: GOLD,
-              letterSpacing: -2,
-              lineHeight: 1.1,
+              fontSize: 96,
+              fontWeight: 800,
+              color: '#E4AA33',
+              letterSpacing: '-3px',
+              lineHeight: 1,
             }}
           >
-            os outros não veem.
+            Metrics
           </span>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+        {/* Tagline */}
+        <div
+          style={{
+            marginTop: 24,
+            fontSize: 28,
+            color: '#a09980',
+            letterSpacing: '0.02em',
+            fontWeight: 400,
+          }}
+        >
+          Análise Fundamental · DCF · AI Insights
+        </div>
+
+        {/* Description */}
+        <div
+          style={{
+            marginTop: 40,
+            fontSize: 22,
+            color: '#6b6452',
+            maxWidth: 680,
+            lineHeight: 1.5,
+            fontWeight: 400,
+          }}
+        >
+          10 anos de dados fundamentais, calculadora DCF integrada e AI Insights.
+          Em português, gratuito.
+        </div>
+
+        {/* Bottom bar */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 60,
+            left: 96,
+            right: 96,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <span style={{ fontSize: 18, color: '#3d3929', fontWeight: 500 }}>
+            bullmetrics.thebullocracy.com
+          </span>
           <div
             style={{
-              height: 2,
-              width: 620,
-              backgroundImage: `linear-gradient(90deg, ${GOLD}, ${BORDER})`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              background: 'rgba(228,170,51,0.12)',
+              border: '1px solid rgba(228,170,51,0.25)',
+              borderRadius: 100,
+              padding: '8px 20px',
             }}
-          />
-          <span style={{ fontSize: 26, color: INK_2 }}>
-            10 anos de fundamentais · DCF integrada · AI Insights — grátis, em português
-          </span>
+          >
+            <div
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                background: '#E4AA33',
+              }}
+            />
+            <span style={{ fontSize: 16, color: '#E4AA33', fontWeight: 600 }}>
+              Gratuito
+            </span>
+          </div>
         </div>
+
+        {/* Decorative chart lines (right side) */}
+        <svg
+          style={{
+            position: 'absolute',
+            right: 80,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            opacity: 0.15,
+          }}
+          width="280"
+          height="160"
+          viewBox="0 0 280 160"
+        >
+          <polyline
+            points="0,120 40,100 80,105 120,80 160,60 200,40 240,20 280,10"
+            fill="none"
+            stroke="#E4AA33"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <polyline
+            points="0,140 40,135 80,130 120,118 160,100 200,90 240,70 280,55"
+            fill="none"
+            stroke="#E4AA33"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
       </div>
     ),
-    {
-      ...size,
-      fonts: [
-        { name: "SF", data: sfHeavy, weight: 800, style: "normal" },
-        { name: "SF", data: sfRegular, weight: 400, style: "normal" },
-        { name: "Scotch", data: scotchBoldItalic, weight: 700, style: "italic" },
-      ],
-    },
-  );
+    { ...size }
+  )
 }

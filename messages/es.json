@@ -229,7 +229,7 @@
   },
   "register": {
     "title": "Crear Cuenta",
-    "subtitle": "Únete a BullVision.",
+    "subtitle": "Únete a BullMetrics.",
     "nameLabel": "Nombre",
     "namePlaceholder": "Tu nombre",
     "emailLabel": "Email",
@@ -373,7 +373,7 @@
       "title": "Sugerencias"
     },
     "landing": {
-      "title": "BullVision",
+      "title": "BullMetrics",
       "description": "Busca una empresa para comenzar.",
       "testExample": "Probar Ejemplo",
       "createAccount": "Crear Cuenta"

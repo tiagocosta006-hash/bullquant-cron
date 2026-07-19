@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
@@ -126,7 +125,7 @@
   --popover-foreground: var(--paper-text);
 
   --primary: var(--gold-matte);
-  --primary-foreground: #ffffff;
+  --primary-foreground: #1a1a17; /* Contraste WCAG AA: 5.5:1 sobre gold-matte (#b8873b) */
   --secondary: var(--paper-surface-2);
   --secondary-foreground: var(--paper-text-2);
   --muted: var(--paper-surface-2);
@@ -270,7 +269,6 @@
 .reveal.in {
   opacity: 1;
   transform: none;
-  filter: none; /* none (não blur(0)) → sem backdrop-root, o glass refrata a página */
 }
 
 /* ── Micro-interações (emotional design) ──────────────────────

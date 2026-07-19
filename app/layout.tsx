@@ -6,10 +6,13 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { PulseTracker } from "@/components/pulse/PulseTracker";
 import { BRAND } from "@/lib/brand";
+import { PaddleProvider } from "@/components/providers/PaddleProvider";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const scotchDisplay = localFont({
   variable: "--font-heading",
-  display: "swap",
+  display: "optional",
+  preload: false,
   src: [
     { path: "../public/fonts/scotch-display/ScotchDisplay-SemiBold.ttf", weight: "600", style: "normal" },
     { path: "../public/fonts/scotch-display/ScotchDisplay-SemiBoldItalic.ttf", weight: "600", style: "italic" },
@@ -20,7 +23,8 @@ const scotchDisplay = localFont({
 
 const sfUIText = localFont({
   variable: "--font-sans",
-  display: "swap",
+  display: "optional",
+  preload: false,
   src: [
     { path: "../public/fonts/sf-ui-text/SFUIText-Light.woff2", weight: "300", style: "normal" },
     { path: "../public/fonts/sf-ui-text/SFUIText-LightItalic.woff2", weight: "300", style: "italic" },
@@ -45,32 +49,58 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(BRAND.siteUrl),
   title: {
-    default: `${BRAND.name} — Value Investing, com visão`,
+    default: `${BRAND.name} — Análise Fundamental de Ações`,
     template: `%s · ${BRAND.name}`,
   },
   description:
     "Análise fundamental de ações com 10 anos de dados, DCF integrada e AI Insights. Em português, gratuito. Uma plataforma Bullocracy.",
   keywords: [
-    "DCF calculator platform",
+    "BullMetrics",
+    "análise fundamental de ações",
+    "calculadora DCF",
+    "value investing",
+    "avaliação de empresas",
     "stock valuation",
     "DCF metrics investing",
-    "value investing",
-    "análise fundamental",
-    "calculadora dcf",
-    "intrinsic value"
+    "intrinsic value",
+    "análise financeira",
   ],
-  icons: {
-    // versão com cantos arredondados transparentes (gerada de bull-metrics-icon.png)
-    icon: [{ url: "/brand/bull-metrics-icon-rounded.png", type: "image/png" }],
-    apple: [{ url: "/brand/bull-metrics-icon-rounded.png" }],
+  verification: {
+    google: [
+      "HKTu1CXFZw_fDo60XEPT-UFCMFxTF2RNjpGIsw2jw0Q",
+      "uPh6Qu3O0murd4rv-qVq6FVyEj896IUmlqwGkPp6QAc",
+    ],
+    other: {
+      "msvalidate.01": "21C2FF6F72DB70916C5EB5F19D885CF6",
+    },
+  },
+  alternates: {
+    canonical: BRAND.siteUrl,
   },
   openGraph: {
-    title: `${BRAND.name} — Value Investing, com visão`,
+    title: `${BRAND.name} — Análise Fundamental de Ações`,
     description:
       "Vê o valor que os outros não veem. Fundamentais de 10 anos, DCF e AI Insights, em português.",
     siteName: BRAND.name,
+    url: BRAND.siteUrl,
     type: "website",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: `${BRAND.name} — Análise Fundamental de Ações`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${BRAND.name} — Análise Fundamental de Ações`,
+    description:
+      "Vê o valor que os outros não veem. Fundamentais de 10 anos, DCF e AI Insights, em português.",
+    images: ["/opengraph-image"],
   },
 };
 
@@ -112,9 +142,12 @@ export default async function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground">
         <NextIntlClientProvider messages={messages}>
-          <main className="flex-1 flex flex-col">{children}</main>
+          <PaddleProvider>
+            <main className="flex-1 flex flex-col">{children}</main>
+          </PaddleProvider>
         </NextIntlClientProvider>
         <PulseTracker />
+        <GoogleAnalytics gaId="G-F89FT4052G" />
       </body>
     </html>
   );

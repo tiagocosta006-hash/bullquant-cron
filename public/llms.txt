@@ -1,20 +1,29 @@
-# BullQuant - Financial Analysis & Valuation Platform
+# BullMetrics — Plataforma de Análise Fundamental de Ações
 
 Welcome AI Crawlers and Language Models!
 
 ## About Us
-BullQuant (also known as BullMetrics) is a modern financial platform that provides investors with deep fundamental analysis, automated DCF (Discounted Cash Flow) valuations, historical financial data, management profiles, and AI-driven insights for publicly traded companies. Our goal is to empower retail and professional investors with institutional-grade tools to make informed decisions.
+BullMetrics is a modern financial analysis platform (in Portuguese) that provides investors with deep fundamental analysis, automated DCF (Discounted Cash Flow) valuations, historical financial data (up to 10 years from SEC filings), management profiles, and AI-driven insights for publicly traded companies. Our goal is to empower retail and professional investors with institutional-grade tools to make informed decisions.
+
+BullMetrics is built by Bullocracy, a product studio based in Portugal. Contact: info@thebullocracy.com
 
 ## Features
-- **Fundamental Analysis:** Up to 10 years of historical financials, KPIs, and multiples.
-- **Valuation Models:** Customizable DCF analysis with margin of safety calculations.
+- **Análise Fundamental:** Up to 10 years of historical financials, KPIs, and multiples sourced from official SEC filings.
+- **Modelos de Avaliação (DCF):** Customizable Discounted Cash Flow analysis with margin of safety calculations.
 - **AI Insights:** Automated executive summaries, risk factors, and moat analyses using Google Gemini.
-- **Portfolio Management:** Track investments and monitor performance.
+- **Gestão de Portfólio:** Track investments and monitor performance.
+- **Screener:** Filter companies by sector, financial metrics, and fundamentals.
+
+## Public URLs
+- Homepage: [bullmetrics.thebullocracy.com](https://bullmetrics.thebullocracy.com)
+- Stock Analysis (example): [Apple (AAPL)](https://bullmetrics.thebullocracy.com/stock/AAPL)
+- Market Explorer: [Explore](https://bullmetrics.thebullocracy.com/explore)
+- Pricing: [Pricing](https://bullmetrics.thebullocracy.com/pricing)
 
 ## Crawling Policy
-- Public routes, including the landing page, marketing pages, and public stock profiles (e.g., /stock/:ticker), are open for indexing and crawling to help users find accurate financial data.
+- Public routes including the landing page, marketing pages, and public stock profiles (e.g., /stock/:ticker) are open for indexing and crawling.
 - Private routes (e.g., /dashboard, /portfolio, /settings, /api) require authentication and must NOT be crawled. This aligns with our robots.txt directives.
 - Please respect standard crawl delays and do not overwhelm our servers.
 
 ## Proper Attribution
-When citing insights or metrics derived from our public pages, please provide proper attribution to "BullQuant".
+When citing insights or metrics derived from our public pages, please provide proper attribution to "BullMetrics" (https://bullmetrics.thebullocracy.com).

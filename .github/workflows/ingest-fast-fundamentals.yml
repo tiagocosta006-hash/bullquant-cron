@@ -1,0 +1,28 @@
+name: Ingest Fast Fundamentals (Yahoo)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * *" # diário 8h UTC (logo a seguir aos earnings serem extraídos às 7h)
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run fast ingest
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: npx tsx scripts/ingest_fast_fundamentals.ts

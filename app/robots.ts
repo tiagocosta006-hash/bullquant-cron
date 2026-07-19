@@ -1,11 +1,12 @@
 import { MetadataRoute } from 'next'
+import { BRAND } from '@/lib/brand'
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
         userAgent: '*',
-        allow: ['/', '/stock/', '/explore', '/calendar'],
+        allow: ['/', '/stock/', '/explore', '/calendar', '/pricing', '/terms', '/privacy', '/refund'],
         disallow: [
           '/api/',
           '/auth/',
@@ -16,9 +17,14 @@ export default function robots(): MetadataRoute.Robots {
           '/screener',
           '/reset-password',
           '/forgot-password',
+          '/login',
+          '/register',
+          '/watchlist',
+          '/compare',
+          '/transcripts',
         ],
       },
     ],
-    sitemap: 'https://bullmetrics.thebullocracy.com/sitemap.xml',
+    sitemap: `${BRAND.siteUrl}/sitemap.xml`,
   }
 }

@@ -172,7 +172,13 @@
       "q5": "Do the numbers match official filings?",
       "a5": "Data comes from official filings and derived metrics (margins, ROIC, FCF) use standard, documented formulas. When a value doesn't exist we show N/A, we never make it up."
     },
-    "floatingNote": "€0 · no card"
+    "floatingNote": "€0 · no card",
+    "mission": {
+      "badge": "Our Mission",
+      "title": "Democratize access to financial data.",
+      "desc": "A platform developed by university students with the goal of delivering professional data to independent investors.",
+      "cta": "Meet the team behind it"
+    }
   },
   "insider": {
     "title": "Company Insider Trading",
@@ -262,7 +268,7 @@
     "analytics": "Pulse"
   },
   "login": {
-    "title": "Sign in to BullVision",
+    "title": "Sign in to BullMetrics",
     "subtitle": "Access your portfolio and analytics.",
     "emailLabel": "Email",
     "emailPlaceholder": "name@email.com",
@@ -277,7 +283,7 @@
   },
   "register": {
     "title": "Create Account",
-    "subtitle": "Join BullVision..",
+    "subtitle": "Join BullMetrics..",
     "nameLabel": "Name",
     "namePlaceholder": "Your name",
     "emailLabel": "Email",
@@ -316,6 +322,7 @@
     "logoutTitle": "Sign out",
     "login": "Sign in",
     "register": "Sign up",
+    "pricing": "Pricing",
     "dcf": "DCF",
     "calendar": "Calendar",
     "theme": "Toggle theme",
@@ -345,7 +352,7 @@
       "namePlaceholder": "How you want to be called",
       "save": "Save Changes",
       "dangerZone": "Danger Zone",
-      "logoutDesc": "Securely sign out of your Bullmetrics session.",
+      "logoutDesc": "Securely sign out of your BullMetrics session.",
       "logoutBtn": "Sign Out",
       "securityTitle": "Security",
       "currentPassword": "Current Password",
@@ -367,7 +374,7 @@
     "preferences": {
       "title": "App Preferences",
       "language": "Interface Language",
-      "languageDesc": "Choose the language you want to use in Bullmetrics.",
+      "languageDesc": "Choose the language you want to use in BullMetrics.",
       "theme": "Visual Theme",
       "themeDesc": "Switch between Dark and Light mode.",
       "themeLight": "Light",
@@ -380,7 +387,6 @@
       "premiumSoonDesc": "We are preparing advanced artificial intelligence features exclusively for PRO subscribers.",
       "upgradeBtn": "Upgrade to PRO",
       "aiUsageLabel": "AI analyses today",
-      "aiUnlimited": "Unlimited",
       "compare": {
         "title": "Free vs PRO",
         "free": "Free",
@@ -422,7 +428,7 @@
       "title": "Suggestions to add"
     },
     "landing": {
-      "title": "BullVision",
+      "title": "BullMetrics",
       "description": "Search for a company ticker in the top bar to get started, or sign up to access your Watchlist.",
       "testExample": "Try Example",
       "createAccount": "Create Free Account"
@@ -623,15 +629,70 @@
       "naMargin": "Margin not reported, common for banks and insurers, which have no cost of goods (COGS).",
       "naPrice": "Unavailable: depends on the live price, which hasn't loaded yet."
     },
+    "earnings": {
+      "title": "Latest Results",
+      "eps": "EPS",
+      "revenue": "Revenue",
+      "estimate": "Est"
+    },
     "tabs": {
       "overview": "Overview",
       "financials": "Financials",
-      "kpis": "KPIs",
+      "analista": "Analyst",
       "valuation": "Valuation",
       "company": "Company",
       "news": "News",
       "valuationEmpty": "No saved DCF analyses for this company yet.",
       "valuationCta": "Open the DCF calculator"
+    }
+  },
+  "analista": {
+    "title": "AI Analyst",
+    "badge": "AI · sourced",
+    "source": "Source: {label}",
+    "generateTitle": "{ticker} analysis by the AI Analyst",
+    "generateDesc": "Generate a grounded dossier, business model, moat, operating KPIs, risks and bull/bear cases, from our verified data and the official SEC 10-K, with source citations.",
+    "generateCta": "Generate Analysis",
+    "generating": "Reading the 10-K and analyzing... (~20s)",
+    "rateLimitTitle": "Daily limit reached",
+    "rateLimitDesc": "You've used today's AI analyses. Come back tomorrow or go Pro for unlimited analyses.",
+    "errorTitle": "Couldn't generate the analysis. Try again.",
+    "retry": "Try again",
+    "needsAuthTitle": "Session expired",
+    "needsAuthDesc": "Your session expired. Sign in again to generate the analysis.",
+    "login": "Sign in",
+    "viewSource": "View source citation",
+    "sourceTitle": "Citation source",
+    "sourceDesc": "Below is the exact quote the AI extracted for:",
+    "openSec": "View in the SEC 10-K",
+    "back": "Back",
+    "disclaimer": "AI-generated analysis from verified data and the 10-K. Not investment advice.",
+    "moatRatings": {
+      "wide": "Wide moat",
+      "narrow": "Narrow moat",
+      "none": "No clear moat"
+    },
+    "sections": {
+      "businessModel": "Business model",
+      "moat": "Competitive advantage (moat)",
+      "segments": "Revenue by segment",
+      "operatingKpis": "Operating KPIs",
+      "risks": "Key risks",
+      "bullCase": "Bull case",
+      "bearCase": "Bear case"
+    },
+    "chat": {
+      "title": "Ask the Analyst",
+      "placeholder": "Ask anything about the company...",
+      "proOnly": "Pro-only chat",
+      "proDesc": "Go Pro to chat with the AI Analyst and ask follow-up questions about the company and its 10-K.",
+      "error": "Something went wrong. Try again.",
+      "suggestions": [
+        "Explain the business in 30 seconds",
+        "What are the 3 biggest risks?",
+        "How did the operating margin evolve?",
+        "What drives the revenue?"
+      ]
     }
   },
   "dcf": {
@@ -805,7 +866,80 @@
     "rights": "© {year} {brand}. All rights reserved.",
     "terms": "Terms of Service",
     "privacy": "Privacy",
-    "refund": "Refund Policy"
+    "refund": "Refund Policy",
+    "pricing": "Pricing",
+    "about": "About Us"
+  },
+  "pricing": {
+    "badge": "Simple and transparent",
+    "title": "Invest with more confidence.",
+    "subtitle": "Start for free or try the PRO plan with a 7-day free trial. Cancel anytime.",
+    "monthly": "Month",
+    "free": {
+      "name": "Free",
+      "price": "€0",
+      "period": "forever",
+      "description": "Everything you need to start analyzing companies.",
+      "cta": "Create free account"
+    },
+    "pro": {
+      "name": "PRO",
+      "price": "€7",
+      "period": "per month",
+      "description": "For the serious investor who wants to go deeper in their analysis.",
+      "cta": "Start 7-day free trial",
+      "badge": "Most popular"
+    },
+    "features": {
+      "title": "What's included",
+      "free": [
+        "Full S&P 500 access",
+        "10 years of fundamental data",
+        "DCF calculator with autofill",
+        "Interactive financial charts",
+        "Watchlist up to 10 companies",
+        "5 AI Brief analyses per day",
+        "Earnings calendar",
+        "Insider Trading data"
+      ],
+      "pro": [
+        "Everything in Free",
+        "Unlimited watchlist",
+        "Unlimited AI Brief",
+        "Unlimited saved DCF analyses",
+        "Advanced screener with custom filters",
+        "Export financial data as CSV",
+        "Early access to new features",
+        "Private value investors community",
+        "Priority 24/7 email support"
+      ]
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "items": [
+        {
+          "q": "Can I cancel at any time?",
+          "a": "Yes, with no penalty. Your PRO access continues until the end of the paid period, then reverts to the free plan."
+        },
+        {
+          "q": "Is there a free trial?",
+          "a": "Yes, we offer a 7-day free trial for you to test the PRO platform. During those 7 days, you'll have access to all advanced features, except the private community."
+        },
+        {
+          "q": "Who processes the payments?",
+          "a": "Payments are processed by Paddle, acting as Merchant of Record and handling invoicing, taxes, and legal compliance across the EU."
+        },
+        {
+          "q": "Does the subscription renew automatically?",
+          "a": "Yes, monthly. You will always receive an advance email notice before any charge, and you can cancel at any time."
+        },
+        {
+          "q": "Is my financial data safe?",
+          "a": "We never store card data, all payment information is managed exclusively by Paddle with bank-grade encryption."
+        }
+      ]
+    },
+    "trust": "Secure payments via Paddle · Cancel anytime · EU VAT compliant"
   },
   "explore": {
     "title": "Explore Businesses",
@@ -880,6 +1014,70 @@
     },
     "suggestionsTitle": "Suggestions to follow",
     "lastUpdate": "Last update:"
+  },
+  "about": {
+    "badge": "Our Mission",
+    "title": "Democratizing access to financial <italic>data.</italic>",
+    "intro": "BullMetrics is a fundamental data analysis platform designed for all types of investors.",
+    "problem": {
+      "title": "Our Goal",
+      "text": "To give the individual investor easy, structured, and transparent access to corporate financial statements. By automating the extraction of complex SEC reports, we free up your time for what really matters: value analysis."
+    },
+    "organization": {
+      "title": "The Bullocracy",
+      "text": "BullMetrics is built by The Bullocracy, an organization of young students seeking to democratize access to knowledge about Politics, Economics, and Investments. To achieve this, they create content on social media, from YouTube to TikTok, fostering a space for our community to write articles and opinions to be published online, on the website thebullocracy.com, where they stimulate free debate and financial literacy.",
+      "cta": "Visit thebullocracy.com"
+    },
+    "team": {
+      "title": "The Team",
+      "description": "The entire platform is designed by people who understand and want to learn more about the markets, ensuring our tools reflect the real needs of fundamental analysis.",
+      "members": [
+        {
+          "name": "Rodrigo Martins",
+          "role": "Co-Founder & Web Analyst",
+          "bio": "Economics student at the University of Minho. Responsible for marketing strategy, site indexing, SEO, analytics metrics, and overall platform performance optimization, as well as the integration of BullMetrics into Bullocracy's content.",
+          "socials": {
+            "linkedin": "https://www.linkedin.com/in/rodrigo-teixeira-martins/",
+            "instagram": "#",
+            "email": "rodrigotmartins30@gmail.com"
+          }
+        },
+        {
+          "name": "Tiago Costa",
+          "role": "Co-Founder & Product Owner",
+          "bio": "Economics student at the University of Minho. Responsible for the conceptualization of the platform's ecosystem and features, defining the direction of tools, and focusing on product usability.",
+          "socials": {
+            "linkedin": "https://www.linkedin.com/in/tcosta06/",
+            "instagram": "#",
+            "email": "tiago.costa006@gmail.com"
+          }
+        },
+        {
+          "name": "Alexandre Machado",
+          "role": "Lead Developer & UI/UX Designer",
+          "bio": "[Insert course/university]. Responsible for the technical development of the platform, designing the interface, and building the backend and frontend structure with a focus on code and software architecture.",
+          "socials": {
+            "linkedin": "#",
+            "instagram": "#",
+            "email": "#"
+          }
+        }
+      ]
+    },
+    "philosophy": {
+      "title": "Data Philosophy",
+      "text": "Our analysis is based on mathematics and official reports extracted directly from the SEC. BullMetrics focuses on the solidity of numbers. We believe that financial decisions require clean data, technical precision, and transparency, characteristics we value deeply at BullMetrics."
+    },
+    "contact": {
+      "title": "Official Contacts",
+      "text": "Do you have questions, partnership proposals, or want to know more about the entire platform? The Bullocracy team is at your disposal.",
+      "email_label": "Institutional Email",
+      "email_value": "info@thebullocracy.com",
+      "location_label": "Location",
+      "location_value": "University of Minho, Braga",
+      "social_label": "Social Media",
+      "social_value": "@thebullocracy"
+    }
   },
   "analytics": {
     "title": "Pulse",

@@ -1,4 +1,5 @@
 import { cache } from 'react'
+import dynamic from 'next/dynamic'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
@@ -6,19 +7,21 @@ import { prisma } from '@/lib/prisma'
 import { getUser } from '@/lib/supabase/server'
 import { StockHeader } from '@/components/stock/StockHeader'
 import { StockSnapshot } from '@/components/stock/StockSnapshot'
-import { StockPriceChart } from '@/components/stock/StockPriceChart'
+const StockPriceChart = dynamic(() => import('@/components/stock/StockPriceChart').then(mod => mod.StockPriceChart))
 import { SavedValuations, type SerializedDcfAnalysis } from '@/components/stock/SavedValuations'
-import { FinancialsEngine } from '@/components/stock/FinancialsEngine'
+const FinancialsEngine = dynamic(() => import('@/components/stock/FinancialsEngine').then(mod => mod.FinancialsEngine))
 import { InsiderActivity } from '@/components/stock/InsiderActivity'
 import { getCurrencySymbol } from '@/lib/finance/format'
+import { BRAND } from '@/lib/brand'
 
+import { LatestResults } from '@/components/stock/LatestResults'
 import { CompanyProfile } from '@/components/stock/CompanyProfile'
 import { StockNews } from '@/components/stock/StockNews'
 import { ManagementTeam } from '@/components/stock/ManagementTeam'
-import { StockKPIs } from '@/components/stock/StockKPIs'
+const StockAnalyst = dynamic(() => import('@/components/stock/StockAnalyst').then(mod => mod.StockAnalyst))
 import { StockTabs } from '@/components/stock/StockTabs'
-import { PremiumPdfButton } from '@/components/stock/pdf/PremiumPdfButton'
-import { ValuationMultiples } from '@/components/stock/ValuationMultiples'
+const PremiumPdfButton = dynamic(() => import('@/components/stock/pdf/PremiumPdfButton').then(mod => mod.PremiumPdfButton))
+const ValuationMultiples = dynamic(() => import('@/components/stock/ValuationMultiples').then(mod => mod.ValuationMultiples))
 
 // Partilhado entre generateMetadata e a página (React.cache = 1 query por pedido,
 // em vez de 2 findUnique idênticos).
@@ -40,12 +43,12 @@ export async function generateMetadata({
 
   if (!company) {
     return {
-      title: 'Empresa não encontrada | BullQuant',
+      title: `Empresa não encontrada | ${BRAND.name}`,
     }
   }
 
-  const title = `${company.name} (${company.ticker}) - Análise e Avaliação DCF | BullQuant`
-  const description = `Análise fundamental profunda, avaliação DCF e insights de IA para a ${company.name} (${company.ticker}) do setor ${company.sector || 'financeiro'}.`
+  const title = `${company.name} (${company.ticker}) - Análise e Avaliação DCF | ${BRAND.name}`
+  const description = `Análise fundamental profunda, avaliação DCF e insights de IA para a ${company.name} (${company.ticker}) do setor ${company.sector || 'financeiro'}. Dados históricos, margens e avaliação inteligente.`
 
   return {
     title,
@@ -54,14 +57,23 @@ export async function generateMetadata({
       title,
       description,
       type: 'website',
+      images: [
+        {
+          url: '/opengraph-image',
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: ['/opengraph-image'],
     },
     alternates: {
-      canonical: `https://bullmetrics.thebullocracy.com/stock/${company.ticker}`,
+      canonical: `${BRAND.siteUrl}/stock/${company.ticker}`,
     }
   }
 }
@@ -95,7 +107,8 @@ export default async function StockPage({
     historicalAnnual,
     latestAnnual,
     aiInsightRaw,
-    latestPrice
+    latestPrice,
+    latestEarnings
   ] = await Promise.all([
     // 1. User PRO plan
     user ? prisma.user.findUnique({ where: { id: user.id } }) : Promise.resolve(null),
@@ -135,6 +148,12 @@ export default async function StockPage({
     prisma.price.findFirst({
       where: { ticker: company.ticker },
       orderBy: { date: 'desc' }
+    }),
+
+    // 8. Últimos resultados já reportados (não o próximo evento estimado)
+    prisma.earningsEvent.findFirst({
+      where: { companyId: company.id, epsActual: { not: null } },
+      orderBy: { date: 'desc' },
     })
   ])
 
@@ -201,7 +220,7 @@ export default async function StockPage({
     "name": company.name,
     "tickerSymbol": company.ticker,
     "exchange": company.exchange,
-    "url": `https://bullmetrics.thebullocracy.com/stock/${company.ticker}`,
+    "url": `${BRAND.siteUrl}/stock/${company.ticker}`,
   }
 
   return (
@@ -232,6 +251,18 @@ export default async function StockPage({
       <StockTabs
         overview={
           <>
+            {latestEarnings && (
+              <LatestResults
+                fiscalYear={latestEarnings.fiscalYear}
+                fiscalQuarter={latestEarnings.fiscalQuarter}
+                date={latestEarnings.date.toISOString().slice(0, 10)}
+                epsEstimate={latestEarnings.epsEstimate !== null ? Number(latestEarnings.epsEstimate) : null}
+                epsActual={latestEarnings.epsActual !== null ? Number(latestEarnings.epsActual) : null}
+                revenueEstimate={latestEarnings.revenueEstimate !== null ? Number(latestEarnings.revenueEstimate) : null}
+                revenueActual={latestEarnings.revenueActual !== null ? Number(latestEarnings.revenueActual) : null}
+                currencySymbol={currencySymbol}
+              />
+            )}
             <div>
               <h2 className="text-xl font-bold tracking-tight mb-4 text-foreground">{t('snapshotTitle')}</h2>
               <StockSnapshot ticker={company.ticker} fundamentals={JSON.parse(JSON.stringify(fundamentalsToPass))} currencySymbol={currencySymbol} />
@@ -243,8 +274,13 @@ export default async function StockPage({
         financials={
           <FinancialsEngine ticker={company.ticker} sector={company.sector} currencySymbol={currencySymbol} />
         }
-        kpis={
-          <StockKPIs fundamentals={JSON.parse(JSON.stringify(historicalAnnual))} isPro={isPro} ticker={company.ticker} />
+        analista={
+          <StockAnalyst
+            ticker={company.ticker}
+            fundamentals={JSON.parse(JSON.stringify(historicalAnnual))}
+            isPro={isPro}
+            currencySymbol={currencySymbol}
+          />
         }
         valuation={
           <>

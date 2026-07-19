@@ -229,7 +229,7 @@
   },
   "register": {
     "title": "创建账户",
-    "subtitle": "加入 BullVision。",
+    "subtitle": "加入 BullMetrics。",
     "nameLabel": "姓名",
     "namePlaceholder": "您的称呼",
     "emailLabel": "电子邮件",
@@ -373,7 +373,7 @@
       "title": "建议添加"
     },
     "landing": {
-      "title": "BullVision",
+      "title": "BullMetrics",
       "description": "在顶部搜索公司或注册账户。",
       "testExample": "查看示例",
       "createAccount": "创建免费账户"

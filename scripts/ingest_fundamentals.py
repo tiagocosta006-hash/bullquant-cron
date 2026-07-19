@@ -199,6 +199,7 @@ DURATION_TAGS = {
         "PaymentsToAcquireOtherPropertyPlantAndEquipment",
         "PaymentsToAcquirePropertyPlantAndEquipmentAndOtherAssets",
         "PaymentsToAcquireAndDevelopRealEstate",  # REITs: aquisição/desenvolvimento é o "capex"
+        "PaymentsToDevelopRealEstateAssets",
         "PaymentsToAcquireOilAndGasProperty",
         "PaymentsToAcquireEquityMethodInvestments",
         "PaymentsToExploreAndDevelopOilAndGasProperties",
@@ -368,6 +369,7 @@ INSTANT_TAGS = {
         "CashAndDueFromBanks",
         # ── Aceites na revisão CFA 2026-07 ──
         "CashAndCashEquivalentsAtCarryingValueIncludingDiscontinuedOperations",  # GE/MDLZ
+        "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsIncludingDisposalGroupAndDiscontinuedOperations",  # MMM 2019-21
         "CashEquivalentsAtCarryingValue",          # O
         "CashCashEquivalentsAndShortTermInvestments",  # GIS/TGT (já inclui STI)
         # REJEITADO: CashAndSecuritiesSegregatedUnderFederalAndOtherRegulations
@@ -406,8 +408,34 @@ def get_companies_with_cik(cur, tickers: list[str] | None = None) -> list[dict]:
             (tickers,),
         )
     else:
+        # Event-driven + Fallback: Apenas processar quem reportou resultados recentemente e 
+        # ainda não publicou o 10-Q correspondente, ou quem não é atualizado há >95 dias.
         cur.execute(
-            'SELECT id, ticker, cik, sector, currency FROM companies WHERE "isActive" = TRUE AND cik IS NOT NULL ORDER BY ticker'
+            '''
+            SELECT c.id, c.ticker, c.cik, c.sector, c.currency
+            FROM companies c
+            WHERE c."isActive" = TRUE 
+              AND c.cik IS NOT NULL
+              AND (
+                  EXISTS (
+                      SELECT 1 FROM earnings_events e 
+                      WHERE e."companyId" = c.id 
+                        AND e.date >= CURRENT_DATE - INTERVAL '90 days'
+                        AND e.date <= CURRENT_DATE
+                        AND NOT EXISTS (
+                            SELECT 1 FROM fundamentals f 
+                            WHERE f."companyId" = c.id AND f."filedAt" >= e.date
+                        )
+                  )
+                  OR
+                  NOT EXISTS (
+                      SELECT 1 FROM fundamentals f 
+                      WHERE f."companyId" = c.id 
+                        AND f."filedAt" >= CURRENT_DATE - INTERVAL '95 days'
+                  )
+              )
+            ORDER BY c.ticker
+            '''
         )
     return [{"id": r[0], "ticker": r[1], "cik": r[2], "sector": r[3], "currency": r[4]} for r in cur.fetchall()]
 
@@ -1048,6 +1076,16 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         unsecured = inst.get("unsecuredDebt")
         if secured is not None or unsecured is not None:
             total_debt = (secured or 0) + (unsecured or 0)
+    if total_debt is None and sector != "Financials" and not evidence.get("has_ltd_ever"):
+        # Debt-free comprovado (MPWR-class): a empresa NUNCA taggou dívida LT
+        # em filing nenhum E não há qualquer componente de borrowing neste
+        # período → 0.0 é a verdade, não um buraco. (Financials excluídos:
+        # bancos têm dívida dimensionada invisível; has_ltd_ever=True idem.)
+        if all(inst.get(k) is None for k in
+               ("longTermDebt", "longTermDebtCurrent", "shortTermDebt",
+                "commercialPaper", "debtInstrumentCarryingAmount",
+                "securedDebt", "unsecuredDebt")):
+            total_debt = 0.0
     if total_debt is None and sector == "Financials":
         # Nível 4 (bancos/seguradoras): borrowed funds por componentes — FHLB
         # advances, subordinated debt, other borrowings, linha de crédito

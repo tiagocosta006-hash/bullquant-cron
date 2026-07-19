@@ -200,7 +200,7 @@ export default function AboutPage() {
 
           <div className="grid sm:grid-cols-3 gap-6 max-w-5xl mx-auto w-full">
             {/* Email */}
-            <div className="glass flex flex-col items-center text-center p-8 rounded-2xl hover:bg-secondary/20 transition-colors">
+            <div className="glass flex flex-col items-center text-center p-8 rounded-2xl hover:scale-105 hover:shadow-xl hover:bg-secondary/30 transition-all duration-300 ease-out">
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
                 <Mail className="w-6 h-6 text-primary" />
               </div>
@@ -211,7 +211,7 @@ export default function AboutPage() {
             </div>
 
             {/* Location */}
-            <div className="glass flex flex-col items-center text-center p-8 rounded-2xl hover:bg-secondary/20 transition-colors">
+            <div className="glass flex flex-col items-center text-center p-8 rounded-2xl hover:scale-105 hover:shadow-xl hover:bg-secondary/30 transition-all duration-300 ease-out">
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
                 <MapPin className="w-6 h-6 text-primary" />
               </div>
@@ -222,7 +222,7 @@ export default function AboutPage() {
             </div>
 
             {/* Social / Community */}
-            <div className="glass flex flex-col items-center text-center p-8 rounded-2xl hover:bg-secondary/20 transition-colors">
+            <div className="glass flex flex-col items-center text-center p-8 rounded-2xl hover:scale-105 hover:shadow-xl hover:bg-secondary/30 transition-all duration-300 ease-out">
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
                 <MessageCircle className="w-6 h-6 text-primary" />
               </div>

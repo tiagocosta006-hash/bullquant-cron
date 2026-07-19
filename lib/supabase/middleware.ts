@@ -37,7 +37,7 @@ export async function updateSession(request: NextRequest) {
   const isPrivateRoute =
     request.nextUrl.pathname.startsWith('/settings') ||
     request.nextUrl.pathname.startsWith('/dashboard') ||
-    request.nextUrl.pathname.startsWith('/dcf') ||
+    request.nextUrl.pathname === '/dcf' ||
     request.nextUrl.pathname.startsWith('/calendar') ||
     request.nextUrl.pathname.startsWith('/explore') ||
     request.nextUrl.pathname.startsWith('/transcripts') ||

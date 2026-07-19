@@ -1,6 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import { successPulse } from "@/lib/motion"
+import { track } from "@/lib/pulse/client"
 import { TrendingUp, TrendingDown, Clock, Check, Plus, Scale } from "lucide-react"
 import { useTranslations, useLocale } from "next-intl"
 import Link from "next/link"
@@ -31,6 +33,7 @@ export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfB
   // Portfolio state
   const [isFollowing, setIsFollowing] = useState<boolean | null>(null)
   const [isUpdatingFollow, setIsUpdatingFollow] = useState(false)
+  const followBtnRef = useRef<HTMLButtonElement>(null)
 
   const fetchPrice = async () => {
     try {
@@ -88,7 +91,14 @@ export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfB
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ticker: company.ticker })
       })
-      if (res.ok) setIsFollowing(!isFollowing)
+      if (res.ok) {
+        setIsFollowing(!isFollowing)
+        // celebrar a adição (não a remoção) — momento de sucesso discreto
+        if (!isFollowing) {
+          successPulse(followBtnRef.current)
+          track("watchlist_add", { ticker: company.ticker })
+        }
+      }
     } catch (err) {
       console.error("Failed to toggle follow state", err)
     } finally {
@@ -122,6 +132,7 @@ export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfB
             {/* Follow Button */}
             {isFollowing !== null && (
               <button
+                ref={followBtnRef}
                 onClick={toggleFollow}
                 disabled={isUpdatingFollow}
                 className={`px-3 py-1 text-xs font-bold rounded-full transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${

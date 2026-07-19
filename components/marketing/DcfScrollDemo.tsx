@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, type CSSProperties } from "react";
 import { LiquidGlass } from "@/components/fx/LiquidGlass";
 import { runDcf } from "@/lib/finance/dcf";
 import { formatPercent, formatPrice } from "@/lib/finance/format";
@@ -30,13 +30,13 @@ const dcfAt = (g: number) =>
 
 const INITIAL = dcfAt(G_MIN);
 
-const BADGE_BASE =
-  "rounded-full px-2.5 py-1 text-xs font-semibold";
-const BADGE_UP = `${BADGE_BASE} bg-bull/10 text-bull`;
-const BADGE_DOWN = `${BADGE_BASE} bg-bear/10 text-bear`;
-
 const marginWidth = (mos: number) =>
   `${Math.min(100, Math.max(4, ((mos + 0.1) / 0.4) * 100))}%`;
+
+/* Crossfade bull↔bear: em vez de trocar classes no cruzamento do zero,
+   a margem mapeia para --mos-t (janela suave de ±6%) e a cor interpola
+   via .mos-color / var(--mos-ink) em globals.css. */
+const mosT = (mos: number) => Math.min(1, Math.max(0, mos / 0.06 + 0.5));
 
 export function DcfScrollDemo({
   labels,
@@ -72,14 +72,10 @@ export function DcfScrollDemo({
       if (fairRef.current) fairRef.current.textContent = formatPrice(res.fairValue);
       if (marginRef.current)
         marginRef.current.textContent = `${mos >= 0 ? "+" : ""}${formatPercent(mos)}`;
-      if (badgeRef.current) {
-        badgeRef.current.className = mos >= 0 ? BADGE_UP : BADGE_DOWN;
+      if (badgeRef.current)
         badgeRef.current.textContent = mos >= 0 ? labels.undervalued : labels.overvalued;
-      }
-      if (marginFillRef.current) {
-        marginFillRef.current.style.width = marginWidth(mos);
-        marginFillRef.current.className = `h-full rounded-full ${mos >= 0 ? "bg-bull" : "bg-bear"}`;
-      }
+      if (marginFillRef.current) marginFillRef.current.style.width = marginWidth(mos);
+      if (rootRef.current) rootRef.current.style.setProperty("--mos-t", String(mosT(mos)));
     },
     [labels.undervalued, labels.overvalued],
   );
@@ -89,6 +85,24 @@ export function DcfScrollDemo({
       const mm = gsap.matchMedia();
       mm.add(MOTION_OK, () => {
         const state = { g: G_MIN };
+        // Depois do scrub, o crescimento respira ±0,3pp e o Fair Value
+        // recalcula ao vivo com o motor real — o cartão nunca é um still.
+        // Só DEPOIS do fim (onLeave): a meio, a margem cruza zero e o
+        // badge piscava. Com g=G_MAX a margem fica folgadamente positiva.
+        const amb = { o: 0 };
+        const breath = gsap.fromTo(
+          amb,
+          { o: -0.003 },
+          {
+            o: 0.003,
+            duration: 4.5,
+            yoyo: true,
+            repeat: -1,
+            ease: "sine.inOut",
+            paused: true,
+            onUpdate: () => render(Math.min(G_MAX + 0.003, state.g + amb.o)),
+          },
+        );
         gsap.to(state, {
           g: G_MAX,
           ease: "none",
@@ -98,8 +112,14 @@ export function DcfScrollDemo({
             start: "top 82%",
             end: "top 22%",
             scrub: 0.5,
+            onLeave: () => breath.play(),
+            onEnterBack: () => breath.pause(),
+            onLeaveBack: () => breath.pause(),
           },
         });
+        return () => {
+          breath.kill();
+        };
       });
     },
     { scope: rootRef, dependencies: [render] },
@@ -108,7 +128,11 @@ export function DcfScrollDemo({
   const initialMos = INITIAL.marginOfSafety;
 
   return (
-    <div ref={rootRef}>
+    <div
+      ref={rootRef}
+      className="mos-color"
+      style={{ "--mos-t": mosT(initialMos) } as CSSProperties}
+    >
       <LiquidGlass className="rounded-3xl p-6 sm:p-8">
         {/* Fair Value — herói full-width (nunca corta, é a estrela do cartão) */}
         <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
@@ -122,7 +146,14 @@ export function DcfScrollDemo({
             {formatPrice(INITIAL.fairValue)}
           </div>
           <div className="flex items-center gap-3 pb-1">
-            <span ref={badgeRef} className={initialMos >= 0 ? BADGE_UP : BADGE_DOWN}>
+            <span
+              ref={badgeRef}
+              className="rounded-full px-2.5 py-1 text-xs font-semibold"
+              style={{
+                color: "var(--mos-ink)",
+                background: "color-mix(in srgb, var(--mos-ink) 10%, transparent)",
+              }}
+            >
               {initialMos >= 0 ? labels.undervalued : labels.overvalued}
             </span>
             <span className="text-sm text-muted-foreground">{labels.margin}</span>
@@ -134,8 +165,8 @@ export function DcfScrollDemo({
         <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-muted">
           <div
             ref={marginFillRef}
-            className={`h-full rounded-full ${initialMos >= 0 ? "bg-bull" : "bg-bear"}`}
-            style={{ width: marginWidth(initialMos) }}
+            className="h-full rounded-full"
+            style={{ width: marginWidth(initialMos), background: "var(--mos-ink)" }}
           />
         </div>
 

@@ -1,19 +1,27 @@
 import { ArrowUpRight, Search } from "lucide-react";
 import { BrandMark } from "@/components/brand/BrandMark";
+import { LiveSpark } from "@/components/marketing/LiveSpark";
 import { cn } from "@/lib/utils";
 
 /**
- * TerminalMock — mock estático da app para dentro do MediaFrame enquanto
- * não há vídeo real (tickers/números são dados de exemplo, não UI).
+ * TerminalMock — mock da app para dentro do MediaFrame enquanto não há
+ * vídeo real (tickers/números são dados de exemplo, não UI). O preço e
+ * a sparkline ganham vida via LiveSpark (client); o resto é estático.
  * Substituído automaticamente quando LANDING_MEDIA.showcaseTerminal
  * apontar para um ficheiro em public/media/.
  */
-const DEMO_SPARK =
-  "M0 34 L20 30 L40 31 L60 24 L80 26 L100 18 L120 20 L140 12 L160 14 L180 7 L200 4";
 
-export function TerminalMock() {
+export function TerminalMock({
+  liveLabel,
+  aiChipLabel,
+}: {
+  /** pill "Em direto" junto ao nome (i18n via page) */
+  liveLabel?: string;
+  /** chip AI Brief da cena 3 do showcase (i18n via page) */
+  aiChipLabel?: string;
+}) {
   return (
-    <div className="p-4 sm:p-6">
+    <div className="relative p-4 sm:p-6">
       {/* pill de navegação do mock */}
       <div className="mb-5 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
@@ -42,30 +50,18 @@ export function TerminalMock() {
       <div className="grid gap-4 md:grid-cols-[1.2fr_1fr]">
         <div className="glass rounded-2xl p-5">
           <div className="flex items-center justify-between">
-            <div>
-              <div className="text-sm font-semibold">
-                Apple Inc. <span className="text-muted-foreground">· AAPL</span>
-              </div>
-              <div className="nums mt-2 text-4xl font-bold tracking-tight">227,34 $</div>
-              <div className="nums mt-1 text-sm font-semibold text-bull">▲ +1,86 (+0,82%)</div>
+            <div className="flex items-center text-sm font-semibold">
+              Apple Inc. <span className="ml-1 text-muted-foreground">· AAPL</span>
+              {liveLabel ? (
+                <span className="ml-2 inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                  <i className="live-dot h-1.5 w-1.5 rounded-full bg-primary" />
+                  {liveLabel}
+                </span>
+              ) : null}
             </div>
             <ArrowUpRight className="h-5 w-5 text-muted-foreground/50" />
           </div>
-          <svg
-            viewBox="0 0 200 40"
-            preserveAspectRatio="none"
-            className="mt-4 h-12 w-full"
-            aria-hidden="true"
-          >
-            <path d={`${DEMO_SPARK} L200 40 L0 40 Z`} fill="var(--primary)" opacity="0.12" />
-            <path
-              d={DEMO_SPARK}
-              fill="none"
-              stroke="var(--primary)"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
+          <LiveSpark />
         </div>
 
         {/* métricas */}
@@ -79,10 +75,33 @@ export function TerminalMock() {
             <div key={k} className="glass rounded-2xl p-4">
               <div className="text-xs font-medium text-muted-foreground">{k}</div>
               <div className="nums mt-1.5 text-xl font-bold tracking-tight">{v}</div>
+              {/* cena 2 do showcase: histograma cresce preso ao scroll */}
+              <div aria-hidden className="mt-2 flex h-6 items-end gap-1">
+                {[40, 55, 48, 72, 100].map((h, i) => (
+                  <span
+                    key={i}
+                    data-scene-bar
+                    style={{ height: `${h}%` }}
+                    className="w-1.5 origin-bottom rounded-sm bg-primary/60"
+                  />
+                ))}
+              </div>
             </div>
           ))}
         </div>
       </div>
+
+      {/* cena 3 do showcase: chip AI Brief sobe do fundo do mock */}
+      {aiChipLabel ? (
+        <div data-scene="3" className="glass absolute inset-x-6 bottom-4 hidden rounded-2xl p-4 sm:block">
+          <span className="flex items-center gap-2 text-xs font-semibold text-primary">
+            <span className="live-dot inline-block h-1.5 w-1.5 rounded-full bg-primary" />
+            {aiChipLabel}
+          </span>
+          <div className="mt-2 h-2 w-3/4 rounded bg-foreground/10" />
+          <div className="mt-1.5 h-2 w-1/2 rounded bg-foreground/10" />
+        </div>
+      ) : null}
     </div>
   );
 }

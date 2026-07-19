@@ -51,6 +51,8 @@ export function MediaFrame({
 
   return (
     <LiquidGlass className={cn("rounded-3xl p-2 sm:p-3", className)}>
+      {/* traço de luz dourada a circular o perímetro (globals .beam-ring) */}
+      <span aria-hidden className="beam-ring" />
       {/* chrome do browser */}
       <div className="flex items-center gap-3 px-3 pb-2 pt-1">
         <span className="flex gap-1.5" aria-hidden>

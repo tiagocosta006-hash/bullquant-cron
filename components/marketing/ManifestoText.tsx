@@ -1,16 +1,17 @@
 "use client";
 
-import { Fragment, useRef } from "react";
+import { useRef } from "react";
 import { gsap, useGSAP, MOTION_OK } from "@/lib/marketing/gsap";
 import { cn } from "@/lib/utils";
 
 /**
- * ManifestoText — scrollytelling assinatura: a frase-manifesto fica
- * sticky ao centro e cada palavra "enche" de tinta (opacity 0.12 → 1)
- * com o progresso do scroll (scrub, reversível por natureza). O
- * `backdrop` (ex.: TickerWall) vive atrás do texto, dentro do sticky.
- * A opacidade inicial só é aplicada dentro do gate de motion — sem JS
- * ou com reduced-motion o texto está sempre completo.
+ * ManifestoText — reveal "zoom-through": a frase fica sticky ao centro e
+ * cada linha ATRAVESSA a câmara — entra gigante e desfocada (scale 2.3,
+ * blur) e assenta no lugar, sequencialmente, presa ao scrub (reversível).
+ * Quando a linha accent assenta, ganha um sweep dourado one-shot.
+ * O `backdrop` (TickerWall) vive atrás do texto, dentro do sticky.
+ * Sem JS / reduced-motion: linhas completas estáticas (estados iniciais
+ * só dentro do gate de motion).
  */
 export function ManifestoText({
   lines,
@@ -29,51 +30,58 @@ export function ManifestoText({
     () => {
       const mm = gsap.matchMedia();
       mm.add(MOTION_OK, () => {
-        const words = trackRef.current?.querySelectorAll<HTMLElement>("[data-word]");
-        if (!words?.length) return;
-        gsap.set(words, { opacity: 0.2 });
-        gsap.to(words, {
-          opacity: 1,
-          duration: 1,
-          stagger: 0.35,
-          ease: "none",
+        const els = gsap.utils.toArray<HTMLElement>("[data-line]", trackRef.current);
+        if (!els.length) return;
+        const tl = gsap.timeline({
           scrollTrigger: {
             trigger: trackRef.current,
-            start: "top 22%",
+            start: "top 18%",
             end: "bottom 96%",
             scrub: 0.4,
           },
         });
+        els.forEach((el, i) => {
+          tl.fromTo(
+            el,
+            { scale: 2.3, autoAlpha: 0, filter: "blur(14px)", transformOrigin: "50% 50%" },
+            { scale: 1, autoAlpha: 1, filter: "blur(0px)", duration: 1, ease: "none" },
+            i * 1.2,
+          );
+        });
+        if (accentLine !== undefined && els[accentLine]) {
+          // sweep dourado quando a linha accent assenta (one-shot CSS)
+          tl.call(
+            () => els[accentLine].classList.add("manifesto-sheen"),
+            undefined,
+            accentLine * 1.2 + 0.95,
+          );
+        }
       });
     },
-    { scope: trackRef },
+    { scope: trackRef, dependencies: [accentLine] },
   );
 
   return (
-    <div ref={trackRef} className="relative h-[300vh]">
+    <div ref={trackRef} className="relative h-[260vh]">
       <div className="sticky top-0 flex h-svh items-center justify-center overflow-hidden px-6">
         {backdrop ? (
           <div aria-hidden className="absolute inset-0 -z-10">
             {backdrop}
           </div>
         ) : null}
-        <p className="max-w-5xl text-balance text-center text-4xl font-extrabold leading-[1.08] tracking-[-0.03em] sm:text-6xl md:text-7xl">
-          {lines.map((line, i) => {
-            const parts = line.split(" ");
-            return (
-              <span key={i} className={cn("block", i === accentLine && "text-primary")}>
-                {parts.map((word, j) => (
-                  <Fragment key={j}>
-                    {/* espaço FORA do span animado: inline-block corta o whitespace final */}
-                    <span data-word className="inline-block will-change-[opacity]">
-                      {word}
-                    </span>
-                    {j < parts.length - 1 ? " " : null}
-                  </Fragment>
-                ))}
-              </span>
-            );
-          })}
+        <p className="max-w-5xl text-balance text-center text-4xl font-extrabold leading-[1.12] tracking-[-0.03em] sm:text-6xl md:text-7xl">
+          {lines.map((line, i) => (
+            <span
+              key={i}
+              data-line
+              className={cn(
+                "block will-change-transform",
+                i === accentLine && "text-primary",
+              )}
+            >
+              {line}
+            </span>
+          ))}
         </p>
       </div>
     </div>

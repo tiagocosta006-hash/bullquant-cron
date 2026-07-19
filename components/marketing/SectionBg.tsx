@@ -36,7 +36,8 @@ export function SectionBg({
 }: {
   tone?: Tone;
   motif?: Motif;
-  fade?: boolean;
+  /** `"deep"` = fade mais longo (22%/78%) para cross-fades entre bandas de tom diferente */
+  fade?: boolean | "deep";
   className?: string;
 }) {
   return (
@@ -46,8 +47,10 @@ export function SectionBg({
         "pointer-events-none absolute inset-0 -z-10",
         TONE[tone],
         MOTIF[motif],
-        fade &&
-          "[mask-image:linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)]",
+        fade === "deep"
+          ? "[mask-image:linear-gradient(to_bottom,transparent,black_22%,black_78%,transparent)]"
+          : fade &&
+              "[mask-image:linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)]",
         className,
       )}
     />

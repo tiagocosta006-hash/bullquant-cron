@@ -16,7 +16,11 @@ const EXTRA = [
   "JPM", "XOM", "PG", "JNJ", "UNH", "HD", "CRM", "AVGO", "COST", "PEP",
   "CSCO", "INTC", "AMD", "ORCL", "ABT", "NKE", "WMT", "LLY", "MRK", "BAC",
   "PFE", "TMO", "ACN", "LIN", "TXN", "QCOM", "HON", "UPS", "CAT", "IBM",
-  "GE", "BA", "SBUX", "GS",
+  "GE", "BA", "SBUX", "GS", "MS", "BLK", "V", "MA", "AXP", "DIS",
+  "NFLX", "ADBE", "PYPL", "SHOP", "UBER", "ABNB", "PLTR", "SNOW", "NOW", "PANW",
+  "MU", "AMAT", "LRCX", "KLAC", "ADI", "MRVL", "DE", "LMT", "RTX", "NOC",
+  "CVX", "COP", "SLB", "EOG", "KO", "MCD", "YUM", "CMG", "TGT", "LOW",
+  "MDT", "ISRG", "SYK", "BSX", "VRTX", "REGN", "GILD", "AMGN", "CI", "ELV",
 ];
 
 interface Cell {
@@ -31,12 +35,14 @@ function buildCells(items: TickerItem[]): Cell[] {
     price: i.close,
     chg: i.changePct ?? 0,
   }));
-  const synthetic: Cell[] = EXTRA.map((ticker, i) => ({
+  // dedupe: tickers reais têm prioridade (keys React têm de ser únicas)
+  const seen = new Set(real.map((r) => r.ticker));
+  const synthetic: Cell[] = EXTRA.filter((t) => !seen.has(t)).map((ticker, i) => ({
     ticker,
     price: 30 + ((i * 47) % 470) + (i % 7) * 0.37,
     chg: (((i * 13) % 9) - 4) / 250,
   }));
-  return [...real, ...synthetic].slice(0, 48);
+  return [...real, ...synthetic].slice(0, 91);
 }
 
 export function TickerWall({ items }: { items: TickerItem[] }) {
@@ -48,13 +54,14 @@ export function TickerWall({ items }: { items: TickerItem[] }) {
     if (!root) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const nodes = Array.from(root.querySelectorAll<HTMLElement>("[data-cell]"));
+    // só as células do bloco original — as cópias do loop ficam estáticas
+    const nodes = Array.from(root.querySelectorAll<HTMLElement>('[data-dup="0"] [data-cell]'));
     if (!nodes.length) return;
     const prices = nodes.map((n) => Number(n.dataset.price) || 100);
 
     let interval = 0;
     const tick = () => {
-      for (let k = 0; k < 4; k++) {
+      for (let k = 0; k < 8; k++) {
         const i = Math.floor(Math.random() * nodes.length);
         const delta = (Math.random() - 0.48) * 0.012;
         prices[i] = Math.max(1, prices[i] * (1 + delta));
@@ -68,8 +75,8 @@ export function TickerWall({ items }: { items: TickerItem[] }) {
         chgEl.classList.toggle("text-bull", up);
         chgEl.classList.toggle("text-bear", !up);
         // flash de "quadro de cotações": o valor apaga e reacende
-        cell.style.transition = "opacity 0.25s ease";
-        cell.style.opacity = "0.35";
+        cell.style.transition = "opacity 0.18s ease";
+        cell.style.opacity = "0.25";
         requestAnimationFrame(() => {
           cell.style.opacity = "1";
         });
@@ -79,7 +86,7 @@ export function TickerWall({ items }: { items: TickerItem[] }) {
     const io = new IntersectionObserver(
       ([entry]) => {
         window.clearInterval(interval);
-        if (entry.isIntersecting) interval = window.setInterval(tick, 650);
+        if (entry.isIntersecting) interval = window.setInterval(tick, 220);
       },
       { threshold: 0 },
     );
@@ -90,38 +97,49 @@ export function TickerWall({ items }: { items: TickerItem[] }) {
     };
   }, []);
 
+  // 7 colunas densas que derivam verticalmente em sentidos alternados
+  // (loop -50% com o conteúdo duplicado — o truque do marquee)
+  const COLS = 7;
+  const cols = Array.from({ length: COLS }, (_, c) => cells.filter((_, i) => i % COLS === c));
+
+  const cell = (c: Cell) => {
+    const up = c.chg >= 0;
+    return (
+      <div key={c.ticker} data-cell data-price={c.price} className="flex flex-col items-center gap-0.5">
+        <span className="text-[11px] font-semibold tracking-wide">{c.ticker}</span>
+        <span data-price-el className="nums text-xs font-medium">
+          {c.price.toFixed(2)}
+        </span>
+        <span
+          data-chg-el
+          className={cn("nums text-[10px] font-semibold", up ? "text-bull" : "text-bear")}
+        >
+          {up ? "▲" : "▼"} {(Math.abs(c.chg) * 100).toFixed(2)}%
+        </span>
+      </div>
+    );
+  };
+
   return (
     <div
       ref={rootRef}
       aria-hidden
-      className="h-full w-full opacity-[0.09] blur-[0.5px] [mask-image:radial-gradient(ellipse_66%_58%_at_50%_50%,transparent_42%,black_88%)] dark:opacity-[0.13]"
+      className="h-full w-full overflow-hidden opacity-[0.14] blur-[0.5px] [mask-image:radial-gradient(ellipse_58%_50%_at_50%_50%,transparent_34%,black_82%)] dark:opacity-[0.2]"
     >
-      <div className="grid h-full w-full grid-cols-3 place-content-between gap-x-6 gap-y-8 p-8 sm:grid-cols-5 xl:grid-cols-7">
-        {cells.map((c) => {
-          const up = c.chg >= 0;
-          return (
-            <div
-              key={c.ticker}
-              data-cell
-              data-price={c.price}
-              className="flex flex-col items-center gap-0.5"
-            >
-              <span className="text-xs font-semibold tracking-wide">{c.ticker}</span>
-              <span data-price-el className="nums text-sm font-medium">
-                {c.price.toFixed(2)}
-              </span>
-              <span
-                data-chg-el
-                className={cn(
-                  "nums text-[11px] font-semibold",
-                  up ? "text-bull" : "text-bear",
-                )}
-              >
-                {up ? "▲" : "▼"} {(Math.abs(c.chg) * 100).toFixed(2)}%
-              </span>
-            </div>
-          );
-        })}
+      <div className="flex h-full w-full justify-between gap-4 px-6">
+        {cols.map((col, c) => (
+          <div
+            key={c}
+            className="wall-col flex flex-col gap-5"
+            style={{ "--wall-dur": `${38 + c * 4}s` } as React.CSSProperties}
+          >
+            {[0, 1].map((dup) => (
+              <div key={dup} data-dup={dup} className="flex flex-col gap-5">
+                {col.map(cell)}
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );

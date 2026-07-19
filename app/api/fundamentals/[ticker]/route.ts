@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
+// Sem isto, o Next.js cacheia o resultado deste GET internamente por rota
+// resolvida (por ticker) até ao próximo deploy — tickers visitados antes de
+// uma atualização de dados (ex: backfill de revenueSegments) ficavam presos
+// na resposta antiga indefinidamente. O Cache-Control abaixo continua a
+// controlar a frescura ao nível do CDN/browser; isto garante que a função
+// em si executa sempre a query.
+export const dynamic = 'force-dynamic'
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ ticker: string }> }

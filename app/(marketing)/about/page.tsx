@@ -20,7 +20,10 @@ export async function generateMetadata({
   params: { locale: string };
 }): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: "about" });
-  const title = `${t("title")} | ${BRAND}`;
+  // title tem tags <italic> para o h1 (t.rich); em texto plano (metadata)
+  // removê-las — senão next-intl lança FORMATTING_ERROR por falta do handler.
+  const plainTitle = t("title").replace(/<\/?italic>/g, "");
+  const title = `${plainTitle} | ${BRAND}`;
   const description = t("intro");
 
   return {
@@ -37,11 +40,11 @@ export async function generateMetadata({
 export default function AboutPage() {
   const t = useTranslations("about");
 
-  // Schema.org JSON-LD for E-E-A-T
+  // Schema.org JSON-LD for E-E-A-T (nome em texto plano, sem as tags <italic>)
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    "name": t("title"),
+    "name": t("title").replace(/<\/?italic>/g, ""),
     "description": t("intro"),
     "publisher": {
       "@type": "Organization",
@@ -116,12 +119,13 @@ export default function AboutPage() {
           <div className="flex flex-col items-center text-center gap-6 relative z-10 max-w-3xl mx-auto">
             {/* Logo */}
             <div className="mb-2">
-              <Image 
-                src="/brand/bullocracy-logo.png" 
-                alt="The Bullocracy Logo" 
-                width={110} 
-                height={110} 
+              <Image
+                src="/brand/bullocracy-logo.png"
+                alt="The Bullocracy Logo"
+                width={110}
+                height={110}
                 className="object-contain drop-shadow-xl"
+                style={{ height: "auto" }}
                 priority
               />
             </div>

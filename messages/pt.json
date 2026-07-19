@@ -869,6 +869,16 @@
     "philosophy": {
       "title": "A Filosofia dos Dados",
       "text": "A nossa análise baseia-se na matemática e nos relatórios oficiais extraídos diretamente da SEC. A BullMetrics foca-se na solidez dos números. Acreditamos que as decisões financeiras exigem dados limpos, precisão técnica e transparência, características que valorizamos muito na BullMetrics."
+    },
+    "contact": {
+      "title": "Contactos Oficiais",
+      "text": "Tens dúvidas, propostas de parceria ou queres saber mais sobre a nossa arquitetura de dados? A equipa da Bullocracy está à tua disposição.",
+      "email_label": "Email Institucional",
+      "email_value": "info@thebullocracy.com",
+      "location_label": "Localização",
+      "location_value": "Universidade do Minho, Braga",
+      "social_label": "Redes Sociais",
+      "social_value": "@thebullocracy"
     }
   }
 }

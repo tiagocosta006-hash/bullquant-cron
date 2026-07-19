@@ -221,6 +221,7 @@ model DcfAnalysis {
   fairValue      Decimal  @db.Decimal(20, 4)
   priceAtSave    Decimal? @db.Decimal(20, 4)
   marginOfSafety Decimal? @db.Decimal(8, 6)
+  isPublic       Boolean  @default(false)
   createdAt      DateTime @default(now())
   company        Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)

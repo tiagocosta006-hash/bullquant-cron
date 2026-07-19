@@ -41,6 +41,7 @@ export async function GET(request: NextRequest) {
       fairValue: Number(a.fairValue),
       priceAtSave: a.priceAtSave != null ? Number(a.priceAtSave) : null,
       marginOfSafety: a.marginOfSafety != null ? Number(a.marginOfSafety) : null,
+      isPublic: a.isPublic,
       createdAt: a.createdAt.toISOString(),
     }))
 

@@ -822,8 +822,8 @@
     "title": "Democratizing access to financial <italic>data.</italic>",
     "intro": "BullMetrics is a fundamental data analysis platform designed for all types of investors.",
     "problem": {
-      "title": "The Problem",
-      "text": "Access to high-quality financial data is often too expensive, visually confusing, and scattered across multiple sources. BullMetrics was born to eliminate these hurdles. Our goal is to offer the technical rigor of professional tools in an interface designed for the everyday investor."
+      "title": "Our Goal",
+      "text": "To give the individual investor easy, structured, and transparent access to corporate financial statements. By automating the extraction of complex SEC reports, we free up your time for what really matters: value analysis."
     },
     "organization": {
       "title": "The Bullocracy",

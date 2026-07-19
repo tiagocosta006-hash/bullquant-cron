@@ -1018,6 +1018,7 @@
   "about": {
     "badge": "A Nossa Missão",
     "title": "A democratizar o acesso a dados <italic>financeiros.</italic>",
+    "titlePlain": "A democratizar o acesso a dados financeiros.",
     "intro": "A BullMetrics é uma plataforma de análise de dados fundamentais desenhada para todo o tipo de investidores.",
     "problem": {
       "title": "O Nosso Objetivo",

@@ -1018,6 +1018,7 @@
   "about": {
     "badge": "Our Mission",
     "title": "Democratizing access to financial <italic>data.</italic>",
+    "titlePlain": "Democratizing access to financial data.",
     "intro": "BullMetrics is a fundamental data analysis platform designed for all types of investors.",
     "problem": {
       "title": "Our Goal",

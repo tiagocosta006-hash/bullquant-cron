@@ -20,10 +20,10 @@ export async function generateMetadata({
   params: { locale: string };
 }): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: "about" });
-  // title tem tags <italic> para o h1 (t.rich); em texto plano (metadata)
-  // removê-las — senão next-intl lança FORMATTING_ERROR por falta do handler.
-  const plainTitle = t("title").replace(/<\/?italic>/g, "");
-  const title = `${plainTitle} | ${BRAND}`;
+  // "title" tem tags <italic> destinadas ao t.rich do h1 — chamar t("title")
+  // em modo plano faz o next-intl lançar FORMATTING_ERROR (não há handler
+  // para a tag). Por isso usa-se "titlePlain", sem markup, para metadata.
+  const title = `${t("titlePlain")} | ${BRAND}`;
   const description = t("intro");
 
   return {
@@ -40,11 +40,11 @@ export async function generateMetadata({
 export default function AboutPage() {
   const t = useTranslations("about");
 
-  // Schema.org JSON-LD for E-E-A-T (nome em texto plano, sem as tags <italic>)
+  // Schema.org JSON-LD for E-E-A-T (nome em texto plano, ver nota acima)
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    "name": t("title").replace(/<\/?italic>/g, ""),
+    "name": t("titlePlain"),
     "description": t("intro"),
     "publisher": {
       "@type": "Organization",
@@ -125,7 +125,11 @@ export default function AboutPage() {
                 width={110}
                 height={110}
                 className="object-contain drop-shadow-xl"
-                style={{ height: "auto" }}
+                // o preflight do Tailwind aplica `height: auto` a todo <img>,
+                // o que desencontra com a largura fixa (110px do atributo) e
+                // dispara o aviso do next/image. Fixar as duas dimensões
+                // aqui sobrepõe o preflight sem mudar o tamanho renderizado.
+                style={{ width: 110, height: 110 }}
                 priority
               />
             </div>

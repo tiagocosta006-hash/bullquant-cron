@@ -94,13 +94,15 @@ export default function AboutPage() {
           </p>
         </div>
 
-        {/* 2. The Problem */}
-        <div className="glass flex flex-col items-center text-center gap-6 rounded-[2rem] p-8 sm:p-12 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150 fill-mode-both">
-          <div className="w-16 h-16 bg-background rounded-full flex items-center justify-center border border-border/50 shadow-sm mb-4">
-            <LineChart className="w-8 h-8 text-foreground" />
+        {/* 2. The Goal (Formerly The Problem) */}
+        <div className="glass flex flex-col items-center text-center gap-6 rounded-3xl p-8 max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150 fill-mode-both border border-border/50 shadow-sm mt-4">
+          <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-2">
+            <Target className="w-7 h-7 text-primary" />
           </div>
-          <h2 className="text-3xl sm:text-5xl font-heading">{t("problem.title")}</h2>
-          <p className="text-muted-foreground leading-relaxed text-xl max-w-2xl">
+          <h2 className={`text-3xl sm:text-4xl text-foreground tracking-tight ${cinzel.className}`}>
+            {t("problem.title")}
+          </h2>
+          <p className="text-muted-foreground leading-relaxed text-lg sm:text-xl">
             {t("problem.text")}
           </p>
         </div>
@@ -178,16 +180,7 @@ export default function AboutPage() {
           </div>
         </div>
 
-        {/* 5. Data Philosophy */}
-        <div className="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto py-12 border-t border-border/50 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500 fill-mode-both">
-          <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-2">
-            <Shield className="w-8 h-8 text-primary" />
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-heading">{t("philosophy.title")}</h2>
-          <p className="text-xl text-muted-foreground leading-relaxed">
-            {t("philosophy.text")}
-          </p>
-        </div>
+
 
         {/* 6. Contacts */}
         <div className="flex flex-col gap-12 pt-12 border-t border-border/50 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-700 fill-mode-both">

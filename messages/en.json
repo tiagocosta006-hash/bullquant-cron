@@ -479,6 +479,12 @@
       "naMargin": "Margin not reported — common for banks and insurers, which have no cost of goods (COGS).",
       "naPrice": "Unavailable: depends on the live price, which hasn't loaded yet."
     },
+    "earnings": {
+      "title": "Latest Results",
+      "eps": "EPS",
+      "revenue": "Revenue",
+      "estimate": "Est"
+    },
     "tabs": {
       "overview": "Overview",
       "financials": "Financials",

@@ -14,6 +14,7 @@ import { InsiderActivity } from '@/components/stock/InsiderActivity'
 import { getCurrencySymbol } from '@/lib/finance/format'
 import { BRAND } from '@/lib/brand'
 
+import { LatestResults } from '@/components/stock/LatestResults'
 import { CompanyProfile } from '@/components/stock/CompanyProfile'
 import { StockNews } from '@/components/stock/StockNews'
 import { ManagementTeam } from '@/components/stock/ManagementTeam'
@@ -106,7 +107,8 @@ export default async function StockPage({
     historicalAnnual,
     latestAnnual,
     aiInsightRaw,
-    latestPrice
+    latestPrice,
+    latestEarnings
   ] = await Promise.all([
     // 1. User PRO plan
     user ? prisma.user.findUnique({ where: { id: user.id } }) : Promise.resolve(null),
@@ -146,6 +148,12 @@ export default async function StockPage({
     prisma.price.findFirst({
       where: { ticker: company.ticker },
       orderBy: { date: 'desc' }
+    }),
+
+    // 8. Últimos resultados já reportados (não o próximo evento estimado)
+    prisma.earningsEvent.findFirst({
+      where: { companyId: company.id, epsActual: { not: null } },
+      orderBy: { date: 'desc' },
     })
   ])
 
@@ -243,6 +251,18 @@ export default async function StockPage({
       <StockTabs
         overview={
           <>
+            {latestEarnings && (
+              <LatestResults
+                fiscalYear={latestEarnings.fiscalYear}
+                fiscalQuarter={latestEarnings.fiscalQuarter}
+                date={latestEarnings.date.toISOString().slice(0, 10)}
+                epsEstimate={latestEarnings.epsEstimate !== null ? Number(latestEarnings.epsEstimate) : null}
+                epsActual={latestEarnings.epsActual !== null ? Number(latestEarnings.epsActual) : null}
+                revenueEstimate={latestEarnings.revenueEstimate !== null ? Number(latestEarnings.revenueEstimate) : null}
+                revenueActual={latestEarnings.revenueActual !== null ? Number(latestEarnings.revenueActual) : null}
+                currencySymbol={currencySymbol}
+              />
+            )}
             <div>
               <h2 className="text-xl font-bold tracking-tight mb-4 text-foreground">{t('snapshotTitle')}</h2>
               <StockSnapshot ticker={company.ticker} fundamentals={JSON.parse(JSON.stringify(fundamentalsToPass))} currencySymbol={currencySymbol} />

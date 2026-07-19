@@ -479,6 +479,12 @@
       "naMargin": "Margem não reportada — típico de bancos e seguradoras, que não têm custo de produção (COGS).",
       "naPrice": "Indisponível: depende do preço atual, que ainda não carregou."
     },
+    "earnings": {
+      "title": "Últimos Resultados",
+      "eps": "EPS",
+      "revenue": "Receita",
+      "estimate": "Est"
+    },
     "tabs": {
       "overview": "Resumo",
       "financials": "Fundamentais",

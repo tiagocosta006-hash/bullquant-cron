@@ -156,7 +156,8 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
       const data = await response.json()
       
       if (response.ok && data.url) {
-        window.location.href = data.url
+        window.open(data.url, '_blank', 'noopener,noreferrer')
+        setIsGeneratingPortal(false)
       } else {
         setPortalError(data.error || 'Ocorreu um erro ao gerar o link do portal.')
         setIsGeneratingPortal(false)

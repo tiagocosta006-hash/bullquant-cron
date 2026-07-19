@@ -25,7 +25,10 @@ export async function GET(
     const { company, fairValue, priceAtSave, marginOfSafety } = analysis
     const currency = company.currency === "EUR" ? "€" : "$"
     
-    const undervalued = (marginOfSafety ?? 0) > 0
+    const marginOfSafetyNum = marginOfSafety && typeof marginOfSafety === "object" && "toNumber" in marginOfSafety
+      ? (marginOfSafety as { toNumber(): number }).toNumber()
+      : Number(marginOfSafety ?? 0)
+    const undervalued = marginOfSafetyNum > 0
     const marginColor = undervalued ? "#10b981" : "#ef4444" // bull / bear hex colors
 
     return new ImageResponse(
@@ -79,21 +82,27 @@ export async function GET(
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <div style={{ fontSize: 32, color: "#a1a1aa", textTransform: "uppercase", marginBottom: 10 }}>Fair Value</div>
                 <div style={{ fontSize: 64, fontWeight: "bold", color: "#facc15" }}>
-                  {formatPrice(Number(fairValue), currency)}
+                  {formatPrice(
+                    fairValue && typeof fairValue === "object" && "toNumber" in fairValue ? (fairValue as { toNumber(): number }).toNumber() : Number(fairValue),
+                    currency
+                  )}
                 </div>
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <div style={{ fontSize: 32, color: "#a1a1aa", textTransform: "uppercase", marginBottom: 10 }}>Current Price</div>
                 <div style={{ fontSize: 64, fontWeight: "bold", color: "#ffffff" }}>
-                  {priceAtSave ? formatPrice(Number(priceAtSave), currency) : "N/A"}
+                  {priceAtSave ? formatPrice(
+                    typeof priceAtSave === "object" && "toNumber" in priceAtSave ? (priceAtSave as { toNumber(): number }).toNumber() : Number(priceAtSave),
+                    currency
+                  ) : "N/A"}
                 </div>
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <div style={{ fontSize: 32, color: "#a1a1aa", textTransform: "uppercase", marginBottom: 10 }}>Margin of Safety</div>
                 <div style={{ fontSize: 64, fontWeight: "bold", color: marginColor }}>
-                  {marginOfSafety ? (undervalued ? "+" : "") + formatPercent(Number(marginOfSafety)) : "N/A"}
+                  {marginOfSafety ? (undervalued ? "+" : "") + formatPercent(marginOfSafetyNum) : "N/A"}
                 </div>
               </div>
 

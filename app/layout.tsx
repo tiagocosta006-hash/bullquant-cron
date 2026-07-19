@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { JetBrains_Mono } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
@@ -9,12 +8,6 @@ import { PulseTracker } from "@/components/pulse/PulseTracker";
 import { BRAND } from "@/lib/brand";
 import { PaddleProvider } from "@/components/providers/PaddleProvider";
 import { GoogleAnalytics } from "@next/third-parties/google";
-
-// Tema anti-FOUC: aplica .dark do localStorage ANTES do 1.º paint. Via
-// next/script beforeInteractive (hoisted para o <head> do HTML inicial),
-// que o Next injeta antes da hidratação — sem o warning do React 19 de
-// renderizar um <script> cru como filho de componente.
-const THEME_INIT = `(function(){try{var d=localStorage.getItem('theme')==='dark';if(d)document.documentElement.classList.add('dark');var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',d?'#100f0d':'#fafaf7')}catch(e){}})()`;
 
 const scotchDisplay = localFont({
   variable: "--font-heading",
@@ -137,9 +130,12 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <Script id="theme-init" strategy="beforeInteractive">
-          {THEME_INIT}
-        </Script>
+        {/* Tema anti-FOUC: ficheiro externo render-blocking (public/theme-init.js).
+            Corre síncrono antes do body → sem flash; externo (src) em vez de
+            inline → sem o warning do React 19 sobre scripts como filhos.
+            O bloqueio síncrono é DELIBERADO (evitar FOUC), daí o disable. */}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script src="/theme-init.js" />
       </head>
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground">
         <NextIntlClientProvider messages={messages}>

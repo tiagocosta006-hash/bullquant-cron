@@ -105,7 +105,7 @@ export default async function PricingPage() {
           <h1 className="text-balance text-5xl font-extrabold leading-tight tracking-[-0.03em] sm:text-6xl">
             {t("title")}
           </h1>
-          <p className="mt-5 max-w-[48ch] text-lg text-muted-foreground">
+          <p className="mt-5 max-w-[48ch] text-lg text-center mx-auto text-muted-foreground">
             {t("subtitle")}
           </p>
         </Reveal>

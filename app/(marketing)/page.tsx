@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import {
   ArrowRight,
@@ -212,7 +213,7 @@ export default async function LandingPage() {
       <section className="mx-auto max-w-6xl px-6 pb-24 md:px-8">
         <Reveal className="grid gap-5 sm:grid-cols-3">
           {stats.map(({ value, label }) => (
-            <div key={label} className="text-center sm:text-left">
+            <div key={label} className="text-center">
               <div className="nums text-5xl font-extrabold tracking-tight text-primary sm:text-6xl">
                 {value}
               </div>
@@ -225,23 +226,37 @@ export default async function LandingPage() {
       {/* ── Missão / Sobre Nós ───────────────────────────────── */}
       <section className="mx-auto max-w-5xl px-6 pb-24 md:px-8">
         <Reveal>
-          <LiquidGlass className="flex flex-col items-center gap-5 rounded-3xl p-8 text-center sm:p-12">
-            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-card/60 px-3.5 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              {t("mission.badge")}
+          <LiquidGlass className="group relative flex flex-col items-center gap-5 overflow-hidden rounded-3xl p-8 text-center sm:p-12">
+            {/* Imagem de Fundo (Hover Reveal) */}
+            <div className="absolute inset-0 z-0">
+              <Image
+                src="/team-mission.jpg"
+                alt="Equipa The Bullocracy a trabalhar no BullMetrics"
+                fill
+                className="object-cover opacity-0 transition-opacity duration-700 group-hover:opacity-40 mix-blend-luminosity grayscale"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-background/90 opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
             </div>
-            <h2 className="max-w-[20ch] text-balance text-3xl font-extrabold tracking-tight sm:text-4xl">
-              {t("mission.title")}
-            </h2>
-            <p className="max-w-[42ch] text-muted-foreground">
-              {t("mission.desc")}
-            </p>
-            <Link
-              href="/about"
-              className={cn(buttonVariants({ variant: "outline", size: "lg" }), "mt-4 font-medium")}
-            >
-              {t("mission.cta")} <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
+
+            {/* Conteúdo Principal (z-10 para ficar por cima da foto) */}
+            <div className="relative z-10 flex flex-col items-center gap-5 transition-transform duration-700 group-hover:scale-[1.02]">
+              <div className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-card/60 px-3.5 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                {t("mission.badge")}
+              </div>
+              <h2 className="max-w-[20ch] text-balance text-3xl font-extrabold tracking-tight sm:text-4xl">
+                {t("mission.title")}
+              </h2>
+              <p className="max-w-[42ch] text-muted-foreground">
+                {t("mission.desc")}
+              </p>
+              <Link
+                href="/about"
+                className={cn(buttonVariants({ variant: "default", size: "lg" }), "mt-4 font-semibold shadow-[0_0_20px_-5px_hsl(var(--primary)/0.3)] transition-all duration-500 group-hover:shadow-[0_0_40px_-5px_hsl(var(--primary)/0.6)] group-hover:-translate-y-1")}
+              >
+                {t("mission.cta")} <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </div>
           </LiquidGlass>
         </Reveal>
       </section>

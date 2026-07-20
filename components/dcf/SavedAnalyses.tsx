@@ -2,13 +2,14 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Bookmark, Trash2, Loader2, RotateCcw, Share2, Link as LinkIcon, Check } from "lucide-react"
+import { Bookmark, Trash2, Loader2, RotateCcw } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { formatPrice, formatPercent } from "@/lib/finance/format"
 import { cn } from "@/lib/utils"
+import { ShareDcfModal } from "./ShareDcfModal"
 
 /** Inputs guardados em unidades absolutas / decimais (convenção do motor DCF). */
 export type SavedDcfInputs = {
@@ -122,16 +123,43 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
 
   const handleShare = async (id: string) => {
     try {
+      const a = analyses.find((x) => x.id === id)
+      if (!a) return
+
+      // Copy immediately to preserve user-gesture context for the browser clipboard API
+      const url = `${window.location.origin}/dcf/${id}`
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(url)
+        } else {
+          const textArea = document.createElement("textarea")
+          textArea.value = url
+          textArea.style.position = "fixed"
+          textArea.style.left = "-999999px"
+          textArea.style.top = "-999999px"
+          document.body.appendChild(textArea)
+          textArea.focus()
+          textArea.select()
+          document.execCommand('copy')
+          textArea.remove()
+        }
+        setCopiedId(id)
+        setTimeout(() => setCopiedId(null), 2000)
+      } catch (err) {
+        console.error('Falha ao copiar link:', err)
+      }
+
+      // Se já for público, não precisamos de alterar a BD
+      if (a.isPublic) {
+        return
+      }
+
+      // Se for privado, torna público
       const res = await fetch(`/api/dcf/analyses/${id}/share`, { method: "PATCH" })
       if (!res.ok) return
       const data = await res.json()
       setAnalyses((prev) => prev.map((a) => (a.id === id ? { ...a, isPublic: data.isPublic } : a)))
-      if (data.isPublic) {
-        const url = `${window.location.origin}/dcf/${id}`
-        await navigator.clipboard.writeText(url)
-        setCopiedId(id)
-        setTimeout(() => setCopiedId(null), 2000)
-      }
+      
     } catch (e) {
       console.error(e)
     }
@@ -208,21 +236,12 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
                   )}
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={cn("h-7 w-7", a.isPublic ? "text-primary" : "text-muted-foreground")}
-                    title={a.isPublic ? "Copiar link público" : "Tornar público"}
-                    onClick={() => handleShare(a.id)}
-                  >
-                    {copiedId === a.id ? (
-                      <Check className="h-3.5 w-3.5" />
-                    ) : a.isPublic ? (
-                      <LinkIcon className="h-3.5 w-3.5" />
-                    ) : (
-                      <Share2 className="h-3.5 w-3.5" />
-                    )}
-                  </Button>
+                  <ShareDcfModal
+                    analysis={a}
+                    copiedId={copiedId}
+                    ticker={ticker || ""}
+                    onCopyLink={() => handleShare(a.id)}
+                  />
                   <Button
                     variant="ghost"
                     size="icon"

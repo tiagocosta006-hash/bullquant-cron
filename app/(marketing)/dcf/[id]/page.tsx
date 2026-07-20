@@ -8,6 +8,7 @@ import { runDcf } from "@/lib/finance/dcf"
 import { DcfResults } from "@/components/dcf/DcfResults"
 import { BrandMark } from "@/components/brand/BrandMark"
 import { buttonVariants } from "@/components/ui/button"
+import { DownloadDcfImageButton } from "@/components/dcf/DownloadDcfImageButton"
 import { cn } from "@/lib/utils"
 import { BRAND } from "@/lib/brand"
 
@@ -107,6 +108,9 @@ export default async function PublicDcfPage({
         <p className="text-muted-foreground">
           {analysis.label ? `"${analysis.label}"` : `Análise criada por ${userName}`}
         </p>
+        <div className="pt-2">
+          <DownloadDcfImageButton id={id} ticker={analysis.company.ticker} />
+        </div>
       </div>
 
       {/* Results Card */}

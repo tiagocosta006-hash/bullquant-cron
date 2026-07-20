@@ -60,25 +60,38 @@ const DEFAULTS = {
   growth1: 10,
   growth2: 5,
   wacc: 10,
-  terminalGrowth: 2.5,
+  terminalGrowth: 2,
 }
 
-export function DcfCalculator() {
+type InitialAnalysis = Omit<SavedAnalysis, "inputs"> & {
+  company: { ticker: string; name: string }
+  fcfMode: "FCFF" | "FCFE"
+  fcf0: number
+  growthStage1: number
+  growthStage2: number
+  wacc: number
+  terminalGrowth: number
+  shares: number
+  netDebt: number
+  priceAtSave: number | null
+}
+
+export function DcfCalculator({ initialAnalysis }: { initialAnalysis?: InitialAnalysis }) {
   const t = useTranslations("dcf")
 
   // --- estado dos inputs ---
-  const [currency, setCurrency] = React.useState("$")
-  const [loadedName, setLoadedName] = React.useState<string | null>(null)
-  const [loadedTicker, setLoadedTicker] = React.useState<string | null>(null)
-  const [currentPrice, setCurrentPrice] = React.useState(DEFAULTS.currentPrice)
-  const [fcf0M, setFcf0M] = React.useState(DEFAULTS.fcf0M)
-  const [sharesM, setSharesM] = React.useState(DEFAULTS.sharesM)
-  const [netDebtM, setNetDebtM] = React.useState(DEFAULTS.netDebtM)
-  const [growth1, setGrowth1] = React.useState(DEFAULTS.growth1)
-  const [growth2, setGrowth2] = React.useState(DEFAULTS.growth2)
-  const [wacc, setWacc] = React.useState(DEFAULTS.wacc)
-  const [terminalGrowth, setTerminalGrowth] = React.useState(DEFAULTS.terminalGrowth)
-  const [fcfMode, setFcfMode] = React.useState<"FCFF" | "FCFE">("FCFF")
+  const [currency, setCurrency] = React.useState("$") // Poderíamos deduzir da empresa
+  const [loadedName, setLoadedName] = React.useState<string | null>(initialAnalysis?.company.name || null)
+  const [loadedTicker, setLoadedTicker] = React.useState<string | null>(initialAnalysis?.company.ticker || null)
+  const [currentPrice, setCurrentPrice] = React.useState(initialAnalysis?.priceAtSave || DEFAULTS.currentPrice)
+  const [fcf0M, setFcf0M] = React.useState(initialAnalysis ? initialAnalysis.fcf0 / MILLION : DEFAULTS.fcf0M)
+  const [sharesM, setSharesM] = React.useState(initialAnalysis ? initialAnalysis.shares / MILLION : DEFAULTS.sharesM)
+  const [netDebtM, setNetDebtM] = React.useState(initialAnalysis ? initialAnalysis.netDebt / MILLION : DEFAULTS.netDebtM)
+  const [growth1, setGrowth1] = React.useState(initialAnalysis ? initialAnalysis.growthStage1 * 100 : DEFAULTS.growth1)
+  const [growth2, setGrowth2] = React.useState(initialAnalysis ? initialAnalysis.growthStage2 * 100 : DEFAULTS.growth2)
+  const [wacc, setWacc] = React.useState(initialAnalysis ? initialAnalysis.wacc * 100 : DEFAULTS.wacc)
+  const [terminalGrowth, setTerminalGrowth] = React.useState(initialAnalysis ? initialAnalysis.terminalGrowth * 100 : DEFAULTS.terminalGrowth)
+  const [fcfMode, setFcfMode] = React.useState<"FCFF" | "FCFE">(initialAnalysis?.fcfMode || "FCFF")
   const [annualFcfSeries, setAnnualFcfSeries] = React.useState<FcfSourceRecord[]>([])
   const [beta, setBeta] = React.useState<number | null>(null)
   const [waccBreakdown, setWaccBreakdown] = React.useState<WaccBreakdown | null>(null)

@@ -8,6 +8,7 @@ export async function PATCH(
 ) {
   try {
     const user = await getUser()
+    console.log("SHARE API hit for user:", user?.id, "params:", params)
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
@@ -27,10 +28,10 @@ export async function PATCH(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    // Toggle isPublic
+    // Ensure it is public
     const updated = await prisma.dcfAnalysis.update({
       where: { id },
-      data: { isPublic: !analysis.isPublic },
+      data: { isPublic: true },
     })
 
     return NextResponse.json({ isPublic: updated.isPublic })

@@ -133,6 +133,7 @@ export default async function RootLayout({
             next/script: beforeInteractive não garante execução antes do 1.º
             paint no App Router, o que causava flash branco em dark mode). */}
         <script
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html:
               "(function(){try{var d=localStorage.getItem('theme')==='dark';if(d)document.documentElement.classList.add('dark');var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',d?'#100f0d':'#fafaf7')}catch(e){}})()",

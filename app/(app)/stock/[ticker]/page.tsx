@@ -20,8 +20,8 @@ import { StockNews } from '@/components/stock/StockNews'
 import { ManagementTeam } from '@/components/stock/ManagementTeam'
 const StockAnalyst = dynamic(() => import('@/components/stock/StockAnalyst').then(mod => mod.StockAnalyst))
 import { StockTabs } from '@/components/stock/StockTabs'
-const PremiumPdfButton = dynamic(() => import('@/components/stock/pdf/PremiumPdfButton').then(mod => mod.PremiumPdfButton))
 const ValuationMultiples = dynamic(() => import('@/components/stock/ValuationMultiples').then(mod => mod.ValuationMultiples))
+import { ShareStockModal } from '@/components/stock/ShareStockModal'
 
 // Partilhado entre generateMetadata e a página (React.cache = 1 query por pedido,
 // em vez de 2 findUnique idênticos).
@@ -106,7 +106,6 @@ export default async function StockPage({
     latestFundamentals,
     historicalAnnual,
     latestAnnual,
-    aiInsightRaw,
     latestPrice,
     latestEarnings
   ] = await Promise.all([
@@ -139,18 +138,12 @@ export default async function StockPage({
       orderBy: { periodEnd: 'desc' },
     }),
 
-    // 6. AI Insights for PDF
-    prisma.aIInsightCache.findUnique({
-      where: { companyId: company.id }
-    }),
-
     // 7. Latest Price
     prisma.price.findFirst({
       where: { ticker: company.ticker },
       orderBy: { date: 'desc' }
     }),
 
-    // 8. Últimos resultados já reportados (não o próximo evento estimado)
     prisma.earningsEvent.findFirst({
       where: { companyId: company.id, epsActual: { not: null } },
       orderBy: { date: 'desc' },
@@ -178,42 +171,6 @@ export default async function StockPage({
 
   const currencySymbol = getCurrencySymbol(company.currency)
 
-  let parsedAiInsight = null;
-  if (aiInsightRaw) {
-    try {
-      parsedAiInsight = {
-        executiveSummary: aiInsightRaw.executiveSummary,
-        moat: aiInsightRaw.moat,
-        catalysts: JSON.parse(aiInsightRaw.catalysts),
-        risks: JSON.parse(aiInsightRaw.risks),
-      }
-    } catch (e) {
-      console.error("Failed to parse AI Insight JSON for PDF", e);
-    }
-  }
-
-  // Format data for PDF
-  const pdfCompanyData = {
-    name: company.name,
-    ticker: company.ticker,
-    exchange: company.exchange,
-    sector: company.sector,
-    country: company.country,
-    price: latestPrice ? Number(latestPrice.close) : null,
-    marketCap: latestPrice && fundamentalsToPass[0]?.sharesOutstanding
-      ? Number(latestPrice.close) * Number(fundamentalsToPass[0].sharesOutstanding)
-      : null,
-  }
-
-  const pdfFundamentals = fundamentalsToPass.map(f => ({
-    year: f.fiscalYear,
-    revenue: f.revenue ? Number(f.revenue) : null,
-    netIncome: f.netIncome ? Number(f.netIncome) : null,
-    eps: f.epsDiluted ? Number(f.epsDiluted) : null,
-    fcf: f.freeCashFlow ? Number(f.freeCashFlow) : null,
-    grossMargin: f.grossMargin ? Number(f.grossMargin) : null,
-  }))
-
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Corporation",
@@ -237,12 +194,10 @@ export default async function StockPage({
         logoUrl: company.logoUrl,
         currency: company.currency
       }}
-      pdfButton={
-        <PremiumPdfButton
-          company={pdfCompanyData}
-          fundamentals={pdfFundamentals}
-          aiInsight={parsedAiInsight}
-          isPremiumUser={true} // Hardcoded for now as requested
+      shareComponent={
+        <ShareStockModal
+          ticker={company.ticker}
+          companyName={company.name}
         />
       }
       />

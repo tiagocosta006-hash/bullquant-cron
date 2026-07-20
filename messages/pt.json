@@ -251,7 +251,7 @@
         "pro": "PRO",
         "priceLabel": "Preço",
         "priceFree": "0 €",
-        "pricePro": "7 €/mês",
+        "pricePro": "10 €/mês",
         "priceNote": "Preço provisório — o valor final será anunciado no lançamento.",
         "quotesLabel": "Cotações e 10 anos de fundamentais",
         "aiLabel": "Análises de IA",
@@ -751,7 +751,7 @@
     },
     "pro": {
       "name": "PRO",
-      "price": "€7",
+      "price": "€10",
       "period": "por mês",
       "description": "Para o investidor sério que quer ir mais fundo na análise.",
       "cta": "Começar trial de 7 dias",

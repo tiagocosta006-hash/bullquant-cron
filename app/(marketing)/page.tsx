@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { getUser } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { BRAND } from "@/lib/brand";
+import { PricingCards } from "./pricing/PricingCards";
 
 /**
  * Landing — página de entrada editorial: hero a ocupar o ecrã com o
@@ -280,65 +281,11 @@ export default async function LandingPage() {
             <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">{tp("title")}</h2>
             <p className="mt-3 text-muted-foreground">{tp("subtitle")}</p>
           </div>
+        </Reveal>
 
-          <div className="grid gap-5 md:grid-cols-2">
-            {/* Gratuito */}
-            <LiquidGlass className="flex flex-col rounded-3xl p-7">
-              <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">{tp("free.name")}</p>
-              <div className="mt-3 flex items-end gap-1">
-                <span className="text-4xl font-extrabold tracking-tight">{tp("free.price")}</span>
-                <span className="mb-1 text-sm text-muted-foreground">/ {tp("free.period")}</span>
-              </div>
-              <p className="mt-2 mb-6 text-sm text-muted-foreground">{tp("free.description")}</p>
-              <ul className="mb-8 flex flex-col gap-2.5">
-                {freeFeatures.map((f) => (
-                  <li key={f} className="flex items-center gap-2.5 text-sm">
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-border bg-muted">
-                      <Check className="h-3 w-3 text-muted-foreground" />
-                    </span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-auto">
-                <Link href="/register" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full")}>
-                  {tp("free.cta")} <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </div>
-            </LiquidGlass>
+        <PricingCards />
 
-            {/* PRO */}
-            <div className="relative flex flex-col rounded-3xl border border-primary/40 bg-gradient-to-br from-primary/8 via-card/80 to-card/60 p-7 shadow-[0_0_50px_-10px_hsl(var(--primary)/0.2)] backdrop-blur">
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                <div className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-1 text-xs font-bold text-primary-foreground shadow-lg">
-                  <Zap className="h-3 w-3 fill-current" />
-                  {tp("pro.badge")}
-                </div>
-              </div>
-              <p className="text-sm font-semibold uppercase tracking-widest text-primary">{tp("pro.name")}</p>
-              <div className="mt-3 flex items-end gap-1">
-                <span className="text-4xl font-extrabold tracking-tight">{tp("pro.price")}</span>
-                <span className="mb-1 text-sm text-muted-foreground">/ {tp("pro.period")}</span>
-              </div>
-              <p className="mt-2 mb-6 text-sm text-muted-foreground">{tp("pro.description")}</p>
-              <ul className="mb-8 flex flex-col gap-2.5">
-                {proFeatures.map((f) => (
-                  <li key={f} className="flex items-center gap-2.5 text-sm">
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-primary/15">
-                      <Check className="h-3 w-3 text-primary" />
-                    </span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-auto">
-                <Link href="/register" className={cn(buttonVariants({ size: "lg" }), "w-full shadow-[0_4px_24px_-6px_hsl(var(--primary)/0.5)]")}>
-                  {tp("pro.cta")} <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </div>
-            </div>
-          </div>
-
+        <Reveal>
           <div className="mt-5 text-center text-xs text-muted-foreground">
             {tp("trust")}
           </div>

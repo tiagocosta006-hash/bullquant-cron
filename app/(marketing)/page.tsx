@@ -78,6 +78,14 @@ export default async function LandingPage() {
         "logo": `${BRAND.siteUrl}/brand/logo.svg`,
         "description": "Plataforma portuguesa de análise fundamental de ações com dados da SEC, DCF integrada e AI Insights.",
         "foundingDate": "2024",
+        "parentOrganization": {
+          "@type": "Organization",
+          "name": BRAND.parent,
+          "sameAs": [
+            "https://www.instagram.com/thebullocracy/",
+            "https://www.tiktok.com/@thebullocracy"
+          ]
+        },
         "contactPoint": {
           "@type": "ContactPoint",
           "email": "info@thebullocracy.com",

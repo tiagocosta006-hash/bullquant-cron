@@ -14,33 +14,41 @@ export async function Header() {
 
   return (
     <header className="glass-topbar sticky top-0 z-50 w-full">
-      <div className="container flex h-16 max-w-screen-2xl items-center px-4 md:px-8 mx-auto">
-        <div className="mr-6">
-          <Logo href="/" size="md" />
-        </div>
-        <div className="flex flex-1 items-center justify-between space-x-4">
-          <div className="w-full flex-1 max-w-sm md:w-auto md:flex-none">
-            <SearchBar />
+      <div className="container flex h-16 max-w-screen-2xl items-center justify-between px-4 md:px-8 mx-auto">
+        <div className="flex items-center gap-8">
+          <div className="mr-2">
+            <Logo href="/" size="md" />
           </div>
-
-          <nav className="flex items-center space-x-2">
-            <ThemeToggle />
+          
+          {/* Navegação Principal (Esquerda) */}
+          <nav className="hidden md:flex items-center space-x-8">
             <Link
               href="/about"
-              className="flex items-center space-x-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mr-2"
+              className="flex items-center space-x-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               title={t('about')}
             >
               <Users className="h-4 w-4" />
-              <span className="hidden md:inline-block">{t('about')}</span>
+              <span>{t('about')}</span>
             </Link>
             <Link
               href="/pricing"
-              className="flex items-center space-x-1.5 text-sm font-bold text-primary bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-colors mr-3 px-3 py-1.5 rounded-full"
+              className="flex items-center space-x-1.5 text-sm font-bold text-primary bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-colors px-4 py-1.5 rounded-full"
               title={t('pricing')}
             >
               <Zap className="h-3.5 w-3.5 fill-current" />
-              <span className="hidden md:inline-block">{t('pricing')}</span>
+              <span>{t('pricing')}</span>
             </Link>
+          </nav>
+        </div>
+
+        {/* Lado Direito: Search, Tema, Auth */}
+        <div className="flex items-center space-x-4 ml-auto">
+          <div className="hidden lg:block w-full max-w-sm">
+            <SearchBar />
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <ThemeToggle />
             {user ? (
               <div className="flex items-center space-x-4">
                 <Link 
@@ -60,16 +68,16 @@ export async function Header() {
                 </form>
               </div>
             ) : (
-              <>
+              <div className="flex items-center space-x-2">
                 <Link href="/login" className={buttonVariants({ variant: "ghost" })}>
                   {t('login')}
                 </Link>
                 <Link href="/register" className={buttonVariants()}>
                   {t('register')}
                 </Link>
-              </>
+              </div>
             )}
-          </nav>
+          </div>
         </div>
       </div>
     </header>

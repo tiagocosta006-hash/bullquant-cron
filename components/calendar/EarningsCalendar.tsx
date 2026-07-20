@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
-import { ChevronLeft, ChevronRight, Sunrise, Moon, TrendingUp, TrendingDown, HelpCircle, Sun, Banknote, Layers, Landmark, CalendarClock } from "lucide-react"
+import { ChevronLeft, ChevronRight, Sunrise, Moon, TrendingUp, TrendingDown, HelpCircle, Sun, Banknote, Layers, Landmark, CalendarClock, Percent, Users, BarChart3, ShoppingCart, Gauge } from "lucide-react"
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { CompanyLogo } from "@/components/ui/CompanyLogo"
@@ -645,6 +645,18 @@ const MACRO_TYPE_LABEL: Record<MacroItem["type"], string> = {
   OTHER: "Evento Macro",
 }
 
+/** Um ícone por tipo de evento macro — antes eram todos `Landmark`,
+ *  indistinguíveis entre si num relance sobre o calendário. */
+const MACRO_TYPE_ICON: Record<MacroItem["type"], React.ElementType> = {
+  FOMC: Landmark,
+  CPI: Percent,
+  JOBS: Users,
+  GDP: BarChart3,
+  PCE: Gauge,
+  RETAIL_SALES: ShoppingCart,
+  OTHER: CalendarClock,
+}
+
 /** Marcador de importância — um ponto dourado discreto, não uma recolorização
  *  de ícone/texto (bull/bear ficam reservados a subida/descida de mercado). */
 function ImportanceDot({ importance }: { importance: MacroItem["importance"] }) {
@@ -653,8 +665,9 @@ function ImportanceDot({ importance }: { importance: MacroItem["importance"] }) 
 }
 
 /** Equivalente ao CompanyLogo para eventos sem empresa (macro): mesmo slot
- *  quadrado com moldura e fundo dourado suave, ícone em vez de imagem. */
-function MacroIconTile({ size = 20, className }: { size?: number; className?: string }) {
+ *  quadrado com moldura e fundo dourado suave, ícone específico do tipo em vez de imagem. */
+function MacroIconTile({ type, size = 20, className }: { type: MacroItem["type"]; size?: number; className?: string }) {
+  const Icon = MACRO_TYPE_ICON[type]
   return (
     <div
       className={cn(
@@ -663,7 +676,7 @@ function MacroIconTile({ size = 20, className }: { size?: number; className?: st
       )}
       style={{ width: size, height: size }}
     >
-      <Landmark className="h-1/2 w-1/2 text-primary" />
+      <Icon className="h-1/2 w-1/2 text-primary" />
     </div>
   )
 }
@@ -710,10 +723,11 @@ function EventTriggerContent({ e }: { e: CalendarItem }) {
   }
 
   // macro
+  const MacroIcon = MACRO_TYPE_ICON[e.type]
   return (
     <>
-      <Landmark className="h-4 w-4 shrink-0 opacity-60" />
-      <span className="truncate text-foreground">{e.title}</span>
+      <MacroIcon className="h-4 w-4 shrink-0 opacity-60" />
+      <span className="truncate text-foreground">{MACRO_TYPE_LABEL[e.type]}</span>
       <ImportanceDot importance={e.importance} />
     </>
   )
@@ -840,7 +854,7 @@ function EventDialogBody({ e }: { e: CalendarItem }) {
     <>
       <DialogHeader>
         <DialogTitle className="flex items-center gap-2">
-          <MacroIconTile />
+          <MacroIconTile type={e.type} />
           {e.title}
           <ImportanceDot importance={e.importance} />
         </DialogTitle>
@@ -887,7 +901,7 @@ function DayEventCard({ e }: { e: CalendarItem }) {
           {ticker ? (
             <CompanyLogo src={logoUrl} alt="" fallback={ticker} size={40} className="rounded-md" />
           ) : (
-            <MacroIconTile size={40} className="rounded-md" />
+            <MacroIconTile type={(e as MacroItem).type} size={40} className="rounded-md" />
           )}
 
           <div className="flex-1 min-w-0">

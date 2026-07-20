@@ -175,7 +175,9 @@
     "register": "Registrati",
     "dcf": "DCF",
     "calendar": "Calendario",
-    "theme": "Cambia tema"
+    "theme": "Cambia tema",
+    "pricing": "Plans",
+    "about": "About Us"
   },
   "search": {
     "placeholder": "Cerca ticker (es. AAPL)...",

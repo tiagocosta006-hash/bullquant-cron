@@ -175,7 +175,9 @@
     "register": "注册",
     "dcf": "DCF",
     "calendar": "日历",
-    "theme": "切换主题"
+    "theme": "切换主题",
+    "pricing": "Plans",
+    "about": "About Us"
   },
   "search": {
     "placeholder": "搜索股票代码 (如 AAPL)...",

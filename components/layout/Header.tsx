@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { SearchBar } from '@/components/search/SearchBar';
-import { LogOut, UserCircle, Calculator, CalendarDays, Zap } from 'lucide-react';
+import { LogOut, UserCircle, Zap, Users } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
@@ -26,12 +26,12 @@ export async function Header() {
           <nav className="flex items-center space-x-2">
             <ThemeToggle />
             <Link
-              href="/calendar"
+              href="/about"
               className="flex items-center space-x-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mr-2"
-              title={t('calendar')}
+              title={t('about')}
             >
-              <CalendarDays className="h-5 w-5" />
-              <span className="hidden md:inline-block">{t('calendar')}</span>
+              <Users className="h-4 w-4" />
+              <span className="hidden md:inline-block">{t('about')}</span>
             </Link>
             <Link
               href="/pricing"
@@ -40,14 +40,6 @@ export async function Header() {
             >
               <Zap className="h-3.5 w-3.5 fill-current" />
               <span className="hidden md:inline-block">{t('pricing')}</span>
-            </Link>
-            <Link
-              href="/dcf"
-              className="flex items-center space-x-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mr-2"
-              title={t('dcf')}
-            >
-              <Calculator className="h-5 w-5" />
-              <span className="hidden md:inline-block">{t('dcf')}</span>
             </Link>
             {user ? (
               <div className="flex items-center space-x-4">

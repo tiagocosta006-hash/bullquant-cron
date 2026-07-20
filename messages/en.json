@@ -179,10 +179,11 @@
     "logoutTitle": "Sign out",
     "login": "Sign in",
     "register": "Sign up",
-    "pricing": "Pricing",
+    "pricing": "Plans",
     "dcf": "DCF",
     "calendar": "Calendar",
-    "theme": "Toggle theme"
+    "theme": "Toggle theme",
+    "about": "About Us"
   },
   "search": {
     "placeholder": "Search ticker (e.g., AAPL)...",

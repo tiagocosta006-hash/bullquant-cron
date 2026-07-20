@@ -179,10 +179,11 @@
     "logoutTitle": "Sair",
     "login": "Login",
     "register": "Registar",
-    "pricing": "Preços",
+    "pricing": "Planos",
     "dcf": "DCF",
     "calendar": "Calendário",
-    "theme": "Alternar tema"
+    "theme": "Alternar tema",
+    "about": "Quem somos"
   },
   "search": {
     "placeholder": "Pesquisar ticker (ex: AAPL)...",

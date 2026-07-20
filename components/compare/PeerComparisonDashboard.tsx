@@ -330,10 +330,16 @@ export function PeerComparisonDashboard({ baseCompany, baseFundamentals, availab
                 {selectedPeers.map(peer => (
                   <Badge key={peer.ticker} variant="secondary" className="text-sm py-1 px-3 flex items-center gap-1">
                     {peer.ticker}
-                    <X 
-                      className="w-3 h-3 cursor-pointer hover:text-destructive transition-colors" 
+                    {/* O X precisa de ser um elemento próprio, não o <svg> direto do Badge —
+                        o Badge aplica pointer-events-none aos seus <svg> filhos, o que anulava o onClick. */}
+                    <button
+                      type="button"
                       onClick={() => removePeer(peer.ticker)}
-                    />
+                      aria-label={`Remover ${peer.ticker} da comparação`}
+                      className="cursor-pointer hover:text-destructive transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
                   </Badge>
                 ))}
 

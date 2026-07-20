@@ -1,5 +1,6 @@
 "use client"
 
+import { useRef } from "react"
 import { useTranslations } from "next-intl"
 import Link from "next/link"
 import { CompanyLogo } from "@/components/ui/CompanyLogo"
@@ -30,6 +31,7 @@ export interface BusinessProfileSheetProps {
 
 export function BusinessProfileSheet({ open, onOpenChange, company }: BusinessProfileSheetProps) {
   const t = useTranslations("explore")
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   if (!company) return null
 
@@ -52,8 +54,13 @@ export function BusinessProfileSheet({ open, onOpenChange, company }: BusinessPr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass !w-[90vw] sm:!max-w-3xl lg:!max-w-4xl xl:!max-w-5xl !p-0 overflow-hidden flex flex-col max-h-[90vh]">
-        <div className="flex-1 overflow-y-auto">
+      <DialogContent
+        initialFocus={scrollRef}
+        className="glass !w-[90vw] sm:!max-w-3xl lg:!max-w-4xl xl:!max-w-5xl !p-0 overflow-hidden flex flex-col max-h-[90vh]"
+      >
+        {/* Foco inicial aponta aqui (não no primeiro link focável, "Comparar", lá em baixo) —
+            senão o browser faz scroll automático da dialog para esse link ao abrir. */}
+        <div ref={scrollRef} tabIndex={-1} className="flex-1 overflow-y-auto outline-none">
           {/* Header */}
           <div className="p-6 border-b border-border">
             <div className="flex items-start justify-between mb-4">

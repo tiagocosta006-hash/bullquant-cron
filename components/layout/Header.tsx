@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { SearchBar } from '@/components/search/SearchBar';
 import { LogOut, UserCircle, Zap, Users } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -32,20 +31,17 @@ export async function Header() {
             </Link>
             <Link
               href="/pricing"
-              className="flex items-center space-x-1.5 text-sm font-bold text-primary bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-colors px-4 py-1.5 rounded-full"
+              className="flex items-center space-x-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               title={t('pricing')}
             >
-              <Zap className="h-3.5 w-3.5 fill-current" />
+              <Zap className="h-4 w-4" />
               <span>{t('pricing')}</span>
             </Link>
           </nav>
         </div>
 
-        {/* Lado Direito: Search, Tema, Auth */}
+        {/* Lado Direito: Tema, Auth */}
         <div className="flex items-center space-x-4 ml-auto">
-          <div className="hidden lg:block w-full max-w-sm">
-            <SearchBar />
-          </div>
 
           <div className="flex items-center space-x-4">
             <ThemeToggle />

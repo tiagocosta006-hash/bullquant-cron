@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Bookmark, Trash2, Loader2, RotateCcw } from "lucide-react"
+import { Bookmark, Trash2, Loader2, RotateCcw, Share2, Link as LinkIcon, Check } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -29,6 +29,7 @@ export type SavedAnalysis = SavedDcfInputs & {
   fairValue: number
   priceAtSave: number | null
   marginOfSafety: number | null
+  isPublic: boolean
   createdAt: string
 }
 
@@ -49,6 +50,7 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
   const [label, setLabel] = React.useState("")
   const [notes, setNotes] = React.useState("")
   const [error, setError] = React.useState<string | null>(null)
+  const [copiedId, setCopiedId] = React.useState<string | null>(null)
 
   const fetchAnalyses = React.useCallback(async () => {
     if (!ticker) {
@@ -115,6 +117,23 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
       await fetch(`/api/dcf/analyses/${id}`, { method: "DELETE" })
     } catch {
       fetchAnalyses() // reverter se falhar
+    }
+  }
+
+  const handleShare = async (id: string) => {
+    try {
+      const res = await fetch(`/api/dcf/analyses/${id}/share`, { method: "PATCH" })
+      if (!res.ok) return
+      const data = await res.json()
+      setAnalyses((prev) => prev.map((a) => (a.id === id ? { ...a, isPublic: data.isPublic } : a)))
+      if (data.isPublic) {
+        const url = `${window.location.origin}/dcf/${id}`
+        await navigator.clipboard.writeText(url)
+        setCopiedId(id)
+        setTimeout(() => setCopiedId(null), 2000)
+      }
+    } catch (e) {
+      console.error(e)
     }
   }
 
@@ -192,7 +211,22 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-7 w-7"
+                    className={cn("h-7 w-7", a.isPublic ? "text-primary" : "text-muted-foreground")}
+                    title={a.isPublic ? "Copiar link público" : "Tornar público"}
+                    onClick={() => handleShare(a.id)}
+                  >
+                    {copiedId === a.id ? (
+                      <Check className="h-3.5 w-3.5" />
+                    ) : a.isPublic ? (
+                      <LinkIcon className="h-3.5 w-3.5" />
+                    ) : (
+                      <Share2 className="h-3.5 w-3.5" />
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-muted-foreground hover:text-foreground"
                     title={t("saved.loadButton")}
                     onClick={() => onLoad(a)}
                   >

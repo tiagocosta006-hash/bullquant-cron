@@ -87,12 +87,12 @@ export function PricingCards({ userEmail, userId }: PricingCardsProps = {}) {
   return (
     <Reveal className="grid gap-5 md:grid-cols-2">
       {/* Plano Gratuito */}
-      <LiquidGlass className="flex flex-col rounded-3xl p-8">
+      <LiquidGlass className="flex flex-col items-center text-center rounded-3xl p-8">
         <div className="mb-8">
           <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
             {t("free.name")}
           </p>
-          <div className="mt-4 flex items-end gap-1">
+          <div className="mt-4 flex items-end justify-center gap-1">
             <span className="text-5xl font-extrabold tracking-tight">
               {t("free.price")}
             </span>
@@ -105,7 +105,7 @@ export function PricingCards({ userEmail, userId }: PricingCardsProps = {}) {
           </p>
         </div>
 
-        <ul className="mb-10 flex flex-col gap-3">
+        <ul className="mb-10 flex flex-col gap-3 text-left w-fit mx-auto">
           {freeFeatures.map((feature) => (
             <li key={feature} className="flex items-center gap-3 text-sm">
               <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-border bg-muted">
@@ -132,7 +132,7 @@ export function PricingCards({ userEmail, userId }: PricingCardsProps = {}) {
       </LiquidGlass>
 
       {/* Plano PRO */}
-      <div className="relative flex flex-col rounded-3xl border border-primary/40 bg-gradient-to-br from-primary/8 via-card/80 to-card/60 p-8 shadow-[0_0_60px_-10px_hsl(var(--primary)/0.25)] backdrop-blur">
+      <div className="relative flex flex-col items-center text-center rounded-3xl border border-primary/40 bg-gradient-to-br from-primary/8 via-card/80 to-card/60 p-8 shadow-[0_0_60px_-10px_hsl(var(--primary)/0.25)] backdrop-blur">
         {/* Badge "Mais popular" */}
         <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
           <div className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-1 text-xs font-bold text-primary-foreground shadow-lg">
@@ -145,9 +145,9 @@ export function PricingCards({ userEmail, userId }: PricingCardsProps = {}) {
           <p className="text-sm font-semibold uppercase tracking-widest text-primary">
             {t("pro.name")}
           </p>
-          <div className="mt-4 flex items-end gap-1 min-h-[56px]">
+          <div className="mt-4 flex items-end justify-center gap-1 min-h-[56px]">
             {loadingPrice ? (
-              <div className="flex items-center h-[56px]">
+              <div className="flex items-center justify-center h-[56px]">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               </div>
             ) : (
@@ -166,7 +166,7 @@ export function PricingCards({ userEmail, userId }: PricingCardsProps = {}) {
           </p>
         </div>
 
-        <ul className="mb-10 flex flex-col gap-3">
+        <ul className="mb-10 flex flex-col gap-3 text-left w-fit mx-auto">
           {proFeatures.map((feature) => (
             <li key={feature} className="flex items-center gap-3 text-sm">
               <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/15 border border-primary/30">

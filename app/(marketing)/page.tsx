@@ -230,7 +230,7 @@ export default async function LandingPage() {
             {/* Imagem de Fundo (Hover Reveal) */}
             <div className="absolute inset-0 z-0">
               <Image
-                src="/team-mission.jpg"
+                src="/imagem-principal.jpeg"
                 alt="Equipa The Bullocracy a trabalhar no BullMetrics"
                 fill
                 className="object-cover opacity-0 transition-opacity duration-700 group-hover:opacity-40 mix-blend-luminosity grayscale"

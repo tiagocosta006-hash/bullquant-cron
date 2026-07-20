@@ -269,6 +269,11 @@
 .reveal.in {
   opacity: 1;
   transform: none;
+  /* sem isto o filter fica preso em blur(10px) para sempre: uma transição
+     CSS só anima uma propriedade se o valor final for diferente, e sem
+     este reset o valor final nunca é definido — bug real, reproduzido
+     nas stories (texto e gráfico ficavam permanentemente desfocados). */
+  filter: none;
 }
 
 /* ── Micro-interações (emotional design) ──────────────────────

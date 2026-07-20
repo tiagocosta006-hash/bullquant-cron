@@ -180,9 +180,17 @@ export function DashboardClient({ tabs, activeTab, activeSector, sectors, initia
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 w-full">
           {companies.map((company) => {
             const priceData = prices[company.ticker];
-            // Fallback ao preço/variação EOD (já vindos do servidor) enquanto o batch em tempo real não chega.
-            const currentPrice = priceData?.currentPrice ?? company.lastClose;
-            const changePercent = priceData?.changePercent ?? company.lastChangePercent;
+            // "gainers"/"losers"/"marketCap" ordenam pela variação EOD (screener.ts) — o card
+            // tem de mostrar essa mesma variação, senão a ordem e o sinal exibido divergem
+            // (ex: uma empresa listada como "subida" ontem mas a cair agora em tempo real).
+            // Nas outras tabs (sem ranking por variação) preferimos o preço live, com fallback a EOD.
+            const isEodRankedTab = activeTab === "gainers" || activeTab === "losers" || activeTab === "marketCap";
+            const currentPrice = isEodRankedTab
+              ? company.lastClose ?? priceData?.currentPrice
+              : priceData?.currentPrice ?? company.lastClose;
+            const changePercent = isEodRankedTab
+              ? company.lastChangePercent ?? priceData?.changePercent
+              : priceData?.changePercent ?? company.lastChangePercent;
             const isLoadingCard = isPricesLoading && priceData === undefined && company.lastClose === null;
 
             return (

@@ -152,7 +152,8 @@
     "loginLink": "Sign in",
     "confirmPasswordLabel": "Confirm Password",
     "passwordMismatch": "Passwords don't match.",
-    "emailInUse": "This email is already registered."
+    "emailInUse": "This email is already registered.",
+    "consentText": "I declare that I am over 16 and agree to the <terms>Terms</terms> and <privacy>Privacy Policy</privacy>."
   },
   "forgotPassword": {
     "title": "Reset Password",
@@ -730,6 +731,11 @@
     "refund": "Refund Policy",
     "pricing": "Pricing",
     "about": "About Us"
+  },
+  "cookieConsent": {
+    "text": "We use cookies exclusively to understand how you use Bullmetrics and improve your experience. Do you accept their use?",
+    "accept": "Accept All",
+    "decline": "Decline"
   },
   "pricing": {
     "badge": "Simple and transparent",

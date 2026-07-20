@@ -152,7 +152,8 @@
     "loginLink": "Faz Login",
     "confirmPasswordLabel": "Confirmar Password",
     "passwordMismatch": "As passwords não coincidem.",
-    "emailInUse": "Este email já está registado."
+    "emailInUse": "Este email já está registado.",
+    "consentText": "Declaro que tenho mais de 16 anos e concordo com os <terms>Termos</terms> e a <privacy>Política de Privacidade</privacy>."
   },
   "forgotPassword": {
     "title": "Recuperar Password",
@@ -730,6 +731,11 @@
     "refund": "Política de Reembolso",
     "pricing": "Preços",
     "about": "Sobre Nós"
+  },
+  "cookieConsent": {
+    "text": "Utilizamos cookies exclusivamente para compreender como utiliza a Bullmetrics e melhorar a sua experiência. Aceita a sua utilização?",
+    "accept": "Aceitar Tudo",
+    "decline": "Recusar"
   },
   "pricing": {
     "badge": "Simples e transparente",

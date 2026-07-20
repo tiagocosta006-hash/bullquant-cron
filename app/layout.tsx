@@ -6,7 +6,8 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { BRAND } from "@/lib/brand";
 import { PaddleProvider } from "@/components/providers/PaddleProvider";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import { CookieConsent } from "@/components/layout/CookieConsent";
+import Script from "next/script";
 
 const scotchDisplay = localFont({
   variable: "--font-heading",
@@ -132,8 +133,9 @@ export default async function RootLayout({
         {/* Tema: claro por defeito, escuro persistido — script inline CRU (não
             next/script: beforeInteractive não garante execução antes do 1.º
             paint no App Router, o que causava flash branco em dark mode). */}
-        <script
-          suppressHydrationWarning
+        <Script
+          id="theme-script"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html:
               "(function(){try{var d=localStorage.getItem('theme')==='dark';if(d)document.documentElement.classList.add('dark');var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',d?'#100f0d':'#fafaf7')}catch(e){}})()",
@@ -145,8 +147,8 @@ export default async function RootLayout({
           <PaddleProvider>
             <main className="flex-1 flex flex-col">{children}</main>
           </PaddleProvider>
+          <CookieConsent />
         </NextIntlClientProvider>
-        <GoogleAnalytics gaId="G-F89FT4052G" />
       </body>
     </html>
   );

@@ -112,6 +112,22 @@ export function RegisterForm({
         </div>
       )}
 
+      <div className="flex items-start gap-2 pt-2">
+        <input 
+          type="checkbox" 
+          id="terms" 
+          name="terms" 
+          required 
+          className="mt-1 cursor-pointer rounded border-border"
+        />
+        <label htmlFor="terms" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
+          {t.rich("consentText", {
+            terms: (chunks) => <Link href="/terms" className="text-foreground hover:underline font-medium" target="_blank">{chunks}</Link>,
+            privacy: (chunks) => <Link href="/privacy" className="text-foreground hover:underline font-medium" target="_blank">{chunks}</Link>
+          })}
+        </label>
+      </div>
+
       <div>
         <SubmitButton
           label={t("submitButton")}

@@ -175,7 +175,9 @@
     "register": "登録",
     "dcf": "DCF",
     "calendar": "カレンダー",
-    "theme": "テーマ切替"
+    "theme": "テーマ切替",
+    "pricing": "Plans",
+    "about": "About Us"
   },
   "search": {
     "placeholder": "ティッカーを検索 (例: AAPL)...",

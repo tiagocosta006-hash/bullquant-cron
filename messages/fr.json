@@ -175,7 +175,9 @@
     "register": "Inscription",
     "dcf": "DCF",
     "calendar": "Calendrier",
-    "theme": "Changer de thème"
+    "theme": "Changer de thème",
+    "pricing": "Plans",
+    "about": "About Us"
   },
   "search": {
     "placeholder": "Chercher un ticker (ex: AAPL)...",

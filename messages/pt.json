@@ -666,7 +666,11 @@
     "empty": "Sem resultados agendados neste período.",
     "summary": "{count} resultados neste período",
     "legendBmo": "Antes da abertura",
-    "legendAmc": "Após o fecho"
+    "legendAmc": "Após o fecho",
+    "filterEarnings": "Resultados",
+    "filterDividend": "Dividendos",
+    "filterSplit": "Splits",
+    "filterMacro": "Macro"
   },
   "news": {
     "title": "Notícias da Empresa",

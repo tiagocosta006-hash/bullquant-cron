@@ -61,6 +61,7 @@ model Company {
   analystReport          AnalystReport?
   filings                FilingCache[]
   companyBrief           CompanyBrief?
+  corporateEvents        CorporateEvent[]
   dcfAnalyses            DcfAnalysis[]
   earnings               EarningsEvent[]
   fundamentals           Fundamental[]
@@ -250,6 +251,49 @@ model EarningsEvent {
   @@map("earnings_events")
 }
 
+// Eventos macro/market-wide, sem empresa associada: FOMC, CPI, emprego, GDP.
+// Movem o discount rate/WACC — relevantes para valuation e DCF.
+model MarketEvent {
+  id         String          @id @default(cuid())
+  type       MarketEventType
+  date       DateTime        @db.Date
+  time       String? // ex: "14:00 ET"; null = evento all-day
+  title      String
+  importance EventImportance @default(MEDIUM)
+  country    String          @default("US")
+  actual     String?
+  estimate   String?
+  previous   String?
+  source     String          @default("curated")
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  @@unique([type, date])
+  @@index([date])
+  @@map("market_events")
+}
+
+// Eventos por empresa que não são earnings: dividendos (ex-date/pay-date),
+// splits, AGM, investor days, IPOs.
+model CorporateEvent {
+  id         String             @id @default(cuid())
+  companyId  String
+  type       CorporateEventType
+  date       DateTime           @db.Date // ex-date para dividendos
+  payDate    DateTime?          @db.Date
+  amount     Decimal?           @db.Decimal(12, 4) // dividendo por ação
+  splitRatio String?
+  note       String?
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+  company    Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, type, date])
+  @@index([date])
+  @@index([companyId, date])
+  @@map("corporate_events")
+}
+
 model AIInsightCache {
   id               String   @id @default(cuid())
   companyId        String   @unique
@@ -401,6 +445,36 @@ enum EarningsHour {
   UNKNOWN
 
   @@map("earnings_hour")
+}
+
+enum MarketEventType {
+  FOMC
+  CPI
+  JOBS
+  GDP
+  PCE
+  RETAIL_SALES
+  OTHER
+
+  @@map("market_event_type")
+}
+
+enum CorporateEventType {
+  DIVIDEND
+  SPLIT
+  AGM
+  INVESTOR_DAY
+  IPO
+
+  @@map("corporate_event_type")
+}
+
+enum EventImportance {
+  LOW
+  MEDIUM
+  HIGH
+
+  @@map("event_importance")
 }
 
 enum InsiderTxnType {

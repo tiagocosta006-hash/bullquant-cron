@@ -605,7 +605,11 @@
     "empty": "Sin eventos.",
     "summary": "{count} resultados",
     "legendBmo": "Antes apertura",
-    "legendAmc": "Después cierre"
+    "legendAmc": "Después cierre",
+    "filterEarnings": "Resultados",
+    "filterDividend": "Dividendos",
+    "filterSplit": "Splits",
+    "filterMacro": "Macro"
   },
   "news": {
     "title": "Noticias",

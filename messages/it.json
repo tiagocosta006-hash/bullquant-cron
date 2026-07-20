@@ -605,7 +605,11 @@
     "empty": "Nessun evento.",
     "summary": "{count} utili",
     "legendBmo": "Prima dell'apertura",
-    "legendAmc": "Dopo la chiusura"
+    "legendAmc": "Dopo la chiusura",
+    "filterEarnings": "Utili",
+    "filterDividend": "Dividendi",
+    "filterSplit": "Splits",
+    "filterMacro": "Macro"
   },
   "news": {
     "title": "Notizie",

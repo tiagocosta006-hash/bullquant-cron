@@ -3,12 +3,14 @@
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
-import { ChevronLeft, ChevronRight, Sunrise, Moon, TrendingUp, TrendingDown, HelpCircle, Sun } from "lucide-react"
+import { ChevronLeft, ChevronRight, Sunrise, Moon, TrendingUp, TrendingDown, HelpCircle, Sun, Banknote, Layers, Landmark, CalendarClock } from "lucide-react"
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { CompanyLogo } from "@/components/ui/CompanyLogo"
+import { cn } from "@/lib/utils"
 
 interface EarningsItem {
+  kind: "earnings"
   id: string
   date: string // YYYY-MM-DD
   hour: "BMO" | "AMC" | "DMH" | "UNKNOWN"
@@ -24,8 +26,51 @@ interface EarningsItem {
   employees?: number | null
 }
 
+interface CorporateItem {
+  kind: "corporate"
+  id: string
+  type: "DIVIDEND" | "SPLIT" | "AGM" | "INVESTOR_DAY" | "IPO"
+  date: string // ex-date para dividendos
+  payDate: string | null
+  amount: number | null
+  splitRatio: string | null
+  note: string | null
+  ticker: string
+  name: string
+  logoUrl: string | null
+  employees?: number | null
+}
+
+interface MacroItem {
+  kind: "macro"
+  id: string
+  type: "FOMC" | "CPI" | "JOBS" | "GDP" | "PCE" | "RETAIL_SALES" | "OTHER"
+  date: string
+  time: string | null
+  title: string
+  importance: "LOW" | "MEDIUM" | "HIGH"
+  country: string
+  actual: string | null
+  estimate: string | null
+  previous: string | null
+}
+
+type CalendarItem = EarningsItem | CorporateItem | MacroItem
+
 type Scope = "all" | "watchlist"
 type ViewMode = "month" | "week" | "day"
+type EventFilter = "earnings" | "dividend" | "split" | "macro"
+const ALL_FILTERS: EventFilter[] = ["earnings", "dividend", "split", "macro"]
+const FILTERS_STORAGE_KEY = "bq_calendar_filters"
+
+function matchesFilter(e: CalendarItem, filters: Set<EventFilter>): boolean {
+  if (e.kind === "earnings") return filters.has("earnings")
+  if (e.kind === "macro") return filters.has("macro")
+  // corporate
+  if (e.type === "DIVIDEND") return filters.has("dividend")
+  if (e.type === "SPLIT") return filters.has("split")
+  return filters.has("split") // AGM/INVESTOR_DAY/IPO agrupados com "outros corporativos"
+}
 
 const fmtDate = (d: Date) => {
   const yy = d.getFullYear()
@@ -75,6 +120,7 @@ function makeDemoEvents(monthStart: Date): EarningsItem[] {
     const epsEstimate = 0.8 + (i % 5) * 0.35
     const epsActual = reported ? epsEstimate + (i % 2 === 0 ? 0.12 : -0.07) : null
     return {
+      kind: "earnings" as const,
       id: `demo-${dateStr}-${co.ticker}`,
       date: dateStr,
       hour: hours[i % hours.length],
@@ -91,13 +137,38 @@ function makeDemoEvents(monthStart: Date): EarningsItem[] {
   })
 }
 
+function loadStoredFilters(): Set<EventFilter> {
+  if (typeof window === "undefined") return new Set(ALL_FILTERS)
+  try {
+    const raw = window.localStorage.getItem(FILTERS_STORAGE_KEY)
+    if (!raw) return new Set(ALL_FILTERS)
+    const parsed = JSON.parse(raw)
+    const valid = Array.isArray(parsed) ? parsed.filter((f): f is EventFilter => ALL_FILTERS.includes(f)) : []
+    return valid.length > 0 ? new Set(valid) : new Set(ALL_FILTERS)
+  } catch {
+    return new Set(ALL_FILTERS)
+  }
+}
+
 export function EarningsCalendar() {
   const t = useTranslations("calendar")
   const [cursor, setCursor] = useState(() => new Date())
   const [scope, setScope] = useState<Scope>("all")
   const [viewMode, setViewMode] = useState<ViewMode>("month")
-  const [events, setEvents] = useState<EarningsItem[]>([])
+  const [events, setEvents] = useState<CalendarItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [filters, setFilters] = useState<Set<EventFilter>>(() => loadStoredFilters())
+
+  const toggleFilter = (f: EventFilter) => {
+    setFilters(prev => {
+      const next = new Set(prev)
+      if (next.has(f)) next.delete(f)
+      else next.add(f)
+      const toStore = next.size > 0 ? next : new Set(ALL_FILTERS)
+      window.localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify([...toStore]))
+      return next
+    })
+  }
 
   // Fetch block is always monthly based on cursor's month
   const monthStart = useMemo(() => startOfMonth(cursor), [cursor])
@@ -112,8 +183,8 @@ export function EarningsCalendar() {
       if (scope === "watchlist") params.set("watchlist", "1")
       const isDev = process.env.NODE_ENV !== "production"
       try {
-        const res = await fetch(`/api/earnings?${params.toString()}`)
-        const data: EarningsItem[] = res.ok ? await res.json() : []
+        const res = await fetch(`/api/calendar?${params.toString()}`)
+        const data: CalendarItem[] = res.ok ? await res.json() : []
         const real = Array.isArray(data) ? data : []
         if (active) setEvents(real.length === 0 && isDev ? makeDemoEvents(monthStart) : real)
       } catch {
@@ -130,20 +201,27 @@ export function EarningsCalendar() {
   }, [monthStart, monthEnd, scope])
 
   const byDay = useMemo(() => {
-    const map = new Map<string, EarningsItem[]>()
+    const map = new Map<string, CalendarItem[]>()
     for (const e of events) {
+      if (!matchesFilter(e, filters)) continue
       const arr = map.get(e.date) ?? []
       arr.push(e)
       map.set(e.date, arr)
     }
-    
-    // Ordenar por relevância
+
+    // Ordenar por relevância (macro primeiro, depois por nº de empregados)
     for (const arr of map.values()) {
-      arr.sort((a, b) => (b.employees ?? 0) - (a.employees ?? 0))
+      arr.sort((a, b) => {
+        if (a.kind === "macro" && b.kind !== "macro") return -1
+        if (b.kind === "macro" && a.kind !== "macro") return 1
+        const empA = a.kind !== "macro" ? (a.employees ?? 0) : 0
+        const empB = b.kind !== "macro" ? (b.employees ?? 0) : 0
+        return empB - empA
+      })
     }
-    
+
     return map
-  }, [events])
+  }, [events, filters])
 
   const todayStr = fmtDate(new Date())
 
@@ -179,6 +257,21 @@ export function EarningsCalendar() {
         viewMode === value ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
       }`}
     >
+      {label}
+    </button>
+  )
+
+  const filterBtn = (value: EventFilter, label: string, Icon: React.ElementType) => (
+    <button
+      onClick={() => toggleFilter(value)}
+      aria-pressed={filters.has(value)}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors ${
+        filters.has(value)
+          ? "bg-primary/10 text-primary"
+          : "bg-muted text-muted-foreground hover:bg-muted/70"
+      }`}
+    >
+      <Icon className="h-3 w-3" />
       {label}
     </button>
   )
@@ -241,9 +334,19 @@ export function EarningsCalendar() {
         </div>
       </div>
 
+      {/* Filtros por tipo de evento */}
+      <div className="flex flex-wrap items-center gap-2">
+        {filterBtn("earnings", t("filterEarnings"), TrendingUp)}
+        {filterBtn("dividend", t("filterDividend"), Banknote)}
+        {filterBtn("split", t("filterSplit"), Layers)}
+        {filterBtn("macro", t("filterMacro"), Landmark)}
+      </div>
+
       {/* Resumo + legenda */}
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
-        <span className="font-medium">{t("summary", { count: events.length })}</span>
+        <span className="font-medium">
+          {t("summary", { count: [...byDay.values()].reduce((sum, arr) => sum + arr.length, 0) })}
+        </span>
         <div className="flex items-center gap-4">
           <span className="flex items-center gap-1.5">
             <Sunrise className="h-3.5 w-3.5" /> Antes da Abertura
@@ -261,7 +364,7 @@ export function EarningsCalendar() {
       {viewMode === "week" && <WeekView cursor={cursor} byDay={byDay} loading={loading} todayStr={todayStr} />}
       {viewMode === "day" && <DayView cursor={cursor} byDay={byDay} loading={loading} todayStr={todayStr} />}
 
-      {!loading && events.length === 0 && viewMode === "month" && (
+      {!loading && byDay.size === 0 && viewMode === "month" && (
         <div className="rounded-xl border border-dashed border-border py-12 text-center text-muted-foreground">
           {t("empty")}
         </div>
@@ -272,7 +375,7 @@ export function EarningsCalendar() {
 
 interface ViewProps {
   cursor: Date
-  byDay: Map<string, EarningsItem[]>
+  byDay: Map<string, CalendarItem[]>
   loading: boolean
   todayStr: string
 }
@@ -407,9 +510,9 @@ function WeekView({ cursor, byDay, loading, todayStr }: ViewProps) {
           const dayEvents = byDay.get(dayStr) ?? []
           const isWeekend = day.getDay() === 0 || day.getDay() === 6
           
-          const bmo = dayEvents.filter((e) => e.hour === "BMO")
-          const amc = dayEvents.filter((e) => e.hour === "AMC")
-          const other = dayEvents.filter((e) => e.hour !== "BMO" && e.hour !== "AMC")
+          const bmo = dayEvents.filter((e) => e.kind === "earnings" && e.hour === "BMO")
+          const amc = dayEvents.filter((e) => e.kind === "earnings" && e.hour === "AMC")
+          const other = dayEvents.filter((e) => e.kind !== "earnings" || (e.hour !== "BMO" && e.hour !== "AMC"))
           
           return (
             <div key={dayStr} className={`min-h-[20rem] border-l border-border p-2 flex flex-col gap-4 ${isWeekend ? "bg-muted/10" : ""}`}>
@@ -435,7 +538,7 @@ function WeekView({ cursor, byDay, loading, todayStr }: ViewProps) {
   )
 }
 
-function HourGroup({ events, icon: Icon, label }: { events: EarningsItem[], icon: React.ElementType, label: string }) {
+function HourGroup({ events, icon: Icon, label }: { events: CalendarItem[], icon: React.ElementType, label: string }) {
   if (!events || events.length === 0) return null
   return (
     <div className="flex flex-col gap-1.5">
@@ -476,22 +579,22 @@ function DayView({ cursor, byDay, loading }: ViewProps) {
     )
   }
   
-  const bmo = dayEvents.filter((e) => e.hour === "BMO")
-  const amc = dayEvents.filter((e) => e.hour === "AMC")
-  const dmh = dayEvents.filter((e) => e.hour === "DMH")
-  const unknown = dayEvents.filter((e) => e.hour === "UNKNOWN")
-  
+  const bmo = dayEvents.filter((e) => e.kind === "earnings" && e.hour === "BMO")
+  const amc = dayEvents.filter((e) => e.kind === "earnings" && e.hour === "AMC")
+  const dmh = dayEvents.filter((e) => e.kind === "earnings" && e.hour === "DMH")
+  const other = dayEvents.filter((e) => e.kind !== "earnings" || e.hour === "UNKNOWN")
+
   return (
     <div className="space-y-6">
       <DayHourSection title="Antes da Abertura (BMO)" icon={Sunrise} events={bmo} />
       <DayHourSection title="Durante a Sessão (DMH)" icon={Sun} events={dmh} />
       <DayHourSection title="Após o Fecho (AMC)" icon={Moon} events={amc} />
-      <DayHourSection title="Sem Hora Marcada" icon={HelpCircle} events={unknown} />
+      <DayHourSection title="Outros Eventos" icon={HelpCircle} events={other} />
     </div>
   )
 }
 
-function DayHourSection({ title, icon: Icon, events }: { title: string, icon: React.ElementType, events: EarningsItem[] }) {
+function DayHourSection({ title, icon: Icon, events }: { title: string, icon: React.ElementType, events: CalendarItem[] }) {
   if (!events || events.length === 0) return null
   
   return (
@@ -514,72 +617,65 @@ function DayHourSection({ title, icon: Icon, events }: { title: string, icon: Re
   )
 }
 
-function DayEventCard({ e }: { e: EarningsItem }) {
-  const reported = e.epsActual !== null && e.epsEstimate !== null
-  const beat = reported && e.epsActual! >= e.epsEstimate!
-  
-  return (
-    <Dialog>
-      {/* @ts-ignore - shadcn base-ui migration */}
-      <DialogTrigger asChild>
-        <button className="flex items-center gap-3 p-3 rounded-lg border border-border/60 bg-background hover:bg-muted/50 hover:border-border transition-all text-left group">
-          <CompanyLogo src={e.logoUrl} alt="" fallback={e.ticker} size={40} className="rounded-md" />
+const formatCurrency = (val: number | null) => {
+  if (val === null) return "-"
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(val)
+}
 
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-sm truncate">{e.ticker}</span>
-              {reported && (
-                beat ? <TrendingUp className="h-3.5 w-3.5 text-bull" /> : <TrendingDown className="h-3.5 w-3.5 text-bear" />
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground truncate" title={e.name}>{e.name}</p>
-          </div>
-        </button>
-      </DialogTrigger>
-      
-      {/* Reutiliza o mesmo DialogContent rico do EventChip */}
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            {e.logoUrl && (
-              <CompanyLogo src={e.logoUrl} alt="" fallback={e.ticker} size={20} className="rounded-sm" imgClassName="p-0" />
-            )}
-            {e.name} ({e.ticker})
-          </DialogTitle>
-          <DialogDescription>
-            Q{e.fiscalQuarter} {e.fiscalYear} · {e.hour}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid grid-cols-2 gap-4 py-2">
-          {/* ... igual ao EventChip ... */}
-        </div>
-      </DialogContent>
-    </Dialog>
+const formatCompact = (val: number | null) => {
+  if (val === null) return "-"
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 2 }).format(val)
+}
+
+const CORPORATE_TYPE_LABEL: Record<CorporateItem["type"], string> = {
+  DIVIDEND: "Dividendo",
+  SPLIT: "Stock Split",
+  AGM: "Assembleia Geral",
+  INVESTOR_DAY: "Investor Day",
+  IPO: "IPO",
+}
+
+const MACRO_TYPE_LABEL: Record<MacroItem["type"], string> = {
+  FOMC: "Decisão FOMC (Fed)",
+  CPI: "Inflação (CPI)",
+  JOBS: "Emprego (Payrolls)",
+  GDP: "PIB (GDP)",
+  PCE: "Inflação (PCE)",
+  RETAIL_SALES: "Vendas a Retalho",
+  OTHER: "Evento Macro",
+}
+
+/** Marcador de importância — um ponto dourado discreto, não uma recolorização
+ *  de ícone/texto (bull/bear ficam reservados a subida/descida de mercado). */
+function ImportanceDot({ importance }: { importance: MacroItem["importance"] }) {
+  if (importance !== "HIGH") return null
+  return <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden />
+}
+
+/** Equivalente ao CompanyLogo para eventos sem empresa (macro): mesmo slot
+ *  quadrado com moldura e fundo dourado suave, ícone em vez de imagem. */
+function MacroIconTile({ size = 20, className }: { size?: number; className?: string }) {
+  return (
+    <div
+      className={cn(
+        "flex shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/50 bg-primary/10",
+        className
+      )}
+      style={{ width: size, height: size }}
+    >
+      <Landmark className="h-1/2 w-1/2 text-primary" />
+    </div>
   )
 }
 
-function EventChip({ e }: { e: EarningsItem }) {
-  // Same as before
-  const reported = e.epsActual !== null && e.epsEstimate !== null
-  const beat = reported && e.epsActual! >= e.epsEstimate!
-  const HourIcon = e.hour === "BMO" ? Sunrise : e.hour === "AMC" ? Moon : null
-
-  const formatCurrency = (val: number | null) => {
-    if (val === null) return "-"
-    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(val)
-  }
-  
-  const formatCompact = (val: number | null) => {
-    if (val === null) return "-"
-    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 2 }).format(val)
-  }
-
-  return (
-    <Dialog>
-      <DialogTrigger
-        title={`${e.name} · Q${e.fiscalQuarter} ${e.fiscalYear}`}
-        className="w-full text-left group flex items-center gap-2 rounded-md px-1.5 py-1 text-sm font-semibold truncate transition-colors hover:bg-muted"
-      >
+/** Ícone + rótulo curto usados tanto no chip do mês/semana como no card do dia. */
+function EventTriggerContent({ e }: { e: CalendarItem }) {
+  if (e.kind === "earnings") {
+    const reported = e.epsActual !== null && e.epsEstimate !== null
+    const beat = reported && e.epsActual! >= e.epsEstimate!
+    const HourIcon = e.hour === "BMO" ? Sunrise : e.hour === "AMC" ? Moon : null
+    return (
+      <>
         {e.logoUrl ? (
           <CompanyLogo src={e.logoUrl} alt="" fallback={e.ticker} size={20} className="rounded-sm" imgClassName="p-0" />
         ) : HourIcon ? (
@@ -589,9 +685,47 @@ function EventChip({ e }: { e: EarningsItem }) {
         {reported && (
           beat ? <TrendingUp className="h-3.5 w-3.5 shrink-0 text-bull" /> : <TrendingDown className="h-3.5 w-3.5 shrink-0 text-bear" />
         )}
-      </DialogTrigger>
+      </>
+    )
+  }
 
-      <DialogContent className="sm:max-w-md">
+  if (e.kind === "corporate") {
+    const Icon = e.type === "DIVIDEND" ? Banknote : e.type === "SPLIT" ? Layers : CalendarClock
+    return (
+      <>
+        {e.logoUrl ? (
+          <CompanyLogo src={e.logoUrl} alt="" fallback={e.ticker} size={20} className="rounded-sm" imgClassName="p-0" />
+        ) : (
+          <Icon className="h-4 w-4 shrink-0 opacity-60" />
+        )}
+        <span className="truncate text-foreground">{e.ticker}</span>
+        {e.type === "DIVIDEND" && e.amount !== null && (
+          <span className="text-xs text-bull shrink-0">{formatCurrency(e.amount)}</span>
+        )}
+        {e.type === "SPLIT" && e.splitRatio && (
+          <span className="text-xs text-muted-foreground shrink-0">{e.splitRatio}</span>
+        )}
+      </>
+    )
+  }
+
+  // macro
+  return (
+    <>
+      <Landmark className="h-4 w-4 shrink-0 opacity-60" />
+      <span className="truncate text-foreground">{e.title}</span>
+      <ImportanceDot importance={e.importance} />
+    </>
+  )
+}
+
+/** Corpo detalhado do Dialog, partilhado entre EventChip (mês/semana) e DayEventCard (dia). */
+function EventDialogBody({ e }: { e: CalendarItem }) {
+  if (e.kind === "earnings") {
+    const reported = e.epsActual !== null && e.epsEstimate !== null
+    const beat = reported && e.epsActual! >= e.epsEstimate!
+    return (
+      <>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {e.logoUrl && (
@@ -635,13 +769,161 @@ function EventChip({ e }: { e: EarningsItem }) {
         </div>
 
         <DialogFooter className="sm:justify-between items-center mt-4">
-          <DialogClose render={<Button variant="ghost" />}>
-            Fechar
-          </DialogClose>
+          <DialogClose render={<Button variant="ghost" />}>Fechar</DialogClose>
           <Link href={`/stock/${e.ticker}`} prefetch={false}>
             <Button>Ver {e.ticker} no Terminal</Button>
           </Link>
         </DialogFooter>
+      </>
+    )
+  }
+
+  if (e.kind === "corporate") {
+    return (
+      <>
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            {e.logoUrl && (
+              <CompanyLogo src={e.logoUrl} alt="" fallback={e.ticker} size={20} className="rounded-sm" imgClassName="p-0" />
+            )}
+            {e.name} ({e.ticker})
+          </DialogTitle>
+          <DialogDescription>{CORPORATE_TYPE_LABEL[e.type]}</DialogDescription>
+        </DialogHeader>
+
+        <div className="rounded-xl border border-border p-3 flex flex-col gap-1.5 text-sm py-2">
+          {e.type === "DIVIDEND" && (
+            <>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Ex-Dividend Date</span>
+                <span className="font-medium">{e.date}</span>
+              </div>
+              {e.payDate && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Data de Pagamento</span>
+                  <span className="font-medium">{e.payDate}</span>
+                </div>
+              )}
+              <div className="flex justify-between border-t border-border/50 pt-1.5">
+                <span className="text-muted-foreground">Dividendo / Ação</span>
+                <span className="font-semibold text-bull">{formatCurrency(e.amount)}</span>
+              </div>
+            </>
+          )}
+          {e.type === "SPLIT" && (
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Ratio</span>
+              <span className="font-semibold">{e.splitRatio ?? "-"}</span>
+            </div>
+          )}
+          {(e.type === "AGM" || e.type === "INVESTOR_DAY" || e.type === "IPO") && (
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Data</span>
+              <span className="font-medium">{e.date}</span>
+            </div>
+          )}
+          {e.note && <p className="text-xs text-muted-foreground pt-1.5 border-t border-border/50">{e.note}</p>}
+        </div>
+
+        <DialogFooter className="sm:justify-between items-center mt-4">
+          <DialogClose render={<Button variant="ghost" />}>Fechar</DialogClose>
+          <Link href={`/stock/${e.ticker}`} prefetch={false}>
+            <Button>Ver {e.ticker} no Terminal</Button>
+          </Link>
+        </DialogFooter>
+      </>
+    )
+  }
+
+  // macro
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2">
+          <MacroIconTile />
+          {e.title}
+          <ImportanceDot importance={e.importance} />
+        </DialogTitle>
+        <DialogDescription>
+          {MACRO_TYPE_LABEL[e.type]} · {e.country}
+          {e.time ? ` · ${e.time}` : ""}
+        </DialogDescription>
+      </DialogHeader>
+
+      <div className="rounded-xl border border-border p-3 flex flex-col gap-1.5 text-sm py-2">
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Anterior</span>
+          <span className="font-medium">{e.previous ?? "-"}</span>
+        </div>
+        <div className="flex justify-between border-t border-border/50 pt-1.5">
+          <span className="text-muted-foreground">Atual</span>
+          <span className="font-semibold">{e.actual ?? "-"}</span>
+        </div>
+      </div>
+
+      {e.type === "FOMC" && (
+        <p className="text-xs text-muted-foreground">
+          Decisões de taxas do Fed movem o discount rate — afetam diretamente o WACC usado na tua calculadora DCF.
+        </p>
+      )}
+
+      <DialogFooter className="justify-end mt-4">
+        <DialogClose render={<Button variant="ghost" />}>Fechar</DialogClose>
+      </DialogFooter>
+    </>
+  )
+}
+
+function DayEventCard({ e }: { e: CalendarItem }) {
+  const ticker = e.kind !== "macro" ? e.ticker : null
+  const name = e.kind !== "macro" ? e.name : e.title
+  const logoUrl = e.kind !== "macro" ? e.logoUrl : null
+
+  return (
+    <Dialog>
+      {/* @ts-ignore - shadcn base-ui migration */}
+      <DialogTrigger asChild>
+        <button className="flex items-center gap-3 p-3 rounded-lg border border-border/60 bg-background hover:bg-muted/50 hover:border-border transition-all text-left group">
+          {ticker ? (
+            <CompanyLogo src={logoUrl} alt="" fallback={ticker} size={40} className="rounded-md" />
+          ) : (
+            <MacroIconTile size={40} className="rounded-md" />
+          )}
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="font-bold text-sm truncate">{ticker ?? MACRO_TYPE_LABEL[(e as MacroItem).type]}</span>
+              {e.kind === "earnings" && e.epsActual !== null && e.epsEstimate !== null && (
+                e.epsActual >= e.epsEstimate ? <TrendingUp className="h-3.5 w-3.5 text-bull shrink-0" /> : <TrendingDown className="h-3.5 w-3.5 text-bear shrink-0" />
+              )}
+              {e.kind === "macro" && <ImportanceDot importance={e.importance} />}
+            </div>
+            <p className="text-xs text-muted-foreground truncate" title={name}>{name}</p>
+          </div>
+        </button>
+      </DialogTrigger>
+
+      <DialogContent className="sm:max-w-md">
+        <EventDialogBody e={e} />
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function EventChip({ e }: { e: CalendarItem }) {
+  const title = e.kind === "macro" ? e.title : `${e.name} · ${e.kind === "earnings" ? `Q${e.fiscalQuarter} ${e.fiscalYear}` : CORPORATE_TYPE_LABEL[e.type]}`
+
+  return (
+    <Dialog>
+      <DialogTrigger
+        title={title}
+        className="w-full text-left group flex items-center gap-2 rounded-md px-1.5 py-1 text-sm font-semibold truncate transition-colors hover:bg-muted"
+      >
+        <EventTriggerContent e={e} />
+      </DialogTrigger>
+
+      <DialogContent className="sm:max-w-md">
+        <EventDialogBody e={e} />
       </DialogContent>
     </Dialog>
   )

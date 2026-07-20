@@ -666,7 +666,11 @@
     "empty": "No earnings scheduled in this period.",
     "summary": "{count} earnings in this period",
     "legendBmo": "Before open",
-    "legendAmc": "After close"
+    "legendAmc": "After close",
+    "filterEarnings": "Earnings",
+    "filterDividend": "Dividends",
+    "filterSplit": "Splits",
+    "filterMacro": "Macro"
   },
   "news": {
     "title": "Company News",

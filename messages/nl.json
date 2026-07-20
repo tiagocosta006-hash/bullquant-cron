@@ -605,7 +605,11 @@
     "empty": "Geen evenementen.",
     "summary": "{count} rapporten",
     "legendBmo": "Voor opening",
-    "legendAmc": "Na sluiting"
+    "legendAmc": "Na sluiting",
+    "filterEarnings": "Resultaten",
+    "filterDividend": "Dividenden",
+    "filterSplit": "Splits",
+    "filterMacro": "Macro"
   },
   "news": {
     "title": "Nieuws",

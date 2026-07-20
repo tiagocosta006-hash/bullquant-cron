@@ -605,7 +605,11 @@
     "empty": "イベントはありません。",
     "summary": "{count}件の決算",
     "legendBmo": "市場オープン前",
-    "legendAmc": "市場クローズ後"
+    "legendAmc": "市場クローズ後",
+    "filterEarnings": "決算",
+    "filterDividend": "配当",
+    "filterSplit": "株式分割",
+    "filterMacro": "マクロ"
   },
   "news": {
     "title": "ニュース",

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { SearchBar } from '@/components/search/SearchBar';
 import { LogOut, UserCircle, Zap, Users } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -19,6 +20,10 @@ export async function Header() {
             <Logo href="/" size="md" />
           </div>
           
+          <div className="hidden lg:block w-full min-w-[280px] max-w-sm">
+            <SearchBar isLoggedIn={!!user} />
+          </div>
+
           {/* Navegação Principal (Esquerda) */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link

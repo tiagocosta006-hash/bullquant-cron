@@ -9,8 +9,11 @@ import { useTranslations } from "next-intl"
 import { useRecentSearches, type RecentSearch } from "@/hooks/useRecentSearches"
 import { CompanyLogo } from "@/components/ui/CompanyLogo"
 
+interface SearchBarProps {
+  isLoggedIn?: boolean;
+}
 
-export function SearchBar() {
+export function SearchBar({ isLoggedIn = true }: SearchBarProps) {
   const router = useRouter()
   const t = useTranslations('search')
   const [query, setQuery] = React.useState("")
@@ -60,6 +63,10 @@ export function SearchBar() {
     e.preventDefault()
     if (query.trim()) {
       setIsOpen(false)
+      if (!isLoggedIn) {
+        router.push('/register')
+        return
+      }
       router.push(`/stock/${query.trim().toUpperCase()}`)
     }
   }
@@ -68,6 +75,10 @@ export function SearchBar() {
     addSearch(company)
     setQuery("")
     setIsOpen(false)
+    if (!isLoggedIn) {
+      router.push('/register')
+      return
+    }
     router.push(`/stock/${company.ticker}`)
   }
 

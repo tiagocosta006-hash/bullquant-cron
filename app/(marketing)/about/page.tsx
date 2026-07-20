@@ -56,11 +56,13 @@ export default function AboutPage() {
           "@type": "Person",
           "name": "Rodrigo Martins",
           "jobTitle": "Founder & Developer",
+          "sameAs": "https://www.linkedin.com/in/rodrigo-teixeira-martins/"
         },
         {
           "@type": "Person",
           "name": "Tiago Costa",
           "jobTitle": "Co-founder",
+          "sameAs": "https://www.linkedin.com/in/tcosta06/"
         },
         {
           "@type": "Person",

@@ -85,8 +85,8 @@
       "dcfDesc": "Calcula o valor intrínseco de uma ação",
       "calendar": "Calendário de resultados",
       "calendarDesc": "Próximos earnings e quem bateu estimativas",
-      "transcripts": "Transcrições de resultados",
-      "transcriptsDesc": "Transcrições das calls de resultados trimestrais"
+      "explore": "Explorar empresas",
+      "exploreDesc": "Descobre novas empresas para analisar"
     },
     "tabs": {
       "marketCap": "Maior Capitalização",

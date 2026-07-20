@@ -85,8 +85,8 @@
       "dcfDesc": "Estimate a stock's intrinsic value",
       "calendar": "Earnings calendar",
       "calendarDesc": "Upcoming earnings and who beat estimates",
-      "transcripts": "Earnings transcripts",
-      "transcriptsDesc": "Quarterly earnings call transcripts"
+      "explore": "Explore companies",
+      "exploreDesc": "Discover new companies to analyze"
     },
     "tabs": {
       "marketCap": "Largest Market Cap",

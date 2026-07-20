@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { Briefcase, Calculator, CalendarDays, MessageSquareText, ArrowUpRight, Loader2, LayoutDashboard, LucideIcon } from "lucide-react";
+import { Briefcase, Calculator, CalendarDays, SearchCode, ArrowUpRight, Loader2, LayoutDashboard, LucideIcon } from "lucide-react";
 import { PageHeader, SectionLabel } from "@/components/layout/PageHeader";
 import { StockCard } from "@/components/stock/StockCard";
 import { ScreenerCompany, ScreenerCategory } from "@/lib/finance/screener";
@@ -132,7 +132,7 @@ export function DashboardClient({ tabs, activeTab, activeSector, sectors, initia
           <QuickAction href="/portfolio" icon={Briefcase} title={t("actions.portfolio")} desc={t("actions.portfolioDesc")} />
           <QuickAction href="/dcf" icon={Calculator} title={t("actions.dcf")} desc={t("actions.dcfDesc")} />
           <QuickAction href="/calendar" icon={CalendarDays} title={t("actions.calendar")} desc={t("actions.calendarDesc")} />
-          <QuickAction href="/transcripts" icon={MessageSquareText} title={t("actions.transcripts")} desc={t("actions.transcriptsDesc")} />
+          <QuickAction href="/explore" icon={SearchCode} title={t("actions.explore")} desc={t("actions.exploreDesc")} />
         </div>
       </div>
 

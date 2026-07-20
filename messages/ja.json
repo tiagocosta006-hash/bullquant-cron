@@ -79,8 +79,8 @@
       "dcfDesc": "本質的価値を推定",
       "calendar": "カレンダー",
       "calendarDesc": "四半期決算",
-      "transcripts": "トランスクリプト",
-      "transcriptsDesc": "決算説明会"
+      "explore": "企業を探す",
+      "exploreDesc": "分析する新しい企業を見つける"
     },
     "tabs": {
       "sp500": "S&P 500",

@@ -79,8 +79,8 @@
       "dcfDesc": "估算股票的内在价值",
       "calendar": "财报日历",
       "calendarDesc": "即将发布的财报",
-      "transcripts": "财报电话会议",
-      "transcriptsDesc": "季度电话会议记录"
+      "explore": "探索公司",
+      "exploreDesc": "发现新的公司进行分析"
     },
     "tabs": {
       "sp500": "标普500",

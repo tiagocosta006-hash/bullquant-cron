@@ -79,8 +79,8 @@
       "dcfDesc": "Calcula el valor intrínseco",
       "calendar": "Calendario",
       "calendarDesc": "Resultados trimestrales",
-      "transcripts": "Transcripciones",
-      "transcriptsDesc": "Llamadas de ganancias"
+      "explore": "Explorar empresas",
+      "exploreDesc": "Descubre nuevas empresas para analizar"
     },
     "tabs": {
       "sp500": "S&P 500",

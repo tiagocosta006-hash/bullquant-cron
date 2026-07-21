@@ -12,6 +12,7 @@ type FundamentalRow = {
   fiscalYear?: number
   fiscalQuarter?: number | null
   label?: string
+  isPreliminary?: boolean
   revenue?: number | null
   grossProfit?: number | null
   operatingIncome?: number | null
@@ -38,7 +39,7 @@ type FundamentalRow = {
   businessKpis?: Record<string, number> | null
 }
 
-export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { ticker: string, sector?: string | null, currencySymbol?: string }) {
+export function FinancialsEngine({ ticker, sector, currencySymbol = "$", preliminary = null }: { ticker: string, sector?: string | null, currencySymbol?: string, preliminary?: { fiscalYear: number; fiscalQuarter: number; revenue: number | null; epsDiluted: number | null } | null }) {
   const t = useTranslations("financials")
   const isBank = sector === "Financials"
   const isReit = sector === "Real Estate"
@@ -242,6 +243,26 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
     }
   })
 
+  // Barra preliminar: revenue/EPS já reportados (earnings) mas ainda sem 10-Q.
+  // Só no modo trimestral e só se o trimestre ainda não existir nos oficiais.
+  // Injetada APENAS nos gráficos de Revenue e EPS (não em processedData/CAGR nem
+  // nos outros gráficos), e marcada como preliminar (barra a claro + nota).
+  const showPreliminary =
+    period === "QUARTERLY" &&
+    preliminary != null &&
+    !data.some(d => d.periodType === "QUARTERLY" && d.fiscalYear === preliminary.fiscalYear && d.fiscalQuarter === preliminary.fiscalQuarter)
+
+  const preliminaryLabel = preliminary
+    ? `Q${preliminary.fiscalQuarter} '${String(preliminary.fiscalYear).slice(2)}`
+    : ""
+
+  const revenueChartData = showPreliminary
+    ? [...chartData, { label: preliminaryLabel, revenue: preliminary!.revenue, isPreliminary: true }]
+    : chartData
+  const epsChartData = showPreliminary
+    ? [...chartData, { label: preliminaryLabel, epsDiluted: preliminary!.epsDiluted, isPreliminary: true }]
+    : chartData
+
   return (
     <div className="mt-12 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -262,12 +283,13 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        <DecisionChart currencySymbol={currencySymbol} 
-          title={t('charts.revenue')} 
-          data={chartData} 
-          type="BAR" 
-          config={{ isCurrency: true, dataKeys: [{ key: 'revenue', color: 'var(--chart-1)', type: 'bar' }] }} 
+        <DecisionChart currencySymbol={currencySymbol}
+          title={t('charts.revenue')}
+          data={revenueChartData}
+          type="BAR"
+          config={{ isCurrency: true, dataKeys: [{ key: 'revenue', color: 'var(--chart-1)', type: 'bar' }] }}
           cagr={calcCAGR('revenue')}
+          infoTooltip={showPreliminary ? t('preliminaryInfo') : undefined}
         />
 
         {segmentKeys.length > 0 && (
@@ -282,12 +304,13 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$" }: { tic
           />
         )}
         
-        <DecisionChart currencySymbol={currencySymbol} 
-          title={t('charts.epsDiluted')} 
-          data={chartData} 
-          type="BAR" 
-          config={{ dataKeys: [{ key: 'epsDiluted', color: 'var(--chart-1)', type: 'bar' }] }} 
+        <DecisionChart currencySymbol={currencySymbol}
+          title={t('charts.epsDiluted')}
+          data={epsChartData}
+          type="BAR"
+          config={{ dataKeys: [{ key: 'epsDiluted', color: 'var(--chart-1)', type: 'bar' }] }}
           cagr={calcCAGR('epsDiluted')}
+          infoTooltip={showPreliminary ? t('preliminaryInfo') : undefined}
         />
 
         {!isBank && (

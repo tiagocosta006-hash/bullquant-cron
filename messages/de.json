@@ -685,7 +685,8 @@
       "profit": "NETTO",
       "roe": "ROE"
     },
-    "reitFcfTooltip": "Bei REITs umfasst CapEx Instandhaltungs- und Vermietungskosten und dient damit als Näherung für den AFFO."
+    "reitFcfTooltip": "Bei REITs umfasst CapEx Instandhaltungs- und Vermietungskosten und dient damit als Näherung für den AFFO.",
+    "preliminaryInfo": "Der blasse Balken ist das bereits in den Ergebnissen gemeldete Quartal (vorläufig), noch nicht im offiziellen Bericht. Aktualisiert sich automatisch, sobald die Meldung erscheint."
   },
   "compare": {
     "title": "Peer-Analyse: {industry}",

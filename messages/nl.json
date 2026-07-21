@@ -686,7 +686,8 @@
       "roe": "ROE"
     },
     "reitFcfTooltip": "Bij REIT's weerspiegelt CapEx de onderhouds- en verhuurkosten van vastgoed en dient zo als benadering van de AFFO.",
-    "preliminaryInfo": "De vervaagde balk is het kwartaal dat al in de resultaten is gerapporteerd (voorlopig), nog niet in het officiële rapport. Wordt automatisch bijgewerkt zodra de indiening verschijnt."
+    "preliminaryInfo": "De vervaagde balk is het kwartaal dat al in de resultaten is gerapporteerd (voorlopig), nog niet in het officiële rapport. Wordt automatisch bijgewerkt zodra de indiening verschijnt.",
+    "sparseQuarterlyNote": "Beperkte kwartaalhistorie voor dit bedrijf — veel (vooral Europese) bedrijven rapporteren halfjaarlijks of jaarlijks. Zie het tabblad 'Jaarlijks' voor de volledige historie."
   },
   "compare": {
     "title": "Peervergelijking: {industry}",

@@ -686,7 +686,8 @@
       "roe": "ROE"
     },
     "reitFcfTooltip": "En los REIT, el CapEx refleja los costes de mantenimiento y arrendamiento inmobiliario, sirviendo como aproximación al AFFO.",
-    "preliminaryInfo": "La barra atenuada es el trimestre ya reportado en resultados (preliminar), aún no publicado en el informe oficial. Se actualiza automáticamente cuando sale el documento."
+    "preliminaryInfo": "La barra atenuada es el trimestre ya reportado en resultados (preliminar), aún no publicado en el informe oficial. Se actualiza automáticamente cuando sale el documento.",
+    "sparseQuarterlyNote": "Historial trimestral limitado para esta empresa — muchas empresas (sobre todo europeas) reportan semestral o anualmente. Consulta la pestaña «Anual» para el historial completo."
   },
   "compare": {
     "title": "Análisis de Pares: {industry}",

@@ -57,7 +57,7 @@ DEFAULT_TICKERS = [
 ]
 
 HISTORY_YEARS = 10
-SLEEP_BETWEEN = 1.5
+SLEEP_BETWEEN = 20  # a API da Nasdaq faz rate-limit a rajadas; espaçar bem entre tickers
 NASDAQ_BASE = "https://api.nasdaq.com/api/quote"
 HEADERS = {
     "User-Agent": (
@@ -94,17 +94,38 @@ def _to_int(raw):
         return None
 
 
-def fetch_nasdaq(ticker: str, from_date: str, to_date: str) -> list[dict]:
+def fetch_nasdaq(ticker: str, from_date: str, to_date: str, max_retries: int = 8) -> list[dict]:
     url = (
         f"{NASDAQ_BASE}/{ticker}/historical"
-        f"?assetclass=stocks&fromdate={from_date}&limit=9999&todate={to_date}"
+        f"?assetclass=stocks&fromdate={from_date}&limit=5000&todate={to_date}"
     )
+    # A API da Nasdaq rejeita limit demasiado alto (ex.: 9999) devolvendo HTTP 200
+    # com data=null + "Something went wrong" (code 1000). limit=5000 chega para
+    # ~20 anos de dias úteis e responde de forma fiável. O retry cobre falhas
+    # transitórias de rede.
+    data = None
+    for attempt in range(max_retries):
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=30)
+            if r.status_code != 200:
+                print(f"    HTTP {r.status_code} (tentativa {attempt+1})", flush=True)
+                time.sleep(5 * (attempt + 1))
+                continue
+            payload = r.json()
+            if payload.get("data") is None:
+                # rate-limited / soft error → backoff e tenta de novo
+                wait = 10 * (attempt + 1)
+                print(f"    rate-limited (data=null), espera {wait}s [tentativa {attempt+1}/{max_retries}]", flush=True)
+                time.sleep(wait)
+                continue
+            data = payload
+            break
+        except Exception as e:
+            print(f"    Nasdaq error para {ticker}: {e} (tentativa {attempt+1})", flush=True)
+            time.sleep(5 * (attempt + 1))
+    if data is None:
+        return []
     try:
-        r = requests.get(url, headers=HEADERS, timeout=30)
-        if r.status_code != 200:
-            print(f"    HTTP {r.status_code}")
-            return []
-        data = r.json()
         table = (data.get("data") or {}).get("tradesTable") or {}
         rows_raw = table.get("rows") or []
         rows = []

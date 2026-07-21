@@ -227,8 +227,8 @@
       "dcfDesc": "Estimate a stock's intrinsic value",
       "calendar": "Earnings calendar",
       "calendarDesc": "Upcoming earnings and who beat estimates",
-      "transcripts": "Earnings transcripts",
-      "transcriptsDesc": "Quarterly earnings call transcripts"
+      "explore": "Explore companies",
+      "exploreDesc": "Discover new companies to analyze"
     },
     "tabs": {
       "marketCap": "Largest Market Cap",
@@ -295,7 +295,8 @@
     "loginLink": "Sign in",
     "confirmPasswordLabel": "Confirm Password",
     "passwordMismatch": "Passwords don't match.",
-    "emailInUse": "This email is already registered."
+    "emailInUse": "This email is already registered.",
+    "consentText": "I declare that I am over 16 and agree to the <terms>Terms</terms> and <privacy>Privacy Policy</privacy>."
   },
   "forgotPassword": {
     "title": "Reset Password",
@@ -322,11 +323,12 @@
     "logoutTitle": "Sign out",
     "login": "Sign in",
     "register": "Sign up",
-    "pricing": "Pricing",
+    "pricing": "Plans",
     "dcf": "DCF",
     "calendar": "Calendar",
     "theme": "Toggle theme",
-    "startFree": "Start free"
+    "startFree": "Start free",
+    "about": "About Us"
   },
   "search": {
     "placeholder": "Search ticker (e.g., AAPL)...",
@@ -849,7 +851,11 @@
     "empty": "No earnings scheduled in this period.",
     "summary": "{count} earnings in this period",
     "legendBmo": "Before open",
-    "legendAmc": "After close"
+    "legendAmc": "After close",
+    "filterEarnings": "Earnings",
+    "filterDividend": "Dividends",
+    "filterSplit": "Splits",
+    "filterMacro": "Macro"
   },
   "news": {
     "title": "Company News",
@@ -909,6 +915,11 @@
     "pricing": "Pricing",
     "about": "About Us"
   },
+  "cookieConsent": {
+    "text": "We use cookies exclusively to understand how you use Bullmetrics and improve your experience. Do you accept their use?",
+    "accept": "Accept All",
+    "decline": "Decline"
+  },
   "pricing": {
     "badge": "Simple and transparent",
     "title": "Invest with more confidence.",
@@ -923,7 +934,7 @@
     },
     "pro": {
       "name": "PRO",
-      "price": "€7",
+      "price": "€10",
       "period": "per month",
       "description": "For the serious investor who wants to go deeper in their analysis.",
       "cta": "Start 7-day free trial",

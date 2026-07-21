@@ -23,7 +23,7 @@ type PriceData = {
   changePercent: number;
 }
 
-export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfButton?: React.ReactNode }) {
+export function StockHeader({ company, shareComponent }: { company: CompanyProp, shareComponent?: React.ReactNode }) {
   const t = useTranslations("stock")
   const locale = useLocale()
   const [priceData, setPriceData] = useState<PriceData | null>(null)
@@ -166,8 +166,8 @@ export function StockHeader({ company, pdfButton }: { company: CompanyProp, pdfB
               {t('header.comparePeers')}
             </Link>
 
-            {/* PDF Report Button */}
-            {pdfButton}
+            {/* Share Button */}
+            {shareComponent}
           </div>
         </div>
       </div>

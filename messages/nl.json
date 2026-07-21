@@ -174,8 +174,8 @@
       "dcfDesc": "Intrinsieke waarde berekenen",
       "calendar": "Kalender",
       "calendarDesc": "Kwartaalcijfers",
-      "transcripts": "Transcripties",
-      "transcriptsDesc": "Aandeelhoudersvergaderingen"
+      "explore": "Verken bedrijven",
+      "exploreDesc": "Ontdek nieuwe bedrijven om te analyseren"
     },
     "tabs": {
       "sp500": "S&P 500",
@@ -270,7 +270,9 @@
     "register": "Registreren",
     "dcf": "DCF",
     "calendar": "Kalender",
-    "theme": "Thema wisselen"
+    "theme": "Thema wisselen",
+    "pricing": "Plans",
+    "about": "About Us"
   },
   "search": {
     "placeholder": "Zoek ticker (bijv. AAPL)...",
@@ -700,7 +702,11 @@
     "empty": "Geen evenementen.",
     "summary": "{count} rapporten",
     "legendBmo": "Voor opening",
-    "legendAmc": "Na sluiting"
+    "legendAmc": "Na sluiting",
+    "filterEarnings": "Resultaten",
+    "filterDividend": "Dividenden",
+    "filterSplit": "Splits",
+    "filterMacro": "Macro"
   },
   "news": {
     "title": "Nieuws",

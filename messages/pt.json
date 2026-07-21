@@ -227,8 +227,8 @@
       "dcfDesc": "Calcula o valor intrínseco de uma ação",
       "calendar": "Calendário de resultados",
       "calendarDesc": "Próximos earnings e quem bateu estimativas",
-      "transcripts": "Transcrições de resultados",
-      "transcriptsDesc": "Transcrições das calls de resultados trimestrais"
+      "explore": "Explorar empresas",
+      "exploreDesc": "Descobre novas empresas para analisar"
     },
     "tabs": {
       "marketCap": "Maior Capitalização",
@@ -295,7 +295,8 @@
     "loginLink": "Faz Login",
     "confirmPasswordLabel": "Confirmar Password",
     "passwordMismatch": "As passwords não coincidem.",
-    "emailInUse": "Este email já está registado."
+    "emailInUse": "Este email já está registado.",
+    "consentText": "Declaro que tenho mais de 16 anos e concordo com os <terms>Termos</terms> e a <privacy>Política de Privacidade</privacy>."
   },
   "forgotPassword": {
     "title": "Recuperar Password",
@@ -322,11 +323,12 @@
     "logoutTitle": "Sair",
     "login": "Login",
     "register": "Registar",
-    "pricing": "Preços",
+    "pricing": "Planos",
     "dcf": "DCF",
     "calendar": "Calendário",
     "theme": "Alternar tema",
-    "startFree": "Começar grátis"
+    "startFree": "Começar grátis",
+    "about": "Quem somos"
   },
   "search": {
     "placeholder": "Pesquisar ticker (ex: AAPL)...",
@@ -393,8 +395,8 @@
         "pro": "PRO",
         "priceLabel": "Preço",
         "priceFree": "0 €",
-        "pricePro": "7 €/mês",
-        "priceNote": "Preço provisório, o valor final será anunciado no lançamento.",
+        "pricePro": "10 €/mês",
+        "priceNote": "Preço provisório — o valor final será anunciado no lançamento.",
         "quotesLabel": "Cotações e 10 anos de fundamentais",
         "aiLabel": "Análises de IA",
         "aiFree": "{limit}/dia",
@@ -849,7 +851,11 @@
     "empty": "Sem resultados agendados neste período.",
     "summary": "{count} resultados neste período",
     "legendBmo": "Antes da abertura",
-    "legendAmc": "Após o fecho"
+    "legendAmc": "Após o fecho",
+    "filterEarnings": "Resultados",
+    "filterDividend": "Dividendos",
+    "filterSplit": "Splits",
+    "filterMacro": "Macro"
   },
   "news": {
     "title": "Notícias da Empresa",
@@ -909,6 +915,11 @@
     "pricing": "Preços",
     "about": "Sobre Nós"
   },
+  "cookieConsent": {
+    "text": "Utilizamos cookies exclusivamente para compreender como utiliza a Bullmetrics e melhorar a sua experiência. Aceita a sua utilização?",
+    "accept": "Aceitar Tudo",
+    "decline": "Recusar"
+  },
   "pricing": {
     "badge": "Simples e transparente",
     "title": "Investe com mais confiança.",
@@ -923,7 +934,7 @@
     },
     "pro": {
       "name": "PRO",
-      "price": "€7",
+      "price": "€10",
       "period": "por mês",
       "description": "Para o investidor sério que quer ir mais fundo na análise.",
       "cta": "Começar trial de 7 dias",

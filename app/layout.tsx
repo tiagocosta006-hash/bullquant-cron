@@ -7,6 +7,7 @@ import { getMessages } from "next-intl/server";
 import { PulseTracker } from "@/components/pulse/PulseTracker";
 import { BRAND } from "@/lib/brand";
 import { PaddleProvider } from "@/components/providers/PaddleProvider";
+import { CookieConsent } from "@/components/layout/CookieConsent";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
 const scotchDisplay = localFont({
@@ -142,6 +143,7 @@ export default async function RootLayout({
           <PaddleProvider>
             <main className="flex-1 flex flex-col">{children}</main>
           </PaddleProvider>
+          <CookieConsent />
         </NextIntlClientProvider>
         <PulseTracker />
         {/* GA só em produção — em dev tenta enviar para o GA e falha com

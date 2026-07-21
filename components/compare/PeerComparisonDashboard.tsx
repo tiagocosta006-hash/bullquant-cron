@@ -350,10 +350,16 @@ export function PeerComparisonDashboard({ baseCompany, baseFundamentals, availab
               {loadingPeers[peer.ticker] && (
                 <span className="ml-1 h-1.5 w-1.5 animate-pulse rounded-full bg-current" />
               )}
-              <X
-                className="h-3 w-3 cursor-pointer transition-colors hover:text-destructive"
+              {/* O X precisa de ser um <button> próprio, não o <svg> direto do Badge —
+                  o Badge aplica [&>svg]:pointer-events-none aos filhos, o que anulava o onClick. */}
+              <button
+                type="button"
                 onClick={() => removePeer(peer.ticker)}
-              />
+                aria-label={`Remover ${peer.ticker}`}
+                className="cursor-pointer transition-colors hover:text-destructive"
+              >
+                <X className="h-3 w-3" />
+              </button>
             </Badge>
           ))}
 

@@ -174,8 +174,8 @@
       "dcfDesc": "估算股票的内在价值",
       "calendar": "财报日历",
       "calendarDesc": "即将发布的财报",
-      "transcripts": "财报电话会议",
-      "transcriptsDesc": "季度电话会议记录"
+      "explore": "探索公司",
+      "exploreDesc": "发现新的公司进行分析"
     },
     "tabs": {
       "sp500": "标普500",
@@ -270,7 +270,9 @@
     "register": "注册",
     "dcf": "DCF",
     "calendar": "日历",
-    "theme": "切换主题"
+    "theme": "切换主题",
+    "pricing": "Plans",
+    "about": "About Us"
   },
   "search": {
     "placeholder": "搜索股票代码 (如 AAPL)...",
@@ -700,7 +702,11 @@
     "empty": "此期间没有财报发布。",
     "summary": "本期共有 {count} 份财报",
     "legendBmo": "盘前发布",
-    "legendAmc": "盘后发布"
+    "legendAmc": "盘后发布",
+    "filterEarnings": "财报",
+    "filterDividend": "股息",
+    "filterSplit": "拆股",
+    "filterMacro": "宏观"
   },
   "news": {
     "title": "公司新闻",

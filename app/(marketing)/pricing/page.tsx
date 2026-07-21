@@ -105,7 +105,7 @@ export default async function PricingPage() {
           <h1 className="text-balance text-5xl font-extrabold leading-tight tracking-[-0.03em] sm:text-6xl">
             {t("title")}
           </h1>
-          <p className="mt-5 max-w-[48ch] text-lg text-muted-foreground">
+          <p className="mt-5 max-w-[48ch] text-lg text-center mx-auto text-muted-foreground">
             {t("subtitle")}
           </p>
         </Reveal>
@@ -156,7 +156,7 @@ export default async function PricingPage() {
           </div>
           <div className="grid gap-5 sm:grid-cols-3">
             {platformFeatures.map(({ icon: Icon, key }) => (
-              <LiquidGlass key={key} className="rounded-3xl p-6">
+              <LiquidGlass key={key} className="flex flex-col items-center text-center rounded-3xl p-6">
                 <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary">
                   <Icon className="h-5 w-5" strokeWidth={2} />
                 </div>

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { BRAND } from "@/lib/brand";
-import { BullMark } from "./BullMark";
 
 /**
  * BrandMark — renders the official Bullocracy bull-rook logo image
@@ -13,7 +12,6 @@ import { BullMark } from "./BullMark";
  */
 export function BrandMark({
   className,
-  title = BRAND.name,
 }: {
   className?: string;
   title?: string;
@@ -21,7 +19,7 @@ export function BrandMark({
   const [errored, setErrored] = useState(false);
 
   if (errored || !BRAND.logoSrc) {
-    return <BullMark className={className} title={title} />;
+    return null; // The old fallback logo was deleted as per user request
   }
 
   return (

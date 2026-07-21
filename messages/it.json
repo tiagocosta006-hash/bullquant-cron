@@ -174,8 +174,8 @@
       "dcfDesc": "Stima il valore intrinseco",
       "calendar": "Calendario",
       "calendarDesc": "Risultati trimestrali",
-      "transcripts": "Trascrizioni",
-      "transcriptsDesc": "Riunioni degli utili"
+      "explore": "Esplora aziende",
+      "exploreDesc": "Scopri nuove aziende da analizzare"
     },
     "tabs": {
       "sp500": "S&P 500",
@@ -270,7 +270,9 @@
     "register": "Registrati",
     "dcf": "DCF",
     "calendar": "Calendario",
-    "theme": "Cambia tema"
+    "theme": "Cambia tema",
+    "pricing": "Plans",
+    "about": "About Us"
   },
   "search": {
     "placeholder": "Cerca ticker (es. AAPL)...",
@@ -700,7 +702,11 @@
     "empty": "Nessun evento.",
     "summary": "{count} utili",
     "legendBmo": "Prima dell'apertura",
-    "legendAmc": "Dopo la chiusura"
+    "legendAmc": "Dopo la chiusura",
+    "filterEarnings": "Utili",
+    "filterDividend": "Dividendi",
+    "filterSplit": "Splits",
+    "filterMacro": "Macro"
   },
   "news": {
     "title": "Notizie",

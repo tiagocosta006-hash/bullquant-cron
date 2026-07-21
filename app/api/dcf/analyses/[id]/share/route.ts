@@ -8,7 +8,6 @@ export async function PATCH(
 ) {
   try {
     const user = await getUser()
-    console.log("SHARE API hit for user:", user?.id, "params:", params)
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }

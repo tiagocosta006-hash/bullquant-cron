@@ -16,11 +16,15 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // O grupo (app) é navegável por anónimos (ver empresas, usar a calculadora
+  // DCF, explorar). As páginas PESSOAIS (portfolio/watchlist/settings) protegem-
+  // se individualmente; guardar dados protege-se sempre na API (401). Por isso
+  // o layout lida com user === null de forma graciosa (TopNav mostra "Entrar").
   const user = await getUser();
 
   let userName: string | null = null;
   let userEmail: string | null = null;
-  let devSlot: React.ReactNode = null;
+  const devSlot: React.ReactNode = null;
   let plan = "FREE";
   let dbUser = null;
 
@@ -31,7 +35,7 @@ export default async function AppLayout({
       where: { id: user.id },
       select: { plan: true, paddleCustomerId: true },
     });
-    
+
     if (dbUser) {
       plan = dbUser.plan;
     }

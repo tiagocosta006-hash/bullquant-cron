@@ -29,31 +29,37 @@ export async function updateSession(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  const isAuthRoute = 
-    request.nextUrl.pathname.startsWith('/login') || 
-    request.nextUrl.pathname.startsWith('/register') ||
-    request.nextUrl.pathname.startsWith('/forgot-password')
+  const { pathname } = request.nextUrl
 
+  const isAuthRoute =
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/register') ||
+    pathname.startsWith('/forgot-password') ||
+    pathname.startsWith('/reset-password') ||
+    pathname.startsWith('/verify-email')
+
+  // Filosofia: navegar é PÚBLICO (ver empresas, calculadora DCF, explorar,
+  // dashboard, calendário…). Só as páginas PESSOAIS exigem sessão. Guardar
+  // dados (posições, watchlist, cenários DCF) protege-se sempre na própria API
+  // com 401 — isto é só o gate das PÁGINAS.
   const isPrivateRoute =
-    request.nextUrl.pathname.startsWith('/settings') ||
-    request.nextUrl.pathname.startsWith('/dashboard') ||
-    request.nextUrl.pathname === '/dcf' ||
-    request.nextUrl.pathname.startsWith('/calendar') ||
-    request.nextUrl.pathname.startsWith('/explore') ||
-    request.nextUrl.pathname.startsWith('/transcripts') ||
-    request.nextUrl.pathname.startsWith('/reset-password')
+    pathname.startsWith('/portfolio') ||
+    pathname.startsWith('/watchlist') ||
+    pathname.startsWith('/settings')
 
-  // Redirecionar utilizadores autenticados para a página inicial se tentarem aceder a rotas de auth
+  // Redirecionar utilizadores autenticados para fora das páginas de auth.
   if (user && isAuthRoute) {
     const url = request.nextUrl.clone()
     url.pathname = '/'
     return NextResponse.redirect(url)
   }
 
-  // Redirecionar utilizadores não autenticados para o login se tentarem aceder a rotas privadas
+  // Anónimos numa página pessoal vão para o login (com ?redirect para voltarem
+  // ao sítio depois de entrar).
   if (!user && isPrivateRoute) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
+    url.searchParams.set('redirect', pathname)
     return NextResponse.redirect(url)
   }
 

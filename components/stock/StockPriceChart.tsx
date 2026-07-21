@@ -38,7 +38,8 @@ export function StockPriceChart({ ticker, currencySymbol = "$" }: { ticker: stri
     async function fetchPrices() {
       try {
         const [histRes, liveRes] = await Promise.all([
-          fetch(`/api/prices/${ticker}`),
+          // period=max → histórico completo (até 10 anos onde existe); a tab MÁX mostra tudo
+          fetch(`/api/prices/${ticker}?period=max`),
           fetch(`/api/price/${ticker}`)
         ])
         

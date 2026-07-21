@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
+import { Info } from "lucide-react"
 import { DecisionChart } from "./DecisionChart"
 import { useTranslations } from "next-intl"
 
@@ -263,6 +264,15 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
     ? [...chartData, { label: preliminaryLabel, epsDiluted: preliminary!.epsDiluted, isPreliminary: true }]
     : chartData
 
+  // Aviso guiado pelos DADOS reais: se o histórico trimestral for escasso (típico
+  // das europeias, que reportam semestral/anual), avisar em vez de mostrar um
+  // gráfico trimestral enganosamente curto. Um reporter trimestral completo tem
+  // ~4 Q por ano; abaixo de 3× o nº de anuais = claramente incompleto. Assim a
+  // ASML (poucos Q) mostra o aviso, mas a AAPL (histórico completo) não.
+  const quarterlyCount = data.filter(d => d.periodType === "QUARTERLY").length
+  const annualCount = data.filter(d => d.periodType === "ANNUAL").length
+  const sparseQuarterly = annualCount > 0 && quarterlyCount < annualCount * 3
+
   return (
     <div className="mt-12 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -281,6 +291,13 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
           ))}
         </div>
       </div>
+
+      {sparseQuarterly && (period === "QUARTERLY" || period === "TTM") && (
+        <div className="flex items-start gap-2.5 rounded-lg border border-border/50 bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
+          <Info className="h-4 w-4 mt-0.5 shrink-0" />
+          <span>{t('sparseQuarterlyNote')}</span>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         <DecisionChart currencySymbol={currencySymbol}

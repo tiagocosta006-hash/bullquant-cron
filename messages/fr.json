@@ -686,7 +686,8 @@
       "roe": "ROE"
     },
     "reitFcfTooltip": "Pour les REIT, le CapEx reflète les coûts d'entretien immobilier et de location, servant d'approximation de l'AFFO.",
-    "preliminaryInfo": "La barre atténuée correspond au trimestre déjà annoncé dans les résultats (préliminaire), pas encore dans le rapport officiel. Elle se met à jour automatiquement dès la publication."
+    "preliminaryInfo": "La barre atténuée correspond au trimestre déjà annoncé dans les résultats (préliminaire), pas encore dans le rapport officiel. Elle se met à jour automatiquement dès la publication.",
+    "sparseQuarterlyNote": "Historique trimestriel limité pour cette entreprise — beaucoup de sociétés (surtout européennes) publient semestriellement ou annuellement. Voir l'onglet « Annuel » pour l'historique complet."
   },
   "compare": {
     "title": "Analyse des Pairs : {industry}",

@@ -798,7 +798,8 @@
       "roe": "ROE"
     },
     "reitFcfTooltip": "For REITs, CapEx reflects property maintenance and leasing costs, making this a proxy for AFFO.",
-    "preliminaryInfo": "The faded bar is the latest quarter already reported in earnings (preliminary), not yet in the official filing. It updates automatically once the filing is published."
+    "preliminaryInfo": "The faded bar is the latest quarter already reported in earnings (preliminary), not yet in the official filing. It updates automatically once the filing is published.",
+    "sparseQuarterlyNote": "Limited quarterly history for this company — many firms (especially European) report semi-annually or annually. See the Annual tab for the full history."
   },
   "compare": {
     "title": "Peer Analysis: {industry}",

@@ -798,7 +798,8 @@
       "roe": "ROE"
     },
     "reitFcfTooltip": "Para Fundos Imobiliários (REITs), o CapEx reflete os custos de manutenção imobiliária e de arrendamento, resultando numa proxy para o AFFO.",
-    "preliminaryInfo": "A barra a claro é o trimestre já reportado nos resultados (preliminar), ainda não publicado no relatório oficial. Atualiza-se sozinha quando o documento sai."
+    "preliminaryInfo": "A barra a claro é o trimestre já reportado nos resultados (preliminar), ainda não publicado no relatório oficial. Atualiza-se sozinha quando o documento sai.",
+    "sparseQuarterlyNote": "Histórico trimestral limitado para esta empresa — muitas empresas (sobretudo europeias) reportam semestral ou anualmente. Vê a aba «Anual» para o histórico completo."
   },
   "compare": {
     "title": "Análise de Pares: {industry}",

@@ -686,7 +686,8 @@
       "roe": "ROE"
     },
     "reitFcfTooltip": "Per i REIT, il CapEx riflette i costi di manutenzione immobiliare e di locazione, fungendo da proxy dell'AFFO.",
-    "preliminaryInfo": "La barra sbiadita è il trimestre già riportato negli utili (preliminare), non ancora nel documento ufficiale. Si aggiorna automaticamente alla pubblicazione."
+    "preliminaryInfo": "La barra sbiadita è il trimestre già riportato negli utili (preliminare), non ancora nel documento ufficiale. Si aggiorna automaticamente alla pubblicazione.",
+    "sparseQuarterlyNote": "Storico trimestrale limitato per questa azienda — molte società (soprattutto europee) rendicontano su base semestrale o annuale. Vedi la scheda «Annuale» per lo storico completo."
   },
   "compare": {
     "title": "Analisi dei Pari: {industry}",

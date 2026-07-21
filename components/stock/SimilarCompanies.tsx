@@ -9,7 +9,7 @@ interface SimilarCompany {
   logoUrl: string | null
 }
 
-export async function SimilarCompanies({ companies, baseTicker }: { companies: SimilarCompany[]; baseTicker: string }) {
+export async function SimilarCompanies({ companies, baseTicker, group }: { companies: SimilarCompany[]; baseTicker: string; group: string }) {
   const t = await getTranslations('stock')
 
   if (!companies || companies.length === 0) return null
@@ -18,7 +18,7 @@ export async function SimilarCompanies({ companies, baseTicker }: { companies: S
     <div className="glass rounded-3xl p-6 md:p-8">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold tracking-tight text-foreground">
-          {t('similarCompaniesTitle')}
+          {group ? t('peersTitle', { group }) : t('peersTitleGeneric')}
         </h2>
         <Link
           href="/explore"

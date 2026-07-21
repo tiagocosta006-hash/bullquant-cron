@@ -22,6 +22,7 @@ const StockAnalyst = dynamic(() => import('@/components/stock/StockAnalyst').the
 import { StockTabs } from '@/components/stock/StockTabs'
 const ValuationMultiples = dynamic(() => import('@/components/stock/ValuationMultiples').then(mod => mod.ValuationMultiples))
 import { ShareStockModal } from '@/components/stock/ShareStockModal'
+import { SimilarCompanies } from '@/components/stock/SimilarCompanies'
 
 // Partilhado entre generateMetadata e a página (React.cache = 1 query por pedido,
 // em vez de 2 findUnique idênticos).
@@ -107,7 +108,8 @@ export default async function StockPage({
     historicalAnnual,
     latestAnnual,
     latestPrice,
-    latestEarnings
+    latestEarnings,
+    similarCompanies
   ] = await Promise.all([
     // 1. User PRO plan
     user ? prisma.user.findUnique({ where: { id: user.id } }) : Promise.resolve(null),
@@ -147,6 +149,17 @@ export default async function StockPage({
     prisma.earningsEvent.findFirst({
       where: { companyId: company.id, epsActual: { not: null } },
       orderBy: { date: 'desc' },
+    }),
+
+    // 8. Similar Companies
+    prisma.company.findMany({
+      where: {
+        isActive: true,
+        sector: company.sector,
+        id: { not: company.id }
+      },
+      take: 4,
+      select: { ticker: true, name: true, logoUrl: true }
     })
   ])
 
@@ -173,11 +186,38 @@ export default async function StockPage({
 
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Corporation",
-    "name": company.name,
-    "tickerSymbol": company.ticker,
-    "exchange": company.exchange,
-    "url": `${BRAND.siteUrl}/stock/${company.ticker}`,
+    "@graph": [
+      {
+        "@type": "Corporation",
+        "name": company.name,
+        "tickerSymbol": company.ticker,
+        "exchange": company.exchange,
+        "url": `${BRAND.siteUrl}/stock/${company.ticker}`,
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "BullQuant",
+            "item": BRAND.siteUrl
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Explorar Ações",
+            "item": `${BRAND.siteUrl}/explore`
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": company.ticker,
+            "item": `${BRAND.siteUrl}/stock/${company.ticker}`
+          }
+        ]
+      }
+    ]
   }
 
   return (
@@ -264,6 +304,12 @@ export default async function StockPage({
         }
         news={<StockNews ticker={company.ticker} />}
       />
+
+      {similarCompanies.length > 0 && (
+        <div className="mt-8">
+          <SimilarCompanies companies={similarCompanies} />
+        </div>
+      )}
     </div>
   )
 }

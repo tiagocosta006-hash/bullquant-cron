@@ -82,11 +82,38 @@ export default async function LandingPage({
       },
       {
         "@type": "Organization",
-        name: BRAND.name,
-        url: `${SITE_URL}/`,
-        logo: `${SITE_URL}${BRAND.logoSrc}`,
+        "name": BRAND.name,
+        "url": BRAND.siteUrl,
+        "logo": `${SITE_URL}${BRAND.logoSrc}`,
+        "description": "Plataforma portuguesa de análise fundamental de ações com dados da SEC, DCF integrada e AI Insights.",
+        "foundingDate": "2024",
+        "parentOrganization": {
+          "@type": "Organization",
+          "name": BRAND.parent,
+          "sameAs": [
+            "https://www.instagram.com/thebullocracy/",
+            "https://www.tiktok.com/@thebullocracy"
+          ]
+        },
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "email": "info@thebullocracy.com",
+          "contactType": "customer support"
+        }
       },
-    ],
+      {
+        "@type": "SoftwareApplication",
+        "name": BRAND.name,
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web",
+        "url": BRAND.siteUrl,
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "EUR"
+        }
+      }
+    ]
   };
 
   const bentoCards = [

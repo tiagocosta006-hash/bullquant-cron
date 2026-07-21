@@ -586,9 +586,10 @@
       "valuationEmpty": "Nog geen opgeslagen DCF-analyses voor dit bedrijf.",
       "valuationCta": "DCF-calculator openen"
     },
-    "similarCompaniesTitle": "Vergelijkbare Bedrijven",
     "similarCompaniesExploreAll": "Alles verkennen",
-    "similarCompaniesCompare": "Concurrenten vergelijken"
+    "similarCompaniesCompare": "Concurrenten vergelijken",
+    "peersTitle": "Andere bedrijven in {group}",
+    "peersTitleGeneric": "Gerelateerde bedrijven"
   },
   "dcf": {
     "title": "DCF Calculator",

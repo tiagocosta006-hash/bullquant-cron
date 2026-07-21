@@ -586,9 +586,10 @@
       "valuationEmpty": "Aucune analyse DCF enregistrée pour cette entreprise.",
       "valuationCta": "Ouvrir le calculateur DCF"
     },
-    "similarCompaniesTitle": "Entreprises Similaires",
     "similarCompaniesExploreAll": "Tout explorer",
-    "similarCompaniesCompare": "Comparer les concurrents"
+    "similarCompaniesCompare": "Comparer les concurrents",
+    "peersTitle": "Autres entreprises dans {group}",
+    "peersTitleGeneric": "Entreprises liées"
   },
   "dcf": {
     "title": "Calculateur DCF",

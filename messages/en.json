@@ -647,9 +647,10 @@
       "valuationEmpty": "No saved DCF analyses for this company yet.",
       "valuationCta": "Open the DCF calculator"
     },
-    "similarCompaniesTitle": "Similar Companies",
     "similarCompaniesExploreAll": "Explore all",
-    "similarCompaniesCompare": "Compare competitors"
+    "similarCompaniesCompare": "Compare competitors",
+    "peersTitle": "Other companies in {group}",
+    "peersTitleGeneric": "Related companies"
   },
   "analista": {
     "title": "AI Analyst",

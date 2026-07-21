@@ -151,14 +151,18 @@ export default async function StockPage({
       orderBy: { date: 'desc' },
     }),
 
-    // 8. Similar Companies
+    // 8. Peers — mesma INDÚSTRIA (peers reais); fallback para o setor só quando
+    // a industry não está preenchida. Ordem determinística por ticker.
     prisma.company.findMany({
       where: {
         isActive: true,
-        sector: company.sector,
-        id: { not: company.id }
+        id: { not: company.id },
+        ...(company.industry
+          ? { industry: company.industry }
+          : { sector: company.sector }),
       },
       take: 4,
+      orderBy: { ticker: 'asc' },
       select: { ticker: true, name: true, logoUrl: true }
     })
   ])
@@ -307,7 +311,7 @@ export default async function StockPage({
 
       {similarCompanies.length > 0 && (
         <div className="mt-8">
-          <SimilarCompanies companies={similarCompanies} baseTicker={company.ticker} />
+          <SimilarCompanies companies={similarCompanies} baseTicker={company.ticker} group={company.industry ?? company.sector ?? ''} />
         </div>
       )}
     </div>

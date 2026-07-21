@@ -12,7 +12,9 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 
 const scotchDisplay = localFont({
   variable: "--font-heading",
-  display: "optional",
+  // Serif só de display (momentos grandes): swap para aparecer quando usada;
+  // sem preload por não ser a fonte primária.
+  display: "swap",
   preload: false,
   src: [
     { path: "../public/fonts/scotch-display/ScotchDisplay-SemiBold.ttf", weight: "600", style: "normal" },
@@ -24,8 +26,11 @@ const scotchDisplay = localFont({
 
 const sfUIText = localFont({
   variable: "--font-sans",
-  display: "optional",
-  preload: false,
+  // SF Pro (a fonte "Apple") é a fonte primária de toda a UI: swap + preload
+  // para carregar já e SEMPRE aparecer. Com "optional" o browser só a usava
+  // se estivesse em cache, senão ficava o fallback feio do sistema para sempre.
+  display: "swap",
+  preload: true,
   src: [
     { path: "../public/fonts/sf-ui-text/SFUIText-Light.woff2", weight: "300", style: "normal" },
     { path: "../public/fonts/sf-ui-text/SFUIText-LightItalic.woff2", weight: "300", style: "italic" },

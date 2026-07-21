@@ -30,7 +30,102 @@
       "priceLabel": "met het gratis plan"
     },
     "ctaTitle": "Zie de waarde die anderen missen.",
-    "ctaSubtitle": "Maak je gratis account aan en analyseer elk S&P 500-bedrijf in seconden."
+    "ctaSubtitle": "Maak je gratis account aan en analyseer elk S&P 500-bedrijf in seconden.",
+    "ticker": {
+      "label": "Slotkoersen van gisteren — S&P 500"
+    },
+    "showcase": {
+      "caption": "Tien jaar fundamentals, DCF en AI Brief — in één terminal, zonder spreadsheets.",
+      "alt": "Demo van de Bull Metrics-terminal",
+      "caption2": "Live koersen, watchlist en earnings-kalender — alles één ⌘K verderop.",
+      "caption3": "Gratis, en klaar in minder dan een minuut."
+    },
+    "manifesto": {
+      "l1": "Beleggen is niet gokken.",
+      "l2": "Het is prijs vergelijken met waarde.",
+      "l3": "De prijs zie je elke dag.",
+      "l4": "De waarde verschuilt zich in de fundamentals.",
+      "l5": "Wij laten je de waarde zien."
+    },
+    "stories": {
+      "fundamentals": {
+        "eyebrow": "Fundamentals",
+        "title": "Tien jaar geschiedenis,",
+        "titleAccent": "in één oogopslag.",
+        "desc": "Omzet, marges, ROIC, free cash flow en buybacks — 40 kwartalen uit SEC EDGAR, ontworpen om in seconden te lezen.",
+        "b1": "9 essentiële grafieken per bedrijf, met automatische CAGR",
+        "b2": "Per kwartaal, TTM of jaarlijks — jij kiest de lens",
+        "b3": "Officiële SEC-data, elke week bijgewerkt",
+        "chartAria": "Voorbeeldgrafiek: jaaromzet als staven en free cash flow als lijn, groeiend over tien jaar",
+        "legendRevenue": "Omzet",
+        "legendFcf": "FCF"
+      },
+      "dcf": {
+        "eyebrow": "Waardering",
+        "title": "Wat is het",
+        "titleAccent": "echt waard?",
+        "desc": "De DCF-calculator vult zichzelf met bedrijfsdata en herberekent in realtime terwijl je groei, WACC en terminal value aanpast.",
+        "b1": "Automatisch gevuld met de echte fundamentals van het bedrijf",
+        "b2": "Een duidelijke veiligheidsmarge — boven of onder de prijs",
+        "b3": "Sla scenario's op en kom er altijd op terug",
+        "growth": "Jaarlijkse groei (jaar 1–5)",
+        "wacc": "WACC",
+        "terminal": "Terminale groei",
+        "price": "Huidige koers",
+        "fairValue": "Fair Value",
+        "perShare": "per aandeel",
+        "margin": "Veiligheidsmarge",
+        "undervalued": "Ondergewaardeerd",
+        "overvalued": "Overgewaardeerd",
+        "disclaimer": "Illustratief voorbeeld met een fictief bedrijf. Een DCF hangt af van jouw aannames — geen beleggingsadvies."
+      },
+      "ai": {
+        "eyebrow": "AI Insights",
+        "title": "Het verhaal achter",
+        "titleAccent": "de cijfers.",
+        "desc": "De AI Brief vat de recente ontwikkelingen van elk bedrijf samen en classificeert ze op sentiment — lees in één minuut wat ertoe doet.",
+        "b1": "Managementsamenvatting, katalysatoren en risico's",
+        "b2": "In heldere taal, zonder jargon",
+        "b3": "Altijd gemarkeerd: nooit beleggingsadvies",
+        "cardTitle": "AI Brief · Voorbeeldbedrijf",
+        "summary": "Sterk kwartaal: omzet boven verwachting, groeiende marges en een versterkt inkoopprogramma. Het management verhoogde de guidance voor de rest van het jaar.",
+        "catalystsLabel": "Katalysatoren",
+        "catalyst1": "Guidance verhoogd",
+        "catalyst2": "Inkoopprogramma",
+        "riskLabel": "Risico's",
+        "risk1": "Klantconcentratie",
+        "disclaimer": "Door AI gegenereerd uit recent nieuws. Nooit beleggingsadvies."
+      }
+    },
+    "tour": {
+      "alt": "Een rondleiding door de functies van Bull Metrics"
+    },
+    "bento": {
+      "title": "Alles in één terminal.",
+      "subtitle": "Watchlist, earnings-kalender, samengestelde lijsten en directe zoekfunctie — zonder te schakelen tussen tabbladen.",
+      "portfolio": {
+        "title": "Portfolio & watchlist",
+        "desc": "Volg je bedrijven met koersen en dagelijkse verandering."
+      },
+      "calendar": {
+        "title": "Earnings-kalender",
+        "desc": "Schattingen, beat/miss en de datums die ertoe doen."
+      },
+      "screener": {
+        "title": "Samengestelde lijsten",
+        "desc": "Growth, Dividend Growth, Buyback Machines en meer."
+      },
+      "search": {
+        "title": "Direct zoeken",
+        "desc": "Elk S&P 500-bedrijf op één ⌘K afstand."
+      }
+    },
+    "numbers": {
+      "years": "jaar aan fundamentals",
+      "companies": "S&P 500-bedrijven",
+      "quarters": "kwartalen aan data",
+      "free": "in het gratis plan"
+    }
   },
   "insider": {
     "title": "Handel met Voorkennis",

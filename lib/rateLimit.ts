@@ -34,6 +34,9 @@ const BUCKETS = {
   api: { tokens: 120, windowMs: 60_000 },
   search: { tokens: 20, windowMs: 10_000 },
   auth: { tokens: 10, windowMs: 60_000 },
+  // /api/track (Pulse) é público e chamado em cada navegação — bucket
+  // próprio para não consumir o orçamento geral da API.
+  track: { tokens: 60, windowMs: 60_000 },
 } satisfies Record<string, WindowConfig>
 
 export type BucketName = keyof typeof BUCKETS
@@ -60,6 +63,12 @@ if (hasUpstash) {
       redis,
       limiter: Ratelimit.slidingWindow(BUCKETS.search.tokens, "10 s"),
       prefix: "rl:search",
+      analytics: false,
+    }),
+    track: new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(BUCKETS.track.tokens, "60 s"),
+      prefix: "rl:track",
       analytics: false,
     }),
     auth: new Ratelimit({

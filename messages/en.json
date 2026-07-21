@@ -3,22 +3,22 @@
     "eyebrow": "Fundamental analysis · Value investing",
     "titleLead": "See the value",
     "titleAccent": "others miss.",
-    "subtitle": "Your premier DCF calculator platform with 10 years of fundamentals and AI Insights — completely free. The ultimate stock valuation tool for long-term investors.",
+    "subtitle": "10 years of fundamentals, a DCF calculator that autofills, and AI Insights, free. Serious analysis for long-term investors.",
     "primaryCta": "Create free account",
-    "secondaryCta": "See example: AAPL",
+    "secondaryCta": "Peek without an account: AAPL",
     "trust": "S&P 500 coverage · SEC EDGAR data · No credit card",
     "features": {
       "fundamentals": {
         "title": "10 years of fundamentals",
-        "desc": "Revenue, margins, ROIC and cash flow at a glance — with CAGR computed automatically."
+        "desc": "Revenue, margins, ROIC and cash flow at a glance, with CAGR computed automatically."
       },
       "dcf": {
         "title": "Built-in DCF",
-        "desc": "The most complete platform for DCF metrics investing. Estimate intrinsic value in seconds. Autofill from the company and tune with sliders."
+        "desc": "Estimate intrinsic value in seconds. Autofill from the company and tune with sliders."
       },
       "ai": {
         "title": "AI Brief",
-        "desc": "An AI summary of each company's recent developments, classified by sentiment — never investment advice."
+        "desc": "An AI summary of each company's recent developments, classified by sentiment, never investment advice."
       }
     },
     "stats": {
@@ -31,6 +31,148 @@
     },
     "ctaTitle": "Start seeing the value others miss.",
     "ctaSubtitle": "Create your free account and analyze any S&P 500 company in seconds.",
+    "ticker": {
+      "label": "Previous close, S&P 500"
+    },
+    "showcase": {
+      "caption": "Ten years of fundamentals, DCF and AI Brief, one terminal, no spreadsheets.",
+      "alt": "Bull Metrics terminal demo",
+      "caption2": "Live prices, watchlist and earnings calendar, all one ⌘K away.",
+      "caption3": "Free, and ready in under a minute.",
+      "live": "Live",
+      "aiChip": "AI Brief"
+    },
+    "manifesto": {
+      "l1": "Less noise, more conviction.",
+      "l2": "Every decision backed by 10 years of fundamentals.",
+      "l3": "This is investing with strategy."
+    },
+    "stories": {
+      "fundamentals": {
+        "eyebrow": "Fundamentals",
+        "title": "Ten years of history,",
+        "titleAccent": "at a glance.",
+        "desc": "Revenue, margins, ROIC, free cash flow and buybacks, 40 quarters from SEC EDGAR, designed to be read in seconds.",
+        "b1": "9 essential charts per company, with automatic CAGR",
+        "b2": "Quarterly, TTM or annual, you pick the lens",
+        "b3": "Official SEC data, updated every week",
+        "chartAria": "Example chart: annual revenue as bars and free cash flow as a line, growing over ten years",
+        "legendRevenue": "Revenue",
+        "legendFcf": "FCF"
+      },
+      "dcf": {
+        "eyebrow": "Valuation",
+        "title": "What is it",
+        "titleAccent": "really worth?",
+        "desc": "The DCF calculator autofills with company data and recalculates in real time as you adjust growth, WACC and terminal value.",
+        "b1": "Autofilled with the company's real fundamentals",
+        "b2": "A clear margin of safety, above or below the price",
+        "b3": "Save scenarios and come back to them anytime",
+        "growth": "Annual growth (years 1–5)",
+        "wacc": "WACC",
+        "terminal": "Terminal growth",
+        "price": "Current price",
+        "fairValue": "Fair Value",
+        "perShare": "per share",
+        "margin": "Margin of safety",
+        "undervalued": "Undervalued",
+        "overvalued": "Overvalued",
+        "disclaimer": "Illustrative example with a fictional company. A DCF depends on your assumptions, not investment advice."
+      },
+      "ai": {
+        "eyebrow": "AI Insights",
+        "title": "The story behind",
+        "titleAccent": "the numbers.",
+        "desc": "The AI Brief summarises each company's recent developments and classifies them by sentiment, read what matters in a minute.",
+        "b1": "Executive summary, catalysts and risks",
+        "b2": "In plain language, no jargon",
+        "b3": "Always flagged: never investment advice",
+        "cardTitle": "AI Brief · Example company",
+        "summary": "Solid quarter: revenue above expectations, margins expanding and the buyback programme reinforced. Management raised guidance for the rest of the year.",
+        "catalystsLabel": "Catalysts",
+        "catalyst1": "Guidance raised",
+        "catalyst2": "Buyback programme",
+        "riskLabel": "Risks",
+        "risk1": "Customer concentration",
+        "disclaimer": "AI-generated from recent news. Never investment advice."
+      }
+    },
+    "tour": {
+      "alt": "A tour of Bull Metrics features"
+    },
+    "bento": {
+      "title": "Everything in one terminal.",
+      "subtitle": "Watchlist, earnings calendar, curated lists and instant search, without juggling tabs.",
+      "portfolio": {
+        "title": "Portfolio & watchlist",
+        "desc": "Follow your companies with prices and daily change."
+      },
+      "calendar": {
+        "title": "Earnings calendar",
+        "desc": "Estimates, beat/miss and the dates that matter."
+      },
+      "screener": {
+        "title": "Curated lists",
+        "desc": "Growth, Dividend Growth, Buyback Machines and more."
+      },
+      "search": {
+        "title": "Instant search",
+        "desc": "Any S&P 500 company one ⌘K away."
+      }
+    },
+    "numbers": {
+      "years": "years of fundamentals",
+      "companies": "S&P 500 companies",
+      "quarters": "quarters of data",
+      "free": "on the free plan"
+    },
+    "pricing": {
+      "eyebrow": "Plans",
+      "title": "Start free. For real.",
+      "subtitle": "No credit card, no trial period, the essentials are free while we build.",
+      "free": {
+        "name": "Free",
+        "price": "€0",
+        "period": "forever",
+        "f1": "Full S&P 500 (500 companies)",
+        "f2": "10 years of visual fundamentals",
+        "f3": "Auto-filled DCF calculator",
+        "f4": "AI Insights",
+        "f5": "Watchlist and portfolio",
+        "cta": "Create free account"
+      },
+      "pro": {
+        "name": "Pro",
+        "badge": "Coming soon",
+        "price": "€9/mo",
+        "period": "at launch",
+        "f1": "Real metrics screener",
+        "f2": "Exportable PDF reports",
+        "f3": "Unlimited watchlists",
+        "f4": "Europe coverage",
+        "f5": "Earnings and price alerts"
+      }
+    },
+    "about": {
+      "eyebrow": "Bullocracy",
+      "title": "Made in Portugal, by investors.",
+      "p1": "Bull Metrics was born from a simple frustration: there was no serious fundamental analysis platform in Portuguese. Tools were either expensive, English-only, or noise disguised as analysis.",
+      "p2": "We are Bullocracy, a small team that believes Portuguese financial literacy deserves better than social media tips. That's why the essentials are free: SEC data, proper DCF and zero buy calls."
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "q1": "Is it really free?",
+      "a1": "Yes. The free plan includes the full S&P 500, 10 years of fundamentals, DCF and AI Insights. A Pro plan with extras will come later, but the essentials stay free.",
+      "q2": "Where does the data come from?",
+      "a2": "Fundamentals straight from SEC EDGAR (official 10-K and 10-Q filings) and prices from Polygon. No scrapers, no dubious sources.",
+      "q3": "Is this financial advice?",
+      "a3": "No. Bull Metrics is an analysis and education tool. No value, metric or insight is a recommendation to buy or sell. Decisions are always yours.",
+      "q4": "Which companies are available?",
+      "a4": "The 500 companies of the S&P 500 at launch. European coverage (including Euronext Lisbon) is on the roadmap.",
+      "q5": "Do the numbers match official filings?",
+      "a5": "Data comes from official filings and derived metrics (margins, ROIC, FCF) use standard, documented formulas. When a value doesn't exist we show N/A, we never make it up."
+    },
+    "floatingNote": "€0 · no card",
     "mission": {
       "badge": "Our Mission",
       "title": "Democratize access to financial data.",
@@ -97,7 +239,7 @@
     "sectorFilter": {
       "all": "All sectors"
     },
-    "eodNotice": "Market cap and change based on the last trading day's close — not real-time.",
+    "eodNotice": "Market cap and change based on the last trading day's close, not real-time.",
     "loadMore": "Load more"
   },
   "sidebar": {
@@ -122,7 +264,8 @@
     "searchAction": "Search",
     "more": "More",
     "watchlist": "Watchlist",
-    "dcfShort": "DCF"
+    "dcfShort": "DCF",
+    "analytics": "Pulse"
   },
   "login": {
     "title": "Sign in to BullMetrics",
@@ -184,6 +327,7 @@
     "dcf": "DCF",
     "calendar": "Calendar",
     "theme": "Toggle theme",
+    "startFree": "Start free",
     "about": "About Us"
   },
   "search": {
@@ -252,7 +396,7 @@
         "priceLabel": "Price",
         "priceFree": "€0",
         "pricePro": "€7/month",
-        "priceNote": "Provisional price — the final price will be announced at launch.",
+        "priceNote": "Provisional price, the final price will be announced at launch.",
         "quotesLabel": "Quotes and 10 years of fundamentals",
         "aiLabel": "AI analyses",
         "aiFree": "{limit}/day",
@@ -332,7 +476,7 @@
     },
     "valueChart": {
       "title": "Portfolio Value Over Time",
-      "approximationTooltip": "Estimate based on each position's current quantity applied to historical prices — does not reflect actual buy/sell history.",
+      "approximationTooltip": "Estimate based on each position's current quantity applied to historical prices, does not reflect actual buy/sell history.",
       "noData": "Not enough data to show the trend yet.",
       "tabs": {
         "1m": "1M",
@@ -397,14 +541,14 @@
     },
     "lastUpdate": "Last update:",
     "addPosition": {
-      "title": "Add position — {ticker}",
+      "title": "Add position, {ticker}",
       "description": "Enter the quantity and average buy price. To follow without a position, use the watchlist.",
       "quantityLabel": "Quantity",
       "priceLabel": "Average buy price (USD)",
       "cancel": "Cancel",
       "confirm": "Add",
       "error": "Couldn't add the position. Please try again.",
-      "editTitle": "Edit position — {ticker}",
+      "editTitle": "Edit position, {ticker}",
       "dateLabel": "Buy date",
       "brokerLabel": "Broker",
       "currencyLabel": "Currency",
@@ -484,7 +628,7 @@
       "dividend": "Dividends",
       "na": "N/A",
       "naGeneric": "No data available for this company.",
-      "naMargin": "Margin not reported — common for banks and insurers, which have no cost of goods (COGS).",
+      "naMargin": "Margin not reported, common for banks and insurers, which have no cost of goods (COGS).",
       "naPrice": "Unavailable: depends on the live price, which hasn't loaded yet."
     },
     "earnings": {
@@ -507,9 +651,11 @@
   "analista": {
     "title": "AI Analyst",
     "badge": "AI · sourced",
+    "thesisLabel": "Investment thesis",
+    "moatLabel": "Moat",
     "source": "Source: {label}",
     "generateTitle": "{ticker} analysis by the AI Analyst",
-    "generateDesc": "Generate a grounded dossier — business model, moat, operating KPIs, risks and bull/bear cases — from our verified data and the official SEC 10-K, with source citations.",
+    "generateDesc": "Generate a grounded dossier, business model, moat, operating KPIs, risks and bull/bear cases, from our verified data and the official SEC 10-K, with source citations.",
     "generateCta": "Generate Analysis",
     "generating": "Reading the 10-K and analyzing... (~20s)",
     "rateLimitTitle": "Daily limit reached",
@@ -557,7 +703,7 @@
     "title": "DCF Calculator",
     "mode": "Method",
     "subtitle": "Estimate a company's intrinsic value using the discounted cash flow method.",
-    "educationalWarning": "A DCF is a model, not a crystal ball. The output is extremely sensitive to your growth assumptions and discount rate (WACC). Use it as one of several analysis tools — never as investment advice.",
+    "educationalWarning": "A DCF is a model, not a crystal ball. The output is extremely sensitive to your growth assumptions and discount rate (WACC). Use it as one of several analysis tools, never as investment advice.",
     "autofillLabel": "Autofill from a company",
     "autofillPlaceholder": "Search ticker (e.g., AAPL)...",
     "loadedFor": "Data loaded from:",
@@ -586,7 +732,7 @@
       "capitalStructure": "Capital Structure",
       "weightEquity": "Equity Weight",
       "weightDebt": "Debt Weight",
-      "betaUnavailable": "Beta unavailable — enter WACC manually"
+      "betaUnavailable": "Beta unavailable, enter WACC manually"
     },
     "terminalGrowth": "Perpetual Growth",
     "terminalGrowthHint": "Long-term growth after year 10 (typically ≤ inflation).",
@@ -653,7 +799,44 @@
     "title": "Peer Analysis: {industry}",
     "subtitle": "Direct comparison of multiples and performance within the same GICS sub-industry.",
     "emptyTitle": "Peer Comparison",
-    "emptyDesc": "Please access this page from a company to start comparing it with its industry."
+    "emptyDesc": "Please access this page from a company to start comparing it with its industry.",
+    "selectorLabel": "Select peers (max {max})",
+    "base": "Base",
+    "addPeer": "Add peer",
+    "searchPlaceholder": "Search competitor...",
+    "noResults": "No company found.",
+    "indexedLabel": "Growth mode (base 100)",
+    "indexedDesc": "Aligns all companies to the starting year to compare real growth percentages.",
+    "historicalTitle": "Historical analysis",
+    "historicalDesc": "Financial evolution over the years across competitors.",
+    "tabGrowth": "Revenue & earnings",
+    "tabFcf": "Cash generation (FCF)",
+    "tabMargins": "Pricing power (margins)",
+    "tabValuation": "Multiples (historical)",
+    "seriesRevenue": "Revenue",
+    "seriesFcf": "FCF",
+    "seriesGrossMargin": "Gross margin",
+    "seriesNetMargin": "Net margin",
+    "metricLabel": "Metric to analyze",
+    "metricDesc": "Analyze historical disparities between peers.",
+    "metricPlaceholder": "Metric",
+    "metricPe": "P/E (earnings)",
+    "metricPs": "P/Sales (revenue)",
+    "currentTitle": "Current valuation multiples",
+    "currentDesc": "Direct comparison of the price the market is paying today (P/E, P/Sales, EV/EBITDA).",
+    "barPe": "P/E",
+    "barPs": "Price / Sales",
+    "barPfcf": "Price / FCF",
+    "barEvEbitda": "EV / EBITDA",
+    "healthTitle": "Financial health & returns",
+    "healthDesc": "A tabular view for exact balance-sheet and profitability comparisons.",
+    "thCompany": "Company",
+    "thPe": "P/E (current)",
+    "thPs": "P/Sales (current)",
+    "thEvEbitda": "EV / EBITDA",
+    "thDebtCash": "Debt / cash",
+    "thRoic": "ROIC",
+    "thRoe": "ROE"
   },
   "calendar": {
     "title": "Earnings Calendar",
@@ -802,7 +985,7 @@
         },
         {
           "q": "Is my financial data safe?",
-          "a": "We never store card data — all payment information is managed exclusively by Paddle with bank-grade encryption."
+          "a": "We never store card data, all payment information is managed exclusively by Paddle with bank-grade encryption."
         }
       ]
     },
@@ -866,12 +1049,12 @@
   },
   "watchlist": {
     "title": "Watchlist",
-    "subtitle": "Companies you're watching — no position, just radar.",
+    "subtitle": "Companies you're watching, no position, just radar.",
     "loginRequired": "Log in to build your watchlist.",
     "loginButton": "Log in",
     "empty": {
       "title": "Your watchlist is empty",
-      "description": "Follow companies to keep an eye on them — prices update live. Start with one of the popular options.",
+      "description": "Follow companies to keep an eye on them, prices update live. Start with one of the popular options.",
       "quickAdd": "Follow",
       "adding": "Adding..."
     },
@@ -885,6 +1068,7 @@
   "about": {
     "badge": "Our Mission",
     "title": "Democratizing access to financial <italic>data.</italic>",
+    "titlePlain": "Democratizing access to financial data.",
     "intro": "BullMetrics is a fundamental data analysis platform designed for all types of investors.",
     "problem": {
       "title": "Our Goal",
@@ -944,6 +1128,28 @@
       "location_value": "University of Minho, Braga",
       "social_label": "Social Media",
       "social_value": "@thebullocracy"
+    }
+  },
+  "analytics": {
+    "title": "Pulse",
+    "subtitle": "First-party analytics for the last 30 days, no cookies, no PII.",
+    "traffic": "Daily traffic",
+    "visitors": "Visitors",
+    "pageviews": "Pageviews",
+    "topPages": "Top pages",
+    "referrers": "Traffic sources",
+    "conversions": "Conversions",
+    "funnel": "Landing → signup funnel",
+    "funnelDesc": "Sessions that saw the landing vs. sessions that created an account.",
+    "funnelLanding": "Landing sessions",
+    "funnelSignups": "Signups",
+    "funnelRate": "Conversion",
+    "empty": "No data yet.",
+    "events": {
+      "cta_click": "CTA clicks",
+      "signup": "Signups",
+      "dcf_saved": "Saved DCF analyses",
+      "watchlist_add": "Watchlist adds"
     }
   }
 }

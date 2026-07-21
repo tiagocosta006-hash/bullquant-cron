@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Activity,
   LayoutDashboard,
   SearchCode,
   Briefcase,
@@ -39,11 +40,14 @@ export function TopNav({
   userEmail,
   plan,
   devSlot,
+  isAdmin,
 }: {
   userName?: string | null;
   userEmail?: string | null;
   plan?: string | null;
   devSlot?: React.ReactNode;
+  /** mostra o link para o dashboard de analytics (Pulse) — a página re-verifica sempre */
+  isAdmin?: boolean;
 }) {
   const pathname = usePathname();
   const t = useTranslations("sidebar");
@@ -66,6 +70,7 @@ export function TopNav({
     { href: "/compare", icon: GitCompareArrows, label: t("compare") },
     { href: "/transcripts", icon: MessageSquareText, label: t("transcripts") },
     { href: "/settings", icon: Settings, label: tHeader("settingsTitle") },
+    ...(isAdmin ? [{ href: "/analytics", icon: Activity, label: t("analytics") }] : []),
   ];
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);

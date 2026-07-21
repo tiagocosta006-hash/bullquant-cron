@@ -4,14 +4,17 @@ import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
+import { PulseTracker } from "@/components/pulse/PulseTracker";
 import { BRAND } from "@/lib/brand";
 import { PaddleProvider } from "@/components/providers/PaddleProvider";
 import { CookieConsent } from "@/components/layout/CookieConsent";
-import Script from "next/script";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const scotchDisplay = localFont({
   variable: "--font-heading",
-  display: "optional",
+  // Serif só de display (momentos grandes): swap para aparecer quando usada;
+  // sem preload por não ser a fonte primária.
+  display: "swap",
   preload: false,
   src: [
     { path: "../public/fonts/scotch-display/ScotchDisplay-SemiBold.ttf", weight: "600", style: "normal" },
@@ -23,8 +26,11 @@ const scotchDisplay = localFont({
 
 const sfUIText = localFont({
   variable: "--font-sans",
-  display: "optional",
-  preload: false,
+  // SF Pro (a fonte "Apple") é a fonte primária de toda a UI: swap + preload
+  // para carregar já e SEMPRE aparecer. Com "optional" o browser só a usava
+  // se estivesse em cache, senão ficava o fallback feio do sistema para sempre.
+  display: "swap",
+  preload: true,
   src: [
     { path: "../public/fonts/sf-ui-text/SFUIText-Light.woff2", weight: "300", style: "normal" },
     { path: "../public/fonts/sf-ui-text/SFUIText-LightItalic.woff2", weight: "300", style: "italic" },
@@ -130,17 +136,12 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Tema: claro por defeito, escuro persistido — script inline CRU (não
-            next/script: beforeInteractive não garante execução antes do 1.º
-            paint no App Router, o que causava flash branco em dark mode). */}
-        <Script
-          id="theme-script"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html:
-              "(function(){try{var d=localStorage.getItem('theme')==='dark';if(d)document.documentElement.classList.add('dark');var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',d?'#100f0d':'#fafaf7')}catch(e){}})()",
-          }}
-        />
+        {/* Tema anti-FOUC: ficheiro externo render-blocking (public/theme-init.js).
+            Corre síncrono antes do body → sem flash; externo (src) em vez de
+            inline → sem o warning do React 19 sobre scripts como filhos.
+            O bloqueio síncrono é DELIBERADO (evitar FOUC), daí o disable. */}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script src="/theme-init.js" />
       </head>
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground">
         <NextIntlClientProvider messages={messages}>
@@ -149,6 +150,10 @@ export default async function RootLayout({
           </PaddleProvider>
           <CookieConsent />
         </NextIntlClientProvider>
+        <PulseTracker />
+        {/* GA só em produção — em dev tenta enviar para o GA e falha com
+            erros de rede na consola (o Pulse é o analytics de dev). */}
+        {process.env.NODE_ENV === "production" && <GoogleAnalytics gaId="G-F89FT4052G" />}
       </body>
     </html>
   );

@@ -18,10 +18,13 @@ export function PaddleProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let isMounted = true;
-    let timeoutId: ReturnType<typeof setTimeout>;
 
     if (!process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN) {
-      console.warn("Paddle client token is missing!");
+      // Em dev o token pode não existir (esperado) — só avisar em produção,
+      // onde faltar o token é de facto um problema.
+      if (process.env.NODE_ENV === "production") {
+        console.warn("Paddle client token is missing!");
+      }
       return;
     }
 
@@ -37,7 +40,7 @@ export function PaddleProvider({ children }: { children: ReactNode }) {
     };
 
     // Atrasar 4 segundos para garantir que FCP/LCP não sofrem concorrência de rede/CPU
-    timeoutId = setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       if ("requestIdleCallback" in window) {
         requestIdleCallback(() => init());
       } else {

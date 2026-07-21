@@ -40,7 +40,7 @@ export function TeamMemberModal({ member }: { member: TeamMember }) {
           {/* Placeholder/Photo for Photo (Small) */}
           <div className="w-24 h-24 rounded-full bg-secondary flex items-center justify-center border-4 border-background shadow-sm mx-auto relative z-10 overflow-hidden">
             {member.image ? (
-              <Image src={member.image} alt={member.name} fill className="object-cover" />
+              <Image src={member.image} alt={member.name} fill sizes="96px" className="object-cover" />
             ) : (
               <span className="text-2xl font-heading text-muted-foreground">{member.initials}</span>
             )}
@@ -75,7 +75,7 @@ export function TeamMemberModal({ member }: { member: TeamMember }) {
              
              <div className="w-48 h-48 sm:w-64 sm:h-64 rounded-full bg-background flex items-center justify-center border-[12px] border-secondary shadow-2xl relative z-10 overflow-hidden">
                {member.image ? (
-                 <Image src={member.image} alt={member.name} fill className="object-cover" />
+                 <Image src={member.image} alt={member.name} fill sizes="(min-width: 640px) 256px, 192px" className="object-cover" />
                ) : (
                  <span className="text-6xl sm:text-7xl font-heading text-muted-foreground/30">{member.initials}</span>
                )}

@@ -30,7 +30,102 @@
       "priceLabel": "avec le plan gratuit"
     },
     "ctaTitle": "Commencez à voir la valeur que les autres ne voient pas.",
-    "ctaSubtitle": "Créez votre compte gratuit et analysez toute entreprise du S&P 500 en quelques secondes."
+    "ctaSubtitle": "Créez votre compte gratuit et analysez toute entreprise du S&P 500 en quelques secondes.",
+    "ticker": {
+      "label": "Clôtures de la veille — S&P 500"
+    },
+    "showcase": {
+      "caption": "Dix ans de fondamentaux, DCF et AI Brief — dans un seul terminal, sans tableurs.",
+      "alt": "Démonstration du terminal Bull Metrics",
+      "caption2": "Prix en direct, watchlist et calendrier des résultats — à un ⌘K.",
+      "caption3": "Gratuit, et prêt en moins d'une minute."
+    },
+    "manifesto": {
+      "l1": "Investir, ce n'est pas deviner.",
+      "l2": "C'est comparer le prix à la valeur.",
+      "l3": "Le prix, vous le voyez tous les jours.",
+      "l4": "La valeur se cache dans les fondamentaux.",
+      "l5": "Nous vous montrons la valeur."
+    },
+    "stories": {
+      "fundamentals": {
+        "eyebrow": "Fondamentaux",
+        "title": "Dix ans d'histoire,",
+        "titleAccent": "en un coup d'œil.",
+        "desc": "Chiffre d'affaires, marges, ROIC, free cash flow et rachats d'actions — 40 trimestres issus de SEC EDGAR, conçus pour être lus en quelques secondes.",
+        "b1": "9 graphiques essentiels par entreprise, avec CAGR automatique",
+        "b2": "Trimestriel, TTM ou annuel — vous choisissez la focale",
+        "b3": "Données officielles de la SEC, mises à jour chaque semaine",
+        "chartAria": "Graphique d'exemple : chiffre d'affaires annuel en barres et free cash flow en ligne, en croissance sur dix ans",
+        "legendRevenue": "Chiffre d'affaires",
+        "legendFcf": "FCF"
+      },
+      "dcf": {
+        "eyebrow": "Valorisation",
+        "title": "Combien ça vaut",
+        "titleAccent": "vraiment ?",
+        "desc": "La calculatrice DCF se préremplit avec les données de l'entreprise et recalcule en temps réel pendant que vous ajustez la croissance, le WACC et la valeur terminale.",
+        "b1": "Préremplie avec les fondamentaux réels de l'entreprise",
+        "b2": "Une marge de sécurité claire — au-dessus ou en dessous du prix",
+        "b3": "Enregistrez des scénarios et revenez-y quand vous voulez",
+        "growth": "Croissance annuelle (années 1–5)",
+        "wacc": "WACC",
+        "terminal": "Croissance terminale",
+        "price": "Prix actuel",
+        "fairValue": "Fair Value",
+        "perShare": "par action",
+        "margin": "Marge de sécurité",
+        "undervalued": "Sous-évaluée",
+        "overvalued": "Surévaluée",
+        "disclaimer": "Exemple illustratif avec une entreprise fictive. Un DCF dépend de vos hypothèses — ce n'est pas un conseil en investissement."
+      },
+      "ai": {
+        "eyebrow": "AI Insights",
+        "title": "L'histoire derrière",
+        "titleAccent": "les chiffres.",
+        "desc": "L'AI Brief résume les développements récents de chaque entreprise et les classe par sentiment — lisez l'essentiel en une minute.",
+        "b1": "Résumé exécutif, catalyseurs et risques",
+        "b2": "En langage clair, sans jargon",
+        "b3": "Toujours signalé : jamais un conseil en investissement",
+        "cardTitle": "AI Brief · Entreprise exemple",
+        "summary": "Trimestre solide : chiffre d'affaires au-dessus des attentes, marges en expansion et programme de rachats renforcé. La direction a relevé ses prévisions pour le reste de l'année.",
+        "catalystsLabel": "Catalyseurs",
+        "catalyst1": "Prévisions relevées",
+        "catalyst2": "Programme de rachats",
+        "riskLabel": "Risques",
+        "risk1": "Concentration des clients",
+        "disclaimer": "Généré par IA à partir d'actualités récentes. Jamais un conseil en investissement."
+      }
+    },
+    "tour": {
+      "alt": "Un tour des fonctionnalités de Bull Metrics"
+    },
+    "bento": {
+      "title": "Tout dans un seul terminal.",
+      "subtitle": "Watchlist, calendrier des résultats, listes sélectionnées et recherche instantanée — sans jongler entre les onglets.",
+      "portfolio": {
+        "title": "Portefeuille & watchlist",
+        "desc": "Suivez vos entreprises avec prix et variation quotidienne."
+      },
+      "calendar": {
+        "title": "Calendrier des résultats",
+        "desc": "Estimations, beat/miss et les dates qui comptent."
+      },
+      "screener": {
+        "title": "Listes sélectionnées",
+        "desc": "Growth, Dividend Growth, Buyback Machines et plus."
+      },
+      "search": {
+        "title": "Recherche instantanée",
+        "desc": "Toute entreprise du S&P 500 à un ⌘K de distance."
+      }
+    },
+    "numbers": {
+      "years": "ans de fondamentaux",
+      "companies": "entreprises du S&P 500",
+      "quarters": "trimestres de données",
+      "free": "avec le plan gratuit"
+    }
   },
   "insider": {
     "title": "Délit d'initié (Insider Trading)",

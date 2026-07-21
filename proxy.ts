@@ -20,7 +20,13 @@ export async function proxy(request: NextRequest) {
   // auth (login/registo/reset) levam um bucket próprio contra brute-force.
   if (pathname.startsWith('/api/') || isAuthRoute) {
     const ip = getClientIp(request)
-    const bucket = isAuthRoute ? 'auth' : pathname.startsWith('/api/search') ? 'search' : 'api'
+    const bucket = isAuthRoute
+      ? 'auth'
+      : pathname.startsWith('/api/search')
+        ? 'search'
+        : pathname.startsWith('/api/track')
+          ? 'track'
+          : 'api'
     const result = await checkRateLimit(ip, bucket)
 
     if (!result.success) {

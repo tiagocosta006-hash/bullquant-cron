@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { formatPrice, formatPercent } from "@/lib/finance/format"
+import { successPulse } from "@/lib/motion"
+import { track } from "@/lib/pulse/client"
 import { cn } from "@/lib/utils"
 import { ShareDcfModal } from "./ShareDcfModal"
 
@@ -51,6 +53,7 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
   const [label, setLabel] = React.useState("")
   const [notes, setNotes] = React.useState("")
   const [error, setError] = React.useState<string | null>(null)
+  const saveBtnRef = React.useRef<HTMLButtonElement>(null)
   const [copiedId, setCopiedId] = React.useState<string | null>(null)
 
   const fetchAnalyses = React.useCallback(async () => {
@@ -104,6 +107,8 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
       }
       setLabel("")
       setNotes("")
+      successPulse(saveBtnRef.current)
+      track("dcf_saved", { ticker })
       await fetchAnalyses()
     } catch {
       setError(t("saved.saveError"))
@@ -185,7 +190,7 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
             maxLength={60}
             className="h-9 bg-input/30 border-input/30 text-sm"
           />
-          <Button onClick={handleSave} disabled={!canSave || isSaving} size="sm" className="shrink-0 h-9">
+          <Button ref={saveBtnRef} onClick={handleSave} disabled={!canSave || isSaving} size="sm" className="shrink-0 h-9">
             {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bookmark className="h-4 w-4" />}
             <span className="ml-1.5">{t("saved.saveButton")}</span>
           </Button>

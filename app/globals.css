@@ -103,7 +103,16 @@
   --market-down-dark: #ff5a4d;
 
   --radius: 0.75rem;
+
+  /* Motion — escala única de durações/easings (ver lib/motion.ts) */
   --spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-instant: 120ms; /* press feedback */
+  --dur-fast: 200ms;    /* hover, cor */
+  --dur-base: 320ms;    /* lift, crossfades */
+  --dur-slow: 600ms;    /* success moments */
+  --dur-reveal: 900ms;  /* reveals de scroll */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 /* ── Layer 2 · SEMANTIC (light — default) ─────────────────── */
@@ -250,12 +259,164 @@
 .reveal {
   opacity: 0;
   transform: translateY(44px);
-  transition: opacity 0.9s var(--spring), transform 0.9s var(--spring);
-  will-change: opacity, transform;
+  filter: blur(10px);
+  transition:
+    opacity var(--dur-reveal) var(--spring),
+    transform var(--dur-reveal) var(--spring),
+    filter var(--dur-reveal) var(--spring);
+  will-change: opacity, transform, filter;
 }
 .reveal.in {
   opacity: 1;
   transform: none;
+  /* sem isto o filter fica preso em blur(10px) para sempre: uma transição
+     CSS só anima uma propriedade se o valor final for diferente, e sem
+     este reset o valor final nunca é definido — bug real, reproduzido
+     nas stories (texto e gráfico ficavam permanentemente desfocados). */
+  filter: none;
+}
+
+/* ── Micro-interações (emotional design) ──────────────────────
+   Feedback tátil premium, discreto: press/hover/success/crossfade.
+   CSS puro — GSAP fica reservado a scrub e contagem de números. */
+@layer components {
+  /* Botões/CTAs: afunda ao pressionar, levita ligeiro em hover */
+  .pressable {
+    transition:
+      transform var(--dur-instant) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out);
+  }
+  .pressable:hover {
+    transform: translateY(-1px);
+  }
+  .pressable:active {
+    transform: scale(0.97);
+  }
+
+  /* Cards: lift + borda a acender para o dourado */
+  .card-lift {
+    transition:
+      transform var(--dur-base) var(--spring),
+      box-shadow var(--dur-base) var(--spring),
+      border-color var(--dur-base) var(--ease-out);
+  }
+  .card-lift:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      inset 0 -10px 26px rgba(0, 0, 0, 0.05),
+      0 30px 70px rgba(40, 30, 10, 0.18);
+  }
+  .dark .card-lift:hover {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -10px 26px rgba(0, 0, 0, 0.28),
+      0 30px 70px rgba(0, 0, 0, 0.6);
+  }
+
+  /* Crossfade bull↔bear: --mos-t interpola 0 (bear) → 1 (bull);
+     filhos leem var(--mos-ink) em vez de trocar classes bg-bull/bg-bear.
+     Sem @property (Safari antigo) a cor continua certa, só sem tween. */
+  .mos-color {
+    --mos-ink: color-mix(
+      in oklab,
+      var(--bear) calc((1 - var(--mos-t, 1)) * 100%),
+      var(--bull) calc(var(--mos-t, 1) * 100%)
+    );
+    transition: --mos-t var(--dur-base) var(--ease-out);
+  }
+
+  /* Momento de sucesso (Revolut-discreto): micro-pop + bloom dourado.
+     One-shot; aplicar via successPulse() de lib/motion.ts. */
+  .success-pop {
+    animation: success-pop var(--dur-slow) var(--spring);
+  }
+}
+
+@property --mos-t {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+
+/* Landing: ponto "ao vivo" no fim da sparkline do TerminalMock — o único
+   loop ambiente permitido, muito ténue. */
+@keyframes live-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(1.5);
+  }
+}
+.live-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: live-dot 2s var(--ease-in-out) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .live-dot {
+    animation: none;
+  }
+}
+
+/* Bento (landing): o dia de earnings respira dourado permanentemente —
+   ciclo lento (3.2s = respiração, não piscar); acelera em hover. */
+@keyframes bento-day {
+  0%,
+  100% {
+    background-color: color-mix(in srgb, var(--primary) 20%, transparent);
+  }
+  50% {
+    background-color: color-mix(in srgb, var(--primary) 42%, transparent);
+  }
+}
+.bento-day-pulse {
+  animation: bento-day 3.2s var(--ease-in-out) infinite;
+}
+.group:hover .bento-day-pulse {
+  animation-duration: 1.6s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bento-day-pulse {
+    animation: none;
+  }
+}
+
+@keyframes success-pop {
+  0% {
+    transform: scale(0.96);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 35%, transparent);
+  }
+  45% {
+    transform: scale(1.02);
+    box-shadow: 0 0 24px 2px color-mix(in srgb, var(--primary) 25%, transparent);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pressable,
+  .pressable:hover,
+  .pressable:active,
+  .card-lift,
+  .card-lift:hover {
+    transition: none;
+    transform: none;
+  }
+  .mos-color {
+    transition: none;
+  }
+  .success-pop {
+    animation: none;
+  }
 }
 
 /* ── Liquid Glass (material iOS 26) — o material DEFAULT da app ──
@@ -371,6 +532,104 @@
   }
 }
 
+/* ── Landing: intro do hero (time-based, sem scroll) ──────────
+   Stagger por elemento via --hero-delay inline. `both` mantém o
+   estado inicial durante o delay e o final depois. */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+.hero-in {
+  animation: hero-rise 0.85s var(--spring) both;
+  animation-delay: var(--hero-delay, 0s);
+}
+
+/* ── Landing: ticker marquee (ambient motion do hero) ─────────
+   A track contém a lista DUAS vezes; -50% dá um loop perfeito.
+   Bordas desvanecem com mask; hover pausa para leitura. */
+@keyframes marquee-x {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+}
+.marquee-track {
+  width: max-content;
+  animation: marquee-x var(--marquee-duration, 52s) linear infinite;
+  will-change: transform;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-in {
+    animation: none;
+  }
+  .marquee-track {
+    animation: none;
+  }
+}
+
+/* ── Landing: motivos de fundo por secção ─────────────────────
+   Padrões estáticos, muito ténues, derivados de --foreground (logo
+   theme-aware: linhas escuras em light, claras em dark). SEM glows.
+   Usados por components/marketing/SectionBg.tsx sobre bandas tonais. */
+@layer components {
+  /* papel-milimétrico (tema "dados/fundamentais") */
+  .motif-grid {
+    background-image:
+      linear-gradient(
+        to right,
+        color-mix(in srgb, var(--foreground) 6%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--foreground) 6%, transparent) 1px,
+        transparent 1px
+      );
+    background-size: 64px 64px;
+  }
+  /* matriz de pontos (tema "IA") */
+  .motif-dots {
+    background-image: radial-gradient(
+      color-mix(in srgb, var(--foreground) 10%, transparent) 1.2px,
+      transparent 1.4px
+    );
+    background-size: 26px 26px;
+  }
+  /* anéis concêntricos off-center (tema "valuation/alvo") */
+  .motif-rings {
+    background-image: repeating-radial-gradient(
+      circle at 72% 38%,
+      transparent 0 68px,
+      color-mix(in srgb, var(--foreground) 5%, transparent) 68px 70px
+    );
+  }
+  /* palco: leve profundidade vertical (topo/fundo mais fundos), sem cor */
+  .motif-stage {
+    background-image: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--foreground) 4%, transparent),
+      transparent 42%,
+      color-mix(in srgb, var(--foreground) 5%, transparent)
+    );
+  }
+}
+
 /* Slider da calculadora DCF (range nativo estilizado) */
 .dcf-slider {
   -webkit-appearance: none;
@@ -418,6 +677,446 @@
   .dcf-slider::-moz-range-thumb {
     width: 26px;
     height: 26px;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   Landing r4 — vida ambiente. Uma única linguagem: luz dourada
+   matte que se DESENHA, VARRE e RESPIRA. Ciclos lentos (7-20s),
+   nunca piscar. Tudo CSS (GSAP só nos scrubs dos componentes).
+   ════════════════════════════════════════════════════════════ */
+
+/* Hero: headline entra palavra a palavra de trás de uma clip-line */
+.hero-clip {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  /* protege descendentes (g, ç, j) e o itálico da Scotch do corte */
+  padding-bottom: 0.09em;
+  margin-bottom: -0.09em;
+  padding-inline-end: 0.28ch;
+}
+.hero-word {
+  display: inline-block;
+  transform: translateY(112%);
+  animation: hero-word-up 0.7s var(--spring) both;
+  animation-delay: calc(0.08s + var(--w, 0) * 0.05s);
+}
+@keyframes hero-word-up {
+  to {
+    transform: none;
+  }
+}
+
+/* Sheen especular: luz quente varre o texto dourado (82% do ciclo em
+   repouso). Só onde background-clip:text existe — senão fica o sólido. */
+@keyframes sheen-x {
+  0%,
+  82% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+@supports (-webkit-background-clip: text) {
+  .gold-sheen-text {
+    background-image: linear-gradient(
+      105deg,
+      var(--primary) 44%,
+      color-mix(in srgb, var(--primary) 55%, #fff) 50%,
+      var(--primary) 56%
+    );
+    background-size: 280% 100%;
+    background-position: 200% 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    padding-right: 0.06em; /* itálico Scotch não corta no clip */
+    animation: sheen-x 9s linear infinite;
+    /* cascata palavra-a-palavra quando usado com --w (heroWords) */
+    animation-delay: calc(var(--w, 0) * 0.12s);
+  }
+}
+
+/* CTA primário: banda especular atravessa o botão a cada ~8s */
+.cta-sheen {
+  position: relative;
+  overflow: hidden;
+}
+.cta-sheen::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 36%;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent, rgb(255 255 255 / 0.2), transparent);
+  transform: translateX(-140%) skewX(-18deg);
+  animation: cta-sheen-x 8s var(--ease-in-out) 1.8s infinite;
+}
+@keyframes cta-sheen-x {
+  0% {
+    transform: translateX(-140%) skewX(-18deg);
+  }
+  11%,
+  100% {
+    transform: translateX(420%) skewX(-18deg);
+  }
+}
+
+/* Hero: aurora dourada — duas manchas radiais enormes a derivar */
+.hero-aurora {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.hero-aurora::before,
+.hero-aurora::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--primary) 7%, transparent),
+    transparent 70%
+  );
+  will-change: transform;
+}
+.hero-aurora::before {
+  top: -22vw;
+  right: -14vw;
+  width: 60vw;
+  height: 60vw;
+  animation: aurora-a 16s var(--ease-in-out) infinite alternate;
+}
+.hero-aurora::after {
+  bottom: -28vw;
+  left: -16vw;
+  width: 46vw;
+  height: 46vw;
+  animation: aurora-b 20s var(--ease-in-out) infinite alternate;
+}
+.dark .hero-aurora::before,
+.dark .hero-aurora::after {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--primary) 11%, transparent),
+    transparent 70%
+  );
+}
+@keyframes aurora-a {
+  to {
+    transform: translate3d(-6vw, 4vw, 0) scale(1.12);
+  }
+}
+@keyframes aurora-b {
+  to {
+    transform: translate3d(5vw, -3vw, 0) scale(1.08);
+  }
+}
+
+/* Hero: linha de preço "Gold Horizon" desenha-se atrás da tipografia.
+   pathLength=1 → animável em CSS puro, sem medir o path (SSR-safe). */
+.hero-horizon-line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: horizon-draw 1.6s var(--ease-out) 0.5s both;
+}
+.hero-horizon-fill {
+  opacity: 0;
+  animation: horizon-fill 1s var(--ease-out) 1.5s both;
+}
+@keyframes horizon-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes horizon-fill {
+  to {
+    opacity: 0.07;
+  }
+}
+
+/* Marquee em modo "fita de terminal": mask com margens fixas */
+.marquee-band {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    black 48px,
+    black calc(100% - 48px),
+    transparent
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    black 48px,
+    black calc(100% - 48px),
+    transparent
+  );
+}
+
+/* Moldura do showcase: um traço de luz circula o perímetro (anel de 1px
+   via mask-composite; a camada cónica gira só por transform). */
+.beam-ring {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  overflow: hidden;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+.beam-ring::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 240%;
+  aspect-ratio: 1;
+  margin: -120% 0 0 -120%;
+  background: conic-gradient(
+    transparent 0 335deg,
+    color-mix(in srgb, var(--primary) 80%, #fff) 352deg,
+    transparent 360deg
+  );
+  animation: beam-spin 7s linear infinite;
+}
+@keyframes beam-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* Manifesto: colunas da parede de tickers derivam verticalmente
+   (loop -50% com conteúdo duplicado, como o marquee) */
+@keyframes wall-drift {
+  to {
+    transform: translateY(-50%);
+  }
+}
+.wall-col {
+  animation: wall-drift var(--wall-dur, 70s) linear infinite;
+  will-change: transform;
+}
+.wall-col:nth-child(even) {
+  animation-direction: reverse;
+}
+
+/* Stories: hairline de capítulo desenha-se quando o Reveal entra */
+.chapter-rule {
+  background: linear-gradient(90deg, var(--primary), transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-reveal) var(--spring) 150ms;
+}
+.reveal.in .chapter-rule {
+  transform: scaleX(1);
+}
+
+/* Manifesto: sweep dourado one-shot quando a linha accent assenta */
+@supports (-webkit-background-clip: text) {
+  .manifesto-sheen {
+    background-image: linear-gradient(
+      105deg,
+      var(--primary) 42%,
+      color-mix(in srgb, var(--primary) 55%, #fff) 50%,
+      var(--primary) 58%
+    );
+    background-size: 260% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: manifesto-sheen-x 1.2s var(--ease-in-out) 0.15s both;
+  }
+}
+@keyframes manifesto-sheen-x {
+  from {
+    background-position: 130% 0;
+  }
+  to {
+    background-position: -30% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .manifesto-sheen {
+    animation: none;
+    background: none;
+    color: var(--primary);
+  }
+}
+
+/* Fundo persistente por secção (SectionBackdrop): layers fixas que
+   cruzam-fade quando a secção ativa muda; a ativa deriva lentíssimo. */
+.backdrop-layer {
+  opacity: 0;
+  transition: opacity 800ms var(--ease-in-out);
+  background-size: 64px 64px; /* herdado pelos motifs que o usam */
+}
+.backdrop-layer.motif-dots {
+  background-size: 26px 26px;
+}
+.backdrop-layer.motif-rings,
+.backdrop-layer.motif-stage {
+  background-size: auto;
+}
+.backdrop-layer[data-active] {
+  opacity: 1;
+  animation: backdrop-drift 40s linear infinite;
+}
+@keyframes backdrop-drift {
+  to {
+    background-position: 64px 64px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .backdrop-layer {
+    transition: none;
+    animation: none !important;
+  }
+}
+
+/* Reveal variante zoom: entra de ligeiramente maior + blur */
+.reveal[data-reveal="zoom"] {
+  transform: translateY(28px) scale(1.06);
+}
+.reveal[data-reveal="zoom"].in {
+  transform: none;
+}
+
+/* Bento: ⌘K "pressiona-se" sozinho a cada 7s */
+@keyframes kbd-tap {
+  0%,
+  92%,
+  100% {
+    transform: scale(1);
+  }
+  95% {
+    transform: scale(0.94);
+  }
+}
+.kbd-tap {
+  animation: kbd-tap 7s var(--ease-out) infinite;
+}
+
+/* CTA flutuante: entra/sai com slide+fade; escondida por defeito */
+.floating-cta {
+  opacity: 0;
+  transform: translateY(16px);
+  pointer-events: none;
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--spring);
+}
+.floating-cta.floating-cta-in {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+/* Hero: anel de glow pulsante no CTA primário (muito subtil, 7s) */
+@keyframes cta-glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 0%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 26px 2px color-mix(in srgb, var(--primary) 28%, transparent);
+  }
+}
+.cta-glow {
+  animation: cta-glow-pulse 7s var(--ease-in-out) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floating-cta {
+    transition: none;
+  }
+  .cta-glow {
+    animation: none;
+  }
+}
+
+/* FAQ: accordions <details> — chevron roda; marker nativo escondido */
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+.faq-item summary {
+  list-style: none;
+}
+.faq-chevron {
+  transition: transform var(--dur-base) var(--spring);
+}
+.faq-item[open] .faq-chevron {
+  transform: rotate(180deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .faq-chevron {
+    transition: none;
+  }
+}
+
+/* Fecho: logo respira; hairline dourada com varrimento de luz */
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
+.breathe {
+  animation: breathe 8s var(--ease-in-out) infinite;
+  will-change: transform;
+}
+.gold-rule-live {
+  background-size: 220% 100%;
+  animation: sheen-x 8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-word {
+    transform: none;
+    animation: none;
+  }
+  .gold-sheen-text {
+    animation: none;
+    background: none;
+    color: var(--primary);
+  }
+  .cta-sheen::after,
+  .hero-aurora::before,
+  .hero-aurora::after,
+  .beam-ring::before,
+  .wall-col,
+  .kbd-tap,
+  .breathe,
+  .gold-rule-live {
+    animation: none;
+  }
+  .beam-ring {
+    display: none;
+  }
+  .hero-horizon-line,
+  .hero-horizon-fill {
+    animation: none;
+  }
+  .hero-horizon-line {
+    stroke-dashoffset: 0;
+  }
+  .hero-horizon-fill {
+    opacity: 0.07;
+  }
+  .chapter-rule {
+    transform: none;
+    transition: none;
   }
 }
 

@@ -30,7 +30,102 @@
       "priceLabel": "im Gratis-Plan"
     },
     "ctaTitle": "Sieh den Wert, den andere übersehen.",
-    "ctaSubtitle": "Erstelle dein kostenloses Konto und analysiere jedes S&P-500-Unternehmen in Sekunden."
+    "ctaSubtitle": "Erstelle dein kostenloses Konto und analysiere jedes S&P-500-Unternehmen in Sekunden.",
+    "ticker": {
+      "label": "Schlusskurse vom Vortag — S&P 500"
+    },
+    "showcase": {
+      "caption": "Zehn Jahre Fundamentaldaten, DCF und AI Brief — in einem Terminal, ohne Tabellenkalkulationen.",
+      "alt": "Demo des Bull-Metrics-Terminals",
+      "caption2": "Live-Kurse, Watchlist und Earnings-Kalender — alles ein ⌘K entfernt.",
+      "caption3": "Gratis, und in unter einer Minute startklar."
+    },
+    "manifesto": {
+      "l1": "Investieren ist kein Raten.",
+      "l2": "Es heißt, Preis mit Wert zu vergleichen.",
+      "l3": "Den Preis siehst du jeden Tag.",
+      "l4": "Der Wert versteckt sich in den Fundamentaldaten.",
+      "l5": "Wir zeigen dir den Wert."
+    },
+    "stories": {
+      "fundamentals": {
+        "eyebrow": "Fundamentaldaten",
+        "title": "Zehn Jahre Geschichte,",
+        "titleAccent": "auf einen Blick.",
+        "desc": "Umsatz, Margen, ROIC, Free Cash Flow und Aktienrückkäufe — 40 Quartale aus SEC EDGAR, gestaltet, um in Sekunden gelesen zu werden.",
+        "b1": "9 essenzielle Charts pro Unternehmen, mit automatischem CAGR",
+        "b2": "Quartalsweise, TTM oder jährlich — du wählst die Linse",
+        "b3": "Offizielle SEC-Daten, jede Woche aktualisiert",
+        "chartAria": "Beispieldiagramm: Jahresumsatz als Balken und Free Cash Flow als Linie, wachsend über zehn Jahre",
+        "legendRevenue": "Umsatz",
+        "legendFcf": "FCF"
+      },
+      "dcf": {
+        "eyebrow": "Bewertung",
+        "title": "Was ist es",
+        "titleAccent": "wirklich wert?",
+        "desc": "Der DCF-Rechner füllt sich automatisch mit Unternehmensdaten und rechnet in Echtzeit neu, während du Wachstum, WACC und Terminal Value anpasst.",
+        "b1": "Automatisch befüllt mit den echten Fundamentaldaten",
+        "b2": "Eine klare Sicherheitsmarge — über oder unter dem Preis",
+        "b3": "Szenarien speichern und jederzeit zurückkehren",
+        "growth": "Jährliches Wachstum (Jahre 1–5)",
+        "wacc": "WACC",
+        "terminal": "Terminales Wachstum",
+        "price": "Aktueller Kurs",
+        "fairValue": "Fair Value",
+        "perShare": "pro Aktie",
+        "margin": "Sicherheitsmarge",
+        "undervalued": "Unterbewertet",
+        "overvalued": "Überbewertet",
+        "disclaimer": "Illustratives Beispiel mit einem fiktiven Unternehmen. Ein DCF hängt von deinen Annahmen ab — keine Anlageberatung."
+      },
+      "ai": {
+        "eyebrow": "AI Insights",
+        "title": "Die Geschichte hinter",
+        "titleAccent": "den Zahlen.",
+        "desc": "Das AI Brief fasst die jüngsten Entwicklungen jedes Unternehmens zusammen und klassifiziert sie nach Sentiment — lies in einer Minute, was zählt.",
+        "b1": "Executive Summary, Katalysatoren und Risiken",
+        "b2": "In klarer Sprache, ohne Jargon",
+        "b3": "Immer gekennzeichnet: niemals Anlageberatung",
+        "cardTitle": "AI Brief · Beispielunternehmen",
+        "summary": "Solides Quartal: Umsatz über den Erwartungen, wachsende Margen und verstärktes Rückkaufprogramm. Das Management hat die Prognose für den Rest des Jahres angehoben.",
+        "catalystsLabel": "Katalysatoren",
+        "catalyst1": "Prognose angehoben",
+        "catalyst2": "Rückkaufprogramm",
+        "riskLabel": "Risiken",
+        "risk1": "Kundenkonzentration",
+        "disclaimer": "KI-generiert aus aktuellen Nachrichten. Niemals Anlageberatung."
+      }
+    },
+    "tour": {
+      "alt": "Eine Tour durch die Funktionen von Bull Metrics"
+    },
+    "bento": {
+      "title": "Alles in einem Terminal.",
+      "subtitle": "Watchlist, Earnings-Kalender, kuratierte Listen und Sofortsuche — ohne Tab-Jonglieren.",
+      "portfolio": {
+        "title": "Portfolio & Watchlist",
+        "desc": "Verfolge deine Unternehmen mit Kursen und Tagesveränderung."
+      },
+      "calendar": {
+        "title": "Earnings-Kalender",
+        "desc": "Schätzungen, Beat/Miss und die Termine, die zählen."
+      },
+      "screener": {
+        "title": "Kuratierte Listen",
+        "desc": "Growth, Dividend Growth, Buyback Machines und mehr."
+      },
+      "search": {
+        "title": "Sofortsuche",
+        "desc": "Jedes S&P-500-Unternehmen nur ein ⌘K entfernt."
+      }
+    },
+    "numbers": {
+      "years": "Jahre Fundamentaldaten",
+      "companies": "S&P-500-Unternehmen",
+      "quarters": "Quartale an Daten",
+      "free": "im Gratis-Plan"
+    }
   },
   "insider": {
     "title": "Insiderhandel",

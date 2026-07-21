@@ -5,6 +5,7 @@ import { Logo } from '@/components/brand/Logo';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { getUser } from '@/lib/supabase/server';
+import { cn } from '@/lib/utils';
 import { logout } from '@/app/(auth)/actions';
 import { getTranslations } from 'next-intl/server';
 
@@ -73,8 +74,12 @@ export async function Header() {
                 <Link href="/login" className={buttonVariants({ variant: "ghost" })}>
                   {t('login')}
                 </Link>
-                <Link href="/register" className={buttonVariants()}>
-                  {t('register')}
+                <Link
+                  href="/register"
+                  data-track="header_register"
+                  className={cn(buttonVariants(), "pressable cta-sheen font-semibold")}
+                >
+                  {t('startFree')}
                 </Link>
               </div>
             )}

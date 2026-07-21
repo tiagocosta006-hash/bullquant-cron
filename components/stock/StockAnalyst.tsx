@@ -14,6 +14,7 @@ import {
   Loader2,
   Lock,
   RefreshCw,
+  ArrowUpRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +29,7 @@ import {
 import { DecisionChart } from "./DecisionChart";
 import { LiquidGlass } from "@/components/fx/LiquidGlass";
 import { buildTextFragmentUrl } from "@/lib/finance/textFragment";
+import { cn } from "@/lib/utils";
 
 // ── Tipos do relatório (espelham o schema Zod da rota) ───────────────
 type Moat = { rating: "WIDE" | "NARROW" | "NONE"; text: string; quote: string | null };
@@ -46,6 +48,7 @@ type Report = {
 
 type FundamentalRow = {
   fiscalYear?: number;
+  revenue?: number | string | null;
   revenueSegments?: Record<string, number> | null;
 };
 
@@ -166,6 +169,29 @@ export function StockAnalyst({
     });
     if (keySet.size === 0) return null;
 
+    // Guard anti-duplicação: alguns emitentes reportam segmentos HIERÁRQUICOS
+    // e sobrepostos (ex.: Google — "Google Services" ⊃ "Google advertising" ⊃
+    // "YouTube ads"). Somados num stack, duplicam/triplicam a receita e o
+    // gráfico rebenta (barras a bater no topo do eixo). Se a soma dos segmentos
+    // exceder materialmente a receita real na maioria dos anos com dados,
+    // escondemos o gráfico — a correção de raiz é no segment map de ingestão,
+    // não aqui na apresentação.
+    const yearsWithSegs = annuals.filter(
+      (f) => f.revenueSegments && Object.keys(f.revenueSegments).length > 0,
+    );
+    const overlapYears = yearsWithSegs.filter((f) => {
+      const rev = Number(f.revenue);
+      if (!Number.isFinite(rev) || rev <= 0) return false;
+      const sum = Object.values(f.revenueSegments ?? {}).reduce(
+        (s, v) => s + (Number(v) || 0),
+        0,
+      );
+      return sum > rev * 1.1;
+    });
+    if (yearsWithSegs.length > 0 && overlapYears.length >= Math.ceil(yearsWithSegs.length / 2)) {
+      return null;
+    }
+
     let keys = Array.from(keySet);
     let folded: Set<string> | null = null;
     const MAX = SEGMENT_COLORS.length;
@@ -219,7 +245,14 @@ export function StockAnalyst({
   // ── Estados que não são "ready" ───────────────────────────────────
   if (status === "loading") {
     return (
-      <div className="mt-4 h-64 w-full animate-pulse rounded-2xl border border-border/40 bg-card" />
+      <div className="mt-4 space-y-6">
+        <div className="h-40 w-full animate-pulse rounded-3xl border border-border/40 bg-card" />
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-24 animate-pulse rounded-2xl border border-border/40 bg-card" />
+          ))}
+        </div>
+      </div>
     );
   }
 
@@ -231,8 +264,9 @@ export function StockAnalyst({
     status === "needs_auth"
   ) {
     return (
-      <div className="glass mt-4 flex flex-col items-center gap-6 rounded-2xl p-8 text-center md:p-12">
-        <div className="rounded-2xl border border-primary/15 bg-primary/10 p-4 text-primary">
+      <LiquidGlass className="relative mt-4 flex flex-col items-center gap-6 overflow-hidden rounded-3xl p-8 text-center md:p-14">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+        <div className="rounded-2xl border border-primary/15 bg-primary/10 p-4 text-primary shadow-lg shadow-primary/5">
           <BrainCircuit className="h-10 w-10" />
         </div>
         {status === "needs_auth" ? (
@@ -263,8 +297,14 @@ export function StockAnalyst({
           </div>
         ) : (
           <div className="max-w-2xl space-y-6">
-            <div>
-              <h3 className="mb-2 text-2xl font-bold tracking-tight">{t("generateTitle", { ticker })}</h3>
+            <div className="space-y-3">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-primary">
+                <BrainCircuit className="h-3.5 w-3.5" />
+                {t("badge")}
+              </span>
+              <h3 className="text-2xl font-bold tracking-tight md:text-3xl">
+                {t("generateTitle", { ticker })}
+              </h3>
               <p className="mx-auto max-w-lg text-muted-foreground">{t("generateDesc")}</p>
             </div>
             <Button
@@ -287,7 +327,7 @@ export function StockAnalyst({
             </Button>
           </div>
         )}
-      </div>
+      </LiquidGlass>
     );
   }
 
@@ -302,10 +342,10 @@ export function StockAnalyst({
         : "text-muted-foreground border-border bg-muted/50";
 
   return (
-    <div className="mt-4 space-y-8">
+    <div className="mt-4 space-y-10 duration-500 animate-in fade-in slide-in-from-bottom-2">
       {/* Cabeçalho + fonte */}
       <div className="flex flex-wrap items-center gap-3">
-        <h2 className="text-xl font-bold tracking-tight">{t("title")}</h2>
+        <h2 className="text-2xl font-bold tracking-tight">{t("title")}</h2>
         <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider text-primary">
           <BrainCircuit className="h-3.5 w-3.5" />
           {t("badge")}
@@ -315,7 +355,7 @@ export function StockAnalyst({
             href={secUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/40 px-2.5 py-0.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/40 px-2.5 py-0.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
           >
             <FileText className="h-3.5 w-3.5" />
             {t("source", { label: filingLabel })}
@@ -323,34 +363,49 @@ export function StockAnalyst({
         )}
       </div>
 
-      {/* Tese executiva */}
-      <LiquidGlass className="rounded-2xl p-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-          <p className="max-w-3xl text-base leading-relaxed text-foreground">
-            {report.executiveSummary}
-          </p>
-          <span
-            className={`inline-flex shrink-0 items-center gap-1.5 self-start rounded-lg border px-3 py-1.5 text-sm font-semibold ${moatColor}`}
+      {/* Herói da tese */}
+      <LiquidGlass className="relative overflow-hidden rounded-3xl p-6 md:p-8">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+        <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+          <div className="max-w-3xl space-y-3">
+            <Eyebrow>{t("thesisLabel")}</Eyebrow>
+            <p className="text-lg font-medium leading-relaxed text-foreground md:text-xl md:leading-relaxed">
+              {report.executiveSummary}
+            </p>
+          </div>
+          <div
+            className={cn(
+              "flex shrink-0 items-center gap-3 self-start rounded-2xl border px-4 py-3",
+              moatColor,
+            )}
           >
-            <ShieldCheck className="h-4 w-4" />
-            {t(`moatRatings.${report.moat.rating.toLowerCase()}`)}
-          </span>
+            <ShieldCheck className="h-6 w-6" />
+            <div className="leading-tight">
+              <div className="text-[10px] font-semibold uppercase tracking-wider opacity-70">
+                {t("moatLabel")}
+              </div>
+              <div className="text-sm font-bold">
+                {t(`moatRatings.${report.moat.rating.toLowerCase()}`)}
+              </div>
+            </div>
+          </div>
         </div>
       </LiquidGlass>
 
       {/* Modelo de negócio */}
-      <Section title={t("sections.businessModel")}>
-        <p className="text-sm leading-relaxed text-muted-foreground">{report.businessModel}</p>
-      </Section>
+      <EditorialSection eyebrow={t("sections.businessModel")} first>
+        <p className="max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
+          {report.businessModel}
+        </p>
+      </EditorialSection>
 
       {/* Mix de segmentos */}
       {segmentChart && (
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            {t("sections.segments")}
-          </h3>
+        <EditorialSection eyebrow={t("sections.segments")}>
           {report.segmentsSummary && (
-            <p className="text-sm leading-relaxed text-muted-foreground">{report.segmentsSummary}</p>
+            <p className="max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
+              {report.segmentsSummary}
+            </p>
           )}
           <DecisionChart
             currencySymbol={currencySymbol}
@@ -359,126 +414,89 @@ export function StockAnalyst({
             type="STACKED_BAR"
             config={{ isCurrency: true, dataKeys: segmentChart.dataKeys }}
           />
-        </div>
+        </EditorialSection>
       )}
 
       {/* KPIs operacionais (source-grounded) */}
       {report.operatingKpis.length > 0 && (
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            {t("sections.operatingKpis")}
-          </h3>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <EditorialSection eyebrow={t("sections.operatingKpis")}>
+          <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border/50 bg-border/50 sm:grid-cols-2 lg:grid-cols-4">
             {report.operatingKpis.map((kpi, i) => (
               <div
                 key={i}
-                className="glass group flex flex-col justify-between rounded-2xl p-4"
+                className="group flex flex-col justify-between gap-3 bg-card p-4 transition-colors hover:bg-card/60"
               >
-                <div className="mb-3 flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <h4
-                      className="line-clamp-2 text-sm font-medium text-muted-foreground"
-                      title={kpi.name}
-                    >
-                      {kpi.name}
-                    </h4>
-                    <p className="mt-1 font-mono text-2xl font-bold tracking-tight">{kpi.value}</p>
-                  </div>
+                <div className="flex items-start justify-between gap-2">
+                  <h4
+                    className="line-clamp-2 text-xs font-medium uppercase tracking-wide text-muted-foreground"
+                    title={kpi.name}
+                  >
+                    {kpi.name}
+                  </h4>
                   {kpi.quote && secUrl && (
-                    <button
-                      onClick={() => openSource(kpi.name, kpi.quote)}
-                      className="shrink-0 rounded-md bg-primary/10 p-1.5 text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-                      title={t("viewSource")}
-                    >
-                      <FileText className="h-4 w-4" />
-                    </button>
+                    <SourceButton onClick={() => openSource(kpi.name, kpi.quote)} label={t("viewSource")} />
                   )}
                 </div>
+                <p className="nums text-2xl font-bold tracking-tight text-foreground">{kpi.value}</p>
                 {kpi.insight && (
-                  <p className="border-l-2 border-primary/30 pl-2 text-xs leading-relaxed text-muted-foreground/90">
-                    {kpi.insight}
-                  </p>
+                  <p className="text-xs leading-relaxed text-muted-foreground/80">{kpi.insight}</p>
                 )}
               </div>
             ))}
           </div>
-        </div>
+        </EditorialSection>
       )}
 
       {/* Moat */}
-      <Section title={t("sections.moat")}>
-        <div className="flex items-start justify-between gap-3">
-          <p className="text-sm leading-relaxed text-muted-foreground">{report.moat.text}</p>
-          {report.moat.quote && secUrl && (
+      <EditorialSection eyebrow={t("sections.moat")}>
+        <p className="max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
+          {report.moat.text}
+        </p>
+        {report.moat.quote && secUrl && (
+          <blockquote className="relative mt-1 max-w-3xl overflow-hidden rounded-xl border border-border/60 bg-muted/30 p-4 pl-6">
+            <span className="pointer-events-none absolute left-2 top-0 font-serif text-5xl leading-none text-primary/20">
+              &ldquo;
+            </span>
+            <p className="relative text-sm italic leading-relaxed text-foreground/85">
+              {report.moat.quote}
+            </p>
             <button
               onClick={() => openSource(t("sections.moat"), report.moat.quote!)}
-              className="shrink-0 rounded-md bg-primary/10 p-1.5 text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-              title={t("viewSource")}
+              className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary transition-colors hover:text-primary/80"
             >
-              <FileText className="h-4 w-4" />
+              {t("viewSource")}
+              <ArrowUpRight className="h-3 w-3" />
             </button>
-          )}
-        </div>
-      </Section>
+          </blockquote>
+        )}
+      </EditorialSection>
 
       {/* Riscos */}
       {report.risks.length > 0 && (
-        <Section title={t("sections.risks")}>
-          <ul className="space-y-3">
+        <EditorialSection eyebrow={t("sections.risks")}>
+          <ul className="space-y-4">
             {report.risks.map((risk, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-bear" />
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="text-sm font-semibold text-foreground">{risk.title}</span>
-                    {risk.quote && secUrl && (
-                      <button
-                        onClick={() => openSource(risk.title, risk.quote!)}
-                        className="shrink-0 rounded-md bg-primary/10 p-1 text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-                        title={t("viewSource")}
-                      >
-                        <FileText className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-                  </div>
-                  <p className="text-sm leading-relaxed text-muted-foreground">{risk.detail}</p>
+              <li key={i} className="border-l-2 border-bear/40 pl-4">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                    <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-bear" />
+                    {risk.title}
+                  </span>
+                  {risk.quote && secUrl && (
+                    <SourceButton onClick={() => openSource(risk.title, risk.quote!)} label={t("viewSource")} />
+                  )}
                 </div>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{risk.detail}</p>
               </li>
             ))}
           </ul>
-        </Section>
+        </EditorialSection>
       )}
 
       {/* Bull vs Bear */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="rounded-2xl border border-bull/20 bg-bull/5 p-5">
-          <div className="mb-3 flex items-center gap-2 text-bull">
-            <TrendingUp className="h-4 w-4" />
-            <h3 className="text-sm font-semibold uppercase tracking-wider">{t("sections.bullCase")}</h3>
-          </div>
-          <ul className="space-y-2">
-            {report.bull.map((b, i) => (
-              <li key={i} className="flex gap-2 text-sm leading-relaxed text-muted-foreground">
-                <span className="text-bull">▲</span>
-                {b}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="rounded-2xl border border-bear/20 bg-bear/5 p-5">
-          <div className="mb-3 flex items-center gap-2 text-bear">
-            <TrendingDown className="h-4 w-4" />
-            <h3 className="text-sm font-semibold uppercase tracking-wider">{t("sections.bearCase")}</h3>
-          </div>
-          <ul className="space-y-2">
-            {report.bear.map((b, i) => (
-              <li key={i} className="flex gap-2 text-sm leading-relaxed text-muted-foreground">
-                <span className="text-bear">▼</span>
-                {b}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <CasePanel tone="bull" title={t("sections.bullCase")} items={report.bull} />
+        <CasePanel tone="bear" title={t("sections.bearCase")} items={report.bear} />
       </div>
 
       {/* Chat */}
@@ -521,14 +539,82 @@ export function StockAnalyst({
   );
 }
 
-// ── Wrapper de secção ────────────────────────────────────────────────
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+// ── Eyebrow (rótulo de secção dourado, uppercase) ────────────────────
+function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-border/40 bg-card p-5">
-      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-        {title}
-      </h3>
+    <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-primary/80">{children}</h3>
+  );
+}
+
+// ── Secção editorial: eyebrow + régua de cabelo, sem caixa ────────────
+function EditorialSection({
+  eyebrow,
+  children,
+  first,
+}: {
+  eyebrow: string;
+  children: React.ReactNode;
+  first?: boolean;
+}) {
+  return (
+    <section className={cn("space-y-4", !first && "border-t border-border/40 pt-8")}>
+      <Eyebrow>{eyebrow}</Eyebrow>
       {children}
+    </section>
+  );
+}
+
+// ── Botão de fonte (afordância fantasma, não bloco preenchido) ───────
+function SourceButton({ onClick, label }: { onClick: () => void; label: string }) {
+  return (
+    <button
+      onClick={onClick}
+      title={label}
+      className="shrink-0 rounded-md p-1 text-muted-foreground/60 transition-colors hover:bg-primary/10 hover:text-primary"
+    >
+      <FileText className="h-3.5 w-3.5" />
+    </button>
+  );
+}
+
+// ── Painel de caso (bull/bear) ───────────────────────────────────────
+function CasePanel({
+  tone,
+  title,
+  items,
+}: {
+  tone: "bull" | "bear";
+  title: string;
+  items: string[];
+}) {
+  const isBull = tone === "bull";
+  return (
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-2xl border p-5",
+        isBull ? "border-bull/25 bg-bull/[0.06]" : "border-bear/25 bg-bear/[0.06]",
+      )}
+    >
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-x-0 top-0 h-0.5",
+          isBull ? "bg-bull/50" : "bg-bear/50",
+        )}
+      />
+      <div className={cn("mb-4 flex items-center gap-2", isBull ? "text-bull" : "text-bear")}>
+        {isBull ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
+        <h3 className="text-sm font-semibold uppercase tracking-wider">{title}</h3>
+      </div>
+      <ul className="space-y-2.5">
+        {items.map((b, i) => (
+          <li key={i} className="flex gap-2.5 text-sm leading-relaxed text-foreground/80">
+            <span className={cn("mt-0.5 shrink-0 text-xs", isBull ? "text-bull" : "text-bear")}>
+              {isBull ? "▲" : "▼"}
+            </span>
+            <span>{b}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -557,6 +643,21 @@ function parseSseEvents(buffer: string): { events: unknown[]; remainder: string 
     }
   }
   return { events, remainder: rest };
+}
+
+// ── Indicador de "a escrever" (três pontos) ──────────────────────────
+function TypingDots() {
+  return (
+    <span className="flex items-center gap-1 py-1">
+      {[0, 150, 300].map((d) => (
+        <span
+          key={d}
+          className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-60"
+          style={{ animationDelay: `${d}ms` }}
+        />
+      ))}
+    </span>
+  );
 }
 
 // ── Chat (Pro) ───────────────────────────────────────────────────────
@@ -685,101 +786,111 @@ function AnalystChat({
 
   if (!isPro) {
     return (
-      <div className="rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-6 text-center">
-        <div className="mb-2 inline-flex items-center gap-2 text-primary">
-          <Lock className="h-4 w-4" />
-          <span className="text-sm font-semibold">{t("chat.proOnly")}</span>
+      <div className="relative overflow-hidden rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-8 text-center">
+        <div className="mx-auto mb-3 w-fit rounded-xl border border-primary/20 bg-primary/10 p-3 text-primary">
+          <Lock className="h-5 w-5" />
         </div>
-        <p className="mx-auto max-w-md text-sm text-muted-foreground">{t("chat.proDesc")}</p>
+        <p className="text-sm font-semibold text-primary">{t("chat.proOnly")}</p>
+        <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">{t("chat.proDesc")}</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-border/40 bg-card p-4">
-      <div className="mb-3 flex items-center gap-2">
+    <div className="overflow-hidden rounded-2xl border border-border/50 bg-card/60">
+      <div className="flex items-center gap-2 border-b border-border/40 px-4 py-3">
         <Sparkles className="h-4 w-4 text-primary" />
         <h3 className="text-sm font-semibold">{t("chat.title")}</h3>
       </div>
 
-      {messages.length > 0 && (
-        <div ref={scrollRef} className="mb-3 max-h-96 space-y-3 overflow-y-auto pr-1">
-          {messages.map((m, i) => (
-            <div
-              key={i}
-              className={m.role === "user" ? "flex justify-end" : "flex flex-col items-start gap-2"}
-            >
+      <div className="p-4">
+        {messages.length > 0 && (
+          <div ref={scrollRef} className="mb-4 max-h-96 space-y-4 overflow-y-auto pr-1">
+            {messages.map((m, i) => (
               <div
-                className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-3.5 py-2 text-sm leading-relaxed ${
-                  m.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted/60 text-foreground"
-                }`}
+                key={i}
+                className={m.role === "user" ? "flex justify-end" : "flex flex-col items-start gap-2"}
               >
-                {m.content || (streaming && i === messages.length - 1 ? <Loader2 className="h-4 w-4 animate-spin" /> : "")}
-              </div>
-
-              {m.role === "assistant" && (!!m.citations?.length || !!m.actions?.length) && (
-                <div className="flex flex-wrap gap-1.5">
-                  {m.citations?.map((c, ci) => (
-                    <button
-                      key={`cite-${ci}`}
-                      onClick={() => onOpenSource(c.label, c.quote)}
-                      disabled={!secUrl}
-                      className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground disabled:opacity-50"
-                    >
-                      <FileText className="h-3 w-3" />
-                      {c.label}
-                    </button>
-                  ))}
-                  {m.actions?.map((a, ai) => (
-                    <a
-                      key={`action-${ai}`}
-                      href={a.href}
-                      className="inline-flex items-center gap-1 rounded-full border border-border bg-muted/40 px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
-                    >
-                      {a.label}
-                    </a>
-                  ))}
+                <div
+                  className={cn(
+                    "max-w-[85%] whitespace-pre-wrap px-4 py-2.5 text-sm leading-relaxed",
+                    m.role === "user"
+                      ? "rounded-2xl rounded-br-md bg-primary text-primary-foreground shadow-sm"
+                      : "rounded-2xl rounded-bl-md border border-border/50 bg-muted/50 text-foreground",
+                  )}
+                >
+                  {m.content ||
+                    (streaming && i === messages.length - 1 ? <TypingDots /> : "")}
                 </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
 
-      {messages.length === 0 && (
-        <div className="mb-3 flex flex-wrap gap-2">
-          {suggestions.map((s, i) => (
-            <button
-              key={i}
-              onClick={() => send(s)}
-              className="rounded-full border border-border bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-      )}
+                {m.role === "assistant" && (!!m.citations?.length || !!m.actions?.length) && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {m.citations?.map((c, ci) => (
+                      <button
+                        key={`cite-${ci}`}
+                        onClick={() => onOpenSource(c.label, c.quote)}
+                        disabled={!secUrl}
+                        className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground disabled:opacity-50"
+                      >
+                        <FileText className="h-3 w-3" />
+                        {c.label}
+                      </button>
+                    ))}
+                    {m.actions?.map((a, ai) => (
+                      <a
+                        key={`action-${ai}`}
+                        href={a.href}
+                        className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+                      >
+                        {a.label}
+                        <ArrowUpRight className="h-3 w-3" />
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          send(input);
-        }}
-        className="flex items-center gap-2"
-      >
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder={t("chat.placeholder")}
-          disabled={streaming}
-          className="flex-1 rounded-full border border-border bg-background px-4 py-2 text-sm outline-none focus:border-primary/50"
-        />
-        <Button type="submit" size="icon" disabled={streaming || !input.trim()} className="rounded-full">
-          {streaming ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-        </Button>
-      </form>
+        {messages.length === 0 && (
+          <div className="mb-4 flex flex-wrap gap-2">
+            {suggestions.map((s, i) => (
+              <button
+                key={i}
+                onClick={() => send(s)}
+                className="rounded-full border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/5 hover:text-foreground"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            send(input);
+          }}
+          className="flex items-center gap-1.5 rounded-full border border-border bg-background py-1.5 pl-4 pr-1.5 transition-colors focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20"
+        >
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder={t("chat.placeholder")}
+            disabled={streaming}
+            className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/70"
+          />
+          <Button
+            type="submit"
+            size="icon"
+            disabled={streaming || !input.trim()}
+            className="h-8 w-8 shrink-0 rounded-full"
+          >
+            {streaming ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }

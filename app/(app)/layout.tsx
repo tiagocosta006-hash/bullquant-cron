@@ -5,6 +5,7 @@ import { InertiaScroll } from "@/components/fx/InertiaScroll";
 import { PaddleRetain } from "@/components/providers/PaddleRetain";
 import { getUser } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
+import { isPulseAdmin } from "@/lib/pulse/server";
 
 /**
  * Terminal — navegação ÚNICA: pill Liquid Glass flutuante no topo
@@ -46,7 +47,13 @@ export default async function AppLayout({
       <InertiaScroll />
       <ContourCanvas />
       <PaddleRetain email={userEmail} customerId={dbUser?.paddleCustomerId} />
-      <TopNav userName={userName} userEmail={userEmail} plan={plan} devSlot={devSlot} />
+      <TopNav
+        userName={userName}
+        userEmail={userEmail}
+        plan={plan}
+        devSlot={devSlot}
+        isAdmin={isPulseAdmin(userEmail)}
+      />
       <main className="mx-auto w-full max-w-7xl px-4 pb-28 pt-24 md:px-6 md:pb-12">
         {children}
       </main>

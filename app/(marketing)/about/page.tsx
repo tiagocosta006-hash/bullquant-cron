@@ -20,7 +20,10 @@ export async function generateMetadata({
   params: { locale: string };
 }): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: "about" });
-  const title = `${t("title")} | ${BRAND}`;
+  // "title" tem tags <italic> destinadas ao t.rich do h1 — chamar t("title")
+  // em modo plano faz o next-intl lançar FORMATTING_ERROR (não há handler
+  // para a tag). Por isso usa-se "titlePlain", sem markup, para metadata.
+  const title = `${t("titlePlain")} | ${BRAND}`;
   const description = t("intro");
 
   return {
@@ -37,11 +40,11 @@ export async function generateMetadata({
 export default function AboutPage() {
   const t = useTranslations("about");
 
-  // Schema.org JSON-LD for E-E-A-T
+  // Schema.org JSON-LD for E-E-A-T (nome em texto plano, ver nota acima)
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    "name": t("title"),
+    "name": t("titlePlain"),
     "description": t("intro"),
     "publisher": {
       "@type": "Organization",
@@ -118,12 +121,17 @@ export default function AboutPage() {
           <div className="flex flex-col items-center text-center gap-6 relative z-10 max-w-3xl mx-auto">
             {/* Logo */}
             <div className="mb-2">
-              <Image 
-                src="/brand/bullocracy-logo.png" 
-                alt="The Bullocracy Logo" 
-                width={110} 
-                height={110} 
+              <Image
+                src="/brand/bullocracy-logo.png"
+                alt="The Bullocracy Logo"
+                width={110}
+                height={110}
                 className="object-contain drop-shadow-xl"
+                // o preflight do Tailwind aplica `height: auto` a todo <img>,
+                // o que desencontra com a largura fixa (110px do atributo) e
+                // dispara o aviso do next/image. Fixar as duas dimensões
+                // aqui sobrepõe o preflight sem mudar o tamanho renderizado.
+                style={{ width: 110, height: 110 }}
                 priority
               />
             </div>

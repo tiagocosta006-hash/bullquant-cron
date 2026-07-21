@@ -30,7 +30,102 @@
       "priceLabel": "免费方案"
     },
     "ctaTitle": "开始发现别人错过的价值。",
-    "ctaSubtitle": "创建免费账户，几秒内分析任何标普500公司。"
+    "ctaSubtitle": "创建免费账户，几秒内分析任何标普500公司。",
+    "ticker": {
+      "label": "前一交易日收盘价 — 标普500"
+    },
+    "showcase": {
+      "caption": "十年基本面、DCF 和 AI Brief — 集于一个终端,无需电子表格。",
+      "alt": "Bull Metrics 终端演示",
+      "caption2": "实时价格、自选清单与财报日历 — 一个 ⌘K 即达。",
+      "caption3": "免费,一分钟内即可上手。"
+    },
+    "manifesto": {
+      "l1": "投资不是猜测。",
+      "l2": "而是比较价格与价值。",
+      "l3": "价格,你每天都看得到。",
+      "l4": "价值,藏在基本面里。",
+      "l5": "我们让你看见价值。"
+    },
+    "stories": {
+      "fundamentals": {
+        "eyebrow": "基本面",
+        "title": "十年历史,",
+        "titleAccent": "一目了然。",
+        "desc": "营收、利润率、ROIC、自由现金流与回购 — 来自 SEC EDGAR 的 40 个季度数据,几秒即可读懂。",
+        "b1": "每家公司 9 张核心图表,自动计算 CAGR",
+        "b2": "季度、TTM 或年度 — 视角由你选择",
+        "b3": "SEC 官方数据,每周更新",
+        "chartAria": "示例图表:年营收为柱状图,自由现金流为折线,十年间持续增长",
+        "legendRevenue": "营收",
+        "legendFcf": "FCF"
+      },
+      "dcf": {
+        "eyebrow": "估值",
+        "title": "它到底",
+        "titleAccent": "值多少?",
+        "desc": "DCF 计算器自动填入公司数据,并在你调整增长率、WACC 和终值时实时重新计算。",
+        "b1": "以公司真实基本面自动填充",
+        "b2": "清晰的安全边际 — 高于或低于价格",
+        "b3": "保存情景,随时回顾",
+        "growth": "年增长率(第1–5年)",
+        "wacc": "WACC",
+        "terminal": "永续增长率",
+        "price": "当前价格",
+        "fairValue": "合理价值",
+        "perShare": "每股",
+        "margin": "安全边际",
+        "undervalued": "被低估",
+        "overvalued": "被高估",
+        "disclaimer": "使用虚构公司的说明性示例。DCF 取决于你的假设 — 不构成投资建议。"
+      },
+      "ai": {
+        "eyebrow": "AI Insights",
+        "title": "数字背后的",
+        "titleAccent": "故事。",
+        "desc": "AI Brief 总结每家公司的最新动态并按情绪分类 — 一分钟读懂重点。",
+        "b1": "执行摘要、催化剂与风险",
+        "b2": "语言清晰,没有行话",
+        "b3": "始终注明:绝非投资建议",
+        "cardTitle": "AI Brief · 示例公司",
+        "summary": "季度表现稳健:营收超预期,利润率扩张,回购计划加强。管理层上调了全年指引。",
+        "catalystsLabel": "催化剂",
+        "catalyst1": "指引上调",
+        "catalyst2": "回购计划",
+        "riskLabel": "风险",
+        "risk1": "客户集中度",
+        "disclaimer": "由 AI 根据近期新闻生成。绝非投资建议。"
+      }
+    },
+    "tour": {
+      "alt": "Bull Metrics 功能导览"
+    },
+    "bento": {
+      "title": "一个终端,应有尽有。",
+      "subtitle": "自选清单、财报日历、精选列表与即时搜索 — 无需在标签页之间切换。",
+      "portfolio": {
+        "title": "组合与自选清单",
+        "desc": "跟踪你的公司,查看价格与每日涨跌。"
+      },
+      "calendar": {
+        "title": "财报日历",
+        "desc": "预期、超预期/不及预期,以及重要日期。"
+      },
+      "screener": {
+        "title": "精选列表",
+        "desc": "Growth、Dividend Growth、Buyback Machines 等。"
+      },
+      "search": {
+        "title": "即时搜索",
+        "desc": "任何标普500公司,一个 ⌘K 即达。"
+      }
+    },
+    "numbers": {
+      "years": "年基本面数据",
+      "companies": "家标普500公司",
+      "quarters": "个季度的数据",
+      "free": "免费方案"
+    }
   },
   "insider": {
     "title": "内部交易",

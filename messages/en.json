@@ -847,6 +847,7 @@
     "nextMonth": "Next month",
     "scopeAll": "All",
     "scopeWatchlist": "Watchlist",
+    "scopePortfolio": "Portfolio",
     "more": "more",
     "empty": "No earnings scheduled in this period.",
     "summary": "{count} earnings in this period",

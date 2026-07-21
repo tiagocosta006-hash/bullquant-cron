@@ -5,19 +5,24 @@ import { createClient } from '@/lib/supabase/server'
 type Kind = 'earnings' | 'corporate' | 'macro'
 const ALL_KINDS: Kind[] = ['earnings', 'corporate', 'macro']
 
+type Scope = 'all' | 'watchlist' | 'portfolio'
+
 /**
- * GET /api/calendar?from=YYYY-MM-DD&to=YYYY-MM-DD[&watchlist=1][&types=earnings,corporate,macro]
+ * GET /api/calendar?from=YYYY-MM-DD&to=YYYY-MM-DD[&scope=all|watchlist|portfolio][&types=earnings,corporate,macro]
  * Calendário unificado: earnings + eventos corporativos (dividendos/splits) +
  * eventos macro (FOMC/CPI/...). Cada item tem um discriminador `kind`.
- * `watchlist=1` restringe earnings/corporate à watchlist do utilizador
+ * `scope=watchlist` restringe earnings/corporate à watchlist do utilizador
  * (WatchlistItem — a mesma lista usada em /api/watchlist e /watchlist).
- * Macro nunca depende de watchlist (é market-wide).
+ * `scope=portfolio` restringe às empresas realmente no portefólio
+ * (Portfolio/PortfolioItem — a mesma lista usada em /api/portfolio e /portfolio).
+ * Macro nunca depende de scope (é market-wide).
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl
   const fromParam = searchParams.get('from')
   const toParam = searchParams.get('to')
-  const watchlistOnly = searchParams.get('watchlist') === '1'
+  const scopeParam = searchParams.get('scope')
+  const scope: Scope = scopeParam === 'watchlist' || scopeParam === 'portfolio' ? scopeParam : 'all'
   const typesParam = searchParams.get('types')
   const kinds = new Set<Kind>(
     typesParam
@@ -35,7 +40,7 @@ export async function GET(request: NextRequest) {
 
   try {
     let companyIds: string[] | undefined
-    if (watchlistOnly) {
+    if (scope === 'watchlist') {
       const supabase = await createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
@@ -46,6 +51,17 @@ export async function GET(request: NextRequest) {
         select: { companyId: true },
       })
       companyIds = items.map(i => i.companyId)
+    } else if (scope === 'portfolio') {
+      const supabase = await createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+      const portfolio = await prisma.portfolio.findUnique({
+        where: { userId: user.id },
+        include: { items: { select: { companyId: true } } },
+      })
+      companyIds = portfolio?.items.map(i => i.companyId) ?? []
     }
 
     const companyFilter = companyIds ? { companyId: { in: companyIds } } : {}
@@ -120,13 +136,13 @@ export async function GET(request: NextRequest) {
       })),
     ].sort((a, b) => a.date.localeCompare(b.date))
 
-    // O calendário geral é público e igual para todos; o ramo watchlist é
-    // por-utilizador e NUNCA pode ir para a cache partilhada da CDN.
+    // O calendário geral é público e igual para todos; os ramos watchlist/portfolio
+    // são por-utilizador e NUNCA podem ir para a cache partilhada da CDN.
     return NextResponse.json(data, {
       headers: {
-        'Cache-Control': watchlistOnly
-          ? 'private, no-store'
-          : 'public, s-maxage=1800, stale-while-revalidate=86400',
+        'Cache-Control': scope === 'all'
+          ? 'public, s-maxage=1800, stale-while-revalidate=86400'
+          : 'private, no-store',
       },
     })
   } catch (error) {

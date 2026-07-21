@@ -57,7 +57,7 @@ interface MacroItem {
 
 type CalendarItem = EarningsItem | CorporateItem | MacroItem
 
-type Scope = "all" | "watchlist"
+type Scope = "all" | "watchlist" | "portfolio"
 type ViewMode = "month" | "week" | "day"
 type EventFilter = "earnings" | "dividend" | "split" | "macro"
 const ALL_FILTERS: EventFilter[] = ["earnings", "dividend", "split", "macro"]
@@ -180,13 +180,16 @@ export function EarningsCalendar() {
     const load = async () => {
       setLoading(true)
       const params = new URLSearchParams({ from: fmtDate(monthStart), to: fmtDate(monthEnd) })
-      if (scope === "watchlist") params.set("watchlist", "1")
+      if (scope !== "all") params.set("scope", scope)
       const isDev = process.env.NODE_ENV !== "production"
       try {
         const res = await fetch(`/api/calendar?${params.toString()}`)
         const data: CalendarItem[] = res.ok ? await res.json() : []
         const real = Array.isArray(data) ? data : []
-        if (active) setEvents(real.length === 0 && isDev ? makeDemoEvents(monthStart) : real)
+        // Demo fallback só faz sentido no scope "all" — em "watchlist" um
+        // resultado vazio é um estado real (sem itens seguidos ou sem
+        // resultados agendados) e não deve ser mascarado com dados fictícios.
+        if (active) setEvents(real.length === 0 && isDev && scope === "all" ? makeDemoEvents(monthStart) : real)
       } catch {
         if (active) setEvents(isDev ? makeDemoEvents(monthStart) : [])
       } finally {
@@ -330,6 +333,7 @@ export function EarningsCalendar() {
           <div className="inline-flex rounded-lg border border-border p-0.5 bg-card shrink-0">
             {scopeBtn("all", t("scopeAll"))}
             {scopeBtn("watchlist", t("scopeWatchlist"))}
+            {scopeBtn("portfolio", t("scopePortfolio"))}
           </div>
         </div>
       </div>

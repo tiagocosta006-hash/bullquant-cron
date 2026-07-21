@@ -67,8 +67,6 @@ export function TopNav({
     { href: "/dcf", icon: Calculator, label: t("dcfShort") },
   ];
   const overflow = [
-    { href: "/compare", icon: GitCompareArrows, label: t("compare") },
-    { href: "/transcripts", icon: MessageSquareText, label: t("transcripts") },
     { href: "/settings", icon: Settings, label: tHeader("settingsTitle") },
     ...(isAdmin ? [{ href: "/analytics", icon: Activity, label: t("analytics") }] : []),
   ];

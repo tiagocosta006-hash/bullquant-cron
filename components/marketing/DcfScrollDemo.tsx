@@ -141,7 +141,7 @@ export function DcfScrollDemo({
         <div className="mt-2 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
           <div
             ref={fairRef}
-            className="nums text-6xl font-extrabold leading-none tracking-tight sm:text-7xl"
+            className="nums text-5xl font-extrabold leading-none tracking-tight sm:text-7xl"
           >
             {formatPrice(INITIAL.fairValue)}
           </div>

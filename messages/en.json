@@ -56,7 +56,7 @@
         "b1": "9 essential charts per company, with automatic CAGR",
         "b2": "Quarterly, TTM or annual, you pick the lens",
         "b3": "Official SEC data, updated every week",
-        "chartAria": "Example chart: annual revenue as bars and free cash flow as a line, growing over ten years",
+        "chartAria": "Example charts: annual revenue as bars, and free cash flow as a bar with operating cash flow and capex lines, both growing over ten years",
         "legendRevenue": "Revenue",
         "legendFcf": "FCF"
       },
@@ -328,7 +328,9 @@
     "calendar": "Calendar",
     "theme": "Toggle theme",
     "startFree": "Start free",
-    "about": "About Us"
+    "about": "About Us",
+    "menuTitle": "Menu",
+    "openMenu": "Open menu"
   },
   "search": {
     "placeholder": "Search ticker (e.g., AAPL)...",

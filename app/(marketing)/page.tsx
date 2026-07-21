@@ -440,7 +440,7 @@ export default async function LandingPage({
                   value={value}
                   suffix={suffix}
                   className={cn(
-                    "text-6xl font-extrabold tracking-tight text-primary sm:text-7xl",
+                    "text-5xl font-extrabold tracking-tight text-primary sm:text-7xl",
                     value === 0 && "gold-sheen-text",
                   )}
                 />
@@ -600,6 +600,7 @@ export default async function LandingPage({
             <Link
               href="/register"
               data-track="footer_register"
+              data-final-cta
               className={cn(
                 buttonVariants({ size: "lg" }),
                 "pressable cta-sheen h-13 px-10 text-base font-semibold",

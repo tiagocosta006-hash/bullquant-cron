@@ -56,7 +56,7 @@
         "b1": "9 gráficos essenciais por empresa, com CAGR automático",
         "b2": "Trimestral, TTM ou anual, tu escolhes a lente",
         "b3": "Dados oficiais da SEC, atualizados toda a semana",
-        "chartAria": "Gráfico de exemplo: receita anual em barras e free cash flow em linha, a crescer ao longo de dez anos",
+        "chartAria": "Gráficos de exemplo: receita anual em barras, e free cash flow em barra com linhas de operating cash flow e capex, ambos a crescer ao longo de dez anos",
         "legendRevenue": "Receita",
         "legendFcf": "FCF"
       },
@@ -328,7 +328,9 @@
     "calendar": "Calendário",
     "theme": "Alternar tema",
     "startFree": "Começar grátis",
-    "about": "Quem somos"
+    "about": "Quem somos",
+    "menuTitle": "Menu",
+    "openMenu": "Abrir menu"
   },
   "search": {
     "placeholder": "Pesquisar ticker (ex: AAPL)...",

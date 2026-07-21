@@ -1028,6 +1028,49 @@
   transform: translateY(16px);
 }
 
+/* Pill interna do CTA flutuante: cresce com o scroll (--cta-scale, JS via
+   GSAP em FloatingCta.tsx — monotónico, nunca encolhe ao subir) e ganha
+   glow dourado crescente (--cta-pull, 0→1) — cada vez mais apetecível.
+   Scale aplicado aqui (não em .floating-cta) para não somar com o
+   translateY do show/hide. */
+.floating-cta-pill {
+  --cta-scale: 1;
+  --cta-pull: 0;
+  transform: scale(var(--cta-scale));
+  transform-origin: 50% 50%;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -10px 26px rgba(0, 0, 0, 0.05),
+    0 22px 55px rgba(40, 30, 10, 0.13),
+    0 0 calc(var(--cta-pull) * 44px) calc(var(--cta-pull) * 4px)
+      color-mix(in srgb, var(--primary) calc(var(--cta-pull) * 38%), transparent);
+}
+.dark .floating-cta-pill {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -10px 26px rgba(0, 0, 0, 0.28),
+    0 22px 55px rgba(0, 0, 0, 0.5),
+    0 0 calc(var(--cta-pull) * 44px) calc(var(--cta-pull) * 4px)
+      color-mix(in srgb, var(--primary) calc(var(--cta-pull) * 42%), transparent);
+}
+/* Pico (perto do fim do scroll): sheen mais rápido + micro-respiração —
+   "irresistível" de clicar. */
+.floating-cta-peak .cta-sheen::after {
+  animation-duration: 3.2s;
+}
+@keyframes floating-cta-breathe {
+  0%,
+  100% {
+    transform: scale(calc(var(--cta-scale) * 1));
+  }
+  50% {
+    transform: scale(calc(var(--cta-scale) * 1.015));
+  }
+}
+.floating-cta-peak {
+  animation: floating-cta-breathe 2.2s var(--ease-in-out) infinite;
+}
+
 /* Hero: anel de glow pulsante no CTA primário (muito subtil, 7s) */
 @keyframes cta-glow-pulse {
   0%,

@@ -6,49 +6,67 @@ import { prefersReducedMotion } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 /**
- * ChartScrollDraw — o gráfico da Story 1 desenha-se com o scroll (scrub):
- * barras de receita crescem da baseline com stagger, a linha de FCF
- * traça-se (dashoffset) e o marcador final + labels diretos aparecem.
- * Specs dataviz: barras finas com topo arredondado 4px ancorado na
- * baseline, linha 2px com marcador ≥8px, grelha recessiva, texto sempre
- * em tokens de tinta (identidade das séries: forma + label, não só cor).
- * Sem motion, o gráfico está completo desde o primeiro paint.
+ * ChartScrollDraw — a Story 1 mostra os DOIS gráficos reais que o produto
+ * tem em /stock/[ticker] (Fundamentais): Receita (barras) e FCF (barra +
+ * linhas OCF/CapEx) — os mesmos dataKeys/cores de FinancialsEngine.tsx.
+ * Antes eram desenhados como um único gráfico combinado (barras de receita
+ * + linha de FCF) que não existe em lado nenhum do produto; agora são dois
+ * painéis empilhados e fiéis, ligados por um único cursor/tooltip partilhado.
+ * Com o scroll (scrub), as barras crescem da baseline com stagger, as linhas
+ * de OCF/CapEx traçam-se (dashoffset) e os labels finais aparecem. Sem
+ * motion, o gráfico está completo desde o primeiro paint.
  */
 const REVENUE = [38, 42, 47, 52, 60, 66, 71, 78, 86, 95]; // B$, 2016–2025
 const FCF = [11, 13, 15, 18, 22, 25, 28, 32, 37, 42];
+const CAPEX = [3, 4, 4, 5, 6, 7, 8, 9, 10, 12];
+const OCF = FCF.map((v, i) => v + CAPEX[i]); // FCF = OCF − CapEx (mesma fórmula do produto)
 const FIRST_YEAR = 2016;
 
 const W = 560;
-const H = 400;
-const BASE = 356;
-const TOP = 26;
+const H = 460;
 const PAD = 8;
 const STEP = (W - PAD * 2) / REVENUE.length;
 const BAR_W = 30;
-const SCALE = (BASE - TOP) / Math.max(...REVENUE);
+
+// Painel A — Receita (só barras, igual a FinancialsEngine `charts.revenue`)
+const A_TOP = 24;
+const A_BASE = 168;
+const A_SCALE = (A_BASE - A_TOP) / Math.max(...REVENUE);
+
+// Painel B — FCF composto (barra FCF + linha OCF + linha CapEx), igual a
+// FinancialsEngine `charts.freeCashFlow` (type COMPOSED); escala partilhada
+// pelo maior valor (OCF) para as três séries ficarem no mesmo eixo.
+const B_TOP = 218;
+const B_BASE = 396;
+const B_SCALE = (B_BASE - B_TOP) / Math.max(...OCF);
 
 const barX = (i: number) => PAD + i * STEP + (STEP - BAR_W) / 2;
 const cx = (i: number) => PAD + i * STEP + STEP / 2;
-const yOf = (v: number) => BASE - v * SCALE;
+const yA = (v: number) => A_BASE - v * A_SCALE;
+const yB = (v: number) => B_BASE - v * B_SCALE;
 
-/** barra com topo arredondado (4px) e base reta na baseline */
-function barPath(i: number, v: number) {
+/** barra com topo arredondado (4px) e base reta na baseline do painel */
+function barPath(i: number, v: number, base: number, yFn: (v: number) => number) {
   const x = barX(i);
-  const top = yOf(v);
+  const top = yFn(v);
   const r = 4;
   return [
-    `M${x} ${BASE}`,
+    `M${x} ${base}`,
     `V${top + r}`,
     `Q${x} ${top} ${x + r} ${top}`,
     `H${x + BAR_W - r}`,
     `Q${x + BAR_W} ${top} ${x + BAR_W} ${top + r}`,
-    `V${BASE}`,
+    `V${base}`,
     "Z",
   ].join(" ");
 }
 
-const LINE_D = FCF.map((v, i) => `${i === 0 ? "M" : "L"}${cx(i)} ${yOf(v)}`).join(" ");
-const GRID_VALUES = [25, 50, 75];
+const lineD = (arr: number[], yFn: (v: number) => number) =>
+  arr.map((v, i) => `${i === 0 ? "M" : "L"}${cx(i)} ${yFn(v)}`).join(" ");
+
+const OCF_LINE_D = lineD(OCF, yB);
+const CAPEX_LINE_D = lineD(CAPEX, yB);
+const GRID_FRACS = [0.25, 0.5, 0.75];
 
 export function ChartScrollDraw({
   ariaLabel,
@@ -62,7 +80,8 @@ export function ChartScrollDraw({
   className?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const lineRef = useRef<SVGPathElement>(null);
+  const ocfLineRef = useRef<SVGPathElement>(null);
+  const capexLineRef = useRef<SVGPathElement>(null);
 
   // ── lente de análise: feixe + dot com cauda de cometa + tooltip glass
   //    + realce magnético das barras; tudo com lag suave (quickTo),
@@ -85,9 +104,10 @@ export function ChartScrollDraw({
 
   /**
    * paint(p) — desenha a lente inteira a partir de uma posição CONTÍNUA
-   * (0..9 float). É este contínuo que dá o feel Revolut/Apple: o dot
-   * desliza SOBRE a linha (lerp entre pontos), os números do tooltip
-   * fluem, e o realce das barras é uma onda gaussiana sem degraus.
+   * (0..9 float). O dot desliza sobre a linha de OCF (painel B) — é este
+   * contínuo que dá o feel Revolut/Apple: os números do tooltip fluem, e
+   * o realce das barras (ambos os painéis, mesmo índice partilhado) é uma
+   * onda gaussiana sem degraus.
    */
   const paint = useCallback((p: number) => {
     const group = cursorRef.current;
@@ -99,7 +119,7 @@ export function ChartScrollDraw({
     const f = c - i0;
     const lerp = (a: number, b: number) => a + (b - a) * f;
     const x = PAD + STEP / 2 + c * STEP;
-    const y = yOf(lerp(FCF[i0], FCF[i1]));
+    const y = yB(lerp(OCF[i0], OCF[i1]));
     const nearest = Math.round(c);
 
     gsap.set(group, { x });
@@ -120,12 +140,13 @@ export function ChartScrollDraw({
       tooltipRef.current.setAttribute("transform", `translate(${flip ? -158 : 14} 0)`);
     }
 
-    // onda gaussiana de luz nas barras (só opacity — o scrub usa scaleY)
+    // onda gaussiana de luz nas barras (painel A e B, mesmo índice — só opacity)
     if (!barsRef.current.length) {
       barsRef.current = Array.from(svg.querySelectorAll<SVGPathElement>("[data-bar]"));
     }
     barsRef.current.forEach((bar, i) => {
-      const d = i - c;
+      const idx = Number(bar.dataset.idx ?? i);
+      const d = idx - c;
       bar.style.opacity = (0.42 + 0.58 * Math.exp(-(d * d) / 1.8)).toFixed(3);
       bar.style.filter = Math.abs(d) < 0.5 ? "brightness(1.08)" : "";
     });
@@ -163,7 +184,7 @@ export function ChartScrollDraw({
         });
         fadeToRef.current = gsap.quickTo(group, "opacity", { duration: 0.25, ease: "power2.out" });
         for (const el of [trailARef.current, trailBRef.current]) {
-          if (el) gsap.set(el, { x: PAD + STEP / 2 + p * STEP, y: yOf(FCF[Math.round(p)]) });
+          if (el) gsap.set(el, { x: PAD + STEP / 2 + p * STEP, y: yB(OCF[Math.round(p)]) });
         }
         trailToRef.current = [trailARef.current, trailBRef.current].flatMap((el, k) =>
           el
@@ -265,27 +286,38 @@ export function ChartScrollDraw({
       const mm = gsap.matchMedia();
       mm.add(MOTION_OK, () => {
         const root = rootRef.current;
-        const line = lineRef.current;
-        if (!root || !line) return;
-        const len = line.getTotalLength();
+        const ocfLine = ocfLineRef.current;
+        const capexLine = capexLineRef.current;
+        if (!root || !ocfLine || !capexLine) return;
+        const ocfLen = ocfLine.getTotalLength();
+        const capexLen = capexLine.getTotalLength();
 
         gsap.fromTo(
           root.querySelectorAll("[data-bar]"),
           { scaleY: 0, transformOrigin: "50% 100%" },
           {
             scaleY: 1,
-            stagger: 0.08,
+            stagger: 0.05,
             ease: "none",
             scrollTrigger: { trigger: root, start: "top 88%", end: "top 34%", scrub: 0.5 },
           },
         );
         gsap.fromTo(
-          line,
-          { strokeDasharray: len, strokeDashoffset: len },
+          ocfLine,
+          { strokeDasharray: ocfLen, strokeDashoffset: ocfLen },
           {
             strokeDashoffset: 0,
             ease: "none",
             scrollTrigger: { trigger: root, start: "top 72%", end: "top 26%", scrub: 0.5 },
+          },
+        );
+        gsap.fromTo(
+          capexLine,
+          { strokeDasharray: capexLen, strokeDashoffset: capexLen },
+          {
+            strokeDashoffset: 0,
+            ease: "none",
+            scrollTrigger: { trigger: root, start: "top 68%", end: "top 22%", scrub: 0.5 },
           },
         );
         gsap.fromTo(
@@ -314,44 +346,96 @@ export function ChartScrollDraw({
         onPointerMove={moveCursor}
         onPointerLeave={leaveCursor}
       >
-        {/* grelha recessiva */}
-        {GRID_VALUES.map((v) => (
+        {/* legenda de painel — igual ao título de cada card real */}
+        <text x={PAD} y={A_TOP - 9} fontSize="11.5" fontWeight="600" className="nums" fill="var(--muted-foreground)">
+          {legendRevenue}
+        </text>
+        <text x={PAD} y={B_TOP - 9} fontSize="11.5" fontWeight="600" className="nums" fill="var(--muted-foreground)">
+          {legendFcf}
+        </text>
+
+        {/* grelha recessiva — painel A (Receita) */}
+        {GRID_FRACS.map((f) => (
           <line
-            key={v}
+            key={`a-${f}`}
             x1={PAD}
             x2={W - PAD}
-            y1={yOf(v)}
-            y2={yOf(v)}
+            y1={yA(f * Math.max(...REVENUE))}
+            y2={yA(f * Math.max(...REVENUE))}
             stroke="var(--border)"
             strokeDasharray="2 6"
             strokeWidth="1"
           />
         ))}
-        <line x1={PAD} x2={W - PAD} y1={BASE} y2={BASE} stroke="var(--border)" strokeWidth="1" />
+        <line x1={PAD} x2={W - PAD} y1={A_BASE} y2={A_BASE} stroke="var(--border)" strokeWidth="1" />
 
-        {/* série 1 — receita (barras douradas) */}
+        {/* painel A — Receita (só barras, igual ao gráfico real) */}
         {REVENUE.map((v, i) => (
-          <path key={i} data-bar d={barPath(i, v)} fill="var(--chart-1)" opacity="0.9">
+          <path
+            key={`rev-${i}`}
+            data-bar
+            data-idx={i}
+            d={barPath(i, v, A_BASE, yA)}
+            fill="var(--chart-1)"
+            opacity="0.9"
+          >
             <title>{`${FIRST_YEAR + i} · $${v}B`}</title>
           </path>
         ))}
 
-        {/* série 2 — FCF (linha de tinta, 2px, marcador de fim ≥8px) */}
+        {/* grelha recessiva — painel B (FCF composto) */}
+        {GRID_FRACS.map((f) => (
+          <line
+            key={`b-${f}`}
+            x1={PAD}
+            x2={W - PAD}
+            y1={yB(f * Math.max(...OCF))}
+            y2={yB(f * Math.max(...OCF))}
+            stroke="var(--border)"
+            strokeDasharray="2 6"
+            strokeWidth="1"
+          />
+        ))}
+        <line x1={PAD} x2={W - PAD} y1={B_BASE} y2={B_BASE} stroke="var(--border)" strokeWidth="1" />
+
+        {/* painel B — FCF (barra) + OCF (linha) + CapEx (linha), specs reais */}
+        {FCF.map((v, i) => (
+          <path
+            key={`fcf-${i}`}
+            data-bar
+            data-idx={i}
+            d={barPath(i, v, B_BASE, yB)}
+            fill="var(--chart-1)"
+            opacity="0.9"
+          >
+            <title>{`${FIRST_YEAR + i} · FCF $${v}B`}</title>
+          </path>
+        ))}
         <path
-          ref={lineRef}
-          d={LINE_D}
+          ref={capexLineRef}
+          d={CAPEX_LINE_D}
           fill="none"
-          stroke="var(--foreground)"
+          stroke="var(--chart-4)"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          opacity="0.75"
+        />
+        <path
+          ref={ocfLineRef}
+          d={OCF_LINE_D}
+          fill="none"
+          stroke="var(--chart-5)"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <circle
           data-pop
-          cx={cx(FCF.length - 1)}
-          cy={yOf(FCF[FCF.length - 1])}
+          cx={cx(OCF.length - 1)}
+          cy={yB(OCF[OCF.length - 1])}
           r="4.5"
-          fill="var(--foreground)"
+          fill="var(--chart-5)"
           stroke="var(--background)"
           strokeWidth="2"
         />
@@ -359,9 +443,21 @@ export function ChartScrollDraw({
         {/* labels diretos (tinta plena — cinzento não se lê em dark) */}
         <text
           data-pop
-          x={cx(FCF.length - 1) - 10}
-          y={yOf(FCF[FCF.length - 1]) - 16}
+          x={cx(OCF.length - 1) - 10}
+          y={yB(OCF[OCF.length - 1]) - 14}
           textAnchor="end"
+          className="nums"
+          fontSize="12"
+          fontWeight="600"
+          fill="var(--chart-5)"
+        >
+          {`OCF · $${OCF[OCF.length - 1]}B`}
+        </text>
+        <text
+          data-pop
+          x={barX(FCF.length - 1) + BAR_W / 2}
+          y={yB(FCF[FCF.length - 1]) - 10}
+          textAnchor="middle"
           className="nums"
           fontSize="13"
           fontWeight="600"
@@ -372,7 +468,7 @@ export function ChartScrollDraw({
         <text
           data-pop
           x={barX(REVENUE.length - 1) + BAR_W / 2}
-          y={yOf(REVENUE[REVENUE.length - 1]) - 10}
+          y={yA(REVENUE[REVENUE.length - 1]) - 10}
           textAnchor="middle"
           className="nums"
           fontSize="13"
@@ -382,7 +478,7 @@ export function ChartScrollDraw({
           {`$${REVENUE[REVENUE.length - 1]}B`}
         </text>
 
-        {/* lente de análise — segue o cursor (ver showIndex) */}
+        {/* lente de análise — segue o cursor (ver showP), atravessa os 2 painéis */}
         <defs>
           <linearGradient id="csd-beam" x1="0" x2="1" y1="0" y2="0">
             <stop offset="0" stopColor="var(--primary)" stopOpacity="0" />
@@ -392,31 +488,31 @@ export function ChartScrollDraw({
           {/* fade vertical do feixe — sem fim abrupto em cima/baixo */}
           <linearGradient id="csd-beam-v" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0" stopColor="#fff" stopOpacity="0" />
-            <stop offset="0.18" stopColor="#fff" stopOpacity="1" />
-            <stop offset="0.85" stopColor="#fff" stopOpacity="1" />
+            <stop offset="0.12" stopColor="#fff" stopOpacity="1" />
+            <stop offset="0.9" stopColor="#fff" stopOpacity="1" />
             <stop offset="1" stopColor="#fff" stopOpacity="0" />
           </linearGradient>
           <mask id="csd-beam-mask">
-            <rect x={-14} y={TOP - 4} width={28} height={BASE - TOP + 4} fill="url(#csd-beam-v)" />
+            <rect x={-14} y={A_TOP - 4} width={28} height={B_BASE - A_TOP + 4} fill="url(#csd-beam-v)" />
           </mask>
         </defs>
         {/* cauda de cometa (fora do grupo — lags próprios por transform) */}
         <circle ref={trailBRef} cx={0} cy={0} r="3" fill="var(--primary)" opacity="0" pointerEvents="none" />
         <circle ref={trailARef} cx={0} cy={0} r="3.6" fill="var(--primary)" opacity="0" pointerEvents="none" />
         <g ref={cursorRef} aria-hidden="true" style={{ opacity: 0 }} pointerEvents="none">
-          {/* feixe vertical suave em vez de hairline */}
+          {/* feixe vertical suave, atravessa Receita + FCF */}
           <rect
             x={-14}
-            y={TOP - 4}
+            y={A_TOP - 4}
             width={28}
-            height={BASE - TOP + 4}
+            height={B_BASE - A_TOP + 4}
             fill="url(#csd-beam)"
             mask="url(#csd-beam-mask)"
           />
           <circle
             ref={cursorDotRef}
             cx={0}
-            cy={yOf(FCF[FCF.length - 1])}
+            cy={yB(OCF[OCF.length - 1])}
             r="5"
             fill="var(--primary)"
             stroke="var(--background)"
@@ -429,7 +525,7 @@ export function ChartScrollDraw({
           <g ref={tooltipRef} transform="translate(14 0)">
             <rect
               x={0}
-              y={TOP - 6}
+              y={A_TOP - 6}
               width={144}
               height={62}
               rx={10}
@@ -439,7 +535,7 @@ export function ChartScrollDraw({
             <text
               ref={ttYearRef}
               x={12}
-              y={TOP + 12}
+              y={A_TOP + 12}
               className="nums"
               fontSize="12"
               fontWeight="700"
@@ -447,11 +543,11 @@ export function ChartScrollDraw({
             >
               {FIRST_YEAR + REVENUE.length - 1}
             </text>
-            <circle cx={16} cy={TOP + 26} r={3.5} fill="var(--chart-1)" />
+            <circle cx={16} cy={A_TOP + 26} r={3.5} fill="var(--chart-1)" />
             <text
               ref={ttRevRef}
               x={26}
-              y={TOP + 30}
+              y={A_TOP + 30}
               className="nums"
               fontSize="11.5"
               fontWeight="600"
@@ -459,11 +555,11 @@ export function ChartScrollDraw({
             >
               {`$${REVENUE[REVENUE.length - 1]}B · +10%`}
             </text>
-            <rect x={12.5} y={TOP + 39.5} width={8} height={2.5} rx={1.25} fill="var(--foreground)" />
+            <rect x={12.5} y={A_TOP + 39.5} width={8} height={2.5} rx={1.25} fill="var(--chart-1)" />
             <text
               ref={ttFcfRef}
               x={26}
-              y={TOP + 45}
+              y={A_TOP + 45}
               className="nums"
               fontSize="11.5"
               fontWeight="600"
@@ -498,15 +594,23 @@ export function ChartScrollDraw({
         </text>
       </svg>
 
-      {/* legenda — sempre presente com 2 séries */}
-      <div className="mt-3 flex items-center gap-5 px-1 text-xs font-medium text-foreground/70">
+      {/* legenda — as 4 séries dos 2 gráficos reais (Receita; FCF/OCF/CapEx) */}
+      <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 px-1 text-xs font-medium text-foreground/70">
         <span className="inline-flex items-center gap-2">
           <span className="h-2.5 w-2.5 rounded-[3px] bg-[var(--chart-1)]" aria-hidden />
           {legendRevenue}
         </span>
         <span className="inline-flex items-center gap-2">
-          <span className="h-0.5 w-4 rounded-full bg-foreground" aria-hidden />
+          <span className="h-2.5 w-2.5 rounded-[3px] bg-[var(--chart-1)]" aria-hidden />
           {legendFcf}
+        </span>
+        <span className="inline-flex items-center gap-2">
+          <span className="h-0.5 w-4 rounded-full bg-[var(--chart-5)]" aria-hidden />
+          OCF
+        </span>
+        <span className="inline-flex items-center gap-2">
+          <span className="h-0.5 w-4 rounded-full bg-[var(--chart-4)]" aria-hidden />
+          CapEx
         </span>
       </div>
     </div>

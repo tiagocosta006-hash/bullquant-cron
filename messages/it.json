@@ -585,7 +585,10 @@
       "news": "Notizie",
       "valuationEmpty": "Nessuna analisi DCF salvata per questa azienda.",
       "valuationCta": "Apri il calcolatore DCF"
-    }
+    },
+    "similarCompaniesTitle": "Aziende Simili",
+    "similarCompaniesExploreAll": "Esplora tutte",
+    "similarCompaniesCompare": "Confronta i concorrenti"
   },
   "dcf": {
     "title": "Calcolatore DCF",

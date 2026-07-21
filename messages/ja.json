@@ -585,7 +585,10 @@
       "news": "ニュース",
       "valuationEmpty": "この企業の保存済みDCF分析はまだありません。",
       "valuationCta": "DCF計算機を開く"
-    }
+    },
+    "similarCompaniesTitle": "類似企業",
+    "similarCompaniesExploreAll": "すべて見る",
+    "similarCompaniesCompare": "競合を比較"
   },
   "dcf": {
     "title": "DCF計算機",

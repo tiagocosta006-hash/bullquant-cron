@@ -585,7 +585,10 @@
       "news": "新闻",
       "valuationEmpty": "该公司暂无已保存的DCF分析。",
       "valuationCta": "打开DCF计算器"
-    }
+    },
+    "similarCompaniesTitle": "类似公司",
+    "similarCompaniesExploreAll": "查看全部",
+    "similarCompaniesCompare": "比较竞争对手"
   },
   "dcf": {
     "title": "DCF 估值模型",

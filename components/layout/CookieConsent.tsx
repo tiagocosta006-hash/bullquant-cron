@@ -19,6 +19,15 @@ export function CookieConsent() {
     }
   }, []);
 
+  // Enquanto o banner está aberto no fundo do ecrã, sinaliza no <html> para a
+  // landing esconder a sua pill flutuante (FloatingCta) — senão colidem
+  // (banner z-50 vs CTA z-40, ambos fixed no fundo). Ver .cookie-open em globals.css.
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.toggle("cookie-open", showBanner);
+    return () => root.classList.remove("cookie-open");
+  }, [showBanner]);
+
   const accept = () => {
     localStorage.setItem("cookie_consent", "true");
     setHasConsent(true);
@@ -32,7 +41,9 @@ export function CookieConsent() {
 
   return (
     <>
-      {hasConsent && <GoogleAnalytics gaId="G-F89FT4052G" />}
+      {hasConsent && process.env.NODE_ENV === "production" && (
+        <GoogleAnalytics gaId="G-F89FT4052G" />
+      )}
       
       {showBanner && (
         <div className="fixed bottom-0 w-full bg-background border-t p-4 z-50 flex flex-col md:flex-row justify-between items-center gap-4 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">

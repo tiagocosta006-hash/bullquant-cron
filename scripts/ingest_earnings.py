@@ -110,6 +110,31 @@ def upsert_earnings(cur, company_id: str, rows: list[dict]) -> int:
     if not dedup:
         return 0
 
+    # Colapsar "gémeos de etiqueta fiscal": a Finnhub por vezes devolve o MESMO
+    # report duas vezes com (year, quarter) diferentes, para empresas com ano
+    # fiscal desalinhado do calendário (ex.: TGT, TFC). O dedup por (year, quarter)
+    # acima não os apanha (chaves diferentes). Aqui juntamos eventos cujas DATAS
+    # estão a <=5 dias (= mesmo report) e ficamos com a linha mais rica
+    # (Actual > Estimate > vazio), evitando duplicados no calendário.
+    def _richness(v: dict) -> int:
+        return (
+            (10 if v.get("epsActual") is not None else 0)
+            + (10 if v.get("revenueActual") is not None else 0)
+            + (1 if v.get("epsEstimate") is not None else 0)
+            + (1 if v.get("revenueEstimate") is not None else 0)
+        )
+
+    survivors: list[tuple[tuple[int, int], dict]] = []
+    for key, entry in sorted(dedup.items(), key=lambda kv: kv[1]["date"]):
+        d = datetime.date.fromisoformat(entry["date"])
+        for idx, (_skey, sentry) in enumerate(survivors):
+            if abs((d - datetime.date.fromisoformat(sentry["date"])).days) <= 5:
+                if _richness(entry) > _richness(sentry):
+                    survivors[idx] = (key, entry)
+                break
+        else:
+            survivors.append((key, entry))
+
     payload = [
         (
             new_id(),
@@ -123,7 +148,7 @@ def upsert_earnings(cur, company_id: str, rows: list[dict]) -> int:
             v["revenueEstimate"],
             v["revenueActual"],
         )
-        for (year, quarter), v in dedup.items()
+        for (year, quarter), v in survivors
     ]
 
     psycopg2.extras.execute_values(

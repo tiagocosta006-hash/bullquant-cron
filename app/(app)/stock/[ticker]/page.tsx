@@ -307,7 +307,7 @@ export default async function StockPage({
 
       {similarCompanies.length > 0 && (
         <div className="mt-8">
-          <SimilarCompanies companies={similarCompanies} />
+          <SimilarCompanies companies={similarCompanies} baseTicker={company.ticker} />
         </div>
       )}
     </div>

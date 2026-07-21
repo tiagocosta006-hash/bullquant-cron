@@ -646,7 +646,10 @@
       "news": "Notícias",
       "valuationEmpty": "Ainda não guardaste análises DCF para esta empresa.",
       "valuationCta": "Abrir a calculadora DCF"
-    }
+    },
+    "similarCompaniesTitle": "Empresas Similares",
+    "similarCompaniesExploreAll": "Explorar todas",
+    "similarCompaniesCompare": "Comparar concorrentes"
   },
   "analista": {
     "title": "Analista IA",

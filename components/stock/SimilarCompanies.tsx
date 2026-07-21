@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, GitCompareArrows } from 'lucide-react'
 
 interface SimilarCompany {
   ticker: string
@@ -9,7 +9,7 @@ interface SimilarCompany {
   logoUrl: string | null
 }
 
-export async function SimilarCompanies({ companies }: { companies: SimilarCompany[] }) {
+export async function SimilarCompanies({ companies, baseTicker }: { companies: SimilarCompany[]; baseTicker: string }) {
   const t = await getTranslations('stock')
 
   if (!companies || companies.length === 0) return null
@@ -18,13 +18,13 @@ export async function SimilarCompanies({ companies }: { companies: SimilarCompan
     <div className="glass rounded-3xl p-6 md:p-8">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold tracking-tight text-foreground">
-          {t('similarCompaniesTitle') || 'Empresas Similares'}
+          {t('similarCompaniesTitle')}
         </h2>
-        <Link 
-          href="/explore" 
+        <Link
+          href="/explore"
           className="text-sm font-medium text-primary hover:underline flex items-center gap-1"
         >
-          Explorar todas <ArrowRight className="h-4 w-4" />
+          {t('similarCompaniesExploreAll')} <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -35,12 +35,12 @@ export async function SimilarCompanies({ companies }: { companies: SimilarCompan
             className="group flex items-center gap-4 rounded-2xl border border-border/50 bg-card/40 p-4 transition-all hover:bg-card/80 hover:shadow-sm"
           >
             {c.logoUrl ? (
-              <Image 
-                src={c.logoUrl} 
-                alt={c.name} 
-                width={40} 
-                height={40} 
-                className="rounded-full object-cover" 
+              <Image
+                src={c.logoUrl}
+                alt={c.name}
+                width={40}
+                height={40}
+                className="rounded-full object-cover"
               />
             ) : (
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold">
@@ -53,6 +53,15 @@ export async function SimilarCompanies({ companies }: { companies: SimilarCompan
             </div>
           </Link>
         ))}
+      </div>
+      <div className="mt-6 flex justify-center">
+        <Link
+          href={`/compare?ticker=${baseTicker}`}
+          className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/50 px-5 py-2.5 text-sm font-semibold text-foreground transition-all hover:bg-card hover:shadow-sm"
+        >
+          <GitCompareArrows className="h-4 w-4" />
+          {t('similarCompaniesCompare')}
+        </Link>
       </div>
     </div>
   )

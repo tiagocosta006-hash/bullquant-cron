@@ -685,7 +685,8 @@
       "profit": "NETTO",
       "roe": "ROE"
     },
-    "reitFcfTooltip": "Bij REIT's weerspiegelt CapEx de onderhouds- en verhuurkosten van vastgoed en dient zo als benadering van de AFFO."
+    "reitFcfTooltip": "Bij REIT's weerspiegelt CapEx de onderhouds- en verhuurkosten van vastgoed en dient zo als benadering van de AFFO.",
+    "preliminaryInfo": "De vervaagde balk is het kwartaal dat al in de resultaten is gerapporteerd (voorlopig), nog niet in het officiële rapport. Wordt automatisch bijgewerkt zodra de indiening verschijnt."
   },
   "compare": {
     "title": "Peervergelijking: {industry}",

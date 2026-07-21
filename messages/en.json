@@ -797,7 +797,8 @@
       "profit": "PROFIT",
       "roe": "ROE"
     },
-    "reitFcfTooltip": "For REITs, CapEx reflects property maintenance and leasing costs, making this a proxy for AFFO."
+    "reitFcfTooltip": "For REITs, CapEx reflects property maintenance and leasing costs, making this a proxy for AFFO.",
+    "preliminaryInfo": "The faded bar is the latest quarter already reported in earnings (preliminary), not yet in the official filing. It updates automatically once the filing is published."
   },
   "compare": {
     "title": "Peer Analysis: {industry}",

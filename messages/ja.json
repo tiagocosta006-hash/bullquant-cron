@@ -685,7 +685,8 @@
       "profit": "純利",
       "roe": "ROE"
     },
-    "reitFcfTooltip": "REITの場合、CapExは不動産の維持費・賃貸費用を反映し、AFFOの近似値となります。"
+    "reitFcfTooltip": "REITの場合、CapExは不動産の維持費・賃貸費用を反映し、AFFOの近似値となります。",
+    "preliminaryInfo": "薄いバーは決算で既に報告された四半期（暫定）で、正式な提出書類にはまだ含まれていません。提出書類が公開されると自動的に更新されます。"
   },
   "compare": {
     "title": "ピア分析: {industry}",

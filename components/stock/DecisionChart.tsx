@@ -298,6 +298,20 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
                           cellColor = 'var(--chart-4)'
                         }
                       }
+                      // Barra preliminar (reportada, ainda sem 10-Q): a claro
+                      // + contorno tracejado para se distinguir das oficiais.
+                      if (entry.isPreliminary) {
+                        return (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={cellColor}
+                            fillOpacity={0.4}
+                            stroke={cellColor}
+                            strokeOpacity={0.9}
+                            strokeDasharray="3 2"
+                          />
+                        )
+                      }
                       return <Cell key={`cell-${index}`} fill={cellColor} />
                     })}
                   </Bar>

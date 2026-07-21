@@ -685,7 +685,8 @@
       "profit": "NETO",
       "roe": "ROE"
     },
-    "reitFcfTooltip": "En los REIT, el CapEx refleja los costes de mantenimiento y arrendamiento inmobiliario, sirviendo como aproximación al AFFO."
+    "reitFcfTooltip": "En los REIT, el CapEx refleja los costes de mantenimiento y arrendamiento inmobiliario, sirviendo como aproximación al AFFO.",
+    "preliminaryInfo": "La barra atenuada es el trimestre ya reportado en resultados (preliminar), aún no publicado en el informe oficial. Se actualiza automáticamente cuando sale el documento."
   },
   "compare": {
     "title": "Análisis de Pares: {industry}",

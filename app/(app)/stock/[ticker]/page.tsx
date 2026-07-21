@@ -169,6 +169,30 @@ export default async function StockPage({
 
   const isPro = dbUser?.plan === 'PRO'
 
+  // Overlay preliminar: revenue/EPS já reportados (earnings) que ainda não estão
+  // nos fundamentais oficiais (10-Q). Mostra-se como barra provisória no gráfico
+  // trimestral e desaparece sozinho quando o filing chega. Só quando o report é
+  // de um trimestre mais recente do que o último fundamental (>55 dias entre o
+  // fim do último trimestre conhecido e a data do report = há trimestre por reportar).
+  const latestQuarterly = latestFundamentals[0]
+  let preliminaryQuarter:
+    | { fiscalYear: number; fiscalQuarter: number; revenue: number | null; epsDiluted: number | null }
+    | null = null
+  if (
+    latestEarnings?.revenueActual != null &&
+    latestQuarterly?.periodEnd &&
+    latestQuarterly.fiscalQuarter != null &&
+    (latestEarnings.date.getTime() - latestQuarterly.periodEnd.getTime()) / 86_400_000 > 55
+  ) {
+    const q = latestQuarterly.fiscalQuarter
+    preliminaryQuarter = {
+      fiscalYear: q === 4 ? latestQuarterly.fiscalYear + 1 : latestQuarterly.fiscalYear,
+      fiscalQuarter: q === 4 ? 1 : q + 1,
+      revenue: Number(latestEarnings.revenueActual),
+      epsDiluted: latestEarnings.epsActual != null ? Number(latestEarnings.epsActual) : null,
+    }
+  }
+
   const serializedDcfs: SerializedDcfAnalysis[] = rawDcfs.map(dcf => ({
     id: dcf.id,
     label: dcf.label,
@@ -271,7 +295,7 @@ export default async function StockPage({
           </>
         }
         financials={
-          <FinancialsEngine ticker={company.ticker} sector={company.sector} currencySymbol={currencySymbol} />
+          <FinancialsEngine ticker={company.ticker} sector={company.sector} currencySymbol={currencySymbol} preliminary={preliminaryQuarter} />
         }
         analista={
           <StockAnalyst

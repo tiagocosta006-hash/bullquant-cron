@@ -685,7 +685,8 @@
       "profit": "NETTO",
       "roe": "ROE"
     },
-    "reitFcfTooltip": "Per i REIT, il CapEx riflette i costi di manutenzione immobiliare e di locazione, fungendo da proxy dell'AFFO."
+    "reitFcfTooltip": "Per i REIT, il CapEx riflette i costi di manutenzione immobiliare e di locazione, fungendo da proxy dell'AFFO.",
+    "preliminaryInfo": "La barra sbiadita è il trimestre già riportato negli utili (preliminare), non ancora nel documento ufficiale. Si aggiorna automaticamente alla pubblicazione."
   },
   "compare": {
     "title": "Analisi dei Pari: {industry}",

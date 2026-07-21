@@ -1,0 +1,36 @@
+name: Backfill History (Nasdaq)
+
+# On-demand: preenche o histórico profundo (10 anos) via API pública da Nasdaq
+# para tickers cujo histórico Polygon é curto (ADRs europeus adicionados à mão).
+# Corre manualmente; não tem cron — é um one-shot de reparação.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tickers:
+        description: "Lista de tickers separada por vírgulas (vazio = ADRs europeus por defeito)"
+        required: false
+        default: ""
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: scripts/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Run backfill
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          TICKERS: ${{ github.event.inputs.tickers }}
+        run: python scripts/backfill_history_nasdaq.py

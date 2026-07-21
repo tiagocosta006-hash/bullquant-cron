@@ -8,7 +8,6 @@ import { PulseTracker } from "@/components/pulse/PulseTracker";
 import { BRAND } from "@/lib/brand";
 import { PaddleProvider } from "@/components/providers/PaddleProvider";
 import { CookieConsent } from "@/components/layout/CookieConsent";
-import { GoogleAnalytics } from "@next/third-parties/google";
 
 const scotchDisplay = localFont({
   variable: "--font-heading",
@@ -151,9 +150,9 @@ export default async function RootLayout({
           <CookieConsent />
         </NextIntlClientProvider>
         <PulseTracker />
-        {/* GA só em produção — em dev tenta enviar para o GA e falha com
-            erros de rede na consola (o Pulse é o analytics de dev). */}
-        {process.env.NODE_ENV === "production" && <GoogleAnalytics gaId="G-F89FT4052G" />}
+        {/* GA NÃO é montado aqui: é carregado pelo <CookieConsent> só APÓS
+            consentimento (RGPD) — montá-lo aqui disparava GA antes/sem
+            consentimento (ilegal na UE) e em duplicado. */}
       </body>
     </html>
   );

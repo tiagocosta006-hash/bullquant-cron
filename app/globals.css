@@ -1019,6 +1019,14 @@
   transform: none;
   pointer-events: auto;
 }
+/* Enquanto o banner de cookies (RGPD) está no fundo do ecrã, esconder a pill
+   flutuante da landing para não colidirem (banner z-50 vs CTA z-40). A
+   especificidade (:root.cookie-open .floating-cta) vence o estado .floating-cta-in. */
+:root.cookie-open .floating-cta {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(16px);
+}
 
 /* Hero: anel de glow pulsante no CTA primário (muito subtil, 7s) */
 @keyframes cta-glow-pulse {

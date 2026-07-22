@@ -2,7 +2,7 @@ import * as cheerio from "cheerio";
 import { prisma } from "@/lib/prisma";
 
 // User-Agent obrigatório da SEC (≤10 req/s). Mantido igual ao já usado na app.
-const SEC_HEADERS = { "User-Agent": "BullQuant Analyst (tiago@bullquant.com)" };
+const SEC_HEADERS = { "User-Agent": "BullValue Analyst (tiago@bullquant.com)" };
 
 const ANNUAL_FORMS = ["10-K", "20-F", "40-F"];
 

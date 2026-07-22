@@ -332,7 +332,7 @@ const DEFAULT_TOL = 0.05
 
 async function main() {
   const now = new Date().toISOString()
-  console.log(`# Bull Metrics — Data Validation Report\n`)
+  console.log(`# BullValue — Data Validation Report\n`)
   console.log(`> Generated: ${now}\n`)
   console.log(`---\n`)
 

@@ -1,4 +1,4 @@
-# Frontend Audit — Bull Metrics
+# Frontend Audit — BullVision
 
 > Audit date: 2026-07-02 · Scope: components, pages, design-system compliance, i18n, TypeScript, a11y, performance. Read-only.
 > Format: every finding = file:line · current code · exact fix. Index at [AUDIT-INDEX.md](AUDIT-INDEX.md).
@@ -20,7 +20,7 @@ Verified clean: all 32 `"use client"` directives are justified (state/effects/ha
 
 ## F1 — Brand identity: four names in production (Critical)
 
-The product is named **"Bull Metrics"**. The codebase currently ships **"Bullmetrics"**, **"BullVision"**, and **"bullquant"** — and the worst occurrences are user-visible.
+The product is named **"BullVision"**. The codebase currently ships **"BullVision"**, **"BullVision"**, and **"bullquant"** — and the worst occurrences are user-visible.
 
 ### F1a. User-visible: i18n message files (fix first)
 
@@ -30,11 +30,11 @@ Every locale ships "BullVision" on the login/register screens, and `en.json` alo
 |---|---|---|
 | `messages/en.json:102` | `"Sign in to BullVision"` | `"Sign in to Bull Metrics"` |
 | `messages/en.json:115` | `"Join BullVision.."` (also: double period) | `"Join Bull Metrics."` |
-| `messages/en.json:175` | `"…your Bullmetrics session"` | `"…your Bull Metrics session"` |
-| `messages/en.json:179` | `"…use in Bullmetrics"` | `"…use in Bull Metrics"` |
+| `messages/en.json:175` | `"…your BullValue session"` | `"…your Bull Metrics session"` |
+| `messages/en.json:179` | `"…use in BullValue"` | `"…use in Bull Metrics"` |
 | `messages/en.json:187` | `"…use in BullQuant"` | `"…use in Bull Metrics"` |
 | `messages/en.json:216` | `"title": "BullVision"` | `"Bull Metrics"` |
-| `messages/pt.json:175,183` | "Bullmetrics" ×2 | "Bull Metrics" |
+| `messages/pt.json:175,183` | "BullValue" ×2 | "Bull Metrics" |
 | `messages/pt.json:212` | `"BullVision"` | `"Bull Metrics"` |
 | `messages/de.json:115,210` · `es.json:115,210` · `fr.json:115,210` · `it.json:115,210` · `ja.json:115,210` · `nl.json:115,210` | "BullVision" ×2 each | "Bull Metrics" (name is not translated) |
 
@@ -44,7 +44,7 @@ Better fix than string replacement: these strings should interpolate the brand �
 
 | File:line | Current | Fix |
 |---|---|---|
-| `lib/brand.ts:9` | `name: "Bullmetrics"` | `name: "Bull Metrics"` |
+| `lib/brand.ts:9` | `name: "BullValue"` | `name: "Bull Metrics"` |
 | `lib/brand.ts:11` | `nameParts: ["Bull", "metrics"]` | `["Bull", "Metrics"]` (wordmark renders parts adjacently — verify spacing in `components/brand/Logo.tsx` when changing) |
 | `lib/brand.ts:2,4` | comments say "BullVision" | "Bull Metrics" |
 | `lib/brand.ts:22` | `logoSrc: ""` — real logo file never dropped in | add `/public/brand/` asset per the comment at `:17–21` |
@@ -58,7 +58,7 @@ Better fix than string replacement: these strings should interpolate the brand �
 | `components/brand/Logo.tsx:24` | comment `"Bull" neutral, "Vision" gold` | update comment to match nameParts |
 | `app/globals.css:8` | header comment "BullVision — Golden Terminal" | "Bull Metrics" |
 | `hooks/useRecentSearches.ts:11` | `STORAGE_KEY = 'bullquant_recent_searches'` | keep as-is for now (renaming silently wipes every user's recent searches); rename only with a read-old-write-new migration, or accept the loss consciously |
-| `scripts/seed_companies.py:51` | User-Agent `"BullQuant/1.0"` | `"BullMetrics/1.0"` next time the script runs |
+| `scripts/seed_companies.py:51` | User-Agent `"BullQuant/1.0"` | `"BullValue/1.0"` next time the script runs |
 | `docs/brand/brand-guidelines.md:13` | "**Name** \| BullVision (one word…)" | The entire brand book (`brand-guidelines.md`, `media-kit.md:10–12`, `README.md`, `design-system.md`) canonizes the wrong name — including the rule "Always: BullVision". Rewrite the four docs' name sections; they are what a new teammate reads first. |
 | `docs/feature-ideas.md:1,19` · `docs/brand/redesign-plan.md:1,3` | "BullVision" titles, "BullVision Score" | "Bull Metrics", "Bull Metrics Score" |
 | `docs/01-visao.md`, `02-features.md`, …, `bullquant_planeamento.md`, `CHANGELOG.md:1` | "BullQuant" throughout | historical planning docs — add a one-line banner "Nome atual: Bull Metrics" at the top of each rather than rewriting history |

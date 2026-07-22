@@ -37,7 +37,7 @@
     },
     "showcase": {
       "caption": "Dieci anni di fondamentali, DCF e AI Brief — in un unico terminale, senza fogli di calcolo.",
-      "alt": "Demo del terminale Bull Metrics",
+      "alt": "Demo del terminale BullValue",
       "caption2": "Prezzi live, watchlist e calendario degli utili — tutto a un ⌘K.",
       "caption3": "Gratis, e pronto in meno di un minuto.",
       "finRows": {
@@ -122,7 +122,7 @@
       }
     },
     "tour": {
-      "alt": "Un tour delle funzionalità di Bull Metrics"
+      "alt": "Un tour delle funzionalità di BullValue"
     },
     "bento": {
       "title": "Tutto in un terminale.",
@@ -268,7 +268,7 @@
   },
   "register": {
     "title": "Crea Account",
-    "subtitle": "Unisciti a BullMetrics.",
+    "subtitle": "Unisciti a BullValue.",
     "nameLabel": "Nome",
     "namePlaceholder": "Il tuo nome",
     "emailLabel": "Email",
@@ -419,7 +419,7 @@
       "title": "Suggerimenti"
     },
     "landing": {
-      "title": "BullMetrics",
+      "title": "BullValue",
       "description": "Cerca un'azienda per iniziare.",
       "testExample": "Prova Esempio",
       "createAccount": "Crea Account"

@@ -20,7 +20,7 @@ export default function PrivacyPolicyPage() {
             Última atualização: {new Date().toLocaleDateString("pt-PT")}
           </p>
           <p>
-            A <strong>BullMetrics</strong> assume o compromisso de garantir a privacidade e segurança dos seus dados pessoais.
+            A <strong>BullValue</strong> assume o compromisso de garantir a privacidade e segurança dos seus dados pessoais.
             A presente Política de Privacidade estabelece as práticas da plataforma relativamente à recolha, uso, processamento
             e proteção de informações, em estrita conformidade com o Regulamento Geral sobre a Proteção de Dados (RGPD)
             europeu e a legislação nacional aplicável em Portugal.
@@ -30,7 +30,7 @@ export default function PrivacyPolicyPage() {
         <section>
           <h2 className="text-2xl font-bold mb-4">1. Identidade e Responsável pelo Tratamento</h2>
           <p>
-            A BullMetrics é a entidade responsável pelo tratamento dos seus dados pessoais no âmbito da prestação dos
+            A BullValue é a entidade responsável pelo tratamento dos seus dados pessoais no âmbito da prestação dos
             serviços descritos nos nossos Termos de Serviço. Em caso de dúvidas ou necessidade de exercer os seus direitos,
             pode contactar o Responsável pelo Tratamento através do e-mail corporativo: <strong>info@thebullocracy.com</strong>.
           </p>
@@ -57,7 +57,7 @@ export default function PrivacyPolicyPage() {
         <section>
           <h2 className="text-2xl font-bold mb-4">3. Transparência na Partilha de Dados com Terceiros</h2>
           <p className="mb-4">
-            O seu direito à transparência é fundamental para a BullMetrics. Não vendemos, alugamos ou comercializamos os seus
+            O seu direito à transparência é fundamental para a BullValue. Não vendemos, alugamos ou comercializamos os seus
             dados pessoais. Operamos, no entanto, com subprocessadores autorizados estritamente para manter a plataforma
             em funcionamento:
           </p>
@@ -67,7 +67,7 @@ export default function PrivacyPolicyPage() {
               eletrónico) são processadas e armazenadas através do Supabase.
             </li>
             <li>
-              <strong>Dados de Faturação e Transações Financeiras (Paddle):</strong> A BullMetrics <strong>não recolhe nem armazena</strong>
+              <strong>Dados de Faturação e Transações Financeiras (Paddle):</strong> A BullValue <strong>não recolhe nem armazena</strong>
               os seus dados bancários ou números de cartão de crédito. Todo o processo de checkout, subscrição, recolha
               de impostos e faturação é efetuado integralmente pelo nosso parceiro Paddle (na qualidade de Merchant of Record).
               Poderemos receber da Paddle informação de faturação para gerir o seu estatuto (Plano PRO).

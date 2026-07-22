@@ -48,8 +48,8 @@ export async function generateMetadata({
     }
   }
 
-  const title = `${company.name} (${company.ticker}) - Análise e Avaliação DCF | ${BRAND.name}`
-  const description = `Análise fundamental profunda, avaliação DCF e insights de IA para a ${company.name} (${company.ticker}) do setor ${company.sector || 'financeiro'}. Dados históricos, margens e avaliação inteligente.`
+  const title = `${company.name} (${company.ticker}): Cotação, Análise Fundamental e Valor Justo DCF | ${BRAND.name}`
+  const description = `Consulte a cotação da ${company.name} (${company.ticker}), demonstrações financeiras de 10 anos, modelo de valor justo DCF e análise de IA do setor ${company.sector || 'financeiro'}.`
 
   return {
     title,
@@ -229,7 +229,7 @@ export default async function StockPage({
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "BullQuant",
+            "name": BRAND.name,
             "item": BRAND.siteUrl
           },
           {

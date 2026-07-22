@@ -38,7 +38,7 @@
     },
     "showcase": {
       "caption": "Dez anos de fundamentais, DCF e AI Brief, num só terminal, sem folhas de cálculo.",
-      "alt": "Demonstração do terminal Bull Metrics",
+      "alt": "Demonstração do terminal BullValue",
       "caption2": "Preço em direto, watchlist e calendário de resultados, tudo a um ⌘K de distância.",
       "caption3": "Grátis, em português, pronto em menos de um minuto.",
       "live": "Em direto",
@@ -121,7 +121,7 @@
       }
     },
     "tour": {
-      "alt": "Tour pelas funcionalidades do Bull Metrics"
+      "alt": "Tour pelas funcionalidades do BullValue"
     },
     "bento": {
       "title": "Tudo num terminal.",
@@ -193,7 +193,7 @@
     "about": {
       "eyebrow": "Bullocracy",
       "title": "Feito em Portugal, por investidores.",
-      "p1": "A Bull Metrics nasceu de uma frustração simples: não existia nenhuma plataforma séria de análise fundamental em português. Ferramentas ou eram caras, ou eram em inglês, ou eram ruído disfarçado de análise.",
+      "p1": "A BullValue nasceu de uma frustração simples: não existia nenhuma plataforma séria de análise fundamental em português. Ferramentas ou eram caras, ou eram em inglês, ou eram ruído disfarçado de análise.",
       "p2": "Somos a Bullocracy, uma equipa pequena que acredita que a literacia financeira portuguesa merece melhor do que dicas de rede social. Por isso o essencial é gratuito: dados da SEC, DCF a sério e zero conselhos de compra."
     },
     "faq": {
@@ -203,7 +203,7 @@
       "q2": "De onde vêm os dados?",
       "a2": "Fundamentais diretamente da SEC EDGAR (os relatórios oficiais 10-K e 10-Q das empresas) e preços da Polygon. Sem scrapers, sem fontes duvidosas.",
       "q3": "Isto é aconselhamento financeiro?",
-      "a3": "Não. A Bull Metrics é uma ferramenta de análise e educação. Nenhum valor, métrica ou insight constitui recomendação de compra ou venda. As decisões são sempre tuas.",
+      "a3": "Não. A BullValue é uma ferramenta de análise e educação. Nenhum valor, métrica ou insight constitui recomendação de compra ou venda. As decisões são sempre tuas.",
       "q4": "Que empresas estão disponíveis?",
       "a4": "As 500 empresas do S&P 500 no lançamento. A cobertura de empresas europeias (incluindo a Euronext Lisboa) está no roadmap.",
       "q5": "Os números batem certo com os relatórios oficiais?",
@@ -305,7 +305,7 @@
     "analytics": "Pulse"
   },
   "login": {
-    "title": "Entrar no BullMetrics",
+    "title": "Entrar no BullValue",
     "subtitle": "Acede ao teu portfólio e análises.",
     "emailLabel": "Email",
     "emailPlaceholder": "nome@email.com",
@@ -320,7 +320,7 @@
   },
   "register": {
     "title": "Criar Conta",
-    "subtitle": "Junta-te a milhares de investidores no BullMetrics.",
+    "subtitle": "Junta-te a milhares de investidores no BullValue.",
     "nameLabel": "Nome",
     "namePlaceholder": "O teu nome",
     "emailLabel": "Email",
@@ -395,7 +395,7 @@
       "namePlaceholder": "Como queres ser chamado",
       "save": "Guardar Alterações",
       "dangerZone": "Zona de Perigo",
-      "logoutDesc": "Termina a tua sessão atual no BullMetrics com segurança.",
+      "logoutDesc": "Termina a tua sessão atual no BullValue com segurança.",
       "logoutBtn": "Sair da Conta",
       "securityTitle": "Segurança",
       "currentPassword": "Password Atual",
@@ -417,7 +417,7 @@
     "preferences": {
       "title": "Preferências de Utilização",
       "language": "Idioma",
-      "languageDesc": "Escolhe a língua em que queres usar o BullMetrics.",
+      "languageDesc": "Escolhe a língua em que queres usar o BullValue.",
       "theme": "Tema Visual",
       "themeDesc": "Alterna entre modo escuro (Dark) e modo claro (Light).",
       "themeLight": "Claro",
@@ -468,10 +468,11 @@
       "adding": "A adicionar..."
     },
     "suggestions": {
-      "title": "Sugestões para adicionares"
+      "title": "Descobre novas empresas",
+      "exploreMore": "Explora negócios por setor e tipo de negócio"
     },
     "landing": {
-      "title": "BullMetrics",
+      "title": "BullValue",
       "description": "Pesquisa pelo ticker de uma empresa na barra superior para começar ou regista-te para acederes à tua Watchlist.",
       "testExample": "Testar Exemplo",
       "createAccount": "Criar Conta Grátis"
@@ -534,7 +535,10 @@
     },
     "manage": {
       "title": "Adicionar ou sincronizar posições",
-      "importCsv": "Importar CSV"
+      "importCsv": "Importar CSV",
+      "manualAdd": "Adicionar manualmente",
+      "manualAddPlaceholder": "Pesquisar ticker ou empresa...",
+      "manualAddNoResults": "Nenhuma empresa encontrada."
     },
     "import": {
       "trigger": "Importar Portfólio",
@@ -989,7 +993,7 @@
     "about": "Sobre Nós"
   },
   "cookieConsent": {
-    "text": "Utilizamos cookies exclusivamente para compreender como utiliza a Bullmetrics e melhorar a sua experiência. Aceita a sua utilização?",
+    "text": "Utilizamos cookies exclusivamente para compreender como utiliza o BullValue e melhorar a sua experiência. Aceita a sua utilização?",
     "accept": "Aceitar Tudo",
     "decline": "Recusar"
   },
@@ -1156,14 +1160,14 @@
     "badge": "A Nossa Missão",
     "title": "A democratizar o acesso a dados <italic>financeiros.</italic>",
     "titlePlain": "A democratizar o acesso a dados financeiros.",
-    "intro": "A BullMetrics é uma plataforma de análise de dados fundamentais desenhada para todo o tipo de investidores.",
+    "intro": "A BullValue é uma plataforma de análise de dados fundamentais desenhada para todo o tipo de investidores.",
     "problem": {
       "title": "O Nosso Objetivo",
       "text": "Dar ao investidor individual acesso fácil, estruturado e transparente às demonstrações financeiras das empresas. Ao automatizar a extração dos complexos relatórios da SEC, libertamos o teu tempo para aquilo que realmente importa: a análise de valor."
     },
     "organization": {
       "title": "A Bullocracy",
-      "text": "A BullMetrics é um produto construído pela Bullocracy, uma organização de jovens estudantes que procuram democratizar o acesso ao conhecimento sobre Política, Economia e Investimentos. Para isso, criam conteúdos nas redes sociais, desde o YouTube ao TikTok, fomentando a criação um espaço para que a nossa comunidade possa escrever artigos e opiniões para serem publicados online, no site thebullocracy.com, onde estimulam o debate livre e a literacia financeira.",
+      "text": "A BullValue é um produto construído pela Bullocracy, uma organização de jovens estudantes que procuram democratizar o acesso ao conhecimento sobre Política, Economia e Investimentos. Para isso, criam conteúdos nas redes sociais, desde o YouTube ao TikTok, fomentando a criação um espaço para que a nossa comunidade possa escrever artigos e opiniões para serem publicados online, no site thebullocracy.com, onde estimulam o debate livre e a literacia financeira.",
       "cta": "Visitar thebullocracy.com"
     },
     "team": {
@@ -1173,7 +1177,7 @@
         {
           "name": "Rodrigo Martins",
           "role": "Co-Founder & Web Analyst",
-          "bio": "Estudante de Economia na Universidade do Minho. Responsável pela estratégia de marketing, indexação do site, SEO, métricas de analytics e otimização geral da performance da plataforma, bem como a integração da BullMetrics nos conteúdos da Bullocracy.",
+          "bio": "Estudante de Economia na Universidade do Minho. Responsável pela estratégia de marketing, indexação do site, SEO, métricas de analytics e otimização geral da performance da plataforma, bem como a integração da BullValue nos conteúdos da Bullocracy.",
           "socials": {
             "linkedin": "https://www.linkedin.com/in/rodrigo-teixeira-martins/",
             "instagram": "#",
@@ -1204,7 +1208,7 @@
     },
     "philosophy": {
       "title": "A Filosofia dos Dados",
-      "text": "A nossa análise baseia-se na matemática e nos relatórios oficiais extraídos diretamente da SEC. A BullMetrics foca-se na solidez dos números. Acreditamos que as decisões financeiras exigem dados limpos, precisão técnica e transparência, características que valorizamos muito na BullMetrics."
+      "text": "A nossa análise baseia-se na matemática e nos relatórios oficiais extraídos diretamente da SEC. A BullValue foca-se na solidez dos números. Acreditamos que as decisões financeiras exigem dados limpos, precisão técnica e transparência, características que valorizamos muito no BullValue."
     },
     "contact": {
       "title": "Contactos Oficiais",

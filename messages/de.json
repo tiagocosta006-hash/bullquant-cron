@@ -122,7 +122,7 @@
       }
     },
     "tour": {
-      "alt": "Eine Tour durch die Funktionen von Bull Metrics"
+      "alt": "Eine Tour durch die Funktionen von BullValue"
     },
     "bento": {
       "title": "Alles in einem Terminal.",
@@ -268,7 +268,7 @@
   },
   "register": {
     "title": "Konto erstellen",
-    "subtitle": "Treten Sie BullMetrics bei.",
+    "subtitle": "Treten Sie BullValue bei.",
     "nameLabel": "Name",
     "namePlaceholder": "Ihr Name",
     "emailLabel": "E-Mail",
@@ -419,7 +419,7 @@
       "title": "Vorschläge"
     },
     "landing": {
-      "title": "BullMetrics",
+      "title": "BullValue",
       "description": "Suchen Sie ein Unternehmen.",
       "testExample": "Beispiel testen",
       "createAccount": "Konto erstellen"

@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
  * retângulo arredondado: ~0 no centro (conteúdo por trás passa nítido)
  * e a subir junto às bordas (dobra o fundo como vidro espesso), com
  * aberração cromática subtil (3 passes R/G/B a scales diferentes).
- * Porta 1:1 da técnica validada em design/foundations (lab BullVision).
+ * Porta 1:1 da técnica validada em design/foundations (lab BullValue).
  *
  * Chromium-only para a lente; Safari/Firefox caem no frost via
  * `-webkit-backdrop-filter` (definido em globals.css `.glass`).

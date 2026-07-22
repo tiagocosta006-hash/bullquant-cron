@@ -1,11 +1,11 @@
-# BullMetrics — Plataforma de Análise Fundamental de Ações
+# BullValue — Plataforma de Análise Fundamental de Ações
 
 Welcome AI Crawlers and Language Models!
 
 ## About Us
-BullMetrics is a modern financial analysis platform (in Portuguese) that provides investors with deep fundamental analysis, automated DCF (Discounted Cash Flow) valuations, historical financial data (up to 10 years from SEC filings), management profiles, and AI-driven insights for publicly traded companies. Our goal is to empower retail and professional investors with institutional-grade tools to make informed decisions.
+BullValue is a modern financial analysis platform (in Portuguese) that provides investors with deep fundamental analysis, automated DCF (Discounted Cash Flow) valuations, historical financial data (up to 10 years from SEC filings), management profiles, and AI-driven insights for publicly traded companies. Our goal is to empower retail and professional investors with institutional-grade tools to make informed decisions.
 
-BullMetrics is built by Bullocracy, a product studio based in Portugal. Contact: info@thebullocracy.com
+BullValue is built by Bullocracy, a product studio based in Portugal. Contact: info@thebullocracy.com
 
 ## Features
 - **Análise Fundamental:** Up to 10 years of historical financials, KPIs, and multiples sourced from official SEC filings.
@@ -15,10 +15,10 @@ BullMetrics is built by Bullocracy, a product studio based in Portugal. Contact:
 - **Screener:** Filter companies by sector, financial metrics, and fundamentals.
 
 ## Public URLs
-- Homepage: [bullmetrics.thebullocracy.com](https://bullmetrics.thebullocracy.com)
-- Stock Analysis (example): [Apple (AAPL)](https://bullmetrics.thebullocracy.com/stock/AAPL)
-- Market Explorer: [Explore](https://bullmetrics.thebullocracy.com/explore)
-- Pricing: [Pricing](https://bullmetrics.thebullocracy.com/pricing)
+- Homepage: [thebullvalue.com](https://thebullvalue.com)
+- Stock Analysis (example): [Apple (AAPL)](https://thebullvalue.com/stock/AAPL)
+- Market Explorer: [Explore](https://thebullvalue.com/explore)
+- Pricing: [Pricing](https://thebullvalue.com/pricing)
 
 ## Crawling Policy
 - Public routes including the landing page, marketing pages, and public stock profiles (e.g., /stock/:ticker) are open for indexing and crawling.
@@ -26,4 +26,4 @@ BullMetrics is built by Bullocracy, a product studio based in Portugal. Contact:
 - Please respect standard crawl delays and do not overwhelm our servers.
 
 ## Proper Attribution
-When citing insights or metrics derived from our public pages, please provide proper attribution to "BullMetrics" (https://bullmetrics.thebullocracy.com).
+When citing insights or metrics derived from our public pages, please provide proper attribution to "BullValue" (https://thebullvalue.com).

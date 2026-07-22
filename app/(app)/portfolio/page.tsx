@@ -19,7 +19,6 @@ import { AddPositionDialog } from "@/components/portfolio/AddPositionDialog"
 import { calculatePositionPnl, aggregatePnl } from "@/lib/finance/portfolio"
 import type { PortfolioItem, PriceData, SortKey, ViewMode } from "@/components/portfolio/types"
 
-const POPULAR_TICKERS = ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA", "NFLX"]
 const VIEW_MODE_STORAGE_KEY = "portfolio.viewMode"
 
 export default function Home() {
@@ -236,7 +235,6 @@ export default function Home() {
   }
 
   const upToday = Object.values(prices).filter(p => p.change !== undefined && p.change >= 0).length
-  const suggestedTickers = POPULAR_TICKERS.filter(ticker => !items.some(item => item.company.ticker === ticker)).slice(0, 4)
 
   return (
     <div className="space-y-6">
@@ -257,7 +255,7 @@ export default function Home() {
       {items.length === 0 ? (
         <>
           <PortfolioEmptyState addingTicker={addingTicker} onQuickAdd={handleQuickAdd} />
-          <PortfolioManageBar onImportClick={() => setIsImportOpen(true)} onSynced={fetchPortfolio} />
+          <PortfolioManageBar onImportClick={() => setIsImportOpen(true)} onSynced={fetchPortfolio} onManualAdd={handleQuickAdd} />
         </>
       ) : (
         <>
@@ -272,7 +270,7 @@ export default function Home() {
             </div>
           )}
 
-          <PortfolioManageBar onImportClick={() => setIsImportOpen(true)} onSynced={fetchPortfolio} />
+          <PortfolioManageBar onImportClick={() => setIsImportOpen(true)} onSynced={fetchPortfolio} onManualAdd={handleQuickAdd} />
 
           <PortfolioToolbar
             sortKey={sortKey}
@@ -325,8 +323,8 @@ export default function Home() {
         onAdded={handleEdited}
       />
 
-      {items.length > 0 && items.length < 4 && suggestedTickers.length > 0 && (
-        <PortfolioSuggestions tickers={suggestedTickers} addingTicker={addingTicker} onQuickAdd={handleQuickAdd} />
+      {items.length > 0 && items.length < 4 && (
+        <PortfolioSuggestions />
       )}
 
       {lastUpdate && items.length > 0 && (

@@ -228,7 +228,7 @@ export default async function StockPage({
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "BullQuant",
+            "name": BRAND.name,
             "item": BRAND.siteUrl
           },
           {

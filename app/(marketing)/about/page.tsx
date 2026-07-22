@@ -34,6 +34,9 @@ export async function generateMetadata({
       description,
       type: "website",
     },
+    alternates: {
+      canonical: `${BRAND.siteUrl}/about`,
+    },
   };
 }
 

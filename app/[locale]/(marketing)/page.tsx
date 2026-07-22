@@ -31,6 +31,7 @@ import { BRAND } from "@/lib/brand";
 import { getTickerItems } from "@/lib/marketing/ticker";
 import { getUser } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
+import { DynamicProPrice } from "@/components/marketing/DynamicProPrice";
 
 
 /**
@@ -565,7 +566,7 @@ export default async function LandingPage({
                   </div>
                   <div className="mt-3 flex items-baseline gap-2">
                     <span className="nums text-5xl font-extrabold tracking-tight">
-                      {t("pricing.pro.price")}
+                      <DynamicProPrice fallback={t("pricing.pro.price")} />
                     </span>
                     <span className="text-sm text-muted-foreground">{t("pricing.pro.period")}</span>
                   </div>

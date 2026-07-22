@@ -314,7 +314,6 @@ INSTANT_TAGS = {
     "shortTermDebt": [
         "ShortTermBorrowings", "ShortTermDebt", "ShorttermBorrowings",
         # ── Aceites na revisão CFA 2026-07 ──
-        "DebtCurrent",                     # total corrente (ADI/KMB/ORCL)
         "OtherShortTermBorrowings",        # DECK/IBKR
         "ShortTermBankLoansAndNotesPayable",  # EVRG/EXPD
         "CurrentDebtInstrumentsIssued",    # IFRS bancos (UBS)
@@ -322,6 +321,12 @@ INSTANT_TAGS = {
         # legítimo borrowing (ADSK/ALGN/CRWD sem outras tags de dívida).
         "LineOfCredit",
     ],
+    # DebtCurrent = TOTAL da dívida corrente (já inclui a porção corrente da LTD
+    # + borrowings de curto prazo). Fica em campo PRÓPRIO — não em shortTermDebt —
+    # senão somava-se com longTermDebtCurrent e contava a porção corrente a dobrar
+    # (NVDA FY2024: 8.459 + 1.250 LTDcurrent + 1.250 DebtCurrent = 10.959 em vez
+    # de 9.709). Ver build_row: current = max(DebtCurrent, LTDcurrent + ST).
+    "debtCurrentTotal": ["DebtCurrent"],
     "commercialPaper": ["CommercialPaper", "CommercialPaperAtCarryingValue"],
     "totalDebt": [
         "DebtLongtermAndShorttermCombinedAmount",
@@ -1226,15 +1231,21 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         ltd_nc = inst.get("longTermDebt")
         ltd_c = inst.get("longTermDebtCurrent")
         st = inst.get("shortTermDebt") or inst.get("commercialPaper")
-        if ltd_nc is not None or ltd_c is not None or st is not None:
+        dc_total = inst.get("debtCurrentTotal")  # DebtCurrent = total corrente reportado
+        # Dívida corrente sem dupla contagem: DebtCurrent JÁ inclui a porção
+        # corrente da LTD + ST, por isso NUNCA se soma com os componentes — usa-se
+        # o MAIOR entre o total reportado e a soma dos componentes (o max protege
+        # contra sub-contagem se o DebtCurrent do emissor for parcial).
+        current_debt = max((dc_total or 0), (ltd_c or 0) + (st or 0))
+        if ltd_nc is not None or ltd_c is not None or st is not None or dc_total is not None:
             # Guard JPM-class: se a empresa JÁ taggou dívida LT nalgum período
             # mas não neste (bancos modernos só a tagham dimensionada, que a
             # API descarta), somar só o curto prazo daria um "total" 8× errado
             # (JPM: $52.9B de ST vs $463B reais). Antes NULL que errado.
-            if ltd_nc is None and ltd_c is None and evidence.get("has_ltd_ever"):
+            if ltd_nc is None and ltd_c is None and dc_total is None and evidence.get("has_ltd_ever"):
                 total_debt = None
             else:
-                total_debt = (ltd_nc or 0) + (ltd_c or 0) + (st or 0)
+                total_debt = (ltd_nc or 0) + current_debt
     if total_debt is None:
         # Nível 2: valor de face da dívida emitida (empresas sem tags de componentes, ex: META)
         total_debt = inst.get("debtInstrumentCarryingAmount")
@@ -1251,7 +1262,7 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         # bancos têm dívida dimensionada invisível; has_ltd_ever=True idem.)
         if all(inst.get(k) is None for k in
                ("longTermDebt", "longTermDebtCurrent", "shortTermDebt",
-                "commercialPaper", "debtInstrumentCarryingAmount",
+                "debtCurrentTotal", "commercialPaper", "debtInstrumentCarryingAmount",
                 "securedDebt", "unsecuredDebt")):
             total_debt = 0.0
     if total_debt is None and sector == "Financials":
@@ -1263,9 +1274,14 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         core = [inst.get("fhlbAdvances"), inst.get("subordinatedDebtBank"),
                 inst.get("otherBorrowingsBank"), inst.get("lineOfCredit")]
         if any(c is not None for c in core):
-            extras = [inst.get("shortTermDebt"), inst.get("commercialPaper"),
-                      inst.get("longTermDebtCurrent")]
-            composite = sum(c for c in core + extras if c is not None)
+            # Corrente sem dupla contagem (idem build_row nível 1): max entre o
+            # DebtCurrent reportado e a soma dos componentes correntes.
+            cur_part = max(
+                (inst.get("debtCurrentTotal") or 0),
+                sum(c for c in (inst.get("shortTermDebt"), inst.get("commercialPaper"),
+                                inst.get("longTermDebtCurrent")) if c is not None),
+            )
+            composite = sum(c for c in core if c is not None) + cur_part
             # Compósito 0 (ex.: ACGL com LoC=0 mas senior notes só
             # dimensionadas) seria um zero fabricado — fica NULL honesto.
             total_debt = composite if composite > 0 else None

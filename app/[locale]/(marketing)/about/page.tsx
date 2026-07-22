@@ -15,10 +15,11 @@ const cinzel = Cinzel({
 });
 
 export async function generateMetadata({
-  params: { locale },
+  params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
+  const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "about" });
   // "title" tem tags <italic> destinadas ao t.rich do h1 — chamar t("title")
   // em modo plano faz o next-intl lançar FORMATTING_ERROR (não há handler

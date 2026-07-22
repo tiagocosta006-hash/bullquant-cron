@@ -29,6 +29,7 @@ export function ManualAddSearch({ onSelect }: { onSelect: (ticker: string) => vo
   const [rect, setRect] = useState<{ top: number; left: number; width: number } | null>(null)
   const [mounted, setMounted] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const debouncedQuery = useDebounce(query, 300)
 
   useEffect(() => {
@@ -59,7 +60,10 @@ export function ManualAddSearch({ onSelect }: { onSelect: (ticker: string) => vo
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+      const target = event.target as Node
+      const insideWrapper = wrapperRef.current?.contains(target)
+      const insideDropdown = dropdownRef.current?.contains(target)
+      if (!insideWrapper && !insideDropdown) {
         setIsOpen(false)
       }
     }
@@ -116,6 +120,7 @@ export function ManualAddSearch({ onSelect }: { onSelect: (ticker: string) => vo
 
       {mounted && (showResults || showNoResults) && rect && createPortal(
         <div
+          ref={dropdownRef}
           style={{ position: "fixed", top: rect.top, left: rect.left, width: rect.width }}
           className="z-[100] bg-popover border border-border/50 rounded-xl shadow-lg overflow-hidden"
         >

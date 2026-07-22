@@ -87,7 +87,7 @@ export function SavedValuations({ analyses, ticker, currency = "$" }: SavedValua
                   <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/70 mb-0.5">
                     WACC
                   </p>
-                  <p className="font-mono text-sm font-medium">
+                  <p className="nums text-sm font-medium">
                     {(a.wacc * 100).toFixed(1)}%
                   </p>
                 </div>
@@ -95,7 +95,7 @@ export function SavedValuations({ analyses, ticker, currency = "$" }: SavedValua
                   <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/70 mb-0.5">
                     {t("growth")}
                   </p>
-                  <p className="font-mono text-sm font-medium">
+                  <p className="nums text-sm font-medium">
                     {(a.growthStage1 * 100).toFixed(1)}%
                   </p>
                 </div>
@@ -103,7 +103,7 @@ export function SavedValuations({ analyses, ticker, currency = "$" }: SavedValua
                   <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/70 mb-0.5">
                     {t("termGrowth")}
                   </p>
-                  <p className="font-mono text-sm font-medium">
+                  <p className="nums text-sm font-medium">
                     {(a.terminalGrowth * 100).toFixed(1)}%
                   </p>
                 </div>

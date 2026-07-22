@@ -42,12 +42,12 @@ export function TeamMemberModal({ member }: { member: TeamMember }) {
             {member.image ? (
               <Image src={member.image} alt={member.name} fill sizes="96px" className="object-cover" />
             ) : (
-              <span className="text-2xl font-heading text-muted-foreground">{member.initials}</span>
+              <span className="text-2xl font-sans text-muted-foreground">{member.initials}</span>
             )}
           </div>
           
           <div className="text-center flex flex-col gap-1 relative z-10">
-            <h3 className="font-heading font-semibold text-2xl group-hover:text-primary transition-colors">{member.name}</h3>
+            <h3 className="font-extrabold tracking-[-0.02em] text-2xl group-hover:text-primary transition-colors">{member.name}</h3>
             <span className="text-sm text-primary font-medium tracking-wider uppercase">{member.role}</span>
           </div>
           
@@ -77,14 +77,14 @@ export function TeamMemberModal({ member }: { member: TeamMember }) {
                {member.image ? (
                  <Image src={member.image} alt={member.name} fill sizes="(min-width: 640px) 256px, 192px" className="object-cover" />
                ) : (
-                 <span className="text-6xl sm:text-7xl font-heading text-muted-foreground/30">{member.initials}</span>
+                 <span className="text-6xl sm:text-7xl font-sans text-muted-foreground/30">{member.initials}</span>
                )}
              </div>
           </div>
           
           {/* Direita: Texto e Redes */}
           <div className="p-10 sm:p-14 flex flex-col justify-center relative">
-            <h2 className="text-4xl sm:text-5xl font-heading font-bold mb-3">{member.name}</h2>
+            <h2 className="text-4xl sm:text-5xl font-extrabold tracking-[-0.02em] mb-3">{member.name}</h2>
             <p className="text-primary font-bold tracking-widest uppercase text-sm mb-8">{member.role}</p>
             
             <p className="text-muted-foreground text-lg sm:text-xl leading-relaxed mb-10">

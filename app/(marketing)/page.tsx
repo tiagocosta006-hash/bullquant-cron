@@ -142,6 +142,9 @@ export default async function LandingPage({
         <DashboardReplica
           tabs={["sp500", "gainers", "marketCap"].map((k) => tDashboard(`tabs.${k}`))}
           marketCapLabel={tDashboard("marketCap")}
+          logos={Object.fromEntries(
+            ["AAPL", "MSFT", "NVDA"].map((tk) => [tk, ticker.items.find((i) => i.ticker === tk)?.logoUrl ?? null]),
+          )}
         />
       ),
     },

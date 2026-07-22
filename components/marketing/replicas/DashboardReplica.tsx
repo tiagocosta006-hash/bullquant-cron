@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils";
  * DashboardReplica — mock fiel do bento "Tudo num terminal": pill tabs +
  * grelha de StockCards, cópia das class strings reais de
  * app/(app)/dashboard/DashboardClient.tsx (pill de tabs) e
- * components/stock/StockCard.tsx (card individual). Sem fetch, dados
- * hardcoded (não precisam de i18n); labels via props (chaves reais de
- * dashboard.* pedidas ao servidor em page.tsx).
+ * components/stock/StockCard.tsx (card individual). Preço/variação/cap
+ * hardcoded (não precisam de i18n); logos reais (AAPL/MSFT/NVDA) vêm do
+ * `ticker.items` já pedido em page.tsx (getTickerItems) — sem fetch extra
+ * aqui, só passagem de prop.
  */
 
 const MOCK_STOCKS = [
@@ -21,11 +22,14 @@ const MOCK_STOCKS = [
 export function DashboardReplica({
   tabs,
   marketCapLabel,
+  logos,
 }: {
   /** dashboard.tabs.* — só os labels, key "sp500" fica ativa */
   tabs: string[];
   /** dashboard.marketCap */
   marketCapLabel: string;
+  /** logoUrl real por ticker (AAPL/MSFT/NVDA) — vem do TickerItem já pedido em page.tsx, sem fetch extra */
+  logos?: Partial<Record<(typeof MOCK_STOCKS)[number]["ticker"], string | null>>;
 }) {
   return (
     <div className="mt-5 space-y-3">
@@ -55,7 +59,7 @@ export function DashboardReplica({
             <div className="gold-rule absolute inset-x-0 top-0 h-px opacity-0 transition-opacity group-hover:opacity-100" />
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5 overflow-hidden">
-                <CompanyLogo src={null} alt={s.ticker} fallback={s.ticker} size={32} className="rounded-md" />
+                <CompanyLogo src={logos?.[s.ticker] ?? null} alt={s.ticker} fallback={s.ticker} size={32} className="rounded-md" />
                 <div className="flex min-w-0 flex-col overflow-hidden">
                   <span className="truncate text-sm font-bold">{s.ticker}</span>
                   <span className="truncate text-[11px] text-muted-foreground">{s.name}</span>

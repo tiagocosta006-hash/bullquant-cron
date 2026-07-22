@@ -75,23 +75,23 @@ export function WaccBreakdownCard({ breakdown, fcfMode = "FCFF", onUseWacc }: Wa
             <div className="bg-muted/40 rounded-lg p-2.5 space-y-1.5 text-xs">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">{t("wacc.riskFreeRate") || "Rf"}:</span>
-                <span className="font-mono">{formatPercent(breakdown.riskFreeRate)}</span>
+                <span className="nums">{formatPercent(breakdown.riskFreeRate)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
                   β ({t("wacc.beta") || "Beta"}):
                 </span>
-                <span className="font-mono">{breakdown.beta?.toFixed(2) || "N/A"}</span>
+                <span className="nums">{breakdown.beta?.toFixed(2) || "N/A"}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
                   {t("wacc.equityRiskPremium") || "ERP"}:
                 </span>
-                <span className="font-mono">{formatPercent(breakdown.equityRiskPremium)}</span>
+                <span className="nums">{formatPercent(breakdown.equityRiskPremium)}</span>
               </div>
               <div className="border-t border-border pt-1.5 mt-1.5 flex justify-between font-semibold">
                 <span className="text-foreground">Re (Rf + β×ERP):</span>
-                <span className="font-mono text-primary">
+                <span className="nums text-primary">
                   {formatPercent(breakdown.costOfEquity ?? 0)}
                 </span>
               </div>
@@ -109,7 +109,7 @@ export function WaccBreakdownCard({ breakdown, fcfMode = "FCFF", onUseWacc }: Wa
                   <span className="text-muted-foreground">
                     {t("wacc.costOfDebtLabel") || "Rd (pre-tax)"}:
                   </span>
-                  <span className="font-mono">
+                  <span className="nums">
                     {breakdown.costOfDebtPretax ? formatPercent(breakdown.costOfDebtPretax) : "N/A"}
                   </span>
                 </div>
@@ -117,13 +117,13 @@ export function WaccBreakdownCard({ breakdown, fcfMode = "FCFF", onUseWacc }: Wa
                   <span className="text-muted-foreground">
                     {t("wacc.taxRate") || "Tax Rate"}:
                   </span>
-                  <span className="font-mono">{formatPercent(breakdown.effectiveTaxRate)}</span>
+                  <span className="nums">{formatPercent(breakdown.effectiveTaxRate)}</span>
                 </div>
                 <div className="border-t border-border pt-1.5 mt-1.5 flex justify-between font-semibold">
                   <span className="text-foreground">
                     Rd (after-tax):
                   </span>
-                  <span className="font-mono text-primary">
+                  <span className="nums text-primary">
                     {breakdown.costOfDebtAfterTax
                       ? formatPercent(breakdown.costOfDebtAfterTax)
                       : "N/A"}

@@ -1,18 +1,14 @@
 import { getTranslations } from "next-intl/server";
 import { useTranslations } from "next-intl";
 import { BRAND } from "@/lib/brand";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, Target, Shield, Users, LineChart, Mail, MapPin, MessageCircle } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
+import { ExternalLink, Target, Mail, MapPin, MessageCircle } from "lucide-react";
 import { TeamMemberModal } from "@/components/marketing/TeamMemberModal";
+import { LiquidGlass } from "@/components/fx/LiquidGlass";
+import { Reveal } from "@/components/fx/Reveal";
 import Image from "next/image";
-import { Cinzel } from "next/font/google";
 import { Metadata } from "next";
-
-const cinzel = Cinzel({
-  subsets: ["latin"],
-  weight: ["600", "700"],
-});
+import { cn } from "@/lib/utils";
 
 export async function generateMetadata({
   params: { locale },
@@ -85,88 +81,81 @@ export default function AboutPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="container mx-auto max-w-5xl py-24 sm:py-32 flex flex-col gap-24 px-4 sm:px-6">
-        {/* 1. Hero Section */}
-        <div className="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <Badge variant="secondary" className="px-4 py-1 text-sm bg-primary/10 text-primary border-primary/20">
-            <Target className="w-4 h-4 mr-2" />
-            {t("badge")}
-          </Badge>
-          <h1 className="text-4xl sm:text-6xl font-heading tracking-tight text-balance">
+      <div className="container mx-auto flex max-w-5xl flex-col gap-24 px-4 py-24 sm:px-6 sm:py-32">
+        {/* 1. Hero */}
+        <Reveal className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
+          <h1 className="text-balance text-4xl font-extrabold leading-[1.02] tracking-[-0.03em] sm:text-6xl">
             {t.rich("title", {
-              italic: (chunks) => <span className="italic text-muted-foreground">{chunks}</span>
+              italic: (chunks) => <span className="not-italic text-foreground">{chunks}</span>,
             })}
           </h1>
-          <p className="text-xl text-muted-foreground leading-relaxed">
-            {t("intro")}
-          </p>
-        </div>
+          <p className="text-xl leading-relaxed text-muted-foreground">{t("intro")}</p>
+        </Reveal>
 
-        {/* 2. The Goal (Formerly The Problem) */}
-        <div className="glass flex flex-col items-center text-center gap-6 rounded-3xl p-8 max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150 fill-mode-both border border-border/50 shadow-sm mt-4">
-          <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-2">
-            <Target className="w-7 h-7 text-primary" />
-          </div>
-          <h2 className={`text-3xl sm:text-4xl text-foreground tracking-tight ${cinzel.className}`}>
-            {t("problem.title")}
-          </h2>
-          <p className="text-muted-foreground leading-relaxed text-lg sm:text-xl">
-            {t("problem.text")}
-          </p>
-        </div>
+        {/* 2. The Goal */}
+        <Reveal>
+          <LiquidGlass className="card-lift mx-auto flex max-w-3xl flex-col items-center gap-6 rounded-3xl p-8 text-center">
+            <div className="mb-2 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+              <Target className="h-7 w-7 text-primary" />
+            </div>
+            <h2 className="text-3xl font-extrabold tracking-[-0.03em] text-foreground sm:text-4xl">
+              {t("problem.title")}
+            </h2>
+            <p className="text-lg leading-relaxed text-muted-foreground sm:text-xl">
+              {t("problem.text")}
+            </p>
+          </LiquidGlass>
+        </Reveal>
 
         {/* 3. The Organization (Bullocracy) */}
-        <div className="relative overflow-hidden bg-[#0A1526] text-slate-50 border border-slate-800/50 rounded-[2rem] p-8 sm:p-12 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 fill-mode-both shadow-2xl mt-4">
-          {/* Brilho decorativo no fundo para dar requinte ao azul */}
-          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary/20 blur-[100px] rounded-full pointer-events-none"></div>
-          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-72 h-72 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none"></div>
-
-          <div className="flex flex-col items-center text-center gap-6 relative z-10 max-w-3xl mx-auto">
-            {/* Logo */}
-            <div className="mb-2">
+        <Reveal>
+          <LiquidGlass className="card-lift relative mx-auto max-w-4xl overflow-hidden rounded-[2rem] p-8 sm:p-12">
+            <div className="pointer-events-none absolute -right-20 -top-20 h-96 w-96 rounded-full bg-primary/15 blur-[100px]" />
+            <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
               <Image
                 src="/brand/bullocracy-logo.png"
                 alt="The Bullocracy Logo"
-                width={110}
-                height={110}
-                className="object-contain drop-shadow-xl"
+                width={100}
+                height={100}
+                className="object-contain"
                 // o preflight do Tailwind aplica `height: auto` a todo <img>,
-                // o que desencontra com a largura fixa (110px do atributo) e
+                // o que desencontra com a largura fixa (100px do atributo) e
                 // dispara o aviso do next/image. Fixar as duas dimensões
                 // aqui sobrepõe o preflight sem mudar o tamanho renderizado.
-                style={{ width: 110, height: 110 }}
+                style={{ width: 100, height: 100 }}
                 priority
               />
-            </div>
-            
-            <h2 className={`text-4xl sm:text-6xl text-primary tracking-wide drop-shadow-sm ${cinzel.className}`}>THE BULLOCRACY</h2>
-            <p className="text-slate-300 leading-relaxed text-lg sm:text-xl">
-              {t("organization.text")}
-            </p>
-            <div className="pt-6">
-              <a href="https://thebullocracy.com" target="_blank" rel="noopener noreferrer" className="inline-flex">
-                <Button size="lg" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-8 shadow-[0_4px_24px_-6px_hsl(var(--primary)/0.5)]">
-                  {t("organization.cta")}
-                  <ExternalLink className="w-4 h-4 ml-2" />
-                </Button>
+
+              <h2 className="text-4xl font-extrabold tracking-wide text-primary sm:text-5xl">
+                THE BULLOCRACY
+              </h2>
+              <p className="text-lg leading-relaxed text-muted-foreground sm:text-xl">
+                {t("organization.text")}
+              </p>
+              <a
+                href="https://thebullocracy.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(buttonVariants({ size: "lg" }), "pressable mt-2 rounded-full px-8 font-semibold")}
+              >
+                {t("organization.cta")}
+                <ExternalLink className="ml-2 h-4 w-4" />
               </a>
             </div>
-          </div>
-        </div>
+          </LiquidGlass>
+        </Reveal>
 
         {/* Divider */}
-        <div className="gold-rule h-[1px] w-full max-w-sm mx-auto opacity-30 animate-in fade-in duration-700 delay-300 fill-mode-both"></div>
+        <div className="gold-rule mx-auto h-px w-full max-w-sm opacity-30" />
 
         {/* 4. The Team */}
-        <div className="flex flex-col gap-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 fill-mode-both">
-          <div className="text-center max-w-2xl mx-auto flex flex-col gap-4">
-            <h2 className="text-3xl sm:text-4xl font-heading">{t("team.title")}</h2>
-            <p className="text-lg text-muted-foreground">
-              {t("team.description")}
-            </p>
-          </div>
+        <div className="flex flex-col gap-12">
+          <Reveal className="mx-auto flex max-w-2xl flex-col gap-4 text-center">
+            <h2 className="text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">{t("team.title")}</h2>
+            <p className="text-lg text-muted-foreground">{t("team.description")}</p>
+          </Reveal>
 
-          <div className="grid sm:grid-cols-3 gap-6">
+          <div className="grid gap-6 sm:grid-cols-3">
             {[0, 1, 2].map((index) => {
               const name = t(`team.members.${index}.name`);
               const initials = name
@@ -188,55 +177,57 @@ export default function AboutPage() {
                 }
               };
 
-              return <TeamMemberModal key={index} member={member} />;
+              return (
+                <Reveal key={index} style={{ transitionDelay: `${index * 70}ms` }}>
+                  <TeamMemberModal member={member} />
+                </Reveal>
+              );
             })}
           </div>
         </div>
 
+        {/* 5. Contacts */}
+        <div className="flex flex-col gap-12 border-t border-border/50 pt-12">
+          <Reveal className="mx-auto flex max-w-2xl flex-col gap-4 text-center">
+            <h2 className="text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">{t("contact.title")}</h2>
+            <p className="text-lg text-muted-foreground">{t("contact.text")}</p>
+          </Reveal>
 
-
-        {/* 6. Contacts */}
-        <div className="flex flex-col gap-12 pt-12 border-t border-border/50 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-700 fill-mode-both">
-          <div className="text-center max-w-2xl mx-auto flex flex-col gap-4">
-            <h2 className="text-3xl sm:text-4xl font-heading">{t("contact.title")}</h2>
-            <p className="text-lg text-muted-foreground">
-              {t("contact.text")}
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-3 gap-6 max-w-5xl mx-auto w-full">
+          <div className="mx-auto grid w-full max-w-5xl gap-6 sm:grid-cols-3">
             {/* Email */}
-            <div className="glass flex flex-col items-center text-center p-8 rounded-2xl hover:scale-105 hover:shadow-xl hover:bg-secondary/30 transition-all duration-300 ease-out">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                <Mail className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="font-semibold text-lg mb-1">{t("contact.email_label")}</h3>
-              <a href={`mailto:${t("contact.email_value")}`} className="text-muted-foreground hover:text-primary transition-colors">
-                {t("contact.email_value")}
-              </a>
-            </div>
+            <Reveal>
+              <LiquidGlass className="card-lift flex h-full flex-col items-center gap-1 rounded-2xl p-8 text-center">
+                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                  <Mail className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold">{t("contact.email_label")}</h3>
+                <a href={`mailto:${t("contact.email_value")}`} className="text-muted-foreground transition-colors hover:text-primary">
+                  {t("contact.email_value")}
+                </a>
+              </LiquidGlass>
+            </Reveal>
 
             {/* Location */}
-            <div className="glass flex flex-col items-center text-center p-8 rounded-2xl hover:scale-105 hover:shadow-xl hover:bg-secondary/30 transition-all duration-300 ease-out">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                <MapPin className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="font-semibold text-lg mb-1">{t("contact.location_label")}</h3>
-              <p className="text-muted-foreground">
-                {t("contact.location_value")}
-              </p>
-            </div>
+            <Reveal style={{ transitionDelay: "70ms" }}>
+              <LiquidGlass className="card-lift flex h-full flex-col items-center gap-1 rounded-2xl p-8 text-center">
+                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                  <MapPin className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold">{t("contact.location_label")}</h3>
+                <p className="text-muted-foreground">{t("contact.location_value")}</p>
+              </LiquidGlass>
+            </Reveal>
 
             {/* Social / Community */}
-            <div className="glass flex flex-col items-center text-center p-8 rounded-2xl hover:scale-105 hover:shadow-xl hover:bg-secondary/30 transition-all duration-300 ease-out">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                <MessageCircle className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="font-semibold text-lg mb-1">{t("contact.social_label")}</h3>
-              <p className="text-muted-foreground">
-                {t("contact.social_value")}
-              </p>
-            </div>
+            <Reveal style={{ transitionDelay: "140ms" }}>
+              <LiquidGlass className="card-lift flex h-full flex-col items-center gap-1 rounded-2xl p-8 text-center">
+                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                  <MessageCircle className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold">{t("contact.social_label")}</h3>
+                <p className="text-muted-foreground">{t("contact.social_value")}</p>
+              </LiquidGlass>
+            </Reveal>
           </div>
         </div>
       </div>

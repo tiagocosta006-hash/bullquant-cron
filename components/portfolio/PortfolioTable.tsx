@@ -72,9 +72,9 @@ export function PortfolioTable({ items, prices, onRemove, onEdit }: PortfolioTab
                   </Link>
                 </TableCell>
                 <TableCell className="text-muted-foreground">{item.company.sector || "N/A"}</TableCell>
-                <TableCell className="text-right font-mono">{formatPercent(fundamental?.roic ?? null)}</TableCell>
-                <TableCell className="text-right font-mono">{formatPercent(fundamental?.grossMargin ?? null)}</TableCell>
-                <TableCell className="text-right font-mono">
+                <TableCell className="text-right nums">{formatPercent(fundamental?.roic ?? null)}</TableCell>
+                <TableCell className="text-right nums">{formatPercent(fundamental?.grossMargin ?? null)}</TableCell>
+                <TableCell className="text-right nums">
                   {hasResolved ? formatPrice(price.currentPrice) : (
                     <span className="inline-block h-4 w-16 bg-muted animate-pulse rounded align-middle" />
                   )}
@@ -89,7 +89,7 @@ export function PortfolioTable({ items, prices, onRemove, onEdit }: PortfolioTab
                   )}
                 </TableCell>
                 {hasAnyPosition && (
-                  <TableCell className="text-right font-mono">
+                  <TableCell className="text-right nums">
                     {pnl ? (
                       <span className={pnl.pnlAbsolute >= 0 ? "text-bull" : "text-bear"}>
                         {pnl.pnlAbsolute >= 0 ? "+" : ""}{formatPrice(pnl.pnlAbsolute)} ({formatPercent(pnl.pnlPercent)})

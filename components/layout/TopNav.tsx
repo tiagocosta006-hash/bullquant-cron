@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link } from '@/i18n/routing';
+
 import {
   Activity,
   LayoutDashboard,
@@ -26,8 +26,9 @@ import { LiquidGlass } from "@/components/fx/LiquidGlass";
 import { CommandMenu } from "@/components/layout/CommandMenu";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { logout } from "@/app/(auth)/actions";
+import { logout } from "@/app/[locale]/(auth)/actions";
 import { useIsMac } from "@/hooks/useIsMac";
+import { usePathname } from '@/i18n/routing';
 
 /**
  * TopNav — a navegação ÚNICA do terminal: uma pill Liquid Glass

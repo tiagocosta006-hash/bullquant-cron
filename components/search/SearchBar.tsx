@@ -3,11 +3,12 @@
 import * as React from "react"
 import { Search, Loader2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { useRouter } from "next/navigation"
+
 import { useDebounce } from "@/hooks/useDebounce"
 import { useTranslations } from "next-intl"
 import { useRecentSearches, type RecentSearch } from "@/hooks/useRecentSearches"
 import { CompanyLogo } from "@/components/ui/CompanyLogo"
+import { useRouter } from '@/i18n/routing';
 
 interface SearchBarProps {
   isLoggedIn?: boolean;

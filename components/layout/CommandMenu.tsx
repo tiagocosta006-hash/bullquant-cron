@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+
 import { useTranslations } from "next-intl";
 import {
   LayoutDashboard,
@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/command";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { CompanyLogo } from "@/components/ui/CompanyLogo";
+import { useRouter } from '@/i18n/routing';
 
 interface SearchResult {
   ticker: string;

@@ -5,8 +5,7 @@ import { successPulse } from "@/lib/motion"
 import { track } from "@/lib/pulse/client"
 import { TrendingUp, TrendingDown, Clock, Check, Plus, Scale } from "lucide-react"
 import { useTranslations, useLocale } from "next-intl"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { Link, useRouter } from '@/i18n/routing';
 import { getCurrencySymbol } from "@/lib/finance/format"
 import { CompanyLogo } from "@/components/ui/CompanyLogo"
 

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from '@/i18n/routing';
 import { LogIn, Menu, Search, UserPlus, Users, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {

@@ -1,0 +1,81 @@
+import { Link } from '@/i18n/routing';
+import { updatePassword } from '../actions'
+import { SubmitButton } from '@/components/auth/SubmitButton'
+import { PasswordInput } from '@/components/ui/password-input'
+import { getTranslations } from 'next-intl/server'
+
+export default async function ResetPasswordPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ message?: string; error?: string }>
+}) {
+  const resolvedParams = await searchParams
+  const t = await getTranslations('resetPassword')
+
+  return (
+    <div className="flex flex-col">
+      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+        <h2 className="text-center text-3xl font-extrabold tracking-tight text-foreground">
+          {t('title')}
+        </h2>
+        <p className="mt-2 text-center text-sm text-muted-foreground">
+          {t('subtitle')}
+        </p>
+      </div>
+
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
+        <form className="space-y-6" action={updatePassword}>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium leading-6 text-foreground mb-2">
+              {t('passwordLabel')}
+            </label>
+            <div className="mt-2">
+              <PasswordInput
+                id="password"
+                name="password"
+                required
+                placeholder={t('passwordPlaceholder')}
+                minLength={6}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium leading-6 text-foreground mb-2">
+              {t('confirmPasswordLabel')}
+            </label>
+            <div className="mt-2">
+              <PasswordInput
+                id="confirmPassword"
+                name="confirmPassword"
+                required
+                placeholder={t('confirmPasswordPlaceholder')}
+                minLength={6}
+              />
+            </div>
+          </div>
+
+          {resolvedParams.error && (
+            <div className="text-sm text-center text-destructive p-3 bg-destructive/10 rounded-md font-medium">
+              {resolvedParams.error}
+            </div>
+          )}
+
+          {resolvedParams.message && (
+            <div className="text-sm text-center text-bull p-3 bg-bull/10 rounded-md font-medium">
+              {resolvedParams.message}
+            </div>
+          )}
+
+          <div>
+            <SubmitButton 
+              label={t('submitButton')} 
+              loadingLabel={t('submitLoading')} 
+              className="w-full text-md h-11 font-bold" 
+            />
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}

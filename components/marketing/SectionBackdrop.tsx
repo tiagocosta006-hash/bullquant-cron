@@ -1,8 +1,8 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { usePathname } from '@/i18n/routing';
 
 /**
  * SectionBackdrop — o fundo da landing é UM palco fixo full-screen que

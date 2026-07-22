@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
+import { Link } from '@/i18n/routing';
 import { useTranslations } from "next-intl"
-import { signup } from "@/app/(auth)/actions"
+import { signup } from "@/app/[locale]/(auth)/actions"
 import { SubmitButton } from "@/components/auth/SubmitButton"
 import { Input } from "@/components/ui/input"
 import { PasswordInput } from "@/components/ui/password-input"

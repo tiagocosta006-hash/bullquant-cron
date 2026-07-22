@@ -1,12 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link } from '@/i18n/routing';
+
 import { useEffect, useRef } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { gsap, useGSAP, ScrollTrigger, MOTION_OK } from "@/lib/marketing/gsap";
 import { prefersReducedMotion } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+import { usePathname } from '@/i18n/routing';
 
 /**
  * FloatingCta — pill fixa em baixo ao centro que aparece depois do hero.

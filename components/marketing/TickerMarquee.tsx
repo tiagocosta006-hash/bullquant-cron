@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from '@/i18n/routing';
 import { CompanyLogo } from "@/components/ui/CompanyLogo";
 import { formatPercent, formatPrice } from "@/lib/finance/format";
 import type { TickerItem } from "@/lib/marketing/ticker";

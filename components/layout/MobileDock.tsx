@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link } from '@/i18n/routing';
+
 import {
   LayoutDashboard,
   SearchCode,
@@ -13,6 +13,7 @@ import {
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { LiquidGlass } from "@/components/fx/LiquidGlass";
+import { usePathname } from '@/i18n/routing';
 
 /**
  * MobileDock — dock Liquid Glass no fundo do ecrã (só mobile),

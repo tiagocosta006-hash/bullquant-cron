@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
+
 import { track } from "@/lib/pulse/client";
+import { usePathname } from '@/i18n/routing';
 
 /**
  * PulseTracker — montado uma vez no root layout (render null):

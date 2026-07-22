@@ -2,7 +2,7 @@
 
 import { useRef } from "react"
 import { useTranslations } from "next-intl"
-import Link from "next/link"
+import { Link } from '@/i18n/routing';
 import { CompanyLogo } from "@/components/ui/CompanyLogo"
 import { Building2, X, Users, ArrowRight, Activity, HandCoins, ExternalLink, Scale, Globe, TrendingUp, TrendingDown } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog"

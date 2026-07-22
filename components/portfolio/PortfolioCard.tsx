@@ -1,4 +1,4 @@
-import Link from "next/link"
+import { Link } from '@/i18n/routing';
 import { useTranslations, useLocale } from "next-intl"
 import { X, Briefcase, Pencil, StickyNote } from "lucide-react"
 import { formatPrice, formatPercent } from "@/lib/finance/format"

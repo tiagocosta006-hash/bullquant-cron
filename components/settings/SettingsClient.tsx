@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+
 import { useTranslations } from 'next-intl'
 import { UserCircle, Mail, Star, LogOut, Settings as SettingsIcon, Globe, Palette, Loader2, Check, X, FlaskConical } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -20,12 +20,13 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog"
-import { updateProfile, setLocale, updatePasswordSettings, updateEmailSettings, deleteAccount } from '@/app/(app)/settings/actions'
-import { logout } from '@/app/(auth)/actions'
+import { updateProfile, setLocale, updatePasswordSettings, updateEmailSettings, deleteAccount } from '@/app/[locale]/(app)/settings/actions'
+import { logout } from '@/app/[locale]/(auth)/actions'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { usePaddle } from '@/components/providers/PaddleProvider'
 import { applyTheme, currentTheme, type Theme } from '@/lib/theme'
 import { userInitials } from '@/lib/utils'
+import { useRouter } from '@/i18n/routing';
 
 interface SettingsClientProps {
   user: {
@@ -69,7 +70,6 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
     const init = () => setTheme(currentTheme())
     init()
   }, [])
-
 
   const [isGeneratingPortal, setIsGeneratingPortal] = useState(false)
   const [portalError, setPortalError] = useState<string | null>(null)
@@ -167,7 +167,6 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
       setIsGeneratingPortal(false)
     }
   }
-
 
   const handleUpdateEmail = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -508,8 +507,6 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
                 />
               </div>
             </div>
-
-
 
             {user.plan === 'PRO' ? (
               /* ── Estado PRO activo ── */

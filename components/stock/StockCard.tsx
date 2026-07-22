@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from '@/i18n/routing';
 import { useTranslations } from "next-intl";
 import { formatLargeNumber } from "@/lib/finance/format";
 import { CompanyLogo } from "@/components/ui/CompanyLogo";

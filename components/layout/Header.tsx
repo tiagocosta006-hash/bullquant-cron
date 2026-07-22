@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { LogOut, UserCircle, Zap, Users } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -6,7 +6,7 @@ import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { HeaderMobileMenu } from '@/components/layout/HeaderMobileMenu';
 import { getUser } from '@/lib/supabase/server';
 import { cn } from '@/lib/utils';
-import { logout } from '@/app/(auth)/actions';
+import { logout } from '@/app/[locale]/(auth)/actions';
 import { getTranslations } from 'next-intl/server';
 
 export async function Header() {

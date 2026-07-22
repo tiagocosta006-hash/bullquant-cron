@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import Link from "next/link"
+import { Link } from '@/i18n/routing';
 import { useTranslations } from "next-intl"
 import { ChevronLeft, ChevronRight, Sunrise, Moon, TrendingUp, TrendingDown, HelpCircle, Sun, Banknote, Layers, Landmark, CalendarClock, Percent, Users, BarChart3, ShoppingCart, Gauge } from "lucide-react"
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog"

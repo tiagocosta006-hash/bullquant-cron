@@ -438,6 +438,13 @@ MANUAL_CAPEX_OVERRIDES: dict[tuple[str, int, str], float] = {
     ("NVDA", 2021, "Q1"): 155_000_000,
     ("NVDA", 2021, "Q2"): 217_000_000,
     ("NVDA", 2021, "Q3"): 473_000_000,
+    # FY2023: a SEC só tem o capex YTD de 9 meses (1.324B) e anual (1.833B) — sem
+    # Q1/Q2 — logo a diferenciação não conseguia derivar os trimestres. Valores
+    # discretos dos 10-Qs (YTD: Q1 361, Q2 794, Q3 1324, FY 1833). Q4 (509) vem
+    # do synthesize_q4 (FY − Q1 − Q2 − Q3).
+    ("NVDA", 2023, "Q1"): 361_000_000,
+    ("NVDA", 2023, "Q2"): 433_000_000,
+    ("NVDA", 2023, "Q3"): 530_000_000,
 }
 
 
@@ -806,37 +813,23 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
             "capex": dur_map[(fy, fp)].get("capex")
         }
     
+    _PRIOR_Q = {"Q2": "Q1", "Q3": "Q2", "Q4": "Q3"}
     for (fy, fp) in periods:
         if fp in ("Q1", "FY"): continue
         dur = dur_map[(fy, fp)]
-        
-        ocf_ytd = original_ytd[(fy, fp)].get("operatingCashFlow")
-        capex_ytd = original_ytd[(fy, fp)].get("capex")
-        
-        ocf_stand = ocf_ytd
-        capex_stand = capex_ytd
-        
-        if fp == "Q2":
-            q1 = original_ytd.get((fy, "Q1"), {})
-            if q1.get("operatingCashFlow") is not None and ocf_stand is not None:
-                ocf_stand -= q1["operatingCashFlow"]
-            if q1.get("capex") is not None and capex_stand is not None:
-                capex_stand -= q1["capex"]
-        elif fp == "Q3":
-            q2 = original_ytd.get((fy, "Q2"), {})
-            if q2.get("operatingCashFlow") is not None and ocf_stand is not None:
-                ocf_stand -= q2["operatingCashFlow"]
-            if q2.get("capex") is not None and capex_stand is not None:
-                capex_stand -= q2["capex"]
-        elif fp == "Q4":
-            q3 = original_ytd.get((fy, "Q3"), {})
-            if q3.get("operatingCashFlow") is not None and ocf_stand is not None:
-                ocf_stand -= q3["operatingCashFlow"]
-            if q3.get("capex") is not None and capex_stand is not None:
-                capex_stand -= q3["capex"]
-                
-        dur["operatingCashFlow"] = ocf_stand
-        dur["capex"] = capex_stand
+        prior = original_ytd.get((fy, _PRIOR_Q[fp]), {})
+        for metric in ("operatingCashFlow", "capex"):
+            ytd = original_ytd[(fy, fp)].get(metric)
+            if ytd is None:
+                dur[metric] = None
+                continue
+            prior_ytd = prior.get(metric)
+            # O valor trimestral discreto só se obtém subtraindo o YTD do trimestre
+            # anterior. Sem esse YTD, deixar o YTD cru seria ERRADO — ex.: NVDA
+            # FY2023 Q3 ficava com o capex YTD de 9 meses (1.32B) e dava um FCF
+            # negativo falso. Preferir NULL honesto; o override manual ou o
+            # synthesize_q4 preenchem depois.
+            dur[metric] = (ytd - prior_ytd) if prior_ytd is not None else None
 
     for field, tags in INSTANT_TAGS.items():
         for (fy, fp) in periods:

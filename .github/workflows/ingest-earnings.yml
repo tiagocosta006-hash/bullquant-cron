@@ -3,7 +3,7 @@ name: Ingest Earnings
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 7 * * *" # diário 7h UTC (após updates da SEC/Finnhub)
+    - cron: "0 7,14,21 * * *" # 3x por dia (após fecho de mercado, antes da abertura e madrugada)
 
 jobs:
   ingest:

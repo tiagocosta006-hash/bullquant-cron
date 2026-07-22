@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl"
-import { Loader2, ArrowRight } from "lucide-react"
+import Link from "next/link"
+import { Loader2, ArrowRight, SearchCode } from "lucide-react"
 
 interface PortfolioSuggestionsProps {
   tickers: string[]
@@ -35,6 +36,16 @@ export function PortfolioSuggestions({ tickers, addingTicker, onQuickAdd }: Port
             </span>
           </button>
         ))}
+        <Link
+          href="/explore"
+          className="flex flex-col items-center justify-center p-4 rounded-xl border border-dashed border-border/50 bg-background hover:bg-muted/50 hover:border-primary/50 hover:shadow-sm transition-all group"
+        >
+          <SearchCode className="w-5 h-5 text-primary" />
+          <span className="text-xs text-muted-foreground font-medium flex items-center gap-1 mt-2 text-center">
+            {t('suggestions.exploreMore')}
+            <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity -ml-2 group-hover:ml-0" />
+          </span>
+        </Link>
       </div>
     </div>
   )

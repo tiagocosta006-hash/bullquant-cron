@@ -429,7 +429,8 @@
       "adding": "Adding..."
     },
     "suggestions": {
-      "title": "Suggestions to add"
+      "title": "Suggestions to add",
+      "exploreMore": "Explore more companies"
     },
     "landing": {
       "title": "BullMetrics",

@@ -1,4 +1,4 @@
-# Frontend Audit — Bull Metrics
+# Frontend Audit — BullVision
 
 > Audit date: 2026-07-02 · Scope: components, pages, design-system compliance, i18n, TypeScript, a11y, performance. Read-only.
 > Format: every finding = file:line · current code · exact fix. Index at [AUDIT-INDEX.md](AUDIT-INDEX.md).
@@ -20,7 +20,7 @@ Verified clean: all 32 `"use client"` directives are justified (state/effects/ha
 
 ## F1 — Brand identity: four names in production (Critical)
 
-The product is named **"Bull Metrics"**. The codebase currently ships **"BullValue"**, **"BullVision"**, and **"bullquant"** — and the worst occurrences are user-visible.
+The product is named **"BullVision"**. The codebase currently ships **"BullVision"**, **"BullVision"**, and **"bullquant"** — and the worst occurrences are user-visible.
 
 ### F1a. User-visible: i18n message files (fix first)
 

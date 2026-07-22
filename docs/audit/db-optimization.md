@@ -1,4 +1,4 @@
-# Database Optimization — Bull Metrics
+# Database Optimization — BullVision
 
 > Audit date: 2026-07-02 · Scope: index coverage, query efficiency, Decimal handling, caching, migration drift, Redis decision.
 > Overlapping route-level findings are cross-referenced to [backend-report.md](backend-report.md) (B-numbers).

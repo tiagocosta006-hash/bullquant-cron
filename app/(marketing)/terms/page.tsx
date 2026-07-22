@@ -20,25 +20,25 @@ export default function TermsOfServicePage() {
             Última atualização: {new Date().toLocaleDateString("pt-PT")}
           </p>
           <p>
-            Bem-vindo à <strong>BullValue</strong>. Os presentes Termos de Serviço ("Termos") regulam o seu acesso e utilização
-            da nossa plataforma, serviços e ferramentas. Ao aceder ou utilizar o BullValue, concorda em ficar vinculado por estes Termos.
+            Bem-vindo à <strong>BullVision</strong>. Os presentes Termos de Serviço ("Termos") regulam o seu acesso e utilização
+            da nossa plataforma, serviços e ferramentas. Ao aceder ou utilizar a BullVision, concorda em ficar vinculado por estes Termos.
           </p>
         </section>
 
         <section>
           <h2 className="text-2xl font-bold mb-4">1. Natureza do Serviço e Isenção de Responsabilidade</h2>
           <p className="mb-4">
-            A plataforma BullValue fornece ferramentas analíticas, modelos financeiros interativos (como a calculadora DCF),
+            A plataforma BullVision fornece ferramentas analíticas, modelos financeiros interativos (como a calculadora DCF),
             agregadores de dados históricos baseados em fontes oficiais (como a SEC) e resumos gerados automatizadamente por
             Inteligência Artificial.
           </p>
           <p className="mb-4 font-semibold text-red-600 dark:text-red-400">
-            AVISO CRUCIAL: A BullValue é uma ferramenta de natureza estritamente educacional e informativa. NÃO constituímos,
+            AVISO CRUCIAL: A BullVision é uma ferramenta de natureza estritamente educacional e informativa. NÃO constituímos,
             sob qualquer forma, aconselhamento financeiro, recomendação de investimento, intermediação financeira ou gestão
             de património.
           </p>
           <p>
-            A BullValue não é uma entidade regulada pela Comissão do Mercado de Valores Mobiliários (CMVM) nem por qualquer
+            A BullVision não é uma entidade regulada pela Comissão do Mercado de Valores Mobiliários (CMVM) nem por qualquer
             outra autoridade de supervisão financeira europeia. Qualquer decisão de investimento baseada nos dados, análises,
             ou resumos de IA fornecidos pela plataforma é da sua exclusiva e total responsabilidade. Recomendamos
             a consulta de um consultor financeiro certificado antes de efetuar qualquer investimento no mercado de capitais.
@@ -48,7 +48,7 @@ export default function TermsOfServicePage() {
         <section>
           <h2 className="text-2xl font-bold mb-4">2. Regras de Subscrição, Faturação e Pagamento</h2>
           <p className="mb-4">
-            A BullValue opera através de um modelo "Freemium", disponibilizando um Plano FREE limitado e um Plano PRO pago.
+            A BullVision opera através de um modelo "Freemium", disponibilizando um Plano FREE limitado e um Plano PRO pago.
           </p>
           <ul className="list-disc pl-6 space-y-2 mb-4">
             <li>
@@ -73,14 +73,14 @@ export default function TermsOfServicePage() {
           <h2 className="text-2xl font-bold mb-4">3. Propriedade Intelectual e Uso Aceitável</h2>
           <p className="mb-4">
             A arquitetura da plataforma, código-fonte, design, logótipos e infraestrutura tecnológica (o "Motor") são
-            propriedade exclusiva da BullValue. Concorda que, ao utilizar a plataforma, é expressamente <strong>proibido</strong>:
+            propriedade exclusiva da BullVision. Concorda que, ao utilizar a plataforma, é expressamente <strong>proibido</strong>:
           </p>
           <ul className="list-disc pl-6 space-y-2">
             <li>Efetuar engenharia reversa, descompilar, ou desmontar qualquer componente da plataforma.</li>
             <li>Utilizar *bots*, *crawlers*, *spiders* ou qualquer ferramenta de extração de dados (*scraping*) para contornar limites, armazenar ou distribuir em massa os dados financeiros e relatórios disponíveis na plataforma.</li>
           </ul>
           <p className="mt-4">
-            Qualquer violação destas regras de uso aceitável confere à BullValue o direito de suspender ou terminar
+            Qualquer violação destas regras de uso aceitável confere à BullVision o direito de suspender ou terminar
             imediatamente o seu acesso à plataforma, sem aviso prévio ou direito a reembolso.
           </p>
         </section>
@@ -90,7 +90,7 @@ export default function TermsOfServicePage() {
           <p>
             Apesar de fazermos todos os esforços para obter dados fidedignos a partir dos
             relatórios formais da SEC ou agregadores oficiais de preço, anomalias e erros de base de dados podem ocorrer.
-            O utilizador aceita estes riscos tecnológicos e exime a BullValue de qualquer responsabilidade por eventuais
+            O utilizador aceita estes riscos tecnológicos e exime a BullVision de qualquer responsabilidade por eventuais
             perdas financeiras decorrentes da utilização das informações disponibilizadas.
           </p>
         </section>

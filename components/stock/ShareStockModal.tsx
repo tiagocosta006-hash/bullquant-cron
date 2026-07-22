@@ -32,7 +32,7 @@ export function ShareStockModal({
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
-      a.download = `bullmetrics-${ticker.toLowerCase()}-snapshot.png`
+      a.download = `bullvision-${ticker.toLowerCase()}-snapshot.png`
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)

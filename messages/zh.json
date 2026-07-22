@@ -36,7 +36,7 @@
     },
     "showcase": {
       "caption": "十年基本面、DCF 和 AI Brief — 集于一个终端,无需电子表格。",
-      "alt": "Bull Metrics 终端演示",
+      "alt": "BullVision 终端演示",
       "caption2": "实时价格、自选清单与财报日历 — 一个 ⌘K 即达。",
       "caption3": "免费,一分钟内即可上手。"
     },
@@ -98,7 +98,7 @@
       }
     },
     "tour": {
-      "alt": "Bull Metrics 功能导览"
+      "alt": "BullVision 功能导览"
     },
     "bento": {
       "title": "一个终端,应有尽有。",
@@ -229,7 +229,7 @@
   },
   "register": {
     "title": "创建账户",
-    "subtitle": "加入 BullValue。",
+    "subtitle": "加入 BullVision。",
     "nameLabel": "姓名",
     "namePlaceholder": "您的称呼",
     "emailLabel": "电子邮件",
@@ -375,7 +375,7 @@
       "title": "建议添加"
     },
     "landing": {
-      "title": "BullValue",
+      "title": "BullVision",
       "description": "在顶部搜索公司或注册账户。",
       "testExample": "查看示例",
       "createAccount": "创建免费账户"

@@ -1,4 +1,4 @@
-# Backend Audit — Bull Metrics
+# Backend Audit — BullVision
 
 > Audit date: 2026-07-02 · Scope: API routes, Prisma usage, schema, ingestion scripts, i18n. Read-only.
 > Security-specific findings (auth coverage, rate limiting, CSRF, RLS) live in [security-report.md](security-report.md); DB tuning detail in [db-optimization.md](db-optimization.md).

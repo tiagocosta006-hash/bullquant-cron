@@ -1,13 +1,13 @@
-# BullValue — CLAUDE.md (contexto permanente)
+# BullVision — CLAUDE.md (contexto permanente)
 
 <!--
   Este ficheiro é lido automaticamente pelo Claude Code em TODAS as sessões deste
   repositório. Coloca-o na raiz do projeto. Não precisa de ser invocado.
-  É a fonte de contexto-mestre do BullValue: decisões fechadas, schema, arquitetura,
+  É a fonte de contexto-mestre da BullVision: decisões fechadas, schema, arquitetura,
   convenções e features. Mantém-no atualizado quando algo mudar.
 -->
 
-# BullValue — Instruções de Desenvolvimento
+# BullVision — Instruções de Desenvolvimento
 
 > Plataforma web de análise fundamental de ações para retail investors PT/UE,
 > focada em value investing. Equipa: Alex, Costa, Nando (Bullocracy).

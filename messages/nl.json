@@ -36,7 +36,7 @@
     },
     "showcase": {
       "caption": "Tien jaar fundamentals, DCF en AI Brief — in één terminal, zonder spreadsheets.",
-      "alt": "Demo van de Bull Metrics-terminal",
+      "alt": "Demo van de BullVision-terminal",
       "caption2": "Live koersen, watchlist en earnings-kalender — alles één ⌘K verderop.",
       "caption3": "Gratis, en klaar in minder dan een minuut."
     },
@@ -98,7 +98,7 @@
       }
     },
     "tour": {
-      "alt": "Een rondleiding door de functies van Bull Metrics"
+      "alt": "Een rondleiding door de functies van BullVision"
     },
     "bento": {
       "title": "Alles in één terminal.",
@@ -229,7 +229,7 @@
   },
   "register": {
     "title": "Account Aanmaken",
-    "subtitle": "Word lid van BullValue.",
+    "subtitle": "Word lid van BullVision.",
     "nameLabel": "Naam",
     "namePlaceholder": "Je naam",
     "emailLabel": "E-mailadres",
@@ -375,7 +375,7 @@
       "title": "Suggesties"
     },
     "landing": {
-      "title": "BullValue",
+      "title": "BullVision",
       "description": "Zoek een bedrijf om te beginnen.",
       "testExample": "Probeer Voorbeeld",
       "createAccount": "Account Aanmaken"

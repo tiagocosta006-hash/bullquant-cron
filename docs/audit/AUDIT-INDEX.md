@@ -1,4 +1,4 @@
-# Bull Metrics — Audit Index
+# BullVision — Audit Index
 
 > Full-codebase audit · 2026-07-02 · Read this page first. Five reports, every finding with `file:line` and a prescribed fix. Nothing was changed in this session — documentation only.
 
@@ -35,7 +35,7 @@ And one thing the brief *understated*: the schema drift is **5 models**, not 2 (
 3. **B3 — migration history is fiction:** 5 models exist only via `db push`; `prisma migrate dev` would offer to wipe the DB. Zero-data-loss baselining procedure in db-optimization §7.
 
 ### Frontend
-1. **F1 — four product names in production:** "BullVision" on login/register screens in all 9 locales, `en.json` alone mixes BullVision/BullValue/BullQuant, brand book canonizes the wrong name, `lib/brand.ts:9` says "BullValue", `package.json` says "bullquant". Product is **Bull Metrics**. Full fix table with the brand-interpolation pattern that prevents recurrence.
+1. **F1 — four product names in production:** "BullVision" on login/register screens in all 9 locales, `en.json` alone mixes BullVision/BullValue/BullQuant, brand book canonizes the wrong name, `lib/brand.ts:9` says "BullValue", `package.json` says "bullquant". Product is **BullVision**. Full fix table with the brand-interpolation pattern that prevents recurrence.
 2. **F2 — five Golden Terminal color violations:** `text-emerald-500`/`text-rose-500` in `ScreenerResults.tsx:113,120,125,135` and `SettingsClient.tsx:112` (brief said 113) → `text-bull`/`text-bear`. These five are the only thing failing the redesign-plan acceptance criterion.
 3. **F3 — 12 hardcoded UI strings** (10 of them Portuguese-only, locking `ManagementTeam` to PT chrome in 9-locale app) — violates CLAUDE.md §2's founding i18n rule.
 

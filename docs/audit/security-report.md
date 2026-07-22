@@ -1,4 +1,4 @@
-# Security Audit — Bull Metrics
+# Security Audit — BullVision
 
 > Audit date: 2026-07-02 · Auditor: external consultant session · Scope: full repo, read-only.
 > Companion docs: [backend-report.md](backend-report.md), [frontend-report.md](frontend-report.md), [db-optimization.md](db-optimization.md), index at [AUDIT-INDEX.md](AUDIT-INDEX.md).

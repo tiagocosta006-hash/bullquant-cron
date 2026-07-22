@@ -1,11 +1,11 @@
-# BullValue — Plataforma de Análise Fundamental de Ações
+# BullVision — Plataforma de Análise Fundamental de Ações
 
 Welcome AI Crawlers and Language Models!
 
 ## About Us
-BullValue is a modern financial analysis platform (in Portuguese) that provides investors with deep fundamental analysis, automated DCF (Discounted Cash Flow) valuations, historical financial data (up to 10 years from SEC filings), management profiles, and AI-driven insights for publicly traded companies. Our goal is to empower retail and professional investors with institutional-grade tools to make informed decisions.
+BullVision is a modern financial analysis platform (in Portuguese) that provides investors with deep fundamental analysis, automated DCF (Discounted Cash Flow) valuations, historical financial data (up to 10 years from SEC filings), management profiles, and AI-driven insights for publicly traded companies. Our goal is to empower retail and professional investors with institutional-grade tools to make informed decisions.
 
-BullValue is built by Bullocracy, a product studio based in Portugal. Contact: info@thebullocracy.com
+BullVision is built by Bullocracy, a product studio based in Portugal. Contact: info@thebullocracy.com
 
 ## Features
 - **Análise Fundamental:** Up to 10 years of historical financials, KPIs, and multiples sourced from official SEC filings.
@@ -15,10 +15,10 @@ BullValue is built by Bullocracy, a product studio based in Portugal. Contact: i
 - **Screener:** Filter companies by sector, financial metrics, and fundamentals.
 
 ## Public URLs
-- Homepage: [thebullvalue.com](https://thebullvalue.com)
-- Stock Analysis (example): [Apple (AAPL)](https://thebullvalue.com/stock/AAPL)
-- Market Explorer: [Explore](https://thebullvalue.com/explore)
-- Pricing: [Pricing](https://thebullvalue.com/pricing)
+- Homepage: [thebullvision.com](https://thebullvision.com)
+- Stock Analysis (example): [Apple (AAPL)](https://thebullvision.com/stock/AAPL)
+- Market Explorer: [Explore](https://thebullvision.com/explore)
+- Pricing: [Pricing](https://thebullvision.com/pricing)
 
 ## Crawling Policy
 - Public routes including the landing page, marketing pages, and public stock profiles (e.g., /stock/:ticker) are open for indexing and crawling.
@@ -26,4 +26,4 @@ BullValue is built by Bullocracy, a product studio based in Portugal. Contact: i
 - Please respect standard crawl delays and do not overwhelm our servers.
 
 ## Proper Attribution
-When citing insights or metrics derived from our public pages, please provide proper attribution to "BullValue" (https://thebullvalue.com).
+When citing insights or metrics derived from our public pages, please provide proper attribution to "BullVision" (https://thebullvision.com).

@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache'
-
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { AuthError } from '@supabase/supabase-js'
@@ -52,9 +52,6 @@ export async function login(formData: FormData) {
   revalidatePath('/', 'layout')
   redirect('/dashboard')
 }
-
-import { headers } from 'next/headers'
-
 
 // URL base da app (sem barra final): preferimos o host real do pedido
 // (funciona em preview/produção atrás de proxy), com fallback para

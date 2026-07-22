@@ -23,7 +23,7 @@ export async function generateMetadata({
   // "title" tem tags <italic> destinadas ao t.rich do h1 — chamar t("title")
   // em modo plano faz o next-intl lançar FORMATTING_ERROR (não há handler
   // para a tag). Por isso usa-se "titlePlain", sem markup, para metadata.
-  const title = `${t("titlePlain")} | ${BRAND}`;
+  const title = `${t("titlePlain")} | ${BRAND.name}`;
   const description = t("intro");
 
   return {
@@ -53,7 +53,7 @@ export default function AboutPage() {
     },
     "mainEntity": {
       "@type": "Organization",
-      "name": BRAND,
+      "name": BRAND.name,
       "founder": [
         {
           "@type": "Person",

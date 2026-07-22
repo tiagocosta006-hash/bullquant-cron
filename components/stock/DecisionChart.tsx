@@ -16,8 +16,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
   CartesianGrid,
-  Cell,
-  Rectangle
+  Cell
 } from "recharts"
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { TooltipProvider, Tooltip as UITooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
@@ -65,20 +64,35 @@ const CustomTooltip = ({ active, payload, label, formatTooltipValue }: CustomToo
 }
 
 /**
- * Barra ativa: alarga LIGEIRAMENTE para os lados (altura intocada —
- * o valor codificado não muda) e ganha um traço mais forte.
+ * Barra com cantos arredondados CIENTE DO SINAL. O recharts, com um `radius`
+ * estático [4,4,0,0], desenha valores NEGATIVOS ao contrário (a barra apontava
+ * para CIMA em vez de para baixo — ex.: FCF negativo da NVDA Q3'23). Aqui o
+ * arredondamento é sempre na extremidade AFASTADA do zero (topo p/ positivos,
+ * fundo p/ negativos) e o raio é limitado à altura da barra (barras minúsculas
+ * não estouram). Normaliza width/height negativos que o recharts possa passar.
+ * `active` (hover) alarga ligeiramente e adiciona traço; `maxR=0` para stacks.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const renderActiveBar = (props: any) => {
-  const grow = Math.min(6, Math.max(3, (props.width ?? 12) * 0.18))
+const RoundedBar = (props: any) => {
+  let { x, y, width, height } = props
+  const { fill, fillOpacity, stroke, strokeOpacity, strokeDasharray, value, payload, dataKey } = props
+  const maxR = props.maxR ?? 4
+  const active = props.active
+  if (width < 0) { x += width; width = -width }
+  if (height < 0) { y += height; height = -height }
+  if (width <= 0 || height <= 0) return null
+  if (active) { const grow = Math.min(6, Math.max(3, width * 0.18)); x -= grow / 2; width += grow }
+  const raw = value ?? (payload && dataKey != null ? payload[dataKey] : undefined)
+  const v = Array.isArray(raw) ? raw[raw.length - 1] : raw
+  const negative = Number(v) < 0
+  const r = Math.max(0, Math.min(maxR, width / 2, height))
+  const d = negative
+    ? `M${x},${y} h${width} v${height - r} a${r},${r} 0 0 1 ${-r},${r} h${-(width - 2 * r)} a${r},${r} 0 0 1 ${-r},${-r} Z`
+    : `M${x},${y + r} a${r},${r} 0 0 1 ${r},${-r} h${width - 2 * r} a${r},${r} 0 0 1 ${r},${r} v${height - r} h${-width} Z`
   return (
-    <Rectangle
-      {...props}
-      x={props.x - grow / 2}
-      width={props.width + grow}
-      stroke={props.fill}
-      strokeOpacity={0.55}
-    />
+    <path d={d} fill={fill} fillOpacity={fillOpacity ?? 1}
+      stroke={active ? fill : stroke} strokeOpacity={active ? 0.55 : strokeOpacity}
+      strokeDasharray={strokeDasharray} />
   )
 }
 
@@ -285,7 +299,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
                   return <Area hide={isHidden} key={k.key} type="linear" dataKey={k.key} name={k.name || k.key} fill={k.color} stroke={k.color} fillOpacity={0.2} strokeWidth={2} activeDot={{ r: 5 }} />
                 }
                 return (
-                  <Bar hide={isHidden} key={k.key} dataKey={k.key} name={k.name || k.key} fill={k.color} stackId={k.stackId} radius={type === 'STACKED_BAR' ? 0 : [4, 4, 0, 0]} activeBar={renderActiveBar}>
+                  <Bar hide={isHidden} key={k.key} dataKey={k.key} name={k.name || k.key} fill={k.color} stackId={k.stackId} shape={<RoundedBar maxR={type === 'STACKED_BAR' ? 0 : 4} dataKey={k.key} />} activeBar={<RoundedBar maxR={type === 'STACKED_BAR' ? 0 : 4} dataKey={k.key} active />}>
                     {displayData.map((entry, index) => {
                       let cellColor = k.color
                       if (config.inverseColors) {

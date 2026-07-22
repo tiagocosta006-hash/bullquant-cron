@@ -1,21 +1,19 @@
 /**
- * Bull Metrics — brand single source of truth.
+ * BullValue — brand single source of truth.
  *
- * Product: Bull Metrics · Parent studio: Bullocracy.
+ * Product: BullValue · Parent studio: Bullocracy.
  * Changing the product name = edit `name` + `nameParts` here only.
  */
 export const BRAND = {
-  /** Product / wordmark name. */
-  name: "BullMetrics",
+  name: "BullValue",
   /** Wordmark split: [neutral part, gold-accent part]. */
-  nameParts: ["Bull", "Metrics"] as const,
+  nameParts: ["Bull", "Value"] as const,
   /** Parent studio shown in footers / "by Bullocracy". */
   parent: "Bullocracy",
   /** Signature gold (matches the bull mark). */
   gold: "#E4AA33",
-  domain: "bullmetrics.thebullocracy.com",
-  /** Canonical site URL — used in metadata, sitemap and JSON-LD. */
-  siteUrl: "https://bullmetrics.thebullocracy.com",
+  domain: "thebullvalue.com",
+  siteUrl: "https://thebullvalue.com",
   /**
    * Official Bullocracy bull-rook logo (raster/vector in /public/brand/).
    * Drop the real file here and it renders everywhere via <BrandMark/>.

@@ -229,7 +229,7 @@
   },
   "register": {
     "title": "Account Aanmaken",
-    "subtitle": "Word lid van BullMetrics.",
+    "subtitle": "Word lid van BullValue.",
     "nameLabel": "Naam",
     "namePlaceholder": "Je naam",
     "emailLabel": "E-mailadres",
@@ -375,7 +375,7 @@
       "title": "Suggesties"
     },
     "landing": {
-      "title": "BullMetrics",
+      "title": "BullValue",
       "description": "Zoek een bedrijf om te beginnen.",
       "testExample": "Probeer Voorbeeld",
       "createAccount": "Account Aanmaken"

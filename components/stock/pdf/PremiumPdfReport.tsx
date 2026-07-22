@@ -295,7 +295,7 @@ export const PremiumPdfReport = ({ company, fundamentals, aiInsight }: PremiumPd
 
         {/* Footer */}
         <View style={styles.footer} fixed>
-          <Text style={styles.footerText}>Bullmetrics Analytics — Confidential & Proprietary</Text>
+          <Text style={styles.footerText}>BullValue Analytics — Confidential & Proprietary</Text>
           <Text style={styles.footerText} render={({ pageNumber, totalPages }) => (
             `Page ${pageNumber} of ${totalPages}`
           )} />

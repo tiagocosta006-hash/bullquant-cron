@@ -48,7 +48,7 @@ def new_id() -> str:
 def fetch_sp500_from_wikipedia() -> pd.DataFrame:
     print("A obter lista S&P 500 da Wikipedia...")
     url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
-    headers = {"User-Agent": "Mozilla/5.0 (compatible; Bullmetrics/1.0; +https://bullocracy.com)"}
+    headers = {"User-Agent": "Mozilla/5.0 (compatible; BullValue/1.0; +https://bullocracy.com)"}
     r = requests.get(url, headers=headers, timeout=30)
     r.raise_for_status()
     tables = pd.read_html(io.StringIO(r.text), header=0)

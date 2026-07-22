@@ -268,7 +268,7 @@
     "analytics": "Pulse"
   },
   "login": {
-    "title": "Entrar no BullMetrics",
+    "title": "Entrar no BullValue",
     "subtitle": "Acede ao teu portfólio e análises.",
     "emailLabel": "Email",
     "emailPlaceholder": "nome@email.com",
@@ -283,7 +283,7 @@
   },
   "register": {
     "title": "Criar Conta",
-    "subtitle": "Junta-te a milhares de investidores no BullMetrics.",
+    "subtitle": "Junta-te a milhares de investidores no BullValue.",
     "nameLabel": "Nome",
     "namePlaceholder": "O teu nome",
     "emailLabel": "Email",
@@ -356,7 +356,7 @@
       "namePlaceholder": "Como queres ser chamado",
       "save": "Guardar Alterações",
       "dangerZone": "Zona de Perigo",
-      "logoutDesc": "Termina a tua sessão atual no BullMetrics com segurança.",
+      "logoutDesc": "Termina a tua sessão atual no BullValue com segurança.",
       "logoutBtn": "Sair da Conta",
       "securityTitle": "Segurança",
       "currentPassword": "Password Atual",
@@ -378,7 +378,7 @@
     "preferences": {
       "title": "Preferências de Utilização",
       "language": "Idioma",
-      "languageDesc": "Escolhe a língua em que queres usar o BullMetrics.",
+      "languageDesc": "Escolhe a língua em que queres usar o BullValue.",
       "theme": "Tema Visual",
       "themeDesc": "Alterna entre modo escuro (Dark) e modo claro (Light).",
       "themeLight": "Claro",
@@ -433,7 +433,7 @@
       "exploreMore": "Explora negócios por setor e tipo de negócio"
     },
     "landing": {
-      "title": "BullMetrics",
+      "title": "BullValue",
       "description": "Pesquisa pelo ticker de uma empresa na barra superior para começar ou regista-te para acederes à tua Watchlist.",
       "testExample": "Testar Exemplo",
       "createAccount": "Criar Conta Grátis"
@@ -929,7 +929,7 @@
     "about": "Sobre Nós"
   },
   "cookieConsent": {
-    "text": "Utilizamos cookies exclusivamente para compreender como utiliza a Bullmetrics e melhorar a sua experiência. Aceita a sua utilização?",
+    "text": "Utilizamos cookies exclusivamente para compreender como utiliza a BullValue e melhorar a sua experiência. Aceita a sua utilização?",
     "accept": "Aceitar Tudo",
     "decline": "Recusar"
   },
@@ -1082,14 +1082,14 @@
     "badge": "A Nossa Missão",
     "title": "A democratizar o acesso a dados <italic>financeiros.</italic>",
     "titlePlain": "A democratizar o acesso a dados financeiros.",
-    "intro": "A BullMetrics é uma plataforma de análise de dados fundamentais desenhada para todo o tipo de investidores.",
+    "intro": "A BullValue é uma plataforma de análise de dados fundamentais desenhada para todo o tipo de investidores.",
     "problem": {
       "title": "O Nosso Objetivo",
       "text": "Dar ao investidor individual acesso fácil, estruturado e transparente às demonstrações financeiras das empresas. Ao automatizar a extração dos complexos relatórios da SEC, libertamos o teu tempo para aquilo que realmente importa: a análise de valor."
     },
     "organization": {
       "title": "A Bullocracy",
-      "text": "A BullMetrics é um produto construído pela Bullocracy, uma organização de jovens estudantes que procuram democratizar o acesso ao conhecimento sobre Política, Economia e Investimentos. Para isso, criam conteúdos nas redes sociais, desde o YouTube ao TikTok, fomentando a criação um espaço para que a nossa comunidade possa escrever artigos e opiniões para serem publicados online, no site thebullocracy.com, onde estimulam o debate livre e a literacia financeira.",
+      "text": "A BullValue é um produto construído pela Bullocracy, uma organização de jovens estudantes que procuram democratizar o acesso ao conhecimento sobre Política, Economia e Investimentos. Para isso, criam conteúdos nas redes sociais, desde o YouTube ao TikTok, fomentando a criação um espaço para que a nossa comunidade possa escrever artigos e opiniões para serem publicados online, no site thebullocracy.com, onde estimulam o debate livre e a literacia financeira.",
       "cta": "Visitar thebullocracy.com"
     },
     "team": {
@@ -1099,7 +1099,7 @@
         {
           "name": "Rodrigo Martins",
           "role": "Co-Founder & Web Analyst",
-          "bio": "Estudante de Economia na Universidade do Minho. Responsável pela estratégia de marketing, indexação do site, SEO, métricas de analytics e otimização geral da performance da plataforma, bem como a integração da BullMetrics nos conteúdos da Bullocracy.",
+          "bio": "Estudante de Economia na Universidade do Minho. Responsável pela estratégia de marketing, indexação do site, SEO, métricas de analytics e otimização geral da performance da plataforma, bem como a integração da BullValue nos conteúdos da Bullocracy.",
           "socials": {
             "linkedin": "https://www.linkedin.com/in/rodrigo-teixeira-martins/",
             "instagram": "#",
@@ -1130,7 +1130,7 @@
     },
     "philosophy": {
       "title": "A Filosofia dos Dados",
-      "text": "A nossa análise baseia-se na matemática e nos relatórios oficiais extraídos diretamente da SEC. A BullMetrics foca-se na solidez dos números. Acreditamos que as decisões financeiras exigem dados limpos, precisão técnica e transparência, características que valorizamos muito na BullMetrics."
+      "text": "A nossa análise baseia-se na matemática e nos relatórios oficiais extraídos diretamente da SEC. A BullValue foca-se na solidez dos números. Acreditamos que as decisões financeiras exigem dados limpos, precisão técnica e transparência, características que valorizamos muito na BullValue."
     },
     "contact": {
       "title": "Contactos Oficiais",

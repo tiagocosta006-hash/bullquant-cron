@@ -38,7 +38,7 @@ import { cn } from "@/lib/utils";
  * slots de components/marketing/media.ts.
  */
 
-const SITE_URL = "https://bullmetrics.thebullocracy.com";
+const SITE_URL = "https://thebullvalue.com";
 
 const heroDelay = (s: number) => ({ "--hero-delay": `${s}s` }) as React.CSSProperties;
 

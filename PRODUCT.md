@@ -2,7 +2,7 @@
 
 ## Register
 
-Product. BullMetrics (BullVision) is a financial terminal web app — dashboards, data
+Product. BullValue (BullVision) is a financial terminal web app — dashboards, data
 tables, forms, real-time-ish price polling. Design serves the workflow; it does not
 sell a story.
 

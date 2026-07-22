@@ -229,7 +229,7 @@
   },
   "register": {
     "title": "アカウント作成",
-    "subtitle": "BullMetricsに参加しましょう。",
+    "subtitle": "BullValueに参加しましょう。",
     "nameLabel": "名前",
     "namePlaceholder": "あなたの名前",
     "emailLabel": "メールアドレス",
@@ -375,7 +375,7 @@
       "title": "おすすめ"
     },
     "landing": {
-      "title": "BullMetrics",
+      "title": "BullValue",
       "description": "企業を検索して開始してください。",
       "testExample": "例を試す",
       "createAccount": "無料アカウント作成"

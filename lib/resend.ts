@@ -6,7 +6,7 @@ const resendApiKey = process.env.RESEND_API_KEY;
 export const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 // Substitui pelo email que tens configurado/verificado no Resend
-const FROM_EMAIL = 'BullMetrics <info@thebullocracy.com>';
+const FROM_EMAIL = 'BullValue <info@thebullocracy.com>';
 
 /**
  * HTML Base Wrapper
@@ -16,7 +16,7 @@ const getEmailTemplate = (content: string) => `
 <html lang="pt-PT">
 <head>
   <meta charset="utf-8">
-  <title>BullMetrics</title>
+  <title>BullValue</title>
   <style>
     body {
       background-color: #fafaf7;
@@ -118,8 +118,8 @@ const getEmailTemplate = (content: string) => `
         ${content}
       </div>
       <div class="footer">
-        <p>&copy; ${new Date().getFullYear()} BullMetrics. Todos os direitos reservados.</p>
-        <p><a href="https://bullmetrics.thebullocracy.com">Visitar a Plataforma</a></p>
+        <p>&copy; ${new Date().getFullYear()} BullValue. Todos os direitos reservados.</p>
+        <p><a href="https://thebullvalue.com">Visitar a Plataforma</a></p>
       </div>
     </div>
   </div>
@@ -131,7 +131,7 @@ const getEmailTemplate = (content: string) => `
 export const isEmailEnabled = () => resend !== null
 
 /**
- * Envia o email de Confirmação de conta (com a marca BullMetrics).
+ * Envia o email de Confirmação de conta (com a marca BullValue).
  * `confirmLink` é o link gerado pelo Supabase (Admin generateLink) que, ao ser
  * aberto, confirma o email e devolve o utilizador autenticado à app.
  */
@@ -144,11 +144,11 @@ export const sendConfirmationEmail = async (email: string, name: string, confirm
   return await resend.emails.send({
     from: FROM_EMAIL,
     to: [email],
-    subject: 'Confirma a tua conta — BullMetrics',
-    text: `Olá ${name},\n\nFalta só um passo para ativares a tua conta na BullMetrics.\nConfirma o teu email abrindo este link:\n\n${confirmLink}\n\nSe não foste tu a criar esta conta, ignora este email.`,
+    subject: 'Confirma a tua conta — BullValue',
+    text: `Olá ${name},\n\nFalta só um passo para ativares a tua conta na BullValue.\nConfirma o teu email abrindo este link:\n\n${confirmLink}\n\nSe não foste tu a criar esta conta, ignora este email.`,
     html: getEmailTemplate(`
       <h2>Olá ${name}, confirma a tua conta</h2>
-      <p>Falta só um passo para começares a usar a BullMetrics. Clica no botão abaixo para confirmar o teu email e ativar a conta.</p>
+      <p>Falta só um passo para começares a usar a BullValue. Clica no botão abaixo para confirmar o teu email e ativar a conta.</p>
       <div style="text-align: center;">
         <a href="${confirmLink}" class="btn">Confirmar Email</a>
       </div>
@@ -166,16 +166,16 @@ export const sendWelcomeEmail = async (email: string, name: string, confirmation
     return;
   }
   
-  const link = confirmationLink || 'https://bullmetrics.thebullocracy.com/dashboard';
+  const link = confirmationLink || 'https://thebullvalue.com/dashboard';
   const buttonText = confirmationLink ? 'Confirmar o meu Email' : 'Aceder à Plataforma';
 
   return await resend.emails.send({
     from: FROM_EMAIL,
     to: [email],
-    subject: 'Bem-vindo à BullMetrics!',
-    text: `Olá ${name}, bem-vindo à BullMetrics!\n\nEstamos muito felizes por te ter connosco. A plataforma foi desenhada para te dar acesso a métricas profissionais e análises fundamentais potenciadas por Inteligência Artificial.\n\nA tua jornada para melhores investimentos começa agora.\n\n${buttonText}: ${link}`,
+    subject: 'Bem-vindo à BullValue!',
+    text: `Olá ${name}, bem-vindo à BullValue!\n\nEstamos muito felizes por te ter connosco. A plataforma foi desenhada para te dar acesso a métricas profissionais e análises fundamentais potenciadas por Inteligência Artificial.\n\nA tua jornada para melhores investimentos começa agora.\n\n${buttonText}: ${link}`,
     html: getEmailTemplate(`
-      <h2>Olá ${name}, bem-vindo à BullMetrics!</h2>
+      <h2>Olá ${name}, bem-vindo à BullValue!</h2>
       <p>Estamos muito felizes por te ter connosco. A plataforma foi desenhada para te dar acesso a métricas profissionais e análises fundamentais potenciadas por Inteligência Artificial.</p>
       <p>A tua jornada para melhores investimentos começa agora.</p>
       <div style="text-align: center;">
@@ -195,13 +195,13 @@ export const sendUpgradeToProEmail = async (email: string, name: string) => {
     from: FROM_EMAIL,
     to: [email],
     subject: 'Bem-vindo ao Plano PRO!',
-    text: `Parabéns ${name}, agora és PRO!\n\nA tua conta foi atualizada com sucesso.\n\nA partir de agora tens acesso total a todas as funcionalidades exclusivas da plataforma, incluindo avaliações de gestão profundas e análises DCF ilimitadas.\n\nExplorar Funcionalidades PRO: https://bullmetrics.thebullocracy.com/dashboard`,
+    text: `Parabéns ${name}, agora és PRO!\n\nA tua conta foi atualizada com sucesso.\n\nA partir de agora tens acesso total a todas as funcionalidades exclusivas da plataforma, incluindo avaliações de gestão profundas e análises DCF ilimitadas.\n\nExplorar Funcionalidades PRO: https://thebullvalue.com/dashboard`,
     html: getEmailTemplate(`
       <h2>Parabéns ${name}, agora és PRO!</h2>
       <p>A tua conta foi atualizada com sucesso.</p>
       <p>A partir de agora tens acesso total a todas as funcionalidades exclusivas da plataforma, incluindo avaliações de gestão profundas e análises DCF ilimitadas.</p>
       <div style="text-align: center;">
-        <a href="https://bullmetrics.thebullocracy.com/dashboard" class="btn">Explorar Funcionalidades PRO</a>
+        <a href="https://thebullvalue.com/dashboard" class="btn">Explorar Funcionalidades PRO</a>
       </div>
     `),
   });
@@ -217,13 +217,13 @@ export const sendTrialConfirmationEmail = async (email: string, name: string) =>
     from: FROM_EMAIL,
     to: [email],
     subject: 'O teu período gratuito de 7 dias começou!',
-    text: `Olá ${name},\n\nO teu período experimental de 7 dias do plano PRO começou agora mesmo.\n\nAproveita para testar todas as nossas ferramentas premium sem qualquer compromisso durante os próximos 7 dias.\n\nAproveitar o Trial: https://bullmetrics.thebullocracy.com/dashboard`,
+    text: `Olá ${name},\n\nO teu período experimental de 7 dias do plano PRO começou agora mesmo.\n\nAproveita para testar todas as nossas ferramentas premium sem qualquer compromisso durante os próximos 7 dias.\n\nAproveitar o Trial: https://thebullvalue.com/dashboard`,
     html: getEmailTemplate(`
       <h2>Olá ${name},</h2>
       <p>O teu período experimental de 7 dias do plano PRO começou agora mesmo.</p>
       <p>Aproveita para testar todas as nossas ferramentas premium sem qualquer compromisso durante os próximos 7 dias.</p>
       <div style="text-align: center;">
-        <a href="https://bullmetrics.thebullocracy.com/dashboard" class="btn">Aproveitar o Trial</a>
+        <a href="https://thebullvalue.com/dashboard" class="btn">Aproveitar o Trial</a>
       </div>
     `),
   });
@@ -238,11 +238,11 @@ export const sendPasswordResetEmail = async (email: string, resetLink: string) =
   return await resend.emails.send({
     from: FROM_EMAIL,
     to: [email],
-    subject: 'Recuperação de Password - BullMetrics',
+    subject: 'Recuperação de Password - BullValue',
     text: `Olá,\n\nRecebemos um pedido para repor a password da tua conta.\nClica no link abaixo para criar uma nova password:\n\n${resetLink}\n\nSe não pediste para repor a password, ignora este email.`,
     html: getEmailTemplate(`
       <h2>Recuperação de Password</h2>
-      <p>Recebemos um pedido para repor a password da tua conta na BullMetrics.</p>
+      <p>Recebemos um pedido para repor a password da tua conta na BullValue.</p>
       <p>Clica no botão abaixo para definir uma password nova e segura:</p>
       <div style="text-align: center;">
         <a href="${resetLink}" class="btn">Repor Password</a>

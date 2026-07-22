@@ -67,7 +67,7 @@ def assert_local_db(url: str) -> None:
 assert_local_db(DIRECT_URL)
 
 EDGAR_BASE = "https://data.sec.gov/api/xbrl/companyfacts"
-EDGAR_HEADERS = {"User-Agent": "Bullmetrics admin@bullocracy.com"}
+EDGAR_HEADERS = {"User-Agent": "BullValue admin@bullocracy.com"}
 SLEEP_BETWEEN = 0.2
 HISTORY_YEARS = 10
 REFRESH_CACHE = "--refresh-cache" in sys.argv

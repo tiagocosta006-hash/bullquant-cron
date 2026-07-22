@@ -229,7 +229,7 @@
   },
   "register": {
     "title": "Crea Account",
-    "subtitle": "Unisciti a BullMetrics.",
+    "subtitle": "Unisciti a BullValue.",
     "nameLabel": "Nome",
     "namePlaceholder": "Il tuo nome",
     "emailLabel": "Email",
@@ -375,7 +375,7 @@
       "title": "Suggerimenti"
     },
     "landing": {
-      "title": "BullMetrics",
+      "title": "BullValue",
       "description": "Cerca un'azienda per iniziare.",
       "testExample": "Prova Esempio",
       "createAccount": "Crea Account"

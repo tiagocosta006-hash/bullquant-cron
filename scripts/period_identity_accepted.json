@@ -1,0 +1,65 @@
+{
+  "_doc": "Exceções de identidade de período REVISTAS e aceites como realidade (mudança de ano fiscal a meio da história) — NÃO são bugs de rotulagem. Chave: TICKER|FY|FQ|CHECK.",
+  "accepted": [
+    {
+      "key": "GPN|2016|3|FY_YEAR_MISMATCH",
+      "rationale": "GPN mudou o fecho de ano fiscal (maio→dezembro) em 2017-2018 — período de transição; nenhum calendário único rotula na perfeição."
+    },
+    {
+      "key": "GPN|2016|4|FY_YEAR_MISMATCH",
+      "rationale": "GPN mudou o fecho de ano fiscal (maio→dezembro) em 2017-2018 — período de transição; nenhum calendário único rotula na perfeição."
+    },
+    {
+      "key": "GPN|2016|None|ANNUAL_MONTH_MISMATCH",
+      "rationale": "GPN mudou o fecho de ano fiscal (maio→dezembro) em 2017-2018 — período de transição; nenhum calendário único rotula na perfeição."
+    },
+    {
+      "key": "LHX|2016|3|FY_YEAR_MISMATCH",
+      "rationale": "LHX (fusão L3+Harris, 2019) mudou de calendário fiscal — período de transição; rótulos do stub não alinham num modelo de calendário único."
+    },
+    {
+      "key": "LHX|2016|4|FY_YEAR_MISMATCH",
+      "rationale": "LHX (fusão L3+Harris, 2019) mudou de calendário fiscal — período de transição; rótulos do stub não alinham num modelo de calendário único."
+    },
+    {
+      "key": "LHX|2016|None|ANNUAL_MONTH_MISMATCH",
+      "rationale": "LHX (fusão L3+Harris, 2019) mudou de calendário fiscal — período de transição; rótulos do stub não alinham num modelo de calendário único."
+    },
+    {
+      "key": "LHX|2017|3|FY_YEAR_MISMATCH",
+      "rationale": "LHX (fusão L3+Harris, 2019) mudou de calendário fiscal — período de transição; rótulos do stub não alinham num modelo de calendário único."
+    },
+    {
+      "key": "LHX|2017|4|FY_YEAR_MISMATCH",
+      "rationale": "LHX (fusão L3+Harris, 2019) mudou de calendário fiscal — período de transição; rótulos do stub não alinham num modelo de calendário único."
+    },
+    {
+      "key": "LHX|2017|None|ANNUAL_MONTH_MISMATCH",
+      "rationale": "LHX (fusão L3+Harris, 2019) mudou de calendário fiscal — período de transição; rótulos do stub não alinham num modelo de calendário único."
+    },
+    {
+      "key": "LHX|2018|3|FY_YEAR_MISMATCH",
+      "rationale": "LHX (fusão L3+Harris, 2019) mudou de calendário fiscal — período de transição; rótulos do stub não alinham num modelo de calendário único."
+    },
+    {
+      "key": "LHX|2018|4|FY_YEAR_MISMATCH",
+      "rationale": "LHX (fusão L3+Harris, 2019) mudou de calendário fiscal — período de transição; rótulos do stub não alinham num modelo de calendário único."
+    },
+    {
+      "key": "LHX|2018|None|ANNUAL_MONTH_MISMATCH",
+      "rationale": "LHX (fusão L3+Harris, 2019) mudou de calendário fiscal — período de transição; rótulos do stub não alinham num modelo de calendário único."
+    },
+    {
+      "key": "LHX|2019|3|FY_YEAR_MISMATCH",
+      "rationale": "LHX (fusão L3+Harris, 2019) mudou de calendário fiscal — período de transição; rótulos do stub não alinham num modelo de calendário único."
+    },
+    {
+      "key": "LHX|2019|4|FY_YEAR_MISMATCH",
+      "rationale": "LHX (fusão L3+Harris, 2019) mudou de calendário fiscal — período de transição; rótulos do stub não alinham num modelo de calendário único."
+    },
+    {
+      "key": "LHX|2019|None|ANNUAL_MONTH_MISMATCH",
+      "rationale": "LHX (fusão L3+Harris, 2019) mudou de calendário fiscal — período de transição; rótulos do stub não alinham num modelo de calendário único."
+    }
+  ]
+}

@@ -16,7 +16,9 @@ import datetime
 import bisect
 import gzip
 import json
+import math
 import uuid
+from collections import Counter, defaultdict
 import requests
 import yfinance as yf  # SÓ para splits (TODO(polygon): migrar; FX já é BCE)
 import psycopg2
@@ -394,6 +396,59 @@ INSTANT_TAGS = {
     ],
     "sharesOutstandingInst": ["CommonStockSharesOutstanding", "NumberOfSharesOutstanding"],
 }
+
+# Override manual de capex para casos em que a empresa reporta "purchases of
+# property and equipment AND intangible assets" como uma única linha na
+# demonstração de cash flow, sem tag XBRL própria (nenhuma das tags de
+# DURATION_TAGS["capex"] aparece) — ex.: NVDA FY2016-FY2021, antes de a empresa
+# passar a taggar a linha separadamente como PaymentsToAcquireProductiveAssets a
+# partir de FY2022. Valores extraídos à mão dos 10-Ks/10-Qs originais na SEC
+# EDGAR (Consolidated Statements of Cash Flows, "Investing activities"); os
+# trimestres já vêm convertidos de YTD para discreto. Aplicado em dur_map por
+# apply_manual_capex_overrides() DEPOIS de extract_all_metrics() e ANTES de
+# synthesize_q4(), e SÓ preenche quando a extração automática devolveu None
+# (nunca sobrepõe um valor real de tag). Chave: (ticker, fiscalYear, fp).
+MANUAL_CAPEX_OVERRIDES: dict[tuple[str, int, str], float] = {
+    ("NVDA", 2016, "FY"): 86_000_000,
+    ("NVDA", 2016, "Q1"): 30_000_000,
+    ("NVDA", 2016, "Q2"): 24_000_000,
+    ("NVDA", 2016, "Q3"): 17_000_000,
+    ("NVDA", 2017, "FY"): 176_000_000,
+    ("NVDA", 2017, "Q1"): 55_000_000,
+    ("NVDA", 2017, "Q2"): 32_000_000,
+    ("NVDA", 2017, "Q3"): 38_000_000,
+    ("NVDA", 2018, "FY"): 593_000_000,
+    ("NVDA", 2018, "Q1"): 54_000_000,
+    ("NVDA", 2018, "Q2"): 54_000_000,
+    ("NVDA", 2018, "Q3"): 69_000_000,
+    ("NVDA", 2019, "FY"): 600_000_000,
+    ("NVDA", 2019, "Q1"): 118_000_000,
+    ("NVDA", 2019, "Q2"): 129_000_000,
+    ("NVDA", 2019, "Q3"): 150_000_000,
+    ("NVDA", 2020, "FY"): 489_000_000,
+    ("NVDA", 2020, "Q1"): 128_000_000,
+    ("NVDA", 2020, "Q2"): 113_000_000,
+    ("NVDA", 2020, "Q3"): 103_000_000,
+    ("NVDA", 2021, "FY"): 1_128_000_000,
+    ("NVDA", 2021, "Q1"): 155_000_000,
+    ("NVDA", 2021, "Q2"): 217_000_000,
+    ("NVDA", 2021, "Q3"): 473_000_000,
+}
+
+
+def apply_manual_capex_overrides(dur_map: dict, ticker: str | None) -> None:
+    """Preenche dur_map[(fy, fp)]["capex"] a partir de MANUAL_CAPEX_OVERRIDES
+    quando a extração automática de tags não encontrou nada. Corre ANTES de
+    synthesize_q4(), para que o Q4 sintetizado (FY − Q1 − Q2 − Q3) beneficie
+    também dos trimestres aqui preenchidos. Nunca sobrepõe um valor real."""
+    if not ticker:
+        return
+    for (t, fy, fp), val in MANUAL_CAPEX_OVERRIDES.items():
+        if t != ticker:
+            continue
+        dur = dur_map.get((fy, fp))
+        if dur is not None and dur.get("capex") is None:
+            dur["capex"] = val
 
 
 def new_id() -> str:
@@ -813,25 +868,138 @@ def safe_clamp(v, lo, hi):
     return max(lo, min(hi, v))
 
 
-def get_period_info(us_gaap: dict, fy: int, fp: str) -> tuple[str | None, str | None]:
-    """Devolve (period_end, filed_at) para um período."""
-    for tag in ["Assets", "NetIncomeLoss", "ProfitLoss", "Revenues", "Revenue", "StockholdersEquity", "Equity"]:
-        entries = extract_tag_entries(us_gaap, tag)
-        matches = [e for e in entries if e.get("fy") == fy and e.get("fp") == fp]
-        if matches:
-            if tag in ["NetIncomeLoss", "ProfitLoss", "Revenues", "Revenue"]:
-                if fp == "FY":
-                    matches = [e for e in matches if is_annual_duration(e)]
-                else:
-                    matches = [e for e in matches if is_quarterly_duration(e)]
-            if not matches:
+# ── Identidade de período fiscal derivada da DATA (não dos campos fy/fp) ──────
+# Os campos fy/fp do XBRL da SEC são frequentemente ERRADOS em factos
+# comparativos de filings posteriores (a mesma data reportada com fy diferente),
+# e confiar neles fazia linhas "FY2020 Q1" ganharem uma periodEnd de 2020-04-26
+# (que é fiscal-2021 Q1). A data de fecho, essa, nunca mente — por isso o ano e
+# o trimestre fiscais são DERIVADOS da periodEnd + o calendário fiscal real da
+# empresa (as datas de fecho anuais observadas).
+_CORE_PERIOD_TAGS = ("NetIncomeLoss", "ProfitLoss", "Revenues", "Revenue")
+_INSTANT_PERIOD_TAGS = ("Assets", "StockholdersEquity", "Equity")
+
+
+_GRACE = datetime.timedelta(days=7)
+_YEAR_DAYS = 365.25
+_QUARTER_DAYS = 91.3125
+
+
+def build_fiscal_calendar(us_gaap: dict) -> dict | None:
+    """Deriva o calendário fiscal da empresa das DATAS dos factos anuais (imunes
+    ao bug de fy/fp: a data está certa mesmo com o rótulo errado).
+
+    Estratégia robusta a calendários 52/53 semanas (fecho oscila jan/fev,
+    ago/set) e a anos fiscais em falta: em vez de um modelo mês+offset (que parte
+    em empresas cujo fecho cruza a fronteira do mês, ex. COST), ancora-se num
+    ÚNICO facto anual FIÁVEL — aquele cujo 10-K foi arquivado <120 dias após o
+    fecho (o original, não um comparativo, logo com `fy` verdadeiro) — e
+    numeram-se todos os outros fechos por DISTÂNCIA EM ANOS a essa âncora
+    (round(dias/365,25)), o que tolera lacunas.
+
+    Devolve {annual_ends: [date], anchor_end: date, anchor_fy: int} ou None se
+    não houver factos anuais ou âncora fiável (aí o chamador cai para o antigo)."""
+    ann_ends: list[datetime.date] = []
+    reliable: dict[datetime.date, tuple[int, int]] = {}  # end -> (gap, fy) do original
+    for tag in _CORE_PERIOD_TAGS:
+        for e in extract_tag_entries(us_gaap, tag):
+            if not is_annual_duration(e):
                 continue
-            matches.sort(key=lambda e: e.get("end") or "", reverse=True)
-            period_end = matches[0].get("end")
-            matches_for_end = [e for e in matches if e.get("end") == period_end]
-            matches_for_end.sort(key=lambda e: e.get("filed") or "", reverse=True)
-            return period_end, matches_for_end[0].get("filed")
-    return None, None
+            try:
+                d = datetime.date.fromisoformat(e["end"])
+            except (ValueError, KeyError, TypeError):
+                continue
+            ann_ends.append(d)
+            fy_label, filed = e.get("fy"), e.get("filed")
+            if fy_label and filed:
+                try:
+                    gap = (datetime.date.fromisoformat(filed) - d).days
+                except (ValueError, TypeError):
+                    continue
+                # Original (não comparativo): 10-K arquivado pouco depois do fecho.
+                if 0 <= gap < 120 and (d not in reliable or gap < reliable[d][0]):
+                    reliable[d] = (gap, fy_label)
+    if not ann_ends or not reliable:
+        return None
+
+    # Calibração da âncora por MODA (robusta a um facto com fy anómalo): cada
+    # fecho anual fiável dá um voto para "que fy teria o fecho REF", contando a
+    # distância em anos. A moda vence — um único rótulo mau não desalinha tudo.
+    ref = max(reliable)
+    base_votes = [fy + round((ref - end).days / _YEAR_DAYS) for end, (_g, fy) in reliable.items()]
+    anchor_fy = Counter(base_votes).most_common(1)[0][0]
+
+    # Dedup/cluster (52/53 semanas fazem as datas oscilar): uma por ano fiscal,
+    # a mais recente de cada cluster de ~25 dias.
+    clustered: list[datetime.date] = []
+    for d in sorted(set(ann_ends)):
+        if clustered and (d - clustered[-1]).days <= 25:
+            clustered[-1] = d
+        else:
+            clustered.append(d)
+    return {"annual_ends": clustered, "anchor_end": ref, "anchor_fy": anchor_fy}
+
+
+def map_end_to_fiscal(d: datetime.date, is_annual: bool, cal: dict) -> tuple[int, str]:
+    """Mapeia uma data de fecho para (fiscalYear, fp), tudo por datas. k = nº de
+    anos fiscais entre a âncora e o ano fiscal a que `d` pertence (o primeiro
+    fecho âncora+k·365,25 que fica >= d). Extrapola por passos de ~1 ano, por
+    isso lacunas nos anos anuais não puxam o resultado (ao contrário de "primeiro
+    anual observado >= d"). O trimestre vem da distância ao fecho estimado."""
+    anchor_end = cal["anchor_end"]
+    k = math.ceil(((d - _GRACE) - anchor_end).days / _YEAR_DAYS)
+    fy = cal["anchor_fy"] + k
+    if is_annual:
+        return fy, "FY"
+    fye_est = anchor_end + datetime.timedelta(days=round(_YEAR_DAYS * k))
+    # Ajustar a um fecho anual observado próximo (±25d) para a distância em
+    # trimestres ser exata mesmo com drift 52/53 semanas.
+    nearest = min(cal["annual_ends"], key=lambda a: abs((a - fye_est).days))
+    fye = nearest if abs((nearest - fye_est).days) <= 25 else fye_est
+    qi = round((fye - d).days / _QUARTER_DAYS)
+    q = 4 - max(0, min(qi, 3))
+    return fy, f"Q{q}"
+
+
+def discover_periods(us_gaap: dict, cal: dict, min_fy: int) -> tuple[set, dict, dict]:
+    """Descobre os períodos (fy, fp) e resolve periodEnd/filed por período,
+    tudo a partir das DATAS (não de fy/fp). Devolve (periods, period_ends,
+    period_filed). period_ends guarda sempre uma string `end` REALMENTE
+    observada (o best_for_period casa por igualdade exata de `end`)."""
+    cand: dict = defaultdict(list)  # (fy, fp) -> [(end_str, filed_str)]
+    for tag in _CORE_PERIOD_TAGS + _INSTANT_PERIOD_TAGS:
+        for e in extract_tag_entries(us_gaap, tag):
+            end = e.get("end")
+            if not end:
+                continue
+            try:
+                d = datetime.date.fromisoformat(end)
+            except (ValueError, TypeError):
+                continue
+            if "start" in e:
+                if is_annual_duration(e):
+                    is_ann = True
+                else:
+                    days = (d - datetime.date.fromisoformat(e["start"])).days
+                    if not (80 <= days <= 300):
+                        continue  # nem trimestre/YTD nem anual — ignorar
+                    is_ann = False
+            else:
+                # Instante (balanço): a data é um fim de período. Anual se coincide
+                # (±25d) com um fecho fiscal; senão é o fecho de um trimestre.
+                is_ann = any(abs((d - a).days) <= 25 for a in cal["annual_ends"])
+            fy, fp = map_end_to_fiscal(d, is_ann, cal)
+            if fy < min_fy:
+                continue
+            cand[(fy, fp)].append((end, e.get("filed")))
+
+    period_ends: dict = {}
+    period_filed: dict = {}
+    for key, lst in cand.items():
+        best_end = Counter(x[0] for x in lst).most_common(1)[0][0]
+        fileds = [x[1] for x in lst if x[0] == best_end and x[1]]
+        period_ends[key] = best_end
+        period_filed[key] = max(fileds) if fileds else None
+    return set(cand.keys()), period_ends, period_filed
 
 
 # ── Evidência ao nível da empresa (política evidência-de-ausência) ───────────
@@ -1702,28 +1870,45 @@ def process_company(conn, company: dict, dry_run: bool = False,
                 reporting_currency = curr
     _PREFERRED_CURRENCY = reporting_currency
 
-    # Descobrir todos os (fy, fp) disponíveis nos últimos 10 anos
-    for sample_tags in [["NetIncomeLoss", "ProfitLoss", "Assets", "Revenues", "Revenue"]]:
-        for tag in sample_tags:
+    # Descobrir períodos DERIVANDO (fy, fp) da DATA de fecho (não dos campos
+    # fy/fp da SEC, que são frequentemente errados em comparativos). O calendário
+    # fiscal vem das datas de fecho anuais observadas. Sem factos anuais (raro:
+    # alguns 20-F/6-K), cai para o comportamento antigo baseado em fy/fp.
+    cal = build_fiscal_calendar(namespace)
+    if cal is not None:
+        periods, period_ends, period_filed = discover_periods(namespace, cal, min_fy)
+    else:
+        for tag in ("NetIncomeLoss", "ProfitLoss", "Assets", "Revenues", "Revenue"):
             for e in extract_tag_entries(namespace, tag):
                 fy = e.get("fy")
                 fp = e.get("fp")
                 if fy and fp and fy >= min_fy and fp in ("FY", "Q1", "Q2", "Q3", "Q4"):
                     periods.add((fy, fp))
+        period_ends, period_filed = {}, {}
+        for (fy, fp) in sorted(periods):
+            for tag in ["Assets", "NetIncomeLoss", "ProfitLoss", "Revenues", "Revenue",
+                        "StockholdersEquity", "Equity"]:
+                entries = extract_tag_entries(namespace, tag)
+                matches = [e for e in entries if e.get("fy") == fy and e.get("fp") == fp]
+                if tag in ("NetIncomeLoss", "ProfitLoss", "Revenues", "Revenue"):
+                    matches = [e for e in matches
+                               if (is_annual_duration(e) if fp == "FY" else is_quarterly_duration(e))]
+                if matches:
+                    matches.sort(key=lambda e: e.get("end") or "", reverse=True)
+                    pe = matches[0].get("end")
+                    fe = [e for e in matches if e.get("end") == pe]
+                    fe.sort(key=lambda e: e.get("filed") or "", reverse=True)
+                    period_ends[(fy, fp)] = pe
+                    period_filed[(fy, fp)] = fe[0].get("filed")
+                    break
 
     if not periods:
         return 0
 
     periods_list = sorted(periods)
-    
-    period_ends = {}
-    period_filed = {}
-    for (fy, fp) in periods_list:
-        p_end, p_filed = get_period_info(namespace, fy, fp)
-        period_ends[(fy, fp)] = p_end
-        period_filed[(fy, fp)] = p_filed
 
     dur_map, inst_map = extract_all_metrics(namespace, periods_list, period_ends)
+    apply_manual_capex_overrides(dur_map, company.get("ticker"))
 
     # Q4 sintético (FY − Q1−Q2−Q3) + anos cujo Q4 existente na BD deve ser limpo
     drop_q4_years = synthesize_q4(periods, period_ends, period_filed, dur_map, inst_map)
@@ -1789,16 +1974,60 @@ def process_company(conn, company: dict, dry_run: bool = False,
             }
         return len(rows)
 
-    # Commit único por empresa (~40 períodos): contra Supabase remoto, o commit
-    # por período dominava o tempo de execução (~3 round-trips × ~100ms cada).
+    # Wipe-then-reinsert por empresa (num único commit): agora que (fy, fp) é
+    # DERIVADO da data, uma re-ingestão pode dar rótulos DIFERENTES aos de antes
+    # — um delete-por-chave deixaria as linhas antigas mis-rotuladas como órfãs
+    # (e não apanha os duplicados ANNUAL de quarter NULL). Apagar tudo da empresa
+    # e reinserir garante convergência. GUARD: nunca apagar sem ter linhas novas
+    # para pôr (fetch falhado/vazio já retornou antes, mas defende-se na mesma).
+    if not rows:
+        return 0
+
+    # Preservar enriquecimentos escritos por pipelines SEPARADOS (revenueSegments
+    # via ingest_segments; businessKpis via pipeline Gemini) que insert_fundamental
+    # NÃO reescreve — senão o wipe apagava-os. Ancorados na identidade FÍSICA do
+    # período (periodType, periodEnd), não no rótulo (fy, fq) que pode mudar com a
+    # relabelagem. Reaplicados por (periodType, periodEnd::date) após reinserir.
+    preserved: dict[tuple, tuple] = {}
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                'SELECT "periodType", "periodEnd"::date, "revenueSegments", "businessKpis" '
+                'FROM fundamentals WHERE "companyId" = %s '
+                'AND ("revenueSegments" IS NOT NULL OR "businessKpis" IS NOT NULL)',
+                (company_id,),
+            )
+            for pt, pe, seg, kpi in cur.fetchall():
+                preserved[(pt, pe.isoformat())] = (seg, kpi)
+    except Exception:
+        conn.rollback()
+        preserved = {}
+
+    def _reattach(cur):
+        if not preserved:
+            return
+        for row in rows:
+            key = (row["periodType"], str(row["periodEnd"])[:10])
+            enr = preserved.get(key)
+            if not enr:
+                continue
+            seg, kpi = enr
+            cur.execute(
+                'UPDATE fundamentals SET "revenueSegments" = %s, "businessKpis" = %s '
+                'WHERE "companyId" = %s AND "periodType" = %s::"period_type" '
+                'AND "periodEnd"::date = %s::date',
+                (Json(seg) if seg is not None else None,
+                 Json(kpi) if kpi is not None else None,
+                 company_id, row["periodType"], str(row["periodEnd"])[:10]),
+            )
+
     inserted = 0
     try:
         with conn.cursor() as cur:
-            for fy in drop_q4_years:
-                delete_period(cur, company_id, "QUARTERLY", fy, 4)
+            cur.execute('DELETE FROM fundamentals WHERE "companyId" = %s', (company_id,))
             for row in rows:
-                delete_period(cur, company_id, row["periodType"], row["fiscalYear"], row["fiscalQuarter"])
                 insert_fundamental(cur, row)
+            _reattach(cur)
         conn.commit()
         inserted = len(rows)
     except Exception as e:
@@ -1806,21 +2035,25 @@ def process_company(conn, company: dict, dry_run: bool = False,
         print(f"    DB error (batch): {e} — fallback período a período")
         try:
             with conn.cursor() as cur:
-                for fy in drop_q4_years:
-                    delete_period(cur, company_id, "QUARTERLY", fy, 4)
+                cur.execute('DELETE FROM fundamentals WHERE "companyId" = %s', (company_id,))
             conn.commit()
         except Exception:
             conn.rollback()
         for row in rows:
             try:
                 with conn.cursor() as cur:
-                    delete_period(cur, company_id, row["periodType"], row["fiscalYear"], row["fiscalQuarter"])
                     insert_fundamental(cur, row)
                 conn.commit()
                 inserted += 1
             except Exception as e2:
                 conn.rollback()
                 print(f"    DB error {row['fiscalYear']}/{row['fiscalQuarter']}: {e2}")
+        try:
+            with conn.cursor() as cur:
+                _reattach(cur)
+            conn.commit()
+        except Exception:
+            conn.rollback()
 
     try:
         with conn.cursor() as cur:

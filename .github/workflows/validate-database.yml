@@ -31,6 +31,22 @@ jobs:
           npx prisma generate
           npx tsx scripts/validate_database.ts
 
+      # Gate de IDENTIDADE DE PERÍODO FISCAL: falha o workflow se reaparecer
+      # alguma linha cujo (fiscalYear, fiscalQuarter) não bate com a periodEnd
+      # (o bug de confiar nos campos fy/fp da SEC). Exceções legítimas (mudanças
+      # de ano fiscal: GPN, LHX) estão em scripts/period_identity_accepted.json.
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Period identity gate
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: |
+          pip install psycopg2-binary python-dotenv
+          python scripts/validate_period_identity.py
+
       - name: Upload Report
         uses: actions/upload-artifact@v4
         with:

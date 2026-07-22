@@ -90,7 +90,7 @@ export async function GET(
             <div style={{ display: "flex", alignItems: "center" }}>
               <img src={brandLogoSrc} width={42} height={42} style={{ marginRight: 16 }} />
               <div style={{ fontSize: 32, fontWeight: 800, letterSpacing: "-0.05em", color: "#1a1a17", display: "flex" }}>
-                <span style={{ color: "#e4aa33" }}>Bull</span>Metrics
+                <span style={{ color: "#e4aa33" }}>Bull</span>Value
               </div>
             </div>
 

@@ -134,7 +134,7 @@ export async function GET(
                   display: "flex",
                 }}
               >
-                <span style={{ color: "#e4aa33" }}>Bull</span>Metrics
+                <span style={{ color: "#e4aa33" }}>Bull</span>Value
               </div>
             </div>
             {price && (

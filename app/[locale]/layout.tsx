@@ -159,8 +159,8 @@ export default async function RootLayout({
             <main className="flex-1 flex flex-col">{children}</main>
           </PaddleProvider>
           <CookieConsent />
+          <PulseTracker />
         </NextIntlClientProvider>
-        <PulseTracker />
         {/* GA NÃO é montado aqui: é carregado pelo <CookieConsent> só APÓS
             consentimento (RGPD) — montá-lo aqui disparava GA antes/sem
             consentimento (ilegal na UE) e em duplicado. */}

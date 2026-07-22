@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { SearchBar } from '@/components/search/SearchBar';
 import { LogOut, UserCircle, Zap, Users } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -15,53 +14,47 @@ export async function Header() {
   const t = await getTranslations('header');
 
   return (
-    // Ilha flutuante: fica dentro de #marketing-wrap (sticky funciona lá;
-    // fixed partiria o rubber-band do InertiaScroll). Camada de vidro
-    // separada da de conteúdo — .glass tem overflow:hidden, que clipava o
-    // dropdown do SearchBar; a ilha vive por trás, o conteúdo por cima.
+    // Arquipélago flutuante: bolhas independentes em vez de uma ilha única.
+    // Fica dentro de #marketing-wrap (sticky funciona lá; fixed partiria o
+    // rubber-band do InertiaScroll). Em cada bolha o vidro é uma camada
+    // absoluta atrás do conteúdo — .glass tem overflow:hidden, que clipava
+    // o dropdown do SearchBar; o conteúdo vive por cima.
     <header className="sticky top-3 z-50 px-4">
-      <div className="relative mx-auto max-w-screen-2xl">
-        <div
-          className="glass glass-frost absolute inset-0 rounded-[1.75rem]"
-          aria-hidden
-        >
-          {/* hairline dourada que esbate nas pontas, em vez do border-bottom reto */}
-          <span className="gold-rule absolute inset-x-8 bottom-0 h-px" aria-hidden />
+      <div className="mx-auto flex max-w-screen-2xl items-center gap-3 lg:gap-4">
+        {/* Logo: sem bolha, só uma hairline dourada por baixo — destaca-se
+            do vidro das restantes */}
+        <div className="relative flex h-14 shrink-0 items-center px-1">
+          <Logo href="/" size="md" />
+          <span className="gold-rule absolute inset-x-0 -bottom-0.5 h-px" aria-hidden />
         </div>
 
-        <div className="relative z-10 flex h-16 items-center justify-between px-4 md:px-6">
-          <div className="flex items-center gap-8">
-            <div className="mr-2">
-              <Logo href="/" size="md" />
-            </div>
-
-            <div className="hidden lg:block w-full min-w-[280px] max-w-sm">
-              <SearchBar isLoggedIn={!!user} />
-            </div>
-
-            {/* Navegação Principal (Esquerda) */}
-            <nav className="hidden lg:flex items-center space-x-8">
-              <Link
-                href="/about"
-                className="flex items-center space-x-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                title={t('about')}
-              >
-                <Users className="h-4 w-4" />
-                <span>{t('about')}</span>
-              </Link>
-              <Link
-                href="/pricing"
-                className="flex items-center space-x-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                title={t('pricing')}
-              >
-                <Zap className="h-4 w-4" />
-                <span>{t('pricing')}</span>
-              </Link>
-            </nav>
+        {/* Bolha da navegação */}
+        <nav className="relative hidden h-12 shrink-0 items-center px-5 md:flex">
+          <div className="glass glass-frost absolute inset-0 rounded-full" aria-hidden />
+          <div className="relative z-10 flex items-center gap-6">
+            <Link
+              href="/about"
+              className="flex items-center space-x-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              title={t('about')}
+            >
+              <Users className="h-4 w-4" />
+              <span>{t('about')}</span>
+            </Link>
+            <Link
+              href="/pricing"
+              className="flex items-center space-x-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              title={t('pricing')}
+            >
+              <Zap className="h-4 w-4" />
+              <span>{t('pricing')}</span>
+            </Link>
           </div>
+        </nav>
 
-          {/* Lado Direito: menu mobile, Tema, Auth */}
-          <div className="flex items-center space-x-2 ml-auto">
+        {/* Bolha da direita: menu mobile, tema, auth */}
+        <div className="relative ml-auto flex h-12 shrink-0 items-center px-2.5 sm:px-4">
+          <div className="glass glass-frost absolute inset-0 rounded-full" aria-hidden />
+          <div className="relative z-10 flex items-center space-x-2">
             <HeaderMobileMenu
               isLoggedIn={!!user}
               labels={{
@@ -70,6 +63,8 @@ export async function Header() {
                 about: t('about'),
                 pricing: t('pricing'),
                 login: t('login'),
+                peek: t('peek'),
+                createAccount: t('createAccount'),
               }}
             />
             <ThemeToggle />
@@ -93,21 +88,38 @@ export async function Header() {
               </div>
             ) : (
               <div className="flex items-center space-x-2">
-                {/* Login some abaixo de sm — Logo + hamburger + tema + Login +
-                    Começar grátis não cabem todos numa linha em ecrãs pequenos
-                    (ficava cortado); Login passa para o menu mobile. */}
+                {/* Login some abaixo de sm — Logo + hamburger + tema + Espreitar +
+                    Login + Criar conta não cabem todos numa linha em ecrãs
+                    pequenos (ficava cortado); Login e Espreitar passam para o
+                    menu mobile. Criar conta é o único CTA sempre visível. */}
+                <Link
+                  href="/stock/AAPL"
+                  data-track="header_peek"
+                  className={cn(
+                    buttonVariants({ variant: "outline" }),
+                    "hidden h-11 rounded-full md:inline-flex md:h-8",
+                  )}
+                >
+                  {t('peek')}
+                </Link>
                 <Link
                   href="/login"
-                  className={cn(buttonVariants({ variant: "ghost" }), "hidden h-11 md:inline-flex md:h-8")}
+                  className={cn(
+                    buttonVariants({ variant: "ghost" }),
+                    "hidden h-11 rounded-full md:inline-flex md:h-8",
+                  )}
                 >
                   {t('login')}
                 </Link>
                 <Link
                   href="/register"
                   data-track="header_register"
-                  className={cn(buttonVariants(), "pressable cta-sheen h-11 font-semibold md:h-8")}
+                  className={cn(
+                    buttonVariants(),
+                    "pressable cta-sheen h-11 rounded-full font-semibold md:h-8",
+                  )}
                 >
-                  {t('startFree')}
+                  {t('createAccount')}
                 </Link>
               </div>
             )}

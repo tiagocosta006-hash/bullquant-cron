@@ -6,6 +6,7 @@
     "subtitle": "10 anos de fundamentais, uma calculadora DCF que se autopreenche e AI Insights, em português e de graça. Análise séria para quem investe a longo prazo.",
     "primaryCta": "Criar conta grátis",
     "secondaryCta": "Espreitar sem conta: AAPL",
+    "peekCta": "Espreitar sem conta",
     "trust": "Cobertura S&P 500 · Dados da SEC EDGAR · Sem cartão de crédito",
     "features": {
       "fundamentals": {
@@ -32,7 +33,8 @@
     "ctaTitle": "Começa a ver o valor que os outros não veem.",
     "ctaSubtitle": "Cria a tua conta gratuita e analisa qualquer empresa do S&P 500 em segundos.",
     "ticker": {
-      "label": "Fechos do dia anterior, S&P 500"
+      "label": "Últimos fechos disponíveis · S&P 500",
+      "labelLive": "Preços em direto · S&P 500"
     },
     "showcase": {
       "caption": "Dez anos de fundamentais, DCF e AI Brief, num só terminal, sem folhas de cálculo.",
@@ -40,7 +42,17 @@
       "caption2": "Preço em direto, watchlist e calendário de resultados, tudo a um ⌘K de distância.",
       "caption3": "Grátis, em português, pronto em menos de um minuto.",
       "live": "Em direto",
-      "aiChip": "AI Brief"
+      "finRows": {
+        "gross": "Bruta",
+        "operating": "Operacional"
+      },
+      "moreCharts": "+{count} gráficos",
+      "finSegmentsTitle": "Receita por segmento",
+      "chat": {
+        "user": "Qual é o maior risco desta empresa?",
+        "answer": "A concentração de receita nos 5 maiores clientes, que pesam 38% do total — uma perda relevante teria impacto direto nas margens.",
+        "cite": "10-K 2025 · Risk Factors"
+      }
     },
     "manifesto": {
       "l1": "Menos ruído, mais convicção.",
@@ -58,7 +70,10 @@
         "b3": "Dados oficiais da SEC, atualizados toda a semana",
         "chartAria": "Gráficos de exemplo: receita anual em barras, e free cash flow em barra com linhas de operating cash flow e capex, ambos a crescer ao longo de dez anos",
         "legendRevenue": "Receita",
-        "legendFcf": "FCF"
+        "legendFcf": "FCF",
+        "cardRevenueTitle": "Receita",
+        "cardFcfTitle": "Free Cash Flow",
+        "cagrLabel": "CAGR"
       },
       "dcf": {
         "eyebrow": "Valuation",
@@ -80,21 +95,29 @@
         "disclaimer": "Exemplo ilustrativo com uma empresa fictícia. Uma DCF depende das tuas premissas, não é conselho de investimento."
       },
       "ai": {
-        "eyebrow": "AI Insights",
-        "title": "A história por trás",
-        "titleAccent": "dos números.",
-        "desc": "O AI Brief resume os desenvolvimentos recentes de cada empresa e classifica-os por sentimento, lês num minuto o que importa.",
-        "b1": "Resumo executivo, catalisadores e riscos",
-        "b2": "Em linguagem clara, sem jargão",
+        "eyebrow": "Analista IA",
+        "title": "Um analista dedicado",
+        "titleAccent": "a cada empresa.",
+        "desc": "O Analista lê o 10-K oficial da SEC e devolve tese de investimento, moat, KPIs operacionais e riscos, com citações à fonte, mais os casos bull e bear lado a lado, para decidires com contexto, não com achismo.",
+        "b1": "Tese, moat e KPIs com citações diretas do 10-K",
+        "b2": "Bull case e bear case lado a lado, sem filtro",
         "b3": "Sempre assinalado: nunca é conselho de investimento",
-        "cardTitle": "AI Brief · Empresa exemplo",
-        "summary": "Trimestre sólido: receita acima do esperado, margens a expandir e programa de recompras reforçado. A administração reviu o guidance em alta para o resto do ano.",
-        "catalystsLabel": "Catalisadores",
-        "catalyst1": "Guidance revisto em alta",
-        "catalyst2": "Programa de recompras",
-        "riskLabel": "Riscos",
-        "risk1": "Concentração de clientes",
-        "disclaimer": "Gerado por IA a partir de notícias recentes. Nunca é conselho de investimento."
+        "cardTitle": "Analista IA · Empresa exemplo",
+        "chipLabel": "IA",
+        "thesisLabel": "Tese de investimento",
+        "thesis": "Líder de mercado com receitas recorrentes, margens em expansão e capital devolvido aos acionistas — um compounder clássico a preço razoável.",
+        "moatLabel": "Moat",
+        "moatValue": "Moat largo",
+        "kpi1Label": "Receita recorrente",
+        "kpi1Value": "78%",
+        "kpi1Insight": "Subscrições dominam o mix e dão previsibilidade.",
+        "kpi2Label": "Margem operacional",
+        "kpi2Value": "31,4%",
+        "kpi2Insight": "Em expansão pelo terceiro ano consecutivo.",
+        "disclaimer": "Gerado por IA a partir dos relatórios oficiais. Nunca é conselho de investimento.",
+        "chatUser": "Como está a evoluir a margem operacional?",
+        "chatAnswer": "Em expansão pelo terceiro ano consecutivo, de 27,1% para 31,4%, impulsionada pelo mix de subscrições e disciplina de custos.",
+        "chatCite": "10-K 2025 · MD&A"
       }
     },
     "tour": {
@@ -118,6 +141,20 @@
       "search": {
         "title": "Pesquisa instantânea",
         "desc": "Qualquer empresa do S&P 500 a um ⌘K de distância."
+      },
+      "dashboard": {
+        "title": "Dashboard de insights",
+        "desc": "Tabs por categoria e as ações mais em foco, num relance."
+      },
+      "explore": {
+        "title": "Explorar por setor",
+        "desc": "Descobre empresas organizadas por setor e indústria."
+      },
+      "replicas": {
+        "calDay": "Dia",
+        "calWeek": "Semana",
+        "calMonth": "Mês",
+        "calOthers": "Outros"
       }
     },
     "numbers": {
@@ -330,7 +367,9 @@
     "startFree": "Começar grátis",
     "about": "Quem somos",
     "menuTitle": "Menu",
-    "openMenu": "Abrir menu"
+    "openMenu": "Abrir menu",
+    "peek": "Espreitar sem conta",
+    "createAccount": "Criar conta"
   },
   "search": {
     "placeholder": "Pesquisar ticker (ex: AAPL)...",
@@ -633,6 +672,26 @@
       "naMargin": "Margem não reportada, típico de bancos e seguradoras, que não têm custo de produção (COGS).",
       "naPrice": "Indisponível: depende do preço atual, que ainda não carregou."
     },
+    "proGate": {
+      "title": "Funcionalidade Pro",
+      "desc": "Desbloqueia os gráficos de valuation histórico para veres se a {ticker} negoceia com prémio ou desconto face às suas médias históricas.",
+      "upgradeCta": "Passar a Pro",
+      "guestTitle": "Cria uma conta para veres o valuation histórico",
+      "guestDesc": "Regista-te grátis para desbloquear os gráficos de valuation histórico da {ticker} e ver se negoceia com prémio ou desconto face às médias.",
+      "guestCta": "Criar conta grátis"
+    },
+    "valuationChart": {
+      "title": "Valuation Histórico",
+      "subtitle": "Como o mercado avaliou a empresa ao longo do tempo",
+      "tabPe": "P/E Ratio",
+      "tabPs": "P/Sales",
+      "tabFcf": "FCF Yield",
+      "tooltipPrice": "Preço",
+      "tooltipPe": "P/E Ratio",
+      "tooltipPs": "P/Sales",
+      "tooltipFcf": "FCF Yield",
+      "avgLabel": "Média"
+    },
     "earnings": {
       "title": "Últimos Resultados",
       "eps": "EPS",
@@ -671,6 +730,7 @@
     "needsAuthTitle": "Sessão expirada",
     "needsAuthDesc": "A tua sessão expirou. Inicia sessão outra vez para gerar a análise.",
     "login": "Iniciar sessão",
+    "registerCta": "Criar conta grátis",
     "viewSource": "Ver citação na fonte",
     "sourceTitle": "Fonte da citação",
     "sourceDesc": "Abaixo está a citação exata de onde a IA tirou:",
@@ -696,6 +756,10 @@
       "placeholder": "Pergunta o que quiseres sobre a empresa...",
       "proOnly": "Chat exclusivo Pro",
       "proDesc": "Passa a Pro para conversar com o Analista IA e fazer perguntas de seguimento sobre a empresa e o 10-K.",
+      "upgradeCta": "Passar a Pro",
+      "guestTitle": "Chat exclusivo para contas Pro",
+      "guestDesc": "Cria uma conta grátis e passa a Pro para conversar com o Analista IA sobre esta empresa.",
+      "guestCta": "Criar conta grátis",
       "error": "Ocorreu um erro. Tenta novamente.",
       "suggestions": [
         "Explica-me o negócio em 30 segundos",
@@ -1037,6 +1101,20 @@
       "compareTitle": "Comparar com Concorrentes",
       "compareDesc": "Avalia o desempenho financeiro lado a lado.",
       "viewFinancials": "Ver Análise Financeira Completa"
+    },
+    "others": {
+      "companiesTitle": "Empresas sem setor",
+      "watchlistsTitle": "As tuas watchlists",
+      "create": "Criar watchlist",
+      "createPlaceholder": "Nome da nova lista...",
+      "createCta": "Criar",
+      "rename": "Renomear",
+      "delete": "Apagar",
+      "deleteConfirm": "Apagar esta watchlist? Esta ação não pode ser desfeita.",
+      "backToHub": "Voltar a Outros",
+      "emptyTitle": "Ainda não tens nada aqui",
+      "emptyDesc": "Cria a tua primeira watchlist para organizares empresas por tema.",
+      "listEmpty": "Esta watchlist ainda não tem nenhuma empresa."
     }
   },
   "verifyEmail": {

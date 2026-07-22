@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { createClient } from "@/lib/supabase/server"
+import type { Prisma } from "@prisma/client"
 
 export async function GET(request: Request) {
   const supabase = await createClient()
@@ -48,25 +49,38 @@ export async function GET(request: Request) {
       })
     }
 
-    // Devolve a lista de empresas filtradas
-    const whereClause: any = { isActive: true }
+    // Devolve a lista de empresas filtradas — composto com AND (nunca
+    // atribuir a whereClause.OR diretamente: sector/industry "Unknown" e a
+    // pesquisa `q` usam OR cada um por si, e sobrescreviam-se um ao outro se
+    // coexistissem). `industry` também trata "Unknown" como sector já
+    // tratava (null OU literal "Unknown") — sem isto, a facet contava
+    // `industry: null` como "Unknown" mas o filtro da lista exigia
+    // igualdade literal, dando chip com contagem > 0 e lista vazia.
+    const and: Prisma.CompanyWhereInput[] = []
     if (sector) {
-      if (sector === "Unknown") {
-        whereClause.OR = [{ sector: null }, { sector: "Unknown" }]
-      } else {
-        whereClause.sector = sector
-      }
+      and.push(
+        sector === "Unknown"
+          ? { OR: [{ sector: null }, { sector: "Unknown" }] }
+          : { sector }
+      )
     }
     if (industry) {
-      whereClause.industry = industry
+      and.push(
+        industry === "Unknown"
+          ? { OR: [{ industry: null }, { industry: "Unknown" }] }
+          : { industry }
+      )
     }
     if (q) {
-      whereClause.OR = [
-        { name: { contains: q, mode: "insensitive" } },
-        { ticker: { contains: q, mode: "insensitive" } },
-        { description: { contains: q, mode: "insensitive" } }
-      ]
+      and.push({
+        OR: [
+          { name: { contains: q, mode: "insensitive" } },
+          { ticker: { contains: q, mode: "insensitive" } },
+          { description: { contains: q, mode: "insensitive" } }
+        ]
+      })
     }
+    const whereClause: Prisma.CompanyWhereInput = { isActive: true, ...(and.length > 0 ? { AND: and } : {}) }
 
     const companies = await prisma.company.findMany({
       where: whereClause,

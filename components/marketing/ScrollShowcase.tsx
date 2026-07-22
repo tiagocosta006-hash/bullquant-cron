@@ -98,13 +98,15 @@ export function ScrollShowcase({
         if (chip) {
           tl.fromTo(chip, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 1, ease: "none" }, 4);
         }
-        // câmara: aproxima ao quadrante das métricas na cena 2, recua na 3
+        // câmara: zoom puro na cena 2, recua na 3 — sem translação lateral
+        // (o pan em X/Y dava sensação de deriva; a origem descentrada chega
+        // para puxar o olhar ao quadrante das métricas)
         if (sceneRef.current) {
           tl.to(
             sceneRef.current,
-            { scale: 1.05, xPercent: -3, yPercent: 3, transformOrigin: "72% 30%", duration: 1.6, ease: "none" },
+            { scale: 1.07, transformOrigin: "60% 35%", duration: 1.6, ease: "none" },
             1.8,
-          ).to(sceneRef.current, { scale: 1, xPercent: 0, yPercent: 0, duration: 1.6, ease: "none" }, 3.6);
+          ).to(sceneRef.current, { scale: 1, duration: 1.6, ease: "none" }, 3.6);
         }
         // saída: o frame afasta-se enquanto o manifesto toma o palco
         if (frameRef.current) {

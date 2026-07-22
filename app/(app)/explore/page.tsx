@@ -6,6 +6,7 @@ import { Search, Loader2, ArrowLeft, Compass } from "lucide-react"
 import { SectorGrid } from "@/components/explore/SectorGrid"
 import { IndustryList } from "@/components/explore/IndustryList"
 import { CompanyCard } from "@/components/explore/CompanyCard"
+import { OthersPanel, type ExploreCompany } from "@/components/explore/OthersPanel"
 import { BusinessProfileSheet } from "@/components/explore/BusinessProfileSheet"
 import { PageHeader } from "@/components/layout/PageHeader"
 
@@ -15,7 +16,7 @@ export default function ExplorePage() {
   const t = useTranslations("explore")
   
   const [facets, setFacets] = useState<Facets | null>(null)
-  const [companies, setCompanies] = useState<any[]>([])
+  const [companies, setCompanies] = useState<ExploreCompany[]>([])
   const [loading, setLoading] = useState(true)
   
   // Estado de navegação: null (ver setores) -> sectorName (ver indústrias) -> {sector, industry} (ver empresas)
@@ -25,7 +26,7 @@ export default function ExplorePage() {
   
   // Sheet state
   const [sheetOpen, setSheetOpen] = useState(false)
-  const [selectedCompany, setSelectedCompany] = useState<any | null>(null)
+  const [selectedCompany, setSelectedCompany] = useState<ExploreCompany | null>(null)
 
   // Carregar facets (setores/indústrias) no início
   useEffect(() => {
@@ -82,7 +83,7 @@ export default function ExplorePage() {
     setSelectedIndustry(null)
   }
 
-  const handleCompanyClick = (company: any) => {
+  const handleCompanyClick = (company: ExploreCompany) => {
     setSelectedCompany(company)
     setSheetOpen(true)
   }
@@ -140,6 +141,19 @@ export default function ExplorePage() {
           <h2 className="text-xl font-semibold text-foreground/90">{t("sectorsTitle")}</h2>
           {facets && <SectorGrid sectors={facets} onSelect={setSelectedSector} />}
         </div>
+      ) : selectedSector === "Unknown" ? (
+        <div className="space-y-6">
+          <button
+            onClick={goBackToSectors}
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft size={16} /> {t("backToSectors")}
+          </button>
+
+          {/* "Outros" não tem indústrias genuínas — vira hub de empresas
+              sem setor + multi-watchlists, em vez do fluxo indústria→empresas. */}
+          <OthersPanel onCompanyClick={handleCompanyClick} />
+        </div>
       ) : !selectedIndustry ? (
         <div className="space-y-6">
           <button
@@ -151,7 +165,7 @@ export default function ExplorePage() {
 
           <div>
             <h2 className="text-2xl font-semibold text-foreground mb-4">
-              {t("industriesFor", { sector: selectedSector === "Unknown" ? t("other") : selectedSector })}
+              {t("industriesFor", { sector: selectedSector })}
             </h2>
             {facets && facets[selectedSector] && (
               <IndustryList

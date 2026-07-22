@@ -32,13 +32,26 @@
     "ctaTitle": "开始发现别人错过的价值。",
     "ctaSubtitle": "创建免费账户，几秒内分析任何标普500公司。",
     "ticker": {
-      "label": "前一交易日收盘价 — 标普500"
+      "label": "最新收盘价 · S&P 500",
+      "labelLive": "实时价格 · S&P 500"
     },
     "showcase": {
       "caption": "十年基本面、DCF 和 AI Brief — 集于一个终端,无需电子表格。",
       "alt": "Bull Metrics 终端演示",
       "caption2": "实时价格、自选清单与财报日历 — 一个 ⌘K 即达。",
-      "caption3": "免费,一分钟内即可上手。"
+      "caption3": "免费,一分钟内即可上手。",
+      "finRows": {
+        "gross": "毛利率",
+        "operating": "营业利润率"
+      },
+      "moreCharts": "+{count} 个图表",
+      "finSegmentsTitle": "分部收入",
+      "chat": {
+        "user": "这家公司最大的风险是什么?",
+        "answer": "收入集中在前5大客户身上,占总收入的38%——若失去一个主要客户,将直接冲击利润率。",
+        "cite": "2025年10-K·风险因素"
+      },
+      "live": "实时"
     },
     "manifesto": {
       "l1": "投资不是猜测。",
@@ -58,7 +71,10 @@
         "b3": "SEC 官方数据,每周更新",
         "chartAria": "示例图表:年营收为柱状图,自由现金流为折线,十年间持续增长",
         "legendRevenue": "营收",
-        "legendFcf": "FCF"
+        "legendFcf": "FCF",
+        "cardRevenueTitle": "营收",
+        "cardFcfTitle": "自由现金流",
+        "cagrLabel": "CAGR"
       },
       "dcf": {
         "eyebrow": "估值",
@@ -80,21 +96,29 @@
         "disclaimer": "使用虚构公司的说明性示例。DCF 取决于你的假设 — 不构成投资建议。"
       },
       "ai": {
-        "eyebrow": "AI Insights",
-        "title": "数字背后的",
-        "titleAccent": "故事。",
-        "desc": "AI Brief 总结每家公司的最新动态并按情绪分类 — 一分钟读懂重点。",
-        "b1": "执行摘要、催化剂与风险",
-        "b2": "语言清晰,没有行话",
-        "b3": "始终注明:绝非投资建议",
-        "cardTitle": "AI Brief · 示例公司",
-        "summary": "季度表现稳健:营收超预期,利润率扩张,回购计划加强。管理层上调了全年指引。",
-        "catalystsLabel": "催化剂",
-        "catalyst1": "指引上调",
-        "catalyst2": "回购计划",
-        "riskLabel": "风险",
-        "risk1": "客户集中度",
-        "disclaimer": "由 AI 根据近期新闻生成。绝非投资建议。"
+        "eyebrow": "AI 分析师",
+        "title": "为每家公司配备",
+        "titleAccent": "专属分析师。",
+        "desc": "分析师会阅读官方 SEC 10-K 文件,给出投资论点、护城河、运营 KPI 和风险,并附上原文引用,还会并列呈现看涨与看跌观点,让你基于事实而非猜测做决策。",
+        "b1": "论点、护城河和 KPI,均附 10-K 原文引用",
+        "b2": "看涨与看跌观点并列呈现,毫无保留",
+        "b3": "始终标注:绝非投资建议",
+        "cardTitle": "AI 分析师 · 示例公司",
+        "chipLabel": "AI",
+        "thesisLabel": "投资论点",
+        "thesis": "拥有经常性收入、利润率持续扩张并向股东返还资本的市场领导者——一家价格合理的经典复利机器。",
+        "moatLabel": "护城河",
+        "moatValue": "宽护城河",
+        "kpi1Label": "经常性收入",
+        "kpi1Value": "78%",
+        "kpi1Insight": "订阅收入主导构成，带来高度可预测性。",
+        "kpi2Label": "营业利润率",
+        "kpi2Value": "31.4%",
+        "kpi2Insight": "连续第三年扩张。",
+        "disclaimer": "由 AI 根据官方报告生成，绝非投资建议。",
+        "chatUser": "营业利润率的变化趋势如何?",
+        "chatAnswer": "已连续第三年扩张,从27.1%提升至31.4%,主要受订阅收入占比提升和成本纪律推动。",
+        "chatCite": "2025年10-K·MD&A"
       }
     },
     "tour": {
@@ -118,6 +142,20 @@
       "search": {
         "title": "即时搜索",
         "desc": "任何标普500公司,一个 ⌘K 即达。"
+      },
+      "dashboard": {
+        "title": "洞察仪表盘",
+        "desc": "按类别分类的标签页,一目了然地查看热门股票。"
+      },
+      "explore": {
+        "title": "按行业探索",
+        "desc": "发现按行业和板块整理的公司。"
+      },
+      "replicas": {
+        "calDay": "日",
+        "calWeek": "周",
+        "calMonth": "月",
+        "calOthers": "其他"
       }
     },
     "numbers": {
@@ -125,7 +163,8 @@
       "companies": "家标普500公司",
       "quarters": "个季度的数据",
       "free": "免费方案"
-    }
+    },
+    "peekCta": "无需注册先看看"
   },
   "insider": {
     "title": "内部交易",
@@ -271,8 +310,13 @@
     "dcf": "DCF",
     "calendar": "日历",
     "theme": "切换主题",
-    "pricing": "Plans",
-    "about": "About Us"
+    "pricing": "定价",
+    "about": "关于我们",
+    "peek": "无需注册先看看",
+    "createAccount": "创建账户",
+    "startFree": "免费开始",
+    "menuTitle": "菜单",
+    "openMenu": "打开菜单"
   },
   "search": {
     "placeholder": "搜索股票代码 (如 AAPL)...",
@@ -579,7 +623,7 @@
     "tabs": {
       "overview": "概览",
       "financials": "财务",
-      "kpis": "KPI",
+      "analista": "分析师",
       "valuation": "估值",
       "company": "公司",
       "news": "新闻",
@@ -589,7 +633,27 @@
     "similarCompaniesExploreAll": "查看全部",
     "similarCompaniesCompare": "比较竞争对手",
     "peersTitle": "{group}行业的其他公司",
-    "peersTitleGeneric": "相关公司"
+    "peersTitleGeneric": "相关公司",
+    "proGate": {
+      "title": "Pro 功能",
+      "desc": "解锁历史估值图表,查看 {ticker} 相对于历史平均水平是溢价还是折价交易。",
+      "upgradeCta": "升级至 Pro",
+      "guestTitle": "创建账户以查看历史估值",
+      "guestDesc": "免费注册即可解锁 {ticker} 的历史估值图表,查看其相对于平均水平是溢价还是折价交易。",
+      "guestCta": "创建免费账户"
+    },
+    "valuationChart": {
+      "title": "历史估值",
+      "subtitle": "市场如何随时间对公司进行估值",
+      "tabPe": "P/E Ratio",
+      "tabPs": "P/Sales",
+      "tabFcf": "FCF Yield",
+      "tooltipPrice": "价格",
+      "tooltipPe": "P/E Ratio",
+      "tooltipPs": "P/Sales",
+      "tooltipFcf": "FCF Yield",
+      "avgLabel": "平均值"
+    }
   },
   "dcf": {
     "title": "DCF 估值模型",
@@ -807,6 +871,20 @@
       "compareTitle": "与同行比较",
       "compareDesc": "并排评估财务表现。",
       "viewFinancials": "查看完整财务分析"
+    },
+    "others": {
+      "companiesTitle": "无所属行业的公司",
+      "watchlistsTitle": "你的自选股列表",
+      "create": "创建自选股列表",
+      "createPlaceholder": "新列表名称...",
+      "createCta": "创建",
+      "rename": "重命名",
+      "delete": "删除",
+      "deleteConfirm": "删除此自选股列表?此操作无法撤销。",
+      "backToHub": "返回「其他」",
+      "emptyTitle": "这里还没有任何内容",
+      "emptyDesc": "创建你的第一个自选股列表,按主题整理公司。",
+      "listEmpty": "此自选股列表还没有任何公司。"
     }
   },
   "verifyEmail": {
@@ -843,5 +921,61 @@
     },
     "suggestionsTitle": "关注建议",
     "lastUpdate": "最后更新："
+  },
+  "analista": {
+    "title": "AI 分析师",
+    "badge": "AI · 附来源",
+    "thesisLabel": "投资论点",
+    "moatLabel": "护城河",
+    "source": "来源: {label}",
+    "generateTitle": "AI 分析师对 {ticker} 的分析",
+    "generateDesc": "基于我们经过验证的数据和官方 SEC 10-K 文件,生成有据可依的报告、商业模式、护城河、运营 KPI、风险以及看涨/看跌情景,并附上原文引用。",
+    "generateCta": "生成分析",
+    "generating": "正在阅读 10-K 并分析中...(约20秒)",
+    "rateLimitTitle": "已达每日上限",
+    "rateLimitDesc": "你今天的 AI 分析次数已用完。明天再来,或升级至 Pro 以获得无限次分析。",
+    "errorTitle": "无法生成分析,请重试。",
+    "retry": "重试",
+    "needsAuthTitle": "会话已过期",
+    "needsAuthDesc": "你的会话已过期。请重新登录以生成分析。",
+    "login": "登录",
+    "registerCta": "创建免费账户",
+    "viewSource": "查看来源引用",
+    "sourceTitle": "引用来源",
+    "sourceDesc": "以下是 AI 提取的确切引文,用于:",
+    "openSec": "在 SEC 10-K 中查看",
+    "back": "返回",
+    "disclaimer": "由 AI 根据经过验证的数据和 10-K 生成的分析,并非投资建议。",
+    "moatRatings": {
+      "wide": "宽护城河",
+      "narrow": "窄护城河",
+      "none": "无明显护城河"
+    },
+    "sections": {
+      "businessModel": "商业模式",
+      "moat": "竞争优势(护城河)",
+      "segments": "分部收入",
+      "operatingKpis": "运营 KPI",
+      "risks": "主要风险",
+      "bullCase": "看涨情景",
+      "bearCase": "看跌情景"
+    },
+    "chat": {
+      "title": "向分析师提问",
+      "placeholder": "关于该公司的任何问题都可以问...",
+      "proOnly": "仅限 Pro 聊天",
+      "proDesc": "升级至 Pro,即可与 AI 分析师聊天,就公司及其 10-K 提出后续问题。",
+      "error": "出现错误,请重试。",
+      "suggestions": [
+        "用30秒解释一下这家公司的业务",
+        "最大的3个风险是什么?",
+        "营业利润率是如何演变的?",
+        "是什么在驱动营收?"
+      ],
+      "upgradeCta": "升级至 Pro",
+      "guestTitle": "聊天功能仅限 Pro 账户",
+      "guestDesc": "创建免费账户并升级至 Pro,即可就该公司与 AI 分析师对话。",
+      "guestCta": "创建免费账户"
+    }
   }
 }

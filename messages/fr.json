@@ -32,13 +32,26 @@
     "ctaTitle": "Commencez à voir la valeur que les autres ne voient pas.",
     "ctaSubtitle": "Créez votre compte gratuit et analysez toute entreprise du S&P 500 en quelques secondes.",
     "ticker": {
-      "label": "Clôtures de la veille — S&P 500"
+      "label": "Dernières clôtures disponibles · S&P 500",
+      "labelLive": "Cours en direct · S&P 500"
     },
     "showcase": {
       "caption": "Dix ans de fondamentaux, DCF et AI Brief — dans un seul terminal, sans tableurs.",
       "alt": "Démonstration du terminal Bull Metrics",
       "caption2": "Prix en direct, watchlist et calendrier des résultats — à un ⌘K.",
-      "caption3": "Gratuit, et prêt en moins d'une minute."
+      "caption3": "Gratuit, et prêt en moins d'une minute.",
+      "finRows": {
+        "gross": "Brute",
+        "operating": "Opérationnelle"
+      },
+      "moreCharts": "+{count} graphiques",
+      "finSegmentsTitle": "Revenus par segment",
+      "chat": {
+        "user": "Quel est le plus grand risque de cette entreprise ?",
+        "answer": "La concentration des revenus chez ses 5 plus gros clients, qui pèsent 38 % du total — en perdre un aurait un impact direct sur les marges.",
+        "cite": "10-K 2025 · Risk Factors"
+      },
+      "live": "En direct"
     },
     "manifesto": {
       "l1": "Investir, ce n'est pas deviner.",
@@ -58,7 +71,10 @@
         "b3": "Données officielles de la SEC, mises à jour chaque semaine",
         "chartAria": "Graphique d'exemple : chiffre d'affaires annuel en barres et free cash flow en ligne, en croissance sur dix ans",
         "legendRevenue": "Chiffre d'affaires",
-        "legendFcf": "FCF"
+        "legendFcf": "FCF",
+        "cardRevenueTitle": "Chiffre d'affaires",
+        "cardFcfTitle": "Free Cash Flow",
+        "cagrLabel": "CAGR"
       },
       "dcf": {
         "eyebrow": "Valorisation",
@@ -80,21 +96,29 @@
         "disclaimer": "Exemple illustratif avec une entreprise fictive. Un DCF dépend de vos hypothèses — ce n'est pas un conseil en investissement."
       },
       "ai": {
-        "eyebrow": "AI Insights",
-        "title": "L'histoire derrière",
-        "titleAccent": "les chiffres.",
-        "desc": "L'AI Brief résume les développements récents de chaque entreprise et les classe par sentiment — lisez l'essentiel en une minute.",
-        "b1": "Résumé exécutif, catalyseurs et risques",
-        "b2": "En langage clair, sans jargon",
+        "eyebrow": "Analyste IA",
+        "title": "Un analyste dédié",
+        "titleAccent": "à chaque entreprise.",
+        "desc": "L'Analyste lit le 10-K officiel de la SEC et fournit une thèse d'investissement, un moat, des KPI opérationnels et des risques, avec des citations de la source, ainsi que les cas haussier et baissier côte à côte, pour décider avec du contexte, pas au hasard.",
+        "b1": "Thèse, moat et KPI avec citations directes du 10-K",
+        "b2": "Cas haussier et cas baissier côte à côte, sans filtre",
         "b3": "Toujours signalé : jamais un conseil en investissement",
-        "cardTitle": "AI Brief · Entreprise exemple",
-        "summary": "Trimestre solide : chiffre d'affaires au-dessus des attentes, marges en expansion et programme de rachats renforcé. La direction a relevé ses prévisions pour le reste de l'année.",
-        "catalystsLabel": "Catalyseurs",
-        "catalyst1": "Prévisions relevées",
-        "catalyst2": "Programme de rachats",
-        "riskLabel": "Risques",
-        "risk1": "Concentration des clients",
-        "disclaimer": "Généré par IA à partir d'actualités récentes. Jamais un conseil en investissement."
+        "cardTitle": "Analyste IA · Entreprise exemple",
+        "chipLabel": "IA",
+        "thesisLabel": "Thèse d'investissement",
+        "thesis": "Un leader du marché aux revenus récurrents, aux marges en expansion et au capital rendu aux actionnaires — un compounder classique à un prix raisonnable.",
+        "moatLabel": "Moat",
+        "moatValue": "Moat large",
+        "kpi1Label": "Revenus récurrents",
+        "kpi1Value": "78%",
+        "kpi1Insight": "Les abonnements dominent le mix et apportent de la prévisibilité.",
+        "kpi2Label": "Marge opérationnelle",
+        "kpi2Value": "31,4%",
+        "kpi2Insight": "En expansion pour la troisième année consécutive.",
+        "disclaimer": "Généré par IA à partir des rapports officiels. Jamais un conseil en investissement.",
+        "chatUser": "Comment évolue la marge opérationnelle ?",
+        "chatAnswer": "En expansion pour la troisième année consécutive, de 27,1 % à 31,4 %, portée par le mix d'abonnements et la discipline des coûts.",
+        "chatCite": "10-K 2025 · MD&A"
       }
     },
     "tour": {
@@ -118,6 +142,20 @@
       "search": {
         "title": "Recherche instantanée",
         "desc": "Toute entreprise du S&P 500 à un ⌘K de distance."
+      },
+      "dashboard": {
+        "title": "Tableau de bord Insights",
+        "desc": "Onglets par catégorie et les actions les plus suivies, en un coup d'œil."
+      },
+      "explore": {
+        "title": "Explorer par secteur",
+        "desc": "Découvre des entreprises organisées par secteur et industrie."
+      },
+      "replicas": {
+        "calDay": "Jour",
+        "calWeek": "Semaine",
+        "calMonth": "Mois",
+        "calOthers": "Autres"
       }
     },
     "numbers": {
@@ -125,7 +163,8 @@
       "companies": "entreprises du S&P 500",
       "quarters": "trimestres de données",
       "free": "avec le plan gratuit"
-    }
+    },
+    "peekCta": "Regarder sans compte"
   },
   "insider": {
     "title": "Délit d'initié (Insider Trading)",
@@ -271,8 +310,13 @@
     "dcf": "DCF",
     "calendar": "Calendrier",
     "theme": "Changer de thème",
-    "pricing": "Plans",
-    "about": "About Us"
+    "pricing": "Tarifs",
+    "about": "À propos",
+    "peek": "Regarder sans compte",
+    "createAccount": "Créer un compte",
+    "startFree": "Commencer gratuitement",
+    "menuTitle": "Menu",
+    "openMenu": "Ouvrir le menu"
   },
   "search": {
     "placeholder": "Chercher un ticker (ex: AAPL)...",
@@ -579,7 +623,7 @@
     "tabs": {
       "overview": "Aperçu",
       "financials": "Fondamentaux",
-      "kpis": "KPIs",
+      "analista": "Analyste",
       "valuation": "Valorisation",
       "company": "Entreprise",
       "news": "Actualités",
@@ -589,7 +633,27 @@
     "similarCompaniesExploreAll": "Tout explorer",
     "similarCompaniesCompare": "Comparer les concurrents",
     "peersTitle": "Autres entreprises dans {group}",
-    "peersTitleGeneric": "Entreprises liées"
+    "peersTitleGeneric": "Entreprises liées",
+    "proGate": {
+      "title": "Fonctionnalité Pro",
+      "desc": "Débloque les graphiques de valorisation historique pour voir si {ticker} se négocie avec une prime ou une décote par rapport à ses moyennes historiques.",
+      "upgradeCta": "Passer à Pro",
+      "guestTitle": "Crée un compte pour voir la valorisation historique",
+      "guestDesc": "Inscris-toi gratuitement pour débloquer les graphiques de valorisation historique de {ticker} et voir s'il se négocie avec une prime ou une décote par rapport à ses moyennes.",
+      "guestCta": "Créer un compte gratuit"
+    },
+    "valuationChart": {
+      "title": "Valorisation Historique",
+      "subtitle": "Comment le marché a valorisé l'entreprise au fil du temps",
+      "tabPe": "P/E Ratio",
+      "tabPs": "P/Sales",
+      "tabFcf": "FCF Yield",
+      "tooltipPrice": "Prix",
+      "tooltipPe": "P/E Ratio",
+      "tooltipPs": "P/Sales",
+      "tooltipFcf": "FCF Yield",
+      "avgLabel": "Moyenne"
+    }
   },
   "dcf": {
     "title": "Calculateur DCF",
@@ -807,6 +871,20 @@
       "compareTitle": "Comparer avec les Concurrents",
       "compareDesc": "Évaluez la performance financière côte à côte.",
       "viewFinancials": "Voir l'Analyse Financière Complète"
+    },
+    "others": {
+      "companiesTitle": "Entreprises sans secteur",
+      "watchlistsTitle": "Tes watchlists",
+      "create": "Créer une watchlist",
+      "createPlaceholder": "Nom de la nouvelle liste...",
+      "createCta": "Créer",
+      "rename": "Renommer",
+      "delete": "Supprimer",
+      "deleteConfirm": "Supprimer cette watchlist ? Cette action est irréversible.",
+      "backToHub": "Retour à Autres",
+      "emptyTitle": "Rien ici pour l'instant",
+      "emptyDesc": "Crée ta première watchlist pour organiser des entreprises par thème.",
+      "listEmpty": "Cette watchlist n'a encore aucune entreprise."
     }
   },
   "verifyEmail": {
@@ -843,5 +921,61 @@
     },
     "suggestionsTitle": "Suggestions à suivre",
     "lastUpdate": "Dernière mise à jour :"
+  },
+  "analista": {
+    "title": "Analyste IA",
+    "badge": "IA · avec sources",
+    "thesisLabel": "Thèse d'investissement",
+    "moatLabel": "Moat",
+    "source": "Source : {label}",
+    "generateTitle": "Analyse de {ticker} par l'Analyste IA",
+    "generateDesc": "Génère un dossier fondé, modèle économique, moat, KPI opérationnels, risques et cas haussier/baissier, à partir de nos données vérifiées et du 10-K officiel de la SEC, avec citations des sources.",
+    "generateCta": "Générer l'analyse",
+    "generating": "Lecture du 10-K et analyse en cours... (~20s)",
+    "rateLimitTitle": "Limite quotidienne atteinte",
+    "rateLimitDesc": "Tu as déjà utilisé tes analyses IA du jour. Reviens demain ou passe à Pro pour des analyses illimitées.",
+    "errorTitle": "Impossible de générer l'analyse. Réessaie.",
+    "retry": "Réessayer",
+    "needsAuthTitle": "Session expirée",
+    "needsAuthDesc": "Ta session a expiré. Reconnecte-toi pour générer l'analyse.",
+    "login": "Se connecter",
+    "registerCta": "Créer un compte gratuit",
+    "viewSource": "Voir la citation source",
+    "sourceTitle": "Source de la citation",
+    "sourceDesc": "Voici la citation exacte utilisée par l'IA pour :",
+    "openSec": "Voir dans le 10-K de la SEC",
+    "back": "Retour",
+    "disclaimer": "Analyse générée par IA à partir de données vérifiées et du 10-K. Ce n'est pas un conseil en investissement.",
+    "moatRatings": {
+      "wide": "Moat large",
+      "narrow": "Moat étroit",
+      "none": "Pas de moat clair"
+    },
+    "sections": {
+      "businessModel": "Modèle économique",
+      "moat": "Avantage concurrentiel (moat)",
+      "segments": "Revenus par segment",
+      "operatingKpis": "KPI opérationnels",
+      "risks": "Principaux risques",
+      "bullCase": "Cas haussier",
+      "bearCase": "Cas baissier"
+    },
+    "chat": {
+      "title": "Demande à l'Analyste",
+      "placeholder": "Pose n'importe quelle question sur l'entreprise...",
+      "proOnly": "Chat réservé à Pro",
+      "proDesc": "Passe à Pro pour discuter avec l'Analyste IA et poser des questions de suivi sur l'entreprise et son 10-K.",
+      "error": "Une erreur est survenue. Réessaie.",
+      "suggestions": [
+        "Explique-moi l'activité en 30 secondes",
+        "Quels sont les 3 plus grands risques ?",
+        "Comment la marge opérationnelle a-t-elle évolué ?",
+        "Qu'est-ce qui stimule le chiffre d'affaires ?"
+      ],
+      "upgradeCta": "Passer à Pro",
+      "guestTitle": "Chat réservé aux comptes Pro",
+      "guestDesc": "Crée un compte gratuit et passe à Pro pour discuter avec l'Analyste IA à propos de cette entreprise.",
+      "guestCta": "Créer un compte gratuit"
+    }
   }
 }

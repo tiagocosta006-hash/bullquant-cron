@@ -32,13 +32,26 @@
     "ctaTitle": "Zie de waarde die anderen missen.",
     "ctaSubtitle": "Maak je gratis account aan en analyseer elk S&P 500-bedrijf in seconden.",
     "ticker": {
-      "label": "Slotkoersen van gisteren — S&P 500"
+      "label": "Laatste beschikbare slotkoersen · S&P 500",
+      "labelLive": "Live koersen · S&P 500"
     },
     "showcase": {
       "caption": "Tien jaar fundamentals, DCF en AI Brief — in één terminal, zonder spreadsheets.",
       "alt": "Demo van de Bull Metrics-terminal",
       "caption2": "Live koersen, watchlist en earnings-kalender — alles één ⌘K verderop.",
-      "caption3": "Gratis, en klaar in minder dan een minuut."
+      "caption3": "Gratis, en klaar in minder dan een minuut.",
+      "finRows": {
+        "gross": "Bruto",
+        "operating": "Operationeel"
+      },
+      "moreCharts": "+{count} grafieken",
+      "finSegmentsTitle": "Omzet per segment",
+      "chat": {
+        "user": "Wat is het grootste risico van dit bedrijf?",
+        "answer": "De omzetconcentratie bij de 5 grootste klanten, goed voor 38% van het totaal — het verlies van een belangrijke klant zou de marges direct raken.",
+        "cite": "10-K 2025 · Risk Factors"
+      },
+      "live": "Live"
     },
     "manifesto": {
       "l1": "Beleggen is niet gokken.",
@@ -58,7 +71,10 @@
         "b3": "Officiële SEC-data, elke week bijgewerkt",
         "chartAria": "Voorbeeldgrafiek: jaaromzet als staven en free cash flow als lijn, groeiend over tien jaar",
         "legendRevenue": "Omzet",
-        "legendFcf": "FCF"
+        "legendFcf": "FCF",
+        "cardRevenueTitle": "Omzet",
+        "cardFcfTitle": "Free Cash Flow",
+        "cagrLabel": "CAGR"
       },
       "dcf": {
         "eyebrow": "Waardering",
@@ -80,21 +96,29 @@
         "disclaimer": "Illustratief voorbeeld met een fictief bedrijf. Een DCF hangt af van jouw aannames — geen beleggingsadvies."
       },
       "ai": {
-        "eyebrow": "AI Insights",
-        "title": "Het verhaal achter",
-        "titleAccent": "de cijfers.",
-        "desc": "De AI Brief vat de recente ontwikkelingen van elk bedrijf samen en classificeert ze op sentiment — lees in één minuut wat ertoe doet.",
-        "b1": "Managementsamenvatting, katalysatoren en risico's",
-        "b2": "In heldere taal, zonder jargon",
+        "eyebrow": "AI-analist",
+        "title": "Een eigen analist",
+        "titleAccent": "voor elk bedrijf.",
+        "desc": "De Analist leest het officiële SEC 10-K-rapport en levert een investeringsthese, moat, operationele KPI's en risico's, met bronvermeldingen, plus de bull- en bear-case naast elkaar, zodat je met context beslist, niet met giswerk.",
+        "b1": "These, moat en KPI's met directe 10-K-citaten",
+        "b2": "Bull case en bear case naast elkaar, ongefilterd",
         "b3": "Altijd gemarkeerd: nooit beleggingsadvies",
-        "cardTitle": "AI Brief · Voorbeeldbedrijf",
-        "summary": "Sterk kwartaal: omzet boven verwachting, groeiende marges en een versterkt inkoopprogramma. Het management verhoogde de guidance voor de rest van het jaar.",
-        "catalystsLabel": "Katalysatoren",
-        "catalyst1": "Guidance verhoogd",
-        "catalyst2": "Inkoopprogramma",
-        "riskLabel": "Risico's",
-        "risk1": "Klantconcentratie",
-        "disclaimer": "Door AI gegenereerd uit recent nieuws. Nooit beleggingsadvies."
+        "cardTitle": "AI-analist · Voorbeeldbedrijf",
+        "chipLabel": "AI",
+        "thesisLabel": "Beleggingsthese",
+        "thesis": "Marktleider met terugkerende omzet, groeiende marges en kapitaal dat naar aandeelhouders terugvloeit — een klassieke compounder tegen een redelijke prijs.",
+        "moatLabel": "Moat",
+        "moatValue": "Brede moat",
+        "kpi1Label": "Terugkerende omzet",
+        "kpi1Value": "78%",
+        "kpi1Insight": "Abonnementen domineren de mix en zorgen voor voorspelbaarheid.",
+        "kpi2Label": "Operationele marge",
+        "kpi2Value": "31,4%",
+        "kpi2Insight": "Voor het derde jaar op rij stijgend.",
+        "disclaimer": "Door AI gegenereerd op basis van officiële verslagen. Nooit beleggingsadvies.",
+        "chatUser": "Hoe ontwikkelt de operationele marge zich?",
+        "chatAnswer": "Groeit voor het derde jaar op rij, van 27,1% naar 31,4%, gedreven door de abonnementsmix en kostendiscipline.",
+        "chatCite": "10-K 2025 · MD&A"
       }
     },
     "tour": {
@@ -118,6 +142,20 @@
       "search": {
         "title": "Direct zoeken",
         "desc": "Elk S&P 500-bedrijf op één ⌘K afstand."
+      },
+      "dashboard": {
+        "title": "Insights-dashboard",
+        "desc": "Categorietabs en de meest besproken aandelen, in één oogopslag."
+      },
+      "explore": {
+        "title": "Verkennen per sector",
+        "desc": "Ontdek bedrijven, georganiseerd per sector en branche."
+      },
+      "replicas": {
+        "calDay": "Dag",
+        "calWeek": "Week",
+        "calMonth": "Maand",
+        "calOthers": "Overige"
       }
     },
     "numbers": {
@@ -125,7 +163,8 @@
       "companies": "S&P 500-bedrijven",
       "quarters": "kwartalen aan data",
       "free": "in het gratis plan"
-    }
+    },
+    "peekCta": "Bekijken zonder account"
   },
   "insider": {
     "title": "Handel met Voorkennis",
@@ -271,8 +310,13 @@
     "dcf": "DCF",
     "calendar": "Kalender",
     "theme": "Thema wisselen",
-    "pricing": "Plans",
-    "about": "About Us"
+    "pricing": "Abonnementen",
+    "about": "Over ons",
+    "peek": "Bekijken zonder account",
+    "createAccount": "Account aanmaken",
+    "startFree": "Gratis beginnen",
+    "menuTitle": "Menu",
+    "openMenu": "Menu openen"
   },
   "search": {
     "placeholder": "Zoek ticker (bijv. AAPL)...",
@@ -579,7 +623,7 @@
     "tabs": {
       "overview": "Overzicht",
       "financials": "Financiën",
-      "kpis": "KPI's",
+      "analista": "Analist",
       "valuation": "Waardering",
       "company": "Bedrijf",
       "news": "Nieuws",
@@ -589,7 +633,27 @@
     "similarCompaniesExploreAll": "Alles verkennen",
     "similarCompaniesCompare": "Concurrenten vergelijken",
     "peersTitle": "Andere bedrijven in {group}",
-    "peersTitleGeneric": "Gerelateerde bedrijven"
+    "peersTitleGeneric": "Gerelateerde bedrijven",
+    "proGate": {
+      "title": "Pro-functie",
+      "desc": "Ontgrendel de historische waarderingsgrafieken om te zien of {ticker} tegen een premie of korting ten opzichte van zijn historische gemiddelden verhandeld wordt.",
+      "upgradeCta": "Upgraden naar Pro",
+      "guestTitle": "Maak een account aan om de historische waardering te zien",
+      "guestDesc": "Registreer gratis om de historische waarderingsgrafieken van {ticker} te ontgrendelen en te zien of het tegen een premie of korting verhandeld wordt.",
+      "guestCta": "Gratis account aanmaken"
+    },
+    "valuationChart": {
+      "title": "Historische Waardering",
+      "subtitle": "Hoe de markt het bedrijf in de loop van de tijd waardeerde",
+      "tabPe": "P/E Ratio",
+      "tabPs": "P/Sales",
+      "tabFcf": "FCF Yield",
+      "tooltipPrice": "Prijs",
+      "tooltipPe": "P/E Ratio",
+      "tooltipPs": "P/Sales",
+      "tooltipFcf": "FCF Yield",
+      "avgLabel": "Gem."
+    }
   },
   "dcf": {
     "title": "DCF Calculator",
@@ -807,6 +871,20 @@
       "compareTitle": "Vergelijk met Concurrenten",
       "compareDesc": "Beoordeel financiële prestaties naast elkaar.",
       "viewFinancials": "Bekijk Volledige Financiële Analyse"
+    },
+    "others": {
+      "companiesTitle": "Bedrijven zonder sector",
+      "watchlistsTitle": "Jouw watchlists",
+      "create": "Watchlist aanmaken",
+      "createPlaceholder": "Naam van de nieuwe lijst...",
+      "createCta": "Aanmaken",
+      "rename": "Hernoemen",
+      "delete": "Verwijderen",
+      "deleteConfirm": "Deze watchlist verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
+      "backToHub": "Terug naar Overige",
+      "emptyTitle": "Hier staat nog niets",
+      "emptyDesc": "Maak je eerste watchlist aan om bedrijven per thema te organiseren.",
+      "listEmpty": "Deze watchlist heeft nog geen bedrijven."
     }
   },
   "verifyEmail": {
@@ -843,5 +921,61 @@
     },
     "suggestionsTitle": "Suggesties om te volgen",
     "lastUpdate": "Laatste update:"
+  },
+  "analista": {
+    "title": "AI-analist",
+    "badge": "AI · met bronnen",
+    "thesisLabel": "Beleggingsthese",
+    "moatLabel": "Moat",
+    "source": "Bron: {label}",
+    "generateTitle": "Analyse van {ticker} door de AI-analist",
+    "generateDesc": "Genereert een onderbouwd dossier met bedrijfsmodel, moat, operationele KPI's, risico's en bull-/bear-cases, gebaseerd op onze geverifieerde data en het officiële SEC 10-K-rapport, met bronvermeldingen.",
+    "generateCta": "Analyse genereren",
+    "generating": "Bezig met lezen van het 10-K en analyseren... (~20s)",
+    "rateLimitTitle": "Dagelijkse limiet bereikt",
+    "rateLimitDesc": "Je hebt je AI-analyses van vandaag al gebruikt. Kom morgen terug of upgrade naar Pro voor onbeperkte analyses.",
+    "errorTitle": "Kon de analyse niet genereren. Probeer opnieuw.",
+    "retry": "Opnieuw proberen",
+    "needsAuthTitle": "Sessie verlopen",
+    "needsAuthDesc": "Je sessie is verlopen. Log opnieuw in om de analyse te genereren.",
+    "login": "Inloggen",
+    "registerCta": "Gratis account aanmaken",
+    "viewSource": "Bekijk broncitaat",
+    "sourceTitle": "Bron van het citaat",
+    "sourceDesc": "Hieronder staat het exacte citaat waaruit de AI het volgende haalde:",
+    "openSec": "Bekijk in het SEC 10-K",
+    "back": "Terug",
+    "disclaimer": "Door AI gegenereerde analyse op basis van geverifieerde data en het 10-K. Geen beleggingsadvies.",
+    "moatRatings": {
+      "wide": "Brede moat",
+      "narrow": "Smalle moat",
+      "none": "Geen duidelijke moat"
+    },
+    "sections": {
+      "businessModel": "Bedrijfsmodel",
+      "moat": "Concurrentievoordeel (moat)",
+      "segments": "Omzet per segment",
+      "operatingKpis": "Operationele KPI's",
+      "risks": "Belangrijkste risico's",
+      "bullCase": "Bull case",
+      "bearCase": "Bear case"
+    },
+    "chat": {
+      "title": "Vraag het de Analist",
+      "placeholder": "Vraag alles over het bedrijf...",
+      "proOnly": "Chat exclusief voor Pro",
+      "proDesc": "Upgrade naar Pro om met de AI-analist te chatten en vervolgvragen te stellen over het bedrijf en het 10-K.",
+      "error": "Er ging iets mis. Probeer opnieuw.",
+      "suggestions": [
+        "Leg het bedrijf uit in 30 seconden",
+        "Wat zijn de 3 grootste risico's?",
+        "Hoe evolueerde de operationele marge?",
+        "Wat drijft de omzet?"
+      ],
+      "upgradeCta": "Upgraden naar Pro",
+      "guestTitle": "Chat exclusief voor Pro-accounts",
+      "guestDesc": "Maak een gratis account aan en upgrade naar Pro om met de AI-analist over dit bedrijf te chatten.",
+      "guestCta": "Gratis account aanmaken"
+    }
   }
 }

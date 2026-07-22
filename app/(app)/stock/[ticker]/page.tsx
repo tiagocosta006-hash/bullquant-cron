@@ -168,6 +168,7 @@ export default async function StockPage({
   ])
 
   const isPro = dbUser?.plan === 'PRO'
+  const isLoggedIn = !!user
 
   // Overlay preliminar: revenue/EPS já reportados (earnings) que ainda não estão
   // nos fundamentais oficiais (10-Q). Mostra-se como barra provisória no gráfico
@@ -302,12 +303,13 @@ export default async function StockPage({
             ticker={company.ticker}
             fundamentals={JSON.parse(JSON.stringify(historicalAnnual))}
             isPro={isPro}
+            isLoggedIn={isLoggedIn}
             currencySymbol={currencySymbol}
           />
         }
         valuation={
           <>
-            <ValuationMultiples ticker={company.ticker} isPro={isPro} />
+            <ValuationMultiples ticker={company.ticker} isPro={isPro} isLoggedIn={isLoggedIn} />
             {serializedDcfs.length > 0 ? (
               <SavedValuations
                 analyses={serializedDcfs}

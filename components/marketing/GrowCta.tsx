@@ -26,7 +26,7 @@ export function GrowCta({
           ref.current,
           { scale: 0.82 },
           {
-            scale: 1.12,
+            scale: 1.2,
             ease: "none",
             scrollTrigger: {
               trigger: ref.current,

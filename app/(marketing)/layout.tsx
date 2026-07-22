@@ -19,7 +19,11 @@ export default async function MarketingLayout({
           (o rubber-band aplica transform ao wrap e partiria o fixed). */}
       <ContourCanvas />
       <SectionBackdrop />
-      <FloatingCta label={t("primaryCta")} note={t("floatingNote")} />
+      <FloatingCta
+        label={t("primaryCta")}
+        peekLabel={t("peekCta")}
+        note={t("floatingNote")}
+      />
       <InertiaScroll wrapId="marketing-wrap" />
       <div id="marketing-wrap" className="flex flex-1 flex-col">
         <Header />

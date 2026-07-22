@@ -27,8 +27,18 @@ interface SectorGridProps {
 export function SectorGrid({ sectors, onSelect }: SectorGridProps) {
   const t = useTranslations("explore")
 
-  // Ordenar por número de empresas (descendente)
-  const sortedSectors = Object.entries(sectors).sort((a, b) => b[1].count - a[1].count)
+  // "Outros" fica sempre visível (mesmo com 0 empresas sem setor) — é o hub
+  // de multi-watchlists, não só a categoria residual de sector: null. Se a
+  // facet não vier da API (nenhuma empresa sem setor), injeta-se sintética.
+  const entries = Object.entries(sectors)
+  const known = entries
+    .filter(([name]) => name !== "Unknown")
+    .sort((a, b) => b[1].count - a[1].count)
+  const unknown: [string, { count: number; industries: Record<string, number> }] =
+    entries.find(([name]) => name === "Unknown") ?? ["Unknown", { count: 0, industries: {} }]
+
+  // Ordenar por número de empresas (descendente), com "Outros" sempre último
+  const sortedSectors = [...known, unknown]
 
   // Grelha de cards IGUAIS: com os 11 setores GICS + "Outros" são 12 cards,
   // que dividem certo em 2, 3 e 4 colunas (sem buracos nem cards gigantes).

@@ -6,6 +6,7 @@ import { track } from "@/lib/pulse/client"
 import { TrendingUp, TrendingDown, Clock, Check, Plus, Scale } from "lucide-react"
 import { useTranslations, useLocale } from "next-intl"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { getCurrencySymbol } from "@/lib/finance/format"
 import { CompanyLogo } from "@/components/ui/CompanyLogo"
 
@@ -26,6 +27,7 @@ type PriceData = {
 export function StockHeader({ company, shareComponent }: { company: CompanyProp, shareComponent?: React.ReactNode }) {
   const t = useTranslations("stock")
   const locale = useLocale()
+  const router = useRouter()
   const [priceData, setPriceData] = useState<PriceData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
@@ -82,8 +84,13 @@ export function StockHeader({ company, shareComponent }: { company: CompanyProp,
   }, [company.ticker])
 
   const toggleFollow = async () => {
-    if (isFollowing === null) return // Not logged in (would ideally redirect to login)
-    
+    // Anónimo: "Seguir" é o momento de maior intenção no header — manda
+    // direto para a criação de conta em vez de ficar em no-op silencioso.
+    if (isFollowing === null) {
+      router.push('/register')
+      return
+    }
+
     setIsUpdatingFollow(true)
     try {
       const res = await fetch('/api/watchlist', {
@@ -129,33 +136,34 @@ export function StockHeader({ company, shareComponent }: { company: CompanyProp,
               <span>{company.exchange}</span>
             </div>
             
-            {/* Follow Button */}
-            {isFollowing !== null && (
-              <button
-                ref={followBtnRef}
-                onClick={toggleFollow}
-                disabled={isUpdatingFollow}
-                className={`px-3 py-1 text-xs font-bold rounded-full transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${
-                  isFollowing 
-                    ? 'bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20' 
-                    : 'bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-md'
-                }`}
-              >
-                {isUpdatingFollow ? (
-                  <span className="animate-pulse">{t('header.updating')}</span>
-                ) : isFollowing ? (
-                  <>
-                    <Check className="w-3.5 h-3.5" />
-                    {t('header.followed')}
-                  </>
-                ) : (
-                  <>
-                    <Plus className="w-3.5 h-3.5" />
-                    {t('header.follow')}
-                  </>
-                )}
-              </button>
-            )}
+            {/* Follow Button — visível também para anónimos (isFollowing
+                fica null: nem "seguido" nem confirmado ainda); toggleFollow
+                trata o caso null como redirect para /register em vez de
+                esconder o botão (guest não via nenhuma afordância aqui). */}
+            <button
+              ref={followBtnRef}
+              onClick={toggleFollow}
+              disabled={isUpdatingFollow}
+              className={`px-3 py-1 text-xs font-bold rounded-full transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${
+                isFollowing
+                  ? 'bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20'
+                  : 'bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-md'
+              }`}
+            >
+              {isUpdatingFollow ? (
+                <span className="animate-pulse">{t('header.updating')}</span>
+              ) : isFollowing ? (
+                <>
+                  <Check className="w-3.5 h-3.5" />
+                  {t('header.followed')}
+                </>
+              ) : (
+                <>
+                  <Plus className="w-3.5 h-3.5" />
+                  {t('header.follow')}
+                </>
+              )}
+            </button>
 
             {/* Compare Button */}
             <Link

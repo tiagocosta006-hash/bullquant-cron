@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
+import { BarChart3, Maximize2, Table2 } from "lucide-react";
 import { gsap, useGSAP, MOTION_OK } from "@/lib/marketing/gsap";
 import { prefersReducedMotion } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -8,45 +9,108 @@ import { cn } from "@/lib/utils";
 /**
  * ChartScrollDraw — a Story 1 mostra os DOIS gráficos reais que o produto
  * tem em /stock/[ticker] (Fundamentais): Receita (barras) e FCF (barra +
- * linhas OCF/CapEx) — os mesmos dataKeys/cores de FinancialsEngine.tsx.
- * Antes eram desenhados como um único gráfico combinado (barras de receita
- * + linha de FCF) que não existe em lado nenhum do produto; agora são dois
- * painéis empilhados e fiéis, ligados por um único cursor/tooltip partilhado.
+ * linhas OCF/CapEx) — os mesmos dataKeys/cores do motor de gráficos
+ * financeiros real da app (components/stock/*, ver nota abaixo).
+ * Cada painel vive agora dentro de um "cartão" com o chrome real do cartão
+ * de gráfico da app (título, CAGR, cluster de ícones). Sem toggle de período
+ * decorativo — lia-se como fake (removido, feedback do Alex). O SVG continua
+ * único (a lente atravessa os dois painéis); os cartões glass são camadas absolutas atrás,
+ * alinhadas por percentagens DERIVADAS das constantes de geometria.
  * Com o scroll (scrub), as barras crescem da baseline com stagger, as linhas
  * de OCF/CapEx traçam-se (dashoffset) e os labels finais aparecem. Sem
  * motion, o gráfico está completo desde o primeiro paint.
  */
-const REVENUE = [38, 42, 47, 52, 60, 66, 71, 78, 86, 95]; // B$, 2016–2025
-const FCF = [11, 13, 15, 18, 22, 25, 28, 32, 37, 42];
-const CAPEX = [3, 4, 4, 5, 6, 7, 8, 9, 10, 12];
-const OCF = FCF.map((v, i) => v + CAPEX[i]); // FCF = OCF − CapEx (mesma fórmula do produto)
-const FIRST_YEAR = 2016;
+// Exportados (não só usados aqui): components/marketing/MiniChart.tsx reutiliza
+// esta geometria/dados para os 3 mini-gráficos do TerminalMock (Fundamentais) —
+// mesmos números, mesmas cores, coerência total com a Story 01. Este ficheiro
+// nunca importa a lib de gráficos client-side usada na app real (components/
+// stock/*), por isso é seguro reexportar estes símbolos puros para o resto do
+// bundle de marketing (ver nota em MiniChart.tsx sobre o que NUNCA se pode
+// importar de components/stock/*).
+export const REVENUE = [38, 42, 47, 52, 60, 66, 71, 78, 86, 95]; // B$, 2016–2025
+export const FCF = [11, 13, 15, 18, 22, 25, 28, 32, 37, 42];
+export const CAPEX = [3, 4, 4, 5, 6, 7, 8, 9, 10, 12];
+export const OCF = FCF.map((v, i) => v + CAPEX[i]); // FCF = OCF − CapEx (mesma fórmula do produto)
+export const FIRST_YEAR = 2016;
 
-const W = 560;
-const H = 460;
-const PAD = 8;
-const STEP = (W - PAD * 2) / REVENUE.length;
-const BAR_W = 30;
+export const W = 560;
+export const H = 540;
+export const PAD = 8;
+export const STEP = (W - PAD * 2) / REVENUE.length;
+export const BAR_W = 30;
 
-// Painel A — Receita (só barras, igual a FinancialsEngine `charts.revenue`)
-const A_TOP = 24;
-const A_BASE = 168;
+// Painel A — Receita (só barras, igual ao gráfico real `charts.revenue`);
+// o topo abre espaço ao header do cartão (título + CAGR + ícones em HTML)
+const A_TOP = 64;
+const A_BASE = 208;
 const A_SCALE = (A_BASE - A_TOP) / Math.max(...REVENUE);
 
-// Painel B — FCF composto (barra FCF + linha OCF + linha CapEx), igual a
-// FinancialsEngine `charts.freeCashFlow` (type COMPOSED); escala partilhada
+// Painel B — FCF composto (barra FCF + linha OCF + linha CapEx), igual ao
+// gráfico real `charts.freeCashFlow` (type COMPOSED); escala partilhada
 // pelo maior valor (OCF) para as três séries ficarem no mesmo eixo.
-const B_TOP = 218;
-const B_BASE = 396;
+const B_TOP = 298;
+const B_BASE = 476;
 const B_SCALE = (B_BASE - B_TOP) / Math.max(...OCF);
 
-const barX = (i: number) => PAD + i * STEP + (STEP - BAR_W) / 2;
-const cx = (i: number) => PAD + i * STEP + STEP / 2;
+// Cartões glass atrás do SVG — limites em unidades do viewBox, convertidos
+// em percentagens (o SVG mantém o aspeto: viewBox fixo + w-full h-auto,
+// por isso as camadas HTML alinham em qualquer largura).
+const CARD_A_TOP = 0;
+const CARD_A_BOTTOM = A_BASE + 16; // 224
+const CARD_B_TOP = A_BASE + 32; // 240 — gap de 16 entre cartões
+const CARD_B_BOTTOM = H; // inclui o eixo temporal
+const pct = (v: number) => `${((v / H) * 100).toFixed(3)}%`;
+
+// CAGR real dos dados mock, no mesmo formato do cartão real ((cagr*100).toFixed(1))
+// Exportado — MiniChart.tsx reutiliza para calcular o CAGR dos mesmos dados.
+export const calcCagr = (arr: number[]) =>
+  `+${((Math.pow(arr[arr.length - 1] / arr[0], 1 / (arr.length - 1)) - 1) * 100).toFixed(1)}%`;
+const CAGR_REVENUE = calcCagr(REVENUE);
+const CAGR_FCF = calcCagr(FCF);
+
+/** header decorativo de cartão, copiado do chrome real do cartão de gráfico da app */
+function ChartCardChrome({
+  title,
+  cagrLabel,
+  cagr,
+}: {
+  title: string;
+  cagrLabel: string;
+  cagr: string;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-2 px-4 pt-3">
+      <div className="flex min-w-0 items-baseline gap-2.5">
+        <span className="truncate text-base font-bold leading-tight text-foreground">{title}</span>
+        <span className="nums text-xs font-semibold text-muted-foreground">
+          {cagrLabel}: <span className="text-bull">{cagr}</span>
+        </span>
+      </div>
+      <div className="flex shrink-0 gap-1 rounded-md border border-border/40 bg-muted/50 p-1">
+        <span className="rounded bg-background p-1 text-foreground shadow-sm">
+          <BarChart3 className="h-3.5 w-3.5" />
+        </span>
+        <span className="rounded p-1 text-muted-foreground">
+          <Table2 className="h-3.5 w-3.5" />
+        </span>
+        <span className="rounded p-1 text-muted-foreground">
+          <Maximize2 className="h-3.5 w-3.5" />
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// barX/cx/barPath/lineD são exportados — MiniChart.tsx reutiliza esta
+// geometria pura (SVG à mão, sem lib de gráficos) para desenhar os
+// mini-gráficos do TerminalMock.
+export const barX = (i: number) => PAD + i * STEP + (STEP - BAR_W) / 2;
+export const cx = (i: number) => PAD + i * STEP + STEP / 2;
 const yA = (v: number) => A_BASE - v * A_SCALE;
 const yB = (v: number) => B_BASE - v * B_SCALE;
 
 /** barra com topo arredondado (4px) e base reta na baseline do painel */
-function barPath(i: number, v: number, base: number, yFn: (v: number) => number) {
+export function barPath(i: number, v: number, base: number, yFn: (v: number) => number) {
   const x = barX(i);
   const top = yFn(v);
   const r = 4;
@@ -61,7 +125,7 @@ function barPath(i: number, v: number, base: number, yFn: (v: number) => number)
   ].join(" ");
 }
 
-const lineD = (arr: number[], yFn: (v: number) => number) =>
+export const lineD = (arr: number[], yFn: (v: number) => number) =>
   arr.map((v, i) => `${i === 0 ? "M" : "L"}${cx(i)} ${yFn(v)}`).join(" ");
 
 const OCF_LINE_D = lineD(OCF, yB);
@@ -72,11 +136,17 @@ export function ChartScrollDraw({
   ariaLabel,
   legendRevenue,
   legendFcf,
+  cardRevenueTitle,
+  cardFcfTitle,
+  cagrLabel,
   className,
 }: {
   ariaLabel: string;
   legendRevenue: string;
   legendFcf: string;
+  cardRevenueTitle: string;
+  cardFcfTitle: string;
+  cagrLabel: string;
   className?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -336,24 +406,35 @@ export function ChartScrollDraw({
   );
 
   return (
-    <div ref={rootRef} className={cn("w-full", className)}>
+    <div ref={rootRef} className={cn("flex w-full flex-col gap-3", className)}>
+      <div className="relative">
+        {/* cartões glass atrás do SVG, alinhados aos painéis por percentagens
+            derivadas das constantes de geometria; o header (chrome real do
+            cartão de gráfico da app) vive dentro de cada cartão, o SVG por cima */}
+        <div
+          aria-hidden
+          className="glass absolute inset-x-0 rounded-xl"
+          style={{ top: pct(CARD_A_TOP), height: pct(CARD_A_BOTTOM - CARD_A_TOP) }}
+        >
+          <ChartCardChrome title={cardRevenueTitle} cagrLabel={cagrLabel} cagr={CAGR_REVENUE} />
+        </div>
+        <div
+          aria-hidden
+          className="glass absolute inset-x-0 rounded-xl"
+          style={{ top: pct(CARD_B_TOP), height: pct(CARD_B_BOTTOM - CARD_B_TOP) }}
+        >
+          <ChartCardChrome title={cardFcfTitle} cagrLabel={cagrLabel} cagr={CAGR_FCF} />
+        </div>
+
       <svg
         ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}
         role="img"
         aria-label={ariaLabel}
-        className="h-auto w-full"
+        className="relative z-10 h-auto w-full"
         onPointerMove={moveCursor}
         onPointerLeave={leaveCursor}
       >
-        {/* legenda de painel — igual ao título de cada card real */}
-        <text x={PAD} y={A_TOP - 9} fontSize="11.5" fontWeight="600" className="nums" fill="var(--muted-foreground)">
-          {legendRevenue}
-        </text>
-        <text x={PAD} y={B_TOP - 9} fontSize="11.5" fontWeight="600" className="nums" fill="var(--muted-foreground)">
-          {legendFcf}
-        </text>
-
         {/* grelha recessiva — painel A (Receita) */}
         {GRID_FRACS.map((f) => (
           <line
@@ -593,9 +674,10 @@ export function ChartScrollDraw({
           {FIRST_YEAR + REVENUE.length - 1}
         </text>
       </svg>
+      </div>
 
       {/* legenda — as 4 séries dos 2 gráficos reais (Receita; FCF/OCF/CapEx) */}
-      <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 px-1 text-xs font-medium text-foreground/70">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 px-1 text-xs font-medium text-foreground/70">
         <span className="inline-flex items-center gap-2">
           <span className="h-2.5 w-2.5 rounded-[3px] bg-[var(--chart-1)]" aria-hidden />
           {legendRevenue}

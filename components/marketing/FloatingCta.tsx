@@ -20,7 +20,15 @@ import { cn } from "@/lib/utils";
  * subir, reverte. Sem motion: sem crescer/morphar, só mostra/esconde como
  * antes (esconde assim que o CTA final entra em vista).
  */
-export function FloatingCta({ label, note }: { label: string; note: string }) {
+export function FloatingCta({
+  label,
+  peekLabel,
+  note,
+}: {
+  label: string;
+  peekLabel: string;
+  note: string;
+}) {
   const pathname = usePathname();
   const ref = useRef<HTMLDivElement>(null);
   const morphRef = useRef<HTMLDivElement>(null);
@@ -168,9 +176,12 @@ export function FloatingCta({ label, note }: { label: string; note: string }) {
       className="floating-cta fixed inset-x-0 z-40 flex justify-center px-4 bottom-[calc(1.25rem+env(safe-area-inset-bottom,0px))]"
     >
       <div ref={morphRef}>
+        {/* Espelha a composição do CTA final (primário + espreitar) para o
+            morph aterrar naturalmente. Em telemóvel a nota desaparece para
+            os 2 botões caberem lado a lado. */}
         <div
           ref={pillRef}
-          className="floating-cta-pill glass glass-frost flex items-center gap-3 rounded-full py-1.5 pl-4 pr-1.5 shadow-lg"
+          className="floating-cta-pill glass glass-frost flex items-center gap-2 rounded-full py-1.5 pl-4 pr-1.5 shadow-lg"
         >
           <span className="nums hidden text-xs font-medium text-muted-foreground sm:inline">
             {note}
@@ -181,6 +192,16 @@ export function FloatingCta({ label, note }: { label: string; note: string }) {
             className={cn(buttonVariants(), "pressable cta-sheen h-11 rounded-full px-5 font-semibold md:h-8")}
           >
             {label}
+          </Link>
+          <Link
+            href="/stock/AAPL"
+            data-track="floating_peek"
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "pressable h-11 rounded-full px-4 font-medium md:h-8",
+            )}
+          >
+            {peekLabel}
           </Link>
         </div>
       </div>

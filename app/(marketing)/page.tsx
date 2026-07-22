@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { ArrowRight, CalendarDays, Check, ChevronDown, LayoutGrid, Search } from "lucide-react";
+import { ArrowRight, Briefcase, CalendarDays, Check, ChevronDown, LayoutDashboard, SearchCode } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { LiquidGlass } from "@/components/fx/LiquidGlass";
@@ -9,7 +9,6 @@ import { Parallax } from "@/components/fx/Parallax";
 import { Reveal } from "@/components/fx/Reveal";
 import { HeroHorizon } from "@/components/marketing/HeroHorizon";
 import { HeroStage } from "@/components/marketing/HeroStage";
-import { LiveCell } from "@/components/marketing/LiveCell";
 import { AiInsightCard } from "@/components/marketing/AiInsightCard";
 import { ChartScrollDraw } from "@/components/marketing/ChartScrollDraw";
 import { Counter } from "@/components/marketing/Counter";
@@ -17,6 +16,10 @@ import { DcfScrollDemo } from "@/components/marketing/DcfScrollDemo";
 import { FeatureStory } from "@/components/marketing/FeatureStory";
 import { GrowCta } from "@/components/marketing/GrowCta";
 import { ManifestoText } from "@/components/marketing/ManifestoText";
+import { DashboardReplica } from "@/components/marketing/replicas/DashboardReplica";
+import { PortfolioReplica } from "@/components/marketing/replicas/PortfolioReplica";
+import { CalendarReplica } from "@/components/marketing/replicas/CalendarReplica";
+import { ExploreReplica } from "@/components/marketing/replicas/ExploreReplica";
 import { TickerWall } from "@/components/marketing/TickerWall";
 import { LANDING_MEDIA } from "@/components/marketing/media";
 import { MediaFrame } from "@/components/marketing/MediaFrame";
@@ -70,7 +73,15 @@ export default async function LandingPage({
     redirect("/dashboard");
   }
 
-  const [t, ticker] = await Promise.all([getTranslations("marketing"), getTickerItems()]);
+  const [t, tStockTabs, tDashboard, tPortfolio, tCalendar, tExplore, ticker] = await Promise.all([
+    getTranslations("marketing"),
+    getTranslations("stock.tabs"),
+    getTranslations("dashboard"),
+    getTranslations("portfolio"),
+    getTranslations("calendar"),
+    getTranslations("explore"),
+    getTickerItems(),
+  ]);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -116,92 +127,76 @@ export default async function LandingPage({
     ]
   };
 
+  // Bento "Tudo num terminal" — 4 réplicas FIÉIS (não mocks genéricos) de
+  // Dashboard, Portfólio, Calendário e Explorar. Cada uma copia literalmente
+  // as class strings dos componentes reais (ver comentários em
+  // components/marketing/replicas/*.tsx). Sem fetch — números hardcoded,
+  // labels via chaves i18n reais das próprias páginas (evita duplicar copy
+  // nos 9 locales).
   const bentoCards = [
     {
-      key: "portfolio",
-      icon: LayoutGrid,
-      span: "md:col-span-4",
+      key: "dashboard",
+      icon: LayoutDashboard,
+      href: "/register",
       mock: (
-        <div className="mt-5 space-y-2.5">
-          {[
-            ["AAPL", "227,34 $", "+0,82%", true],
-            ["MSFT", "448,90 $", "+0,41%", true],
-            ["NVDA", "131,62 $", "−1,13%", false],
-          ].map(([tick, price, chg, up], i) => (
-            <div
-              key={tick as string}
-              className="flex items-center justify-between rounded-xl border border-border/50 bg-card/40 px-4 py-2.5 transition-transform duration-[var(--dur-fast)] ease-[var(--ease-out)] group-hover:translate-x-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
-              style={{ transitionDelay: `${i * 50}ms` }}
-            >
-              <span className="text-sm font-semibold">{tick}</span>
-              <span className="nums text-sm text-muted-foreground">{price}</span>
-              {tick === "AAPL" ? (
-                <LiveCell
-                  values={["+0,82%", "+0,85%", "+0,79%"]}
-                  className="nums text-xs font-semibold text-bull"
-                />
-              ) : (
-                <span className={cn("nums text-xs font-semibold", up ? "text-bull" : "text-bear")}>
-                  {chg}
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
+        <DashboardReplica
+          tabs={["sp500", "gainers", "marketCap"].map((k) => tDashboard(`tabs.${k}`))}
+          marketCapLabel={tDashboard("marketCap")}
+        />
       ),
     },
     {
-      key: "search",
-      icon: Search,
-      span: "md:col-span-2",
+      key: "portfolio",
+      icon: Briefcase,
+      href: "/register",
       mock: (
-        <div className="mt-5 flex items-center gap-2 rounded-full border border-border/60 bg-card/50 px-4 py-2.5 text-sm text-muted-foreground">
-          <Search className="h-4 w-4" />
-          AAPL
-          <kbd className="kbd-tap ml-auto rounded border border-border px-1.5 text-[10px] transition-colors duration-[var(--dur-fast)] group-hover:border-primary/50 group-hover:text-primary">
-            ⌘K
-          </kbd>
-        </div>
+        <PortfolioReplica
+          labels={{
+            marketValue: tPortfolio("summary.marketValue"),
+            totalPnl: tPortfolio("summary.totalPnl"),
+            positions: tPortfolio("positions"),
+            upToday: tPortfolio("upToday"),
+            allocationTitle: tPortfolio("allocation.title"),
+            valueTabs: {
+              "1m": tPortfolio("valueChart.tabs.1m"),
+              "6m": tPortfolio("valueChart.tabs.6m"),
+              "1y": tPortfolio("valueChart.tabs.1y"),
+              max: tPortfolio("valueChart.tabs.max"),
+            },
+          }}
+        />
       ),
     },
     {
       key: "calendar",
       icon: CalendarDays,
-      span: "md:col-span-2",
+      href: "/register",
       mock: (
-        <div className="mt-5 grid grid-cols-7 gap-1.5" aria-hidden>
-          {Array.from({ length: 14 }).map((_, i) => (
-            <span
-              key={i}
-              className={cn(
-                "h-6 rounded-md border border-border/40",
-                i === 9 ? "bento-day-pulse bg-primary/20" : "bg-card/40",
-              )}
-            />
-          ))}
-        </div>
+        <CalendarReplica
+          labels={{
+            day: t("bento.replicas.calDay"),
+            week: t("bento.replicas.calWeek"),
+            month: t("bento.replicas.calMonth"),
+            scopeAll: tCalendar("scopeAll"),
+            scopeWatchlist: tCalendar("scopeWatchlist"),
+            scopePortfolio: tCalendar("scopePortfolio"),
+            others: t("bento.replicas.calOthers"),
+          }}
+        />
       ),
     },
     {
-      key: "screener",
-      icon: LayoutGrid,
-      span: "md:col-span-4",
+      key: "explore",
+      icon: SearchCode,
+      href: "/register",
       mock: (
-        <div className="mt-5 flex flex-wrap gap-2">
-          {["Growth", "Dividend Growth", "Buyback Machines", "Wide Moat"].map((c, i) => (
-            <span
-              key={c}
-              className={cn(
-                "rounded-full px-3.5 py-1.5 text-xs font-medium",
-                i === 0
-                  ? "bg-primary/15 text-primary transition-transform duration-[var(--dur-fast)] ease-[var(--ease-out)] group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-                  : "border border-border/60 bg-card/40 text-muted-foreground",
-              )}
-            >
-              {c}
-            </span>
-          ))}
-        </div>
+        <ExploreReplica
+          heading={tExplore("sectorsTitle")}
+          // resolvido no servidor (contagens fixas ilustrativas, mesma ordem
+          // dos 4 setores em ExploreReplica.tsx) — Server Components não
+          // podem passar funções como prop a Client Components.
+          companiesLabels={[68, 52, 61, 47].map((count) => tExplore("companiesCount", { count }))}
+        />
       ),
     },
   ] as const;
@@ -273,7 +268,12 @@ export default async function LandingPage({
           className="hero-in -mx-6 border-y border-border/50 bg-card/40 md:-mx-8"
           style={heroDelay(0.5)}
         >
-          <TickerMarquee items={ticker} label={t("ticker.label")} />
+          {/* legenda acompanha a fonte real dos dados — nunca prometer
+              "em direto" quando são fechos da BD (e vice-versa) */}
+          <TickerMarquee
+            items={ticker.items}
+            label={ticker.live ? t("ticker.labelLive") : t("ticker.label")}
+          />
         </div>
       </section>
 
@@ -284,7 +284,30 @@ export default async function LandingPage({
           captions={[t("showcase.caption"), t("showcase.caption2"), t("showcase.caption3")]}
         >
           <MediaFrame media={LANDING_MEDIA.showcaseTerminal} alt={t("showcase.alt")}>
-            <TerminalMock liveLabel={t("showcase.live")} aiChipLabel={t("showcase.aiChip")} />
+            <TerminalMock
+              liveLabel={t("showcase.live")}
+              tabs={{
+                overview: tStockTabs("overview"),
+                financials: tStockTabs("financials"),
+                analista: tStockTabs("analista"),
+              }}
+              fin={{
+                revenueTitle: t("stories.fundamentals.cardRevenueTitle"),
+                segmentsTitle: t("showcase.finSegmentsTitle"),
+                fcfTitle: t("stories.fundamentals.cardFcfTitle"),
+                cagrLabel: t("stories.fundamentals.cagrLabel"),
+                moreCharts: t("showcase.moreCharts", { count: 8 }),
+              }}
+              analystMock={{
+                thesisLabel: t("stories.ai.thesisLabel"),
+                thesis: t("stories.ai.thesis"),
+                moatLabel: t("stories.ai.moatLabel"),
+                moatValue: t("stories.ai.moatValue"),
+                chatUser: t("showcase.chat.user"),
+                chatAnswer: t("showcase.chat.answer"),
+                chatCite: t("showcase.chat.cite"),
+              }}
+            />
           </MediaFrame>
         </ScrollShowcase>
       </section>
@@ -294,7 +317,7 @@ export default async function LandingPage({
         <ManifestoText
           lines={[t("manifesto.l1"), t("manifesto.l2"), t("manifesto.l3")]}
           accentLine={2}
-          backdrop={<TickerWall items={ticker} />}
+          backdrop={<TickerWall items={ticker.items} />}
         />
       </section>
 
@@ -313,13 +336,14 @@ export default async function LandingPage({
               t("stories.fundamentals.b3"),
             ]}
           >
-            <LiquidGlass className="rounded-3xl p-6 sm:p-8">
-              <ChartScrollDraw
-                ariaLabel={t("stories.fundamentals.chartAria")}
-                legendRevenue={t("stories.fundamentals.legendRevenue")}
-                legendFcf={t("stories.fundamentals.legendFcf")}
-              />
-            </LiquidGlass>
+            <ChartScrollDraw
+              ariaLabel={t("stories.fundamentals.chartAria")}
+              legendRevenue={t("stories.fundamentals.legendRevenue")}
+              legendFcf={t("stories.fundamentals.legendFcf")}
+              cardRevenueTitle={t("stories.fundamentals.cardRevenueTitle")}
+              cardFcfTitle={t("stories.fundamentals.cardFcfTitle")}
+              cagrLabel={t("stories.fundamentals.cagrLabel")}
+            />
           </FeatureStory>
         </div>
       </section>
@@ -367,11 +391,26 @@ export default async function LandingPage({
           >
             <AiInsightCard
               title={t("stories.ai.cardTitle")}
-              summary={t("stories.ai.summary")}
-              catalystsLabel={t("stories.ai.catalystsLabel")}
-              catalysts={[t("stories.ai.catalyst1"), t("stories.ai.catalyst2")]}
-              riskLabel={t("stories.ai.riskLabel")}
-              risk={t("stories.ai.risk1")}
+              chipLabel={t("stories.ai.chipLabel")}
+              thesisLabel={t("stories.ai.thesisLabel")}
+              thesis={t("stories.ai.thesis")}
+              moatLabel={t("stories.ai.moatLabel")}
+              moatValue={t("stories.ai.moatValue")}
+              kpis={[
+                {
+                  label: t("stories.ai.kpi1Label"),
+                  value: t("stories.ai.kpi1Value"),
+                  insight: t("stories.ai.kpi1Insight"),
+                },
+                {
+                  label: t("stories.ai.kpi2Label"),
+                  value: t("stories.ai.kpi2Value"),
+                  insight: t("stories.ai.kpi2Insight"),
+                },
+              ]}
+              chatUser={t("stories.ai.chatUser")}
+              chatAnswer={t("stories.ai.chatAnswer")}
+              chatCite={t("stories.ai.chatCite")}
               disclaimer={t("stories.ai.disclaimer")}
             />
           </FeatureStory>
@@ -404,20 +443,26 @@ export default async function LandingPage({
           <p className="mt-5 text-lg leading-relaxed text-muted-foreground">{t("bento.subtitle")}</p>
         </Reveal>
 
-        <div className="mt-14 grid gap-5 md:grid-cols-6">
-          {bentoCards.map(({ key, icon: Icon, span, mock }, i) => (
-            <Reveal key={key} className={span} style={{ transitionDelay: `${i * 70}ms` }}>
+        <div className="mt-14 grid gap-5 md:grid-cols-2">
+          {bentoCards.map(({ key, icon: Icon, href, mock }, i) => (
+            <Reveal key={key} style={{ transitionDelay: `${i * 70}ms` }}>
               <Parallax amp={i % 2 ? 28 : 44} zoom className="h-full">
-              <LiquidGlass className="group card-lift h-full rounded-3xl p-6">
-                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary transition-transform duration-[var(--dur-base)] ease-[var(--spring)] group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100">
-                  <Icon className="h-5 w-5" strokeWidth={2} />
-                </div>
-                <h3 className="text-base font-semibold">{t(`bento.${key}.title`)}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                  {t(`bento.${key}.desc`)}
-                </p>
-                {mock}
-              </LiquidGlass>
+              <Link
+                href={href}
+                data-track={`bento_${key}`}
+                className="block h-full rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                <LiquidGlass className="group card-lift h-full rounded-3xl p-6">
+                  <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary transition-transform duration-[var(--dur-base)] ease-[var(--spring)] group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100">
+                    <Icon className="h-5 w-5" strokeWidth={2} />
+                  </div>
+                  <h3 className="text-base font-semibold">{t(`bento.${key}.title`)}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                    {t(`bento.${key}.desc`)}
+                  </p>
+                  {mock}
+                </LiquidGlass>
+              </Link>
               </Parallax>
             </Reveal>
           ))}
@@ -428,7 +473,7 @@ export default async function LandingPage({
       {/* ── 9 · Números (counters, banda dourada) ───────────────── */}
       <section data-backdrop="gold" className="relative isolate">
         <div className="relative mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
-          <Reveal className="grid gap-12 text-center sm:grid-cols-2 sm:text-left lg:grid-cols-4">
+          <Reveal className="grid gap-12 text-center sm:grid-cols-2 lg:grid-cols-4">
             {[
               { value: 10, suffix: "", label: t("numbers.years") },
               { value: 500, suffix: "", label: t("numbers.companies") },
@@ -590,25 +635,51 @@ export default async function LandingPage({
         <Reveal data-reveal="zoom" className="flex flex-col items-center text-center">
           <BrandMark className="breathe h-16 w-16 rounded-2xl shadow-lg" />
           <span className="gold-rule gold-rule-live mt-8 h-px w-28" aria-hidden />
-          <h2 className="mt-8 max-w-[18ch] text-balance text-5xl font-extrabold leading-[1.02] tracking-[-0.035em] sm:text-6xl md:text-7xl">
-            {t("ctaTitle")}
-          </h2>
-          <p className="mt-6 max-w-[48ch] text-lg leading-relaxed text-muted-foreground">
-            {t("ctaSubtitle")}
-          </p>
-          <GrowCta className="mt-10">
+          {/* título+subtítulo clicáveis: um único link em bloco (um só tab
+              stop; heading dentro de link é HTML válido), hover subtil */}
+          <Link
+            href="/register"
+            data-track="footer_text_register"
+            className="group mt-8 flex flex-col items-center"
+          >
+            <h2 className="max-w-[18ch] text-balance text-5xl font-extrabold leading-[1.02] tracking-[-0.035em] transition-opacity duration-[var(--dur-fast)] group-hover:opacity-90 sm:text-6xl md:text-7xl">
+              {t("ctaTitle")}
+            </h2>
+            <p className="mt-6 max-w-[48ch] text-lg leading-relaxed text-muted-foreground transition-colors duration-[var(--dur-fast)] group-hover:text-foreground">
+              {t("ctaSubtitle")}
+            </p>
+          </Link>
+          {/* data-final-cta vai na LINHA (não no botão primário): o pill
+              flutuante espelha esta composição de 2 botões, por isso o morph
+              tem de medir a linha toda — medir só o primário fazia o pill (mais
+              largo) tentar encaixar numa caixa mais estreita e aterrar torto. */}
+          <div
+            data-final-cta
+            className="mt-10 flex flex-col items-center gap-4 sm:flex-row"
+          >
+            <GrowCta>
+              <Link
+                href="/register"
+                data-track="footer_register"
+                className={cn(
+                  buttonVariants({ size: "lg" }),
+                  "pressable cta-sheen h-16 px-14 text-lg font-semibold",
+                )}
+              >
+                {t("primaryCta")}
+              </Link>
+            </GrowCta>
             <Link
-              href="/register"
-              data-track="footer_register"
-              data-final-cta
+              href="/stock/AAPL"
+              data-track="footer_peek"
               className={cn(
-                buttonVariants({ size: "lg" }),
-                "pressable cta-sheen h-13 px-10 text-base font-semibold",
+                buttonVariants({ size: "lg", variant: "outline" }),
+                "pressable h-16 px-10 text-lg",
               )}
             >
-              {t("primaryCta")}
+              {t("peekCta")}
             </Link>
-          </GrowCta>
+          </div>
           <p className="mt-6 text-xs text-muted-foreground/80">{t("trust")}</p>
         </Reveal>
       </section>

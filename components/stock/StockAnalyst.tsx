@@ -86,11 +86,13 @@ export function StockAnalyst({
   ticker,
   fundamentals,
   isPro,
+  isLoggedIn,
   currencySymbol = "$",
 }: {
   ticker: string;
   fundamentals: FundamentalRow[];
   isPro?: boolean;
+  isLoggedIn?: boolean;
   currencySymbol?: string;
 }) {
   const t = useTranslations("analista");
@@ -275,10 +277,10 @@ export function StockAnalyst({
               <h3 className="text-2xl font-bold tracking-tight">{t("needsAuthTitle")}</h3>
               <p className="text-muted-foreground">{t("needsAuthDesc")}</p>
             </div>
-            <a href="/login">
+            <a href="/register">
               <Button size="lg" className="gap-2">
                 <Lock className="h-4 w-4" />
-                {t("login")}
+                {t("registerCta")}
               </Button>
             </a>
           </div>
@@ -392,115 +394,132 @@ export function StockAnalyst({
         </div>
       </LiquidGlass>
 
-      {/* Modelo de negócio */}
-      <EditorialSection eyebrow={t("sections.businessModel")} first>
-        <p className="max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
-          {report.businessModel}
-        </p>
-      </EditorialSection>
-
-      {/* Mix de segmentos */}
-      {segmentChart && (
-        <EditorialSection eyebrow={t("sections.segments")}>
-          {report.segmentsSummary && (
+      {/* Layout 2 colunas: dossier rola à esquerda, chat fixo à direita
+          (desktop). Em mobile empilha — sem prefixo lg: os utilitários
+          sticky/altura ficam inativos e o rail cai para altura automática. */}
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
+        {/* ── Coluna esquerda: dossier ─────────────────────────────── */}
+        <div className="space-y-8">
+          {/* Modelo de negócio */}
+          <EditorialSection eyebrow={t("sections.businessModel")} first>
             <p className="max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
-              {report.segmentsSummary}
+              {report.businessModel}
             </p>
+          </EditorialSection>
+
+          {/* Mix de segmentos */}
+          {segmentChart && (
+            <EditorialSection eyebrow={t("sections.segments")}>
+              {report.segmentsSummary && (
+                <p className="max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
+                  {report.segmentsSummary}
+                </p>
+              )}
+              <DecisionChart
+                currencySymbol={currencySymbol}
+                title={t("sections.segments")}
+                data={segmentChart.chartData}
+                type="STACKED_BAR"
+                config={{ isCurrency: true, dataKeys: segmentChart.dataKeys }}
+              />
+            </EditorialSection>
           )}
-          <DecisionChart
-            currencySymbol={currencySymbol}
-            title={t("sections.segments")}
-            data={segmentChart.chartData}
-            type="STACKED_BAR"
-            config={{ isCurrency: true, dataKeys: segmentChart.dataKeys }}
-          />
-        </EditorialSection>
-      )}
 
-      {/* KPIs operacionais (source-grounded) */}
-      {report.operatingKpis.length > 0 && (
-        <EditorialSection eyebrow={t("sections.operatingKpis")}>
-          <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border/50 bg-border/50 sm:grid-cols-2 lg:grid-cols-4">
-            {report.operatingKpis.map((kpi, i) => (
-              <div
-                key={i}
-                className="group flex flex-col justify-between gap-3 bg-card p-4 transition-colors hover:bg-card/60"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <h4
-                    className="line-clamp-2 text-xs font-medium uppercase tracking-wide text-muted-foreground"
-                    title={kpi.name}
+          {/* KPIs operacionais (source-grounded) */}
+          {report.operatingKpis.length > 0 && (
+            <EditorialSection eyebrow={t("sections.operatingKpis")}>
+              <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border/50 bg-border/50 sm:grid-cols-2 lg:grid-cols-4">
+                {report.operatingKpis.map((kpi, i) => (
+                  <div
+                    key={i}
+                    className="group glass flex flex-col justify-between gap-3 rounded-none p-4 transition-colors hover:bg-foreground/[0.03]"
                   >
-                    {kpi.name}
-                  </h4>
-                  {kpi.quote && secUrl && (
-                    <SourceButton onClick={() => openSource(kpi.name, kpi.quote)} label={t("viewSource")} />
-                  )}
-                </div>
-                <p className="nums text-2xl font-bold tracking-tight text-foreground">{kpi.value}</p>
-                {kpi.insight && (
-                  <p className="text-xs leading-relaxed text-muted-foreground/80">{kpi.insight}</p>
-                )}
+                    <div className="flex items-start justify-between gap-2">
+                      <h4
+                        className="line-clamp-2 text-xs font-medium uppercase tracking-wide text-muted-foreground"
+                        title={kpi.name}
+                      >
+                        {kpi.name}
+                      </h4>
+                      {kpi.quote && secUrl && (
+                        <SourceButton onClick={() => openSource(kpi.name, kpi.quote)} label={t("viewSource")} />
+                      )}
+                    </div>
+                    <p className="nums text-2xl font-bold tracking-tight text-foreground">{kpi.value}</p>
+                    {kpi.insight && (
+                      <p className="text-xs leading-relaxed text-muted-foreground/80">{kpi.insight}</p>
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </EditorialSection>
-      )}
+            </EditorialSection>
+          )}
 
-      {/* Moat */}
-      <EditorialSection eyebrow={t("sections.moat")}>
-        <p className="max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
-          {report.moat.text}
-        </p>
-        {report.moat.quote && secUrl && (
-          <blockquote className="relative mt-1 max-w-3xl overflow-hidden rounded-xl border border-border/60 bg-muted/30 p-4 pl-6">
-            <span className="pointer-events-none absolute left-2 top-0 font-serif text-5xl leading-none text-primary/20">
-              &ldquo;
-            </span>
-            <p className="relative text-sm italic leading-relaxed text-foreground/85">
-              {report.moat.quote}
+          {/* Moat */}
+          <EditorialSection eyebrow={t("sections.moat")}>
+            <p className="max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
+              {report.moat.text}
             </p>
-            <button
-              onClick={() => openSource(t("sections.moat"), report.moat.quote!)}
-              className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary transition-colors hover:text-primary/80"
-            >
-              {t("viewSource")}
-              <ArrowUpRight className="h-3 w-3" />
-            </button>
-          </blockquote>
-        )}
-      </EditorialSection>
+            {report.moat.quote && secUrl && (
+              <blockquote className="relative mt-1 max-w-3xl overflow-hidden rounded-xl border border-border/60 bg-muted/30 p-4 pl-6">
+                <span className="pointer-events-none absolute left-2 top-0 font-serif text-5xl leading-none text-primary/20">
+                  &ldquo;
+                </span>
+                <p className="relative text-sm italic leading-relaxed text-foreground/85">
+                  {report.moat.quote}
+                </p>
+                <button
+                  onClick={() => openSource(t("sections.moat"), report.moat.quote!)}
+                  className="pressable mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary transition-colors hover:text-primary/80"
+                >
+                  {t("viewSource")}
+                  <ArrowUpRight className="h-3 w-3" />
+                </button>
+              </blockquote>
+            )}
+          </EditorialSection>
 
-      {/* Riscos */}
-      {report.risks.length > 0 && (
-        <EditorialSection eyebrow={t("sections.risks")}>
-          <ul className="space-y-4">
-            {report.risks.map((risk, i) => (
-              <li key={i} className="border-l-2 border-bear/40 pl-4">
-                <div className="flex items-start justify-between gap-2">
-                  <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                    <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-bear" />
-                    {risk.title}
-                  </span>
-                  {risk.quote && secUrl && (
-                    <SourceButton onClick={() => openSource(risk.title, risk.quote!)} label={t("viewSource")} />
-                  )}
-                </div>
-                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{risk.detail}</p>
-              </li>
-            ))}
-          </ul>
-        </EditorialSection>
-      )}
+          {/* Riscos */}
+          {report.risks.length > 0 && (
+            <EditorialSection eyebrow={t("sections.risks")}>
+              <ul className="space-y-4">
+                {report.risks.map((risk, i) => (
+                  <li key={i} className="border-l-2 border-bear/40 pl-4">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                        <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-bear" />
+                        {risk.title}
+                      </span>
+                      {risk.quote && secUrl && (
+                        <SourceButton onClick={() => openSource(risk.title, risk.quote!)} label={t("viewSource")} />
+                      )}
+                    </div>
+                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{risk.detail}</p>
+                  </li>
+                ))}
+              </ul>
+            </EditorialSection>
+          )}
 
-      {/* Bull vs Bear */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <CasePanel tone="bull" title={t("sections.bullCase")} items={report.bull} />
-        <CasePanel tone="bear" title={t("sections.bearCase")} items={report.bear} />
+          {/* Bull vs Bear */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <CasePanel tone="bull" title={t("sections.bullCase")} items={report.bull} />
+            <CasePanel tone="bear" title={t("sections.bearCase")} items={report.bear} />
+          </div>
+        </div>
+
+        {/* ── Coluna direita: chat fixo (sticky em lg+) ────────────── */}
+        <div className="lg:sticky lg:top-24 lg:h-[calc(100svh-8rem)]">
+          <AnalystChat
+            ticker={ticker}
+            isPro={!!isPro}
+            isLoggedIn={!!isLoggedIn}
+            secUrl={secUrl}
+            onOpenSource={openSource}
+            className="h-full"
+          />
+        </div>
       </div>
-
-      {/* Chat */}
-      <AnalystChat ticker={ticker} isPro={!!isPro} secUrl={secUrl} onOpenSource={openSource} />
 
       <p className="text-xs text-muted-foreground/70">{t("disclaimer")}</p>
 
@@ -570,7 +589,7 @@ function SourceButton({ onClick, label }: { onClick: () => void; label: string }
     <button
       onClick={onClick}
       title={label}
-      className="shrink-0 rounded-md p-1 text-muted-foreground/60 transition-colors hover:bg-primary/10 hover:text-primary"
+      className="pressable shrink-0 rounded-md p-1 text-muted-foreground/60 transition-colors hover:bg-primary/10 hover:text-primary"
     >
       <FileText className="h-3.5 w-3.5" />
     </button>
@@ -589,9 +608,12 @@ function CasePanel({
 }) {
   const isBull = tone === "bull";
   return (
+    // .glass como base (CSS puro, sem custo de ResizeObserver/SDF do
+    // LiquidGlass — reservado às 2-3 superfícies grandes) com o tint
+    // semântico bull/bear por cima, como overlay, não substituição.
     <div
       className={cn(
-        "relative overflow-hidden rounded-2xl border p-5",
+        "glass relative overflow-hidden rounded-2xl border p-5",
         isBull ? "border-bull/25 bg-bull/[0.06]" : "border-bear/25 bg-bear/[0.06]",
       )}
     >
@@ -664,13 +686,17 @@ function TypingDots() {
 function AnalystChat({
   ticker,
   isPro,
+  isLoggedIn,
   secUrl,
   onOpenSource,
+  className,
 }: {
   ticker: string;
   isPro: boolean;
+  isLoggedIn: boolean;
   secUrl: string | null;
   onOpenSource: (label: string, quote: string) => void;
+  className?: string;
 }) {
   const t = useTranslations("analista");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -785,27 +811,55 @@ function AnalystChat({
   );
 
   if (!isPro) {
+    // LiquidGlass aqui (superfície grande do rail) — mesma composição já
+    // usada no estado vazio/erro do dossier (linha ~269): border-dashed +
+    // p-8 text-center, agora também h-full flex-col centrado para preencher
+    // o rail sticky sem "flutuar" a meio.
     return (
-      <div className="relative overflow-hidden rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-8 text-center">
+      <LiquidGlass
+        className={cn(
+          "relative flex flex-col items-center justify-center overflow-hidden rounded-2xl border-dashed border-primary/30 p-8 text-center",
+          className,
+        )}
+      >
         <div className="mx-auto mb-3 w-fit rounded-xl border border-primary/20 bg-primary/10 p-3 text-primary">
           <Lock className="h-5 w-5" />
         </div>
-        <p className="text-sm font-semibold text-primary">{t("chat.proOnly")}</p>
-        <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">{t("chat.proDesc")}</p>
-      </div>
+        {isLoggedIn ? (
+          <>
+            <p className="text-sm font-semibold text-primary">{t("chat.proOnly")}</p>
+            <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">{t("chat.proDesc")}</p>
+            <a href="/pricing">
+              <Button size="sm" className="pressable mt-4 gap-2">
+                {t("chat.upgradeCta")}
+              </Button>
+            </a>
+          </>
+        ) : (
+          <>
+            <p className="text-sm font-semibold text-primary">{t("chat.guestTitle")}</p>
+            <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">{t("chat.guestDesc")}</p>
+            <a href="/register">
+              <Button size="sm" className="pressable mt-4 gap-2">
+                {t("chat.guestCta")}
+              </Button>
+            </a>
+          </>
+        )}
+      </LiquidGlass>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border/50 bg-card/60">
-      <div className="flex items-center gap-2 border-b border-border/40 px-4 py-3">
+    <div className={cn("flex h-full flex-col overflow-hidden rounded-2xl border border-border/50 bg-card/60", className)}>
+      <div className="flex shrink-0 items-center gap-2 border-b border-border/40 px-4 py-3">
         <Sparkles className="h-4 w-4 text-primary" />
         <h3 className="text-sm font-semibold">{t("chat.title")}</h3>
       </div>
 
-      <div className="p-4">
+      <div className="flex flex-1 min-h-0 flex-col p-4">
         {messages.length > 0 && (
-          <div ref={scrollRef} className="mb-4 max-h-96 space-y-4 overflow-y-auto pr-1">
+          <div ref={scrollRef} className="mb-4 flex-1 min-h-0 space-y-4 overflow-y-auto pr-1">
             {messages.map((m, i) => (
               <div
                 key={i}
@@ -830,7 +884,7 @@ function AnalystChat({
                         key={`cite-${ci}`}
                         onClick={() => onOpenSource(c.label, c.quote)}
                         disabled={!secUrl}
-                        className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground disabled:opacity-50"
+                        className="pressable inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground disabled:opacity-50 disabled:hover:translate-y-0"
                       >
                         <FileText className="h-3 w-3" />
                         {c.label}
@@ -840,7 +894,7 @@ function AnalystChat({
                       <a
                         key={`action-${ai}`}
                         href={a.href}
-                        className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+                        className="pressable inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
                       >
                         {a.label}
                         <ArrowUpRight className="h-3 w-3" />
@@ -854,17 +908,21 @@ function AnalystChat({
         )}
 
         {messages.length === 0 && (
-          <div className="mb-4 flex flex-wrap gap-2">
-            {suggestions.map((s, i) => (
-              <button
-                key={i}
-                onClick={() => send(s)}
-                className="rounded-full border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/5 hover:text-foreground"
-              >
-                {s}
-              </button>
-            ))}
-          </div>
+          <>
+            <div className="mb-4 flex flex-wrap gap-2">
+              {suggestions.map((s, i) => (
+                <button
+                  key={i}
+                  onClick={() => send(s)}
+                  className="pressable rounded-full border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/5 hover:text-foreground"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+            {/* spacer — sem histórico, ainda assim pina o form ao fundo do rail */}
+            <div className="flex-1" />
+          </>
         )}
 
         <form
@@ -872,7 +930,7 @@ function AnalystChat({
             e.preventDefault();
             send(input);
           }}
-          className="flex items-center gap-1.5 rounded-full border border-border bg-background py-1.5 pl-4 pr-1.5 transition-colors focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20"
+          className="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-background py-1.5 pl-4 pr-1.5 transition-colors focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20"
         >
           <input
             value={input}
@@ -885,7 +943,7 @@ function AnalystChat({
             type="submit"
             size="icon"
             disabled={streaming || !input.trim()}
-            className="h-8 w-8 shrink-0 rounded-full"
+            className="pressable h-8 w-8 shrink-0 rounded-full"
           >
             {streaming ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </Button>

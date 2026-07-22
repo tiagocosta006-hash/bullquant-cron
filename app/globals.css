@@ -560,10 +560,20 @@
     transform: translateX(-50%);
   }
 }
+/* Esbatimento curto e FIXO (24px), não percentual: a 8% num ecrã largo
+   comiam-se ~150px de cada lado e a fita parecia acabar a meio. Assim
+   atravessa o ecrã de ponta a ponta, só com o suficiente para não haver
+   corte seco nas bordas. */
 .marquee {
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
-  mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    black 24px,
+    black calc(100% - 24px),
+    transparent
+  );
+  mask-image: linear-gradient(90deg, transparent, black 24px, black calc(100% - 24px), transparent);
 }
 .marquee-track {
   width: max-content;

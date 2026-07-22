@@ -32,7 +32,8 @@
     "ctaTitle": "Start seeing the value others miss.",
     "ctaSubtitle": "Create your free account and analyze any S&P 500 company in seconds.",
     "ticker": {
-      "label": "Previous close, S&P 500"
+      "label": "Latest available closes · S&P 500",
+      "labelLive": "Live prices · S&P 500"
     },
     "showcase": {
       "caption": "Ten years of fundamentals, DCF and AI Brief, one terminal, no spreadsheets.",
@@ -40,7 +41,17 @@
       "caption2": "Live prices, watchlist and earnings calendar, all one ⌘K away.",
       "caption3": "Free, and ready in under a minute.",
       "live": "Live",
-      "aiChip": "AI Brief"
+      "finRows": {
+        "gross": "Gross",
+        "operating": "Operating"
+      },
+      "moreCharts": "+{count} charts",
+      "finSegmentsTitle": "Revenue by segment",
+      "chat": {
+        "user": "What's this company's biggest risk?",
+        "answer": "Revenue concentration in its top 5 customers, which make up 38% of the total — losing a major one would hit margins directly.",
+        "cite": "2025 10-K · Risk Factors"
+      }
     },
     "manifesto": {
       "l1": "Less noise, more conviction.",
@@ -58,7 +69,10 @@
         "b3": "Official SEC data, updated every week",
         "chartAria": "Example charts: annual revenue as bars, and free cash flow as a bar with operating cash flow and capex lines, both growing over ten years",
         "legendRevenue": "Revenue",
-        "legendFcf": "FCF"
+        "legendFcf": "FCF",
+        "cardRevenueTitle": "Revenue",
+        "cardFcfTitle": "Free Cash Flow",
+        "cagrLabel": "CAGR"
       },
       "dcf": {
         "eyebrow": "Valuation",
@@ -80,21 +94,29 @@
         "disclaimer": "Illustrative example with a fictional company. A DCF depends on your assumptions, not investment advice."
       },
       "ai": {
-        "eyebrow": "AI Insights",
-        "title": "The story behind",
-        "titleAccent": "the numbers.",
-        "desc": "The AI Brief summarises each company's recent developments and classifies them by sentiment, read what matters in a minute.",
-        "b1": "Executive summary, catalysts and risks",
-        "b2": "In plain language, no jargon",
+        "eyebrow": "AI Analyst",
+        "title": "A dedicated analyst",
+        "titleAccent": "for every company.",
+        "desc": "The Analyst reads the official SEC 10-K and returns an investment thesis, moat, operating KPIs and risks, with citations to the source, plus the bull and bear cases side by side, so you decide with context, not guesswork.",
+        "b1": "Thesis, moat and KPIs with direct 10-K citations",
+        "b2": "Bull case and bear case side by side, unfiltered",
         "b3": "Always flagged: never investment advice",
-        "cardTitle": "AI Brief · Example company",
-        "summary": "Solid quarter: revenue above expectations, margins expanding and the buyback programme reinforced. Management raised guidance for the rest of the year.",
-        "catalystsLabel": "Catalysts",
-        "catalyst1": "Guidance raised",
-        "catalyst2": "Buyback programme",
-        "riskLabel": "Risks",
-        "risk1": "Customer concentration",
-        "disclaimer": "AI-generated from recent news. Never investment advice."
+        "cardTitle": "AI Analyst · Example company",
+        "chipLabel": "AI",
+        "thesisLabel": "Investment thesis",
+        "thesis": "A market leader with recurring revenue, expanding margins and capital returned to shareholders — a classic compounder at a reasonable price.",
+        "moatLabel": "Moat",
+        "moatValue": "Wide moat",
+        "kpi1Label": "Recurring revenue",
+        "kpi1Value": "78%",
+        "kpi1Insight": "Subscriptions dominate the mix and add predictability.",
+        "kpi2Label": "Operating margin",
+        "kpi2Value": "31.4%",
+        "kpi2Insight": "Expanding for the third year in a row.",
+        "disclaimer": "AI-generated from official filings. Never investment advice.",
+        "chatUser": "How is the operating margin trending?",
+        "chatAnswer": "Expanding for the third straight year, from 27.1% to 31.4%, driven by the subscription mix and cost discipline.",
+        "chatCite": "2025 10-K · MD&A"
       }
     },
     "tour": {
@@ -118,6 +140,20 @@
       "search": {
         "title": "Instant search",
         "desc": "Any S&P 500 company one ⌘K away."
+      },
+      "dashboard": {
+        "title": "Insights dashboard",
+        "desc": "Category tabs and the stocks in focus, at a glance."
+      },
+      "explore": {
+        "title": "Explore by sector",
+        "desc": "Discover companies organized by sector and industry."
+      },
+      "replicas": {
+        "calDay": "Day",
+        "calWeek": "Week",
+        "calMonth": "Month",
+        "calOthers": "Other"
       }
     },
     "numbers": {
@@ -178,7 +214,8 @@
       "title": "Democratize access to financial data.",
       "desc": "A platform developed by university students with the goal of delivering professional data to independent investors.",
       "cta": "Meet the team behind it"
-    }
+    },
+    "peekCta": "Peek without an account"
   },
   "insider": {
     "title": "Company Insider Trading",
@@ -330,7 +367,9 @@
     "startFree": "Start free",
     "about": "About Us",
     "menuTitle": "Menu",
-    "openMenu": "Open menu"
+    "openMenu": "Open menu",
+    "peek": "Peek without an account",
+    "createAccount": "Create account"
   },
   "search": {
     "placeholder": "Search ticker (e.g., AAPL)...",
@@ -652,7 +691,27 @@
     "similarCompaniesExploreAll": "Explore all",
     "similarCompaniesCompare": "Compare competitors",
     "peersTitle": "Other companies in {group}",
-    "peersTitleGeneric": "Related companies"
+    "peersTitleGeneric": "Related companies",
+    "proGate": {
+      "title": "Pro feature",
+      "desc": "Unlock historical valuation charts to see whether {ticker} trades at a premium or discount to its historical averages.",
+      "upgradeCta": "Upgrade to Pro",
+      "guestTitle": "Create an account to see historical valuation",
+      "guestDesc": "Sign up for free to unlock {ticker}'s historical valuation charts and see whether it trades at a premium or discount to its averages.",
+      "guestCta": "Create free account"
+    },
+    "valuationChart": {
+      "title": "Historical Valuation",
+      "subtitle": "How the market priced the company over time",
+      "tabPe": "P/E Ratio",
+      "tabPs": "P/Sales",
+      "tabFcf": "FCF Yield",
+      "tooltipPrice": "Price",
+      "tooltipPe": "P/E Ratio",
+      "tooltipPs": "P/Sales",
+      "tooltipFcf": "FCF Yield",
+      "avgLabel": "Avg"
+    }
   },
   "analista": {
     "title": "AI Analyst",
@@ -702,8 +761,13 @@
         "What are the 3 biggest risks?",
         "How did the operating margin evolve?",
         "What drives the revenue?"
-      ]
-    }
+      ],
+      "upgradeCta": "Upgrade to Pro",
+      "guestTitle": "Chat exclusive to Pro accounts",
+      "guestDesc": "Create a free account and upgrade to Pro to chat with the AI Analyst about this company.",
+      "guestCta": "Create free account"
+    },
+    "registerCta": "Create free account"
   },
   "dcf": {
     "title": "DCF Calculator",
@@ -1037,6 +1101,20 @@
       "compareTitle": "Compare with Peers",
       "compareDesc": "Evaluate financial performance side-by-side.",
       "viewFinancials": "View Full Financial Analysis"
+    },
+    "others": {
+      "companiesTitle": "Companies without a sector",
+      "watchlistsTitle": "Your watchlists",
+      "create": "Create watchlist",
+      "createPlaceholder": "New list name...",
+      "createCta": "Create",
+      "rename": "Rename",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this watchlist? This action cannot be undone.",
+      "backToHub": "Back to Other",
+      "emptyTitle": "Nothing here yet",
+      "emptyDesc": "Create your first watchlist to organize companies by theme.",
+      "listEmpty": "This watchlist doesn't have any companies yet."
     }
   },
   "verifyEmail": {

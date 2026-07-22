@@ -32,13 +32,26 @@
     "ctaTitle": "他の人が見逃す価値を見つけよう。",
     "ctaSubtitle": "無料アカウントを作成して、S&P 500企業を数秒で分析。",
     "ticker": {
-      "label": "前日終値 — S&P 500"
+      "label": "最新の終値 · S&P 500",
+      "labelLive": "リアルタイム株価 · S&P 500"
     },
     "showcase": {
       "caption": "10年分のファンダメンタルズ、DCF、AI Brief — スプレッドシート不要のひとつのターミナルで。",
       "alt": "Bull Metrics ターミナルのデモ",
       "caption2": "ライブ価格、ウォッチリスト、決算カレンダー — すべて⌘Kひとつで。",
-      "caption3": "無料で、1分以内に使い始められる。"
+      "caption3": "無料で、1分以内に使い始められる。",
+      "finRows": {
+        "gross": "粗利率",
+        "operating": "営業利益率"
+      },
+      "moreCharts": "+{count} 件のグラフ",
+      "finSegmentsTitle": "セグメント別収益",
+      "chat": {
+        "user": "この企業の最大のリスクは何ですか?",
+        "answer": "上位5社の顧客に売上の38%が集中している点です。主要顧客を失えば利益率に直接影響します。",
+        "cite": "10-K 2025年度・リスク要因"
+      },
+      "live": "ライブ"
     },
     "manifesto": {
       "l1": "投資は当てずっぽうではない。",
@@ -58,7 +71,10 @@
         "b3": "SECの公式データを毎週更新",
         "chartAria": "サンプルチャート:年間売上を棒グラフ、フリーキャッシュフローを折れ線で表示し、10年間成長していく様子",
         "legendRevenue": "売上",
-        "legendFcf": "FCF"
+        "legendFcf": "FCF",
+        "cardRevenueTitle": "売上高",
+        "cardFcfTitle": "フリーキャッシュフロー",
+        "cagrLabel": "CAGR"
       },
       "dcf": {
         "eyebrow": "バリュエーション",
@@ -80,21 +96,29 @@
         "disclaimer": "架空の企業を使った説明用の例です。DCFは前提次第で変わります — 投資助言ではありません。"
       },
       "ai": {
-        "eyebrow": "AI Insights",
-        "title": "数字の裏にある",
-        "titleAccent": "ストーリー。",
-        "desc": "AI Briefが各企業の最近の動きを要約し、センチメントで分類 — 重要なことを1分で読めます。",
-        "b1": "エグゼクティブサマリー、カタリスト、リスク",
-        "b2": "専門用語なしの明快な言葉で",
-        "b3": "常に明記:投資助言ではありません",
-        "cardTitle": "AI Brief · サンプル企業",
-        "summary": "堅調な四半期:売上は予想超え、マージンは拡大、自社株買いも強化。経営陣は通期ガイダンスを引き上げました。",
-        "catalystsLabel": "カタリスト",
-        "catalyst1": "ガイダンス引き上げ",
-        "catalyst2": "自社株買いプログラム",
-        "riskLabel": "リスク",
-        "risk1": "顧客集中",
-        "disclaimer": "最近のニュースからAIが生成。投資助言ではありません。"
+        "eyebrow": "AIアナリスト",
+        "title": "専属アナリストが",
+        "titleAccent": "企業ごとに。",
+        "desc": "アナリストはSECの公式10-Kを読み込み、投資テーゼ、モート、営業KPI、リスクを出典引用付きで提示し、さらに強気派と弱気派の見解を並べて表示します。憶測ではなく、文脈に基づいて判断できます。",
+        "b1": "10-Kからの直接引用付きテーゼ・モート・KPI",
+        "b2": "強気派と弱気派の見解を並べて、フィルターなしで",
+        "b3": "常に明示: 投資助言では一切ありません",
+        "cardTitle": "AIアナリスト · サンプル企業",
+        "chipLabel": "AI",
+        "thesisLabel": "投資テーゼ",
+        "thesis": "経常的な収益、拡大するマージン、株主への資本還元を備えた市場リーダー — 妥当な価格の典型的なコンパウンダー。",
+        "moatLabel": "モート",
+        "moatValue": "広いモート",
+        "kpi1Label": "経常収益比率",
+        "kpi1Value": "78%",
+        "kpi1Insight": "サブスクリプションが収益の中心で、予測可能性が高い。",
+        "kpi2Label": "営業利益率",
+        "kpi2Value": "31.4%",
+        "kpi2Insight": "3年連続で拡大中。",
+        "disclaimer": "公式報告書からAIが生成。投資助言ではありません。",
+        "chatUser": "営業利益率はどう推移していますか?",
+        "chatAnswer": "3年連続で拡大しており、27.1%から31.4%まで上昇。サブスクリプション比率の向上とコスト規律が牽引しています。",
+        "chatCite": "10-K 2025年度・MD&A"
       }
     },
     "tour": {
@@ -118,6 +142,20 @@
       "search": {
         "title": "即時検索",
         "desc": "S&P 500のどの企業も ⌘K ひとつで。"
+      },
+      "dashboard": {
+        "title": "インサイト・ダッシュボード",
+        "desc": "カテゴリー別タブと注目銘柄がひと目でわかる。"
+      },
+      "explore": {
+        "title": "セクター別に探す",
+        "desc": "セクターと業種で整理された企業を発見。"
+      },
+      "replicas": {
+        "calDay": "日",
+        "calWeek": "週",
+        "calMonth": "月",
+        "calOthers": "その他"
       }
     },
     "numbers": {
@@ -125,7 +163,8 @@
       "companies": "社のS&P 500企業",
       "quarters": "四半期分のデータ",
       "free": "無料プラン"
-    }
+    },
+    "peekCta": "アカウントなしで見る"
   },
   "insider": {
     "title": "インサイダー取引",
@@ -271,8 +310,13 @@
     "dcf": "DCF",
     "calendar": "カレンダー",
     "theme": "テーマ切替",
-    "pricing": "Plans",
-    "about": "About Us"
+    "pricing": "プラン",
+    "about": "私たちについて",
+    "peek": "アカウントなしで見る",
+    "createAccount": "アカウント作成",
+    "startFree": "無料で始める",
+    "menuTitle": "メニュー",
+    "openMenu": "メニューを開く"
   },
   "search": {
     "placeholder": "ティッカーを検索 (例: AAPL)...",
@@ -579,7 +623,7 @@
     "tabs": {
       "overview": "概要",
       "financials": "財務",
-      "kpis": "KPI",
+      "analista": "アナリスト",
       "valuation": "バリュエーション",
       "company": "企業情報",
       "news": "ニュース",
@@ -589,7 +633,27 @@
     "similarCompaniesExploreAll": "すべて見る",
     "similarCompaniesCompare": "競合を比較",
     "peersTitle": "{group}の他の企業",
-    "peersTitleGeneric": "関連企業"
+    "peersTitleGeneric": "関連企業",
+    "proGate": {
+      "title": "Pro機能",
+      "desc": "{ticker}が過去の平均に対してプレミアムかディスカウントで取引されているかを確認するには、過去のバリュエーションチャートのロックを解除してください。",
+      "upgradeCta": "Proにアップグレード",
+      "guestTitle": "過去のバリュエーションを見るにはアカウントを作成してください",
+      "guestDesc": "無料登録して{ticker}の過去のバリュエーションチャートのロックを解除し、平均に対してプレミアムかディスカウントかを確認しましょう。",
+      "guestCta": "無料アカウントを作成"
+    },
+    "valuationChart": {
+      "title": "過去のバリュエーション",
+      "subtitle": "市場が時間の経過とともに企業をどう評価してきたか",
+      "tabPe": "P/E Ratio",
+      "tabPs": "P/Sales",
+      "tabFcf": "FCF Yield",
+      "tooltipPrice": "価格",
+      "tooltipPe": "P/E Ratio",
+      "tooltipPs": "P/Sales",
+      "tooltipFcf": "FCF Yield",
+      "avgLabel": "平均"
+    }
   },
   "dcf": {
     "title": "DCF計算機",
@@ -807,6 +871,20 @@
       "compareTitle": "競合と比較",
       "compareDesc": "財務パフォーマンスを並べて評価。",
       "viewFinancials": "完全な財務分析を見る"
+    },
+    "others": {
+      "companiesTitle": "セクター未設定の企業",
+      "watchlistsTitle": "あなたのウォッチリスト",
+      "create": "ウォッチリストを作成",
+      "createPlaceholder": "新しいリスト名...",
+      "createCta": "作成",
+      "rename": "名前を変更",
+      "delete": "削除",
+      "deleteConfirm": "このウォッチリストを削除しますか?この操作は元に戻せません。",
+      "backToHub": "「その他」に戻る",
+      "emptyTitle": "まだ何もありません",
+      "emptyDesc": "最初のウォッチリストを作成して、企業をテーマ別に整理しましょう。",
+      "listEmpty": "このウォッチリストにはまだ企業がありません。"
     }
   },
   "verifyEmail": {
@@ -843,5 +921,61 @@
     },
     "suggestionsTitle": "フォローのおすすめ",
     "lastUpdate": "最終更新："
+  },
+  "analista": {
+    "title": "AIアナリスト",
+    "badge": "AI・出典あり",
+    "thesisLabel": "投資テーゼ",
+    "moatLabel": "モート",
+    "source": "出典: {label}",
+    "generateTitle": "AIアナリストによる{ticker}の分析",
+    "generateDesc": "検証済みデータと公式SEC 10-Kに基づき、出典引用付きで根拠のあるドシエ、ビジネスモデル、モート、営業KPI、リスク、強気・弱気シナリオを生成します。",
+    "generateCta": "分析を生成",
+    "generating": "10-Kを読み込んで分析中...(約20秒)",
+    "rateLimitTitle": "1日の上限に達しました",
+    "rateLimitDesc": "本日のAI分析はすでに使用済みです。明日また来るか、Proにアップグレードすると無制限に分析できます。",
+    "errorTitle": "分析を生成できませんでした。もう一度お試しください。",
+    "retry": "再試行",
+    "needsAuthTitle": "セッションの有効期限が切れました",
+    "needsAuthDesc": "セッションの有効期限が切れました。分析を生成するには再度ログインしてください。",
+    "login": "ログイン",
+    "registerCta": "無料アカウントを作成",
+    "viewSource": "出典の引用を見る",
+    "sourceTitle": "引用の出典",
+    "sourceDesc": "以下はAIが抽出した正確な引用です:",
+    "openSec": "SECの10-Kで見る",
+    "back": "戻る",
+    "disclaimer": "検証済みデータと10-KからAIが生成した分析です。投資助言ではありません。",
+    "moatRatings": {
+      "wide": "広いモート",
+      "narrow": "狭いモート",
+      "none": "明確なモートなし"
+    },
+    "sections": {
+      "businessModel": "ビジネスモデル",
+      "moat": "競争優位性(モート)",
+      "segments": "セグメント別収益",
+      "operatingKpis": "営業KPI",
+      "risks": "主なリスク",
+      "bullCase": "強気シナリオ",
+      "bearCase": "弱気シナリオ"
+    },
+    "chat": {
+      "title": "アナリストに質問",
+      "placeholder": "この企業について何でも質問してください...",
+      "proOnly": "Pro限定チャット",
+      "proDesc": "Proにアップグレードすると、AIアナリストとチャットして企業や10-Kについて追加の質問ができます。",
+      "error": "エラーが発生しました。もう一度お試しください。",
+      "suggestions": [
+        "30秒でビジネスを説明して",
+        "最大の3つのリスクは?",
+        "営業利益率はどう推移した?",
+        "何が収益を牽引している?"
+      ],
+      "upgradeCta": "Proにアップグレード",
+      "guestTitle": "Proアカウント専用チャット",
+      "guestDesc": "無料アカウントを作成してProにアップグレードすると、この企業についてAIアナリストとチャットできます。",
+      "guestCta": "無料アカウントを作成"
+    }
   }
 }

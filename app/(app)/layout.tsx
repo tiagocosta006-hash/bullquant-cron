@@ -43,7 +43,10 @@ export default async function AppLayout({
   }
 
   return (
-    <div className="relative min-h-screen">
+    // overflow-x-clip: os filhos full-bleed (ex. a fita de ações da dashboard,
+    // que usa 100vw para escapar ao max-w-7xl do <main>) não podem gerar scroll
+    // horizontal — o 100vw inclui a largura da barra de scroll vertical.
+    <div className="relative min-h-screen overflow-x-clip">
       <InertiaScroll />
       <ContourCanvas />
       <PaddleRetain email={userEmail} customerId={dbUser?.paddleCustomerId} />

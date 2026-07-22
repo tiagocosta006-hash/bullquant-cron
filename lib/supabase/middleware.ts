@@ -63,5 +63,31 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // Guest funnel: o resto da app fica atrás de conta, exceto /stock/AAPL — a
+  // demo viva usada no header/CTA "Espreitar sem conta". Objetivo é
+  // maximizar criação de contas, não deixar o anónimo passear pela app
+  // inteira; por isso vai para /register (sem ?redirect — não é suposto
+  // voltar a esta página depois de entrar, é suposto criar conta).
+  // ⚠️ Checklist: qualquer rota nova em app/(app)/ nasce PÚBLICA por omissão
+  // aqui — quem adicionar uma página tem de decidir explicitamente se entra
+  // em isPrivateRoute (precisa de conta, com redirect de regresso) ou
+  // isGuestOnlyRoute (bloqueada para anónimos, funil de aquisição).
+  const upperPath = pathname.toUpperCase()
+  const isGuestOnlyRoute =
+    pathname === '/dashboard' ||
+    pathname.startsWith('/explore') ||
+    pathname.startsWith('/calendar') ||
+    pathname.startsWith('/compare') ||
+    pathname.startsWith('/analytics') ||
+    pathname.startsWith('/transcripts') ||
+    pathname === '/dcf' || // exato — /dcf/[id] é a página pública de DCF partilhada
+    (pathname.startsWith('/stock/') && upperPath !== '/STOCK/AAPL')
+
+  if (!user && isGuestOnlyRoute) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/register'
+    return NextResponse.redirect(url)
+  }
+
   return supabaseResponse
 }

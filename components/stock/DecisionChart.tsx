@@ -153,17 +153,17 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
     if (config.isCurrency || config.isLargeNumber) {
       let formatted = ""
       if (absVal >= 1_000_000_000) {
-        formatted = `${(absVal / 1_000_000_000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}B`
+        formatted = `${(absVal / 1_000_000_000).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}B`
       } else if (absVal >= 1_000_000) {
-        formatted = `${(absVal / 1_000_000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}M`
+        formatted = `${(absVal / 1_000_000).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}M`
       } else {
-        formatted = `${absVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+        formatted = `${absVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
       }
       if (config.isCurrency) return num < 0 ? `-${currencySymbol}${formatted}` : `${currencySymbol}${formatted}`
       return num < 0 ? `-${formatted}` : formatted
     }
     
-    return num < 0 ? `-${absVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : absVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    return num < 0 ? `-${absVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : absVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }
 
 

@@ -255,7 +255,7 @@ export default function Home() {
       {items.length === 0 ? (
         <>
           <PortfolioEmptyState addingTicker={addingTicker} onQuickAdd={handleQuickAdd} />
-          <PortfolioManageBar onImportClick={() => setIsImportOpen(true)} onSynced={fetchPortfolio} />
+          <PortfolioManageBar onImportClick={() => setIsImportOpen(true)} onSynced={fetchPortfolio} onManualAdd={handleQuickAdd} />
         </>
       ) : (
         <>
@@ -270,7 +270,7 @@ export default function Home() {
             </div>
           )}
 
-          <PortfolioManageBar onImportClick={() => setIsImportOpen(true)} onSynced={fetchPortfolio} />
+          <PortfolioManageBar onImportClick={() => setIsImportOpen(true)} onSynced={fetchPortfolio} onManualAdd={handleQuickAdd} />
 
           <PortfolioToolbar
             sortKey={sortKey}

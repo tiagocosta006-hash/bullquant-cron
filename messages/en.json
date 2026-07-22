@@ -496,7 +496,10 @@
     },
     "manage": {
       "title": "Add or sync positions",
-      "importCsv": "Import CSV"
+      "importCsv": "Import CSV",
+      "manualAdd": "Add manually",
+      "manualAddPlaceholder": "Search ticker or company...",
+      "manualAddNoResults": "No companies found."
     },
     "import": {
       "trigger": "Import Portfolio",

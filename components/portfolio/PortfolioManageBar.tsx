@@ -2,16 +2,18 @@
 
 import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { Upload, Link2, ChevronDown } from "lucide-react"
+import { Upload, Link2, ChevronDown, PlusCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Trading212Connection } from "./Trading212Connection"
+import { ManualAddSearch } from "./ManualAddSearch"
 
 interface PortfolioManageBarProps {
   onImportClick: () => void
   onSynced: () => void
+  onManualAdd: (ticker: string) => void
 }
 
-export function PortfolioManageBar({ onImportClick, onSynced }: PortfolioManageBarProps) {
+export function PortfolioManageBar({ onImportClick, onSynced, onManualAdd }: PortfolioManageBarProps) {
   const t = useTranslations("portfolio.manage")
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -37,6 +39,13 @@ export function PortfolioManageBar({ onImportClick, onSynced }: PortfolioManageB
             <Upload className="w-4 h-4" />
             {t('importCsv')}
           </Button>
+          <div className="pt-1 border-t border-border/40">
+            <span className="mb-2 flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <PlusCircle className="w-4 h-4" />
+              {t('manualAdd')}
+            </span>
+            <ManualAddSearch onSelect={onManualAdd} />
+          </div>
         </div>
       )}
     </div>

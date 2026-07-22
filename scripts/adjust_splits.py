@@ -48,7 +48,7 @@ if not DIRECT_URL:
     sys.exit("DIRECT_URL não definida")
 
 EDGAR_BASE = "https://data.sec.gov/api/xbrl/companyfacts"
-EDGAR_HEADERS = {"User-Agent": "BullVision admin@bullocracy.com"}
+EDGAR_HEADERS = {"User-Agent": "BullValue admin@bullocracy.com"}
 
 # Quebra na série de shares que justifica investigação (mergers legítimos raramente
 # passam de 2.5x; splits são >= 3x na prática — os 2:1 consecutivos compõem).

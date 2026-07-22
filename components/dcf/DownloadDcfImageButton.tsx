@@ -33,7 +33,7 @@ export function DownloadDcfImageButton({
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
-      a.download = `bullvision-${ticker.toLowerCase()}-dcf.png`
+      a.download = `bullvalue-${ticker.toLowerCase()}-dcf.png`
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)

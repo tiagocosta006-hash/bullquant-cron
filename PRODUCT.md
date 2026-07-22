@@ -2,7 +2,7 @@
 
 ## Register
 
-Product. BullVision is a financial terminal web app — dashboards, data
+Product. BullValue is a financial terminal web app — dashboards, data
 tables, forms, real-time-ish price polling. Design serves the workflow; it does not
 sell a story.
 

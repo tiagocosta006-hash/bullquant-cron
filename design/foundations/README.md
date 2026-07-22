@@ -1,6 +1,6 @@
-# BullVision — Fundações visuais (artefacto de testes)
+# BullValue — Fundações visuais (artefacto de testes)
 
-Página única e auto-contida que serve de **laboratório de design** da BullVision:
+Página única e auto-contida que serve de **laboratório de design** do BullValue:
 cor, tipografia, movimento, gráficos e Liquid Glass — para o Alex ver e reagir
 antes de tocar em páginas reais da app.
 
@@ -8,26 +8,26 @@ antes de tocar em páginas reais da app.
 
 ```bash
 cd design/foundations
-node build-foundations.js          # gera bullvision-foundations.html (fontes embebidas)
+node build-foundations.js          # gera bullvalue-foundations.html (fontes embebidas)
 ```
 
-Depois publica `bullvision-foundations.html` com a ferramenta **Artifact** do Claude
+Depois publica `bullvalue-foundations.html` com a ferramenta **Artifact** do Claude
 (favicon 🎨). Em sessões anteriores esteve em:
 `https://claude.ai/code/artifact/b0e21f45-158d-4009-b104-4b49c21c5638`
 (um chat novo cria um URL novo — não há problema.)
 
 - Editar sempre o `foundations.template.html` (o conteúdo). O HTML final é gerado.
 - O build lê as fontes reais de `../../public/fonts/` (SF UI Text + Scotch) e
-  embebe-as em base64. Não editar o `bullvision-foundations.html` à mão.
+  embebe-as em base64. Não editar o `bullvalue-foundations.html` à mão.
 
-## Direção de design fechada (ver memória `design_vision_bullvision`)
+## Direção de design fechada (ver memória `design_vision_bullvalue`)
 
 - **Norte:** "o que faria a Apple". Clean, chamativo mas clean. Nada de premium
   dourado forçado/azeiteiro.
 - **Canvas:** claro por defeito + toggle escuro.
 - **Cor:** neutros quentes quase monocromáticos + **dourado matte** como acento
   (não azul Apple, não lime/laranja). Verde/vermelho só para semântica (sobe/desce).
-  Dourado #E4AA33 pertence à Bullocracy; na BullVision é acento contido.
+  Dourado #E4AA33 pertence à Bullocracy; no BullValue é acento contido.
 - **Tipografia:** **SF Pro em tudo**, incl. números (tabular-nums). **JetBrains
   Mono largada.** Usar toda a escala de pesos (Light→Heavy), Heavy nos grandes
   títulos. **Scotch Bold Italic** só num título-herói da landing, nunca maiúsculas.
@@ -67,7 +67,7 @@ da banda de refração), `STRENGTH` (intensidade da lente), `ABERR` (separação
 
 **Toggle de fundos** no demo (procedural, CSP-safe): **Foto** (wallpaper vívido em
 canvas — prova a lente), **Mesh** (aurora em tons de marca), **App** (mock da UI
-BullVision — ver o vidro sobre a app real), **Contour** (o fundo topográfico da
+BullValue — ver o vidro sobre a app real), **Contour** (o fundo topográfico da
 página). Só funciona bem em Chromium (Safari/FF caem no frost via `-webkit-`).
 
 ## Estado atual

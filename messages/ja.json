@@ -36,7 +36,7 @@
     },
     "showcase": {
       "caption": "10年分のファンダメンタルズ、DCF、AI Brief — スプレッドシート不要のひとつのターミナルで。",
-      "alt": "BullVision ターミナルのデモ",
+      "alt": "BullValue ターミナルのデモ",
       "caption2": "ライブ価格、ウォッチリスト、決算カレンダー — すべて⌘Kひとつで。",
       "caption3": "無料で、1分以内に使い始められる。"
     },
@@ -98,7 +98,7 @@
       }
     },
     "tour": {
-      "alt": "BullVision の機能ツアー"
+      "alt": "BullValue の機能ツアー"
     },
     "bento": {
       "title": "すべてをひとつのターミナルに。",
@@ -229,7 +229,7 @@
   },
   "register": {
     "title": "アカウント作成",
-    "subtitle": "BullVisionに参加しましょう。",
+    "subtitle": "BullValueに参加しましょう。",
     "nameLabel": "名前",
     "namePlaceholder": "あなたの名前",
     "emailLabel": "メールアドレス",
@@ -375,7 +375,7 @@
       "title": "おすすめ"
     },
     "landing": {
-      "title": "BullVision",
+      "title": "BullValue",
       "description": "企業を検索して開始してください。",
       "testExample": "例を試す",
       "createAccount": "無料アカウント作成"

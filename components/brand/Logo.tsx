@@ -21,7 +21,7 @@ interface LogoProps {
 }
 
 /**
- * BullVision logo lockup — gold bull mark + wordmark ("Bull" neutral, "Vision"
+ * BullValue logo lockup — gold bull mark + wordmark ("Bull" neutral, "Value"
  * gold). Single source of truth in `lib/brand.ts`.
  */
 export function Logo({

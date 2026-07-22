@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { JetBrains_Mono } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { PulseTracker } from "@/components/pulse/PulseTracker";
@@ -18,10 +18,10 @@ const scotchDisplay = localFont({
   display: "swap",
   preload: false,
   src: [
-    { path: "../public/fonts/scotch-display/ScotchDisplay-SemiBold.ttf", weight: "600", style: "normal" },
-    { path: "../public/fonts/scotch-display/ScotchDisplay-SemiBoldItalic.ttf", weight: "600", style: "italic" },
-    { path: "../public/fonts/scotch-display/ScotchDisplay-Bold.ttf", weight: "700", style: "normal" },
-    { path: "../public/fonts/scotch-display/ScotchDisplay-BoldItalic.ttf", weight: "700", style: "italic" },
+    { path: "../../public/fonts/scotch-display/ScotchDisplay-SemiBold.ttf", weight: "600", style: "normal" },
+    { path: "../../public/fonts/scotch-display/ScotchDisplay-SemiBoldItalic.ttf", weight: "600", style: "italic" },
+    { path: "../../public/fonts/scotch-display/ScotchDisplay-Bold.ttf", weight: "700", style: "normal" },
+    { path: "../../public/fonts/scotch-display/ScotchDisplay-BoldItalic.ttf", weight: "700", style: "italic" },
   ],
 });
 
@@ -33,18 +33,18 @@ const sfUIText = localFont({
   display: "swap",
   preload: true,
   src: [
-    { path: "../public/fonts/sf-ui-text/SFUIText-Light.woff2", weight: "300", style: "normal" },
-    { path: "../public/fonts/sf-ui-text/SFUIText-LightItalic.woff2", weight: "300", style: "italic" },
-    { path: "../public/fonts/sf-ui-text/SFUIText-Regular.woff2", weight: "400", style: "normal" },
-    { path: "../public/fonts/sf-ui-text/SFUIText-RegularItalic.woff2", weight: "400", style: "italic" },
-    { path: "../public/fonts/sf-ui-text/SFUIText-Medium.woff2", weight: "500", style: "normal" },
-    { path: "../public/fonts/sf-ui-text/SFUIText-MediumItalic.woff2", weight: "500", style: "italic" },
-    { path: "../public/fonts/sf-ui-text/SFUIText-Semibold.woff2", weight: "600", style: "normal" },
-    { path: "../public/fonts/sf-ui-text/SFUIText-SemiboldItalic.woff2", weight: "600", style: "italic" },
-    { path: "../public/fonts/sf-ui-text/SFUIText-Bold.woff2", weight: "700", style: "normal" },
-    { path: "../public/fonts/sf-ui-text/SFUIText-BoldItalic.woff2", weight: "700", style: "italic" },
-    { path: "../public/fonts/sf-ui-text/SFUIText-Heavy.woff2", weight: "800", style: "normal" },
-    { path: "../public/fonts/sf-ui-text/SFUIText-HeavyItalic.woff2", weight: "800", style: "italic" },
+    { path: "../../public/fonts/sf-ui-text/SFUIText-Light.woff2", weight: "300", style: "normal" },
+    { path: "../../public/fonts/sf-ui-text/SFUIText-LightItalic.woff2", weight: "300", style: "italic" },
+    { path: "../../public/fonts/sf-ui-text/SFUIText-Regular.woff2", weight: "400", style: "normal" },
+    { path: "../../public/fonts/sf-ui-text/SFUIText-RegularItalic.woff2", weight: "400", style: "italic" },
+    { path: "../../public/fonts/sf-ui-text/SFUIText-Medium.woff2", weight: "500", style: "normal" },
+    { path: "../../public/fonts/sf-ui-text/SFUIText-MediumItalic.woff2", weight: "500", style: "italic" },
+    { path: "../../public/fonts/sf-ui-text/SFUIText-Semibold.woff2", weight: "600", style: "normal" },
+    { path: "../../public/fonts/sf-ui-text/SFUIText-SemiboldItalic.woff2", weight: "600", style: "italic" },
+    { path: "../../public/fonts/sf-ui-text/SFUIText-Bold.woff2", weight: "700", style: "normal" },
+    { path: "../../public/fonts/sf-ui-text/SFUIText-BoldItalic.woff2", weight: "700", style: "italic" },
+    { path: "../../public/fonts/sf-ui-text/SFUIText-Heavy.woff2", weight: "800", style: "normal" },
+    { path: "../../public/fonts/sf-ui-text/SFUIText-HeavyItalic.woff2", weight: "800", style: "italic" },
   ],
 });
 

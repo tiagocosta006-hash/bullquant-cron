@@ -1,11 +1,11 @@
-# Features Roadmap Evaluation — Bull Metrics
+# Features Roadmap Evaluation — BullVision
 
 > Audit date: 2026-07-02 · Inputs: `docs/feature-ideas.md` (10 ideas), team proposals (Community layer, Pro AI Analyst per `docs/pro-features-roadmap.md`), current schema and data-pipeline state.
 > Verdicts are decisive by design. Index at [AUDIT-INDEX.md](AUDIT-INDEX.md).
 
 ## The one constraint that orders everything
 
-Two features on this list (Real Screener, Bull Metrics Score) and half the value of a third (Valuation Bands) are **downstream of ingestion data quality**. CLAUDE.md §10 already admits "revenues com tags XBRL erradas" blocks real screening. Any feature that computes across *all 500 companies* amplifies bad data into visible nonsense; features scoped to *one company at a time* let a human sanity-check the chart. That is why per-company features rank first below, and why "fix ingestion data quality" appears as a prerequisite row even though it is not a feature.
+Two features on this list (Real Screener, BullVision Score) and half the value of a third (Valuation Bands) are **downstream of ingestion data quality**. CLAUDE.md §10 already admits "revenues com tags XBRL erradas" blocks real screening. Any feature that computes across *all 500 companies* amplifies bad data into visible nonsense; features scoped to *one company at a time* let a human sanity-check the chart. That is why per-company features rank first below, and why "fix ingestion data quality" appears as a prerequisite row even though it is not a feature.
 
 The second structural fact: **there is no billing**. `User.plan` exists, but nothing sells PRO (the only plan mutation is the dev-only toggle — see security report S10). Every "Pro" feature has Stripe (or equivalent) as a hidden prerequisite.
 
@@ -17,7 +17,7 @@ The second structural fact: **there is no billing**. `User.plan` exists, but not
 | 2 | **Buyback Tracker** | ★★ | S | ✅ `sharesOutstanding` trend | Free | none | none — bundle with #1 |
 | 3 | **Valuation History Bands** | ★★★ | M | ✅ `prices` × `fundamentals` | Free | none (optional cache table later) | none — build next |
 | 4 | *(infra)* Ingestion data-quality fix + backfill | — enabler — | M | — | — | none | none — run in parallel with #1–3 |
-| 5 | **Bull Metrics Score** | ★★★ | M | ✅ pure calc off `fundamentals` | Free (marketing hook) | optional `Company.bullScore` cache column | #4 — a signature score on bad data burns the brand once |
+| 5 | **BullVision Score** | ★★★ | M | ✅ pure calc off `fundamentals` | Free (marketing hook) | optional `Company.bullScore` cache column | #4 — a signature score on bad data burns the brand once |
 | 6 | **Real Screener** | ★★★ | M (not L — half-built) | ⚠️ blocked by data quality | Free basic / Pro advanced filters | indexes only (see [db-optimization.md](db-optimization.md)) | #4; `/api/screener/route.ts` already does sector/margin/ROIC/earnings-yield |
 | 7 | **Thesis Journal** | ★★ | S | n/a (user content) | Free (3 notes) / Pro unlimited | new `Thesis` model | none — gap-week feature |
 | 8 | **Watchlist Alerts** | ★★★ | L | ✅ + needs email + cron | Pro (Free: 1 alert) | `Alert` model | email provider (Resend); GitHub Actions cron exists as pattern |
@@ -30,7 +30,7 @@ The second structural fact: **there is no billing**. `User.plan` exists, but not
 ## Verdicts in one line each
 
 - **Build now (this month):** Dividend Safety, Buyback Tracker, Valuation Bands — all data is already in PostgreSQL, all are per-company (data-quality safe), all are S/M effort, and together they complete the "10 years of visual fundamentals" promise that is the product's core pitch.
-- **Build after the data fix:** Bull Metrics Score, Real Screener.
+- **Build after the data fix:** BullVision Score, Real Screener.
 - **Build for v1 monetization:** Watchlist Alerts, then Pro AI Analyst (with Filing Summaries as its retrieval layer) — in that order, because Alerts creates the retention habit that makes a Pro subscription defensible before the flashier AI ships.
 - **Deprioritize:** Peer Comparison (v1 tail), 13F (v2), Thesis Journal (whenever a small win is needed).
 - **Reject as an in-app feature:** Community layer.
@@ -52,9 +52,9 @@ The second structural fact: **there is no billing**. `User.plan` exists, but not
 **How:** Server-side computation joining `prices` (already `(ticker,date)`-indexed) with quarterly `fundamentals` stepped forward per period; ~2.5k price rows × lookup per ticker is cheap. Cache the computed series with `unstable_cache` 24h. No schema change; if it later proves hot, add a `valuation_daily` cache table — not before.
 **Effort:** ~1 week including TTM-alignment subtleties (use the same TTM logic FinancialsEngine already has). **Trap to avoid:** mixing fiscal-period boundaries — off-by-one-quarter makes bands visibly wrong for anyone who checks against Qualtrim.
 
-### 3. Bull Metrics Score — after the data fix, and rename it
+### 3. BullVision Score — after the data fix, and rename it
 
-**What:** Composite 0–100 from five pillars (ROIC consistency, margin stability, FCF positivity streak, dilution trend, balance-sheet strength), shown as a gold dial on every stock page — the signature, ownable metric. `docs/feature-ideas.md:19` still calls it "BullVision Score"; it is the **Bull Metrics Score** (see frontend report F1).
+**What:** Composite 0–100 from five pillars (ROIC consistency, margin stability, FCF positivity streak, dilution trend, balance-sheet strength), shown as a gold dial on every stock page — the signature, ownable metric. `docs/feature-ideas.md:19` still calls it "BullVision Score"; it is the **BullVision Score** (see frontend report F1).
 **Why gated:** A score is a *claim*. One viral screenshot of "Score 92" on a company with garbage revenue data (the known XBRL tag problem) costs more credibility than the feature earns. Fix ingestion, backfill, spot-check 50 companies, then ship.
 **How:** Pure functions in `lib/finance/score.ts` (per CLAUDE.md §7 — testable, no UI). Compute at page load from the fundamentals already fetched; add a nightly-computed `Company.bullScore` column only when the screener needs to sort by it.
 **Effort:** 1 week calc+UI, plus the methodology doc — publish the formula openly; transparency is the moat against "black box score" criticism.
@@ -105,4 +105,4 @@ Credits ride on the existing `AIUsageLog` pattern: N messages/month on Pro, hard
 3. **The strategic goal is already served cheaper.** `docs/01-visao.md` identifies the real need: convert Bullocracy's cold TikTok reach into a captive audience. A Discord + newsletter + "analyses become videos" flywheel does that with zero code, and the docs already propose exactly this.
 4. **What to build instead, in-app:** the **Thesis Journal (#7)** — private notes are the single-player seed of community. If v2 validates demand, "publish thesis" becomes the bridge, built on data about what users actually write.
 
-Revisit as its own project ("Bullocracy Community") only after Bull Metrics has paying users and an admin/moderation capability exists.
+Revisit as its own project ("Bullocracy Community") only after BullVision has paying users and an admin/moderation capability exists.

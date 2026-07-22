@@ -25,7 +25,7 @@ export async function generateMetadata({
   })
 
   if (!analysis || !analysis.isPublic) {
-    return { title: "Análise não encontrada | BullValue" }
+    return { title: "Análise não encontrada | BullVision" }
   }
 
   const ticker = analysis.company.ticker
@@ -136,7 +136,7 @@ export default async function PublicDcfPage({
       <div className="glass rounded-3xl p-8 text-center flex flex-col items-center gap-4 w-full">
         <h2 className="text-xl font-bold">Cria as tuas próprias análises</h2>
         <p className="text-muted-foreground max-w-[40ch] text-sm">
-          A BullValue permite-te aceder a 10 anos de dados financeiros da SEC e calcular modelos DCF em segundos.
+          A BullVision permite-te aceder a 10 anos de dados financeiros da SEC e calcular modelos DCF em segundos.
         </p>
         <Link
           href="/register"

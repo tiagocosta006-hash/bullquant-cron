@@ -36,7 +36,7 @@
     },
     "showcase": {
       "caption": "Ten years of fundamentals, DCF and AI Brief, one terminal, no spreadsheets.",
-      "alt": "Bull Metrics terminal demo",
+      "alt": "BullVision terminal demo",
       "caption2": "Live prices, watchlist and earnings calendar, all one ⌘K away.",
       "caption3": "Free, and ready in under a minute.",
       "live": "Live",
@@ -98,7 +98,7 @@
       }
     },
     "tour": {
-      "alt": "A tour of Bull Metrics features"
+      "alt": "A tour of BullVision features"
     },
     "bento": {
       "title": "Everything in one terminal.",
@@ -156,7 +156,7 @@
     "about": {
       "eyebrow": "Bullocracy",
       "title": "Made in Portugal, by investors.",
-      "p1": "Bull Metrics was born from a simple frustration: there was no serious fundamental analysis platform in Portuguese. Tools were either expensive, English-only, or noise disguised as analysis.",
+      "p1": "BullVision was born from a simple frustration: there was no serious fundamental analysis platform in Portuguese. Tools were either expensive, English-only, or noise disguised as analysis.",
       "p2": "We are Bullocracy, a small team that believes Portuguese financial literacy deserves better than social media tips. That's why the essentials are free: SEC data, proper DCF and zero buy calls."
     },
     "faq": {
@@ -166,7 +166,7 @@
       "q2": "Where does the data come from?",
       "a2": "Fundamentals straight from SEC EDGAR (official 10-K and 10-Q filings) and prices from Polygon. No scrapers, no dubious sources.",
       "q3": "Is this financial advice?",
-      "a3": "No. Bull Metrics is an analysis and education tool. No value, metric or insight is a recommendation to buy or sell. Decisions are always yours.",
+      "a3": "No. BullVision is an analysis and education tool. No value, metric or insight is a recommendation to buy or sell. Decisions are always yours.",
       "q4": "Which companies are available?",
       "a4": "The 500 companies of the S&P 500 at launch. European coverage (including Euronext Lisbon) is on the roadmap.",
       "q5": "Do the numbers match official filings?",
@@ -268,7 +268,7 @@
     "analytics": "Pulse"
   },
   "login": {
-    "title": "Sign in to BullValue",
+    "title": "Sign in to BullVision",
     "subtitle": "Access your portfolio and analytics.",
     "emailLabel": "Email",
     "emailPlaceholder": "name@email.com",
@@ -283,7 +283,7 @@
   },
   "register": {
     "title": "Create Account",
-    "subtitle": "Join BullValue..",
+    "subtitle": "Join BullVision.",
     "nameLabel": "Name",
     "namePlaceholder": "Your name",
     "emailLabel": "Email",
@@ -356,7 +356,7 @@
       "namePlaceholder": "How you want to be called",
       "save": "Save Changes",
       "dangerZone": "Danger Zone",
-      "logoutDesc": "Securely sign out of your BullValue session.",
+      "logoutDesc": "Securely sign out of your BullVision session.",
       "logoutBtn": "Sign Out",
       "securityTitle": "Security",
       "currentPassword": "Current Password",
@@ -378,7 +378,7 @@
     "preferences": {
       "title": "App Preferences",
       "language": "Interface Language",
-      "languageDesc": "Choose the language you want to use in BullValue.",
+      "languageDesc": "Choose the language you want to use in BullVision.",
       "theme": "Visual Theme",
       "themeDesc": "Switch between Dark and Light mode.",
       "themeLight": "Light",
@@ -433,7 +433,7 @@
       "exploreMore": "Explore businesses by sector and business type"
     },
     "landing": {
-      "title": "BullValue",
+      "title": "BullVision",
       "description": "Search for a company ticker in the top bar to get started, or sign up to access your Watchlist.",
       "testExample": "Try Example",
       "createAccount": "Create Free Account"
@@ -929,7 +929,7 @@
     "about": "About Us"
   },
   "cookieConsent": {
-    "text": "We use cookies exclusively to understand how you use BullValue and improve your experience. Do you accept their use?",
+    "text": "We use cookies exclusively to understand how you use BullVision and improve your experience. Do you accept their use?",
     "accept": "Accept All",
     "decline": "Decline"
   },
@@ -1082,14 +1082,14 @@
     "badge": "Our Mission",
     "title": "Democratizing access to financial <italic>data.</italic>",
     "titlePlain": "Democratizing access to financial data.",
-    "intro": "BullValue is a fundamental data analysis platform designed for all types of investors.",
+    "intro": "BullVision is a fundamental data analysis platform designed for all types of investors.",
     "problem": {
       "title": "Our Goal",
       "text": "To give the individual investor easy, structured, and transparent access to corporate financial statements. By automating the extraction of complex SEC reports, we free up your time for what really matters: value analysis."
     },
     "organization": {
       "title": "The Bullocracy",
-      "text": "BullValue is built by The Bullocracy, an organization of young students seeking to democratize access to knowledge about Politics, Economics, and Investments. To achieve this, they create content on social media, from YouTube to TikTok, fostering a space for our community to write articles and opinions to be published online, on the website thebullocracy.com, where they stimulate free debate and financial literacy.",
+      "text": "BullVision is built by The Bullocracy, an organization of young students seeking to democratize access to knowledge about Politics, Economics, and Investments. To achieve this, they create content on social media, from YouTube to TikTok, fostering a space for our community to write articles and opinions to be published online, on the website thebullocracy.com, where they stimulate free debate and financial literacy.",
       "cta": "Visit thebullocracy.com"
     },
     "team": {
@@ -1099,7 +1099,7 @@
         {
           "name": "Rodrigo Martins",
           "role": "Co-Founder & Web Analyst",
-          "bio": "Economics student at the University of Minho. Responsible for marketing strategy, site indexing, SEO, analytics metrics, and overall platform performance optimization, as well as the integration of BullValue into Bullocracy's content.",
+          "bio": "Economics student at the University of Minho. Responsible for marketing strategy, site indexing, SEO, analytics metrics, and overall platform performance optimization, as well as the integration of BullVision into Bullocracy's content.",
           "socials": {
             "linkedin": "https://www.linkedin.com/in/rodrigo-teixeira-martins/",
             "instagram": "#",
@@ -1130,7 +1130,7 @@
     },
     "philosophy": {
       "title": "Data Philosophy",
-      "text": "Our analysis is based on mathematics and official reports extracted directly from the SEC. BullValue focuses on the solidity of numbers. We believe that financial decisions require clean data, technical precision, and transparency, characteristics we value deeply at BullValue."
+      "text": "Our analysis is based on mathematics and official reports extracted directly from the SEC. BullVision focuses on the solidity of numbers. We believe that financial decisions require clean data, technical precision, and transparency, characteristics we value deeply at BullVision."
     },
     "contact": {
       "title": "Official Contacts",

@@ -62,7 +62,7 @@ export const metadata: Metadata = {
   description:
     "Análise fundamental de ações com 10 anos de dados, DCF integrada e AI Insights. Em português, gratuito. Uma plataforma Bullocracy.",
   keywords: [
-    "BullValue",
+    "BullVision",
     "análise fundamental de ações",
     "calculadora DCF",
     "value investing",

@@ -1,7 +1,7 @@
-# Bull Metrics — Design & Front-end Handoff
+# BullVision — Design & Front-end Handoff
 
 > **Para o Costa (e o Claude dele).** Este ficheiro é o *design system* completo da
-> plataforma Bull Metrics, extraído do código real (não é teoria). Dá-o ao teu Claude
+> plataforma BullVision, extraído do código real (não é teoria). Dá-o ao teu Claude
 > e pede-lhe para continuar QUALQUER página nova (ex: pricing) neste mesmo sistema.
 > Tudo aqui é copy-paste — tokens, tipografia, material, movimento e as regras que
 > não se quebram. Se seguires isto, o que fizeres vai encaixar sem retrabalho.
@@ -262,4 +262,4 @@ Classes utilitárias (já em `globals.css`):
 
 ---
 
-*Extraído do código real de Bull Metrics em 2026-07-20. Uma plataforma Bullocracy.*
+*Extraído do código real de BullVision em 2026-07-20. Uma plataforma Bullocracy.*

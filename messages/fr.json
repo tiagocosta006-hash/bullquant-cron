@@ -36,7 +36,7 @@
     },
     "showcase": {
       "caption": "Dix ans de fondamentaux, DCF et AI Brief — dans un seul terminal, sans tableurs.",
-      "alt": "Démonstration du terminal BullVision",
+      "alt": "Démonstration du terminal BullValue",
       "caption2": "Prix en direct, watchlist et calendrier des résultats — à un ⌘K.",
       "caption3": "Gratuit, et prêt en moins d'une minute."
     },
@@ -98,7 +98,7 @@
       }
     },
     "tour": {
-      "alt": "Un tour des fonctionnalités de BullVision"
+      "alt": "Un tour des fonctionnalités de BullValue"
     },
     "bento": {
       "title": "Tout dans un seul terminal.",
@@ -229,7 +229,7 @@
   },
   "register": {
     "title": "Créer un Compte",
-    "subtitle": "Rejoignez BullVision.",
+    "subtitle": "Rejoignez BullValue.",
     "nameLabel": "Nom",
     "namePlaceholder": "Votre nom",
     "emailLabel": "Email",
@@ -375,7 +375,7 @@
       "title": "Suggestions"
     },
     "landing": {
-      "title": "BullVision",
+      "title": "BullValue",
       "description": "Cherchez une entreprise pour commencer.",
       "testExample": "Essayer l'Exemple",
       "createAccount": "Créer un Compte"

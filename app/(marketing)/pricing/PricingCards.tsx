@@ -79,7 +79,7 @@ export function PricingCards({ userEmail, userId }: PricingCardsProps = {}) {
       customer: userEmail ? { email: userEmail } : undefined,
       customData: userId ? { userId } : undefined,
       settings: {
-        successUrl: "https://thebullvision.com/dashboard",
+        successUrl: "https://thebullvalue.com/dashboard",
       }
     });
   };

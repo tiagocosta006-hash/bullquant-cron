@@ -68,7 +68,7 @@ export default async function Image() {
               lineHeight: 1,
             }}
           >
-            Vision
+            Value
           </span>
         </div>
 
@@ -113,7 +113,7 @@ export default async function Image() {
           }}
         >
           <span style={{ fontSize: 18, color: '#3d3929', fontWeight: 500 }}>
-            thebullvision.com
+            thebullvalue.com
           </span>
           <div
             style={{

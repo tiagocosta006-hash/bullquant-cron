@@ -47,17 +47,35 @@ const sfUIText = localFont({
   ],
 });
 
+import { headers } from "next/headers";
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
+  
+  // Obter o pathname real injetado pelo middleware
+  const headersList = await headers();
+  const fullPathname = headersList.get("x-pathname") || "/";
+  
+  // Remover o locale do pathname para termos a rota limpa (ex: "/pt/stock/AAPL" -> "/stock/AAPL")
+  const pathWithoutLocale = fullPathname.replace(new RegExp(`^/(${routing.locales.join('|')})(/|$)`), '/');
+  
+  // Limpar barras duplas no caso do path base ser apenas '/'
+  const cleanPath = pathWithoutLocale === '/' ? '' : (pathWithoutLocale.startsWith('/') ? pathWithoutLocale : `/${pathWithoutLocale}`);
 
   const languages: Record<string, string> = {};
   routing.locales.forEach((l) => {
-    languages[l] = l === routing.defaultLocale ? "/" : `/${l}`;
+    // Se for o default locale e tivermos 'as-needed' configurado, a rota base não tem o prefixo do locale
+    const prefix = (l === routing.defaultLocale && routing.localePrefix === 'as-needed') ? "" : `/${l}`;
+    languages[l] = `${prefix}${cleanPath}` || "/";
   });
+
+  // O Canonical principal vai ser a rota do default locale (Inglês) se não tiver prefixo
+  const currentPrefix = (locale === routing.defaultLocale && routing.localePrefix === 'as-needed') ? "" : `/${locale}`;
+  const canonicalPath = `${currentPrefix}${cleanPath}` || "/";
 
   return {
     metadataBase: new URL(BRAND.siteUrl),
@@ -88,7 +106,7 @@ export async function generateMetadata({
       },
     },
     alternates: {
-      canonical: BRAND.siteUrl,
+      canonical: canonicalPath,
       languages,
     },
     openGraph: {

@@ -73,6 +73,9 @@ export async function middleware(request: NextRequest) {
     intlResponse.cookies.set(cookie.name, cookie.value, cookie)
   })
 
+  // Injetar o pathname atual nos headers para a geração dinâmica de SEO (canonicals e hreflang)
+  intlResponse.headers.set('x-pathname', pathname)
+
   return intlResponse
 }
 

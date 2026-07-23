@@ -194,7 +194,12 @@
       "eyebrow": "Bullocracy",
       "title": "Feito em Portugal, por investidores.",
       "p1": "A BullValue nasceu de uma frustração simples: não existia nenhuma plataforma séria de análise fundamental em português. Ferramentas ou eram caras, ou eram em inglês, ou eram ruído disfarçado de análise.",
-      "p2": "Somos a Bullocracy, uma equipa pequena que acredita que a literacia financeira portuguesa merece melhor do que dicas de rede social. Por isso o essencial é gratuito: dados da SEC, DCF a sério e zero conselhos de compra."
+      "p2": "Somos a Bullocracy, uma equipa pequena que acredita que a literacia financeira portuguesa merece melhor do que dicas de rede social. Por isso o essencial é gratuito: dados da SEC, DCF a sério e zero conselhos de compra.",
+      "team": {
+        "role1": "Co-Founder & Web Analyst",
+        "role2": "Co-Founder & Product Owner",
+        "role3": "Lead Developer & UI/UX Designer"
+      }
     },
     "faq": {
       "title": "Perguntas frequentes",

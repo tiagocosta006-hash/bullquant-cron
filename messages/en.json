@@ -193,7 +193,12 @@
       "eyebrow": "Bullocracy",
       "title": "Made in Portugal, by investors.",
       "p1": "BullValue was born from a simple frustration: there was no serious fundamental analysis platform in Portuguese. Tools were either expensive, English-only, or noise disguised as analysis.",
-      "p2": "We are Bullocracy, a small team that believes Portuguese financial literacy deserves better than social media tips. That's why the essentials are free: SEC data, proper DCF and zero buy calls."
+      "p2": "We are Bullocracy, a small team that believes Portuguese financial literacy deserves better than social media tips. That's why the essentials are free: SEC data, proper DCF and zero buy calls.",
+      "team": {
+        "role1": "Co-Founder & Web Analyst",
+        "role2": "Co-Founder & Product Owner",
+        "role3": "Lead Developer & UI/UX Designer"
+      }
     },
     "faq": {
       "title": "Frequently asked questions",

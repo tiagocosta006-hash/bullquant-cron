@@ -164,7 +164,18 @@
       "quarters": "trimestres de données",
       "free": "avec le plan gratuit"
     },
-    "peekCta": "Regarder sans compte"
+    "peekCta": "Regarder sans compte",
+    "about": {
+      "eyebrow": "Bullocracy",
+      "title": "Fait au Portugal, par des investisseurs.",
+      "p1": "BullValue est né d'une frustration simple : il n'existait aucune plateforme sérieuse d'analyse fondamentale en portugais. Les outils étaient soit chers, soit uniquement en anglais, soit du bruit déguisé en analyse.",
+      "p2": "Nous sommes Bullocracy, une petite équipe qui pense que l'éducation financière portugaise mérite mieux que des conseils de réseaux sociaux. C'est pourquoi l'essentiel est gratuit : données de la SEC, DCF sérieux et zéro conseil d'achat.",
+      "team": {
+        "role1": "Co-Founder & Web Analyst",
+        "role2": "Co-Founder & Product Owner",
+        "role3": "Lead Developer & UI/UX Designer"
+      }
+    }
   },
   "insider": {
     "title": "Délit d'initié (Insider Trading)",

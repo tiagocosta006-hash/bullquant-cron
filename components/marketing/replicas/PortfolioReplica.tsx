@@ -53,36 +53,42 @@ export function PortfolioReplica({
 
   return (
     <div className="mt-5 space-y-3">
-      {/* summary — cópia fiel de PortfolioSummary.tsx */}
+      {/* summary — cópia fiel de PortfolioSummary.tsx.
+          2 colunas SEMPRE (não sm:grid-cols-4): o `sm:` dispara com o viewport,
+          mas este cartão é meia-largura de um max-w-6xl — sobravam ~105px por
+          coluna e os montantes partiam ("48 219,40" com o $ na linha de baixo).
+          A página real também está a 2 colunas enquanto é estreita. */}
       <div className="glass rounded-2xl p-4">
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-3">
           <div>
             <p className="mb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
               {labels.marketValue}
             </p>
-            <p className="nums text-lg font-extrabold tracking-tight">48 219,40 $</p>
-          </div>
-          <div>
-            <p className="mb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-              {labels.totalPnl}
-            </p>
-            <p className="nums flex items-center gap-1 text-lg font-extrabold tracking-tight text-bull">
-              <TrendingUp className="h-4 w-4" />
-              +3 812,10 $
-            </p>
+            <p className="nums whitespace-nowrap text-lg font-extrabold tracking-tight">48 219,40 $</p>
           </div>
           <div>
             <p className="mb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
               {labels.positions}
             </p>
-            <p className="nums text-lg font-extrabold tracking-tight">12</p>
+            <p className="nums whitespace-nowrap text-lg font-extrabold tracking-tight">12</p>
+          </div>
+          <div>
+            <p className="mb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+              {labels.totalPnl}
+            </p>
+            {/* a % entre parênteses existe no PortfolioSummary real e faltava aqui */}
+            <p className="nums flex items-center gap-1 whitespace-nowrap text-lg font-extrabold tracking-tight text-bull">
+              <TrendingUp className="h-4 w-4 shrink-0" />
+              +3 812,10 $
+              <span className="text-xs font-semibold opacity-80">(+8,6%)</span>
+            </p>
           </div>
           <div>
             <p className="mb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
               {labels.upToday}
             </p>
-            <p className="nums flex items-center gap-1 text-lg font-extrabold tracking-tight text-bull">
-              <TrendingUp className="h-4 w-4" /> 8
+            <p className="nums flex items-center gap-1 whitespace-nowrap text-lg font-extrabold tracking-tight text-bull">
+              <TrendingUp className="h-4 w-4 shrink-0" /> 8
             </p>
           </div>
         </div>

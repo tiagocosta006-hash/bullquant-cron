@@ -164,7 +164,18 @@
       "quarters": "个季度的数据",
       "free": "免费方案"
     },
-    "peekCta": "无需注册先看看"
+    "peekCta": "无需注册先看看",
+    "about": {
+      "eyebrow": "Bullocracy",
+      "title": "由投资者在葡萄牙打造。",
+      "p1": "BullValue 源于一个简单的挫折：没有一个像样的葡萄牙语基本面分析平台。工具要么昂贵，要么只有英文，要么只是伪装成分析的噪音。",
+      "p2": "我们是 Bullocracy，一个小团队，相信葡萄牙的金融素养值得比社交媒体贴士更好的东西。因此核心功能免费：SEC 数据、真正的 DCF，以及零买入建议。",
+      "team": {
+        "role1": "Co-Founder & Web Analyst",
+        "role2": "Co-Founder & Product Owner",
+        "role3": "Lead Developer & UI/UX Designer"
+      }
+    }
   },
   "insider": {
     "title": "内部交易",

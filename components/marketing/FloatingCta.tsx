@@ -154,8 +154,16 @@ export function FloatingCta({
               gsap.set(morph, { x: dx * p, y: dy * p, scale: 1 + (scaleRatio - 1) * p });
               outer.style.opacity =
                 p <= FADE_START ? "1" : String(Math.max(0, 1 - (p - FADE_START) / (1 - FADE_START)));
+              // Assim que começa a desvanecer, a pill já está pousada por cima do
+              // CTA final — e `opacity: 0` NÃO desliga o rato. Sem isto ficava um
+              // fantasma invisível a roubar o hover/clique dos dois botões reais
+              // (o .floating-cta-in mantém pointer-events: auto, e o observer que
+              // o desligava só é registado em reduced-motion). Bug real: o hover
+              // dos CTAs finais acendia e apagava ao mexer o rato.
+              outer.style.pointerEvents = p > FADE_START ? "none" : "";
             } else {
               outer.style.opacity = "";
+              outer.style.pointerEvents = "";
               gsap.set(morph, { x: 0, y: 0, scale: 1 });
             }
           },

@@ -14,6 +14,15 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
+  /* Default de TODAS as transitions do Tailwind sem duration explícita
+     (`transition-colors`, `transition-all`… — 150+ sítios na app). O default
+     do Tailwind é 150ms/cubic-bezier(0.4,0,0.2,1), rápido e jerky de mais para
+     o feel que queremos. Mudar aqui suaviza a plataforma inteira de uma vez;
+     quem tem `duration-*` explícito mantém-se, e os enter/exit de dialogs
+     usam keyframes (`animate-in`), por isso não são afetados. */
+  --default-transition-duration: var(--dur-hover);
+  --default-transition-timing-function: var(--ease-hover);
+
   --font-sans: var(--font-sans);
   --font-heading: var(--font-heading);
 
@@ -105,13 +114,17 @@
 
   /* Motion — escala única de durações/easings (ver lib/motion.ts) */
   --spring: cubic-bezier(0.16, 1, 0.3, 1);
-  --dur-instant: 120ms; /* press feedback */
-  --dur-fast: 200ms;    /* hover, cor */
+  --dur-instant: 120ms; /* press feedback — tem de continuar SECO */
+  --dur-hover: 260ms;   /* hover: o default de TODAS as transitions (ver @theme) */
+  --dur-fast: 260ms;    /* hover, cor — alinhado com --dur-hover */
   --dur-base: 320ms;    /* lift, crossfades */
   --dur-slow: 600ms;    /* success moments */
   --dur-reveal: 900ms;  /* reveals de scroll */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  /* Hover: arranca suave e assenta devagar (mais "fade in" que o ease do
+     Tailwind, que arrancava a pique e dava a sensação de jerky). */
+  --ease-hover: cubic-bezier(0.4, 0.14, 0.3, 1);
 }
 
 /* ── Layer 2 · SEMANTIC (light — default) ─────────────────── */

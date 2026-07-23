@@ -164,7 +164,18 @@
       "quarters": "四半期分のデータ",
       "free": "無料プラン"
     },
-    "peekCta": "アカウントなしで見る"
+    "peekCta": "アカウントなしで見る",
+    "about": {
+      "eyebrow": "Bullocracy",
+      "title": "ポルトガルで、投資家の手によって。",
+      "p1": "BullValue は単純な不満から生まれました。ポルトガル語で本格的なファンダメンタル分析ができるプラットフォームが存在しなかったのです。ツールは高額か、英語のみか、分析を装ったノイズでした。",
+      "p2": "私たちは Bullocracy です。ポルトガルの金融リテラシーは SNS のヒントよりも良いものに値すると信じる小さなチームです。だからこそ基本は無料です。SEC のデータ、本物の DCF、そして売買推奨はゼロ。",
+      "team": {
+        "role1": "Co-Founder & Web Analyst",
+        "role2": "Co-Founder & Product Owner",
+        "role3": "Lead Developer & UI/UX Designer"
+      }
+    }
   },
   "insider": {
     "title": "インサイダー取引",

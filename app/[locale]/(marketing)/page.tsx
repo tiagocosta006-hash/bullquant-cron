@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { Link } from '@/i18n/routing';
 
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { ArrowRight, Briefcase, CalendarDays, Check, ChevronDown, LayoutDashboard, SearchCode } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
@@ -45,6 +46,14 @@ import { DynamicProPrice } from "@/components/marketing/DynamicProPrice";
  */
 
 const SITE_URL = "https://thebullvalue.com";
+
+/* Equipa mostrada na secção "Feito em Portugal" — mesmas fotos da página
+   /about (public/team/). Sem foto → iniciais, como lá. */
+const TEAM = [
+  { name: "Rodrigo Martins", roleKey: "role1", image: "/team/rodrigo.jpg", initials: "RM" },
+  { name: "Tiago Costa", roleKey: "role2", image: "/team/tiago.jpg", initials: "TC" },
+  { name: "Alexandre Machado", roleKey: "role3", image: null, initials: "AM" },
+] as const;
 
 const heroDelay = (s: number) => ({ "--hero-delay": `${s}s` }) as React.CSSProperties;
 
@@ -602,6 +611,39 @@ export default async function LandingPage({
             <span className="gold-rule mx-auto mt-8 block h-px w-24" aria-hidden />
             <p className="mt-8 text-lg leading-relaxed text-muted-foreground">{t("about.p1")}</p>
             <p className="mt-5 text-lg leading-relaxed text-muted-foreground">{t("about.p2")}</p>
+
+            {/* As caras da equipa — mesmo avatar redondo da página /about
+                (TeamMemberModal): foto com object-cover, iniciais em fallback
+                para quem ainda não tem foto em public/team/. Aqui sem modal:
+                a landing não precisa das bios, só de pôr cara ao projeto.
+                Nomes são nomes próprios → hardcoded (CLAUDE.md §7). */}
+            <ul className="mt-12 flex flex-wrap items-start justify-center gap-x-10 gap-y-8">
+              {TEAM.map((member) => (
+                <li key={member.name} className="flex w-28 flex-col items-center gap-3">
+                  <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border-4 border-background bg-secondary shadow-md">
+                    {member.image ? (
+                      <Image
+                        src={member.image}
+                        alt={member.name}
+                        fill
+                        sizes="80px"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <span className="text-lg font-semibold text-muted-foreground">
+                        {member.initials}
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold leading-tight">{member.name}</p>
+                    <p className="mt-0.5 text-[11px] leading-tight text-primary">
+                      {t(`about.team.${member.roleKey}`)}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </Reveal>
         </div>
       </section>

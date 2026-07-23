@@ -5,19 +5,32 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
-export function CookieConsent() {
+export function CookieConsent({
+  initialConsent = false,
+  showInitialBanner = false,
+}: {
+  initialConsent?: boolean;
+  showInitialBanner?: boolean;
+}) {
   const t = useTranslations("cookieConsent");
-  const [hasConsent, setHasConsent] = useState(false);
-  const [showBanner, setShowBanner] = useState(false);
+  const [hasConsent, setHasConsent] = useState(initialConsent);
+  const [showBanner, setShowBanner] = useState(showInitialBanner);
 
+  // Fallback: se o utilizador já tiver aceite via localStorage (antigo) mas o
+  // cookie ainda não existir no servidor, atualizamos o estado client-side.
   useEffect(() => {
-    const consent = localStorage.getItem("cookie_consent");
-    if (consent === "true") {
-      setHasConsent(true);
-    } else if (consent === null) {
-      setShowBanner(true);
+    if (!initialConsent && showInitialBanner) {
+      const oldConsent = localStorage.getItem("cookie_consent");
+      if (oldConsent === "true") {
+        setHasConsent(true);
+        setShowBanner(false);
+        document.cookie = "cookie_consent=true; path=/; max-age=31536000; SameSite=Lax";
+      } else if (oldConsent === "false") {
+        setShowBanner(false);
+        document.cookie = "cookie_consent=false; path=/; max-age=31536000; SameSite=Lax";
+      }
     }
-  }, []);
+  }, [initialConsent, showInitialBanner]);
 
   // Enquanto o banner está aberto no fundo do ecrã, sinaliza no <html> para a
   // landing esconder a sua pill flutuante (FloatingCta) — senão colidem
@@ -30,12 +43,14 @@ export function CookieConsent() {
 
   const accept = () => {
     localStorage.setItem("cookie_consent", "true");
+    document.cookie = "cookie_consent=true; path=/; max-age=31536000; SameSite=Lax";
     setHasConsent(true);
     setShowBanner(false);
   };
 
   const decline = () => {
     localStorage.setItem("cookie_consent", "false");
+    document.cookie = "cookie_consent=false; path=/; max-age=31536000; SameSite=Lax";
     setShowBanner(false);
   };
 

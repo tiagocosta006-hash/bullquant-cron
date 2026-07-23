@@ -9,6 +9,7 @@ import { PaddleProvider } from "@/components/providers/PaddleProvider";
 import { CookieConsent } from "@/components/layout/CookieConsent";
 import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 
 const scotchDisplay = localFont({
   variable: "--font-heading",
@@ -156,6 +157,7 @@ export default async function RootLayout({
     notFound();
   }
   const messages = await getMessages();
+  const cookieStore = await cookies();
 
   return (
     <html
@@ -180,7 +182,10 @@ export default async function RootLayout({
           <PaddleProvider>
             <main className="flex-1 flex flex-col">{children}</main>
           </PaddleProvider>
-          <CookieConsent />
+          <CookieConsent
+            initialConsent={cookieStore.get("cookie_consent")?.value === "true"}
+            showInitialBanner={cookieStore.get("cookie_consent") === undefined}
+          />
           <PulseTracker />
         </NextIntlClientProvider>
         {/* GA NÃO é montado aqui: é carregado pelo <CookieConsent> só APÓS

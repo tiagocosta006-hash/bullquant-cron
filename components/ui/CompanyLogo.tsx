@@ -3,7 +3,20 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
-import Image from "next/image"
+/**
+ * Helper para gerar o URL otimizado do Next.js sem usar o componente pesado <Image>.
+ * O componente <Image> injetado repetidas vezes (ex: marquees) destroi o Main Thread
+ * devido aos Observers nativos do React.
+ */
+function getOptimizedUrl(src: string, size: number) {
+  if (!src.startsWith('http')) return src;
+  
+  // O Next.js apenas aceita widths que estejam na lista do next.config.js (default imageSizes).
+  const sizes = [16, 32, 48, 64, 96, 128, 256, 384];
+  const nextSize = sizes.find(s => s >= size) || 256;
+  
+  return `/_next/image?url=${encodeURIComponent(src)}&w=${nextSize}&q=75`;
+}
 
 /**
  * CompanyLogo — o único sítio onde logos de empresas são renderizados.
@@ -43,11 +56,13 @@ export function CompanyLogo({
       style={{ width: size, height: size }}
     >
       {showImage ? (
-        <Image
-          src={src}
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={getOptimizedUrl(src, size)}
           alt={alt}
           width={size}
           height={size}
+          loading="lazy"
           onError={() => setErrored(true)}
           className={cn("h-full w-full object-contain p-1", imgClassName)}
         />

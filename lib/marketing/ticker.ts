@@ -47,10 +47,31 @@ const TICKERS = [
   "V",
   "MA",
   "KO",
-  "MCD",
   "DIS",
   "ADBE",
 ];
+
+export const GLOBAL_ETFS = [
+  "SPY",
+  "QQQ",
+  "DIA",
+  "IWM",
+  "FEZ",
+  "EWU",
+  "EWG",
+  "EWQ",
+  "EWJ",
+  "MCHI",
+  "INDA",
+  "EEM",
+  "GLD",
+  "USO",
+  "TLT",
+  "VNQ"
+];
+
+// Combina tudo para o fetch
+const ALL_TICKERS = [...GLOBAL_ETFS, ...TICKERS];
 
 /** Snapshot estático (dados de exemplo) — só usado sem BD utilizável. */
 const FALLBACK: TickerItem[] = [
@@ -75,7 +96,7 @@ type CompanyMeta = { name: string; logoUrl: string | null; close: number; prevCl
 
 async function fetchCompanyMeta(): Promise<Map<string, CompanyMeta>> {
   const companies = await prisma.company.findMany({
-    where: { ticker: { in: TICKERS }, isActive: true },
+    where: { ticker: { in: ALL_TICKERS } },
     select: {
       ticker: true,
       name: true,
@@ -108,8 +129,8 @@ const CHUNK_DELAY_MS = 250;
 async function fetchLiveQuotes(apiKey: string): Promise<Map<string, { price: number; changePct: number | null }>> {
   const out = new Map<string, { price: number; changePct: number | null }>();
 
-  for (let i = 0; i < TICKERS.length; i += CHUNK_SIZE) {
-    const chunk = TICKERS.slice(i, i + CHUNK_SIZE);
+  for (let i = 0; i < ALL_TICKERS.length; i += CHUNK_SIZE) {
+    const chunk = ALL_TICKERS.slice(i, i + CHUNK_SIZE);
     const settled = await Promise.allSettled(
       chunk.map(async (ticker) => {
         const res = await fetch(
@@ -133,7 +154,7 @@ async function fetchLiveQuotes(apiKey: string): Promise<Map<string, { price: num
       if (r.status === "fulfilled") out.set(r.value.ticker, { price: r.value.price, changePct: r.value.changePct });
     }
 
-    if (i + CHUNK_SIZE < TICKERS.length) {
+    if (i + CHUNK_SIZE < ALL_TICKERS.length) {
       await new Promise((resolve) => setTimeout(resolve, CHUNK_DELAY_MS));
     }
   }
@@ -154,22 +175,23 @@ async function fetchTickerItems(): Promise<TickerData> {
   if (apiKey) {
     try {
       const quotes = await fetchLiveQuotes(apiKey);
-      const items: TickerItem[] = [];
-      for (const ticker of TICKERS) {
-        const quote = quotes.get(ticker);
-        const company = meta.get(ticker);
-        if (!quote || !company) continue;
-        items.push({
-          ticker,
-          name: company.name,
-          logoUrl: company.logoUrl,
-          close: quote.price,
-          changePct: quote.changePct,
-        });
+      if (quotes.size > 0) {
+        const items: TickerItem[] = [];
+        for (const ticker of ALL_TICKERS) {
+          const quote = quotes.get(ticker);
+          const company = meta.get(ticker);
+          if (!quote || !company) continue;
+
+          items.push({
+            ticker,
+            name: company.name,
+            logoUrl: company.logoUrl,
+            close: quote.price,
+            changePct: quote.changePct,
+          });
+        }
+        return { items, live: true };
       }
-      // Só vale como "em direto" se a maioria respondeu; senão seria uma fita
-      // meia-vazia com uma legenda a prometer preços reais.
-      if (items.length >= TICKERS.length - 2) return { items, live: true };
     } catch {
       // cai para os fechos da BD
     }
@@ -177,7 +199,7 @@ async function fetchTickerItems(): Promise<TickerData> {
 
   // 2) fechos da BD (podem estar atrasados — a legenda tem de o refletir)
   const items: TickerItem[] = [];
-  for (const ticker of TICKERS) {
+  for (const ticker of ALL_TICKERS) {
     const company = meta.get(ticker);
     if (!company || company.close === 0) continue;
     items.push({

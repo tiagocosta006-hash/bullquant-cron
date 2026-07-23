@@ -156,6 +156,7 @@ export default async function StockPage({
     prisma.company.findMany({
       where: {
         isActive: true,
+        ticker: { not: { startsWith: '^' } },
         id: { not: company.id },
         ...(company.industry
           ? { industry: company.industry }
@@ -273,6 +274,7 @@ export default async function StockPage({
 
       {/* Conteúdo organizado por intenção, não por scroll infinito */}
       <StockTabs
+        isEtf={company.exchange === 'MACRO'}
         overview={
           <>
             {latestEarnings && (
@@ -296,10 +298,10 @@ export default async function StockPage({
           </>
         }
         financials={
-          <FinancialsEngine ticker={company.ticker} sector={company.sector} currencySymbol={currencySymbol} preliminary={preliminaryQuarter} />
+          company.exchange !== 'MACRO' && <FinancialsEngine ticker={company.ticker} sector={company.sector} currencySymbol={currencySymbol} preliminary={preliminaryQuarter} />
         }
         analista={
-          <StockAnalyst
+          company.exchange !== 'MACRO' && <StockAnalyst
             ticker={company.ticker}
             fundamentals={JSON.parse(JSON.stringify(historicalAnnual))}
             isPro={isPro}
@@ -308,7 +310,7 @@ export default async function StockPage({
           />
         }
         valuation={
-          <>
+          company.exchange !== 'MACRO' && <>
             <ValuationMultiples ticker={company.ticker} isPro={isPro} isLoggedIn={isLoggedIn} />
             {serializedDcfs.length > 0 ? (
               <SavedValuations
@@ -327,7 +329,7 @@ export default async function StockPage({
           </>
         }
         company={
-          <>
+          company.exchange !== 'MACRO' && <>
             <ManagementTeam ticker={company.ticker} />
             <InsiderActivity ticker={company.ticker} currencySymbol={currencySymbol} />
           </>
@@ -335,7 +337,7 @@ export default async function StockPage({
         news={<StockNews ticker={company.ticker} />}
       />
 
-      {similarCompanies.length > 0 && (
+      {company.exchange !== 'MACRO' && similarCompanies.length > 0 && (
         <div className="mt-8">
           <SimilarCompanies companies={similarCompanies} baseTicker={company.ticker} group={company.industry ?? company.sector ?? ''} />
         </div>

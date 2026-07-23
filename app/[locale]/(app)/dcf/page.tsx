@@ -3,8 +3,14 @@ import { Calculator, Info } from "lucide-react"
 import { DcfCalculator } from "@/components/dcf/DcfCalculator"
 import { PageHeader, InfoNote } from "@/components/layout/PageHeader"
 
-export default async function DcfPage() {
+export default async function DcfPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ ticker?: string }>
+}) {
   const t = await getTranslations("dcf")
+  const resolvedParams = await searchParams
+  const defaultTicker = resolvedParams.ticker
 
   return (
     <div className="space-y-6">
@@ -16,7 +22,7 @@ export default async function DcfPage() {
 
       <InfoNote icon={<Info className="h-5 w-5" />}>{t("educationalWarning")}</InfoNote>
 
-      <DcfCalculator />
+      <DcfCalculator defaultTicker={defaultTicker} />
     </div>
   )
 }

@@ -29,7 +29,7 @@ import { ScrollShowcase } from "@/components/marketing/ScrollShowcase";
 import { TerminalMock } from "@/components/marketing/TerminalMock";
 import { TickerMarquee } from "@/components/marketing/TickerMarquee";
 import { BRAND } from "@/lib/brand";
-import { getTickerItems } from "@/lib/marketing/ticker";
+import { getTickerItems, GLOBAL_ETFS } from "@/lib/marketing/ticker";
 import { getUser } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 import { DynamicProPrice } from "@/components/marketing/DynamicProPrice";
@@ -280,13 +280,18 @@ export default async function LandingPage({
 
         {/* fita de terminal full-bleed (fora do HeroStage — plano próprio) */}
         <div
-          className="hero-in -mx-6 border-y border-border/50 bg-card/40 md:-mx-8"
+          className="hero-in flex flex-col -mx-6 border-y border-border/50 bg-card/40 md:-mx-8"
           style={heroDelay(0.5)}
         >
           {/* legenda acompanha a fonte real dos dados — nunca prometer
               "em direto" quando são fechos da BD (e vice-versa) */}
           <TickerMarquee
-            items={ticker.items}
+            items={ticker.items.filter(i => GLOBAL_ETFS.includes(i.ticker))}
+            label={ticker.live ? t("ticker.labelLive") : t("ticker.label")}
+          />
+          <div className="h-px w-full bg-border/50" />
+          <TickerMarquee
+            items={ticker.items.filter(i => !GLOBAL_ETFS.includes(i.ticker))}
             label={ticker.live ? t("ticker.labelLive") : t("ticker.label")}
           />
         </div>

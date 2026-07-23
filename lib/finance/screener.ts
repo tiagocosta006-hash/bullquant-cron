@@ -31,13 +31,15 @@ export type ScreenerCategory =
   | "sp500"
   | "marketCap"
   | "gainers"
-  | "losers";
+  | "losers"
+  | "etfs";
 
 export const SCREENER_CATEGORIES: ScreenerCategory[] = [
   "marketCap",
   "gainers",
   "losers",
   "sp500",
+  "etfs",
 ];
 
 export const DEFAULT_CATEGORY: ScreenerCategory = "marketCap";
@@ -94,8 +96,12 @@ async function queryCompanies(
   limit: number,
   offset: number,
   sector?: string,
+  isEtf?: boolean,
 ): Promise<{ rows: RawRow[] }> {
   const sectorFilter = sector ? Prisma.sql`AND c.sector = ${sector}` : Prisma.empty;
+  const etfFilter = isEtf 
+    ? Prisma.sql`AND c.exchange = 'MACRO' AND c.ticker NOT LIKE '^%'`
+    : Prisma.sql`AND (c.exchange IS NULL OR c.exchange != 'MACRO')`;
 
   const rows = await prisma.$queryRaw<RawRow[]>`
     SELECT
@@ -125,6 +131,7 @@ async function queryCompanies(
     ) lp ON true
     WHERE c."isActive" = true
     ${sectorFilter}
+    ${etfFilter}
     ORDER BY ${orderBy}
     LIMIT ${limit} OFFSET ${offset}
   `;
@@ -150,12 +157,13 @@ export async function getCategoryCompaniesPage(
   offset = 0,
   sector?: string,
 ): Promise<ScreenerPage> {
+  const isEtf = category === "etfs";
   const orderBy = category === "gainers" ? ORDER_BY_GAINERS
     : category === "losers" ? ORDER_BY_LOSERS
-    : ORDER_BY_MARKET_CAP; // marketCap e sp500 ordenam por Market Cap
+    : ORDER_BY_MARKET_CAP; // marketCap, sp500 e etfs ordenam por Market Cap (sendo que ETFs não devem ter, vão ficar com ordem arbitrária, mas okay)
 
   // Pede 1 a mais para saber se há próxima página, sem precisar de um COUNT(*) à parte.
-  const { rows } = await queryCompanies(orderBy, limit + 1, offset, sector);
+  const { rows } = await queryCompanies(orderBy, limit + 1, offset, sector, isEtf);
   const hasMore = rows.length > limit;
   const companies = rows.slice(0, limit).map(mapRawRow);
 

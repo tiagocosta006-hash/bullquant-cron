@@ -76,7 +76,7 @@ type InitialAnalysis = Omit<SavedAnalysis, "inputs"> & {
   priceAtSave: number | null
 }
 
-export function DcfCalculator({ initialAnalysis }: { initialAnalysis?: InitialAnalysis }) {
+export function DcfCalculator({ initialAnalysis, defaultTicker }: { initialAnalysis?: InitialAnalysis; defaultTicker?: string }) {
   const t = useTranslations("dcf")
 
   // --- estado dos inputs ---
@@ -221,6 +221,13 @@ export function DcfCalculator({ initialAnalysis }: { initialAnalysis?: InitialAn
       setIsLoadingData(false)
     }
   }
+
+  React.useEffect(() => {
+    if (defaultTicker && !initialAnalysis) {
+      handleSelect(defaultTicker)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultTicker])
 
   // --- cálculo reativo ---
   const result = React.useMemo(() => {

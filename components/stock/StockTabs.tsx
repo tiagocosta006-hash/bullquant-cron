@@ -22,16 +22,21 @@ export function StockTabs({
   valuation,
   company,
   news,
-}: Record<TabKey, React.ReactNode>) {
+  isEtf = false,
+}: Record<TabKey, React.ReactNode> & { isEtf?: boolean }) {
   const t = useTranslations("stock.tabs");
   const [active, setActive] = useState<TabKey>("overview");
   const slots: Record<TabKey, React.ReactNode> = { overview, financials, analista, valuation, company, news };
+
+  const tabsToShow = isEtf 
+    ? TAB_KEYS.filter(k => k === "overview" || k === "news")
+    : TAB_KEYS;
 
   return (
     <div>
       <div className="sticky top-20 z-40 mb-6 flex justify-center md:justify-start">
         <LiquidGlass className="flex max-w-full items-center gap-1 overflow-x-auto rounded-full p-1.5" data-native-scroll>
-          {TAB_KEYS.map((key) => (
+          {tabsToShow.map((key) => (
             <button
               key={key}
               type="button"
@@ -49,7 +54,7 @@ export function StockTabs({
         </LiquidGlass>
       </div>
 
-      {TAB_KEYS.map((key) => (
+      {tabsToShow.map((key) => (
         <div key={key} className={cn("space-y-8", active !== key && "hidden")}>
           {slots[key]}
         </div>

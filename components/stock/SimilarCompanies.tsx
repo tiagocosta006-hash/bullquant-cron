@@ -54,15 +54,7 @@ export async function SimilarCompanies({ companies, baseTicker, group }: { compa
           </Link>
         ))}
       </div>
-      <div className="mt-6 flex justify-center">
-        <Link
-          href={`/compare?ticker=${baseTicker}`}
-          className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/50 px-5 py-2.5 text-sm font-semibold text-foreground transition-all hover:bg-card hover:shadow-sm"
-        >
-          <GitCompareArrows className="h-4 w-4" />
-          {t('similarCompaniesCompare')}
-        </Link>
-      </div>
+
     </div>
   )
 }

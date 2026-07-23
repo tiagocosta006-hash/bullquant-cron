@@ -10,7 +10,7 @@ import {
 } from "@/lib/finance/screener";
 import { getTranslations } from "next-intl/server";
 import { TickerMarquee } from "@/components/marketing/TickerMarquee";
-import { getTickerItems } from "@/lib/marketing/ticker";
+import { getTickerItems, GLOBAL_ETFS } from "@/lib/marketing/ticker";
 import { DashboardClient } from "./DashboardClient";
 
 
@@ -44,9 +44,9 @@ export default async function DashboardPage({
           `mx-auto max-w-7xl`, por isso não chega anular o padding: o
           mx-[calc(50%-50vw)] escapa também ao max-width. O pt-24 do layout
           NÃO é anulado — é o espaço da TopNav fixa. */}
-      <div className="mx-[calc(50%-50vw)] mb-6 w-screen border-y border-border/50 bg-card/40">
+      <div className="mx-[calc(50%-50vw)] mb-6 w-screen flex flex-col border-y border-border/50 bg-card/40">
         <TickerMarquee
-          items={ticker.items}
+          items={ticker.items.filter(i => !GLOBAL_ETFS.includes(i.ticker))}
           label={ticker.live ? tMarketing("ticker.labelLive") : tMarketing("ticker.label")}
         />
       </div>

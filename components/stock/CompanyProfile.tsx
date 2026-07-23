@@ -16,15 +16,16 @@ interface CompanyProfileProps {
     country: string
     exchange: string
   }
+  isEtf?: boolean
 }
 
-export function CompanyProfile({ company }: CompanyProfileProps) {
+export function CompanyProfile({ company, isEtf }: CompanyProfileProps) {
   const t = useTranslations("stock.profile")
 
   const details = [
     {
       label: "CEO",
-      value: company.ceo || "-",
+      value: company.ceo,
       icon: User
     },
     {
@@ -38,40 +39,40 @@ export function CompanyProfile({ company }: CompanyProfileProps) {
         >
           {company.website.replace(/^https?:\/\//, '')}
         </a>
-      ) : "-",
+      ) : null,
       icon: Globe
     },
     {
       label: t("sector"),
-      value: company.sector || "-",
+      value: company.sector,
       icon: Briefcase
     },
     {
       label: t("industry"),
-      value: company.industry || "-",
+      value: company.industry,
       icon: Building2
     },
     {
       label: t("employees"),
-      value: company.employees ? company.employees.toLocaleString("en-US") : "-",
+      value: company.employees ? company.employees.toLocaleString("en-US") : null,
       icon: Users
     },
     {
       label: t("country"),
-      value: company.country || "-",
+      value: company.country,
       icon: MapPin
     },
     {
       label: t("exchange"),
-      value: company.exchange || "-",
+      value: company.exchange === 'MACRO' ? null : company.exchange,
       icon: Landmark
     }
-  ]
+  ].filter(d => !!d.value)
 
   return (
     <div className="glass rounded-xl p-6">
       <h2 className="mb-6 text-xl font-bold tracking-tight text-foreground">
-        {t("title")}
+        {isEtf ? "Perfil do ETF" : t("title")}
       </h2>
 
       <div className="mb-8 space-y-3">

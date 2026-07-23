@@ -164,12 +164,16 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Tema anti-FOUC: ficheiro externo render-blocking (public/theme-init.js).
-            Corre síncrono antes do body → sem flash; externo (src) em vez de
-            inline → sem o warning do React 19 sobre scripts como filhos.
-            O bloqueio síncrono é DELIBERADO (evitar FOUC), daí o disable. */}
-        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
-        <script src="/theme-init.js" />
+        {/* Preconnect para acelerar o download dos logos da Finnhub */}
+        <link rel="preconnect" href="https://static2.finnhub.io" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://static2.finnhub.io" />
+        
+        {/* Tema anti-FOUC inlined para evitar render-blocking. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var d=localStorage.getItem("theme")==="dark";if(d)document.documentElement.classList.add("dark");var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",d?"#100f0d":"#fafaf7")}catch(e){}})();`,
+          }}
+        />
       </head>
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground">
         <NextIntlClientProvider messages={messages}>

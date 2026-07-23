@@ -3,6 +3,8 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
+import Image from "next/image"
+
 /**
  * CompanyLogo — o único sítio onde logos de empresas são renderizados.
  * Fundo neutro subtil (nunca caixa branca forçada): logos transparentes
@@ -41,14 +43,11 @@ export function CompanyLogo({
       style={{ width: size, height: size }}
     >
       {showImage ? (
-        // eslint-disable-next-line @next/next/no-img-element -- logos externos (Finnhub), domínios variados
-        <img
+        <Image
           src={src}
           alt={alt}
           width={size}
           height={size}
-          loading="lazy"
-          referrerPolicy="no-referrer"
           onError={() => setErrored(true)}
           className={cn("h-full w-full object-contain p-1", imgClassName)}
         />

@@ -276,7 +276,8 @@
       "marketCap": "Maior Capitalização",
       "gainers": "Maiores Subidas",
       "losers": "Maiores Descidas",
-      "sp500": "S&P 500"
+      "sp500": "S&P 500",
+      "etfs": "ETFs"
     },
     "sectorFilter": {
       "all": "Todos os setores"
@@ -307,7 +308,8 @@
     "more": "Mais",
     "watchlist": "Watchlist",
     "dcfShort": "DCF",
-    "analytics": "Pulse"
+    "analytics": "Pulse",
+    "compound": "Juro Composto"
   },
   "login": {
     "title": "Entrar no BullValue",
@@ -1246,6 +1248,70 @@
       "signup": "Registos",
       "dcf_saved": "Análises DCF guardadas",
       "watchlist_add": "Adições à watchlist"
+    }
+  },
+  "compound": {
+    "title": "Juro Composto",
+    "subtitle": "Calculadora de juro composto para simular o crescimento do teu património.",
+    "initialAmount": "Capital Inicial",
+    "monthlyContribution": "Reforço",
+    "interestRate": "Taxa de Juro Anual (%)",
+    "years": "Prazo (Anos)",
+    "summary": {
+      "finalBalance": "Saldo Final",
+      "totalContributions": "Total Investido",
+      "totalInterest": "Total de Juros"
+    },
+    "chart": {
+      "principal": "Capital Inicial",
+      "contributions": "Reforços",
+      "interest": "Juros"
+    },
+    "presets": {
+      "custom": "Personalizado",
+      "sp500": "S&P 500",
+      "nasdaq": "Nasdaq 100",
+      "dow": "Dow Jones",
+      "conservative": "Obrigações / Depósitos (3%)"
+    },
+    "presetLabel": "Predefinições de Mercado",
+    "lookbackLabel": "Janela Histórica (Anos)",
+    "compoundLabel": "Capitalização (Juros)",
+    "compoundOptions": {
+      "annually": "Anual",
+      "semi": "Semestral",
+      "quarterly": "Trimestral",
+      "monthly": "Mensal",
+      "daily": "Diária",
+      "semimonthly": "Semimensal",
+      "biweekly": "Quinzenal",
+      "weekly": "Semanal",
+      "continuously": "Contínua"
+    },
+    "contribFreqLabel": "Frequência de Reforço",
+    "contribFreqOptions": {
+      "monthly": "Mensal",
+      "annually": "Anual"
+    },
+    "contribTimingLabel": "Momento do Reforço",
+    "contribTimingOptions": {
+      "beginning": "Início do período",
+      "end": "Fim do período"
+    },
+    "sections": {
+      "investment": "1. O teu Investimento",
+      "return": "2. Rentabilidade Projetada"
+    },
+    "tooltips": {
+      "initialAmount": "O capital que tens disponível para alocar no início da simulação.",
+      "monthlyContribution": "O valor que planeias adicionar regularmente. Pequenos reforços consistentes maximizam o efeito exponencial do juro composto.",
+      "contribFreq": "A frequência com que irás aportar novos fundos ao investimento.",
+      "contribTiming": "Investir no início do período maximiza os retornos, uma vez que o capital passa mais tempo no mercado.",
+      "years": "O horizonte temporal. O tempo é a variável matemática com maior impacto no crescimento do Juro Composto.",
+      "preset": "Escolhe uma taxa fixa ou um índice real. Extraímos os dados históricos oficiais dos índices (desde a sua criação) e calculamos a sua Rentabilidade Média Histórica (CAGR) verdadeira.",
+      "lookback": "Define qual a janela do histórico do ativo que vamos utilizar para extrair a rentabilidade média anualizada.",
+      "interestRate": "A rentabilidade anual líquida projetada. Ajustada automaticamente através de algoritmos caso escolhas um índice real.",
+      "compound": "A frequência com que o investimento gera juros sobre os lucros acumulados. A rendibilidade bolsista modela-se geralmente com capitalização Anual."
     }
   }
 }

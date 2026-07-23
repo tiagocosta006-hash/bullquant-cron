@@ -18,6 +18,8 @@ import {
   Settings,
   LogOut,
   Zap,
+  Globe,
+  TrendingUp,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn, userInitials } from "@/lib/utils";
@@ -61,11 +63,13 @@ export function TopNav({
   const primary = [
     { href: "/dashboard", icon: LayoutDashboard, label: t("dashboard") },
     { href: "/explore", icon: SearchCode, label: t("explore") },
+    { href: "/macro", icon: Globe, label: "Macro" },
     { href: "/portfolio", icon: Briefcase, label: t("portfolio") },
     { href: "/watchlist", icon: Star, label: t("watchlist") },
     { href: "/calendar", icon: CalendarDays, label: t("calendar") },
-    // rótulo curto na nav (o título da página continua "Calculadora DCF")
+    // calculadoras em destaque
     { href: "/dcf", icon: Calculator, label: t("dcfShort") },
+    { href: "/compound", icon: TrendingUp, label: t("compound") },
   ];
   const overflow = [
     { href: "/settings", icon: Settings, label: tHeader("settingsTitle") },
@@ -77,7 +81,7 @@ export function TopNav({
   return (
     <>
       <div className="fixed inset-x-3 top-3 z-50 flex justify-center">
-        <LiquidGlass className="flex h-14 w-full max-w-6xl items-center gap-1 rounded-full px-3 md:px-4">
+        <LiquidGlass className="flex h-14 w-full max-w-7xl items-center gap-1 rounded-full px-3 md:px-4">
           <Logo href="/dashboard" size="sm" className="mr-2 hidden sm:flex" />
           <Logo href="/dashboard" size="sm" iconOnly className="mr-1 sm:hidden" />
 
@@ -90,7 +94,7 @@ export function TopNav({
                 aria-label={label}
                 title={label}
                 className={cn(
-                  "flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium transition-colors",
+                  "flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-sm font-medium transition-colors",
                   isActive(href)
                     ? "bg-primary/12 text-primary"
                     : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",

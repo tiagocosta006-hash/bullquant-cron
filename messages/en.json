@@ -276,7 +276,8 @@
       "marketCap": "Largest Market Cap",
       "gainers": "Top Gainers",
       "losers": "Top Losers",
-      "sp500": "S&P 500"
+      "sp500": "S&P 500",
+      "etfs": "ETFs"
     },
     "sectorFilter": {
       "all": "All sectors"
@@ -307,7 +308,8 @@
     "more": "More",
     "watchlist": "Watchlist",
     "dcfShort": "DCF",
-    "analytics": "Pulse"
+    "analytics": "Pulse",
+    "compound": "Compound Interest"
   },
   "login": {
     "title": "Sign in to BullValue",
@@ -1246,6 +1248,70 @@
       "signup": "Signups",
       "dcf_saved": "Saved DCF analyses",
       "watchlist_add": "Watchlist adds"
+    }
+  },
+  "compound": {
+    "title": "Compound Interest",
+    "subtitle": "Compound interest calculator to simulate your wealth growth.",
+    "initialAmount": "Initial Amount",
+    "monthlyContribution": "Contribution",
+    "interestRate": "Annual Interest Rate (%)",
+    "years": "Time (Years)",
+    "summary": {
+      "finalBalance": "Final Balance",
+      "totalContributions": "Total Contributions",
+      "totalInterest": "Total Interest"
+    },
+    "chart": {
+      "principal": "Principal",
+      "contributions": "Contributions",
+      "interest": "Interest"
+    },
+    "presets": {
+      "custom": "Custom",
+      "sp500": "S&P 500",
+      "nasdaq": "Nasdaq 100",
+      "dow": "Dow Jones",
+      "conservative": "Bonds / Deposits (3%)"
+    },
+    "presetLabel": "Market Presets",
+    "lookbackLabel": "Historical Window (Years)",
+    "compoundLabel": "Compound Frequency",
+    "compoundOptions": {
+      "annually": "Annually",
+      "semi": "Semi-Annually",
+      "quarterly": "Quarterly",
+      "monthly": "Monthly",
+      "daily": "Daily",
+      "semimonthly": "Semi-monthly",
+      "biweekly": "Bi-weekly",
+      "weekly": "Weekly",
+      "continuously": "Continuously"
+    },
+    "contribFreqLabel": "Contribution Frequency",
+    "contribFreqOptions": {
+      "monthly": "Monthly",
+      "annually": "Annually"
+    },
+    "contribTimingLabel": "Contribution Timing",
+    "contribTimingOptions": {
+      "beginning": "Beginning of period",
+      "end": "End of period"
+    },
+    "sections": {
+      "investment": "1. Your Investment",
+      "return": "2. Projected Return"
+    },
+    "tooltips": {
+      "initialAmount": "The capital you have available to allocate at the start of the simulation.",
+      "monthlyContribution": "The amount you plan to add regularly. Small consistent contributions maximize the exponential effect of compound interest.",
+      "contribFreq": "The frequency with which you will add new funds to the investment.",
+      "contribTiming": "Investing at the beginning of the period maximizes returns, since the capital spends more time in the market.",
+      "years": "The time horizon. Time is the mathematical variable with the greatest impact on the growth of Compound Interest.",
+      "preset": "Choose a fixed rate or a real index. We extract the full historical data of the indices (since their inception) and calculate their true Historical Average Return (CAGR).",
+      "lookback": "Sets which window of the asset's history we will use to extract the annualized average return.",
+      "interestRate": "The projected net annual return. Automatically adjusted using algorithms if you choose a real index.",
+      "compound": "The frequency with which the investment generates interest on accumulated profits. Stock market return is generally modeled with Annual compounding."
     }
   }
 }

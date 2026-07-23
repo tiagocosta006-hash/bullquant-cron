@@ -16,7 +16,7 @@ const scotchDisplay = localFont({
   // Serif só de display (momentos grandes): swap para aparecer quando usada;
   // sem preload por não ser a fonte primária.
   display: "swap",
-  preload: false,
+  preload: true,
   src: [
     { path: "../../public/fonts/scotch-display/ScotchDisplay-SemiBold.ttf", weight: "600", style: "normal" },
     { path: "../../public/fonts/scotch-display/ScotchDisplay-SemiBoldItalic.ttf", weight: "600", style: "italic" },

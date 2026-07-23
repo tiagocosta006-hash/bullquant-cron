@@ -19,9 +19,12 @@ export async function GET(request: Request) {
 
   try {
     if (mode === "facets") {
-      // Devolve a contagem agrupada por setor e indústria
+      // Devolve a contagem agrupada por setor e indústria (excluindo índices e ETFs macro)
       const companies = await prisma.company.findMany({
-        where: { isActive: true },
+        where: { 
+          isActive: true,
+          exchange: { notIn: ["INDEX", "MACRO"] }
+        },
         select: { sector: true, industry: true }
       })
 
@@ -80,7 +83,11 @@ export async function GET(request: Request) {
         ]
       })
     }
-    const whereClause: Prisma.CompanyWhereInput = { isActive: true, ...(and.length > 0 ? { AND: and } : {}) }
+    const whereClause: Prisma.CompanyWhereInput = { 
+      isActive: true, 
+      exchange: { notIn: ["INDEX", "MACRO"] },
+      ...(and.length > 0 ? { AND: and } : {}) 
+    }
 
     const companies = await prisma.company.findMany({
       where: whereClause,

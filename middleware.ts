@@ -80,8 +80,8 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Ignorar caminhos internos do Next.js, ficheiros estáticos e ficheiros de validação HTML
+  // Ignorar caminhos internos do Next.js, ficheiros estáticos, imagens e scripts
   matcher: [
-    '/((?!_next/static|_next/image|brand/|team/|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|html)$).*)',
+    '/((?!_next/static|_next/image|brand/|team/|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|html|js|css|woff|woff2|json|xml)$).*)',
   ],
 }

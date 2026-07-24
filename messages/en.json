@@ -841,7 +841,8 @@
     },
     "errorWacc": "WACC must be greater than perpetual growth for the model to be valid. Adjust the sliders.",
     "errorShares": "Enter the number of shares outstanding to compute value per share.",
-    "errorFcf": "Enter a valid initial Free Cash Flow to start."
+    "errorFcf": "Enter a valid initial Free Cash Flow to start.",
+    "exportImage": "Share Image"
   },
   "financials": {
     "engineTitle": "Financials & Decision Engine",
@@ -1205,7 +1206,7 @@
         {
           "name": "Alexandre Machado",
           "role": "Lead Developer & UI/UX Designer",
-          "bio": "Student at IPCA (Polytechnic Institute of Cávado and Ave). Responsible for the technical development of the platform, designing the interface, and building the backend and frontend structure with a focus on code and software architecture.",
+          "bio": "[Insert course/university]. Responsible for the technical development of the platform, designing the interface, and building the backend and frontend structure with a focus on code and software architecture.",
           "socials": {
             "linkedin": "#",
             "instagram": "#",

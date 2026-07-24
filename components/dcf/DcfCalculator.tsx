@@ -492,7 +492,14 @@ export function DcfCalculator({ initialAnalysis, defaultTicker }: { initialAnaly
 
       {/* ── Painel direito: resultados ── */}
       <div className="space-y-4 lg:sticky lg:top-6 self-start">
-        <DcfResults result={result} currency={currency} mode={fcfMode} />
+        <DcfResults 
+          result={result} 
+          currency={currency} 
+          mode={fcfMode} 
+          ticker={loadedTicker}
+          name={loadedName}
+          inputs={currentForSave?.inputs}
+        />
         <WaccBreakdownCard breakdown={waccBreakdown} fcfMode={fcfMode} onUseWacc={handleUseWacc} />
         <SavedAnalyses
           ticker={loadedTicker}

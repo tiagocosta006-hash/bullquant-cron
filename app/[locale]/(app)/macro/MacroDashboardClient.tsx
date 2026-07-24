@@ -239,33 +239,9 @@ const CARD_CONFIG = [
 export function MacroDashboardClient({ initialData, commentaries }: MacroDashboardClientProps) {
   const t = useTranslations("macro");
   const locale = useLocale();
-  const briefing = commentaries["WEEKLY_BRIEFING"];
 
   return (
     <div className="space-y-8">
-      {/* O Púlpito do Economista */}
-      {briefing?.content && (
-        <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/20 text-primary">
-              <Presentation className="h-5 w-5" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight text-foreground">{t("briefingTitle")}</h2>
-              <p className="text-sm text-muted-foreground">{t("briefingSubtitle")}</p>
-            </div>
-          </div>
-          <div className="prose prose-sm dark:prose-invert max-w-none text-foreground/90 whitespace-pre-wrap leading-relaxed">
-            {briefing.content}
-          </div>
-          <div className="mt-6 pt-4 border-t border-border/50 text-xs text-muted-foreground">
-            {t("publishedAt", {
-              date: new Date(briefing.updatedAt).toLocaleDateString(locale),
-              time: new Date(briefing.updatedAt).toLocaleTimeString(locale),
-            })}
-          </div>
-        </div>
-      )}
 
       {/* Os pilares macro + Máquina do Tempo */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { createClient } from "@/lib/supabase/server"
+import { isPulseAdmin } from "@/lib/pulse/server"
 
 export async function GET() {
   try {
@@ -26,6 +27,11 @@ export async function PATCH(request: Request) {
 
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  // Só a allowlist de admins pode escrever o comentário macro do site inteiro.
+  if (!isPulseAdmin(user.email)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
   try {

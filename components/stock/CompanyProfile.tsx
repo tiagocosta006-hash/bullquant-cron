@@ -72,7 +72,7 @@ export function CompanyProfile({ company, isEtf }: CompanyProfileProps) {
   return (
     <div className="glass rounded-xl p-6">
       <h2 className="mb-6 text-xl font-bold tracking-tight text-foreground">
-        {isEtf ? "Perfil do ETF" : t("title")}
+        {isEtf ? t("etfTitle") : t("title")}
       </h2>
 
       <div className="mb-8 space-y-3">

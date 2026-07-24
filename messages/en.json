@@ -648,6 +648,7 @@
     },
     "profile": {
       "title": "Company Profile",
+      "etfTitle": "ETF Profile",
       "website": "Website",
       "sector": "Sector",
       "industry": "Industry",
@@ -1326,5 +1327,58 @@
       "compound": "The frequency with which the investment generates interest on accumulated profits. Stock market return is generally modeled with Annual compounding."
     },
     "disclaimer": "Simulation for educational purposes only. Index returns are historical averages (price change, excluding dividends) and do not guarantee future results. This is not financial advice."
+  },
+  "macro": {
+    "briefingTitle": "BullQuant Macro Briefing",
+    "briefingSubtitle": "Weekly Outlook from the Chief Economist",
+    "publishedAt": "Published on {date} at {time}",
+    "economistTake": "The Economist's Take",
+    "updated": "Updated: {date}",
+    "noData": "No historical data available",
+    "expand": "Expand",
+    "cards": {
+      "yieldCurve": {
+        "title": "Yield Curve (10Y - 2Y)",
+        "description": "The spread between 10-year and 2-year yields. An inverted curve (below zero) has historically been the market's most reliable recession warning."
+      },
+      "fedFunds": {
+        "title": "Federal Funds Rate",
+        "description": "The benchmark interest rate set by the Federal Reserve. It governs how easily money flows through the entire economy, driving cycles of expansion or contraction."
+      },
+      "cpi": {
+        "title": "Inflation (CPI YoY)",
+        "description": "The year-over-year percentage change in the Consumer Price Index. High inflation erodes purchasing power and forces central banks to raise rates, choking the economy."
+      },
+      "gdp": {
+        "title": "GDP Growth (Real GDP YoY)",
+        "description": "Real growth of the United States Gross Domestic Product. The definitive thermometer of the real economy."
+      },
+      "unemployment": {
+        "title": "Unemployment Rate (US)",
+        "description": "The percentage of the US labor force that is unemployed. Rapid increases (the Sahm Rule) signal imminent danger."
+      },
+      "vix": {
+        "title": "Volatility (VIX)",
+        "description": "The famous 'Fear Index'. It measures the market's expectation of 30-day volatility. Readings above 30 indicate widespread panic."
+      }
+    },
+    "admin": {
+      "title": "Macro Backoffice",
+      "subtitle": "Manage your economic commentary and views. Changes made here are reflected instantly on the Macro page for all users.",
+      "lastUpdate": "Last updated: {date}",
+      "saveSuccess": "Saved successfully!",
+      "saveError": "Failed to save. Please try again.",
+      "saving": "Saving...",
+      "publish": "Publish",
+      "placeholder": "Write your analysis here...",
+      "types": {
+        "WEEKLY_BRIEFING": "Weekly Briefing (Top of Page)",
+        "YIELD_CURVE": "Note: Yield Curve",
+        "CPI": "Note: Inflation (CPI)",
+        "GDP": "Note: Growth (GDP)",
+        "UNEMPLOYMENT": "Note: Unemployment",
+        "VIX": "Note: Volatility (VIX)"
+      }
+    }
   }
 }

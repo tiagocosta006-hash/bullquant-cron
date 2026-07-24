@@ -65,3 +65,6 @@ design/foundations/bullvision-foundations.html
 # caches e outputs da reparação de fundamentais (nunca versionar)
 scripts/.cache/
 scripts/out/
+# relatórios/dumps de auditoria gerados por scripts (ex: audit_null_fundamentals.txt)
+scripts/audit_*.txt
+scripts/*_audit*.txt

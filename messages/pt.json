@@ -648,6 +648,7 @@
     },
     "profile": {
       "title": "Perfil da Empresa",
+      "etfTitle": "Perfil do ETF",
       "website": "Website",
       "sector": "Setor",
       "industry": "Indústria",
@@ -1326,5 +1327,58 @@
       "compound": "A frequência com que o investimento gera juros sobre os lucros acumulados. A rendibilidade bolsista modela-se geralmente com capitalização Anual."
     },
     "disclaimer": "Simulação apenas para fins educativos. As rentabilidades dos índices são médias históricas (variação de preço, sem dividendos) e não garantem resultados futuros. Não constitui aconselhamento financeiro."
+  },
+  "macro": {
+    "briefingTitle": "BullQuant Macro Briefing",
+    "briefingSubtitle": "Perspetiva Semanal do Economista Principal",
+    "publishedAt": "Publicado a {date} às {time}",
+    "economistTake": "A Visão do Economista",
+    "updated": "Atualizado: {date}",
+    "noData": "Sem dados históricos disponíveis",
+    "expand": "Expandir",
+    "cards": {
+      "yieldCurve": {
+        "title": "Curva de Rendimentos (10Y - 2Y)",
+        "description": "A diferença entre os juros a 10 anos e 2 anos. Uma curva invertida (abaixo de zero) tem sido historicamente o sinal de alarme de recessão mais fiável do mercado."
+      },
+      "fedFunds": {
+        "title": "Federal Funds Rate",
+        "description": "A taxa de juro diretora estipulada pela Reserva Federal. Dita a facilidade com que o dinheiro flui na economia inteira, determinando os ciclos de expansão ou retração."
+      },
+      "cpi": {
+        "title": "Inflação (CPI YoY)",
+        "description": "A variação percentual anual do Consumer Price Index. Uma inflação alta corrói o poder de compra e força os bancos centrais a subir as taxas de juro, asfixiando a economia."
+      },
+      "gdp": {
+        "title": "Crescimento do PIB (Real GDP YoY)",
+        "description": "Crescimento Real do Produto Interno Bruto dos Estados Unidos. O termómetro definitivo da Economia Real."
+      },
+      "unemployment": {
+        "title": "Taxa de Desemprego (US)",
+        "description": "A percentagem da força de trabalho americana que está desempregada. Subidas rápidas (Regra de Sahm) indicam perigo eminente."
+      },
+      "vix": {
+        "title": "Volatilidade (VIX)",
+        "description": "O famoso 'Índice do Medo'. Mede a expectativa de volatilidade do mercado a 30 dias. Valores acima de 30 indicam pânico generalizado."
+      }
+    },
+    "admin": {
+      "title": "Macro Backoffice",
+      "subtitle": "Gere os teus textos e opiniões económicas. As alterações feitas aqui refletem-se instantaneamente na página Macro para todos os utilizadores.",
+      "lastUpdate": "Última atualização: {date}",
+      "saveSuccess": "Guardado com sucesso!",
+      "saveError": "Erro ao guardar. Tenta novamente.",
+      "saving": "A guardar...",
+      "publish": "Publicar",
+      "placeholder": "Escreve a tua análise aqui...",
+      "types": {
+        "WEEKLY_BRIEFING": "Briefing Semanal (Topo da Página)",
+        "YIELD_CURVE": "Nota: Curva de Rendimentos",
+        "CPI": "Nota: Inflação (CPI)",
+        "GDP": "Nota: Crescimento (PIB)",
+        "UNEMPLOYMENT": "Nota: Desemprego",
+        "VIX": "Nota: Volatilidade (VIX)"
+      }
+    }
   }
 }

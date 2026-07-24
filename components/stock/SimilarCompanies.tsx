@@ -1,7 +1,7 @@
 import { Link } from '@/i18n/routing';
 import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
-import { ArrowRight, GitCompareArrows } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 
 interface SimilarCompany {
   ticker: string
@@ -54,7 +54,6 @@ export async function SimilarCompanies({ companies, baseTicker, group }: { compa
           </Link>
         ))}
       </div>
-
     </div>
   )
 }

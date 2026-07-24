@@ -192,13 +192,11 @@ function MacroCard({
           {renderHeaderControls()}
 
           <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
-            <DialogTrigger asChild>
-              <button
-                className="flex items-center justify-center h-8 w-8 ml-1 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md transition-all border border-transparent hover:border-border/40 shadow-sm"
-                title={t("expand")}
-              >
-                <Maximize2 className="h-4 w-4" />
-              </button>
+            <DialogTrigger
+              title={t("expand")}
+              className="flex items-center justify-center h-8 w-8 ml-1 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md transition-all border border-transparent hover:border-border/40 shadow-sm"
+            >
+              <Maximize2 className="h-4 w-4" />
             </DialogTrigger>
             <DialogContent className="sm:max-w-6xl w-[95vw] h-[85vh] flex flex-col bg-card border-border/50 outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-2 gap-4">

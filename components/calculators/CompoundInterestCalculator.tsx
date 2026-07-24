@@ -176,7 +176,7 @@ export function CompoundInterestCalculator() {
   }
 
   return (
-    <TooltipProvider delayDuration={200}>
+    <TooltipProvider delay={200}>
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Inputs Panel */}
       <Card className="p-6 space-y-8 lg:col-span-1">
@@ -209,7 +209,7 @@ export function CompoundInterestCalculator() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <LabelWithTooltip label={t("contribFreqLabel")} tooltip={t("tooltips.contribFreq")} />
-              <Select value={contribFreq} onValueChange={setContribFreq}>
+              <Select value={contribFreq} onValueChange={(v) => setContribFreq(v ?? "")}>
                 <SelectTrigger className="w-full bg-input/30 border-input/30">
                   <SelectValue>
                     {contribFreq === "12" ? t("contribFreqOptions.monthly") : t("contribFreqOptions.annually")}
@@ -223,7 +223,7 @@ export function CompoundInterestCalculator() {
             </div>
             <div className="space-y-1.5">
               <LabelWithTooltip label={t("contribTimingLabel")} tooltip={t("tooltips.contribTiming")} />
-              <Select value={contribTiming} onValueChange={setContribTiming}>
+              <Select value={contribTiming} onValueChange={(v) => setContribTiming(v ?? "")}>
                 <SelectTrigger className="w-full bg-input/30 border-input/30">
                   <SelectValue>
                     {contribTiming === "beginning" ? t("contribTimingOptions.beginning") : t("contribTimingOptions.end")}
@@ -259,7 +259,7 @@ export function CompoundInterestCalculator() {
           <div className="space-y-1.5 mb-2">
             <LabelWithTooltip label={t("presetLabel")} tooltip={t("tooltips.preset")} />
             <div className="flex gap-2">
-              <Select value={presetIndex} onValueChange={setPresetIndex}>
+              <Select value={presetIndex} onValueChange={(v) => setPresetIndex(v ?? "")}>
                 <SelectTrigger className="flex-1 bg-input/30 border-input/30">
                   <SelectValue>
                     {presetIndex === "GSPC" ? t("presets.sp500") : 
@@ -284,7 +284,7 @@ export function CompoundInterestCalculator() {
             <div className="space-y-1.5 mb-2">
               <LabelWithTooltip label={t("lookbackLabel")} tooltip={t("tooltips.lookback")} />
               <div className="flex gap-2">
-                <Select value={presetLookback} onValueChange={setPresetLookback}>
+                <Select value={presetLookback} onValueChange={(v) => setPresetLookback(v ?? "")}>
                   <SelectTrigger className="flex-1 bg-input/30 border-input/30">
                     <SelectValue />
                   </SelectTrigger>
@@ -316,7 +316,7 @@ export function CompoundInterestCalculator() {
 
           <div className="space-y-1.5">
             <LabelWithTooltip label={t("compoundLabel")} tooltip={t("tooltips.compound")} />
-            <Select value={compoundFreq} onValueChange={setCompoundFreq}>
+            <Select value={compoundFreq} onValueChange={(v) => setCompoundFreq(v ?? "")}>
               <SelectTrigger className="w-full bg-input/30 border-input/30">
                 <SelectValue>
                   {compoundFreq === "1" && t("compoundOptions.annually")}

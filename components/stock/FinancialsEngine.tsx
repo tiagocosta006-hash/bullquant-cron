@@ -437,14 +437,45 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
               </div>
             );
 
+            const ratioConfigs = {
+              ROIC: {
+                title: t('charts.roic'),
+                type: "COMPOSED" as const,
+                config: { isPercentage: true, dataKeys: [{ key: 'roic', color: 'var(--chart-1)', type: 'bar' as const }], referenceLine: { y: 0.15, color: 'var(--bull)', label: '15%' } }
+              },
+              ROE: {
+                title: t('charts.returnOnEquity'),
+                type: "BAR" as const,
+                config: { isPercentage: true, dataKeys: [{ key: 'returnOnEquity', color: 'var(--chart-1)', type: 'bar' as const }] }
+              },
+              GROSS: {
+                title: t('charts.grossMargin'),
+                type: "LINE" as const,
+                config: { isPercentage: true, dataKeys: [{ key: 'grossMargin', color: 'var(--chart-1)', type: 'line' as const }] }
+              },
+              OPERATING: {
+                title: t('charts.operatingMargin'),
+                type: "LINE" as const,
+                config: { isPercentage: true, dataKeys: [{ key: 'operatingMargin', color: 'var(--chart-1)', type: 'line' as const }] }
+              },
+              PROFIT: {
+                title: t('charts.profitMargin'),
+                type: "LINE" as const,
+                config: { isPercentage: true, dataKeys: [{ key: 'profitMargin', color: 'var(--chart-1)', type: 'line' as const }] }
+              }
+            };
+            
+            const activeConfig = ratioConfigs[ratioTab];
+
             return (
-              <>
-                {ratioTab === "ROIC" && <DecisionChart currencySymbol={currencySymbol} title={t('charts.roic')} data={chartData} type="COMPOSED" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'roic', color: 'var(--chart-1)', type: 'bar' }], referenceLine: { y: 0.15, color: 'var(--bull)', label: '15%' } }} />}
-                {ratioTab === "ROE" && <DecisionChart currencySymbol={currencySymbol} title={t('charts.returnOnEquity')} data={chartData} type="BAR" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'returnOnEquity', color: 'var(--chart-1)', type: 'bar' }] }} />}
-                {ratioTab === "GROSS" && <DecisionChart currencySymbol={currencySymbol} title={t('charts.grossMargin')} data={chartData} type="LINE" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'grossMargin', color: 'var(--chart-1)', type: 'line' }] }} />}
-                {ratioTab === "OPERATING" && <DecisionChart currencySymbol={currencySymbol} title={t('charts.operatingMargin')} data={chartData} type="LINE" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'operatingMargin', color: 'var(--chart-1)', type: 'line' }] }} />}
-                {ratioTab === "PROFIT" && <DecisionChart currencySymbol={currencySymbol} title={t('charts.profitMargin')} data={chartData} type="LINE" headerExtra={tabs} config={{ isPercentage: true, dataKeys: [{ key: 'profitMargin', color: 'var(--chart-1)', type: 'line' }] }} />}
-              </>
+              <DecisionChart 
+                currencySymbol={currencySymbol} 
+                title={activeConfig.title} 
+                data={chartData} 
+                type={activeConfig.type} 
+                headerExtra={tabs} 
+                config={activeConfig.config} 
+              />
             );
           })()}
 

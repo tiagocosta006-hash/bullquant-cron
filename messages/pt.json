@@ -3,7 +3,7 @@
     "eyebrow": "Análise fundamental · Value investing",
     "titleLead": "Vê o valor que",
     "titleAccent": "os outros não veem.",
-    "subtitle": "10 anos de fundamentais, uma calculadora DCF que se autopreenche e AI Insights, em português e de graça. Análise séria para quem investe a longo prazo.",
+    "subtitle": "10 anos de fundamentais, uma calculadora DCF que se autopreenche e AI Brief, em português e de graça. Análise séria para quem investe a longo prazo.",
     "primaryCta": "Criar conta grátis",
     "secondaryCta": "Espreitar sem conta: AAPL",
     "peekCta": "Espreitar sem conta",
@@ -166,7 +166,7 @@
     "pricing": {
       "eyebrow": "Planos",
       "title": "Começa grátis. A sério.",
-      "subtitle": "Sem cartão de crédito, sem período de teste, o essencial é gratuito enquanto construímos.",
+      "subtitle": "Sem cartão de crédito para começar. O plano gratuito é para sempre; o Pro desbloqueia os extras quando quiseres.",
       "free": {
         "name": "Grátis",
         "price": "0 €",
@@ -174,20 +174,20 @@
         "f1": "S&P 500 completo (500 empresas)",
         "f2": "10 anos de fundamentais visuais",
         "f3": "Calculadora DCF com autopreenchimento",
-        "f4": "AI Insights em português",
-        "f5": "Watchlist e portfólio",
+        "f4": "AI Brief e listas temáticas curadas",
+        "f5": "Watchlist, calendário de resultados e insider trading",
         "cta": "Criar conta grátis"
       },
       "pro": {
         "name": "Pro",
-        "badge": "Brevemente",
-        "price": "9 €/mês",
-        "period": "quando lançar",
-        "f1": "Screener real por métricas",
-        "f2": "Relatórios PDF exportáveis",
-        "f3": "Watchlists ilimitadas",
-        "f4": "Cobertura Europa",
-        "f5": "Alertas de earnings e preço"
+        "badge": "Mais popular",
+        "price": "7 €",
+        "period": "por mês",
+        "f1": "Watchlist ilimitada",
+        "f2": "AI Brief ilimitado",
+        "f3": "Guardar cenários DCF ilimitados",
+        "f4": "Exportar dados financeiros em CSV",
+        "f5": "Comunidade privada e apoio prioritário"
       }
     },
     "about": {
@@ -203,16 +203,16 @@
     },
     "faq": {
       "title": "Perguntas frequentes",
-      "q1": "É mesmo grátis?",
-      "a1": "Sim. O plano gratuito inclui o S&P 500 completo, 10 anos de fundamentais, DCF e AI Insights. No futuro haverá um plano Pro com extras, mas o essencial fica gratuito.",
-      "q2": "De onde vêm os dados?",
-      "a2": "Fundamentais diretamente da SEC EDGAR (os relatórios oficiais 10-K e 10-Q das empresas) e preços da Polygon. Sem scrapers, sem fontes duvidosas.",
-      "q3": "Isto é aconselhamento financeiro?",
-      "a3": "Não. A BullValue é uma ferramenta de análise e educação. Nenhum valor, métrica ou insight constitui recomendação de compra ou venda. As decisões são sempre tuas.",
-      "q4": "Que empresas estão disponíveis?",
-      "a4": "As 500 empresas do S&P 500 no lançamento. A cobertura de empresas europeias (incluindo a Euronext Lisboa) está no roadmap.",
-      "q5": "Os números batem certo com os relatórios oficiais?",
-      "a5": "Os dados vêm dos filings oficiais e as métricas derivadas (margens, ROIC, FCF) são calculadas com fórmulas padrão, documentadas. Quando um valor não existe, mostramos N/A, nunca inventamos."
+      "q1": "Qual é a diferença entre o plano Grátis e o Pro?",
+      "a1": "O Grátis inclui o S&P 500 completo, 10 anos de fundamentais, a calculadora DCF, o AI Brief (5 por dia), as listas temáticas, o calendário de resultados e o insider trading. O Pro acrescenta AI Brief e watchlists ilimitados, guardar cenários DCF, exportar em CSV, comunidade privada e apoio prioritário.",
+      "q2": "Isto é aconselhamento financeiro?",
+      "a2": "Não. A BullValue é uma ferramenta de análise e educação. Nenhum valor, métrica ou insight constitui recomendação de compra ou venda. As decisões são sempre tuas.",
+      "q3": "Que empresas estão disponíveis?",
+      "a3": "As 500 empresas do S&P 500. A cobertura de empresas europeias (incluindo a Euronext Lisboa) está no roadmap.",
+      "q4": "Os números batem certo com os relatórios oficiais?",
+      "a4": "Sim. Os fundamentais vêm diretamente dos filings oficiais da SEC EDGAR (10-K e 10-Q) e as métricas derivadas (margens, ROIC, FCF) são calculadas com fórmulas padrão, documentadas. Quando um valor não existe, mostramos N/A, nunca inventamos.",
+      "q5": "Posso experimentar o Pro e cancelar?",
+      "a5": "Sim. O Pro tem 7 dias grátis e podes cancelar a qualquer momento, sem penalização. Os pagamentos são processados com segurança pelo Paddle."
     },
     "floatingNote": "0 € · sem cartão",
     "mission": {
@@ -1019,7 +1019,7 @@
     },
     "pro": {
       "name": "PRO",
-      "price": "€10",
+      "price": "€7",
       "period": "por mês",
       "description": "Para o investidor sério que quer ir mais fundo na análise.",
       "cta": "Começar trial de 7 dias",

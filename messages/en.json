@@ -3,7 +3,7 @@
     "eyebrow": "Fundamental analysis · Value investing",
     "titleLead": "See the value",
     "titleAccent": "others miss.",
-    "subtitle": "10 years of fundamentals, a DCF calculator that autofills, and AI Insights, free. Serious analysis for long-term investors.",
+    "subtitle": "10 years of fundamentals, a DCF calculator that autofills, and AI Brief, free. Serious analysis for long-term investors.",
     "primaryCta": "Create free account",
     "secondaryCta": "Peek without an account: AAPL",
     "trust": "S&P 500 coverage · SEC EDGAR data · No credit card",
@@ -165,7 +165,7 @@
     "pricing": {
       "eyebrow": "Plans",
       "title": "Start free. For real.",
-      "subtitle": "No credit card, no trial period, the essentials are free while we build.",
+      "subtitle": "No credit card to get started. The free plan is forever; Pro unlocks the extras whenever you want.",
       "free": {
         "name": "Free",
         "price": "€0",
@@ -173,20 +173,20 @@
         "f1": "Full S&P 500 (500 companies)",
         "f2": "10 years of visual fundamentals",
         "f3": "Auto-filled DCF calculator",
-        "f4": "AI Insights",
-        "f5": "Watchlist and portfolio",
+        "f4": "AI Brief and curated theme lists",
+        "f5": "Watchlist, earnings calendar and insider trading",
         "cta": "Create free account"
       },
       "pro": {
         "name": "Pro",
-        "badge": "Coming soon",
-        "price": "€9/mo",
-        "period": "at launch",
-        "f1": "Real metrics screener",
-        "f2": "Exportable PDF reports",
-        "f3": "Unlimited watchlists",
-        "f4": "Europe coverage",
-        "f5": "Earnings and price alerts"
+        "badge": "Most popular",
+        "price": "€7",
+        "period": "per month",
+        "f1": "Unlimited watchlist",
+        "f2": "Unlimited AI Brief",
+        "f3": "Save unlimited DCF scenarios",
+        "f4": "Export financial data to CSV",
+        "f5": "Private community and priority support"
       }
     },
     "about": {
@@ -202,16 +202,16 @@
     },
     "faq": {
       "title": "Frequently asked questions",
-      "q1": "Is it really free?",
-      "a1": "Yes. The free plan includes the full S&P 500, 10 years of fundamentals, DCF and AI Insights. A Pro plan with extras will come later, but the essentials stay free.",
-      "q2": "Where does the data come from?",
-      "a2": "Fundamentals straight from SEC EDGAR (official 10-K and 10-Q filings) and prices from Polygon. No scrapers, no dubious sources.",
-      "q3": "Is this financial advice?",
-      "a3": "No. BullValue is an analysis and education tool. No value, metric or insight is a recommendation to buy or sell. Decisions are always yours.",
-      "q4": "Which companies are available?",
-      "a4": "The 500 companies of the S&P 500 at launch. European coverage (including Euronext Lisbon) is on the roadmap.",
-      "q5": "Do the numbers match official filings?",
-      "a5": "Data comes from official filings and derived metrics (margins, ROIC, FCF) use standard, documented formulas. When a value doesn't exist we show N/A, we never make it up."
+      "q1": "What's the difference between Free and Pro?",
+      "a1": "Free includes the full S&P 500, 10 years of fundamentals, the DCF calculator, AI Brief (5 per day), curated theme lists, the earnings calendar and insider trading. Pro adds unlimited AI Brief and watchlists, saving DCF scenarios, CSV export, a private community and priority support.",
+      "q2": "Is this financial advice?",
+      "a2": "No. BullValue is an analysis and education tool. No value, metric or insight is a recommendation to buy or sell. Decisions are always yours.",
+      "q3": "Which companies are available?",
+      "a3": "The 500 companies of the S&P 500. European coverage (including Euronext Lisbon) is on the roadmap.",
+      "q4": "Do the numbers match official filings?",
+      "a4": "Yes. Fundamentals come straight from official SEC EDGAR filings (10-K and 10-Q) and derived metrics (margins, ROIC, FCF) use standard, documented formulas. When a value doesn't exist we show N/A, we never make it up.",
+      "q5": "Can I try Pro and cancel?",
+      "a5": "Yes. Pro has a 7-day free trial and you can cancel anytime, no penalty. Payments are securely processed by Paddle."
     },
     "floatingNote": "€0 · no card",
     "mission": {
@@ -1020,7 +1020,7 @@
     },
     "pro": {
       "name": "PRO",
-      "price": "€10",
+      "price": "€7",
       "period": "per month",
       "description": "For the serious investor who wants to go deeper in their analysis.",
       "cta": "Start 7-day free trial",

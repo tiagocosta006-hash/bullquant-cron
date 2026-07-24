@@ -52,7 +52,7 @@ const SITE_URL = "https://thebullvalue.com";
 const TEAM = [
   { name: "Rodrigo Martins", roleKey: "role1", image: "/team/rodrigo.jpg", initials: "RM" },
   { name: "Tiago Costa", roleKey: "role2", image: "/team/tiago.jpg", initials: "TC" },
-  { name: "Alexandre Machado", roleKey: "role3", image: null, initials: "AM" },
+  { name: "Alexandre Machado", roleKey: "role3", image: "/team/alex.jpeg", initials: "AM" },
 ] as const;
 
 const heroDelay = (s: number) => ({ "--hero-delay": `${s}s` }) as React.CSSProperties;
@@ -108,7 +108,7 @@ export default async function LandingPage({
         "name": BRAND.name,
         "url": BRAND.siteUrl,
         "logo": `${SITE_URL}${BRAND.logoSrc}`,
-        "description": "Plataforma portuguesa de análise fundamental de ações com dados da SEC, DCF integrada e AI Insights.",
+        "description": "Plataforma portuguesa de análise fundamental de ações com dados da SEC, DCF integrada e AI Brief.",
         "foundingDate": "2024",
         "parentOrganization": {
           "@type": "Organization",

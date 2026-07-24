@@ -85,7 +85,7 @@ export async function generateMetadata({
       template: `%s · ${BRAND.name}`,
     },
     description:
-      "Análise fundamental de ações com 10 anos de dados, DCF integrada e AI Insights. Em português, gratuito. Uma plataforma Bullocracy.",
+      "Análise fundamental de ações com 10 anos de dados, DCF integrada e AI Brief. Em português, gratuito. Uma plataforma Bullocracy.",
     keywords: [
       "BullValue",
       "análise fundamental de ações",
@@ -113,7 +113,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${BRAND.name} — Análise Fundamental de Ações`,
       description:
-        "Vê o valor que os outros não veem. Fundamentais de 10 anos, DCF e AI Insights, em português.",
+        "Vê o valor que os outros não veem. Fundamentais de 10 anos, DCF e AI Brief, em português.",
       siteName: BRAND.name,
       url: BRAND.siteUrl,
       type: "website",
@@ -130,7 +130,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: `${BRAND.name} — Análise Fundamental de Ações`,
       description:
-        "Vê o valor que os outros não veem. Fundamentais de 10 anos, DCF e AI Insights, em português.",
+        "Vê o valor que os outros não veem. Fundamentais de 10 anos, DCF e AI Brief, em português.",
       images: ["/opengraph-image"],
     },
   };

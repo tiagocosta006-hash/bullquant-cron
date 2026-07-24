@@ -82,7 +82,7 @@ export default async function Image() {
             fontWeight: 400,
           }}
         >
-          Análise Fundamental · DCF · AI Insights
+          Análise Fundamental · DCF · AI Brief
         </div>
 
         {/* Description */}
@@ -96,7 +96,7 @@ export default async function Image() {
             fontWeight: 400,
           }}
         >
-          10 anos de dados fundamentais, calculadora DCF integrada e AI Insights.
+          10 anos de dados fundamentais, calculadora DCF integrada e AI Brief.
           Em português, gratuito.
         </div>
 

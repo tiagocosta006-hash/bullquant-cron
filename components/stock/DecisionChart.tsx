@@ -386,7 +386,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
         <div className="flex items-center gap-1.5 min-w-0 flex-1 mr-2">
           <h3 className="font-bold text-foreground text-base leading-tight truncate" title={title}>{title}</h3>
           {infoTooltip && (
-            <TooltipProvider delayDuration={100}>
+            <TooltipProvider delay={100}>
               <UITooltip>
                 <TooltipTrigger
                   render={

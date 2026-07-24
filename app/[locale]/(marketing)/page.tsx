@@ -49,11 +49,15 @@ const SITE_URL = "https://thebullvalue.com";
 
 /* Equipa mostrada na secção "Feito em Portugal" — mesmas fotos da página
    /about (public/team/). Sem foto → iniciais, como lá. */
-const TEAM = [
+// image é opcional de propósito: com todos os membros a ter foto, o `as const`
+// tornava `image` sempre truthy e o TS estreitava o ramo do fallback de iniciais
+// para `never` (erro de build). Tipar `image?` mantém o fallback válido para
+// quando um membro ainda não tiver foto em public/team/.
+const TEAM: { name: string; roleKey: string; image?: string; initials: string }[] = [
   { name: "Rodrigo Martins", roleKey: "role1", image: "/team/rodrigo.jpg", initials: "RM" },
   { name: "Tiago Costa", roleKey: "role2", image: "/team/tiago.jpg", initials: "TC" },
   { name: "Alexandre Machado", roleKey: "role3", image: "/team/alex.jpeg", initials: "AM" },
-] as const;
+];
 
 const heroDelay = (s: number) => ({ "--hero-delay": `${s}s` }) as React.CSSProperties;
 

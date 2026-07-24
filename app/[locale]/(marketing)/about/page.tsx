@@ -170,7 +170,7 @@ export default function AboutPage() {
                 role: t(`team.members.${index}.role`),
                 bio: t(`team.members.${index}.bio`),
                 initials,
-                image: index === 0 ? "/team/rodrigo.jpg" : index === 1 ? "/team/tiago.jpg" : undefined,
+                image: index === 0 ? "/team/rodrigo.jpg" : index === 1 ? "/team/tiago.jpg" : "/team/alex.jpeg",
                 socials: {
                   linkedin: t.has(`team.members.${index}.socials.linkedin`) ? t(`team.members.${index}.socials.linkedin`) : "#",
                   instagram: t.has(`team.members.${index}.socials.instagram`) ? t(`team.members.${index}.socials.instagram`) : "#",

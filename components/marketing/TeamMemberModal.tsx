@@ -38,9 +38,9 @@ export function TeamMemberModal({ member }: { member: TeamMember }) {
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
           
           {/* Placeholder/Photo for Photo (Small) */}
-          <div className="w-24 h-24 rounded-full bg-secondary flex items-center justify-center border-4 border-background shadow-sm mx-auto relative z-10 overflow-hidden">
+          <div className="w-32 h-32 rounded-full bg-secondary flex items-center justify-center border-4 border-background shadow-sm mx-auto relative z-10 overflow-hidden">
             {member.image ? (
-              <Image src={member.image} alt={member.name} fill sizes="96px" className="object-cover" />
+              <Image src={member.image} alt={member.name} fill sizes="128px" className="object-cover" />
             ) : (
               <span className="text-2xl font-sans text-muted-foreground">{member.initials}</span>
             )}
@@ -73,9 +73,9 @@ export function TeamMemberModal({ member }: { member: TeamMember }) {
           <div className="bg-secondary/30 p-10 flex flex-col items-center justify-center border-b sm:border-b-0 sm:border-r border-border/50 relative overflow-hidden">
              <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-primary/10 blur-[80px] rounded-full pointer-events-none"></div>
              
-             <div className="w-48 h-48 sm:w-64 sm:h-64 rounded-full bg-background flex items-center justify-center border-[12px] border-secondary shadow-2xl relative z-10 overflow-hidden">
+             <div className="w-56 h-56 sm:w-72 sm:h-72 rounded-full bg-background flex items-center justify-center border-[12px] border-secondary shadow-2xl relative z-10 overflow-hidden">
                {member.image ? (
-                 <Image src={member.image} alt={member.name} fill sizes="(min-width: 640px) 256px, 192px" className="object-cover" />
+                 <Image src={member.image} alt={member.name} fill sizes="(min-width: 640px) 288px, 224px" className="object-cover" />
                ) : (
                  <span className="text-6xl sm:text-7xl font-sans text-muted-foreground/30">{member.initials}</span>
                )}

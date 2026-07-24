@@ -1262,20 +1262,32 @@
       "totalContributions": "Total Contributions",
       "totalInterest": "Total Interest"
     },
+    "yearsSuffix": "Years",
     "chart": {
       "principal": "Principal",
       "contributions": "Contributions",
-      "interest": "Interest"
+      "interest": "Interest",
+      "total": "Total",
+      "yearAxis": "Year {value}"
     },
     "presets": {
       "custom": "Custom",
       "sp500": "S&P 500",
-      "nasdaq": "Nasdaq 100",
+      "nasdaq": "Nasdaq",
       "dow": "Dow Jones",
       "conservative": "Bonds / Deposits (3%)"
     },
     "presetLabel": "Market Presets",
     "lookbackLabel": "Historical Window (Years)",
+    "lookbackOptions": {
+      "1": "1 Year",
+      "3": "3 Years",
+      "5": "5 Years",
+      "10": "10 Years",
+      "20": "20 Years",
+      "30": "30 Years",
+      "50": "Max (50+ Years)"
+    },
     "compoundLabel": "Compound Frequency",
     "compoundOptions": {
       "annually": "Annually",
@@ -1308,10 +1320,11 @@
       "contribFreq": "The frequency with which you will add new funds to the investment.",
       "contribTiming": "Investing at the beginning of the period maximizes returns, since the capital spends more time in the market.",
       "years": "The time horizon. Time is the mathematical variable with the greatest impact on the growth of Compound Interest.",
-      "preset": "Choose a fixed rate or a real index. We extract the full historical data of the indices (since their inception) and calculate their true Historical Average Return (CAGR).",
-      "lookback": "Sets which window of the asset's history we will use to extract the annualized average return.",
-      "interestRate": "The projected net annual return. Automatically adjusted using algorithms if you choose a real index.",
+      "preset": "Choose a fixed rate or a benchmark index. Indices auto-fill the rate with that market's historical average annualized return (CAGR) for the chosen window — price change only, excluding dividends.",
+      "lookback": "Sets the historical window used to estimate the index's annualized average return.",
+      "interestRate": "The projected annual return. Auto-filled with the historical CAGR when you pick a benchmark index; edit it freely for your own scenario.",
       "compound": "The frequency with which the investment generates interest on accumulated profits. Stock market return is generally modeled with Annual compounding."
-    }
+    },
+    "disclaimer": "Simulation for educational purposes only. Index returns are historical averages (price change, excluding dividends) and do not guarantee future results. This is not financial advice."
   }
 }

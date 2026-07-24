@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server"
-import { TrendingUp, Info } from "lucide-react"
+import { TrendingUp } from "lucide-react"
 import { CompoundInterestCalculator } from "@/components/calculators/CompoundInterestCalculator"
 import { PageHeader, InfoNote } from "@/components/layout/PageHeader"
 
@@ -15,6 +15,8 @@ export default async function CompoundInterestPage() {
       />
 
       <CompoundInterestCalculator />
+
+      <InfoNote>{t("disclaimer")}</InfoNote>
     </div>
   )
 }

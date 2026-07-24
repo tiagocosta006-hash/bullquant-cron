@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react"
 import { useTranslations, useLocale } from "next-intl"
 import { Link } from '@/i18n/routing';
-import { Clock, Star, Loader2, ArrowRight } from "lucide-react"
+import { Clock, Star, Loader2, ArrowRight, Compass, Search } from "lucide-react"
 import { PageHeader } from "@/components/layout/PageHeader"
 import { PortfolioCard } from "@/components/portfolio/PortfolioCard"
 import { AddPositionDialog } from "@/components/portfolio/AddPositionDialog"
+import { ManualAddSearch } from "@/components/portfolio/ManualAddSearch"
 import type { Company, PortfolioItem, PriceData } from "@/components/portfolio/types"
 
 const POPULAR_TICKERS = ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA", "NFLX"]
@@ -19,6 +20,7 @@ type WatchlistApiItem = {
 
 export default function WatchlistPage() {
   const t = useTranslations("watchlist")
+  const tExplore = useTranslations("explore")
   const locale = useLocale()
   const [items, setItems] = useState<PortfolioItem[]>([])
   const [prices, setPrices] = useState<Record<string, PriceData>>({})
@@ -190,6 +192,18 @@ export default function WatchlistPage() {
           <h3 className="text-xl font-bold mb-2">{t("empty.title")}</h3>
           <p className="text-muted-foreground mb-8 max-w-md mx-auto">{t("empty.description")}</p>
 
+          <div className="max-w-md mx-auto mb-10 flex flex-col items-center gap-4">
+            <ManualAddSearch onSelect={handleQuickAdd} />
+            <span className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">— OU —</span>
+            <Link
+              href="/explore"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-border bg-background hover:bg-muted/50 font-semibold transition-colors w-full"
+            >
+              <Compass className="w-5 h-5 text-primary" />
+              {tExplore("title")}
+            </Link>
+          </div>
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
             {POPULAR_TICKERS.slice(0, 4).map((ticker) => (
               <QuickAddButton
@@ -241,6 +255,14 @@ export default function WatchlistPage() {
               </div>
             </div>
           )}
+
+          <div className="mt-8 pt-8 border-t border-border/40 max-w-sm">
+            <span className="mb-4 flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <Search className="w-4 h-4" />
+              Procurar ticker para adicionar
+            </span>
+            <ManualAddSearch onSelect={handleQuickAdd} />
+          </div>
 
           {lastUpdate && (
             <div className="flex items-center justify-end gap-1.5 text-xs text-muted-foreground mt-4 font-medium">

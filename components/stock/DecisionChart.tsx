@@ -383,37 +383,31 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
   const content = (
     <div className="flex flex-col h-full">
       <div className="flex flex-wrap items-center justify-between mb-4 gap-2">
-        <div className="shrink-0 max-w-[50%]">
-          <div className="flex items-center gap-1.5">
-            <h3 className="font-bold text-foreground text-base leading-tight truncate" title={title}>{title}</h3>
-            {infoTooltip && (
-              <TooltipProvider delay={100}>
-                <UITooltip>
-                  <TooltipTrigger
-                    render={
-                      <span className="cursor-help inline-flex text-muted-foreground hover:text-foreground transition-colors shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-                      </span>
-                    }
-                  />
-                  <TooltipContent side="right" className="max-w-[300px] text-[13px] leading-relaxed p-3 shadow-xl">
-                    {infoTooltip}
-                  </TooltipContent>
-                </UITooltip>
-              </TooltipProvider>
-            )}
-          </div>
+        <div className="flex items-center gap-1.5 min-w-0 flex-1 mr-2">
+          <h3 className="font-bold text-foreground text-base leading-tight truncate" title={title}>{title}</h3>
+          {infoTooltip && (
+            <TooltipProvider delayDuration={100}>
+              <UITooltip>
+                <TooltipTrigger
+                  render={
+                    <span className="cursor-help inline-flex text-muted-foreground hover:text-foreground transition-colors shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                    </span>
+                  }
+                />
+                <TooltipContent side="right" className="max-w-[300px] text-[13px] leading-relaxed p-3 shadow-xl">
+                  {infoTooltip}
+                </TooltipContent>
+              </UITooltip>
+            </TooltipProvider>
+          )}
           {cagr !== undefined && cagr !== null && Number.isFinite(cagr) && (
-            <p className="text-xs font-semibold text-muted-foreground mt-0.5">
+            <p className="text-xs font-semibold text-muted-foreground ml-2 shrink-0">
               CAGR: <span className={cagr >= 0 ? "text-bull" : "text-bear"}>{cagr > 0 ? '+' : ''}{(cagr * 100).toFixed(1)}%</span>
             </p>
           )}
         </div>
-        {headerExtra && (
-          <div className="flex-1 flex justify-center mx-2 min-w-0 hidden sm:flex overflow-x-auto no-scrollbar">
-            {headerExtra}
-          </div>
-        )}
+        
         <div className="flex gap-1 shrink-0 bg-muted/50 p-1 rounded-md border border-border/40">
           <button 
             onClick={() => setViewMode('chart')}
@@ -460,6 +454,11 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
             </DialogContent>
           </Dialog>
         </div>
+        {headerExtra && (
+          <div className="w-full flex overflow-x-auto no-scrollbar mt-1">
+            {headerExtra}
+          </div>
+        )}
       </div>
       <div className="flex-1 min-h-0">
         {viewMode === 'chart' ? renderChart("100%") : renderTable()}

@@ -18,7 +18,6 @@ import {
   Settings,
   LogOut,
   Zap,
-  Globe,
   TrendingUp,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -63,7 +62,6 @@ export function TopNav({
   const primary = [
     { href: "/dashboard", icon: LayoutDashboard, label: t("dashboard") },
     { href: "/explore", icon: SearchCode, label: t("explore") },
-    { href: "/macro", icon: Globe, label: "Macro" },
     { href: "/portfolio", icon: Briefcase, label: t("portfolio") },
     { href: "/watchlist", icon: Star, label: t("watchlist") },
     { href: "/calendar", icon: CalendarDays, label: t("calendar") },

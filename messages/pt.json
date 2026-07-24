@@ -1262,20 +1262,32 @@
       "totalContributions": "Total Investido",
       "totalInterest": "Total de Juros"
     },
+    "yearsSuffix": "Anos",
     "chart": {
       "principal": "Capital Inicial",
       "contributions": "Reforços",
-      "interest": "Juros"
+      "interest": "Juros",
+      "total": "Total",
+      "yearAxis": "Ano {value}"
     },
     "presets": {
       "custom": "Personalizado",
       "sp500": "S&P 500",
-      "nasdaq": "Nasdaq 100",
+      "nasdaq": "Nasdaq",
       "dow": "Dow Jones",
       "conservative": "Obrigações / Depósitos (3%)"
     },
     "presetLabel": "Predefinições de Mercado",
     "lookbackLabel": "Janela Histórica (Anos)",
+    "lookbackOptions": {
+      "1": "1 Ano",
+      "3": "3 Anos",
+      "5": "5 Anos",
+      "10": "10 Anos",
+      "20": "20 Anos",
+      "30": "30 Anos",
+      "50": "Max (50+ Anos)"
+    },
     "compoundLabel": "Capitalização (Juros)",
     "compoundOptions": {
       "annually": "Anual",
@@ -1308,10 +1320,11 @@
       "contribFreq": "A frequência com que irás aportar novos fundos ao investimento.",
       "contribTiming": "Investir no início do período maximiza os retornos, uma vez que o capital passa mais tempo no mercado.",
       "years": "O horizonte temporal. O tempo é a variável matemática com maior impacto no crescimento do Juro Composto.",
-      "preset": "Escolhe uma taxa fixa ou um índice real. Extraímos os dados históricos oficiais dos índices (desde a sua criação) e calculamos a sua Rentabilidade Média Histórica (CAGR) verdadeira.",
-      "lookback": "Define qual a janela do histórico do ativo que vamos utilizar para extrair a rentabilidade média anualizada.",
-      "interestRate": "A rentabilidade anual líquida projetada. Ajustada automaticamente através de algoritmos caso escolhas um índice real.",
+      "preset": "Escolhe uma taxa fixa ou um índice de referência. Os índices preenchem automaticamente a taxa com a rentabilidade média anualizada (CAGR) histórica desse mercado para a janela escolhida — apenas variação de preço, sem dividendos.",
+      "lookback": "Define a janela histórica usada para estimar a rentabilidade média anualizada do índice.",
+      "interestRate": "A rentabilidade anual projetada. Preenchida automaticamente com o CAGR histórico se escolheres um índice de referência; edita à vontade para o teu cenário.",
       "compound": "A frequência com que o investimento gera juros sobre os lucros acumulados. A rendibilidade bolsista modela-se geralmente com capitalização Anual."
-    }
+    },
+    "disclaimer": "Simulação apenas para fins educativos. As rentabilidades dos índices são médias históricas (variação de preço, sem dividendos) e não garantem resultados futuros. Não constitui aconselhamento financeiro."
   }
 }

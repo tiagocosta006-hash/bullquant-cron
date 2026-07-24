@@ -15,7 +15,8 @@ import {
   ResponsiveContainer,
 } from "recharts"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { InfoIcon, Loader2 } from "lucide-react"
+import { InfoIcon } from "lucide-react"
+import { getIndexCagr } from "@/lib/finance/indexReturns"
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("en-US", {
@@ -55,7 +56,6 @@ export function CompoundInterestCalculator() {
   
   const [presetIndex, setPresetIndex] = React.useState<string>("GSPC")
   const [presetLookback, setPresetLookback] = React.useState<string>("10")
-  const [isFetching, setIsFetching] = React.useState<boolean>(false)
 
   // Set sensible defaults when preset changes
   React.useEffect(() => {
@@ -70,54 +70,17 @@ export function CompoundInterestCalculator() {
     }
   }, [presetIndex])
 
-  // Fetch data and calculate CAGR when preset changes
+  // Autopreenche a taxa a partir do CAGR histórico curado do índice + janela.
+  // (Constantes em lib/finance/indexReturns.ts — os níveis de preço dos índices
+  // não estão na BD, por isso não há fetch nem 404; ver notas no ficheiro.)
   React.useEffect(() => {
-    if (presetIndex === "custom" || presetIndex === "conservative") {
-      if (presetIndex === "conservative") setInterestRate(3)
+    if (presetIndex === "custom") return
+    if (presetIndex === "conservative") {
+      setInterestRate(3)
       return
     }
-
-    async function fetchAndCalculate() {
-      setIsFetching(true)
-      try {
-        const fetchTicker = ["GSPC", "IXIC", "DJI"].includes(presetIndex) ? `^${presetIndex}` : presetIndex;
-        const res = await fetch(`/api/prices/${fetchTicker}?period=max`)
-        if (res.ok) {
-          const prices = await res.json()
-          if (prices.length > 0) {
-            const latestPrice = prices[prices.length - 1].close
-            
-            const targetDate = new Date()
-            targetDate.setFullYear(targetDate.getFullYear() - parseInt(presetLookback))
-            const targetTime = targetDate.getTime()
-            
-            let closestPrice = prices[0].close
-            let minDiff = Infinity
-            
-            for (let i = 0; i < prices.length; i++) {
-              const pDate = new Date(prices[i].date).getTime()
-              const diff = Math.abs(pDate - targetTime)
-              if (diff < minDiff) {
-                minDiff = diff
-                closestPrice = prices[i].close
-              }
-            }
-            
-            const yearsDiff = parseInt(presetLookback)
-            if (yearsDiff > 0 && closestPrice > 0) {
-              const cagr = (Math.pow(latestPrice / closestPrice, 1 / yearsDiff) - 1) * 100
-              setInterestRate(Math.round(cagr * 10) / 10)
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch prices:", error)
-      } finally {
-        setIsFetching(false)
-      }
-    }
-    
-    fetchAndCalculate()
+    const cagr = getIndexCagr(presetIndex, parseInt(presetLookback))
+    if (cagr !== null) setInterestRate(cagr)
   }, [presetIndex, presetLookback])
 
   const data = React.useMemo(() => {
@@ -186,7 +149,7 @@ export function CompoundInterestCalculator() {
       return (
         <div className="bg-popover/95 backdrop-blur-md border border-border/50 p-4 rounded-xl shadow-xl space-y-3 min-w-[200px]">
           <div className="font-bold text-foreground">
-            Ano {label}
+            {t("chart.yearAxis", { value: label })}
           </div>
           <div className="space-y-1">
             <div className="flex justify-between gap-4 text-sm">
@@ -202,7 +165,7 @@ export function CompoundInterestCalculator() {
               <span className="font-medium text-blue-500">{formatCurrency(payload[0].payload.interest)}</span>
             </div>
             <div className="flex justify-between gap-4 text-sm pt-2 border-t border-border/50 font-bold">
-              <span className="text-foreground">Total</span>
+              <span className="text-foreground">{t("chart.total")}</span>
               <span className="text-foreground">{formatCurrency(payload[0].payload.total)}</span>
             </div>
           </div>
@@ -280,7 +243,7 @@ export function CompoundInterestCalculator() {
             value={years}
             onChange={setYears}
             step={1}
-            suffix="Anos"
+            suffix={t("yearsSuffix")}
           />
         </div>
 
@@ -326,35 +289,30 @@ export function CompoundInterestCalculator() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">1 Ano</SelectItem>
-                    <SelectItem value="3">3 Anos</SelectItem>
-                    <SelectItem value="5">5 Anos</SelectItem>
-                    <SelectItem value="10">10 Anos</SelectItem>
-                    <SelectItem value="20">20 Anos</SelectItem>
-                    <SelectItem value="30">30 Anos</SelectItem>
-                    <SelectItem value="50">Max (50+ Anos)</SelectItem>
+                    <SelectItem value="1">{t("lookbackOptions.1")}</SelectItem>
+                    <SelectItem value="3">{t("lookbackOptions.3")}</SelectItem>
+                    <SelectItem value="5">{t("lookbackOptions.5")}</SelectItem>
+                    <SelectItem value="10">{t("lookbackOptions.10")}</SelectItem>
+                    <SelectItem value="20">{t("lookbackOptions.20")}</SelectItem>
+                    <SelectItem value="30">{t("lookbackOptions.30")}</SelectItem>
+                    <SelectItem value="50">{t("lookbackOptions.50")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
           )}
 
-          <div className="relative">
-            <NumberField
-              label={t("interestRate")}
-              tooltip={t("tooltips.interestRate")}
-              value={interestRate}
-              onChange={(val) => {
-                setInterestRate(val)
-                setPresetIndex("custom")
-              }}
-              step={0.1}
-              suffix="%"
-            />
-            {isFetching && (
-              <Loader2 className="absolute right-8 top-[28px] h-4 w-4 animate-spin text-muted-foreground" />
-            )}
-          </div>
+          <NumberField
+            label={t("interestRate")}
+            tooltip={t("tooltips.interestRate")}
+            value={interestRate}
+            onChange={(val) => {
+              setInterestRate(val)
+              setPresetIndex("custom")
+            }}
+            step={0.1}
+            suffix="%"
+          />
 
           <div className="space-y-1.5">
             <LabelWithTooltip label={t("compoundLabel")} tooltip={t("tooltips.compound")} />
@@ -439,7 +397,7 @@ export function CompoundInterestCalculator() {
                   tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
                   axisLine={false}
                   tickLine={false}
-                  tickFormatter={(val) => `Ano ${val}`}
+                  tickFormatter={(val) => t("chart.yearAxis", { value: val })}
                 />
                 <YAxis
                   tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}

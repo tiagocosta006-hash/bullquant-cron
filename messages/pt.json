@@ -1170,6 +1170,7 @@
     "titlePlain": "A democratizar o acesso a dados financeiros.",
     "intro": "A BullValue é uma plataforma de análise de dados fundamentais desenhada para todo o tipo de investidores.",
     "problem": {
+      "eyebrow": "O Problema",
       "title": "O Nosso Objetivo",
       "text": "Dar ao investidor individual acesso fácil, estruturado e transparente às demonstrações financeiras das empresas. Ao automatizar a extração dos complexos relatórios da SEC, libertamos o teu tempo para aquilo que realmente importa: a análise de valor."
     },
@@ -1179,6 +1180,7 @@
       "cta": "Visitar thebullocracy.com"
     },
     "team": {
+      "eyebrow": "Quem Somos",
       "title": "A Equipa",
       "description": "Toda a plataforma é desenhada por quem entende e quer entender cada vez mais de mercados, garantindo que as ferramentas refletem as necessidades reais da análise fundamental.",
       "members": [
@@ -1207,18 +1209,22 @@
           "role": "Lead Developer & UI/UX Designer",
           "bio": "Estudante no IPCA (Instituto Politécnico do Cávado e do Ave). Responsável pelo desenvolvimento técnico da plataforma, desenhando a interface e construindo a estrutura de backend e frontend com foco em código e arquitetura de software.",
           "socials": {
-            "linkedin": "#",
+            "linkedin": "https://www.linkedin.com/in/alexandre-magalhaes-martins-machado/",
             "instagram": "#",
-            "email": "#"
+            "email": "alexmachadovi@gmail.com"
           }
         }
-      ]
+      ],
+      "viewProfile": "Ver perfil",
+      "socialsSoon": "Redes sociais a atualizar em breve"
     },
     "philosophy": {
+      "eyebrow": "Metodologia",
       "title": "A Filosofia dos Dados",
       "text": "A nossa análise baseia-se na matemática e nos relatórios oficiais extraídos diretamente da SEC. A BullValue foca-se na solidez dos números. Acreditamos que as decisões financeiras exigem dados limpos, precisão técnica e transparência, características que valorizamos muito no BullValue."
     },
     "contact": {
+      "eyebrow": "Falar Connosco",
       "title": "Contactos Oficiais",
       "text": "Tens dúvidas, propostas de parceria ou queres saber mais sobre toda a plataforma? A equipa da Bullocracy está à tua disposição.",
       "email_label": "Email Institucional",

@@ -1171,6 +1171,7 @@
     "titlePlain": "Democratizing access to financial data.",
     "intro": "BullValue is a fundamental data analysis platform designed for all types of investors.",
     "problem": {
+      "eyebrow": "The Problem",
       "title": "Our Goal",
       "text": "To give the individual investor easy, structured, and transparent access to corporate financial statements. By automating the extraction of complex SEC reports, we free up your time for what really matters: value analysis."
     },
@@ -1180,6 +1181,7 @@
       "cta": "Visit thebullocracy.com"
     },
     "team": {
+      "eyebrow": "Who We Are",
       "title": "The Team",
       "description": "The entire platform is designed by people who understand and want to learn more about the markets, ensuring our tools reflect the real needs of fundamental analysis.",
       "members": [
@@ -1208,18 +1210,22 @@
           "role": "Lead Developer & UI/UX Designer",
           "bio": "Student at IPCA (Polytechnic Institute of Cávado and Ave). Responsible for the technical development of the platform, designing the interface, and building the backend and frontend structure with a focus on code and software architecture.",
           "socials": {
-            "linkedin": "#",
+            "linkedin": "https://www.linkedin.com/in/alexandre-magalhaes-martins-machado/",
             "instagram": "#",
-            "email": "#"
+            "email": "alexmachadovi@gmail.com"
           }
         }
-      ]
+      ],
+      "viewProfile": "View profile",
+      "socialsSoon": "Social links coming soon"
     },
     "philosophy": {
+      "eyebrow": "Methodology",
       "title": "Data Philosophy",
       "text": "Our analysis is based on mathematics and official reports extracted directly from the SEC. BullValue focuses on the solidity of numbers. We believe that financial decisions require clean data, technical precision, and transparency, characteristics we value deeply at BullValue."
     },
     "contact": {
+      "eyebrow": "Get In Touch",
       "title": "Official Contacts",
       "text": "Do you have questions, partnership proposals, or want to know more about the entire platform? The Bullocracy team is at your disposal.",
       "email_label": "Institutional Email",

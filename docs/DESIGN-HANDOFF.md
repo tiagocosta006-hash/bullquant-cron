@@ -65,15 +65,44 @@ O sistema é de **3 camadas**: primitives → semantic (light/dark) → componen
 
   /* Motion — escala ÚNICA de durações/easings. Usa estas, não inventes ms. */
   --spring: cubic-bezier(0.16, 1, 0.3, 1);
-  --dur-instant: 120ms;  /* press feedback */
-  --dur-fast: 200ms;     /* hover, cor */
+  --dur-instant: 120ms;  /* press feedback — tem de continuar SECO */
+  --dur-hover: 260ms;    /* hover: default de TODAS as transitions (ver @theme) */
+  --dur-fast: 260ms;     /* hover, cor — alinhado com --dur-hover */
   --dur-base: 320ms;     /* lift, crossfades */
   --dur-slow: 600ms;     /* success moments */
   --dur-reveal: 900ms;   /* reveals de scroll */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-hover: cubic-bezier(0.4, 0.14, 0.3, 1);  /* hover do terminal */
+  --ease-lush: cubic-bezier(0.3, 0.06, 0.3, 1);   /* hover das páginas públicas */
 }
 ```
+
+**Duas velocidades de hover.** O `@theme inline` injeta
+`transition-duration: var(--tw-duration, var(--dur-hover))` em todas as utilities
+`transition-*` sem `duration-*` explícito — a resolução acontece **no elemento**, por
+isso redefinir os tokens num ancestral cascata para a subárvore. É assim que
+`.motion-lush` (aplicado em `app/[locale]/(marketing)/layout.tsx` num wrapper
+`display:contents`) dá 450ms só às páginas públicas sem tocar no terminal:
+
+```css
+.motion-lush {
+  --dur-hover: 450ms;  --dur-fast: 450ms;  --ease-hover: var(--ease-lush);
+  --dur-lift: 450ms;   --ease-lift: var(--ease-lush);
+  --lift-y: -7px;      /* .card-lift  */
+  --lift-y-sm: -2px;   /* .pressable  */
+}
+```
+
+`--dur-lift`/`--ease-lift`/`--lift-y` existem **só** dentro do escopo; `.card-lift` e
+`.pressable` leem-nos com fallback (`var(--dur-lift, var(--dur-base))`), logo fora do
+escopo o comportamento é o de sempre. Não redefinir `--dur-base` no escopo: é lido pela
+`.floating-cta` e pelo `.faq-chevron`, que a 450ms arrastavam.
+
+⚠️ O `.pressable` separa hover (`translate`) de press (`scale`) em propriedades
+diferentes — partilhavam `transform` e portanto a duração, e não havia como ter hover
+longo com press seco. Consequência: o press afunda a partir do estado levantado.
+Quem mexer no reduced-motion tem de anular `translate`/`scale`, não só `transform`.
 
 ### 1.2 Semantic — light (default)
 

@@ -39,7 +39,10 @@ export function ExploreReplica({
         {SECTORS.map(({ name, icon: Icon, color, bg }, i) => (
           <div
             key={name}
-            className="glass group flex flex-col items-start rounded-xl p-4 text-left transition-transform hover:-translate-y-0.5"
+            /* duration-200 fixo de propósito: isto é uma RÉPLICA do terminal
+               dentro da landing e tem de continuar a ler como o produto, não
+               herdar os 450ms do .motion-lush (igual ao DashboardReplica). */
+            className="glass group flex flex-col items-start rounded-xl p-4 text-left transition-transform duration-200 hover:-translate-y-0.5"
           >
             <div className={`mb-3 rounded-lg p-2.5 ${bg} ${color} transition-transform group-hover:scale-110`}>
               <Icon size={20} strokeWidth={1.5} />

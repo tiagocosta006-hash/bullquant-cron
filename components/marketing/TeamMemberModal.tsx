@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Link, Camera, Mail } from "lucide-react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 export interface TeamMember {
   name: string;
@@ -24,6 +25,7 @@ export interface TeamMember {
 }
 
 export function TeamMemberModal({ member }: { member: TeamMember }) {
+  const t = useTranslations("about.team");
   // Verifica que redes sociais têm dados, assumimos que "#" significa vazio de momento
   const hasLinkedin = member.socials?.linkedin && member.socials.linkedin !== "#";
   const hasInstagram = member.socials?.instagram && member.socials.instagram !== "#";
@@ -33,7 +35,11 @@ export function TeamMemberModal({ member }: { member: TeamMember }) {
   return (
     <Dialog>
       <DialogTrigger className="w-full text-left">
-        <span className="block glass group flex flex-col gap-6 p-8 rounded-3xl transition-all duration-300 hover:-translate-y-2 cursor-pointer hover:shadow-2xl hover:border-primary/30 relative overflow-hidden">
+        {/* .card-lift é o primitivo partilhado (lift + borda dourada + sombra
+            do sistema). Substituiu um transition-all/duration-300/shadow-2xl
+            à mão, que fugia aos tokens de motion e ficava fora da cobertura de
+            prefers-reduced-motion. */}
+        <span className="card-lift glass group relative flex cursor-pointer flex-col gap-6 overflow-hidden rounded-3xl p-8">
           {/* Efeito de brilho hover no cartão pequeno */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
           
@@ -57,7 +63,7 @@ export function TeamMemberModal({ member }: { member: TeamMember }) {
           
           <div className="mt-4 text-center relative z-10">
             <span className="text-xs font-semibold text-primary/70 uppercase tracking-widest group-hover:text-primary flex items-center justify-center gap-2 transition-colors">
-              Ver perfil <span className="text-lg leading-none">&rarr;</span>
+              {t("viewProfile")} <span className="text-lg leading-none">&rarr;</span>
             </span>
           </div>
         </span>
@@ -114,7 +120,7 @@ export function TeamMemberModal({ member }: { member: TeamMember }) {
               
               {!hasAnySocial && (
                 <div className="px-4 py-2.5 bg-secondary/50 rounded-xl text-muted-foreground/60 font-medium text-sm border border-border/50 border-dashed">
-                  Redes sociais a atualizar em breve
+                  {t("socialsSoon")}
                 </div>
               )}
             </div>

@@ -125,6 +125,12 @@
   /* Hover: arranca suave e assenta devagar (mais "fade in" que o ease do
      Tailwind, que arrancava a pique e dava a sensação de jerky). */
   --ease-hover: cubic-bezier(0.4, 0.14, 0.3, 1);
+  /* Hover das páginas públicas (ver .motion-lush): ease-in-out com arranque
+     perceptível MAS travel suficiente nos primeiros ~100ms para deixar rasto
+     quando se varre o rato pela grelha — é isso que faz vários cartões ficarem
+     a assentar ao mesmo tempo. Um ease-in-out puro (sine) fica bonito parado
+     e falha o rasto: a 80ms teria andado 0.5px de 7px. */
+  --ease-lush: cubic-bezier(0.3, 0.06, 0.3, 1);
 }
 
 /* ── Layer 2 · SEMANTIC (light — default) ─────────────────── */
@@ -292,28 +298,38 @@
    Feedback tátil premium, discreto: press/hover/success/crossfade.
    CSS puro — GSAP fica reservado a scrub e contagem de números. */
 @layer components {
-  /* Botões/CTAs: afunda ao pressionar, levita ligeiro em hover */
+  /* Botões/CTAs: afunda ao pressionar, levita ligeiro em hover.
+     Hover e press vivem em PROPRIEDADES DIFERENTES (`translate` vs `scale`)
+     de propósito: partilhavam `transform`, logo partilhavam a duração, e não
+     havia como dar um hover longo mantendo o press SECO. O Tailwind 4 também
+     emite `translate:`/`scale:` nos seus utilities, por isso compõem em vez de
+     se esmagarem. Efeito lateral aceite: o press agora afunda A PARTIR do
+     estado levantado (antes o `transform` do :active substituía o lift). */
   .pressable {
     transition:
-      transform var(--dur-instant) var(--ease-out),
+      translate var(--dur-lift, var(--dur-instant)) var(--ease-lift, var(--ease-out)),
+      scale var(--dur-instant) var(--ease-out),
       box-shadow var(--dur-fast) var(--ease-out);
   }
   .pressable:hover {
-    transform: translateY(-1px);
+    translate: 0 var(--lift-y-sm, -1px);
   }
   .pressable:active {
-    transform: scale(0.97);
+    scale: var(--press-scale, 0.97);
   }
 
-  /* Cards: lift + borda a acender para o dourado */
+  /* Cards: lift + borda a acender para o dourado.
+     Os tokens --dur-lift/--ease-lift/--lift-y só existem dentro de
+     .motion-lush (páginas públicas); fora dele os fallbacks devolvem
+     exatamente os valores de sempre, por isso o terminal fica intocado. */
   .card-lift {
     transition:
-      transform var(--dur-base) var(--spring),
-      box-shadow var(--dur-base) var(--spring),
-      border-color var(--dur-base) var(--ease-out);
+      transform var(--dur-lift, var(--dur-base)) var(--ease-lift, var(--spring)),
+      box-shadow var(--dur-lift, var(--dur-base)) var(--ease-lift, var(--spring)),
+      border-color var(--dur-lift, var(--dur-base)) var(--ease-lift, var(--ease-out));
   }
   .card-lift:hover {
-    transform: translateY(-3px);
+    transform: translateY(var(--lift-y, -3px));
     border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.28),
@@ -422,12 +438,67 @@
   .card-lift:hover {
     transition: none;
     transform: none;
+    /* O lift/press do .pressable vivem em `translate`/`scale`, que
+       `transform: none` NÃO anula. Não se resolve aqui com
+       `translate:none; scale:none` — o lightningcss funde esses longhands no
+       shorthand `transform` (propriedade diferente) e o lift continuava a
+       aplicar-se. A anulação é feita a zerar os tokens, mais abaixo. */
+  }
+  /* Lifts feitos com utilities do Tailwind (`hover:-translate-y-*`, 9 sítios:
+     cards do produto, replicas, cartões da equipa). O v4 compila para
+     `translate: var(--tw-translate-x) var(--tw-translate-y)`, por isso basta
+     neutralizar a custom property. O seletor exige a classe no elemento —
+     NUNCA um `*:hover`, que rebentaria os `-translate-y-1/2` de centragem
+     quando o rato lhes passasse por cima. */
+  [class*="hover:-translate-y"]:hover {
+    --tw-translate-y: 0 !important;
   }
   .mos-color {
     transition: none;
   }
   .success-pop {
     animation: none;
+  }
+}
+
+/* ── Motion: escopo "lush" (SÓ páginas públicas) ───────────────
+   O `@theme inline` (linhas 23-24) injeta nas utilities do Tailwind sem
+   duration explícito a REFERÊNCIA, não o valor:
+     transition-duration: var(--tw-duration, var(--dur-hover));
+   (verificado no CSS compilado em .next/static/chunks). Como a resolução
+   acontece NO ELEMENTO, redefinir os tokens num ancestral cascata para toda
+   a subárvore — é assim que se escopa sem duplicar classes. Se um upgrade do
+   Tailwind passar a inlinar o valor literal, este bloco deixa de ter efeito:
+   reconfirmar o output nessa altura.
+   Aplicado em app/[locale]/(marketing)/layout.tsx via `.contents.motion-lush`.
+   O terminal (grupo (app)) fica nos 260ms de sempre. */
+.motion-lush {
+  --dur-hover: 450ms;
+  --dur-fast: 450ms;
+  --ease-hover: var(--ease-lush);
+
+  --dur-lift: 450ms;
+  --ease-lift: var(--ease-lush);
+  --lift-y: -7px; /* .card-lift — a -3px um fade de 450ms era imperceptível */
+  --lift-y-sm: -2px; /* .pressable — botão sugere, não flutua */
+  /* --dur-instant NÃO se redefine: o press tem de continuar SECO.
+     --dur-base NÃO se redefine: é lido pela .floating-cta e pelo
+     .faq-chevron, que a 450ms arrastavam. Daí existir --dur-lift. */
+}
+
+/* Reduced-motion do lift/press: zera-se pelos TOKENS e não com
+   `translate:none`/`scale:none`, porque o lightningcss funde esses longhands
+   no shorthand `transform` — propriedade diferente, que não os anula, e o
+   lift continuava a acontecer (verificado no CSS compilado).
+   Tem de vir DEPOIS de .motion-lush e incluí-lo: as custom properties
+   resolvem-se no ancestral mais próximo, por isso um `:root` sozinho não
+   chegava para a subárvore pública. */
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  .motion-lush {
+    --lift-y: 0px;
+    --lift-y-sm: 0px;
+    --press-scale: 1;
   }
 }
 
@@ -592,7 +663,13 @@
   animation: marquee-x var(--marquee-duration, 52s) linear infinite;
   will-change: transform;
 }
-.marquee:hover .marquee-track {
+/* Pausa binária: SÓ quando o JS não assumiu o controlo. O `data-js` é posto no
+   mount pelo MarqueeViewport, que trava a fita suavemente interpolando o
+   playbackRate. Sem este :not(), o `animation-play-state: paused` congelava a
+   track e o tween não se veria — lutariam. `focus-within` dá paridade de
+   teclado ao fallback. */
+.marquee:not([data-js]):hover .marquee-track,
+.marquee:not([data-js]):focus-within .marquee-track {
   animation-play-state: paused;
 }
 
@@ -649,6 +726,30 @@
       transparent 42%,
       color-mix(in srgb, var(--foreground) 5%, transparent)
     );
+  }
+
+  /* Marca d'água da marca (assinatura discreta atrás do conteúdo).
+     O logo.svg tem `fill` hardcoded (#C28B1A), por isso entra como MÁSCARA —
+     usa-se só o alpha e a cor vem do token, o que a torna theme-aware de graça
+     sem duplicar o path em JSX nem manter um asset por tema.
+     O dark precisa de ~1.5× do alpha: opacidade baixa lê mais fraco sobre
+     fundo escuro. Acima de ~0.08 começa a competir com os .motif-*.
+     ⚠️ O slot `mask-image` fica OCUPADO: um fade radial extra (à TickerWall)
+     substituiria a máscara em vez de compor — teria de vir de um wrapper. */
+  .brand-watermark {
+    background-color: var(--primary);
+    -webkit-mask-image: url("/brand/logo.svg");
+    mask-image: url("/brand/logo.svg");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    opacity: 0.035;
+  }
+  .dark .brand-watermark {
+    opacity: 0.055;
   }
 }
 

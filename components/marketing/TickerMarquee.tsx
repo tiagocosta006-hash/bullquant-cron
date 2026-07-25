@@ -1,5 +1,6 @@
 import { Link } from '@/i18n/routing';
 import { CompanyLogo } from "@/components/ui/CompanyLogo";
+import { MarqueeViewport } from "@/components/fx/MarqueeViewport";
 import { formatPercent, formatPrice } from "@/lib/finance/format";
 import type { TickerItem } from "@/lib/marketing/ticker";
 import { cn } from "@/lib/utils";
@@ -8,9 +9,11 @@ import { cn } from "@/lib/utils";
  * TickerMarquee — fita de terminal (ambient motion). Usada no rodapé do hero
  * da landing E no topo da dashboard da app (app/(app)/dashboard/page.tsx) —
  * não introduzir aqui dependências específicas de marketing.
- * Server Component: a animação é 100% CSS (`.marquee` em globals.css),
- * pausa em hover e desliga com prefers-reduced-motion. A lista é
- * renderizada duas vezes (a cópia é aria-hidden) para o loop -50%.
+ * Continua Server Component: os itens são renderizados no servidor e passam
+ * como children ao MarqueeViewport (cliente), que possui a casca e trava a
+ * fita SUAVEMENTE em hover interpolando o playbackRate. A animação em si é
+ * CSS (`.marquee` em globals.css) e desliga com prefers-reduced-motion.
+ * A lista é renderizada duas vezes (a cópia é aria-hidden) para o loop -50%.
  * Cada ticker leva uma mini-sparkline determinística (SSR estável,
  * igual nas duas cópias) — verde/vermelho é a semântica real do dia.
  */
@@ -67,14 +70,9 @@ export function TickerMarquee({ items, label }: { items: TickerItem[]; label: st
     });
 
   return (
-    <div aria-label={label} className="marquee marquee-band w-full py-4">
-      <div
-        className="marquee-track flex items-center"
-        style={{ "--marquee-duration": `${items.length * 4}s` } as React.CSSProperties}
-      >
-        {row(false)}
-        {row(true)}
-      </div>
-    </div>
+    <MarqueeViewport label={label} durationSec={items.length * 4}>
+      {row(false)}
+      {row(true)}
+    </MarqueeViewport>
   );
 }

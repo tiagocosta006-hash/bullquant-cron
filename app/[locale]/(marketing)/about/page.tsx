@@ -2,8 +2,10 @@ import { getTranslations } from "next-intl/server";
 import { useTranslations } from "next-intl";
 import { BRAND } from "@/lib/brand";
 import { buttonVariants } from "@/components/ui/button";
-import { ExternalLink, Target, Mail, MapPin, MessageCircle } from "lucide-react";
+import { ExternalLink, Target, Mail, MapPin, MessageCircle, Scale } from "lucide-react";
 import { TeamMemberModal } from "@/components/marketing/TeamMemberModal";
+import { SectionBg } from "@/components/marketing/SectionBg";
+import { BrandMark } from "@/components/brand/BrandMark";
 import { LiquidGlass } from "@/components/fx/LiquidGlass";
 import { Reveal } from "@/components/fx/Reveal";
 import Image from "next/image";
@@ -82,14 +84,38 @@ export default function AboutPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="container mx-auto flex max-w-5xl flex-col gap-24 px-4 py-24 sm:px-6 sm:py-32">
+      {/* `relative isolate` cria o stacking context que confina o -z-10 da
+          marca d'água: sem ele afundava para trás da cartografia global fixa
+          (ContourCanvas). Mesmo contrato documentado no SectionBg.
+          NÃO pôr overflow-hidden aqui: cortaria as sombras 0 22px 55px dos
+          cartões de vidro (a grelha de contactos chega à borda do container). */}
+      <div className="container relative isolate mx-auto flex max-w-5xl flex-col gap-24 px-4 py-24 sm:px-6 sm:py-32">
+        {/* Assinatura da marca, muito ténue, atrás de todo o conteúdo.
+            `absolute` e não `fixed`: o rubber-band do InertiaScroll aplica
+            transform ao #marketing-wrap e um fixed aqui dentro tremia.
+            Deslocada para a goteira direita para não ficar debaixo do texto —
+            transparece pelos cartões de vidro, que são translúcidos.
+            A largura em min(70vw, …) garante que nunca gera scroll-x. */}
+        <div
+          aria-hidden
+          className="brand-watermark pointer-events-none absolute -z-10 left-[68%] top-[22%] h-[min(70vw,560px)] w-[min(70vw,560px)] -translate-x-1/2"
+        />
+
         {/* 1. Hero */}
-        <Reveal className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
+        <Reveal
+          data-reveal="zoom"
+          className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center"
+        >
+          <BrandMark className="h-14 w-14 rounded-2xl shadow-lg" />
+          <div className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            {t("badge")}
+          </div>
           <h1 className="text-balance text-4xl font-extrabold leading-[1.02] tracking-[-0.03em] sm:text-6xl">
             {t.rich("title", {
               italic: (chunks) => <span className="not-italic text-foreground">{chunks}</span>,
             })}
           </h1>
+          <span className="gold-rule block h-px w-24" aria-hidden />
           <p className="text-xl leading-relaxed text-muted-foreground">{t("intro")}</p>
         </Reveal>
 
@@ -98,6 +124,9 @@ export default function AboutPage() {
           <LiquidGlass className="card-lift mx-auto flex max-w-3xl flex-col items-center gap-6 rounded-3xl p-8 text-center">
             <div className="mb-2 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
               <Target className="h-7 w-7 text-primary" />
+            </div>
+            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+              {t("problem.eyebrow")}
             </div>
             <h2 className="text-3xl font-extrabold tracking-[-0.03em] text-foreground sm:text-4xl">
               {t("problem.title")}
@@ -109,7 +138,7 @@ export default function AboutPage() {
         </Reveal>
 
         {/* 3. The Organization (Bullocracy) */}
-        <Reveal>
+        <Reveal data-reveal="zoom">
           <LiquidGlass className="card-lift relative mx-auto max-w-4xl overflow-hidden rounded-[2rem] p-8 sm:p-12">
             <div className="pointer-events-none absolute -right-20 -top-20 h-96 w-96 rounded-full bg-primary/15 blur-[100px]" />
             <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
@@ -146,12 +175,38 @@ export default function AboutPage() {
           </LiquidGlass>
         </Reveal>
 
-        {/* Divider */}
-        <div className="gold-rule mx-auto h-px w-full max-w-sm opacity-30" />
+        {/* Divider — mesma régua dourada da landing (w-24, sem opacity-30) */}
+        <div className="gold-rule mx-auto h-px w-24" />
+
+        {/* 3b. Data Philosophy — copy já existia traduzida em about.philosophy
+             e não estava a ser usada em lado nenhum. */}
+        <section className="relative isolate">
+          <SectionBg motif="grid" />
+          <Reveal>
+            <LiquidGlass className="card-lift mx-auto flex max-w-3xl flex-col items-center gap-6 rounded-3xl p-8 text-center">
+              <div className="mb-2 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+                <Scale className="h-7 w-7 text-primary" />
+              </div>
+              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+                {t("philosophy.eyebrow")}
+              </div>
+              <h2 className="text-3xl font-extrabold tracking-[-0.03em] text-foreground sm:text-4xl">
+                {t("philosophy.title")}
+              </h2>
+              <p className="text-lg leading-relaxed text-muted-foreground sm:text-xl">
+                {t("philosophy.text")}
+              </p>
+            </LiquidGlass>
+          </Reveal>
+        </section>
 
         {/* 4. The Team */}
-        <div className="flex flex-col gap-12">
+        <section className="relative isolate flex flex-col gap-12">
+          <SectionBg tone="raised" motif="dots" />
           <Reveal className="mx-auto flex max-w-2xl flex-col gap-4 text-center">
+            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+              {t("team.eyebrow")}
+            </div>
             <h2 className="text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">{t("team.title")}</h2>
             <p className="text-lg text-muted-foreground">{t("team.description")}</p>
           </Reveal>
@@ -185,11 +240,18 @@ export default function AboutPage() {
               );
             })}
           </div>
-        </div>
+        </section>
+
+        {/* Divider */}
+        <div className="gold-rule mx-auto h-px w-24" />
 
         {/* 5. Contacts */}
-        <div className="flex flex-col gap-12 border-t border-border/50 pt-12">
+        <section className="relative isolate flex flex-col gap-12">
+          <SectionBg tone="sunken" motif="stage" />
           <Reveal className="mx-auto flex max-w-2xl flex-col gap-4 text-center">
+            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+              {t("contact.eyebrow")}
+            </div>
             <h2 className="text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">{t("contact.title")}</h2>
             <p className="text-lg text-muted-foreground">{t("contact.text")}</p>
           </Reveal>
@@ -230,7 +292,7 @@ export default function AboutPage() {
               </LiquidGlass>
             </Reveal>
           </div>
-        </div>
+        </section>
       </div>
     </>
   );

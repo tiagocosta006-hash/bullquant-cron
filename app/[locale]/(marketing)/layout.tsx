@@ -13,7 +13,16 @@ export default async function MarketingLayout({
 }) {
   const t = await getTranslations("marketing");
   return (
-    <>
+    /* `motion-lush` = hovers longos (450ms, ease-in-out) SÓ nas páginas
+       públicas; o terminal fica nos 260ms. Os tokens são custom properties,
+       por isso herdam para toda a subárvore (ver globals.css).
+       `contents` é deliberado: não gera caixa, logo não cria containing block
+       (o ContourCanvas/SectionBackdrop/FloatingCta continuam `fixed` ao
+       viewport), não cria stacking context (os -z-10 continuam a resolver na
+       raiz) e o `flex-1` do #marketing-wrap continua a resolver contra o
+       <main> do layout raiz. Serve apenas de portador dos tokens — incluindo
+       para o que tem de viver FORA do #marketing-wrap. */
+    <div className="contents motion-lush">
       {/* Cartografia topográfica fixa atrás de tudo + scroll pesado com rubber-band.
           ScrollPriceLine é fixed → tem de viver FORA do #marketing-wrap
           (o rubber-band aplica transform ao wrap e partiria o fixed). */}
@@ -30,6 +39,6 @@ export default async function MarketingLayout({
         <div className="flex-1">{children}</div>
         <Footer />
       </div>
-    </>
+    </div>
   );
 }

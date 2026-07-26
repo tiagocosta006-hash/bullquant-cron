@@ -1595,6 +1595,15 @@ def apply_stock_splits(ticker: str, periods_data: list[dict]):
                 break
                 
         if not reference_shares:
+            for p in reversed(periods_data):
+                d_str = p.get('filedAt')
+                if not d_str: continue
+                f_date = datetime.date.fromisoformat(d_str) if isinstance(d_str, str) else d_str
+                if f_date >= split_date_only and p.get('sharesOutstanding'):
+                    reference_shares = p['sharesOutstanding']
+                    break
+                    
+        if not reference_shares:
             continue
             
         for p in periods_data:

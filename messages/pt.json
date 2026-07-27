@@ -3,7 +3,7 @@
     "eyebrow": "Análise fundamental · Value investing",
     "titleLead": "Vê o valor que",
     "titleAccent": "os outros não veem.",
-    "subtitle": "10 anos de fundamentais, uma calculadora DCF que se autopreenche e AI Brief, em português e de graça. Análise séria para quem investe a longo prazo.",
+    "subtitle": "10 anos de fundamentais, uma calculadora DCF que se autopreenche e um Analista IA, em português e de graça. Análise séria para quem investe a longo prazo.",
     "primaryCta": "Criar conta grátis",
     "secondaryCta": "Espreitar sem conta: AAPL",
     "peekCta": "Espreitar sem conta",
@@ -18,8 +18,8 @@
         "desc": "Estima o valor intrínseco em segundos. Autopreenche a partir da empresa e ajusta com sliders."
       },
       "ai": {
-        "title": "AI Brief",
-        "desc": "Resumo por IA dos desenvolvimentos recentes de cada empresa, classificados por sentimento, nunca conselho de investimento."
+        "title": "Analista IA",
+        "desc": "Lê o 10-K oficial e devolve tese de investimento, moat e KPIs com citações à fonte. Podes perguntar-lhe o que quiseres. Nunca é conselho de investimento."
       }
     },
     "stats": {
@@ -37,7 +37,7 @@
       "labelLive": "Preços em direto · S&P 500"
     },
     "showcase": {
-      "caption": "Dez anos de fundamentais, DCF e AI Brief, num só terminal, sem folhas de cálculo.",
+      "caption": "Dez anos de fundamentais, DCF e Analista IA, num só terminal, sem folhas de cálculo.",
       "alt": "Demonstração do terminal BullValue",
       "caption2": "Preço em direto, watchlist e calendário de resultados, tudo a um ⌘K de distância.",
       "caption3": "Grátis, em português, pronto em menos de um minuto.",
@@ -174,7 +174,7 @@
         "f1": "S&P 500 completo (500 empresas)",
         "f2": "10 anos de fundamentais visuais",
         "f3": "Calculadora DCF com autopreenchimento",
-        "f4": "AI Brief e listas temáticas curadas",
+        "f4": "5 créditos de IA por dia e listas temáticas curadas",
         "f5": "Watchlist, calendário de resultados e insider trading",
         "cta": "Criar conta grátis"
       },
@@ -184,7 +184,7 @@
         "price": "7 €",
         "period": "por mês",
         "f1": "Watchlist ilimitada",
-        "f2": "AI Brief ilimitado",
+        "f2": "20 créditos de IA por dia (~6 análises)",
         "f3": "Guardar cenários DCF ilimitados",
         "f4": "Exportar dados financeiros em CSV",
         "f5": "Comunidade privada e apoio prioritário"
@@ -204,7 +204,7 @@
     "faq": {
       "title": "Perguntas frequentes",
       "q1": "Qual é a diferença entre o plano Grátis e o Pro?",
-      "a1": "O Grátis inclui o S&P 500 completo, 10 anos de fundamentais, a calculadora DCF, o AI Brief (5 por dia), as listas temáticas, o calendário de resultados e o insider trading. O Pro acrescenta AI Brief e watchlists ilimitados, guardar cenários DCF, exportar em CSV, comunidade privada e apoio prioritário.",
+      "a1": "O Grátis inclui o S&P 500 completo, 10 anos de fundamentais, a calculadora DCF, o Analista IA (5 créditos por dia, que dão uma análise completa), as listas temáticas, o calendário de resultados e o insider trading. O Pro acrescenta 20 créditos de IA por dia (~6 análises), watchlists ilimitadas, guardar cenários DCF, exportar em CSV, comunidade privada e apoio prioritário.",
       "q2": "Isto é aconselhamento financeiro?",
       "a2": "Não. A BullValue é uma ferramenta de análise e educação. Nenhum valor, métrica ou insight constitui recomendação de compra ou venda. As decisões são sempre tuas.",
       "q3": "Que empresas estão disponíveis?",
@@ -1033,14 +1033,14 @@
         "Calculadora DCF com autopreenche",
         "Gráficos financeiros interativos",
         "Watchlist até 10 empresas",
-        "5 análises AI Brief por dia",
+        "5 créditos de IA por dia (1 análise do Analista)",
         "Calendário de resultados",
         "Dados de Insider Trading"
       ],
       "pro": [
         "Tudo do plano Gratuito",
         "Watchlist ilimitada",
-        "AI Brief ilimitado",
+        "20 créditos de IA por dia (~6 análises)",
         "Guardar análises DCF ilimitadas",
         "Screener avançado com filtros customizados",
         "Exportar dados financeiros em CSV",

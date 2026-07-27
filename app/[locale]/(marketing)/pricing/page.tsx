@@ -20,7 +20,7 @@ import { BRAND } from "@/lib/brand";
 export const metadata = {
   title: `Preços | ${BRAND.name}`,
   description:
-    `Plano gratuito para sempre ou PRO a €7/mês. Análise fundamental completa do S&P 500, DCF integrada e AI Brief em português com ${BRAND.name}.`,
+    `Plano gratuito para sempre ou PRO a €7/mês. Análise fundamental completa do S&P 500, DCF integrada e Analista IA em português com ${BRAND.name}.`,
   alternates: {
     canonical: `${BRAND.siteUrl}/pricing`,
   },
@@ -84,7 +84,7 @@ export default async function PricingPage() {
             "billingIncrement": "P1M",
           },
         ],
-        "description": `Análise fundamental de ações com 10 anos de dados da SEC, calculadora DCF integrada e AI Brief. Em português, gratuito.`,
+        "description": `Análise fundamental de ações com 10 anos de dados da SEC, calculadora DCF integrada e Analista IA. Em português, gratuito.`,
       },
     ],
   };

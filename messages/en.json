@@ -3,7 +3,7 @@
     "eyebrow": "Fundamental analysis · Value investing",
     "titleLead": "See the value",
     "titleAccent": "others miss.",
-    "subtitle": "10 years of fundamentals, a DCF calculator that autofills, and AI Brief, free. Serious analysis for long-term investors.",
+    "subtitle": "10 years of fundamentals, a DCF calculator that autofills, and an AI Analyst, free. Serious analysis for long-term investors.",
     "primaryCta": "Create free account",
     "secondaryCta": "Peek without an account: AAPL",
     "trust": "S&P 500 coverage · SEC EDGAR data · No credit card",
@@ -17,8 +17,8 @@
         "desc": "Estimate intrinsic value in seconds. Autofill from the company and tune with sliders."
       },
       "ai": {
-        "title": "AI Brief",
-        "desc": "An AI summary of each company's recent developments, classified by sentiment, never investment advice."
+        "title": "AI Analyst",
+        "desc": "Reads the official 10-K and returns an investment thesis, moat and KPIs with citations to the source. Ask it anything. Never investment advice."
       }
     },
     "stats": {
@@ -36,7 +36,7 @@
       "labelLive": "Live prices · S&P 500"
     },
     "showcase": {
-      "caption": "Ten years of fundamentals, DCF and AI Brief, one terminal, no spreadsheets.",
+      "caption": "Ten years of fundamentals, DCF and the AI Analyst, one terminal, no spreadsheets.",
       "alt": "BullValue terminal demo",
       "caption2": "Live prices, watchlist and earnings calendar, all one ⌘K away.",
       "caption3": "Free, and ready in under a minute.",
@@ -173,7 +173,7 @@
         "f1": "Full S&P 500 (500 companies)",
         "f2": "10 years of visual fundamentals",
         "f3": "Auto-filled DCF calculator",
-        "f4": "AI Brief and curated theme lists",
+        "f4": "5 AI credits per day and curated theme lists",
         "f5": "Watchlist, earnings calendar and insider trading",
         "cta": "Create free account"
       },
@@ -183,7 +183,7 @@
         "price": "€7",
         "period": "per month",
         "f1": "Unlimited watchlist",
-        "f2": "Unlimited AI Brief",
+        "f2": "20 AI credits per day (~6 analyses)",
         "f3": "Save unlimited DCF scenarios",
         "f4": "Export financial data to CSV",
         "f5": "Private community and priority support"
@@ -203,7 +203,7 @@
     "faq": {
       "title": "Frequently asked questions",
       "q1": "What's the difference between Free and Pro?",
-      "a1": "Free includes the full S&P 500, 10 years of fundamentals, the DCF calculator, AI Brief (5 per day), curated theme lists, the earnings calendar and insider trading. Pro adds unlimited AI Brief and watchlists, saving DCF scenarios, CSV export, a private community and priority support.",
+      "a1": "Free includes the full S&P 500, 10 years of fundamentals, the DCF calculator, the AI Analyst (5 credits per day, enough for one full analysis), curated theme lists, the earnings calendar and insider trading. Pro adds 20 AI credits per day (~6 analyses), unlimited watchlists, saving DCF scenarios, CSV export, a private community and priority support.",
       "q2": "Is this financial advice?",
       "a2": "No. BullValue is an analysis and education tool. No value, metric or insight is a recommendation to buy or sell. Decisions are always yours.",
       "q3": "Which companies are available?",
@@ -1034,14 +1034,14 @@
         "DCF calculator with autofill",
         "Interactive financial charts",
         "Watchlist up to 10 companies",
-        "5 AI Brief analyses per day",
+        "5 AI credits per day (1 Analyst report)",
         "Earnings calendar",
         "Insider Trading data"
       ],
       "pro": [
         "Everything in Free",
         "Unlimited watchlist",
-        "Unlimited AI Brief",
+        "20 AI credits per day (~6 analyses)",
         "Unlimited saved DCF analyses",
         "Advanced screener with custom filters",
         "Export financial data as CSV",

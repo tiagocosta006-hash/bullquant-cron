@@ -1,5 +1,5 @@
 import { Link } from '@/i18n/routing';
-import { LogOut, UserCircle, Zap, Users } from 'lucide-react';
+import { LogOut, UserCircle, Zap, Users, BookOpen } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
@@ -48,6 +48,14 @@ export async function Header() {
               <Zap className="h-4 w-4" />
               <span>{t('pricing')}</span>
             </Link>
+            <Link
+              href="/glossary"
+              className="flex items-center space-x-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              title={t('glossary')}
+            >
+              <BookOpen className="h-4 w-4" />
+              <span>{t('glossary')}</span>
+            </Link>
           </div>
         </nav>
 
@@ -62,6 +70,7 @@ export async function Header() {
                 openMenu: t('openMenu'),
                 about: t('about'),
                 pricing: t('pricing'),
+                glossary: t('glossary'),
                 login: t('login'),
                 peek: t('peek'),
                 createAccount: t('createAccount'),

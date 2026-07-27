@@ -451,11 +451,12 @@ function MonthView({ cursor, byDay, loading, todayStr }: ViewProps) {
                   ))}
                   {dayEvents.length > 4 && (
                     <Dialog>
-                      {/* @ts-ignore - shadcn base-ui migration */}
-                      <DialogTrigger asChild>
-                        <button className="text-xs text-muted-foreground px-1.5 text-left hover:underline w-full mt-0.5">
-                          +{dayEvents.length - 4} {t("more")}
-                        </button>
+                      <DialogTrigger
+                        render={
+                          <button className="text-xs text-muted-foreground px-1.5 text-left hover:underline w-full mt-0.5" />
+                        }
+                      >
+                        +{dayEvents.length - 4} {t("more")}
                       </DialogTrigger>
                       <DialogContent className="max-h-[85vh] overflow-y-auto max-w-sm">
                         <DialogHeader>
@@ -899,26 +900,27 @@ function DayEventCard({ e }: { e: CalendarItem }) {
 
   return (
     <Dialog>
-      {/* @ts-ignore - shadcn base-ui migration */}
-      <DialogTrigger asChild>
-        <button className="flex items-center gap-3 p-3 rounded-lg border border-border/60 bg-background hover:bg-muted/50 hover:border-border transition-all text-left group">
-          {ticker ? (
-            <CompanyLogo src={logoUrl} alt="" fallback={ticker} size={40} className="rounded-md" />
-          ) : (
-            <MacroIconTile type={(e as MacroItem).type} size={40} className="rounded-md" />
-          )}
+      <DialogTrigger
+        render={
+          <button className="flex items-center gap-3 p-3 rounded-lg border border-border/60 bg-background hover:bg-muted/50 hover:border-border transition-all text-left group" />
+        }
+      >
+        {ticker ? (
+          <CompanyLogo src={logoUrl} alt="" fallback={ticker} size={40} className="rounded-md" />
+        ) : (
+          <MacroIconTile type={(e as MacroItem).type} size={40} className="rounded-md" />
+        )}
 
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-sm truncate">{ticker ?? MACRO_TYPE_LABEL[(e as MacroItem).type]}</span>
-              {e.kind === "earnings" && e.epsActual !== null && e.epsEstimate !== null && (
-                e.epsActual >= e.epsEstimate ? <TrendingUp className="h-3.5 w-3.5 text-bull shrink-0" /> : <TrendingDown className="h-3.5 w-3.5 text-bear shrink-0" />
-              )}
-              {e.kind === "macro" && <ImportanceDot importance={e.importance} />}
-            </div>
-            <p className="text-xs text-muted-foreground truncate" title={name}>{name}</p>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5">
+            <span className="font-bold text-sm truncate">{ticker ?? MACRO_TYPE_LABEL[(e as MacroItem).type]}</span>
+            {e.kind === "earnings" && e.epsActual !== null && e.epsEstimate !== null && (
+              e.epsActual >= e.epsEstimate ? <TrendingUp className="h-3.5 w-3.5 text-bull shrink-0" /> : <TrendingDown className="h-3.5 w-3.5 text-bear shrink-0" />
+            )}
+            {e.kind === "macro" && <ImportanceDot importance={e.importance} />}
           </div>
-        </button>
+          <p className="text-xs text-muted-foreground truncate" title={name}>{name}</p>
+        </div>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-md">

@@ -49,11 +49,11 @@ export function CompoundInterestCalculator() {
   const [contribution, setContribution] = React.useState<number>(1000)
   const [interestRate, setInterestRate] = React.useState<number>(6)
   const [years, setYears] = React.useState<number>(10)
-  
+
   const [compoundFreq, setCompoundFreq] = React.useState<string>("1") // Annually
   const [contribFreq, setContribFreq] = React.useState<string>("12") // Monthly
   const [contribTiming, setContribTiming] = React.useState<string>("end") // 'beginning' or 'end'
-  
+
   const [presetIndex, setPresetIndex] = React.useState<string>("GSPC")
   const [presetLookback, setPresetLookback] = React.useState<string>("10")
 
@@ -88,7 +88,7 @@ export function CompoundInterestCalculator() {
     let currentPrincipal = principal
     let totalContributions = 0
     let totalInterest = 0
-    
+
     result.push({
       year: 0,
       principal: currentPrincipal,
@@ -100,30 +100,30 @@ export function CompoundInterestCalculator() {
     const r = interestRate / 100
     const f = parseInt(contribFreq)
     const pmt = contribution
-    
+
     // Equivalent rate per contribution period
     let rate_p = 0
     if (compoundFreq === "continuously") {
       rate_p = Math.exp(r / f) - 1
     } else {
       const n = parseInt(compoundFreq)
-      rate_p = Math.pow(1 + r/n, n/f) - 1
+      rate_p = Math.pow(1 + r / n, n / f) - 1
     }
 
     for (let y = 1; y <= years; y++) {
       let yearInterest = 0
-      
+
       for (let p = 1; p <= f; p++) {
         if (contribTiming === "beginning") {
           currentPrincipal += pmt
           totalContributions += pmt
         }
-        
+
         const periodInterest = currentPrincipal * rate_p
         yearInterest += periodInterest
         totalInterest += periodInterest
         currentPrincipal += periodInterest
-        
+
         if (contribTiming === "end") {
           currentPrincipal += pmt
           totalContributions += pmt
@@ -179,128 +179,129 @@ export function CompoundInterestCalculator() {
     <TooltipProvider delay={200}>
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Inputs Panel */}
-      <Card className="p-6 space-y-8 lg:col-span-1">
-        
-        {/* Section 1: Investment */}
-        <div className="space-y-5">
-          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-            <div className="h-5 w-1 bg-emerald-500 rounded-full"></div>
-            {t("sections.investment")}
-          </h3>
+        <Card className="p-6 space-y-8 lg:col-span-1">
 
-          <NumberField
-            label={t("initialAmount")}
-            tooltip={t("tooltips.initialAmount")}
-            value={principal}
-            onChange={setPrincipal}
-            step={100}
-            suffix="$"
-          />
-          
-          <NumberField
-            label={t("monthlyContribution")}
-            tooltip={t("tooltips.monthlyContribution")}
-            value={contribution}
-            onChange={setContribution}
-            step={50}
-            suffix="$"
-          />
+          {/* Section 1: Investment */}
+          <div className="space-y-5">
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <div className="h-5 w-1 bg-emerald-500 rounded-full"></div>
+              {t("sections.investment")}
+            </h3>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <LabelWithTooltip label={t("contribFreqLabel")} tooltip={t("tooltips.contribFreq")} />
-              <Select value={contribFreq} onValueChange={(v) => setContribFreq(v ?? "")}>
-                <SelectTrigger className="w-full bg-input/30 border-input/30">
-                  <SelectValue>
-                    {contribFreq === "12" ? t("contribFreqOptions.monthly") : t("contribFreqOptions.annually")}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="12">{t("contribFreqOptions.monthly")}</SelectItem>
-                  <SelectItem value="1">{t("contribFreqOptions.annually")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <LabelWithTooltip label={t("contribTimingLabel")} tooltip={t("tooltips.contribTiming")} />
-              <Select value={contribTiming} onValueChange={(v) => setContribTiming(v ?? "")}>
-                <SelectTrigger className="w-full bg-input/30 border-input/30">
-                  <SelectValue>
-                    {contribTiming === "beginning" ? t("contribTimingOptions.beginning") : t("contribTimingOptions.end")}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="beginning">{t("contribTimingOptions.beginning")}</SelectItem>
-                  <SelectItem value="end">{t("contribTimingOptions.end")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+            <NumberField
+              label={t("initialAmount")}
+              tooltip={t("tooltips.initialAmount")}
+              value={principal}
+              onChange={setPrincipal}
+              step={100}
+              suffix="$"
+            />
 
-          <NumberField
-            label={t("years")}
-            tooltip={t("tooltips.years")}
-            value={years}
-            onChange={setYears}
-            step={1}
-            suffix={t("yearsSuffix")}
-          />
-        </div>
+            <NumberField
+              label={t("monthlyContribution")}
+              tooltip={t("tooltips.monthlyContribution")}
+              value={contribution}
+              onChange={setContribution}
+              step={50}
+              suffix="$"
+            />
 
-        <div className="h-px bg-border/50" />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <LabelWithTooltip label={t("contribFreqLabel")} tooltip={t("tooltips.contribFreq")} />
+              <Select value={contribFreq} onValueChange={(val) => val && setContribFreq(val)}>
+      <SelectTrigger className="w-full bg-input/30 border-input/30">
+        <SelectValue>
+          {contribFreq === "12" ? t("contribFreqOptions.monthly") : t("contribFreqOptions.annually")}
+        </SelectValue>
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="12">{t("contribFreqOptions.monthly")}</SelectItem>
+        <SelectItem value="1">{t("contribFreqOptions.annually")}</SelectItem>
+      </SelectContent>
+    </Select>
+  </div>
+    <div className="space-y-1.5">
+      <LabelWithTooltip label={t("contribTimingLabel")} tooltip={t("tooltips.contribTiming")} />
+              <Select value={contribTiming} onValueChange={(val) => val && setContribTiming(val)}>
+      <SelectTrigger className="w-full bg-input/30 border-input/30">
+        <SelectValue>
+          {contribTiming === "beginning" ? t("contribTimingOptions.beginning") : t("contribTimingOptions.end")}
+        </SelectValue>
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="beginning">{t("contribTimingOptions.beginning")}</SelectItem>
+        <SelectItem value="end">{t("contribTimingOptions.end")}</SelectItem>
+      </SelectContent>
+    </Select>
+  </div>
+          </div >
 
-        {/* Section 2: Returns & Compounding */}
-        <div className="space-y-5">
-          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-            <div className="h-5 w-1 bg-blue-500 rounded-full"></div>
-            {t("sections.return")}
-          </h3>
+    <NumberField
+      label={t("years")}
+      tooltip={t("tooltips.years")}
+      value={years}
+      onChange={setYears}
+      step={1}
+      suffix={t("yearsSuffix")}
+    />
+        </div >
 
-          <div className="space-y-1.5 mb-2">
-            <LabelWithTooltip label={t("presetLabel")} tooltip={t("tooltips.preset")} />
-            <div className="flex gap-2">
-              <Select value={presetIndex} onValueChange={(v) => setPresetIndex(v ?? "")}>
-                <SelectTrigger className="flex-1 bg-input/30 border-input/30">
-                  <SelectValue>
-                    {presetIndex === "GSPC" ? t("presets.sp500") : 
-                     presetIndex === "IXIC" ? t("presets.nasdaq") : 
-                     presetIndex === "DJI" ? t("presets.dow") : 
-                     presetIndex === "conservative" ? t("presets.conservative") : 
-                     t("presets.custom")}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="custom">{t("presets.custom")}</SelectItem>
-                  <SelectItem value="GSPC">{t("presets.sp500")}</SelectItem>
-                  <SelectItem value="IXIC">{t("presets.nasdaq")}</SelectItem>
-                  <SelectItem value="DJI">{t("presets.dow")}</SelectItem>
-                  <SelectItem value="conservative">{t("presets.conservative")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+    <div className="h-px bg-border/50" />
 
-          {presetIndex !== "custom" && presetIndex !== "conservative" && (
-            <div className="space-y-1.5 mb-2">
-              <LabelWithTooltip label={t("lookbackLabel")} tooltip={t("tooltips.lookback")} />
-              <div className="flex gap-2">
-                <Select value={presetLookback} onValueChange={(v) => setPresetLookback(v ?? "")}>
-                  <SelectTrigger className="flex-1 bg-input/30 border-input/30">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">{t("lookbackOptions.1")}</SelectItem>
-                    <SelectItem value="3">{t("lookbackOptions.3")}</SelectItem>
-                    <SelectItem value="5">{t("lookbackOptions.5")}</SelectItem>
-                    <SelectItem value="10">{t("lookbackOptions.10")}</SelectItem>
-                    <SelectItem value="20">{t("lookbackOptions.20")}</SelectItem>
-                    <SelectItem value="30">{t("lookbackOptions.30")}</SelectItem>
-                    <SelectItem value="50">{t("lookbackOptions.50")}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          )}
+  {/* Section 2: Returns & Compounding */ }
+  <div className="space-y-5">
+    <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+      <div className="h-5 w-1 bg-blue-500 rounded-full"></div>
+      {t("sections.return")}
+    </h3>
+
+    <div className="space-y-1.5 mb-2">
+      <LabelWithTooltip label={t("presetLabel")} tooltip={t("tooltips.preset")} />
+      <div className="flex gap-2">
+              <Select value={presetIndex} onValueChange={(val) => val && setPresetIndex(val)}>
+      <SelectTrigger className="flex-1 bg-input/30 border-input/30">
+        <SelectValue>
+          {presetIndex === "GSPC" ? t("presets.sp500") :
+            presetIndex === "IXIC" ? t("presets.nasdaq") :
+              presetIndex === "DJI" ? t("presets.dow") :
+                presetIndex === "conservative" ? t("presets.conservative") :
+                  t("presets.custom")}
+        </SelectValue>
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="custom">{t("presets.custom")}</SelectItem>
+        <SelectItem value="GSPC">{t("presets.sp500")}</SelectItem>
+        <SelectItem value="IXIC">{t("presets.nasdaq")}</SelectItem>
+        <SelectItem value="DJI">{t("presets.dow")}</SelectItem>
+        <SelectItem value="conservative">{t("presets.conservative")}</SelectItem>
+      </SelectContent>
+    </Select>
+  </div>
+          </div >
+
+    { presetIndex !== "custom" && presetIndex !== "conservative" && (
+      <div className="space-y-1.5 mb-2">
+        <LabelWithTooltip label={t("lookbackLabel")} tooltip={t("tooltips.lookback")} />
+        <div className="flex gap-2">
+                <Select value={presetLookback} onValueChange={(val) => val && setPresetLookback(val)}>
+      <SelectTrigger className="flex-1 bg-input/30 border-input/30">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="1">{t("lookbackOptions.1")}</SelectItem>
+        <SelectItem value="3">{t("lookbackOptions.3")}</SelectItem>
+        <SelectItem value="5">{t("lookbackOptions.5")}</SelectItem>
+        <SelectItem value="10">{t("lookbackOptions.10")}</SelectItem>
+        <SelectItem value="20">{t("lookbackOptions.20")}</SelectItem>
+        <SelectItem value="30">{t("lookbackOptions.30")}</SelectItem>
+        <SelectItem value="50">{t("lookbackOptions.50")}</SelectItem>
+      </SelectContent>
+    </Select>
+  </div>
+            </div >
+          )
+}
 
           <NumberField
             label={t("interestRate")}
@@ -316,38 +317,38 @@ export function CompoundInterestCalculator() {
 
           <div className="space-y-1.5">
             <LabelWithTooltip label={t("compoundLabel")} tooltip={t("tooltips.compound")} />
-            <Select value={compoundFreq} onValueChange={(v) => setCompoundFreq(v ?? "")}>
-              <SelectTrigger className="w-full bg-input/30 border-input/30">
-                <SelectValue>
-                  {compoundFreq === "1" && t("compoundOptions.annually")}
-                  {compoundFreq === "2" && t("compoundOptions.semi")}
-                  {compoundFreq === "4" && t("compoundOptions.quarterly")}
-                  {compoundFreq === "12" && t("compoundOptions.monthly")}
-                  {compoundFreq === "24" && t("compoundOptions.semimonthly")}
-                  {compoundFreq === "26" && t("compoundOptions.biweekly")}
-                  {compoundFreq === "52" && t("compoundOptions.weekly")}
-                  {compoundFreq === "365" && t("compoundOptions.daily")}
-                  {compoundFreq === "continuously" && t("compoundOptions.continuously")}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">{t("compoundOptions.annually")}</SelectItem>
-                <SelectItem value="2">{t("compoundOptions.semi")}</SelectItem>
-                <SelectItem value="4">{t("compoundOptions.quarterly")}</SelectItem>
-                <SelectItem value="12">{t("compoundOptions.monthly")}</SelectItem>
-                <SelectItem value="24">{t("compoundOptions.semimonthly")}</SelectItem>
-                <SelectItem value="26">{t("compoundOptions.biweekly")}</SelectItem>
-                <SelectItem value="52">{t("compoundOptions.weekly")}</SelectItem>
-                <SelectItem value="365">{t("compoundOptions.daily")}</SelectItem>
-                <SelectItem value="continuously">{t("compoundOptions.continuously")}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </Card>
+            <Select value={compoundFreq} onValueChange={(val) => val && setCompoundFreq(val)}>
+    <SelectTrigger className="w-full bg-input/30 border-input/30">
+      <SelectValue>
+        {compoundFreq === "1" && t("compoundOptions.annually")}
+        {compoundFreq === "2" && t("compoundOptions.semi")}
+        {compoundFreq === "4" && t("compoundOptions.quarterly")}
+        {compoundFreq === "12" && t("compoundOptions.monthly")}
+        {compoundFreq === "24" && t("compoundOptions.semimonthly")}
+        {compoundFreq === "26" && t("compoundOptions.biweekly")}
+        {compoundFreq === "52" && t("compoundOptions.weekly")}
+        {compoundFreq === "365" && t("compoundOptions.daily")}
+        {compoundFreq === "continuously" && t("compoundOptions.continuously")}
+      </SelectValue>
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="1">{t("compoundOptions.annually")}</SelectItem>
+      <SelectItem value="2">{t("compoundOptions.semi")}</SelectItem>
+      <SelectItem value="4">{t("compoundOptions.quarterly")}</SelectItem>
+      <SelectItem value="12">{t("compoundOptions.monthly")}</SelectItem>
+      <SelectItem value="24">{t("compoundOptions.semimonthly")}</SelectItem>
+      <SelectItem value="26">{t("compoundOptions.biweekly")}</SelectItem>
+      <SelectItem value="52">{t("compoundOptions.weekly")}</SelectItem>
+      <SelectItem value="365">{t("compoundOptions.daily")}</SelectItem>
+      <SelectItem value="continuously">{t("compoundOptions.continuously")}</SelectItem>
+    </SelectContent>
+  </Select>
+</div>
+        </div >
+      </Card >
 
-      {/* Results Panel */}
-      <div className="space-y-6 lg:col-span-2">
+  {/* Results Panel */ }
+  < div className = "space-y-6 lg:col-span-2" >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="p-4 bg-primary/5 border-primary/20">
             <div className="text-sm font-medium text-muted-foreground mb-1">
@@ -440,9 +441,9 @@ export function CompoundInterestCalculator() {
             </ResponsiveContainer>
           </div>
         </Card>
-        </div>
-      </div>
-    </TooltipProvider>
+        </div >
+      </div >
+    </TooltipProvider >
   )
 }
 

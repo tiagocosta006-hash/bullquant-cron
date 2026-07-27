@@ -158,11 +158,10 @@ function MacroCard({
         <button
           key={tab}
           onClick={() => setActiveTab(tab)}
-          className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
-            activeTab === tab
+          className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${activeTab === tab
               ? 'bg-background shadow-sm text-foreground'
               : 'text-muted-foreground hover:text-foreground'
-          }`}
+            }`}
         >
           {tab.toUpperCase()}
         </button>

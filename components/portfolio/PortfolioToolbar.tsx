@@ -40,7 +40,7 @@ export function PortfolioToolbar({
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div className="flex flex-wrap items-center gap-3">
-        <Select value={sortKey} onValueChange={(value) => onSortKeyChange(value as SortKey)}>
+        <Select value={sortKey} onValueChange={(value) => value && onSortKeyChange(value as SortKey)}>
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder={t('toolbar.sortBy')}>
               {(value: SortKey | null) => value ? sortLabels[value] : t('toolbar.sortBy')}
@@ -55,7 +55,7 @@ export function PortfolioToolbar({
         </Select>
 
         {sectors.length > 0 && (
-          <Select value={sectorFilter} onValueChange={(value) => onSectorFilterChange(value ?? "ALL")}>
+          <Select value={sectorFilter} onValueChange={(value) => value && onSectorFilterChange(value)}>
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder={t('toolbar.allSectors')}>
                 {(value: string | null) => !value || value === "ALL" ? t('toolbar.allSectors') : value}

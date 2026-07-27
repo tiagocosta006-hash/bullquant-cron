@@ -460,37 +460,37 @@ export default async function LandingPage({
         )}
       >
         <div className="relative mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
-        <Reveal data-reveal="zoom" className="mx-auto max-w-3xl text-center">
-          <h2 className="text-balance text-4xl font-extrabold tracking-[-0.03em] sm:text-5xl md:text-6xl">
-            {t("bento.title")}
-          </h2>
-          <p className="mt-5 text-lg leading-relaxed text-muted-foreground">{t("bento.subtitle")}</p>
-        </Reveal>
+          <Reveal data-reveal="zoom" className="mx-auto max-w-3xl text-center">
+            <h2 className="text-balance text-4xl font-extrabold tracking-[-0.03em] sm:text-5xl md:text-6xl">
+              {t("bento.title")}
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">{t("bento.subtitle")}</p>
+          </Reveal>
 
-        <div className="mt-14 grid gap-5 md:grid-cols-2">
-          {bentoCards.map(({ key, icon: Icon, href, mock }, i) => (
-            <Reveal key={key} style={{ transitionDelay: `${i * 70}ms` }}>
-              <Parallax amp={i % 2 ? 28 : 44} zoom className="h-full">
-              <Link
-                href={href}
-                data-track={`bento_${key}`}
-                className="block h-full rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-              >
-                <LiquidGlass className="group card-lift h-full rounded-3xl p-6">
-                  <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary transition-transform duration-[var(--dur-base)] ease-[var(--spring)] group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100">
-                    <Icon className="h-5 w-5" strokeWidth={2} />
-                  </div>
-                  <h3 className="text-base font-semibold">{t(`bento.${key}.title`)}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                    {t(`bento.${key}.desc`)}
-                  </p>
-                  {mock}
-                </LiquidGlass>
-              </Link>
-              </Parallax>
-            </Reveal>
-          ))}
-        </div>
+          <div className="mt-14 grid gap-5 md:grid-cols-2">
+            {bentoCards.map(({ key, icon: Icon, href, mock }, i) => (
+              <Reveal key={key} style={{ transitionDelay: `${i * 70}ms` }}>
+                <Parallax amp={i % 2 ? 28 : 44} zoom className="h-full">
+                  <Link
+                    href={href}
+                    data-track={`bento_${key}`}
+                    className="block h-full rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  >
+                    <LiquidGlass className="group card-lift h-full rounded-3xl p-6">
+                      <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary transition-transform duration-[var(--dur-base)] ease-[var(--spring)] group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100">
+                        <Icon className="h-5 w-5" strokeWidth={2} />
+                      </div>
+                      <h3 className="text-base font-semibold">{t(`bento.${key}.title`)}</h3>
+                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                        {t(`bento.${key}.desc`)}
+                      </p>
+                      {mock}
+                    </LiquidGlass>
+                  </Link>
+                </Parallax>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 

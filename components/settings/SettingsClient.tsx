@@ -544,7 +544,7 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
                       <span className="mb-0.5 text-sm text-muted-foreground">/ para sempre</span>
                     </div>
                     <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-                      {["S&P 500 completo", "10 anos de fundamentais", "DCF com autopreenche", "5 AI Briefs/dia", "Watchlist até 10 empresas"].map(f => (
+                      {["S&P 500 completo", "10 anos de fundamentais", "DCF com autopreenche", "5 créditos de IA/dia", "Watchlist até 10 empresas"].map(f => (
                         <li key={f} className="flex items-center gap-2">
                           <Check className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                           {f}
@@ -572,7 +572,7 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
                       <span className="mb-0.5 text-sm text-muted-foreground">/ mês</span>
                     </div>
                     <ul className="mt-4 space-y-2 text-sm">
-                      {["Watchlist ilimitada", "AI Brief ilimitado", "DCF analyses ilimitadas", "Screener avançado", "Exportar CSV", "Comunidade privada", "Suporte 24/7"].map(f => (
+                      {["Watchlist ilimitada", "20 créditos de IA/dia (~6 análises)", "DCF analyses ilimitadas", "Screener avançado", "Exportar CSV", "Comunidade privada", "Suporte 24/7"].map(f => (
                         <li key={f} className="flex items-center gap-2">
                           <Check className="h-3.5 w-3.5 shrink-0 text-primary" />
                           {f}

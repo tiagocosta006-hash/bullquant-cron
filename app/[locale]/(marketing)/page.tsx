@@ -39,7 +39,7 @@ import { DynamicProPrice } from "@/components/marketing/DynamicProPrice";
  * Landing v2 — scroll-cinematográfica: hero de tipografia gigante com
  * ticker vivo (dados EOD do Postgres), showcase que se "abre" com o
  * scroll, manifesto palavra-a-palavra, três stories (gráfico que se
- * desenha · DCF real scriptada · AI Brief), bento, counters e CTA final.
+ * desenha · DCF real scriptada · Analista IA), bento, counters e CTA final.
  * Pinned sections são CSS sticky (nunca pin do GSAP — ver
  * lib/marketing/gsap.ts); todo o texto via i18n; media real entra pelos
  * slots de components/marketing/media.ts.
@@ -112,7 +112,7 @@ export default async function LandingPage({
         "name": BRAND.name,
         "url": BRAND.siteUrl,
         "logo": `${SITE_URL}${BRAND.logoSrc}`,
-        "description": "Plataforma portuguesa de análise fundamental de ações com dados da SEC, DCF integrada e AI Brief.",
+        "description": "Plataforma portuguesa de análise fundamental de ações com dados da SEC, DCF integrada e Analista IA.",
         "foundingDate": "2024",
         "parentOrganization": {
           "@type": "Organization",

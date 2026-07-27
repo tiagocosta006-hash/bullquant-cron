@@ -73,7 +73,7 @@ export default function PrivacyPolicyPage() {
               Poderemos receber da Paddle informação de faturação para gerir o seu estatuto (Plano PRO).
             </li>
             <li>
-              <strong>Inteligência Artificial (Google Gemini API):</strong> De forma a gerar o AI Brief da plataforma,
+              <strong>Inteligência Artificial (Google Gemini API):</strong> De forma a gerar as análises do Analista IA da plataforma,
               as consultas e tickers solicitados por si são enviados para a infraestrutura do Google Gemini. Informamos
               que estas transmissões limitam-se ao contexto do pedido financeiro (ex: nome da empresa) e passam de
               forma completamente <strong>anónima</strong>, não contendo dados de identificação pessoal.

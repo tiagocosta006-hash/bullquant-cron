@@ -17,6 +17,7 @@ interface DcfResultsProps {
   mode?: "FCFF" | "FCFE"
   ticker?: string | null
   name?: string | null
+  logoUrl?: string | null
   inputs?: {
     growthStage1: number
     wacc: number
@@ -24,7 +25,7 @@ interface DcfResultsProps {
   }
 }
 
-export function DcfResults({ result, currency = "$", mode = "FCFF", ticker, name, inputs }: DcfResultsProps) {
+export function DcfResults({ result, currency = "$", mode = "FCFF", ticker, name, logoUrl, inputs }: DcfResultsProps) {
   const t = useTranslations("dcf")
   const [isExporting, setIsExporting] = React.useState(false)
   const cardRef = React.useRef<HTMLDivElement>(null)
@@ -35,7 +36,9 @@ export function DcfResults({ result, currency = "$", mode = "FCFF", ticker, name
     try {
       const dataUrl = await htmlToImage.toPng(cardRef.current, {
         quality: 1,
-        pixelRatio: 1, // Fix resolution to the 1080px we defined
+        pixelRatio: 2, // 2x para garantir nitidez em redes sociais
+        width: 1200,
+        height: 630,
         skipFonts: false,
       })
       const link = document.createElement("a")
@@ -162,6 +165,7 @@ export function DcfResults({ result, currency = "$", mode = "FCFF", ticker, name
           mode={mode}
           ticker={ticker}
           name={name}
+          logoUrl={logoUrl}
           inputs={inputs}
         />
       </div>

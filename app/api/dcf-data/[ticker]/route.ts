@@ -152,6 +152,7 @@ export async function GET(
       ticker: upper,
       name: company.name,
       currency: company.currency,
+      logoUrl: company.logoUrl,
       fcfe0,
       fcff0,
       effectiveTaxRate,

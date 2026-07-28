@@ -36,6 +36,7 @@ type DcfDataResponse = {
   ticker: string
   name: string
   currency: string
+  logoUrl: string | null
   fcfe0: number | null
   fcff0: number | null
   effectiveTaxRate: number
@@ -64,7 +65,7 @@ const DEFAULTS = {
 }
 
 type InitialAnalysis = Omit<SavedAnalysis, "inputs"> & {
-  company: { ticker: string; name: string }
+  company: { ticker: string; name: string; logoUrl?: string | null }
   fcfMode: "FCFF" | "FCFE"
   fcf0: number
   growthStage1: number
@@ -83,6 +84,7 @@ export function DcfCalculator({ initialAnalysis, defaultTicker }: { initialAnaly
   const [currency, setCurrency] = React.useState("$") // Poderíamos deduzir da empresa
   const [loadedName, setLoadedName] = React.useState<string | null>(initialAnalysis?.company.name || null)
   const [loadedTicker, setLoadedTicker] = React.useState<string | null>(initialAnalysis?.company.ticker || null)
+  const [loadedLogo, setLoadedLogo] = React.useState<string | null>(initialAnalysis?.company.logoUrl || null)
   const [currentPrice, setCurrentPrice] = React.useState(initialAnalysis?.priceAtSave || DEFAULTS.currentPrice)
   const [fcf0M, setFcf0M] = React.useState(initialAnalysis ? initialAnalysis.fcf0 / MILLION : DEFAULTS.fcf0M)
   const [sharesM, setSharesM] = React.useState(initialAnalysis ? initialAnalysis.shares / MILLION : DEFAULTS.sharesM)
@@ -154,6 +156,7 @@ export function DcfCalculator({ initialAnalysis, defaultTicker }: { initialAnaly
       setCurrency(data.currency === "EUR" ? "€" : "$")
       setLoadedName(data.name)
       setLoadedTicker(ticker.toUpperCase())
+      setLoadedLogo(data.logoUrl)
       setAnnualFcfSeries(data.annualFcfSeries)
       setFcfMode("FCFF") // default, pode ser alterado depois
       if (data.currentPrice != null) {
@@ -498,6 +501,7 @@ export function DcfCalculator({ initialAnalysis, defaultTicker }: { initialAnaly
           mode={fcfMode} 
           ticker={loadedTicker}
           name={loadedName}
+          logoUrl={loadedLogo}
           inputs={currentForSave?.inputs}
         />
         <WaccBreakdownCard breakdown={waccBreakdown} fcfMode={fcfMode} onUseWacc={handleUseWacc} />

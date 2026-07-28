@@ -68,8 +68,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 })
     }
 
-    const num = (v: unknown): number | null =>
-      typeof v === "number" && Number.isFinite(v) ? v : null
+    const num = (v: unknown): number | null => {
+      if (typeof v !== "number" || !Number.isFinite(v)) return null;
+      // Arredondar para evitar problemas de overflow no tipo Decimal do Prisma (Postgres)
+      return Math.round(v * 1000000) / 1000000;
+    }
 
     const fcf0 = num(inputs.fcf0)
     const shares = num(inputs.shares)
@@ -77,14 +80,14 @@ export async function POST(request: NextRequest) {
 
     // Campos essenciais para um cenário ser válido.
     if (fcf0 === null || shares === null || shares <= 0 || fairValue === null) {
-      return NextResponse.json({ error: "Invalid analysis values" }, { status: 400 })
+      return NextResponse.json({ error: `Valores de análise inválidos (fcf0: ${fcf0}, shares: ${shares}, fairValue: ${fairValue})` }, { status: 400 })
     }
 
     const company = await prisma.company.findUnique({
       where: { ticker: String(ticker).toUpperCase() },
     })
     if (!company) {
-      return NextResponse.json({ error: "Company not found" }, { status: 404 })
+      return NextResponse.json({ error: "Ação (Ticker) não encontrada" }, { status: 404 })
     }
 
     const fcfMode = typeof inputs.fcfMode === "string" && ["FCFF", "FCFE"].includes(inputs.fcfMode)
@@ -114,6 +117,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ id: created.id }, { status: 201 })
   } catch (error) {
     console.error("Error saving DCF analysis:", error)
-    return NextResponse.json({ error: "Failed to save analysis" }, { status: 500 })
+    return NextResponse.json({ error: "Ocorreu um erro ao guardar a análise. Tenta novamente." }, { status: 500 })
   }
 }

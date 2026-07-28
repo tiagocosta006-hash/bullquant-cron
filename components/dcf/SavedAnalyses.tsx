@@ -102,7 +102,8 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
         }),
       })
       if (!res.ok) {
-        setError(t("saved.saveError"))
+        const errorData = await res.json().catch(() => null)
+        setError(errorData?.error || t("saved.saveError"))
         return
       }
       setLabel("")

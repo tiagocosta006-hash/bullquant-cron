@@ -135,75 +135,83 @@ export function TopNav({
 
           <ThemeToggle />
 
-          {/* menu de perfil: avatar de iniciais + conta, links e logout */}
-          <Popover open={menuOpen} onOpenChange={setMenuOpen}>
-            <PopoverTrigger
-              render={
-                <button
-                  type="button"
-                  title={userName || t("more")}
-                  aria-label={userName || t("more")}
-                  className="ml-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/10 text-xs font-extrabold leading-none text-primary transition-colors hover:bg-primary/20"
-                >
-                  {userName ? userInitials(userName) : <MoreHorizontal className="h-5 w-5" />}
-                </button>
-              }
-            />
-            {/* positionMethod fixed: o trigger vive numa pill fixed — com o
-                default (absolute) o popup deslizava com o scroll da página */}
-            <PopoverContent align="end" positionMethod="fixed" className="w-64 p-1.5">
-              {userName && (
-                <div className="mb-1 border-b border-border/60 pb-1.5">
-                  {/* o cartão do perfil também leva às Definições (atalho) */}
-                  <Link
-                    href="/settings"
-                    onClick={() => setMenuOpen(false)}
-                    className="group/profile flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-accent active:scale-[0.98]"
-                  >
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/15 bg-primary/10 text-xs font-extrabold leading-none text-primary">
-                      {userInitials(userName)}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-foreground transition-colors group-hover/profile:text-primary">{userName}</p>
-                      {userEmail && (
+          {/* Auth ou Menu de Perfil */}
+          {!userEmail ? (
+            <div className="flex items-center gap-1.5 ml-1">
+              <Link
+                href="/login"
+                className="hidden items-center justify-center rounded-full px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground sm:flex"
+              >
+                {tHeader("login")}
+              </Link>
+              <Link
+                href="/register"
+                className="flex items-center justify-center rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+              >
+                {tHeader("createAccount")}
+              </Link>
+            </div>
+          ) : (
+            <Popover open={menuOpen} onOpenChange={setMenuOpen}>
+              <PopoverTrigger
+                title={userName || tHeader("settingsTitle")}
+                aria-label={userName || tHeader("settingsTitle")}
+                className="ml-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/10 text-xs font-extrabold leading-none text-primary transition-colors hover:bg-primary/20 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {userName ? userInitials(userName) : <MoreHorizontal className="h-5 w-5" />}
+              </PopoverTrigger>
+              <PopoverContent align="end" positionMethod="fixed" className="w-64 p-1.5">
+                {userName && (
+                  <div className="mb-1 border-b border-border/60 pb-1.5">
+                    {/* o cartão do perfil também leva às Definições (atalho) */}
+                    <Link
+                      href="/settings"
+                      onClick={() => setMenuOpen(false)}
+                      className="group/profile flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-accent active:scale-[0.98]"
+                    >
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/15 bg-primary/10 text-xs font-extrabold leading-none text-primary">
+                        {userInitials(userName)}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-foreground transition-colors group-hover/profile:text-primary">{userName}</p>
                         <p className="truncate text-xs text-muted-foreground">{userEmail}</p>
+                      </div>
+                      {plan && (
+                        <span className="ml-auto shrink-0 rounded-full border border-bull/20 bg-bull/10 px-2 py-0.5 text-[10px] font-bold text-bull">
+                          {plan}
+                        </span>
                       )}
-                    </div>
-                    {plan && (
-                      <span className="ml-auto shrink-0 rounded-full border border-bull/20 bg-bull/10 px-2 py-0.5 text-[10px] font-bold text-bull">
-                        {plan}
-                      </span>
+                    </Link>
+                  </div>
+                )}
+                {overflow.map(({ href, icon: Icon, label }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => setMenuOpen(false)}
+                    className={cn(
+                      "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                      isActive(href)
+                        ? "bg-primary/12 text-primary"
+                        : "text-muted-foreground hover:bg-accent hover:text-foreground",
                     )}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {label}
                   </Link>
-                </div>
-              )}
-              {overflow.map(({ href, icon: Icon, label }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={() => setMenuOpen(false)}
-                  className={cn(
-                    "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                    isActive(href)
-                      ? "bg-primary/12 text-primary"
-                      : "text-muted-foreground hover:bg-accent hover:text-foreground",
-                  )}
-                >
-                  <Icon className="h-4 w-4" />
-                  {label}
-                </Link>
-              ))}
-              <form action={logout} onSubmit={() => setMenuOpen(false)}>
-                <button
-                  type="submit"
-                  className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                >
-                  <LogOut className="h-4 w-4" />
-                  {tHeader("logoutTitle")}
-                </button>
-              </form>
-            </PopoverContent>
-          </Popover>
+                ))}
+                <form action={logout} onSubmit={() => setMenuOpen(false)}>
+                  <button
+                    type="submit"
+                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    {tHeader("logoutTitle")}
+                  </button>
+                </form>
+              </PopoverContent>
+            </Popover>
+          )}
         </LiquidGlass>
       </div>
 

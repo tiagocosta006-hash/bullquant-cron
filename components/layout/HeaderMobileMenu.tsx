@@ -1,7 +1,7 @@
 "use client";
 
 import { Link } from '@/i18n/routing';
-import { LogIn, Menu, Search, UserPlus, Users, Zap } from "lucide-react";
+import { LogIn, Menu, Search, UserPlus, Users, Zap, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -30,6 +30,7 @@ export function HeaderMobileMenu({
     openMenu: string;
     about: string;
     pricing: string;
+    glossary: string;
     login: string;
     peek: string;
     createAccount: string;
@@ -63,6 +64,13 @@ export function HeaderMobileMenu({
             >
               <Zap className="h-4 w-4 text-muted-foreground" />
               {labels.pricing}
+            </Link>
+            <Link
+              href="/glossary"
+              className="flex items-center gap-3 rounded-xl px-3 py-3 text-[15px] font-medium text-foreground transition-colors hover:bg-muted"
+            >
+              <BookOpen className="h-4 w-4 text-muted-foreground" />
+              {labels.glossary}
             </Link>
             {!isLoggedIn && (
               <>

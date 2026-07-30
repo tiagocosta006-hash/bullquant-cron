@@ -46,7 +46,7 @@ export const SupabaseResetPassword = () => {
             </Heading>
 
             <Text className="text-foreground text-[16px] leading-[24px]">
-              Olá {"{{ nome }}"},
+              Olá {"{{ if .Data.name }}{{ .Data.name }}{{ else }}Investidor{{ end }}"},
             </Text>
             
             <Text className="text-muted text-[16px] leading-[24px]">

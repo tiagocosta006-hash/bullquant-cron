@@ -38,12 +38,9 @@ export const SupabaseChangeEmail = () => {
         <Body className="bg-background my-auto mx-auto font-sans text-foreground">
           <Container className="border border-solid border-[#27272a] rounded-xl my-[40px] mx-auto p-[30px] max-w-[600px] bg-card">
             <Section className="mt-[10px] text-center">
-              <Img
-                src="https://framerusercontent.com/images/3K0Y47k7Xw8tW5s6X8x6Z2g5w.png"
-                width="150"
-                alt="BullValue"
-                className="my-0 mx-auto"
-              />
+              <Text className="text-foreground text-[28px] font-extrabold tracking-tight m-0 p-0">
+                Bull<span className="text-[#d6a64a]">Value</span>
+              </Text>
             </Section>
             
             <Heading className="text-foreground text-[24px] font-bold text-center p-0 mt-[20px] mb-[30px] mx-0">
@@ -51,7 +48,7 @@ export const SupabaseChangeEmail = () => {
             </Heading>
 
             <Text className="text-foreground text-[16px] leading-[24px]">
-              Olá {"{{ if .Data.name }}{{ .Data.name }}{{ else }}Investidor{{ end }}"},
+              Olá {"{{ nome }}"},
             </Text>
             
             <Text className="text-muted text-[16px] leading-[24px]">

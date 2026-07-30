@@ -24,6 +24,7 @@
     "@paddle/paddle-node-sdk": "^3.8.0",
     "@prisma/client": "^6.19.3",
     "@react-email/components": "^1.0.12",
+    "@react-email/render": "^2.1.0",
     "@react-email/tailwind": "^2.0.7",
     "@react-pdf/renderer": "^4.5.1",
     "@supabase/ssr": "^0.12.0",

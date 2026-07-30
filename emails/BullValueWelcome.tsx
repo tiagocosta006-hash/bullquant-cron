@@ -20,7 +20,7 @@ interface BullValueWelcomeEmailProps {
 }
 
 export const BullValueWelcomeEmail = ({
-  userFirstName = "Investidor",
+  userFirstName = "{{ nome }}",
 }: BullValueWelcomeEmailProps) => {
   const previewText = `Bem-vindo(a) à BullValue. Vê o valor que os outros não veem.`;
 
@@ -47,12 +47,9 @@ export const BullValueWelcomeEmail = ({
           <Container className="border border-solid border-[#27272a] rounded-xl my-[40px] mx-auto p-[20px] max-w-[600px] bg-card">
             <Section className="mt-[32px] text-center">
               {/* Nota: Em produção, deves substituir o src por um URL público e absoluto (ex: https://thebullocracy.com/brand/logo.png) */}
-              <Img
-                src="https://framerusercontent.com/images/3K0Y47k7Xw8tW5s6X8x6Z2g5w.png"
-                width="150"
-                alt="BullValue"
-                className="my-0 mx-auto"
-              />
+              <Text className="text-foreground text-[28px] font-extrabold tracking-tight m-0 p-0">
+                Bull<span className="text-[#d6a64a]">Value</span>
+              </Text>
             </Section>
             
             <Heading className="text-foreground text-[24px] font-bold text-center p-0 mt-[10px] mb-[30px] mx-0">

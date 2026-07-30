@@ -47,9 +47,7 @@ export const BullValueWelcomeEmail = ({
           <Container className="border border-solid border-[#27272a] rounded-xl my-[40px] mx-auto p-[20px] max-w-[600px] bg-card">
             <Section className="mt-[32px] text-center">
               {/* Nota: Em produção, deves substituir o src por um URL público e absoluto (ex: https://thebullocracy.com/brand/logo.png) */}
-              <Text className="text-foreground text-[28px] font-extrabold tracking-tight m-0 p-0">
-                Bull<span className="text-[#d6a64a]">Value</span>
-              </Text>
+              <Img src="https://thebullvalue.com/brand/logo.svg" height="40" alt="BullValue" className="my-0 mx-auto" />
             </Section>
             
             <Heading className="text-foreground text-[24px] font-bold text-center p-0 mt-[10px] mb-[30px] mx-0">

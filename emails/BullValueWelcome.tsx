@@ -47,7 +47,7 @@ export const BullValueWelcomeEmail = ({
           <Container className="border border-solid border-[#27272a] rounded-xl my-[40px] mx-auto p-[20px] max-w-[600px] bg-card">
             <Section className="mt-[32px] text-center">
               {/* Nota: Em produção, deves substituir o src por um URL público e absoluto (ex: https://thebullocracy.com/brand/logo.png) */}
-              <Img src="https://raw.githubusercontent.com/alequece2/bullquant/main/public/brand/logo.svg" height="40" alt="BullValue" className="my-0 mx-auto" />
+              <Img src="https://thebullvalue.com/brand/logo.svg" height="40" alt="BullValue" className="my-0 mx-auto" />
             </Section>
             
             <Heading className="text-foreground text-[24px] font-bold text-center p-0 mt-[10px] mb-[30px] mx-0">

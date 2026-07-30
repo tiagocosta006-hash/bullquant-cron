@@ -15,14 +15,14 @@ import {
 } from "@react-email/components";
 import * as React from "react";
 
-interface BullMetricsWelcomeEmailProps {
+interface BullValueWelcomeEmailProps {
   userFirstName?: string;
 }
 
-export const BullMetricsWelcomeEmail = ({
+export const BullValueWelcomeEmail = ({
   userFirstName = "Investidor",
-}: BullMetricsWelcomeEmailProps) => {
-  const previewText = `Bem-vindo(a) à BullMetrics. Vê o valor que os outros não veem.`;
+}: BullValueWelcomeEmailProps) => {
+  const previewText = `Bem-vindo(a) à BullValue. Vê o valor que os outros não veem.`;
 
   return (
     <Html>
@@ -50,24 +50,24 @@ export const BullMetricsWelcomeEmail = ({
               <Img
                 src="https://framerusercontent.com/images/3K0Y47k7Xw8tW5s6X8x6Z2g5w.png"
                 width="150"
-                alt="BullMetrics"
+                alt="BullValue"
                 className="my-0 mx-auto"
               />
             </Section>
             
-            <Heading className="text-foreground text-[24px] font-bold text-center p-0 my-[30px] mx-0">
-              Bem-vindo(a) à BullMetrics 🐂
+            <Heading className="text-foreground text-[24px] font-bold text-center p-0 mt-[10px] mb-[30px] mx-0">
+              Bem-vindo(a) à Bull<span className="text-brand">Value</span>
             </Heading>
 
             <Text className="text-foreground text-[16px] leading-[24px]">
               Olá {userFirstName},
             </Text>
             <Text className="text-muted text-[16px] leading-[24px]">
-              Obrigado por te juntares à <strong>BullMetrics</strong> — a plataforma criada pela <em>The Bullocracy</em> para democratizar o acesso a dados financeiros institucionais.
+              Obrigado por te juntares à <strong>BullValue</strong>, a plataforma criada pela <em>Bullocracy</em> para democratizar o acesso a dados financeiros institucionais.
             </Text>
             
             <Text className="text-muted text-[16px] leading-[24px]">
-              A partir de agora, tens acesso a mais de 10 anos de dados fundamentais das empresas do S&P 500, análises DCF interativas com inteligência artificial, e muito mais. Tudo desenhado para investidores de longo prazo como tu.
+              A partir de agora, tens acesso a mais de 10 anos de dados fundamentais das empresas do S&P 500, análises DCF interativas com inteligência artificial, e muito mais. Tudo desenhado para value investers com visão a longo prazo como tu.
             </Text>
 
             <Section className="text-center mt-[32px] mb-[32px]">
@@ -82,8 +82,8 @@ export const BullMetricsWelcomeEmail = ({
             <Hr className="border border-solid border-[#27272a] my-[26px] mx-0 w-full" />
             
             <Text className="text-muted text-[12px] leading-[24px] text-center">
-              A equipa da The Bullocracy está à tua disposição se tiveres dúvidas ou propostas de parceria.
-              <br />
+              A equipa da BullValue e Bullocracy está à tua disposição se tiveres dúvidas ou propostas de parceria.<br />
+              Em caso de alguma dúvida ou dificuldade na plataforma, reportem no email <Link href="mailto:suporte@thebullvalue.com" className="text-brand no-underline">suporte@thebullvalue.com</Link>.<br />
               Se não criaste conta connosco, podes ignorar este email.
             </Text>
           </Container>
@@ -93,4 +93,4 @@ export const BullMetricsWelcomeEmail = ({
   );
 };
 
-export default BullMetricsWelcomeEmail;
+export default BullValueWelcomeEmail;

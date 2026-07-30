@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { Environment, LogLevel, Paddle, EventName } from "@paddle/paddle-node-sdk";
 import { prisma } from "@/lib/prisma";
+import { sendUpgradeToProEmail } from "@/lib/resend";
+
 
 // Inicializar o SDK do Paddle
 const paddleEnv = process.env.NEXT_PUBLIC_PADDLE_ENV === 'production' 
@@ -118,6 +120,9 @@ async function handleSubscriptionChange(subscription: any) {
     const plan = isPro ? "PRO" : "FREE";
 
     if (userId) {
+      const user = await prisma.user.findUnique({ where: { id: userId }, select: { plan: true, email: true, name: true } });
+      const previousPlan = user?.plan;
+
       await prisma.user.update({
         where: { id: userId },
         data: {
@@ -128,6 +133,11 @@ async function handleSubscriptionChange(subscription: any) {
           plan: plan,
         },
       });
+
+      if (isPro && previousPlan !== "PRO" && user?.email) {
+        await sendUpgradeToProEmail(user.email, user.name || "Investidor");
+      }
+
       return;
     }
 
@@ -136,6 +146,9 @@ async function handleSubscriptionChange(subscription: any) {
     const email = customer.email;
 
     if (email) {
+      const user = await prisma.user.findUnique({ where: { email }, select: { plan: true, name: true } });
+      const previousPlan = user?.plan;
+
       await prisma.user.update({
         where: { email },
         data: {
@@ -146,6 +159,10 @@ async function handleSubscriptionChange(subscription: any) {
           plan: plan,
         },
       });
+
+      if (isPro && previousPlan !== "PRO") {
+        await sendUpgradeToProEmail(email, user?.name || "Investidor");
+      }
     }
   } catch (error) {
     console.error("Erro a processar alteração de subscrição:", error);

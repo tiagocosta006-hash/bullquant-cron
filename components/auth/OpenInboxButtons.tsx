@@ -2,7 +2,7 @@ import { Mail } from "lucide-react"
 import { getTranslations } from "next-intl/server"
 
 // Remetente dos emails transacionais (lib/resend.ts) — usado na pesquisa do Gmail.
-const SENDER = "info@thebullocracy.com"
+const SENDER = "no-reply@thebullvalue.com"
 
 // Gmail suporta deep-link de pesquisa; abre a caixa já filtrada pelo remetente.
 const GMAIL_URL = `https://mail.google.com/mail/u/0/#search/${encodeURIComponent(`from:${SENDER} in:anywhere`)}`

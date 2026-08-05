@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { Resend } from 'resend';
 import { render } from '@react-email/render';
 import { BullValueWelcomeEmail } from '@/emails/BullValueWelcome';
@@ -171,7 +172,7 @@ export const sendWelcomeEmail = async (email: string, name: string, confirmation
   }
   
   const link = confirmationLink || 'https://thebullvalue.com/dashboard';
-  const html = await render(BullValueWelcomeEmail({ userFirstName: name }));
+  const html = await render(<BullValueWelcomeEmail userFirstName={name} />);
 
   return await resend.emails.send({
     from: FROM_EMAIL,
@@ -188,7 +189,7 @@ export const sendWelcomeEmail = async (email: string, name: string, confirmation
 export const sendUpgradeToProEmail = async (email: string, name: string) => {
   if (!resend) return;
 
-  const html = await render(BullValueUpgradeEmail({ userFirstName: name }));
+  const html = await render(<BullValueUpgradeEmail userFirstName={name} />);
 
   return await resend.emails.send({
     from: FROM_EMAIL,

@@ -182,31 +182,15 @@ export const sendWelcomeEmail = async (email: string, name: string, confirmation
   }
   
   const link = confirmationLink || 'https://thebullvalue.com/dashboard';
-  const html = await render(<BullValueWelcomeEmail userFirstName={name} />);
-
-<<<<<<< Updated upstream:lib/resend.tsx
-  return await resend.emails.send({
-    from: FROM_EMAIL,
-    to: [email],
-    subject: 'Bem-vindo ao BullValue!',
-    text: `Olá ${name}, bem-vindo ao BullValue! A tua jornada para melhores investimentos começa agora. Acede à plataforma aqui: ${link}`,
-    html: html,
-  });
-=======
   try {
+    const html = await render(<BullValueWelcomeEmail userFirstName={name} />);
+
     const res = await resend.emails.send({
       from: FROM_EMAIL,
       to: [email],
       subject: 'Bem-vindo ao BullValue!',
-      text: `Olá ${name}, bem-vindo ao BullValue!\n\nEstamos muito felizes por te ter connosco. A plataforma foi desenhada para te dar acesso a métricas profissionais e análises fundamentais potenciadas por Inteligência Artificial.\n\nA tua jornada para melhores investimentos começa agora.\n\n${buttonText}: ${link}`,
-      html: getEmailTemplate(`
-        <h2>Olá ${name}, bem-vindo ao BullValue!</h2>
-        <p>Estamos muito felizes por te ter connosco. A plataforma foi desenhada para te dar acesso a métricas profissionais e análises fundamentais potenciadas por Inteligência Artificial.</p>
-        <p>A tua jornada para melhores investimentos começa agora.</p>
-        <div style="text-align: center;">
-          <a href="${link}" class="btn">${buttonText}</a>
-        </div>
-      `),
+      text: `Olá ${name}, bem-vindo ao BullValue! A tua jornada para melhores investimentos começa agora. Acede à plataforma aqui: ${link}`,
+      html: html,
     });
 
     if (res.error) {
@@ -217,7 +201,6 @@ export const sendWelcomeEmail = async (email: string, name: string, confirmation
     console.error('[Resend] Exceção ao enviar email de boas-vindas:', err);
     return { data: null, error: { message: err?.message || 'Falha de rede ao contactar Resend' } };
   }
->>>>>>> Stashed changes:lib/resend.ts
 };
 
 /**
@@ -226,31 +209,15 @@ export const sendWelcomeEmail = async (email: string, name: string, confirmation
 export const sendUpgradeToProEmail = async (email: string, name: string) => {
   if (!resend) return { data: null, error: { message: 'RESEND_API_KEY não configurada' } };
 
-<<<<<<< Updated upstream:lib/resend.tsx
-  const html = await render(<BullValueUpgradeEmail userFirstName={name} />);
-
-  return await resend.emails.send({
-    from: FROM_EMAIL,
-    to: [email],
-    subject: 'Bem-vindo ao Plano PRO!',
-    text: `Parabéns ${name}, agora és PRO! Tens acesso total a todas as funcionalidades exclusivas da plataforma.`,
-    html: html,
-  });
-=======
   try {
+    const html = await render(<BullValueUpgradeEmail userFirstName={name} />);
+
     const res = await resend.emails.send({
       from: FROM_EMAIL,
       to: [email],
       subject: 'Bem-vindo ao Plano PRO!',
-      text: `Parabéns ${name}, agora és PRO!\n\nA tua conta foi atualizada com sucesso.\n\nA partir de agora tens acesso total a todas as funcionalidades exclusivas da plataforma, incluindo avaliações de gestão profundas e análises DCF ilimitadas.\n\nExplorar Funcionalidades PRO: https://thebullvalue.com/dashboard`,
-      html: getEmailTemplate(`
-        <h2>Parabéns ${name}, agora és PRO!</h2>
-        <p>A tua conta foi atualizada com sucesso.</p>
-        <p>A partir de agora tens acesso total a todas as funcionalidades exclusivas da plataforma, incluindo avaliações de gestão profundas e análises DCF ilimitadas.</p>
-        <div style="text-align: center;">
-          <a href="https://thebullvalue.com/dashboard" class="btn">Explorar Funcionalidades PRO</a>
-        </div>
-      `),
+      text: `Parabéns ${name}, agora és PRO! Tens acesso total a todas as funcionalidades exclusivas da plataforma.`,
+      html: html,
     });
 
     if (res.error) {
@@ -261,7 +228,6 @@ export const sendUpgradeToProEmail = async (email: string, name: string) => {
     console.error('[Resend] Exceção ao enviar email de upgrade PRO:', err);
     return { data: null, error: { message: err?.message || 'Falha de rede ao contactar Resend' } };
   }
->>>>>>> Stashed changes:lib/resend.ts
 };
 
 /**

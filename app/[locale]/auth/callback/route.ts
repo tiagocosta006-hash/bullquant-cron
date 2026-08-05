@@ -29,11 +29,11 @@ export async function GET(request: Request) {
     })
     authError = error
   } else {
-    return NextResponse.redirect(`${origin}/login?message=O link expirou ou é inválido. (Missing token)`)
+    return NextResponse.redirect(`${origin}/login?error=O link expirou ou é inválido. (Missing token)`)
   }
 
   if (authError) {
-    return NextResponse.redirect(`${origin}/login?message=Erro de Verificação: ${encodeURIComponent(authError.message)}`)
+    return NextResponse.redirect(`${origin}/login?error=Erro de Verificação: ${encodeURIComponent(authError.message)}`)
   }
 
   if (!authError) {
@@ -78,5 +78,5 @@ export async function GET(request: Request) {
   }
 
   // Return the user to an error page with some instructions
-  return NextResponse.redirect(`${origin}/login?message=O link expirou ou é inválido.`)
+  return NextResponse.redirect(`${origin}/login?error=O link expirou ou é inválido.`)
 }

@@ -140,8 +140,12 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
 
   const handleDeleteAccount = async () => {
     setIsDeleting(true)
-    await deleteAccount()
-    // It will redirect automatically from action
+    const result = await deleteAccount()
+    if (result?.error) {
+      alert(result.error)
+      setIsDeleting(false)
+    }
+    // If successful, it will redirect automatically from the action
   }
 
   const handleManageSubscription = async () => {

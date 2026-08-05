@@ -120,9 +120,10 @@ export async function signup(formData: FormData) {
       }
     }
 
-    const confirmationLink =
-      linkData?.properties?.action_link ||
-      `${siteUrl}/auth/callback?token_hash=${linkData?.properties?.hashed_token}&type=signup&next=/dashboard&welcome=1`
+    // Construímos o link manualmente para forçar o envio do token por Query String (?token_hash=)
+    // Se usássemos o action_link gerado pelo Supabase, ele redirecionaria com o token num Hash Fragment (#access_token=)
+    // e o Next.js (SSR) não conseguiria ler os dados, gerando o erro "Missing token".
+    const confirmationLink = `${siteUrl}/auth/callback?token_hash=${linkData?.properties?.hashed_token}&type=signup&next=/dashboard&welcome=1`
     await sendConfirmationEmail(email, name || 'Investidor', confirmationLink)
 
     if (linkData?.user) await recordServerEvent(await headers(), 'signup', '/register')

@@ -9,8 +9,8 @@ const resendApiKey = process.env.RESEND_API_KEY;
 // Inicializa o cliente Resend apenas se a chave existir
 export const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
-// Substitui pelo email que tens configurado/verificado no Resend
-const FROM_EMAIL = 'BullValue <info@thebullocracy.com>';
+// O domínio tem de corresponder ao domínio verificado na Resend (thebullvalue.com)
+const FROM_EMAIL = 'BullValue <no-reply@thebullvalue.com>';
 
 /**
  * HTML Base Wrapper

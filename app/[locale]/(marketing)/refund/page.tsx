@@ -80,7 +80,7 @@ export default function RefundPolicyPage() {
             Caso seja identificada uma cobrança dupla, erro de sistema no momento do checkout via Paddle,
             ou incapacidade técnica devidamente comprovada em aceder à infraestrutura PRO nas primeiras 48 horas
             pós-compra (por responsabilidade exclusiva do BullValue), deverá contactar imediatamente a equipa
-            através de <strong>info@thebullocracy.com</strong>. Estes casos manifestamente excecionais serão
+            através de <strong>suporte@thebullvalue.com</strong>. Estes casos manifestamente excecionais serão
             revisados o mais rápido possível, e as retificações serão executadas caso
             se confirme o erro de processamento.
           </p>

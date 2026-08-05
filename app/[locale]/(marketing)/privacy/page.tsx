@@ -32,7 +32,7 @@ export default function PrivacyPolicyPage() {
           <p>
             A BullValue é a entidade responsável pelo tratamento dos seus dados pessoais no âmbito da prestação dos
             serviços descritos nos nossos Termos de Serviço. Em caso de dúvidas ou necessidade de exercer os seus direitos,
-            pode contactar o Responsável pelo Tratamento através do e-mail corporativo: <strong>info@thebullocracy.com</strong>.
+            pode contactar o Responsável pelo Tratamento através do e-mail corporativo: <strong>suporte@thebullvalue.com</strong>.
           </p>
         </section>
 
@@ -103,7 +103,7 @@ export default function PrivacyPolicyPage() {
             <li><strong>Direito de Oposição e Limitação:</strong> Opor-se a certos tipos de tratamentos ou pedir a sua suspensão.</li>
           </ul>
           <p className="mt-4">
-            Para exercer qualquer um dos seus direitos, contacte-nos de forma inequívoca através do e-mail <strong>info@thebullocracy.com</strong>.
+            Para exercer qualquer um dos seus direitos, contacte-nos de forma inequívoca através do e-mail <strong>suporte@thebullvalue.com</strong>.
           </p>
         </section>
       </div>

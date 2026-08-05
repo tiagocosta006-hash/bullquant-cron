@@ -124,7 +124,7 @@ export default async function LandingPage({
         },
         "contactPoint": {
           "@type": "ContactPoint",
-          "email": "info@thebullocracy.com",
+          "email": "suporte@thebullvalue.com",
           "contactType": "customer support"
         }
       },

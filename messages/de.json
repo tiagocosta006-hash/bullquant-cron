@@ -513,9 +513,8 @@
       "action": "Action",
       "change": "Change",
       "company": "Company",
-      "grossMargin": "Gross Margin",
+      "weight": "Gewicht",
       "pnl": "P&L",
-      "roic": "ROIC",
       "sector": "Sector"
     },
     "toolbar": {
@@ -931,7 +930,11 @@
       "upToday": "Heute im Plus"
     },
     "suggestionsTitle": "Vorschläge zum Folgen",
-    "lastUpdate": "Letzte Aktualisierung:"
+    "lastUpdate": "Letzte Aktualisierung:",
+    "explorePreview": {
+      "title": "Oder erkunde nach Sektor und Geschäftstyp",
+      "viewAll": "Alles in Entdecken ansehen"
+    }
   },
   "analista": {
     "title": "KI-Analyst",

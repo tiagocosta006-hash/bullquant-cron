@@ -279,12 +279,109 @@ DURATION_TAGS = {
         "AdjustmentsForDepreciationAndAmortisationExpense",
         "DepreciationAmortizationAndAccretionNet",  # LEN
     ],
+    "incomeBeforeTax": [
+        "IncomeLossFromContinuingOperationsBeforeIncomeTaxesMinorityInterestAndIncomeLossFromEquityMethodInvestments",
+        "IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest",
+        "IncomeLossFromContinuingOperationsBeforeIncomeTaxes",
+        "ProfitLossBeforeTax",
+        "IncomeBeforeTax",
+    ],
+    "netInterestIncome": [
+        "InterestAndDividendIncomeOperating",
+        "InterestIncomeExpenseNet",
+        "InterestIncomeExpenseAfterProvisionForLoanLosses",
+        "InterestAndFeeIncomeLoansAndLeases",
+    ],
+    "otherNonOperatingIncome": [
+        "OtherNonoperatingIncomeExpense",
+        "NonoperatingIncomeExpense",
+        "OtherNonoperatingIncomeExpenseNet",
+    ],
+    "investingCashFlow": [
+        "NetCashProvidedByUsedInInvestingActivities",
+        "NetCashProvidedByUsedInInvestingActivitiesContinuingOperations",
+        "CashFlowsFromUsedInInvestingActivities",
+    ],
+    "financingCashFlow": [
+        "NetCashProvidedByUsedInFinancingActivities",
+        "NetCashProvidedByUsedInFinancingActivitiesContinuingOperations",
+        "CashFlowsFromUsedInFinancingActivities",
+    ],
+    "stockBasedCompensation": [
+        "ShareBasedCompensation",
+        "AllocatedShareBasedCompensationExpense",
+        "ShareBasedPaymentArrangementExpense",
+        "ShareBasedCompensationArrangementByShareBasedPaymentAwardExpense",
+    ],
+    "shareRepurchases": [
+        "PaymentsForRepurchaseOfCommonStock",
+        "PaymentsForRepurchaseOfEquity",
+        "PaymentsToAcquireOrRedeemEntitysShares",
+        "PurchaseOfTreasuryShares",
+        "PaymentsForRepurchaseOfPreferredStockAndPreferenceStock",
+    ],
+    "dividendsPaid": [
+        "PaymentsOfDividendsCommonStock",
+        "PaymentsOfDividends",
+        "PaymentsOfOrdinaryDividends",
+        "DividendsPaid",
+        "PaymentsOfDividendsMinorityInterest",
+    ],
+    "netChangeInCash": [
+        "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseIncludingExchangeRateEffect",
+        "CashAndCashEquivalentsPeriodIncreaseDecrease",
+        "NetIncreaseDecreaseInCashAndCashEquivalents",
+        "CashAndCashEquivalentsPeriodIncreaseDecreaseExcludingExchangeRateEffect",
+        "CashPeriodIncreaseDecrease",
+    ],
 }
 
 INSTANT_TAGS = {
     "totalAssets": ["Assets"],
+    "totalCurrentAssets": [
+        "AssetsCurrent",
+        "CurrentAssets",
+    ],
+    "accountsReceivable": [
+        "AccountsReceivableNetCurrent",
+        "AccountsReceivableCurrent",
+        "ReceivablesNetCurrent",
+        "TradeAndOtherCurrentReceivables",
+        "AccountsAndOtherReceivablesNetCurrent",
+    ],
+    "inventory": [
+        "InventoryNet",
+        "Inventories",
+        "InventoryGross",
+        "InventoryFinishedGoods",
+    ],
+    "propertyPlantEquipment": [
+        "PropertyPlantAndEquipmentNet",
+        "PropertyPlantAndEquipmentGross",
+        "PropertyPlantAndEquipment",
+    ],
+    "goodwillAndIntangibles": [
+        "GoodwillAndIntangibleAssetsNet",
+    ],
+    "goodwillOnly": [
+        "Goodwill",
+    ],
+    "intangiblesOnly": [
+        "IntangibleAssetsNetExcludingGoodwill",
+        "OtherIntangibleAssetsNet",
+    ],
+    "accountsPayable": [
+        "AccountsPayableCurrent",
+        "AccountsPayableAndAccruedLiabilitiesCurrent",
+        "TradeAndOtherCurrentPayables",
+        "AccountsPayable",
+    ],
+    "retainedEarnings": [
+        "RetainedEarningsAccumulatedDeficit",
+        "RetainedEarnings",
+    ],
     "totalCurrentLiab": ["LiabilitiesCurrent", "CurrentLiabilities"],
-    "totalLiabilities": ["Liabilities"],
+    "totalLiabilities": ["Liabilities", "LiabilitiesCurrentAndNoncurrent"],
     "longTermDebt": [
         "LongTermDebtNoncurrent",
         # ⚠️ NUNCA reintroduzir "NoncurrentLiabilities" aqui: em IFRS é o TOTAL
@@ -1417,6 +1514,53 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         if dur.get("sellingGeneralAndAdmin") is None and op_expenses is not None:
             dur["sellingGeneralAndAdmin"] = op_expenses
 
+    # --- 3-STATEMENT DETAILED FINANCIAL LINE ITEMS ---
+    # Income Statement details
+    income_before_tax = dur.get("incomeBeforeTax")
+    if income_before_tax is None and net_income is not None and tax_expense is not None:
+        income_before_tax = net_income + tax_expense
+
+    net_interest_income = dur.get("netInterestIncome")
+    other_non_operating = dur.get("otherNonOperatingIncome")
+    da_val = dur.get("depreciationAndAmortization")
+
+    # Balance Sheet details
+    total_curr_assets = inst.get("totalCurrentAssets")
+    accts_receivable = inst.get("accountsReceivable")
+    inv = inst.get("inventory")
+    ppe = inst.get("propertyPlantEquipment")
+    
+    gw_int = inst.get("goodwillAndIntangibles")
+    if gw_int is None:
+        gw = inst.get("goodwillOnly")
+        intang = inst.get("intangiblesOnly")
+        if gw is not None or intang is not None:
+            gw_int = (gw or 0) + (intang or 0)
+
+    accts_payable = inst.get("accountsPayable")
+    st_debt = inst.get("shortTermDebt") or inst.get("longTermDebtCurrent") or inst.get("commercialPaper")
+    
+    tot_liab = inst.get("totalLiabilities")
+    if tot_liab is None and total_assets is not None and total_equity is not None:
+        tot_liab = total_assets - total_equity
+
+    ret_earnings = inst.get("retainedEarnings")
+
+    # Cash Flow details
+    inv_cf = dur.get("investingCashFlow")
+    fin_cf = dur.get("financingCashFlow")
+    sbc = dur.get("stockBasedCompensation")
+    
+    share_repurchases_raw = dur.get("shareRepurchases")
+    share_repurchases = abs(share_repurchases_raw) if share_repurchases_raw is not None else None
+    
+    divs_paid_raw = dur.get("dividendsPaid")
+    divs_paid = abs(divs_paid_raw) if divs_paid_raw is not None else None
+    
+    net_change_cash = dur.get("netChangeInCash")
+    if net_change_cash is None and op_cf is not None and inv_cf is not None and fin_cf is not None:
+        net_change_cash = op_cf + inv_cf + fin_cf
+
     return {
         "id": new_id(),
         "companyId": company_id,
@@ -1453,6 +1597,25 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         "researchAndDevelopment": dur.get("researchAndDevelopment"),
         "sellingGeneralAndAdmin": dur.get("sellingGeneralAndAdmin"),
         "ebitda": ebitda,
+        "depreciationAndAmortization": da_val,
+        "incomeBeforeTax": income_before_tax,
+        "netInterestIncome": net_interest_income,
+        "otherNonOperatingIncome": other_non_operating,
+        "totalCurrentAssets": total_curr_assets,
+        "accountsReceivable": accts_receivable,
+        "inventory": inv,
+        "propertyPlantEquipment": ppe,
+        "goodwillAndIntangibles": gw_int,
+        "accountsPayable": accts_payable,
+        "shortTermDebt": st_debt,
+        "totalLiabilities": tot_liab,
+        "retainedEarnings": ret_earnings,
+        "investingCashFlow": inv_cf,
+        "financingCashFlow": fin_cf,
+        "stockBasedCompensation": sbc,
+        "shareRepurchases": share_repurchases,
+        "dividendsPaid": divs_paid,
+        "netChangeInCash": net_change_cash,
     }
 
 
@@ -1547,7 +1710,13 @@ def apply_fx_conversion(company_currency: str, periods_data: list[dict]) -> bool
             "epsDiluted", "operatingCashFlow", "capex", "freeCashFlow",
             "totalAssets", "totalCurrentLiab", "longTermDebt", "totalDebt",
             "cash", "totalEquity", "dividendPerShare", "researchAndDevelopment",
-            "sellingGeneralAndAdmin", "ebitda"
+            "sellingGeneralAndAdmin", "ebitda",
+            "depreciationAndAmortization", "incomeBeforeTax", "netInterestIncome",
+            "otherNonOperatingIncome", "totalCurrentAssets", "accountsReceivable",
+            "inventory", "propertyPlantEquipment", "goodwillAndIntangibles",
+            "accountsPayable", "shortTermDebt", "totalLiabilities", "retainedEarnings",
+            "investingCashFlow", "financingCashFlow", "stockBasedCompensation",
+            "shareRepurchases", "dividendsPaid", "netChangeInCash"
         ]
 
         for p in periods_data:
@@ -1643,6 +1812,10 @@ def insert_fundamental(cur, row: dict):
             "cash", "totalEquity",
             "grossMargin", "operatingMargin", "netMargin", "roic", "returnOnEquity",
             "dividendPerShare", "researchAndDevelopment", "sellingGeneralAndAdmin", "ebitda",
+            "depreciationAndAmortization", "incomeBeforeTax", "netInterestIncome", "otherNonOperatingIncome",
+            "totalCurrentAssets", "accountsReceivable", "inventory", "propertyPlantEquipment",
+            "goodwillAndIntangibles", "accountsPayable", "shortTermDebt", "totalLiabilities", "retainedEarnings",
+            "investingCashFlow", "financingCashFlow", "stockBasedCompensation", "shareRepurchases", "dividendsPaid", "netChangeInCash",
             "createdAt", "updatedAt"
         ) VALUES (
             %(id)s, %(companyId)s, %(periodType)s::"period_type", %(fiscalYear)s, %(fiscalQuarter)s,
@@ -1655,6 +1828,10 @@ def insert_fundamental(cur, row: dict):
             %(cash)s, %(totalEquity)s,
             %(grossMargin)s, %(operatingMargin)s, %(netMargin)s, %(roic)s, %(returnOnEquity)s,
             %(dividendPerShare)s, %(researchAndDevelopment)s, %(sellingGeneralAndAdmin)s, %(ebitda)s,
+            %(depreciationAndAmortization)s, %(incomeBeforeTax)s, %(netInterestIncome)s, %(otherNonOperatingIncome)s,
+            %(totalCurrentAssets)s, %(accountsReceivable)s, %(inventory)s, %(propertyPlantEquipment)s,
+            %(goodwillAndIntangibles)s, %(accountsPayable)s, %(shortTermDebt)s, %(totalLiabilities)s, %(retainedEarnings)s,
+            %(investingCashFlow)s, %(financingCashFlow)s, %(stockBasedCompensation)s, %(shareRepurchases)s, %(dividendsPaid)s, %(netChangeInCash)s,
             NOW(), NOW()
         )
         """,
@@ -1663,17 +1840,7 @@ def insert_fundamental(cur, row: dict):
 
 
 def derive_q4_dps(fy_dps: float, q_dps: list[float]) -> float | None:
-    """Q4 DPS = FY − ΣQ1..3, com alinhamento de base de split.
-
-    O "paradoxo da Apple": 10-Ks pós-split retaggam o DPS ANUAL histórico já
-    ajustado (AAPL FY2019 = 0.75 pós-split 4:1), mas os trimestres só existem
-    nos 10-Qs originais pré-split (0.73+0.73+0.77 = 2.23). Subtrair bases
-    mistas dava −1.48, que o código antigo mascarava com 0.0 — a origem dos
-    "buracos" Q4 de DPS da AAPL/ABBV.
-
-    Testa fatores de split comuns e devolve o Q4 NA BASE DO FY — a mesma base
-    das shares/EPS que a row Q4 sintética herda do FY, mantendo a coerência
-    per-período de que o apply_stock_splits depende."""
+    """Q4 DPS = FY − ΣQ1..3, com alinhamento de base de split."""
     qsum = sum(q_dps)
     if qsum <= 0:
         return None
@@ -1688,24 +1855,14 @@ def derive_q4_dps(fy_dps: float, q_dps: list[float]) -> float | None:
 
 def synthesize_q4(periods: set, period_ends: dict, period_filed: dict,
                   dur_map: dict, inst_map: dict) -> list[int]:
-    """Sintetiza Q4 standalone: o EDGAR raramente o tagga (as empresas reportam
-    FY, e Q4 = FY − Q1 − Q2 − Q3). Campo a campo: valores já extraídos do EDGAR
-    ficam; só os em falta são derivados. Balanço do Q4 = balanço do FY (mesmo
-    period end); shares = weighted avg do FY; eps = NI/shares.
-
-    Guard de mismatch de base: em spin-offs (MMM/Solventum, IBM/Kyndryl) o FY
-    mais recente é restated para continuing operations mas os quarters antigos
-    são os originais → o Q4 derivado seria lixo (revenue ~0 com margens
-    absurdas). Detetável porque o revenue Q4 derivado colapsa (<20% do Q3) sem
-    o Q3 ter colapsado. Nesses anos não se sintetiza nada.
-
-    Devolve os fiscal years cujo Q4 deve ser APAGADO da BD (anos sem síntese
-    válida — remove restos de backfills manuais sobre bases erradas)."""
     SUBTRACTIVE = [
         "revenue", "costOfRevenue", "grossProfit", "operatingExpenses",
         "operatingIncome", "interestExpense", "taxExpense", "netIncome",
         "operatingCashFlow", "capex", "researchAndDevelopment",
         "sellingGeneralAndAdmin", "ebitda", "depreciationAndAmortization",
+        "incomeBeforeTax", "netInterestIncome", "otherNonOperatingIncome",
+        "investingCashFlow", "financingCashFlow", "stockBasedCompensation",
+        "shareRepurchases", "dividendsPaid", "netChangeInCash",
         # ⚠️ NÃO REMOVER: sem isto o Q4 de DPS nunca é derivado e os payers
         # ficam com buraco no Q4 (paradoxo da Apple). O ramo per-share abaixo
         # depende desta entrada.
@@ -2122,6 +2279,10 @@ def sync_dual_class(conn):
                         cash, "totalEquity",
                         "grossMargin", "operatingMargin", "netMargin", roic, "returnOnEquity",
                         "dividendPerShare", "researchAndDevelopment", "sellingGeneralAndAdmin", ebitda,
+                        "depreciationAndAmortization", "incomeBeforeTax", "netInterestIncome", "otherNonOperatingIncome",
+                        "totalCurrentAssets", "accountsReceivable", "inventory", "propertyPlantEquipment",
+                        "goodwillAndIntangibles", "accountsPayable", "shortTermDebt", "totalLiabilities", "retainedEarnings",
+                        "investingCashFlow", "financingCashFlow", "stockBasedCompensation", "shareRepurchases", "dividendsPaid", "netChangeInCash",
                         "createdAt", "updatedAt"
                     )
                     SELECT
@@ -2135,6 +2296,10 @@ def sync_dual_class(conn):
                         cash, "totalEquity",
                         "grossMargin", "operatingMargin", "netMargin", roic, "returnOnEquity",
                         "dividendPerShare", "researchAndDevelopment", "sellingGeneralAndAdmin", ebitda,
+                        "depreciationAndAmortization", "incomeBeforeTax", "netInterestIncome", "otherNonOperatingIncome",
+                        "totalCurrentAssets", "accountsReceivable", "inventory", "propertyPlantEquipment",
+                        "goodwillAndIntangibles", "accountsPayable", "shortTermDebt", "totalLiabilities", "retainedEarnings",
+                        "investingCashFlow", "financingCashFlow", "stockBasedCompensation", "shareRepurchases", "dividendsPaid", "netChangeInCash",
                         NOW(), NOW()
                     FROM fundamentals WHERE "companyId" = %s
                     """,

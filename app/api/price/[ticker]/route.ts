@@ -1,4 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+
+async function getDbPriceFallback(ticker: string) {
+  try {
+    const prices = await prisma.price.findMany({
+      where: { ticker },
+      orderBy: { date: 'desc' },
+      take: 2,
+    })
+    if (!prices || prices.length === 0) return null
+    const last = Number(prices[0].close)
+    const prev = prices.length > 1 ? Number(prices[1].close) : last
+    const change = Number((last - prev).toFixed(4))
+    const changePercent = prev !== 0 ? Number((((last - prev) / prev) * 100).toFixed(2)) : 0
+    return {
+      ticker,
+      currentPrice: last,
+      change,
+      changePercent,
+      high: prices[0].high ? Number(prices[0].high) : last,
+      low: prices[0].low ? Number(prices[0].low) : last,
+      open: prices[0].open ? Number(prices[0].open) : last,
+      previousClose: prev,
+      isFallback: true,
+    }
+  } catch (err) {
+    console.error(`Database price fallback failed for ${ticker}:`, err)
+    return null
+  }
+}
 
 export async function GET(
   request: NextRequest,
@@ -9,9 +39,15 @@ export async function GET(
 
   const apiKey = process.env.FINNHUB_API_KEY
   if (!apiKey) {
+    const fallback = await getDbPriceFallback(ticker)
+    if (fallback) {
+      return NextResponse.json(fallback, {
+        headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60' },
+      })
+    }
     return NextResponse.json(
-      { error: 'Finnhub API key not configured' },
-      { status: 500 }
+      { error: 'Finnhub API key not configured and no price in database' },
+      { status: 404 }
     )
   }
 
@@ -24,6 +60,12 @@ export async function GET(
     )
 
     if (!response.ok) {
+      const fallback = await getDbPriceFallback(ticker)
+      if (fallback) {
+        return NextResponse.json(fallback, {
+          headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60' },
+        })
+      }
       return NextResponse.json(
         { error: 'Failed to fetch price from Finnhub' },
         { status: response.status }
@@ -34,6 +76,12 @@ export async function GET(
 
     // O Finnhub retorna c=0 se o ticker não for encontrado ou não suportado
     if (data.c === 0 && data.d === null) {
+      const fallback = await getDbPriceFallback(ticker)
+      if (fallback) {
+        return NextResponse.json(fallback, {
+          headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60' },
+        })
+      }
       return NextResponse.json(
         { error: 'Ticker not found on Finnhub' },
         { status: 404 }
@@ -58,9 +106,16 @@ export async function GET(
     })
   } catch (error) {
     console.error(`Error fetching price for ${ticker}:`, error)
+    const fallback = await getDbPriceFallback(ticker)
+    if (fallback) {
+      return NextResponse.json(fallback, {
+        headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60' },
+      })
+    }
     return NextResponse.json(
       { error: 'Internal server error while fetching price' },
       { status: 500 }
     )
   }
 }
+

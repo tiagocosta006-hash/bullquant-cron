@@ -15,7 +15,7 @@ describe("screener — categorias", () => {
 
   it("todas as categorias são chaves estáveis conhecidas", () => {
     for (const category of SCREENER_CATEGORIES) {
-      expect(["marketCap", "gainers", "losers", "sp500"]).toContain(category)
+      expect(["marketCap", "gainers", "losers", "sp500", "etfs"]).toContain(category)
     }
   })
 })

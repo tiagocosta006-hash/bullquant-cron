@@ -494,9 +494,8 @@
     "table": {
       "company": "Company",
       "sector": "Sector",
-      "roic": "ROIC",
-      "grossMargin": "Gross Margin",
       "change": "Change",
+      "weight": "Weight",
       "pnl": "P&L",
       "action": "Action"
     },
@@ -523,6 +522,23 @@
       "marketValue": "Market Value",
       "totalPnl": "Total P&L",
       "watchlistOnly": "Add quantity and buy price to your positions to see market value and P&L."
+    },
+    "annualReturn": {
+      "title": "Annual Return",
+      "perYear": "per year (XIRR)",
+      "invested": "Total Invested",
+      "currentValue": "Current Value",
+      "totalReturn": "Total Return",
+      "notAnnualized": "since inception",
+      "loading": "Calculating annual return...",
+      "importing": "Importing deposit history from your broker...",
+      "error": "Could not calculate the annual return.",
+      "notEnoughData": "Not enough deposits yet to calculate an annual return. At least one deposit and some elapsed time are needed.",
+      "tooltip": "XIRR: your true annualised return, accounting for when each deposit landed. A euro invested 3 years ago does not count the same as one invested last month.",
+      "partialHistory": "History still incomplete — your broker limits how many movements we can read at once. The rest is imported on your next visit.",
+      "foreignCurrency": "{count} movement(s) in another currency were included without FX conversion. The real figure may differ slightly.",
+      "showCashFlows": "Show the {count} movements used in the calculation",
+      "hideCashFlows": "Hide movements"
     },
     "valueChart": {
       "title": "Portfolio Value Over Time",
@@ -881,6 +897,106 @@
     "preliminaryInfo": "The faded bar is the latest quarter already reported in earnings (preliminary), not yet in the official filing. It updates automatically once the filing is published.",
     "sparseQuarterlyNote": "Limited quarterly history for this company — many firms (especially European) report semi-annually or annually. See the Annual tab for the full history."
   },
+  "financialStatements": {
+    "title": "Financial Statements",
+    "subtitle": "Comprehensive 10-year history of Income Statement, Balance Sheet, and Cash Flow Statements.",
+    "viewModes": {
+      "charts": "Charts & Analysis",
+      "statements": "Accounting Statements"
+    },
+    "tabs": {
+      "incomeStatement": "Income Statement",
+      "balanceSheet": "Balance Sheet",
+      "cashFlow": "Cash Flow Statement"
+    },
+    "periods": {
+      "annual": "Annual",
+      "quarterly": "Quarterly",
+      "ttm": "TTM"
+    },
+    "displayMode": {
+      "label": "Display",
+      "absolute": "Values",
+      "percentRevenue": "% Revenue",
+      "yoyGrowth": "YoY Growth"
+    },
+    "headers": {
+      "lineItem": "Financial Metric",
+      "trend": "Trend"
+    },
+    "actions": {
+      "searchPlaceholder": "Search metric (e.g. R&D, Cash, Debt, Goodwill, SBC)...",
+      "exportCsv": "Export CSV",
+      "sortDesc": "Newest first",
+      "sortAsc": "Oldest first",
+      "noResults": "No financial metrics found."
+    },
+    "sections": {
+      "revenueGrossProfit": "Revenue & Gross Profit",
+      "operatingExpenses": "Operating Expenses (OpEx)",
+      "operatingIncomeEbitda": "Operating Income & EBITDA",
+      "netIncomeBeforeTax": "Pre-tax & Net Income",
+      "perShareData": "Per Share Data",
+      "currentAssets": "Current Assets",
+      "nonCurrentAssets": "Non-Current Assets",
+      "currentLiabilities": "Current Liabilities",
+      "nonCurrentLiabilities": "Non-Current Liabilities & Debt",
+      "stockholdersEquity": "Stockholders' Equity",
+      "operatingActivities": "Cash from Operating Activities",
+      "investingActivities": "Cash from Investing Activities",
+      "financingActivities": "Cash from Financing Activities",
+      "cashSummaryFreeCashFlow": "Cash Summary & Free Cash Flow"
+    },
+    "metrics": {
+      "revenue": "Revenue",
+      "costOfRevenue": "Cost of Goods Sold (COGS)",
+      "grossProfit": "Gross Profit",
+      "researchAndDevelopment": "Research & Development (R&D)",
+      "sellingGeneralAndAdmin": "Selling, General & Admin (SG&A)",
+      "operatingExpensesTotal": "Total Operating Expenses",
+      "operatingIncome": "Operating Income (EBIT)",
+      "depreciationAndAmortization": "Depreciation & Amortization (D&A)",
+      "ebitda": "EBITDA",
+      "interestExpense": "Interest Expense",
+      "netInterestIncome": "Net Interest Income / Expense",
+      "otherNonOperatingIncome": "Other Non-Operating Income",
+      "incomeBeforeTax": "Income Before Tax (EBT)",
+      "taxExpense": "Income Tax Expense",
+      "netIncome": "Net Income",
+      "epsDiluted": "Diluted EPS",
+      "sharesOutstanding": "Shares Outstanding",
+      "dividendPerShare": "Dividend Per Share (DPS)",
+      "cashAndEquivalents": "Cash & Cash Equivalents",
+      "accountsReceivable": "Accounts Receivable",
+      "inventory": "Inventory",
+      "totalCurrentAssets": "Total Current Assets",
+      "propertyPlantEquipment": "Property, Plant & Equipment (PP&E)",
+      "goodwillAndIntangibles": "Goodwill & Intangibles",
+      "totalAssets": "Total Assets",
+      "accountsPayable": "Accounts Payable",
+      "shortTermDebt": "Short-Term Debt",
+      "totalCurrentLiabilities": "Total Current Liabilities",
+      "longTermDebt": "Long-Term Debt",
+      "totalDebt": "Total Financial Debt",
+      "netDebt": "Net Debt (Total Debt - Cash)",
+      "totalLiabilities": "Total Liabilities",
+      "retainedEarnings": "Retained Earnings",
+      "totalEquity": "Total Stockholders' Equity",
+      "stockBasedCompensation": "Stock-Based Compensation (SBC)",
+      "operatingCashFlowTotal": "Operating Cash Flow (OCF)",
+      "capex": "Capital Expenditures (CapEx)",
+      "investingCashFlowTotal": "Investing Cash Flow (ICF)",
+      "shareRepurchases": "Share Repurchases (Buybacks)",
+      "dividendsPaid": "Dividends Paid",
+      "financingCashFlowTotal": "Financing Cash Flow (FCFin)",
+      "netChangeInCash": "Net Change in Cash",
+      "freeCashFlow": "Free Cash Flow (FCF)"
+    },
+    "footer": {
+      "sourceNote": "Official accounting data extracted from SEC EDGAR 10-K and 10-Q filings.",
+      "unitsNote": "Values expressed in reporting currency ({symbol})."
+    }
+  },
   "compare": {
     "title": "Peer Analysis: {industry}",
     "subtitle": "Direct comparison of multiples and performance within the same GICS sub-industry.",
@@ -1164,7 +1280,11 @@
       "upToday": "Up today"
     },
     "suggestionsTitle": "Suggestions to follow",
-    "lastUpdate": "Last update:"
+    "lastUpdate": "Last update:",
+    "explorePreview": {
+      "title": "Or explore by sector and business type",
+      "viewAll": "View all in Explore"
+    }
   },
   "about": {
     "badge": "Our Mission",

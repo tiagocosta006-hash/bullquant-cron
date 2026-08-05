@@ -56,3 +56,19 @@ export function aggregatePnl(positions: PositionPnl[]): PositionPnl {
     pnlPercent: totals.costBasis > 0 ? totals.pnlAbsolute / totals.costBasis : 0,
   }
 }
+
+/**
+ * Peso de uma posição no portfólio: valor de mercado próprio / valor de mercado total.
+ *
+ * Devolve `null` (→ "N/A" na UI, nunca 0) quando a posição não tem valor de mercado
+ * apurável — sem quantidade, sem preço atual, ou portfólio sem posições reais. Um
+ * peso de 0 diria "esta posição não vale nada", que é diferente de "não sabemos".
+ */
+export function positionWeight(
+  marketValue: number | null | undefined,
+  totalMarketValue: number
+): number | null {
+  if (marketValue === null || marketValue === undefined || !Number.isFinite(marketValue)) return null
+  if (!Number.isFinite(totalMarketValue) || totalMarketValue <= 0) return null
+  return marketValue / totalMarketValue
+}

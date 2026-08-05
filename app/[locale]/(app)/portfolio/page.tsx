@@ -10,6 +10,7 @@ import { PortfolioTable } from "@/components/portfolio/PortfolioTable"
 import { PortfolioEmptyState } from "@/components/portfolio/PortfolioEmptyState"
 import { PortfolioSuggestions } from "@/components/portfolio/PortfolioSuggestions"
 import { PortfolioSummary } from "@/components/portfolio/PortfolioSummary"
+import { PortfolioReturn } from "@/components/portfolio/PortfolioReturn"
 import { PortfolioToolbar } from "@/components/portfolio/PortfolioToolbar"
 import { PortfolioValueChart } from "@/components/portfolio/PortfolioValueChart"
 import { PortfolioAllocation } from "@/components/portfolio/PortfolioAllocation"
@@ -260,6 +261,10 @@ export default function Home() {
       ) : (
         <>
           <PortfolioSummary positions={items.length} upToday={upToday} pnl={portfolioPnl} />
+
+          {/* Retorno anualizado da conta na corretora. Renderiza-se a si
+              próprio como null quando não há corretora ligada. */}
+          <PortfolioReturn />
 
           {hasRealPositions && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

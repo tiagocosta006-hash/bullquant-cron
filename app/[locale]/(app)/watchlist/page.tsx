@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react"
 import { useTranslations, useLocale } from "next-intl"
 import { Link } from '@/i18n/routing';
-import { Clock, Star, Loader2, ArrowRight, Compass, Search } from "lucide-react"
+import { Clock, Star, Loader2, Plus } from "lucide-react"
 import { PageHeader } from "@/components/layout/PageHeader"
 import { PortfolioCard } from "@/components/portfolio/PortfolioCard"
 import { AddPositionDialog } from "@/components/portfolio/AddPositionDialog"
+import { PortfolioSuggestions } from "@/components/portfolio/PortfolioSuggestions"
 import { ManualAddSearch } from "@/components/portfolio/ManualAddSearch"
+import { ExploreTeaser } from "@/components/watchlist/ExploreTeaser"
 import type { Company, PortfolioItem, PriceData } from "@/components/portfolio/types"
 
 const POPULAR_TICKERS = ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA", "NFLX"]
@@ -20,7 +22,6 @@ type WatchlistApiItem = {
 
 export default function WatchlistPage() {
   const t = useTranslations("watchlist")
-  const tExplore = useTranslations("explore")
   const locale = useLocale()
   const [items, setItems] = useState<PortfolioItem[]>([])
   const [prices, setPrices] = useState<Record<string, PriceData>>({})
@@ -164,9 +165,6 @@ export default function WatchlistPage() {
   }
 
   const upToday = Object.values(prices).filter((p) => p.change !== undefined && p.change >= 0).length
-  const suggestedTickers = POPULAR_TICKERS.filter(
-    (ticker) => !items.some((item) => item.company.ticker === ticker)
-  ).slice(0, 4)
 
   return (
     <div className="space-y-6">
@@ -185,35 +183,29 @@ export default function WatchlistPage() {
       />
 
       {items.length === 0 ? (
-        <div className="glass rounded-2xl p-12 text-center">
-          <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Star className="w-8 h-8 text-primary" />
-          </div>
-          <h3 className="text-xl font-bold mb-2">{t("empty.title")}</h3>
-          <p className="text-muted-foreground mb-8 max-w-md mx-auto">{t("empty.description")}</p>
+        <div className="space-y-8">
+          <div className="glass rounded-2xl p-6 space-y-4">
+            <div>
+              <h3 className="text-lg font-semibold">{t("empty.title")}</h3>
+              <p className="text-sm text-muted-foreground mt-1">{t("empty.description")}</p>
+            </div>
 
-          <div className="max-w-md mx-auto mb-10 flex flex-col items-center gap-4">
-            <ManualAddSearch onSelect={handleQuickAdd} />
-            <span className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">— OU —</span>
-            <Link
-              href="/explore"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-border bg-background hover:bg-muted/50 font-semibold transition-colors w-full"
-            >
-              <Compass className="w-5 h-5 text-primary" />
-              {tExplore("title")}
-            </Link>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <ManualAddSearch onSelect={handleQuickAdd} />
+              <div className="flex flex-wrap items-center gap-2">
+                {POPULAR_TICKERS.slice(0, 4).map((ticker) => (
+                  <QuickAddChip
+                    key={ticker}
+                    ticker={ticker}
+                    isAdding={addingTicker === ticker}
+                    onQuickAdd={handleQuickAdd}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-            {POPULAR_TICKERS.slice(0, 4).map((ticker) => (
-              <QuickAddButton
-                key={ticker}
-                ticker={ticker}
-                isAdding={addingTicker === ticker}
-                onQuickAdd={handleQuickAdd}
-              />
-            ))}
-          </div>
+          <ExploreTeaser />
         </div>
       ) : (
         <>
@@ -240,29 +232,7 @@ export default function WatchlistPage() {
             ))}
           </div>
 
-          {items.length < 4 && suggestedTickers.length > 0 && (
-            <div className="mt-12 pt-8 border-t border-border/40">
-              <h3 className="text-xl font-bold mb-6">{t("suggestionsTitle")}</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl">
-                {suggestedTickers.map((ticker) => (
-                  <QuickAddButton
-                    key={ticker}
-                    ticker={ticker}
-                    isAdding={addingTicker === ticker}
-                    onQuickAdd={handleQuickAdd}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="mt-8 pt-8 border-t border-border/40 max-w-sm">
-            <span className="mb-4 flex items-center gap-2 text-sm font-medium text-muted-foreground">
-              <Search className="w-4 h-4" />
-              Procurar ticker para adicionar
-            </span>
-            <ManualAddSearch onSelect={handleQuickAdd} />
-          </div>
+          {items.length < 4 && <PortfolioSuggestions />}
 
           {lastUpdate && (
             <div className="flex items-center justify-end gap-1.5 text-xs text-muted-foreground mt-4 font-medium">
@@ -284,7 +254,7 @@ export default function WatchlistPage() {
   )
 }
 
-function QuickAddButton({
+function QuickAddChip({
   ticker,
   isAdding,
   onQuickAdd,
@@ -298,16 +268,11 @@ function QuickAddButton({
     <button
       onClick={() => onQuickAdd(ticker)}
       disabled={isAdding}
-      className="flex flex-col items-center justify-center p-4 rounded-xl border border-border/50 bg-background hover:bg-muted/50 hover:border-primary/50 hover:shadow-sm transition-all group disabled:opacity-70 disabled:cursor-not-allowed"
+      aria-label={`${t("empty.quickAdd")} ${ticker}`}
+      className="inline-flex items-center gap-1.5 rounded-full border border-border/50 bg-background px-3 py-1.5 text-sm font-semibold transition-colors hover:border-primary/50 hover:bg-muted/50 disabled:cursor-not-allowed disabled:opacity-60"
     >
-      <span className="font-extrabold text-lg group-hover:text-primary transition-colors">{ticker}</span>
-      <span className="text-xs text-muted-foreground font-medium flex items-center gap-1 mt-1">
-        {isAdding ? (
-          <><Loader2 className="w-3 h-3 animate-spin" /> {t("empty.adding")}</>
-        ) : (
-          <>{t("empty.quickAdd")} <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity -ml-2 group-hover:ml-0" /></>
-        )}
-      </span>
+      {isAdding ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5 text-muted-foreground" />}
+      {ticker}
     </button>
   )
 }

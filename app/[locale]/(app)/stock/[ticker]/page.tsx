@@ -256,20 +256,26 @@ export default async function StockPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {/* Header fixo da empresa (info + preço Finnhub ao vivo) */}
-      <StockHeader company={{
-        ticker: company.ticker,
-        name: company.name,
-        exchange: company.exchange,
-        logoUrl: company.logoUrl,
-        currency: company.currency
-      }}
-      shareComponent={
-        <ShareStockModal
-          ticker={company.ticker}
-          companyName={company.name}
-        />
-      }
+      {/* Header fixo da empresa (info + preço Finnhub ao vivo com fallback SSR) */}
+      <StockHeader 
+        company={{
+          ticker: company.ticker,
+          name: company.name,
+          exchange: company.exchange,
+          logoUrl: company.logoUrl,
+          currency: company.currency
+        }}
+        initialPriceData={latestPrice ? {
+          currentPrice: Number(latestPrice.close),
+          change: 0,
+          changePercent: 0,
+        } : null}
+        shareComponent={
+          <ShareStockModal
+            ticker={company.ticker}
+            companyName={company.name}
+          />
+        }
       />
 
       {/* Conteúdo organizado por intenção, não por scroll infinito */}
@@ -291,7 +297,12 @@ export default async function StockPage({
             )}
             <div>
               <h2 className="text-xl font-bold tracking-tight mb-4 text-foreground">{t('snapshotTitle')}</h2>
-              <StockSnapshot ticker={company.ticker} fundamentals={JSON.parse(JSON.stringify(fundamentalsToPass))} currencySymbol={currencySymbol} />
+              <StockSnapshot 
+                ticker={company.ticker} 
+                fundamentals={JSON.parse(JSON.stringify(fundamentalsToPass))} 
+                currencySymbol={currencySymbol}
+                initialPrice={latestPrice ? Number(latestPrice.close) : null}
+              />
             </div>
             <StockPriceChart ticker={company.ticker} currencySymbol={currencySymbol} />
             <CompanyProfile company={company} />

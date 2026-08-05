@@ -513,9 +513,8 @@
       "action": "Action",
       "change": "Change",
       "company": "Company",
-      "grossMargin": "Gross Margin",
+      "weight": "Peso",
       "pnl": "P&L",
-      "roic": "ROIC",
       "sector": "Sector"
     },
     "toolbar": {
@@ -931,7 +930,11 @@
       "upToday": "En alza hoy"
     },
     "suggestionsTitle": "Sugerencias para seguir",
-    "lastUpdate": "Última actualización:"
+    "lastUpdate": "Última actualización:",
+    "explorePreview": {
+      "title": "O explora por sector y tipo de negocio",
+      "viewAll": "Ver todo en Explorar"
+    }
   },
   "analista": {
     "title": "Analista IA",

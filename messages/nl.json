@@ -513,9 +513,8 @@
       "action": "Action",
       "change": "Change",
       "company": "Company",
-      "grossMargin": "Gross Margin",
+      "weight": "Gewicht",
       "pnl": "P&L",
-      "roic": "ROIC",
       "sector": "Sector"
     },
     "toolbar": {
@@ -931,7 +930,11 @@
       "upToday": "Vandaag omhoog"
     },
     "suggestionsTitle": "Suggesties om te volgen",
-    "lastUpdate": "Laatste update:"
+    "lastUpdate": "Laatste update:",
+    "explorePreview": {
+      "title": "Of verken op sector en bedrijfstype",
+      "viewAll": "Alles bekijken in Verkennen"
+    }
   },
   "analista": {
     "title": "AI-analist",

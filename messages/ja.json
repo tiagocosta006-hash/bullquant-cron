@@ -513,9 +513,8 @@
       "action": "Action",
       "change": "Change",
       "company": "Company",
-      "grossMargin": "Gross Margin",
+      "weight": "構成比",
       "pnl": "P&L",
-      "roic": "ROIC",
       "sector": "Sector"
     },
     "toolbar": {
@@ -931,7 +930,11 @@
       "upToday": "本日上昇"
     },
     "suggestionsTitle": "フォローのおすすめ",
-    "lastUpdate": "最終更新："
+    "lastUpdate": "最終更新：",
+    "explorePreview": {
+      "title": "またはセクターと業種で探索する",
+      "viewAll": "探索ですべて見る"
+    }
   },
   "analista": {
     "title": "AIアナリスト",

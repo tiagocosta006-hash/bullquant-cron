@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { formatPrice, formatPercent } from "@/lib/finance/format"
-import { calculatePositionPnl } from "@/lib/finance/portfolio"
+import { calculatePositionPnl, positionWeight } from "@/lib/finance/portfolio"
 import { PriceChangeBadge } from "@/components/finance/PriceChangeBadge"
 import { CompanyLogo } from "@/components/ui/CompanyLogo"
 import type { PortfolioItem, PriceData } from "./types"
@@ -26,6 +26,19 @@ export function PortfolioTable({ items, prices, onRemove, onEdit }: PortfolioTab
   const t = useTranslations("portfolio")
   const hasAnyPosition = items.some(item => item.quantity !== null && item.avgBuyPrice !== null)
 
+  // Valor de mercado por posição, para o peso. Mesma convenção do
+  // PortfolioAllocation (quantidade × preço atual, só posições reais) — se as duas
+  // vistas usassem regras diferentes, os pesos contradiziam-se na mesma página.
+  const marketValueById = new Map<string, number>()
+  for (const item of items) {
+    const price = prices[item.company.ticker]
+    const quantity = item.quantity !== null ? Number(item.quantity) : null
+    if (quantity !== null && price?.error === undefined && price?.currentPrice !== undefined) {
+      marketValueById.set(item.id, quantity * price.currentPrice)
+    }
+  }
+  const totalMarketValue = Array.from(marketValueById.values()).reduce((sum, v) => sum + v, 0)
+
   return (
     <div className="glass rounded-xl overflow-hidden">
       <Table>
@@ -33,10 +46,9 @@ export function PortfolioTable({ items, prices, onRemove, onEdit }: PortfolioTab
           <TableRow className="bg-muted/50">
             <TableHead>{t('table.company')}</TableHead>
             <TableHead>{t('table.sector')}</TableHead>
-            <TableHead className="text-right">{t('table.roic')}</TableHead>
-            <TableHead className="text-right">{t('table.grossMargin')}</TableHead>
             <TableHead className="text-right">{t('card.currentPrice')}</TableHead>
             <TableHead className="text-right">{t('table.change')}</TableHead>
+            {hasAnyPosition && <TableHead className="text-right">{t('table.weight')}</TableHead>}
             {hasAnyPosition && <TableHead className="text-right">{t('table.pnl')}</TableHead>}
             <TableHead className="text-right">{t('table.action')}</TableHead>
           </TableRow>
@@ -46,13 +58,13 @@ export function PortfolioTable({ items, prices, onRemove, onEdit }: PortfolioTab
             const price = prices[item.company.ticker]
             const hasResolved = price !== undefined
             const hasValidPrice = hasResolved && price.error === undefined && price.currentPrice !== undefined
-            const fundamental = item.company.fundamentals?.[0]
             const quantity = item.quantity !== null ? Number(item.quantity) : null
             const avgBuyPrice = item.avgBuyPrice !== null ? Number(item.avgBuyPrice) : null
             const fees = item.fees !== null && item.fees !== undefined ? Number(item.fees) : 0
             const pnl = quantity !== null && avgBuyPrice !== null && hasValidPrice
               ? calculatePositionPnl(quantity, avgBuyPrice, price.currentPrice as number, fees)
               : null
+            const weight = positionWeight(marketValueById.get(item.id), totalMarketValue)
 
             return (
               <TableRow key={item.id} className="group hover:bg-muted/50 transition-colors">
@@ -72,8 +84,6 @@ export function PortfolioTable({ items, prices, onRemove, onEdit }: PortfolioTab
                   </Link>
                 </TableCell>
                 <TableCell className="text-muted-foreground">{item.company.sector || "N/A"}</TableCell>
-                <TableCell className="text-right nums">{formatPercent(fundamental?.roic ?? null)}</TableCell>
-                <TableCell className="text-right nums">{formatPercent(fundamental?.grossMargin ?? null)}</TableCell>
                 <TableCell className="text-right nums">
                   {hasResolved ? formatPrice(price.currentPrice) : (
                     <span className="inline-block h-4 w-16 bg-muted animate-pulse rounded align-middle" />
@@ -88,6 +98,13 @@ export function PortfolioTable({ items, prices, onRemove, onEdit }: PortfolioTab
                     <span className="text-muted-foreground text-sm">N/A</span>
                   )}
                 </TableCell>
+                {hasAnyPosition && (
+                  <TableCell className="text-right nums">
+                    {weight !== null ? formatPercent(weight) : (
+                      <span className="text-muted-foreground text-sm">N/A</span>
+                    )}
+                  </TableCell>
+                )}
                 {hasAnyPosition && (
                   <TableCell className="text-right nums">
                     {pnl ? (

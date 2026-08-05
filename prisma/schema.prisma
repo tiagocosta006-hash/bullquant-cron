@@ -18,6 +18,7 @@ model User {
   updatedAt         DateTime           @updatedAt
   aiUsageLogs       AIUsageLog[]
   brokerConnections BrokerConnection[]
+  brokerCashFlows   BrokerCashFlow[]
   dcfAnalyses       DcfAnalysis[]
   portfolio         Portfolio?
   watchlistItems    WatchlistItem[]
@@ -116,6 +117,32 @@ model Fundamental {
   roic                   Decimal?   @db.Decimal(8, 6)
   returnOnEquity         Decimal?   @db.Decimal(8, 6)
   dividendPerShare       Decimal?   @db.Decimal(10, 4)
+
+  // --- Demonstração de Resultados (DRE) Detalhada ---
+  depreciationAndAmortization Decimal? @db.Decimal(20, 4)
+  incomeBeforeTax            Decimal? @db.Decimal(20, 4)
+  netInterestIncome          Decimal? @db.Decimal(20, 4)
+  otherNonOperatingIncome    Decimal? @db.Decimal(20, 4)
+
+  // --- Balanço Patrimonial Detalhado ---
+  totalCurrentAssets         Decimal? @db.Decimal(20, 4)
+  accountsReceivable         Decimal? @db.Decimal(20, 4)
+  inventory                  Decimal? @db.Decimal(20, 4)
+  propertyPlantEquipment     Decimal? @db.Decimal(20, 4)
+  goodwillAndIntangibles     Decimal? @db.Decimal(20, 4)
+  accountsPayable            Decimal? @db.Decimal(20, 4)
+  shortTermDebt              Decimal? @db.Decimal(20, 4)
+  totalLiabilities           Decimal? @db.Decimal(20, 4)
+  retainedEarnings           Decimal? @db.Decimal(20, 4)
+
+  // --- Fluxos de Caixa Detalhados ---
+  investingCashFlow          Decimal? @db.Decimal(20, 4)
+  financingCashFlow          Decimal? @db.Decimal(20, 4)
+  stockBasedCompensation     Decimal? @db.Decimal(20, 4)
+  shareRepurchases           Decimal? @db.Decimal(20, 4)
+  dividendsPaid              Decimal? @db.Decimal(20, 4)
+  netChangeInCash            Decimal? @db.Decimal(20, 4)
+
   createdAt              DateTime   @default(now())
   updatedAt              DateTime   @updatedAt
   businessKpis           Json?
@@ -227,6 +254,17 @@ model BrokerConnection {
   encryptedApiSecret String    @db.Text
   lastSyncedAt       DateTime?
   lastSyncError      String?   @db.Text
+
+  // ── Estado da sincronização do histórico de caixa (para o XIRR) ──
+  // O endpoint de transações tem rate limit de 6 req/min e só devolve 50
+  // movimentos por página, logo uma conta com muito histórico não cabe numa
+  // única chamada. Guardamos o cursor da próxima página para retomar o
+  // backfill em chamadas seguintes; quando termina, `cashFlowBackfillDone`
+  // fica true e as sincronizações passam a ser incrementais.
+  cashFlowCursor       String?   @db.Text
+  cashFlowBackfillDone Boolean   @default(false)
+  cashFlowsSyncedAt    DateTime?
+
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
   user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -234,6 +272,33 @@ model BrokerConnection {
   @@unique([userId, broker])
   @@index([userId])
   @@map("broker_connections")
+}
+
+// ── MOVIMENTOS DE CAIXA DA CORRETORA ──────────────
+// Depósitos, levantamentos, taxas e juros importados da corretora. Servem para
+// calcular o XIRR (retorno anualizado) em lib/finance/xirr.ts — sem as datas de
+// cada entrada de dinheiro, só é possível calcular retorno total, não anualizado.
+//
+// `reference` é o ID do movimento na corretora — é a chave de deduplicação que
+// torna a sincronização idempotente (re-ler páginas sobrepostas não duplica).
+model BrokerCashFlow {
+  id     String @id @default(cuid())
+  userId String
+  broker Broker
+
+  reference  String
+  type       String // DEPOSIT | WITHDRAW | TRANSFER | FEE | INTEREST_ON_FREE_CASH | LENDING_INTEREST
+  amount     Decimal  @db.Decimal(20, 6)
+  currency   String
+  occurredAt DateTime
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, broker, reference])
+  @@index([userId, broker, occurredAt])
+  @@map("broker_cash_flows")
 }
 
 model DcfAnalysis {

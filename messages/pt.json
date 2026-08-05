@@ -494,9 +494,8 @@
     "table": {
       "company": "Empresa",
       "sector": "Setor",
-      "roic": "ROIC",
-      "grossMargin": "Margem Bruta",
       "change": "Variação",
+      "weight": "Peso",
       "pnl": "Ganho/Perda",
       "action": "Ação"
     },
@@ -523,6 +522,23 @@
       "marketValue": "Valor de Mercado",
       "totalPnl": "Ganho/Perda Total",
       "watchlistOnly": "Adiciona quantidade e preço de compra às tuas posições para veres o valor de mercado e o ganho/perda."
+    },
+    "annualReturn": {
+      "title": "Retorno Anual",
+      "perYear": "ao ano (XIRR)",
+      "invested": "Total Investido",
+      "currentValue": "Valor Atual",
+      "totalReturn": "Retorno Total",
+      "notAnnualized": "desde o início",
+      "loading": "A calcular o retorno anual...",
+      "importing": "A importar o histórico de depósitos da corretora...",
+      "error": "Não foi possível calcular o retorno anual.",
+      "notEnoughData": "Ainda não há depósitos suficientes para calcular um retorno anual. É preciso pelo menos um depósito e algum tempo decorrido.",
+      "tooltip": "XIRR: o retorno anualizado real, que tem em conta a data em que cada depósito entrou. Um euro investido há 3 anos não conta o mesmo que um investido no mês passado.",
+      "partialHistory": "Histórico ainda incompleto — a corretora limita quantos movimentos podemos ler de cada vez. O resto é importado na próxima visita.",
+      "foreignCurrency": "{count} movimento(s) noutra moeda foram incluídos sem conversão cambial. O valor real pode diferir ligeiramente.",
+      "showCashFlows": "Ver os {count} movimentos usados no cálculo",
+      "hideCashFlows": "Esconder movimentos"
     },
     "valueChart": {
       "title": "Evolução do Portfólio",
@@ -880,6 +896,106 @@
     "preliminaryInfo": "A barra a claro é o trimestre já reportado nos resultados (preliminar), ainda não publicado no relatório oficial. Atualiza-se sozinha quando o documento sai.",
     "sparseQuarterlyNote": "Histórico trimestral limitado para esta empresa — muitas empresas (sobretudo europeias) reportam semestral ou anualmente. Vê a aba «Anual» para o histórico completo."
   },
+  "financialStatements": {
+    "title": "Demonstrações Financeiras",
+    "subtitle": "Histórico detalhado de 10 anos de Demonstração de Resultados, Balanço e Fluxos de Caixa.",
+    "viewModes": {
+      "charts": "Gráficos & Análise",
+      "statements": "Tabelas Contabilísticas"
+    },
+    "tabs": {
+      "incomeStatement": "Demonstração de Resultados",
+      "balanceSheet": "Balanço Patrimonial",
+      "cashFlow": "Fluxos de Caixa"
+    },
+    "periods": {
+      "annual": "Anual",
+      "quarterly": "Trimestral",
+      "ttm": "TTM"
+    },
+    "displayMode": {
+      "label": "Apresentação",
+      "absolute": "Valores",
+      "percentRevenue": "% Receita",
+      "yoyGrowth": "Crescimento YoY"
+    },
+    "headers": {
+      "lineItem": "Rubrica Financeira",
+      "trend": "Tendência"
+    },
+    "actions": {
+      "searchPlaceholder": "Pesquisar rubrica (ex: I&D, Caixa, Dívida, Goodwill, SBC)...",
+      "exportCsv": "Exportar CSV",
+      "sortDesc": "Mais recente primeiro",
+      "sortAsc": "Mais antigo primeiro",
+      "noResults": "Nenhuma rubrica encontrada para a pesquisa."
+    },
+    "sections": {
+      "revenueGrossProfit": "Receitas & Lucro Bruto",
+      "operatingExpenses": "Despesas Operacionais (OpEx)",
+      "operatingIncomeEbitda": "Resultado Operacional & EBITDA",
+      "netIncomeBeforeTax": "Resultado Antes de Impostos & Lucro Líquido",
+      "perShareData": "Dados por Ação",
+      "currentAssets": "Ativo Corrente",
+      "nonCurrentAssets": "Ativo Não Corrente",
+      "currentLiabilities": "Passivo Corrente",
+      "nonCurrentLiabilities": "Passivo Não Corrente & Dívida",
+      "stockholdersEquity": "Capital Próprio",
+      "operatingActivities": "Atividades Operacionais",
+      "investingActivities": "Atividades de Investimento",
+      "financingActivities": "Atividades de Financiamento",
+      "cashSummaryFreeCashFlow": "Resumo de Caixa & Free Cash Flow"
+    },
+    "metrics": {
+      "revenue": "Receita Líquida (Revenue)",
+      "costOfRevenue": "Custo das Vendas (COGS)",
+      "grossProfit": "Lucro Bruto (Gross Profit)",
+      "researchAndDevelopment": "Investigação & Desenvolvimento (I&D)",
+      "sellingGeneralAndAdmin": "Vendas, Gerais & Admin. (SG&A)",
+      "operatingExpensesTotal": "Total Despesas Operacionais",
+      "operatingIncome": "Resultado Operacional (EBIT)",
+      "depreciationAndAmortization": "Depreciação & Amortização (D&A)",
+      "ebitda": "EBITDA",
+      "interestExpense": "Despesas com Juros",
+      "netInterestIncome": "Rendimentos / Custos de Juros Líquidos",
+      "otherNonOperatingIncome": "Outros Rendimentos Não Operacionais",
+      "incomeBeforeTax": "Resultado Antes de Impostos (EBT)",
+      "taxExpense": "Imposto s/ Rendimento",
+      "netIncome": "Resultado Líquido (Net Income)",
+      "epsDiluted": "EPS Diluído",
+      "sharesOutstanding": "Ações em Circulação",
+      "dividendPerShare": "Dividendo por Ação (DPS)",
+      "cashAndEquivalents": "Caixa & Equivalentes",
+      "accountsReceivable": "Clientes / Contas a Receber",
+      "inventory": "Inventários / Stocks",
+      "totalCurrentAssets": "Total Ativo Corrente",
+      "propertyPlantEquipment": "Ativos Fixos Tangíveis (PP&E)",
+      "goodwillAndIntangibles": "Goodwill & Intangíveis",
+      "totalAssets": "Total do Ativo",
+      "accountsPayable": "Fornecedores / Contas a Pagar",
+      "shortTermDebt": "Dívida de Curto Prazo",
+      "totalCurrentLiabilities": "Total Passivo Corrente",
+      "longTermDebt": "Dívida de Longo Prazo",
+      "totalDebt": "Dívida Financeira Total",
+      "netDebt": "Dívida Líquida (Total Debt - Caixa)",
+      "totalLiabilities": "Total do Passivo",
+      "retainedEarnings": "Resultados Transitados",
+      "totalEquity": "Capital Próprio Total",
+      "stockBasedCompensation": "Remuneração em Ações (SBC)",
+      "operatingCashFlowTotal": "Fluxo de Caixa Operacional (OCF)",
+      "capex": "Despesas de Capital (CapEx)",
+      "investingCashFlowTotal": "Fluxo de Caixa de Investimento (ICF)",
+      "shareRepurchases": "Recompra de Ações (Buybacks)",
+      "dividendsPaid": "Dividendos Pagos",
+      "financingCashFlowTotal": "Fluxo de Caixa de Financiamento (FCFin)",
+      "netChangeInCash": "Variação Líquida de Caixa",
+      "freeCashFlow": "Free Cash Flow (FCF)"
+    },
+    "footer": {
+      "sourceNote": "Dados contabilísticos oficiais extraídos de relatórios 10-K e 10-Q da SEC EDGAR.",
+      "unitsNote": "Valores expressos na moeda de reporte ({symbol})."
+    }
+  },
   "compare": {
     "title": "Análise de Pares: {industry}",
     "subtitle": "Comparação direta de múltiplos e desempenho dentro da mesma sub-indústria GICS.",
@@ -1163,7 +1279,11 @@
       "upToday": "Em alta hoje"
     },
     "suggestionsTitle": "Sugestões para seguir",
-    "lastUpdate": "Última atualização:"
+    "lastUpdate": "Última atualização:",
+    "explorePreview": {
+      "title": "Ou explora por setor e tipo de negócio",
+      "viewAll": "Ver tudo no Explorar"
+    }
   },
   "about": {
     "badge": "A Nossa Missão",

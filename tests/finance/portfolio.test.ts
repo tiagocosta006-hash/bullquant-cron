@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { mergePosition, calculatePositionPnl, aggregatePnl } from "@/lib/finance/portfolio"
+import { mergePosition, calculatePositionPnl, aggregatePnl, positionWeight } from "@/lib/finance/portfolio"
 
 describe("mergePosition — média ponderada do preço de compra", () => {
   it("10@100 + 10@200 ⇒ 20@150", () => {
@@ -50,5 +50,34 @@ describe("aggregatePnl — soma de posições", () => {
     expect(total.costBasis).toBe(2100)
     expect(total.pnlAbsolute).toBe(0)
     expect(total.pnlPercent).toBeCloseTo(0, 10)
+  })
+})
+
+describe("positionWeight — peso da posição no portfólio", () => {
+  it("quota simples: 2500 em 10000 ⇒ 25%", () => {
+    expect(positionWeight(2500, 10000)).toBe(0.25)
+  })
+
+  it("os pesos de todas as posições somam 1", () => {
+    const values = [2500, 6000, 1500]
+    const total = values.reduce((s, v) => s + v, 0)
+    const sum = values.reduce((s, v) => s + (positionWeight(v, total) ?? 0), 0)
+    expect(sum).toBeCloseTo(1, 10)
+  })
+
+  it("posição sem valor de mercado ⇒ null (N/A), nunca 0", () => {
+    expect(positionWeight(null, 10000)).toBeNull()
+    expect(positionWeight(undefined, 10000)).toBeNull()
+    expect(positionWeight(NaN, 10000)).toBeNull()
+  })
+
+  it("portfólio sem valor total (watchlist pura) ⇒ null, não divisão por zero", () => {
+    expect(positionWeight(0, 0)).toBeNull()
+    expect(positionWeight(100, 0)).toBeNull()
+    expect(positionWeight(100, -5)).toBeNull()
+  })
+
+  it("uma posição a valer 0 tem peso 0, o que é diferente de N/A", () => {
+    expect(positionWeight(0, 10000)).toBe(0)
   })
 })

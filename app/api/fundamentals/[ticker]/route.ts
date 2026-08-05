@@ -33,7 +33,7 @@ export async function GET(
       orderBy: {
         periodEnd: 'desc',
       },
-      take: 60,
+      take: 100,
     })
     fundamentals.reverse()
 

@@ -98,7 +98,7 @@ const RoundedBar = (props: any) => {
 
 interface DecisionChartProps {
   title: string
-  data: any[]
+  data: Record<string, unknown>[]
   type: 'BAR' | 'LINE' | 'COMPOSED' | 'STACKED_BAR' | 'AREA'
   config: ChartConfig
   cagr?: number | null
@@ -430,11 +430,19 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
             >
               <Maximize2 className="w-4 h-4" />
             </DialogTrigger>
-            <DialogContent className="sm:max-w-5xl w-[90vw] h-[80vh] flex flex-col bg-card border-border/50 outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0">
+            <DialogContent className="sm:max-w-5xl w-[90vw] h-[80vh] flex flex-col bg-card border-border/50 outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 [&_*:focus]:outline-none [&_*:focus]:ring-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <DialogTitle className="text-xl">{title}</DialogTitle>
-                  {headerExtra && <div className="hidden md:block scale-90 origin-left">{headerExtra}</div>}
+                  <DialogTitle className="text-xl font-bold tracking-tight">{title}</DialogTitle>
+                  {headerExtra && (
+                    <div 
+                      className="hidden md:block scale-90 origin-left"
+                      onClick={(e) => e.stopPropagation()}
+                      onPointerDown={(e) => e.stopPropagation()}
+                    >
+                      {headerExtra}
+                    </div>
+                  )}
                 </div>
                 <div className="flex gap-1 bg-muted/50 p-1 rounded-md border border-border/40 mr-6">
                   {TIME_FILTERS.map(tf => (
@@ -448,7 +456,7 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
                   ))}
                 </div>
               </div>
-              <div className="flex-1 mt-4 min-h-0">
+              <div className="flex-1 mt-4 min-h-0 [&_*:focus]:outline-none [&_*:focus]:ring-0" tabIndex={-1}>
                 {viewMode === 'chart' ? renderChart("100%") : renderTable()}
               </div>
             </DialogContent>

@@ -513,9 +513,8 @@
       "action": "Action",
       "change": "Change",
       "company": "Company",
-      "grossMargin": "Gross Margin",
+      "weight": "权重",
       "pnl": "P&L",
-      "roic": "ROIC",
       "sector": "Sector"
     },
     "toolbar": {
@@ -931,7 +930,11 @@
       "upToday": "今日上涨"
     },
     "suggestionsTitle": "关注建议",
-    "lastUpdate": "最后更新："
+    "lastUpdate": "最后更新：",
+    "explorePreview": {
+      "title": "或按行业和业务类型探索",
+      "viewAll": "在探索中查看全部"
+    }
   },
   "analista": {
     "title": "AI 分析师",

@@ -31,15 +31,6 @@ export async function GET() {
                 exchange: true,
                 sector: true,
                 industry: true,
-                fundamentals: {
-                  where: { periodType: 'ANNUAL' },
-                  orderBy: { periodEnd: 'desc' },
-                  take: 1,
-                  select: {
-                    roic: true,
-                    grossMargin: true,
-                  }
-                }
               }
             }
           },

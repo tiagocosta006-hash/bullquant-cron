@@ -8,6 +8,7 @@ type StockSnapshotProps = {
   ticker: string
   fundamentals: Fundamental[] // 4 quarters or 1 annual
   currencySymbol?: string
+  initialPrice?: number | null
 }
 
 function formatVal(value: number | null | undefined, isPercent = false, isCurrency = false, isRatio = false, currencySymbol = "$") {
@@ -65,10 +66,10 @@ function Stat({
   )
 }
 
-export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$" }: StockSnapshotProps) {
+export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$", initialPrice = null }: StockSnapshotProps) {
   const t = useTranslations("stock.snapshot")
-  const [price, setPrice] = useState<number | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [price, setPrice] = useState<number | null>(initialPrice)
+  const [isLoading, setIsLoading] = useState(initialPrice === null)
 
   useEffect(() => {
     const fetchPrice = async () => {

@@ -124,7 +124,10 @@ export async function signup(formData: FormData) {
     // Se usássemos o action_link gerado pelo Supabase, ele redirecionaria com o token num Hash Fragment (#access_token=)
     // e o Next.js (SSR) não conseguiria ler os dados, gerando o erro "Missing token".
     const confirmationLink = `${siteUrl}/auth/callback?token_hash=${linkData?.properties?.hashed_token}&type=signup&next=/dashboard&welcome=1`
-    await sendConfirmationEmail(email, name || 'Investidor', confirmationLink)
+    const sendResult = await sendConfirmationEmail(email, name || 'Investidor', confirmationLink)
+    if (sendResult && 'error' in sendResult && sendResult.error) {
+      console.error('[Signup] Erro ao enviar email de confirmação via Resend:', sendResult.error)
+    }
 
     if (linkData?.user) await recordServerEvent(await headers(), 'signup', '/register')
     revalidatePath('/', 'layout')
@@ -171,9 +174,8 @@ export async function signup(formData: FormData) {
   redirect(`/verify-email?email=${encodeURIComponent(email)}`)
 }
 
-// Reenvia o email de confirmação de registo (via SMTP configurado no Supabase).
+// Reenvia o email de confirmação de registo (via Resend se ativo, senão via Supabase).
 export async function resendConfirmation(formData: FormData) {
-  const supabase = await createClient()
   const email = normalizeEmail(formData.get('email'))
 
   if (!email) {
@@ -181,6 +183,38 @@ export async function resendConfirmation(formData: FormData) {
   }
 
   const siteUrl = await getSiteUrl()
+
+  if (isEmailEnabled()) {
+    const adminAuth = createAdminClient().auth
+    const { data: linkData, error } = await adminAuth.admin.generateLink({
+      type: 'magiclink',
+      email,
+      options: {
+        redirectTo: `${siteUrl}/auth/callback?next=/dashboard&welcome=1`,
+      },
+    })
+
+    if (error) {
+      console.error('[ResendConfirmation] Erro ao gerar link de confirmação:', error)
+      const msg = (error.message || '').toLowerCase()
+      if (msg.includes('already confirmed') || msg.includes('already been confirmed')) {
+        redirect('/login?message=O teu email já se encontra confirmado. Podes entrar.')
+      }
+      redirect(`/verify-email?email=${encodeURIComponent(email)}&error=${encodeURIComponent(translateError(error))}`)
+    }
+
+    const confirmationLink = `${siteUrl}/auth/callback?token_hash=${linkData?.properties?.hashed_token}&type=magiclink&next=/dashboard&welcome=1`
+    const sendResult = await sendConfirmationEmail(email, 'Investidor', confirmationLink)
+    if (sendResult?.error) {
+      console.error('[ResendConfirmation] Erro ao enviar email pelo Resend:', sendResult.error)
+      redirect(`/verify-email?email=${encodeURIComponent(email)}&error=${encodeURIComponent(`Erro ao enviar email (${sendResult.error.message})`)}`)
+    }
+
+    redirect(`/verify-email?email=${encodeURIComponent(email)}&resent=1`)
+  }
+
+  // Fallback: via SMTP configurado no Supabase
+  const supabase = await createClient()
   const { error } = await supabase.auth.resend({
     type: 'signup',
     email,
@@ -259,18 +293,40 @@ export async function logout() {
 }
 
 export async function forgotPassword(formData: FormData) {
-  const supabase = await createClient()
-  const email = formData.get('email') as string
-  const origin = process.env.NEXT_PUBLIC_SITE_URL
+  const email = normalizeEmail(formData.get('email'))
 
-  if (!origin && process.env.NODE_ENV === 'production') {
-    console.error('CRITICAL ERROR: NEXT_PUBLIC_SITE_URL is not defined in production.')
-    redirect('/forgot-password?error=Erro de configuração do servidor. Contacte o suporte.')
+  if (!email) {
+    redirect('/forgot-password?error=Introduz um email válido.')
   }
 
-  const siteUrl = origin ? origin.replace(/\/$/, '') : 'http://localhost:3000'
+  const siteUrl = await getSiteUrl()
 
-  // Pedir à Supabase para gerir o envio do email de recuperação (usando o SMTP do Resend que configuraste)
+  if (isEmailEnabled()) {
+    const adminAuth = createAdminClient().auth
+    const { data: linkData, error } = await adminAuth.admin.generateLink({
+      type: 'recovery',
+      email,
+      options: {
+        redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
+      },
+    })
+
+    if (error) {
+      console.error('[ForgotPassword] Erro ao gerar link de recuperação:', error)
+      redirect(`/forgot-password?error=${encodeURIComponent(translateError(error))}`)
+    }
+
+    const resetLink = `${siteUrl}/auth/callback?token_hash=${linkData?.properties?.hashed_token}&type=recovery&next=/reset-password`
+    const sendResult = await sendPasswordResetEmail(email, resetLink)
+    if (sendResult?.error) {
+      console.error('[ForgotPassword] Erro ao enviar email pelo Resend:', sendResult.error)
+      redirect(`/forgot-password?error=${encodeURIComponent(`Erro ao enviar email (${sendResult.error.message})`)}`)
+    }
+
+    redirect('/forgot-password?message=Verifica o teu email para redefinir a password.')
+  }
+
+  const supabase = await createClient()
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
   })

@@ -1,8 +1,9 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { Info } from "lucide-react"
+import { Info, BarChart3, FileSpreadsheet } from "lucide-react"
 import { DecisionChart } from "./DecisionChart"
+import { FinancialStatements } from "./FinancialStatements"
 import { useTranslations } from "next-intl"
 
 type PeriodType = "QUARTERLY" | "TTM" | "ANNUAL"
@@ -15,6 +16,7 @@ type FundamentalRow = {
   label?: string
   isPreliminary?: boolean
   revenue?: number | null
+  costOfRevenue?: number | null
   grossProfit?: number | null
   operatingIncome?: number | null
   netIncome?: number | null
@@ -38,14 +40,43 @@ type FundamentalRow = {
   dividendPerShare?: number | null
   revenueSegments?: Record<string, number> | null
   businessKpis?: Record<string, number> | null
+  // Demonstrações Contabilísticas Expandidas
+  depreciationAndAmortization?: number | null
+  interestExpense?: number | null
+  netInterestIncome?: number | null
+  otherNonOperatingIncome?: number | null
+  incomeBeforeTax?: number | null
+  taxExpense?: number | null
+  cashAndEquivalents?: number | null
+  accountsReceivable?: number | null
+  inventory?: number | null
+  totalCurrentAssets?: number | null
+  propertyPlantEquipment?: number | null
+  goodwillAndIntangibles?: number | null
+  totalAssets?: number | null
+  accountsPayable?: number | null
+  shortTermDebt?: number | null
+  totalCurrentLiabilities?: number | null
+  longTermDebt?: number | null
+  totalLiabilities?: number | null
+  retainedEarnings?: number | null
+  totalEquity?: number | null
+  stockBasedCompensation?: number | null
+  investingCashFlow?: number | null
+  shareRepurchases?: number | null
+  dividendsPaid?: number | null
+  financingCashFlow?: number | null
+  netChangeInCash?: number | null
 }
 
 export function FinancialsEngine({ ticker, sector, currencySymbol = "$", preliminary = null }: { ticker: string, sector?: string | null, currencySymbol?: string, preliminary?: { fiscalYear: number; fiscalQuarter: number; revenue: number | null; epsDiluted: number | null } | null }) {
   const t = useTranslations("financials")
+  const tFs = useTranslations("financialStatements")
   const isBank = sector === "Financials"
   const isReit = sector === "Real Estate"
   const [data, setData] = useState<FundamentalRow[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [mainView, setMainView] = useState<"charts" | "statements">("charts")
   const [period, setPeriod] = useState<PeriodType>("ANNUAL")
   
   // Ratios internal tab state
@@ -176,14 +207,6 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
     return Math.pow(end / start, 1 / years) - 1
   }
 
-  if (isLoading) {
-    return (
-      <div className="w-full h-96 flex items-center justify-center animate-pulse bg-card rounded-xl border border-border/40 mt-8">
-        <div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
-      </div>
-    )
-  }
-
   // Pre-process segments and KPIs for dynamic keys
   // União de todas as categorias vistas em QUALQUER período, não só num de
   // referência — empresas reorganizam segmentos ao longo do tempo (ex.: MSFT
@@ -246,22 +269,30 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
 
   // Barra preliminar: revenue/EPS já reportados (earnings) mas ainda sem 10-Q.
   // Só no modo trimestral e só se o trimestre ainda não existir nos oficiais.
-  // Injetada APENAS nos gráficos de Revenue e EPS (não em processedData/CAGR nem
-  // nos outros gráficos), e marcada como preliminar (barra a claro + nota).
-  const showPreliminary =
-    period === "QUARTERLY" &&
-    preliminary != null &&
-    !data.some(d => d.periodType === "QUARTERLY" && d.fiscalYear === preliminary.fiscalYear && d.fiscalQuarter === preliminary.fiscalQuarter)
-
-  const preliminaryLabel = preliminary
-    ? `Q${preliminary.fiscalQuarter} '${String(preliminary.fiscalYear).slice(2)}`
-    : ""
+  const showPreliminary = useMemo(() => {
+    if (!preliminary || period !== "QUARTERLY" || chartData.length === 0) return null
+    const last = chartData[chartData.length - 1]
+    const isNewer =
+      preliminary.fiscalYear > (last.fiscalYear ?? 0) ||
+      (preliminary.fiscalYear === (last.fiscalYear ?? 0) &&
+        preliminary.fiscalQuarter > (last.fiscalQuarter ?? 0))
+    if (!isNewer) return null
+    return {
+      label: `Q${preliminary.fiscalQuarter}'${String(preliminary.fiscalYear).slice(2)}`,
+      fiscalYear: preliminary.fiscalYear,
+      fiscalQuarter: preliminary.fiscalQuarter,
+      revenue: preliminary.revenue,
+      epsDiluted: preliminary.epsDiluted,
+      isPreliminary: true,
+    }
+  }, [preliminary, period, chartData])
 
   const revenueChartData = showPreliminary
-    ? [...chartData, { label: preliminaryLabel, revenue: preliminary!.revenue, isPreliminary: true }]
+    ? [...chartData, { ...showPreliminary, revenue: showPreliminary.revenue }]
     : chartData
+
   const epsChartData = showPreliminary
-    ? [...chartData, { label: preliminaryLabel, epsDiluted: preliminary!.epsDiluted, isPreliminary: true }]
+    ? [...chartData, { ...showPreliminary, epsDiluted: showPreliminary.epsDiluted }]
     : chartData
 
   // Aviso guiado pelos DADOS reais: se o histórico trimestral for escasso (típico
@@ -273,213 +304,262 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
   const annualCount = data.filter(d => d.periodType === "ANNUAL").length
   const sparseQuarterly = annualCount > 0 && quarterlyCount < annualCount * 3
 
+  if (isLoading) {
+    return (
+      <div className="w-full h-96 flex items-center justify-center animate-pulse bg-card rounded-xl border border-border/40 mt-8">
+        <div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
+      </div>
+    )
+  }
+
   return (
     <div className="mt-12 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <h2 className="text-2xl font-bold tracking-tight">{t('engineTitle')}</h2>
-        <div className="flex bg-muted/50 p-1 rounded-lg border border-border/40 w-fit">
-          {(["QUARTERLY", "TTM", "ANNUAL"] as PeriodType[]).map(p => (
+        <div className="flex items-center gap-3 flex-wrap">
+          <h2 className="text-2xl font-bold tracking-tight">{t('engineTitle')}</h2>
+          <div className="flex bg-muted/40 p-1 rounded-xl border border-border/50 shadow-inner">
             <button
-              key={p}
-              onClick={() => setPeriod(p)}
-              className={`px-4 py-1.5 text-sm font-semibold rounded-md transition-all ${
-                period === p ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
+              onClick={() => setMainView("charts")}
+              className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                mainView === "charts"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              {t(`periods.${p.toLowerCase()}`)}
+              <BarChart3 className="w-3.5 h-3.5" />
+              {tFs("viewModes.charts")}
             </button>
-          ))}
+            <button
+              onClick={() => setMainView("statements")}
+              className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                mainView === "statements"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5" />
+              {tFs("viewModes.statements")}
+            </button>
+          </div>
         </div>
+
+        {mainView === "charts" && (
+          <div className="flex bg-muted/50 p-1 rounded-lg border border-border/40 w-fit">
+            {(["QUARTERLY", "TTM", "ANNUAL"] as PeriodType[]).map(p => (
+              <button
+                key={p}
+                onClick={() => setPeriod(p)}
+                className={`px-4 py-1.5 text-sm font-semibold rounded-md transition-all ${
+                  period === p ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {t(`periods.${p.toLowerCase()}`)}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {sparseQuarterly && (period === "QUARTERLY" || period === "TTM") && (
-        <div className="flex items-start gap-2.5 rounded-lg border border-border/50 bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
-          <Info className="h-4 w-4 mt-0.5 shrink-0" />
-          <span>{t('sparseQuarterlyNote')}</span>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        <DecisionChart currencySymbol={currencySymbol}
-          title={t('charts.revenue')}
-          data={revenueChartData}
-          type="BAR"
-          config={{ isCurrency: true, dataKeys: [{ key: 'revenue', color: 'var(--chart-1)', type: 'bar' }] }}
-          cagr={calcCAGR('revenue')}
-          infoTooltip={showPreliminary ? t('preliminaryInfo') : undefined}
+      {mainView === "statements" ? (
+        <FinancialStatements
+          ticker={ticker}
+          data={data}
+          currencySymbol={currencySymbol}
+          defaultPeriod={period}
         />
+      ) : (
+        <>
+          {sparseQuarterly && (period === "QUARTERLY" || period === "TTM") && (
+            <div className="flex items-start gap-2.5 rounded-lg border border-border/50 bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
+              <Info className="h-4 w-4 mt-0.5 shrink-0" />
+              <span>{t('sparseQuarterlyNote')}</span>
+            </div>
+          )}
 
-        {segmentKeys.length > 0 && (
-          <DecisionChart currencySymbol={currencySymbol} 
-            title={t('charts.revenueBySegment')} 
-            data={chartData} 
-            type="STACKED_BAR" 
-            config={{ 
-              isCurrency: true, 
-              dataKeys: segmentKeys.map((k, i) => ({ key: k, color: segmentColors[i % segmentColors.length], type: 'bar', stackId: 'a' })) 
-            }} 
-          />
-        )}
-        
-        <DecisionChart currencySymbol={currencySymbol}
-          title={t('charts.epsDiluted')}
-          data={epsChartData}
-          type="BAR"
-          config={{ dataKeys: [{ key: 'epsDiluted', color: 'var(--chart-1)', type: 'bar' }] }}
-          cagr={calcCAGR('epsDiluted')}
-          infoTooltip={showPreliminary ? t('preliminaryInfo') : undefined}
-        />
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <DecisionChart currencySymbol={currencySymbol}
+              title={t('charts.revenue')}
+              data={revenueChartData}
+              type="BAR"
+              config={{ isCurrency: true, dataKeys: [{ key: 'revenue', color: 'var(--chart-1)', type: 'bar' }] }}
+              cagr={calcCAGR('revenue')}
+              infoTooltip={showPreliminary ? t('preliminaryInfo') : undefined}
+            />
 
-        {!isBank && (
-          <DecisionChart currencySymbol={currencySymbol} 
-            title={isReit ? "AFFO / FCF" : t('charts.freeCashFlow')} 
-            data={chartData} 
-            type="COMPOSED" 
-            config={{ 
-              isCurrency: true,
-              dataKeys: [
-                { key: 'freeCashFlow', name: 'FCF', color: 'var(--chart-1)', type: 'bar' },
-                { key: 'operatingCashFlow', name: 'OCF', color: 'var(--chart-5)', type: 'line' },
-                { key: 'capex', name: 'CapEx', color: 'var(--chart-4)', type: 'line' }
-              ],
-              defaultHiddenKeys: ['operatingCashFlow', 'capex']
-            }} 
-            cagr={calcCAGR('freeCashFlow')}
-            infoTooltip={isReit ? t('reitFcfTooltip') : undefined}
-          />
-        )}
-
-        <DecisionChart currencySymbol={currencySymbol} 
-          title={t('charts.netIncome')} 
-          data={chartData} 
-          type="BAR" 
-          config={{ isCurrency: true, dataKeys: [{ key: 'netIncome', color: 'var(--chart-1)', type: 'bar' }] }} 
-          cagr={calcCAGR('netIncome')}
-        />
-
-        {!isBank && (
-          <DecisionChart currencySymbol={currencySymbol} 
-            title={t('charts.ebitda')} 
-            data={chartData} 
-            type="BAR" 
-            config={{ isCurrency: true, dataKeys: [{ key: 'ebitda', color: 'var(--chart-1)', type: 'bar' }] }} 
-            cagr={calcCAGR('ebitda')}
-          />
-        )}
-
-        <DecisionChart currencySymbol={currencySymbol} 
-          title={isBank ? "Operating Expenses" : t('charts.expenses')} 
-          data={chartData} 
-          type={isBank ? "BAR" : "STACKED_BAR"} 
-          config={{ 
-            isCurrency: true,
-            dataKeys: isBank ? [
-              { key: 'operatingExpenses', name: 'OpEx', color: 'var(--chart-4)', type: 'bar' }
-            ] : [
-              { key: 'researchAndDevelopment', name: 'R&D', color: 'var(--chart-5)', type: 'bar', stackId: 'a' },
-              { key: 'sellingGeneralAndAdmin', name: 'SG&A', color: 'var(--chart-4)', type: 'bar', stackId: 'a' },
-              { key: 'capex', name: 'CapEx', color: 'var(--chart-1)', type: 'bar', stackId: 'a' }
-            ] 
-          }} 
-        />
-
-        <DecisionChart currencySymbol={currencySymbol} 
-          title={t('charts.cashDebt')} 
-          data={chartData} 
-          type="BAR" 
-          config={{ 
-            isCurrency: true,
-            dataKeys: [
-              { key: 'cash', name: 'Cash', color: 'var(--bull)', type: 'bar' },
-              { key: 'totalDebt', name: 'Debt', color: 'var(--bear)', type: 'bar' }
-            ] 
-          }} 
-        />
-
-        <DecisionChart currencySymbol={currencySymbol} 
-          title={t('charts.sharesOutstanding')} 
-          data={chartData} 
-          type="BAR" 
-          config={{ dataKeys: [{ key: 'sharesOutstanding', color: 'var(--chart-4)', type: 'bar' }], inverseColors: true, isLargeNumber: true }} 
-          cagr={calcCAGR('sharesOutstanding')}
-        />
-
-        <DecisionChart currencySymbol={currencySymbol} 
-          title={t('charts.dividends')} 
-          data={chartData} 
-          type="BAR" 
-          config={{ dataKeys: [{ key: 'dividendPerShare', name: 'Dividend/Share', color: 'var(--chart-1)', type: 'bar' }] }} 
-          cagr={calcCAGR('dividendPerShare')}
-          emptyMessage={t('charts.noDividends')}
-        />
-
-        {/* 4-in-1 Ratios Card */}
-        {(() => {
-            const tabs = (
-              <div className="flex bg-muted/50 p-1 rounded-md border border-border/40">
-                {(["ROIC", "ROE", "GROSS", "OPERATING", "PROFIT"] as const)
-                  .filter(tab => {
-                    if (isBank && (tab === "ROIC" || tab === "GROSS")) return false;
-                    if (!isBank && tab === "ROE") return false;
-                    return true;
-                  })
-                  .map(tab => (
-                  <button
-                    key={tab}
-                    onClick={(e) => { e.stopPropagation(); setRatioTab(tab) }}
-                    className={`px-2 py-1 text-xs font-semibold rounded-sm transition-all whitespace-nowrap shrink-0 ${
-                      ratioTab === tab ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    {t(`ratios.${tab.toLowerCase()}`)}
-                  </button>
-                ))}
-              </div>
-            );
-
-            const ratioConfigs = {
-              ROIC: {
-                title: t('charts.roic'),
-                type: "COMPOSED" as const,
-                config: { isPercentage: true, dataKeys: [{ key: 'roic', color: 'var(--chart-1)', type: 'bar' as const }], referenceLine: { y: 0.15, color: 'var(--bull)', label: '15%' } }
-              },
-              ROE: {
-                title: t('charts.returnOnEquity'),
-                type: "BAR" as const,
-                config: { isPercentage: true, dataKeys: [{ key: 'returnOnEquity', color: 'var(--chart-1)', type: 'bar' as const }] }
-              },
-              GROSS: {
-                title: t('charts.grossMargin'),
-                type: "LINE" as const,
-                config: { isPercentage: true, dataKeys: [{ key: 'grossMargin', color: 'var(--chart-1)', type: 'line' as const }] }
-              },
-              OPERATING: {
-                title: t('charts.operatingMargin'),
-                type: "LINE" as const,
-                config: { isPercentage: true, dataKeys: [{ key: 'operatingMargin', color: 'var(--chart-1)', type: 'line' as const }] }
-              },
-              PROFIT: {
-                title: t('charts.profitMargin'),
-                type: "LINE" as const,
-                config: { isPercentage: true, dataKeys: [{ key: 'profitMargin', color: 'var(--chart-1)', type: 'line' as const }] }
-              }
-            };
-            
-            const activeConfig = ratioConfigs[ratioTab];
-
-            return (
-              <DecisionChart 
-                currencySymbol={currencySymbol} 
-                title={activeConfig.title} 
+            {segmentKeys.length > 0 && (
+              <DecisionChart currencySymbol={currencySymbol} 
+                title={t('charts.revenueBySegment')} 
                 data={chartData} 
-                type={activeConfig.type} 
-                headerExtra={tabs} 
-                config={activeConfig.config} 
+                type="STACKED_BAR" 
+                config={{ 
+                  isCurrency: true, 
+                  dataKeys: segmentKeys.map((k, i) => ({ key: k, color: segmentColors[i % segmentColors.length], type: 'bar', stackId: 'a' })) 
+                }} 
               />
-            );
-          })()}
+            )}
+            
+            <DecisionChart currencySymbol={currencySymbol}
+              title={t('charts.epsDiluted')}
+              data={epsChartData}
+              type="BAR"
+              config={{ dataKeys: [{ key: 'epsDiluted', color: 'var(--chart-1)', type: 'bar' }] }}
+              cagr={calcCAGR('epsDiluted')}
+              infoTooltip={showPreliminary ? t('preliminaryInfo') : undefined}
+            />
 
-      </div>
+            {!isBank && (
+              <DecisionChart currencySymbol={currencySymbol} 
+                title={isReit ? "AFFO / FCF" : t('charts.freeCashFlow')} 
+                data={chartData} 
+                type="COMPOSED" 
+                config={{ 
+                  isCurrency: true,
+                  dataKeys: [
+                    { key: 'freeCashFlow', name: 'FCF', color: 'var(--chart-1)', type: 'bar' },
+                    { key: 'operatingCashFlow', name: 'OCF', color: 'var(--chart-5)', type: 'line' },
+                    { key: 'capex', name: 'CapEx', color: 'var(--chart-4)', type: 'line' }
+                  ],
+                  defaultHiddenKeys: ['operatingCashFlow', 'capex']
+                }} 
+                cagr={calcCAGR('freeCashFlow')}
+                infoTooltip={isReit ? t('reitFcfTooltip') : undefined}
+              />
+            )}
+
+            <DecisionChart currencySymbol={currencySymbol} 
+              title={t('charts.netIncome')} 
+              data={chartData} 
+              type="BAR" 
+              config={{ isCurrency: true, dataKeys: [{ key: 'netIncome', color: 'var(--chart-1)', type: 'bar' }] }} 
+              cagr={calcCAGR('netIncome')}
+            />
+
+            {!isBank && (
+              <DecisionChart currencySymbol={currencySymbol} 
+                title={t('charts.ebitda')} 
+                data={chartData} 
+                type="BAR" 
+                config={{ isCurrency: true, dataKeys: [{ key: 'ebitda', color: 'var(--chart-1)', type: 'bar' }] }} 
+                cagr={calcCAGR('ebitda')}
+              />
+            )}
+
+            <DecisionChart currencySymbol={currencySymbol} 
+              title={isBank ? "Operating Expenses" : t('charts.expenses')} 
+              data={chartData} 
+              type={isBank ? "BAR" : "STACKED_BAR"} 
+              config={{ 
+                isCurrency: true,
+                dataKeys: isBank ? [
+                  { key: 'operatingExpenses', name: 'OpEx', color: 'var(--chart-4)', type: 'bar' }
+                ] : [
+                  { key: 'researchAndDevelopment', name: 'R&D', color: 'var(--chart-5)', type: 'bar', stackId: 'a' },
+                  { key: 'sellingGeneralAndAdmin', name: 'SG&A', color: 'var(--chart-4)', type: 'bar', stackId: 'a' },
+                  { key: 'capex', name: 'CapEx', color: 'var(--chart-1)', type: 'bar', stackId: 'a' }
+                ] 
+              }} 
+            />
+
+            <DecisionChart currencySymbol={currencySymbol} 
+              title={t('charts.cashDebt')} 
+              data={chartData} 
+              type="BAR" 
+              config={{ 
+                isCurrency: true,
+                dataKeys: [
+                  { key: 'cash', name: 'Cash', color: 'var(--bull)', type: 'bar' },
+                  { key: 'totalDebt', name: 'Debt', color: 'var(--bear)', type: 'bar' }
+                ] 
+              }} 
+            />
+
+            <DecisionChart currencySymbol={currencySymbol} 
+              title={t('charts.sharesOutstanding')} 
+              data={chartData} 
+              type="BAR" 
+              config={{ dataKeys: [{ key: 'sharesOutstanding', color: 'var(--chart-4)', type: 'bar' }], inverseColors: true, isLargeNumber: true }} 
+              cagr={calcCAGR('sharesOutstanding')}
+            />
+
+            <DecisionChart currencySymbol={currencySymbol} 
+              title={t('charts.dividends')} 
+              data={chartData} 
+              type="BAR" 
+              config={{ dataKeys: [{ key: 'dividendPerShare', name: 'Dividend/Share', color: 'var(--chart-1)', type: 'bar' }] }} 
+              cagr={calcCAGR('dividendPerShare')}
+              emptyMessage={t('charts.noDividends')}
+            />
+
+            {/* 4-in-1 Ratios Card */}
+            {(() => {
+                const tabs = (
+                  <div className="flex bg-muted/50 p-1 rounded-md border border-border/40">
+                    {(["ROIC", "ROE", "GROSS", "OPERATING", "PROFIT"] as const)
+                      .filter(tab => {
+                        if (isBank && (tab === "ROIC" || tab === "GROSS")) return false;
+                        if (!isBank && tab === "ROE") return false;
+                        return true;
+                      })
+                      .map(tab => (
+                      <button
+                        key={tab}
+                        onClick={(e) => { e.stopPropagation(); setRatioTab(tab) }}
+                        className={`px-2 py-1 text-xs font-semibold rounded-sm transition-all whitespace-nowrap shrink-0 ${
+                          ratioTab === tab ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        {t(`ratios.${tab.toLowerCase()}`)}
+                      </button>
+                    ))}
+                  </div>
+                );
+
+                const ratioConfigs = {
+                  ROIC: {
+                    title: t('charts.roic'),
+                    type: "COMPOSED" as const,
+                    config: { isPercentage: true, dataKeys: [{ key: 'roic', color: 'var(--chart-1)', type: 'bar' as const }], referenceLine: { y: 0.15, color: 'var(--bull)', label: '15%' } }
+                  },
+                  ROE: {
+                    title: t('charts.returnOnEquity'),
+                    type: "BAR" as const,
+                    config: { isPercentage: true, dataKeys: [{ key: 'returnOnEquity', color: 'var(--chart-1)', type: 'bar' as const }] }
+                  },
+                  GROSS: {
+                    title: t('charts.grossMargin'),
+                    type: "LINE" as const,
+                    config: { isPercentage: true, dataKeys: [{ key: 'grossMargin', color: 'var(--chart-1)', type: 'line' as const }] }
+                  },
+                  OPERATING: {
+                    title: t('charts.operatingMargin'),
+                    type: "LINE" as const,
+                    config: { isPercentage: true, dataKeys: [{ key: 'operatingMargin', color: 'var(--chart-1)', type: 'line' as const }] }
+                  },
+                  PROFIT: {
+                    title: t('charts.profitMargin'),
+                    type: "LINE" as const,
+                    config: { isPercentage: true, dataKeys: [{ key: 'profitMargin', color: 'var(--chart-1)', type: 'line' as const }] }
+                  }
+                };
+                
+                const activeConfig = ratioConfigs[ratioTab];
+
+                return (
+                  <DecisionChart 
+                    key="ratios-multi-card"
+                    currencySymbol={currencySymbol} 
+                    title={activeConfig.title} 
+                    data={chartData} 
+                    type={activeConfig.type} 
+                    headerExtra={tabs} 
+                    config={activeConfig.config} 
+                  />
+                );
+              })()}
+
+          </div>
+        </>
+      )}
     </div>
   )
 }

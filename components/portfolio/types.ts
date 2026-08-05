@@ -1,8 +1,3 @@
-export type Fundamental = {
-  roic: number | null
-  grossMargin: number | null
-}
-
 export type Company = {
   id: string
   ticker: string
@@ -11,7 +6,6 @@ export type Company = {
   exchange: string
   sector: string | null
   industry: string | null
-  fundamentals: Fundamental[]
 }
 
 export type PortfolioItem = {

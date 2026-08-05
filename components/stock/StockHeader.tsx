@@ -23,13 +23,13 @@ type PriceData = {
   changePercent: number;
 }
 
-export function StockHeader({ company, shareComponent }: { company: CompanyProp, shareComponent?: React.ReactNode }) {
+export function StockHeader({ company, shareComponent, initialPriceData = null }: { company: CompanyProp, shareComponent?: React.ReactNode, initialPriceData?: PriceData | null }) {
   const t = useTranslations("stock")
   const locale = useLocale()
   const router = useRouter()
-  const [priceData, setPriceData] = useState<PriceData | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
+  const [priceData, setPriceData] = useState<PriceData | null>(initialPriceData)
+  const [isLoading, setIsLoading] = useState(initialPriceData === null)
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(initialPriceData ? new Date() : null)
   
   // Portfolio state
   const [isFollowing, setIsFollowing] = useState<boolean | null>(null)

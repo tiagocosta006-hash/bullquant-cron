@@ -11,7 +11,7 @@ const resendApiKey = process.env.RESEND_API_KEY;
 export const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 // O domínio tem de corresponder ao domínio verificado na Resend (thebullvalue.com)
-const FROM_EMAIL = 'BullValue <no-reply@thebullvalue.com>';
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'BullValue <no-reply@thebullvalue.com>';
 
 /**
  * HTML Base Wrapper
@@ -137,29 +137,39 @@ export const isEmailEnabled = () => resend !== null
 
 /**
  * Envia o email de Confirmação de conta (com a marca BullValue).
- * `confirmLink` é o link gerado pelo Supabase (Admin generateLink) que, ao ser
+ * `confirmLink` é o link direto gerado pelo Supabase (com token_hash) que, ao ser
  * aberto, confirma o email e devolve o utilizador autenticado à app.
  */
 export const sendConfirmationEmail = async (email: string, name: string, confirmLink: string) => {
   if (!resend) {
-    console.warn('RESEND_API_KEY não encontrada. Email de confirmação ignorado.');
-    return;
+    console.warn('[Resend] RESEND_API_KEY não encontrada. Email de confirmação ignorado.');
+    return { data: null, error: { message: 'RESEND_API_KEY não configurada' } };
   }
 
-  return await resend.emails.send({
-    from: FROM_EMAIL,
-    to: [email],
-    subject: 'Confirma a tua conta — BullValue',
-    text: `Olá ${name},\n\nFalta só um passo para ativares a tua conta no BullValue.\nConfirma o teu email abrindo este link:\n\n${confirmLink}\n\nSe não foste tu a criar esta conta, ignora este email.`,
-    html: getEmailTemplate(`
-      <h2>Olá ${name}, confirma a tua conta</h2>
-      <p>Falta só um passo para começares a usar o BullValue. Clica no botão abaixo para confirmar o teu email e ativar a conta.</p>
-      <div style="text-align: center;">
-        <a href="${confirmLink}" class="btn">Confirmar Email</a>
-      </div>
-      <p style="margin-top: 24px; font-size: 14px;">Se não foste tu a criar esta conta, podes ignorar este email com segurança.</p>
-    `),
-  });
+  try {
+    const res = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [email],
+      subject: 'Confirma a tua conta — BullValue',
+      text: `Olá ${name},\n\nFalta só um passo para ativares a tua conta no BullValue.\nConfirma o teu email abrindo este link:\n\n${confirmLink}\n\nSe não foste tu a criar esta conta, ignora este email.`,
+      html: getEmailTemplate(`
+        <h2>Olá ${name}, confirma a tua conta</h2>
+        <p>Falta só um passo para começares a usar o BullValue. Clica no botão abaixo para confirmar o teu email e ativar a conta.</p>
+        <div style="text-align: center;">
+          <a href="${confirmLink}" class="btn">Confirmar Email</a>
+        </div>
+        <p style="margin-top: 24px; font-size: 14px;">Se não foste tu a criar esta conta, podes ignorar este email com segurança.</p>
+      `),
+    });
+
+    if (res.error) {
+      console.error('[Resend] Erro ao enviar email de confirmação para', email, res.error);
+    }
+    return res;
+  } catch (err: any) {
+    console.error('[Resend] Exceção ao enviar email de confirmação:', err);
+    return { data: null, error: { message: err?.message || 'Falha de rede ao contactar Resend' } };
+  }
 };
 
 /**
@@ -167,13 +177,14 @@ export const sendConfirmationEmail = async (email: string, name: string, confirm
  */
 export const sendWelcomeEmail = async (email: string, name: string, confirmationLink?: string) => {
   if (!resend) {
-    console.warn('RESEND_API_KEY não encontrada. Email ignorado.');
-    return;
+    console.warn('[Resend] RESEND_API_KEY não encontrada. Email ignorado.');
+    return { data: null, error: { message: 'RESEND_API_KEY não configurada' } };
   }
   
   const link = confirmationLink || 'https://thebullvalue.com/dashboard';
   const html = await render(<BullValueWelcomeEmail userFirstName={name} />);
 
+<<<<<<< Updated upstream:lib/resend.tsx
   return await resend.emails.send({
     from: FROM_EMAIL,
     to: [email],
@@ -181,14 +192,41 @@ export const sendWelcomeEmail = async (email: string, name: string, confirmation
     text: `Olá ${name}, bem-vindo ao BullValue! A tua jornada para melhores investimentos começa agora. Acede à plataforma aqui: ${link}`,
     html: html,
   });
+=======
+  try {
+    const res = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [email],
+      subject: 'Bem-vindo ao BullValue!',
+      text: `Olá ${name}, bem-vindo ao BullValue!\n\nEstamos muito felizes por te ter connosco. A plataforma foi desenhada para te dar acesso a métricas profissionais e análises fundamentais potenciadas por Inteligência Artificial.\n\nA tua jornada para melhores investimentos começa agora.\n\n${buttonText}: ${link}`,
+      html: getEmailTemplate(`
+        <h2>Olá ${name}, bem-vindo ao BullValue!</h2>
+        <p>Estamos muito felizes por te ter connosco. A plataforma foi desenhada para te dar acesso a métricas profissionais e análises fundamentais potenciadas por Inteligência Artificial.</p>
+        <p>A tua jornada para melhores investimentos começa agora.</p>
+        <div style="text-align: center;">
+          <a href="${link}" class="btn">${buttonText}</a>
+        </div>
+      `),
+    });
+
+    if (res.error) {
+      console.error('[Resend] Erro ao enviar email de boas-vindas para', email, res.error);
+    }
+    return res;
+  } catch (err: any) {
+    console.error('[Resend] Exceção ao enviar email de boas-vindas:', err);
+    return { data: null, error: { message: err?.message || 'Falha de rede ao contactar Resend' } };
+  }
+>>>>>>> Stashed changes:lib/resend.ts
 };
 
 /**
  * Envia o email de Upgrade para o Plano PRO
  */
 export const sendUpgradeToProEmail = async (email: string, name: string) => {
-  if (!resend) return;
+  if (!resend) return { data: null, error: { message: 'RESEND_API_KEY não configurada' } };
 
+<<<<<<< Updated upstream:lib/resend.tsx
   const html = await render(<BullValueUpgradeEmail userFirstName={name} />);
 
   return await resend.emails.send({
@@ -198,49 +236,95 @@ export const sendUpgradeToProEmail = async (email: string, name: string) => {
     text: `Parabéns ${name}, agora és PRO! Tens acesso total a todas as funcionalidades exclusivas da plataforma.`,
     html: html,
   });
+=======
+  try {
+    const res = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [email],
+      subject: 'Bem-vindo ao Plano PRO!',
+      text: `Parabéns ${name}, agora és PRO!\n\nA tua conta foi atualizada com sucesso.\n\nA partir de agora tens acesso total a todas as funcionalidades exclusivas da plataforma, incluindo avaliações de gestão profundas e análises DCF ilimitadas.\n\nExplorar Funcionalidades PRO: https://thebullvalue.com/dashboard`,
+      html: getEmailTemplate(`
+        <h2>Parabéns ${name}, agora és PRO!</h2>
+        <p>A tua conta foi atualizada com sucesso.</p>
+        <p>A partir de agora tens acesso total a todas as funcionalidades exclusivas da plataforma, incluindo avaliações de gestão profundas e análises DCF ilimitadas.</p>
+        <div style="text-align: center;">
+          <a href="https://thebullvalue.com/dashboard" class="btn">Explorar Funcionalidades PRO</a>
+        </div>
+      `),
+    });
+
+    if (res.error) {
+      console.error('[Resend] Erro ao enviar email de upgrade PRO para', email, res.error);
+    }
+    return res;
+  } catch (err: any) {
+    console.error('[Resend] Exceção ao enviar email de upgrade PRO:', err);
+    return { data: null, error: { message: err?.message || 'Falha de rede ao contactar Resend' } };
+  }
+>>>>>>> Stashed changes:lib/resend.ts
 };
 
 /**
  * Envia o email de Confirmação dos 7 dias gratuitos (Trial)
  */
 export const sendTrialConfirmationEmail = async (email: string, name: string) => {
-  if (!resend) return;
+  if (!resend) return { data: null, error: { message: 'RESEND_API_KEY não configurada' } };
 
-  return await resend.emails.send({
-    from: FROM_EMAIL,
-    to: [email],
-    subject: 'O teu período gratuito de 7 dias começou!',
-    text: `Olá ${name},\n\nO teu período experimental de 7 dias do plano PRO começou agora mesmo.\n\nAproveita para testar todas as nossas ferramentas premium sem qualquer compromisso durante os próximos 7 dias.\n\nAproveitar o Trial: https://thebullvalue.com/dashboard`,
-    html: getEmailTemplate(`
-      <h2>Olá ${name},</h2>
-      <p>O teu período experimental de 7 dias do plano PRO começou agora mesmo.</p>
-      <p>Aproveita para testar todas as nossas ferramentas premium sem qualquer compromisso durante os próximos 7 dias.</p>
-      <div style="text-align: center;">
-        <a href="https://thebullvalue.com/dashboard" class="btn">Aproveitar o Trial</a>
-      </div>
-    `),
-  });
+  try {
+    const res = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [email],
+      subject: 'O teu período gratuito de 7 dias começou!',
+      text: `Olá ${name},\n\nO teu período experimental de 7 dias do plano PRO começou agora mesmo.\n\nAproveita para testar todas as nossas ferramentas premium sem qualquer compromisso durante os próximos 7 dias.\n\nAproveitar o Trial: https://thebullvalue.com/dashboard`,
+      html: getEmailTemplate(`
+        <h2>Olá ${name},</h2>
+        <p>O teu período experimental de 7 dias do plano PRO começou agora mesmo.</p>
+        <p>Aproveita para testar todas as nossas ferramentas premium sem qualquer compromisso durante os próximos 7 dias.</p>
+        <div style="text-align: center;">
+          <a href="https://thebullvalue.com/dashboard" class="btn">Aproveitar o Trial</a>
+        </div>
+      `),
+    });
+
+    if (res.error) {
+      console.error('[Resend] Erro ao enviar email de trial para', email, res.error);
+    }
+    return res;
+  } catch (err: any) {
+    console.error('[Resend] Exceção ao enviar email de trial:', err);
+    return { data: null, error: { message: err?.message || 'Falha de rede ao contactar Resend' } };
+  }
 };
 
 /**
  * Envia o email de Recuperação de Password
  */
 export const sendPasswordResetEmail = async (email: string, resetLink: string) => {
-  if (!resend) return;
+  if (!resend) return { data: null, error: { message: 'RESEND_API_KEY não configurada' } };
 
-  return await resend.emails.send({
-    from: FROM_EMAIL,
-    to: [email],
-    subject: 'Recuperação de Password - BullValue',
-    text: `Olá,\n\nRecebemos um pedido para repor a password da tua conta.\nClica no link abaixo para criar uma nova password:\n\n${resetLink}\n\nSe não pediste para repor a password, ignora este email.`,
-    html: getEmailTemplate(`
-      <h2>Recuperação de Password</h2>
-      <p>Recebemos um pedido para repor a password da tua conta no BullValue.</p>
-      <p>Clica no botão abaixo para definir uma password nova e segura:</p>
-      <div style="text-align: center;">
-        <a href="${resetLink}" class="btn">Repor Password</a>
-      </div>
-      <p style="margin-top: 24px; font-size: 14px;">Se não fizeste este pedido, podes ignorar este email com segurança.</p>
-    `),
-  });
+  try {
+    const res = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [email],
+      subject: 'Recuperação de Password - BullValue',
+      text: `Olá,\n\nRecebemos um pedido para repor a password da tua conta.\nClica no link abaixo para criar uma nova password:\n\n${resetLink}\n\nSe não pediste para repor a password, ignora este email.`,
+      html: getEmailTemplate(`
+        <h2>Recuperação de Password</h2>
+        <p>Recebemos um pedido para repor a password da tua conta no BullValue.</p>
+        <p>Clica no botão abaixo para definir uma password nova e segura:</p>
+        <div style="text-align: center;">
+          <a href="${resetLink}" class="btn">Repor Password</a>
+        </div>
+        <p style="margin-top: 24px; font-size: 14px;">Se não fizeste este pedido, podes ignorar este email com segurança.</p>
+      `),
+    });
+
+    if (res.error) {
+      console.error('[Resend] Erro ao enviar email de recuperação para', email, res.error);
+    }
+    return res;
+  } catch (err: any) {
+    console.error('[Resend] Exceção ao enviar email de recuperação:', err);
+    return { data: null, error: { message: err?.message || 'Falha de rede ao contactar Resend' } };
+  }
 };

@@ -31,21 +31,24 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
+  // Remove o prefixo do idioma (ex: /pt/login -> /login, /en/dashboard -> /dashboard)
+  const normalizedPath = pathname.replace(/^\/(?:en|pt|es|fr|de|it|zh|ja|nl)(?=\/|$)/, '') || '/'
+
   const isAuthRoute =
-    pathname.startsWith('/login') ||
-    pathname.startsWith('/register') ||
-    pathname.startsWith('/forgot-password') ||
-    pathname.startsWith('/reset-password') ||
-    pathname.startsWith('/verify-email')
+    normalizedPath.startsWith('/login') ||
+    normalizedPath.startsWith('/register') ||
+    normalizedPath.startsWith('/forgot-password') ||
+    normalizedPath.startsWith('/reset-password') ||
+    normalizedPath.startsWith('/verify-email')
 
   // Filosofia: navegar é PÚBLICO (ver empresas, calculadora DCF, explorar,
   // dashboard, calendário…). Só as páginas PESSOAIS exigem sessão. Guardar
   // dados (posições, watchlist, cenários DCF) protege-se sempre na própria API
   // com 401 — isto é só o gate das PÁGINAS.
   const isPrivateRoute =
-    pathname.startsWith('/portfolio') ||
-    pathname.startsWith('/watchlist') ||
-    pathname.startsWith('/settings')
+    normalizedPath.startsWith('/portfolio') ||
+    normalizedPath.startsWith('/watchlist') ||
+    normalizedPath.startsWith('/settings')
 
   // Redirecionar utilizadores autenticados para fora das páginas de auth.
   if (user && isAuthRoute) {
@@ -68,20 +71,16 @@ export async function updateSession(request: NextRequest) {
   // maximizar criação de contas, não deixar o anónimo passear pela app
   // inteira; por isso vai para /register (sem ?redirect — não é suposto
   // voltar a esta página depois de entrar, é suposto criar conta).
-  // ⚠️ Checklist: qualquer rota nova em app/(app)/ nasce PÚBLICA por omissão
-  // aqui — quem adicionar uma página tem de decidir explicitamente se entra
-  // em isPrivateRoute (precisa de conta, com redirect de regresso) ou
-  // isGuestOnlyRoute (bloqueada para anónimos, funil de aquisição).
-  const upperPath = pathname.toUpperCase()
+  const upperPath = normalizedPath.toUpperCase()
   const isGuestOnlyRoute =
-    pathname === '/dashboard' ||
-    pathname.startsWith('/explore') ||
-    pathname.startsWith('/calendar') ||
-    pathname.startsWith('/compare') ||
-    pathname.startsWith('/analytics') ||
-    pathname.startsWith('/transcripts') ||
-    pathname === '/dcf' || // exato — /dcf/[id] é a página pública de DCF partilhada
-    (pathname.startsWith('/stock/') && upperPath !== '/STOCK/AAPL')
+    normalizedPath === '/dashboard' ||
+    normalizedPath.startsWith('/explore') ||
+    normalizedPath.startsWith('/calendar') ||
+    normalizedPath.startsWith('/compare') ||
+    normalizedPath.startsWith('/analytics') ||
+    normalizedPath.startsWith('/transcripts') ||
+    normalizedPath === '/dcf' || // exato — /dcf/[id] é a página pública de DCF partilhada
+    (normalizedPath.startsWith('/stock/') && upperPath !== '/STOCK/AAPL')
 
   if (!user && isGuestOnlyRoute) {
     const url = request.nextUrl.clone()

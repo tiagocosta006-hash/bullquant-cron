@@ -243,6 +243,10 @@ export function PriceVsEarnings({
                 {t("logToggle")}
               </button>
             )}
+            {/* Só para Pro: o overlay de gating tapa o gráfico mas não o
+                cabeçalho, e o export lê o SVG que continua no DOM — sem esta
+                condição, um visitante anónimo descarregava o gráfico todo. */}
+            {isPro && (
             <button
               onClick={() => {
                 if (chartRef.current) {
@@ -258,6 +262,7 @@ export function PriceVsEarnings({
             >
               <Download className="w-3.5 h-3.5" />
             </button>
+            )}
           </div>
         </div>
       </div>

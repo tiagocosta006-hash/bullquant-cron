@@ -1,0 +1,118 @@
+name: DB Maintenance
+
+# Tarefas de reparação da BD, à mão. Não têm cron: são one-shots que se correm
+# quando se sabe porquê. Correm com os secrets do repo, portanto ninguém precisa
+# de ter a connection string de produção na sua máquina.
+#
+# Ordem recomendada quando se está a reparar tudo:
+#   1. measure         — quanto espaço há (o free tier do Supabase põe a BD em
+#                        READ-ONLY aos 500MB; o backfill de preços acrescenta
+#                        ~150MB, portanto isto NÃO é opcional)
+#   2. adjust-splits   — alinha shares/EPS/DPS com a base de split dos preços
+#   3. backfill-prices — aprofunda o histórico (o ingest_prices.py é incremental
+#                        e só sabe avançar, nunca aprofunda)
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: "Tarefa a correr"
+        required: true
+        type: choice
+        default: measure
+        options:
+          - measure
+          - adjust-splits-dry-run
+          - adjust-splits
+          - backfill-prices-dry-run
+          - backfill-prices
+      years:
+        description: "Anos de histórico (só para backfill-prices)"
+        required: false
+        default: "15"
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: scripts/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      # Corre sempre, seja qual for a tarefa: é o número que decide se as
+      # escritas seguintes são seguras, e sai no log antes de qualquer uma.
+      - name: Measure database
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: |
+          python - <<'PY'
+          import os, psycopg2
+          conn = psycopg2.connect(os.environ["DIRECT_URL"])
+          with conn.cursor() as cur:
+              cur.execute("SELECT pg_size_pretty(pg_database_size(current_database())), pg_database_size(current_database())")
+              pretty, raw = cur.fetchone()
+              print(f"BD total: {pretty}  ({raw/1e6:.0f} MB)")
+              free_tier_mb = 500
+              print(f"Free tier Supabase: {free_tier_mb} MB — margem: {free_tier_mb - raw/1e6:.0f} MB")
+              cur.execute("""
+                  SELECT relname, n_live_tup, pg_size_pretty(pg_total_relation_size(relid))
+                  FROM pg_stat_user_tables ORDER BY pg_total_relation_size(relid) DESC LIMIT 8
+              """)
+              print(f"\n{'tabela':<28} {'linhas':>12}  tamanho")
+              for name, rows, size in cur.fetchall():
+                  print(f"{name:<28} {rows:>12,}  {size}")
+              cur.execute("""
+                  SELECT count(*), min(date), max(date) FROM prices WHERE ticker NOT LIKE '^%'
+              """)
+              n, lo, hi = cur.fetchone()
+              print(f"\nprices: {n:,} linhas, de {lo} a {hi}")
+          conn.close()
+          PY
+
+      - name: Adjust splits (dry-run)
+        if: inputs.task == 'adjust-splits-dry-run'
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: python scripts/adjust_splits.py --dry-run
+
+      - name: Adjust splits
+        if: inputs.task == 'adjust-splits'
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: python scripts/adjust_splits.py
+
+      - name: Backfill prices (dry-run)
+        if: inputs.task == 'backfill-prices-dry-run'
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: python scripts/backfill_prices.py --years ${{ inputs.years }} --dry-run
+
+      - name: Backfill prices
+        if: inputs.task == 'backfill-prices'
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: python scripts/backfill_prices.py --years ${{ inputs.years }}
+
+      - name: Measure again
+        if: inputs.task == 'adjust-splits' || inputs.task == 'backfill-prices'
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: |
+          python - <<'PY'
+          import os, psycopg2
+          conn = psycopg2.connect(os.environ["DIRECT_URL"])
+          with conn.cursor() as cur:
+              cur.execute("SELECT pg_size_pretty(pg_database_size(current_database())), pg_database_size(current_database())")
+              pretty, raw = cur.fetchone()
+              print(f"BD depois: {pretty} — margem para os 500 MB: {500 - raw/1e6:.0f} MB")
+          conn.close()
+          PY

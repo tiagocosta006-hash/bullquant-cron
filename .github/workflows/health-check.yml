@@ -16,7 +16,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      BASE_URL: https://bullmetrics.app
+      BASE_URL: https://thebullvalue.com
     steps:
       - name: Check endpoints and open issues on failure
         run: |

@@ -683,6 +683,7 @@
       "baseShifted": "Basis = erstes Quartal mit positivem EPS im Zeitraum",
       "tooltipPe": "KGV",
       "seriesEarningsNetIncome": "Nettogewinn (TTM)",
+      "download": "Diagramm herunterladen",
       "verdict": {
         "priceAhead": "Kurs wächst stärker als die Gewinne — Multiple-Expansion",
         "earningsAhead": "Gewinne wachsen stärker als der Kurs — Multiple-Kompression",

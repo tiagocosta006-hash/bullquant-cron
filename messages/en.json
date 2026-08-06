@@ -760,6 +760,7 @@
       "baseShifted": "base = first quarter with positive EPS in the window",
       "tooltipPe": "P/E",
       "seriesEarningsNetIncome": "Net income (TTM)",
+      "download": "Download chart",
       "verdict": {
         "priceAhead": "Price growing faster than profits — multiple expansion",
         "earningsAhead": "Profits growing faster than price — multiple compression",

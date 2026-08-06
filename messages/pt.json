@@ -740,6 +740,7 @@
       "baseShifted": "base = primeiro trimestre com EPS positivo na janela",
       "tooltipPe": "P/E",
       "seriesEarningsNetIncome": "Lucro líquido (TTM)",
+      "download": "Descarregar gráfico",
       "verdict": {
         "priceAhead": "Preço a crescer mais que os lucros — expansão de múltiplo",
         "earningsAhead": "Lucros a crescer mais que o preço — compressão de múltiplo",

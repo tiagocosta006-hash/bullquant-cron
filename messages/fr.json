@@ -683,6 +683,7 @@
       "baseShifted": "base = premier trimestre à BPA positif de la période",
       "tooltipPe": "PER",
       "seriesEarningsNetIncome": "Bénéfice net (TTM)",
+      "download": "Télécharger le graphique",
       "verdict": {
         "priceAhead": "Le cours croît plus vite que les bénéfices — expansion du multiple",
         "earningsAhead": "Les bénéfices croissent plus vite que le cours — compression du multiple",

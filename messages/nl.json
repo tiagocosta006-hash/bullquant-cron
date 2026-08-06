@@ -683,6 +683,7 @@
       "baseShifted": "basis = eerste kwartaal met positieve WPA in de periode",
       "tooltipPe": "K/W",
       "seriesEarningsNetIncome": "Nettowinst (TTM)",
+      "download": "Grafiek downloaden",
       "verdict": {
         "priceAhead": "Koers groeit sneller dan de winst — multiple-expansie",
         "earningsAhead": "Winst groeit sneller dan de koers — multiple-compressie",

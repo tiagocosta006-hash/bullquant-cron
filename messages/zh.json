@@ -683,6 +683,7 @@
       "baseShifted": "基期 = 区间内首个每股收益为正的季度",
       "tooltipPe": "市盈率",
       "seriesEarningsNetIncome": "净利润（TTM）",
+      "download": "下载图表",
       "verdict": {
         "priceAhead": "股价增速快于利润 — 估值扩张",
         "earningsAhead": "利润增速快于股价 — 估值压缩",

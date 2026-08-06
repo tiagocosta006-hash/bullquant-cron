@@ -683,6 +683,7 @@
       "baseShifted": "base = primo trimestre con EPS positivo del periodo",
       "tooltipPe": "P/E",
       "seriesEarningsNetIncome": "Utile netto (TTM)",
+      "download": "Scarica il grafico",
       "verdict": {
         "priceAhead": "Prezzo in crescita più degli utili — espansione del multiplo",
         "earningsAhead": "Utili in crescita più del prezzo — compressione del multiplo",

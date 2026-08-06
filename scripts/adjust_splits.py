@@ -5,9 +5,11 @@ O EDGAR só reapresenta 2-3 anos comparativos após um split; o histórico mais
 antigo fica na base pré-split (ex.: AMZN FY2019 504M vs FY2020 10.198M shares).
 Este script deteta quebras na série de sharesOutstanding (>BREAK_DETECT) e valida-as
 contra os rácios de split que as próprias empresas taggam no EDGAR
-(StockholdersEquityNoteStockSplitConversionRatio1). Só ajusta quando a quebra
-bate com um split real — mergers (KDP 2018) e anos de IPO (DASH 2020) nunca
-são "ajustados" por engano.
+(StockholdersEquityNoteStockSplitConversionRatio1) E contra a série de preços
+(yfinance), que é a base a que os fundamentais têm de ficar alinhados. Só
+ajusta quando a quebra bate com um split real confirmado pelas duas fontes —
+mergers (KDP 2018), anos de IPO (DASH 2020) e spin-offs (HON 2026, onde o
+EDGAR diz 0.5x e o preço diz 0.9535x) nunca são "ajustados" por engano.
 
 Campos ajustados nas rows antigas: sharesOutstanding ×F, epsDiluted ÷F,
 dividendPerShare ÷F.
@@ -21,8 +23,10 @@ import sys
 import math
 import time
 import itertools
+import datetime
 import requests
 import psycopg2
+import yfinance as yf
 from dotenv import load_dotenv
 
 # Consolas Windows usam cp1252 — sem isto, prints com "⚠"/"←" matam o script.
@@ -107,6 +111,51 @@ def fetch_split_ratios(cik: str) -> list[tuple[str, float]]:
                 if key not in events or end < events[key]:
                     events[key] = end
     return sorted(((d, ratio) for (_, ratio), d in events.items()))
+
+
+def corroborate_with_prices(ticker: str, edgar: list[tuple[str, float]]) -> tuple[list[tuple[str, float]], list[str]]:
+    """Mantém só os rácios do EDGAR confirmados pela fonte dos PREÇOS (yfinance).
+
+    O objetivo do ajuste é pôr os fundamentais na mesma base de split em que
+    estão os preços. Logo a autoridade não é o EDGAR — é quem ajusta os
+    preços. Quando as duas fontes discordam, ajustar pelo EDGAR *cria* a
+    incoerência que se queria eliminar.
+
+    Caso real: a HON tem no EDGAR uma etiqueta de 0.5x a 2026-06-29, mas o
+    yfinance regista 0.9535x na mesma data — o fator típico de um SPIN-OFF,
+    que mexe no preço e não no número de ações. Sem esta validação o script
+    multiplicava 51 linhas boas por 0.5 para as alinhar com uma única linha
+    recente defeituosa (319M contra 638M no trimestre anterior), destruindo o
+    histórico. A DD, essa, tem 0.333x nas duas fontes — reverse split real,
+    e é ajustada.
+    """
+    try:
+        yf_splits = yf.Ticker(ticker).splits
+    except Exception as e:
+        return [], [f"yfinance indisponível ({e}) — nada ajustado, EDGAR sozinho não chega"]
+
+    price_events = [(str(d.date()), float(r)) for d, r in yf_splits.items()] if len(yf_splits) else []
+    kept, warnings = [], []
+    for date, ratio in edgar:
+        match = None
+        for pdate, pratio in price_events:
+            # ±10 dias: a data efetiva e a de registo raramente coincidem
+            if abs((datetime.date.fromisoformat(pdate) - datetime.date.fromisoformat(date)).days) > 10:
+                continue
+            if abs(math.log(pratio / ratio)) < math.log(1.02):
+                match = (pdate, pratio)
+                break
+        if match:
+            kept.append((date, ratio))
+        else:
+            near = [f"{d} {r:g}x" for d, r in price_events
+                    if abs((datetime.date.fromisoformat(d) - datetime.date.fromisoformat(date)).days) <= 10]
+            warnings.append(
+                f"EDGAR diz {date} {ratio:g}x mas a série de preços "
+                f"{'diz ' + ', '.join(near) if near else 'não tem split nessa data'} — "
+                f"não é split de ações (provável spin-off), ignorado"
+            )
+    return kept, warnings
 
 
 def candidate_factors(splits: list[tuple[str, float]], older_end: str) -> list[float]:
@@ -207,6 +256,12 @@ def main():
             print("  sem splits taggados no EDGAR — quebra é corporate action (merger/IPO/reorg), não ajustado")
             continue
         print(f"  splits EDGAR: {', '.join(f'{d} {r}x' for d, r in splits)}")
+        splits, price_warnings = corroborate_with_prices(ticker, splits)
+        for w in price_warnings:
+            print(f"  ⚠ {w}")
+        if not splits:
+            print("  nenhum split confirmado pela série de preços — não ajustado")
+            continue
 
         with conn.cursor() as cur:
             cur.execute("""

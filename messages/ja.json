@@ -683,6 +683,7 @@
       "baseShifted": "基準 = 期間内で最初にEPSが黒字となった四半期",
       "tooltipPe": "PER",
       "seriesEarningsNetIncome": "純利益（TTM）",
+      "download": "チャートをダウンロード",
       "verdict": {
         "priceAhead": "株価が利益を上回って成長 — バリュエーション拡大",
         "earningsAhead": "利益が株価を上回って成長 — バリュエーション縮小",

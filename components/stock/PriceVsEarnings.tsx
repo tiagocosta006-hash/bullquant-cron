@@ -1,15 +1,16 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import { useTranslations, useLocale } from "next-intl"
-import { Lock, Loader2, Scale, Info } from "lucide-react"
+import { Lock, Loader2, Scale, Info, Download } from "lucide-react"
 import {
-  LineChart, Line, YAxis, XAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid
+  LineChart, Line, YAxis, XAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid, LabelList
 } from "recharts"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { TooltipProvider, Tooltip as UITooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 import { buildPriceVsEarnings, type PriceEarningsRow, type IndexedPoint } from "@/lib/finance/priceVsEarnings"
+import { exportSvgToPng } from "@/lib/exportChart"
 
 const RANGES = ["3Y", "5Y", "10Y", "MAX"] as const
 type Range = typeof RANGES[number]
@@ -37,6 +38,7 @@ export function PriceVsEarnings({
   // null = segue a sugestão automática da janela atual; true/false = escolha
   // explícita do utilizador, que passa a mandar.
   const [logOverride, setLogOverride] = useState<boolean | null>(null)
+  const chartRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     async function fetchData() {
@@ -63,6 +65,33 @@ export function PriceVsEarnings({
     () => buildPriceVsEarnings(rows, range === "MAX" ? null : Number(range.replace("Y", ""))),
     [rows, range],
   )
+
+  // Etiquetas de valor sobre a linha dos lucros. O eixo mostra o índice
+  // (base 100), portanto sem estas o leitor nunca vê o EPS real — são elas
+  // que dão a leitura em dólares sem precisarmos de um segundo eixo.
+  // Marcamos só onde o TTM muda (um degrau = um relatório novo) e afastamos
+  // as etiquetas o suficiente para não colidirem em janelas longas.
+  const labelIndices = useMemo(() => {
+    const out = new Set<number>()
+    if (data.length === 0) return out
+    const minGap = Math.max(1, Math.floor(data.length / 12))
+    let last = -Infinity
+    let prev: number | null = null
+    data.forEach((d, i) => {
+      const changed = prev !== null && d.earnings !== prev
+      prev = d.earnings
+      if (changed && i - last >= minGap) {
+        out.add(i)
+        last = i
+      }
+    })
+    // O valor mais recente é o que toda a gente procura: entra sempre, e
+    // remove-se o anterior se ficasse por cima.
+    const lastIdx = data.length - 1
+    if (lastIdx - last < minGap) out.delete(last)
+    out.add(lastIdx)
+    return out
+  }, [data])
 
   const formatDate = (val: string) => {
     const d = new Date(val)
@@ -104,6 +133,47 @@ export function PriceVsEarnings({
   // unidade de lucro do que pagava na data-base).
   const gap = priceCagr !== null && earningsCagr !== null ? priceCagr - earningsCagr : null
   const verdict = gap === null ? null : gap > 0.02 ? "priceAhead" : gap < -0.02 ? "earningsAhead" : "inLine"
+
+  // SVG puro, não foreignObject: o export para PNG desenha o SVG serializado
+  // num canvas, e foreignObject não rasteriza de forma fiável nos browsers.
+  const pill = (key: string, x: number, y: number, text: string, accent: string, atEnd: boolean) => {
+    const w = text.length * 6.4 + 12
+    const h = 18
+    // No último ponto a etiqueta encosta à esquerda do ponto em vez de ficar
+    // centrada — centrada, metade dela cairia fora da área desenhável.
+    const dx = atEnd ? -w - 6 : -w / 2
+    return (
+      <g transform={`translate(${x + dx}, ${y - h - 7})`} key={key}>
+        <rect width={w} height={h} rx={5} fill="var(--popover)" stroke={accent} strokeWidth={1} strokeOpacity={0.5} />
+        <text
+          x={w / 2} y={h / 2 + 1} textAnchor="middle" dominantBaseline="middle"
+          fontSize={10.5} fontWeight={600} fill="var(--foreground)"
+        >
+          {text}
+        </text>
+      </g>
+    )
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const renderEarningsLabel = (props: any) => {
+    const { x, y, index } = props as { x?: number; y?: number; index?: number }
+    if (x == null || y == null || index == null || !labelIndices.has(index)) return null
+    const point = data[index]
+    if (!point) return null
+    return pill(`e-${index}`, x, y, formatEarnings(point.earnings), EARNINGS_COLOR, index === data.length - 1)
+  }
+
+  // O preço só leva etiqueta no ponto final: é o número que o leitor procura,
+  // e etiquetar uma série diária ponto a ponto seria ruído puro.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const renderPriceLabel = (props: any) => {
+    const { x, y, index } = props as { x?: number; y?: number; index?: number }
+    if (x == null || y == null || index !== data.length - 1) return null
+    const point = data[index]
+    if (!point) return null
+    return pill("p-last", x, y, `${currencySymbol}${point.price.toFixed(2)}`, PRICE_COLOR, true)
+  }
 
   const useLog = logAvailable && (logOverride ?? logSuggested)
   // O eixo log precisa de domínio explícito — com ['auto','auto'] o recharts
@@ -173,6 +243,21 @@ export function PriceVsEarnings({
                 {t("logToggle")}
               </button>
             )}
+            <button
+              onClick={() => {
+                if (chartRef.current) {
+                  exportSvgToPng(chartRef.current, `${ticker}-preco-vs-lucros.png`, {
+                    title: `${ticker} — ${t("seriesPrice")} vs ${t(basis === "eps" ? "seriesEarnings" : "seriesEarningsNetIncome")}`,
+                    subtitle: baseDate ? t("baseNote", { date: formatFullDate(baseDate) }) : undefined,
+                  })
+                }
+              }}
+              title={t("download")}
+              aria-label={t("download")}
+              className="flex items-center px-3 py-1.5 text-xs font-semibold rounded-md border border-border/40 bg-muted/50 text-muted-foreground transition-all hover:text-foreground hover:bg-background"
+            >
+              <Download className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
       </div>
@@ -258,9 +343,9 @@ export function PriceVsEarnings({
             )}
           </div>
 
-          <div className="h-[350px] w-full">
+          <div ref={chartRef} className="h-[380px] w-full">
             <ResponsiveContainer width="100%" height="100%" className="outline-none focus:outline-none">
-              <LineChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+              <LineChart data={data} margin={{ top: 26, right: 18, left: -10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.6} />
                 <XAxis
                   dataKey="date"
@@ -335,7 +420,9 @@ export function PriceVsEarnings({
                   strokeWidth={2}
                   dot={false}
                   activeDot={{ r: 5, fill: PRICE_COLOR, stroke: "var(--background)", strokeWidth: 2 }}
-                />
+                >
+                  <LabelList dataKey="priceIdx" content={renderPriceLabel} />
+                </Line>
                 {/* stepAfter: o lucro TTM só muda quando sai um relatório —
                     interpolar linearmente inventaria lucro entre trimestres */}
                 <Line
@@ -346,7 +433,9 @@ export function PriceVsEarnings({
                   strokeWidth={2}
                   dot={false}
                   activeDot={{ r: 5, fill: EARNINGS_COLOR, stroke: "var(--background)", strokeWidth: 2 }}
-                />
+                >
+                  <LabelList dataKey="earningsIdx" content={renderEarningsLabel} />
+                </Line>
               </LineChart>
             </ResponsiveContainer>
           </div>

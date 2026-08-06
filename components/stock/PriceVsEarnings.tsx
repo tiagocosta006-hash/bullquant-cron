@@ -58,7 +58,7 @@ export function PriceVsEarnings({
 
   const {
     data, priceCagr, earningsCagr, priceTotal, earningsTotal, years,
-    baseDate, baseShifted, logAvailable, logSuggested,
+    baseDate, baseShifted, logAvailable, logSuggested, basis,
   } = useMemo(
     () => buildPriceVsEarnings(rows, range === "MAX" ? null : Number(range.replace("Y", ""))),
     [rows, range],
@@ -72,14 +72,16 @@ export function PriceVsEarnings({
   const formatFullDate = (val: string) =>
     new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short", year: "numeric" }).format(new Date(val))
 
-  const formatCompact = (val: number) => {
+  // A formatação segue a série em uso: EPS é por ação (dois decimais, como o
+  // preço), net income é um total (notação compacta, B/M).
+  const formatEarnings = (val: number) => {
     const abs = Math.abs(val)
-    const formatted = new Intl.NumberFormat("en-US", {
-      notation: "compact",
-      compactDisplay: "short",
-      maximumFractionDigits: 1,
-    }).format(abs)
-    return val < 0 ? `-${currencySymbol}${formatted}` : `${currencySymbol}${formatted}`
+    const body = basis === "eps"
+      ? abs.toFixed(2)
+      : new Intl.NumberFormat("en-US", {
+          notation: "compact", compactDisplay: "short", maximumFractionDigits: 1,
+        }).format(abs)
+    return val < 0 ? `-${currencySymbol}${body}` : `${currencySymbol}${body}`
   }
 
   const formatPct = (val: number | null) => {
@@ -244,7 +246,7 @@ export function PriceVsEarnings({
             </div>
             <div className="flex items-center gap-2">
               <span className="h-3 w-0.5 rounded-full" style={{ backgroundColor: EARNINGS_COLOR }} />
-              <span className="text-muted-foreground">{t("seriesEarnings")}</span>
+              <span className="text-muted-foreground">{t(basis === "eps" ? "seriesEarnings" : "seriesEarningsNetIncome")}</span>
             </div>
             {baseDate && (
               <span className="ml-auto text-[11px] text-muted-foreground/70 text-right">
@@ -302,14 +304,24 @@ export function PriceVsEarnings({
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="h-3 w-0.5 rounded-full shrink-0" style={{ backgroundColor: EARNINGS_COLOR }} />
-                            <span className="text-muted-foreground">{t("seriesEarnings")}</span>
+                            <span className="text-muted-foreground">{t(basis === "eps" ? "seriesEarnings" : "seriesEarningsNetIncome")}</span>
                             <span className="nums font-semibold ml-auto pl-4">
-                              {formatCompact(p.netIncome)}
+                              {formatEarnings(p.earnings)}
                               <span className="text-muted-foreground font-normal ml-1.5">
                                 {formatPct(p.earningsIdx / 100 - 1)}
                               </span>
                             </span>
                           </div>
+                          {/* Com as duas séries por ação, o rácio entre elas é o
+                              P/E — é isto que a distância vertical representa. */}
+                          {basis === "eps" && p.earnings > 0 && (
+                            <div className="flex items-center gap-2 pt-1.5 mt-0.5 border-t border-border/50">
+                              <span className="text-muted-foreground">{t("tooltipPe")}</span>
+                              <span className="nums font-semibold ml-auto pl-4">
+                                {(p.price / p.earnings).toFixed(1)}x
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )
@@ -329,7 +341,7 @@ export function PriceVsEarnings({
                 <Line
                   type="stepAfter"
                   dataKey="earningsIdx"
-                  name={t("seriesEarnings")}
+                  name={t(basis === "eps" ? "seriesEarnings" : "seriesEarningsNetIncome")}
                   stroke={EARNINGS_COLOR}
                   strokeWidth={2}
                   dot={false}

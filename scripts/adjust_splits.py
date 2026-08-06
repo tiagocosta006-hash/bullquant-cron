@@ -3,7 +3,7 @@ adjust_splits.py — Corrige histórico de shares/EPS/DPS não ajustado a stock 
 
 O EDGAR só reapresenta 2-3 anos comparativos após um split; o histórico mais
 antigo fica na base pré-split (ex.: AMZN FY2019 504M vs FY2020 10.198M shares).
-Este script deteta quebras >2.5x na série de sharesOutstanding e valida-as
+Este script deteta quebras na série de sharesOutstanding (>BREAK_DETECT) e valida-as
 contra os rácios de split que as próprias empresas taggam no EDGAR
 (StockholdersEquityNoteStockSplitConversionRatio1). Só ajusta quando a quebra
 bate com um split real — mergers (KDP 2018) e anos de IPO (DASH 2020) nunca
@@ -50,12 +50,23 @@ if not DIRECT_URL:
 EDGAR_BASE = "https://data.sec.gov/api/xbrl/companyfacts"
 EDGAR_HEADERS = {"User-Agent": "BullValue admin@bullocracy.com"}
 
-# Quebra na série de shares que justifica investigação (mergers legítimos raramente
-# passam de 2.5x; splits são >= 3x na prática — os 2:1 consecutivos compõem).
+# Deteção e tolerância são coisas diferentes e tinham o mesmo valor (2.5), o
+# que escondia uma família inteira de casos: um split 2:1 dá um degrau de
+# exatamente 2.0 e um 3:2 dá 1.5 — ambos abaixo de 2.5, portanto essas
+# empresas nunca eram sequer investigadas (54 na BD atual, contra 35 acima de
+# 2.5x). O pressuposto de que "os 2:1 consecutivos compõem" só é verdade
+# quando há vários; um único 2:1 não compõe com nada.
+#
+# Baixar a deteção não relaxa o rigor: cada row só é ajustada por um fator que
+# corresponda a splits realmente taggados no EDGAR, e quem não encaixar fica
+# intocada e é reportada. O custo de detetar a mais é uma chamada ao EDGAR.
+BREAK_DETECT = 1.4          # abaixo de 1.5 para apanhar 3:2 exatos
+BREAK_DETECT_LO = 1 / BREAK_DETECT
+# Tolerância de encaixe: o fator escolhido tem de deixar a row a menos disto da
+# série (weighted averages nunca batem exato; buybacks/emissões no mesmo ano
+# desviam). Mantém-se folgada de propósito.
 BREAK_HI = 2.5
 BREAK_LO = 1 / BREAK_HI
-# O fator escolhido tem de deixar a row a menos de BREAK_HI da série
-# (weighted averages nunca batem exato; buybacks/emissões no mesmo ano desviam).
 
 SPLIT_TAGS = [
     "StockholdersEquityNoteStockSplitConversionRatio1",
@@ -113,7 +124,7 @@ def candidate_factors(splits: list[tuple[str, float]], older_end: str) -> list[f
 
 
 def find_break_companies(cur) -> list[dict]:
-    """Empresas com quebras >2.5x entre rows consecutivas (anuais E trimestrais:
+    """Empresas com quebras >BREAK_DETECT entre rows consecutivas (anuais E trimestrais:
     Q4 sintetizado/backfilled pode ficar na base pré-split mesmo com a série
     anual já ajustada — a deteção tem de ver todas as rows)."""
     cur.execute("""
@@ -127,7 +138,7 @@ def find_break_companies(cur) -> list[dict]:
         SELECT DISTINCT id, ticker, cik FROM s
         WHERE prev IS NOT NULL AND prev > 0 AND (sh / prev > %s OR sh / prev < %s)
         ORDER BY ticker
-    """, (BREAK_HI, BREAK_LO))
+    """, (BREAK_DETECT, BREAK_DETECT_LO))
     return [{"id": r[0], "ticker": r[1], "cik": r[2]} for r in cur.fetchall()]
 
 

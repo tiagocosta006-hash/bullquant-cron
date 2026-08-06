@@ -39,12 +39,21 @@ export async function GET(
     // lucros. Quando o desvio face ao fim do período é implausível para o
     // calendário da SEC, caímos no prazo legal de reporte (10-Q ~40 dias,
     // 10-K ~60-75 dias) em vez de confiar num filedAt claramente errado.
+    // O corte de plausibilidade não é arbitrário: a distribuição de
+    // (filedAt − periodEnd) na BD tem uma banda vazia entre os 71 e os 95 dias
+    // (8 linhas trimestrais e 7 anuais em ~24 mil). Abaixo dela estão as
+    // filings verdadeiras (10-Q até ~40 dias, 10-K e Q4 até ~70); acima estão
+    // as datas herdadas da filing SEGUINTE, que aparecem em múltiplos de um
+    // trimestre (a GOOGL tinha o Q4'25 com 120 dias e o Q2'25 com 122 — ambos
+    // a data de um filing posterior). Cortar a meio da banda vazia separa as
+    // duas populações sem tocar em nenhuma filing legítima.
     const DAY = 24 * 3600 * 1000
+    const MAX_PLAUSIBLE_LAG_DAYS = 85
     const fundamentalsWithDate = allFundamentals.map(f => {
       const periodEnd = f.periodEnd.getTime()
       const isAnnual = f.periodType === 'ANNUAL'
-      const typicalLag = (isAnnual ? 75 : 45) * DAY
-      const maxPlausibleLag = (isAnnual ? 150 : 120) * DAY
+      const typicalLag = (isAnnual ? 65 : 45) * DAY
+      const maxPlausibleLag = MAX_PLAUSIBLE_LAG_DAYS * DAY
       const filed = f.filedAt ? f.filedAt.getTime() : null
       const filedIsPlausible = filed !== null && filed >= periodEnd && filed - periodEnd <= maxPlausibleLag
       return {
@@ -55,6 +64,29 @@ export async function GET(
 
     const quarters = fundamentalsWithDate.filter(f => f.periodType === 'QUARTERLY')
     const annuals = fundamentalsWithDate.filter(f => f.periodType === 'ANNUAL')
+
+    // Guarda de splits. Em ~14% dos emitentes o sharesOutstanding e o
+    // epsDiluted históricos ficaram numa base de split diferente da dos
+    // preços (o ajuste na ingestão só toca nas linhas do lote em curso, e o
+    // histórico já gravado nunca é revisitado). Nesses casos qualquer métrica
+    // POR AÇÃO fica errada por um fator inteiro — o WMT dava P/E de 5,4x em
+    // 2016 em vez de ~15x. O net income é imune, porque não é por ação.
+    //
+    // Um degrau na série de ações é a assinatura: emissões e recompras reais
+    // são graduais, um split é instantâneo. Detetado o degrau, deixamos de
+    // emitir epsTtm e o gráfico cai sozinho para net income (ver
+    // lib/finance/priceVsEarnings.ts). Enquanto os splits não estiverem
+    // corrigidos na origem, é preferível uma série imune a uma série elegante.
+    const SPLIT_BREAK = 1.4
+    const shareSeries = [...quarters]
+      .sort((a, b) => a.periodEnd.getTime() - b.periodEnd.getTime())
+      .map(q => q.sharesOutstanding?.toNumber())
+      .filter((s): s is number => typeof s === 'number' && s > 0)
+    const hasSplitBreak = shareSeries.some((s, i) => {
+      if (i === 0) return false
+      const ratio = s / shareSeries[i - 1]
+      return ratio > SPLIT_BREAK || ratio < 1 / SPLIT_BREAK
+    })
 
     const weeklyPrices = allPrices
 
@@ -81,7 +113,18 @@ export async function GET(
       const avgCapex = capexCount > 0 ? totalCapex / capexCount : 0;
 
       for (const q of latest4) {
-        const eps = q.epsDiluted?.toNumber();
+        // epsDiluted tem buracos grandes na BD para vários emitentes (a VISA
+        // não tem um único trimestre preenchido; COST/CRM/PEP/WMT têm ~75% em
+        // falta), mas netIncome e sharesOutstanding estão completos. Derivar
+        // dá o mesmo número: validado contra os trimestres onde ambos existem,
+        // desvio máximo de 0,3%. Sem este fallback essas empresas ficavam sem
+        // gráfico de preço vs lucros e sem P/E pela via trimestral.
+        let eps = q.epsDiluted?.toNumber();
+        if (eps === undefined || eps === null) {
+          const ni = q.netIncome?.toNumber();
+          const sh = q.sharesOutstanding?.toNumber();
+          if (ni !== undefined && ni !== null && sh) eps = ni / sh;
+        }
         if (eps !== undefined && eps !== null) ttmEps += eps; else hasAllEps = false;
 
         const rev = q.revenue?.toNumber();
@@ -151,6 +194,12 @@ export async function GET(
         if (validA.length > 0) {
           const latest = validA[validA.length - 1]
           ttmEps = latest.epsDiluted ? latest.epsDiluted.toNumber() : null
+          if (ttmEps === null) {
+            // Mesmo fallback do caminho trimestral (ver getTtm)
+            const niA = latest.netIncome?.toNumber()
+            const shA = latest.sharesOutstanding?.toNumber()
+            if (niA !== undefined && niA !== null && shA) ttmEps = niA / shA
+          }
           ttmRev = latest.revenue ? latest.revenue.toNumber() : null
           ttmNi = latest.netIncome ? latest.netIncome.toNumber() : null
           
@@ -185,7 +234,9 @@ export async function GET(
       if (ttmNi !== null) {
         obj.netIncome = ttmNi
       }
-      if (ttmEps !== null) {
+      // Omitido de propósito quando a base de splits é inconsistente: a
+      // ausência do campo é o sinal para o gráfico usar net income.
+      if (ttmEps !== null && !hasSplitBreak) {
         obj.epsTtm = ttmEps
       }
 
@@ -202,7 +253,8 @@ export async function GET(
         }
       }
 
-      if (obj.pe !== undefined || obj.ps !== undefined || obj.fcfYield !== undefined || obj.netIncome !== undefined) {
+      if (obj.pe !== undefined || obj.ps !== undefined || obj.fcfYield !== undefined
+          || obj.netIncome !== undefined || obj.epsTtm !== undefined) {
         results.push(obj)
       }
     }

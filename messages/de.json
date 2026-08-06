@@ -663,6 +663,29 @@
       "tooltipPs": "P/Sales",
       "tooltipFcf": "FCF Yield",
       "avgLabel": "Durchschnitt"
+    },
+    "priceVsEarnings": {
+      "title": "Kurs vs Gewinn",
+      "subtitle": "Ob das Gewinnwachstum mit dem Aktienkurs mithalten konnte",
+      "methodologyLabel": "Methodik",
+      "methodology": "Beide Reihen werden zum Beginn des Zeitraums auf 100 indexiert und teilen so eine einzige Skala — keine willkürliche zweite Achse. Der Gewinn ist der der letzten zwölf Monate (TTM), zugeordnet zum Datum der tatsächlichen Veröffentlichung. Hinweis: Der Kurs ist je Aktie, der Gewinn ein Gesamtwert — Aktienrückkäufe können den Kurs also legitim vor den Gewinn setzen.",
+      "rangeMax": "MAX",
+      "seriesPrice": "Kurs",
+      "seriesEarnings": "Nettogewinn (TTM)",
+      "priceCagr": "Kurs-CAGR",
+      "earningsCagr": "Gewinn-CAGR",
+      "priceChange": "Kursveränderung",
+      "earningsChange": "Gewinnveränderung",
+      "gap": "Differenz",
+      "baseNote": "Basis 100 = {date}",
+      "logToggle": "Log",
+      "logHint": "Logarithmische Skala — gleiche vertikale Abstände bedeuten gleiche prozentuale Veränderungen. Nützlich, wenn eine Reihe sich vervielfacht.",
+      "baseShifted": "Basis = erstes profitables Quartal im Zeitraum",
+      "verdict": {
+        "priceAhead": "Kurs wächst stärker als die Gewinne — Multiple-Expansion",
+        "earningsAhead": "Gewinne wachsen stärker als der Kurs — Multiple-Kompression",
+        "inLine": "Kurs folgt dem Gewinnwachstum eng"
+      }
     }
   },
   "dcf": {

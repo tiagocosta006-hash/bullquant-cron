@@ -740,6 +740,29 @@
       "tooltipPs": "P/Sales",
       "tooltipFcf": "FCF Yield",
       "avgLabel": "Avg"
+    },
+    "priceVsEarnings": {
+      "title": "Price vs Earnings",
+      "subtitle": "Whether profit growth has kept up with the share price",
+      "methodologyLabel": "Methodology",
+      "methodology": "Both series are rebased to 100 at the start of the window, so they share one scale — no arbitrary second axis. Net income is trailing twelve months, mapped to the date it was actually filed. Note that price is per share while net income is a total: buybacks can push price ahead of profit legitimately.",
+      "rangeMax": "MAX",
+      "seriesPrice": "Price",
+      "seriesEarnings": "Net income (TTM)",
+      "priceCagr": "Price CAGR",
+      "earningsCagr": "Earnings CAGR",
+      "priceChange": "Price change",
+      "earningsChange": "Earnings change",
+      "gap": "Gap",
+      "baseNote": "Base 100 = {date}",
+      "logToggle": "Log",
+      "logHint": "Logarithmic scale — equal vertical distances mean equal percentage moves. Useful when one series grows many times over.",
+      "baseShifted": "base = first profitable quarter in the window",
+      "verdict": {
+        "priceAhead": "Price growing faster than profits — multiple expansion",
+        "earningsAhead": "Profits growing faster than price — multiple compression",
+        "inLine": "Price tracking profit growth closely"
+      }
     }
   },
   "analista": {

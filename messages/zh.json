@@ -663,6 +663,29 @@
       "tooltipPs": "P/Sales",
       "tooltipFcf": "FCF Yield",
       "avgLabel": "平均值"
+    },
+    "priceVsEarnings": {
+      "title": "股价 vs 净利润",
+      "subtitle": "利润增长是否跟上了股价涨幅",
+      "methodologyLabel": "计算方法",
+      "methodology": "两条序列均以区间起点为基期指数化至100，共用同一坐标轴，不使用任意设定的第二坐标轴。净利润为过去十二个月（TTM），并对应其实际披露日期。请注意：股价是每股口径，净利润是总额口径，因此股份回购可能合理地使股价涨幅超过利润增幅。",
+      "rangeMax": "全部",
+      "seriesPrice": "股价",
+      "seriesEarnings": "净利润（TTM）",
+      "priceCagr": "股价年化增速",
+      "earningsCagr": "利润年化增速",
+      "priceChange": "股价变化",
+      "earningsChange": "利润变化",
+      "gap": "差距",
+      "baseNote": "基期100 = {date}",
+      "logToggle": "对数",
+      "logHint": "对数刻度 — 相同的纵向距离代表相同的百分比变化。当某条序列成倍增长时尤其有用。",
+      "baseShifted": "基期 = 区间内首个盈利季度",
+      "verdict": {
+        "priceAhead": "股价增速快于利润 — 估值扩张",
+        "earningsAhead": "利润增速快于股价 — 估值压缩",
+        "inLine": "股价与利润增长基本同步"
+      }
     }
   },
   "dcf": {

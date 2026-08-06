@@ -30,10 +30,28 @@ export async function GET(
       orderBy: { periodEnd: 'asc' }
     })
 
-    const fundamentalsWithDate = allFundamentals.map(f => ({
-      ...f,
-      availableAt: f.filedAt ? f.filedAt.getTime() : f.periodEnd.getTime()
-    })).sort((a, b) => a.availableAt - b.availableAt)
+    // Data em que o período passou a ser público. `filedAt` é a fonte
+    // preferida, MAS na BD muitos trimestres antigos foram carregados a partir
+    // das colunas comparativas de uma filing posterior — ficaram com o filedAt
+    // dessa filing (ex.: AAPL FY2025Q1, fechado em 2024-12-28, com filedAt
+    // 2026-05-01). Usar isso tal e qual atrasava toda a série de fundamentais
+    // ~1 ano face ao preço, inflando P/E e desalinhando o gráfico preço vs
+    // lucros. Quando o desvio face ao fim do período é implausível para o
+    // calendário da SEC, caímos no prazo legal de reporte (10-Q ~40 dias,
+    // 10-K ~60-75 dias) em vez de confiar num filedAt claramente errado.
+    const DAY = 24 * 3600 * 1000
+    const fundamentalsWithDate = allFundamentals.map(f => {
+      const periodEnd = f.periodEnd.getTime()
+      const isAnnual = f.periodType === 'ANNUAL'
+      const typicalLag = (isAnnual ? 75 : 45) * DAY
+      const maxPlausibleLag = (isAnnual ? 150 : 120) * DAY
+      const filed = f.filedAt ? f.filedAt.getTime() : null
+      const filedIsPlausible = filed !== null && filed >= periodEnd && filed - periodEnd <= maxPlausibleLag
+      return {
+        ...f,
+        availableAt: filedIsPlausible ? filed : periodEnd + typicalLag
+      }
+    }).sort((a, b) => a.availableAt - b.availableAt)
 
     const quarters = fundamentalsWithDate.filter(f => f.periodType === 'QUARTERLY')
     const annuals = fundamentalsWithDate.filter(f => f.periodType === 'ANNUAL')
@@ -44,10 +62,12 @@ export async function GET(
       let ttmEps = 0;
       let ttmRev = 0;
       let ttmFcf: number | null = 0;
-      
+      let ttmNi = 0;
+
       let hasAllEps = true;
       let hasAllRev = true;
       let hasAllFcf = true;
+      let hasAllNi = true;
 
       let totalCapex = 0;
       let capexCount = 0;
@@ -67,6 +87,9 @@ export async function GET(
         const rev = q.revenue?.toNumber();
         if (rev !== undefined && rev !== null) ttmRev += rev; else hasAllRev = false;
 
+        const ni = q.netIncome?.toNumber();
+        if (ni !== undefined && ni !== null) ttmNi += ni; else hasAllNi = false;
+
         let fcf = q.freeCashFlow?.toNumber();
         if (fcf === undefined || fcf === null) {
           const ocf = q.operatingCashFlow?.toNumber();
@@ -79,7 +102,8 @@ export async function GET(
       return {
         ttmEps: hasAllEps ? ttmEps : null,
         ttmRev: hasAllRev ? ttmRev : null,
-        ttmFcf: hasAllFcf ? ttmFcf : null
+        ttmFcf: hasAllFcf ? ttmFcf : null,
+        ttmNi: hasAllNi ? ttmNi : null
       }
     }
 
@@ -92,6 +116,7 @@ export async function GET(
       let ttmEps: number | null = null
       let ttmRev: number | null = null
       let ttmFcf: number | null = null
+      let ttmNi: number | null = null
       let shares: number | null = null
       let foundTtm = false;
 
@@ -113,6 +138,7 @@ export async function GET(
               ttmEps = ttm.ttmEps
               ttmRev = ttm.ttmRev
               ttmFcf = ttm.ttmFcf
+              ttmNi = ttm.ttmNi
               shares = latest4[0].sharesOutstanding?.toNumber() || null
               foundTtm = true
             }
@@ -126,6 +152,7 @@ export async function GET(
           const latest = validA[validA.length - 1]
           ttmEps = latest.epsDiluted ? latest.epsDiluted.toNumber() : null
           ttmRev = latest.revenue ? latest.revenue.toNumber() : null
+          ttmNi = latest.netIncome ? latest.netIncome.toNumber() : null
           
           let fcf = latest.freeCashFlow?.toNumber();
           if (fcf === undefined || fcf === null) {
@@ -140,9 +167,26 @@ export async function GET(
         }
       }
 
-      const obj: any = {
+      const obj: {
+        date: string
+        price: number
+        netIncome?: number
+        epsTtm?: number
+        pe?: number
+        ps?: number
+        fcfYield?: number
+      } = {
         date: p.date.toISOString().split('T')[0],
         price: priceVal
+      }
+
+      // Lucro TTM point-in-time: serve o gráfico "preço vs lucros" (indexado).
+      // Vai em bruto (sem sinal filtrado) — prejuízos são informação, não ruído.
+      if (ttmNi !== null) {
+        obj.netIncome = ttmNi
+      }
+      if (ttmEps !== null) {
+        obj.epsTtm = ttmEps
       }
 
       if (ttmEps !== null && ttmEps > 0) {
@@ -158,7 +202,7 @@ export async function GET(
         }
       }
 
-      if (obj.pe !== undefined || obj.ps !== undefined || obj.fcfYield !== undefined) {
+      if (obj.pe !== undefined || obj.ps !== undefined || obj.fcfYield !== undefined || obj.netIncome !== undefined) {
         results.push(obj)
       }
     }

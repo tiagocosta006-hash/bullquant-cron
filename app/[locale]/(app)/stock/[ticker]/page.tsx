@@ -12,6 +12,7 @@ import { SavedValuations, type SerializedDcfAnalysis } from '@/components/stock/
 const FinancialsEngine = dynamic(() => import('@/components/stock/FinancialsEngine').then(mod => mod.FinancialsEngine))
 import { InsiderActivity } from '@/components/stock/InsiderActivity'
 import { getCurrencySymbol } from '@/lib/finance/format'
+import { isDevUnlocked } from '@/lib/devAccess'
 import { BRAND } from '@/lib/brand'
 
 import { LatestResults } from '@/components/stock/LatestResults'
@@ -21,6 +22,7 @@ import { ManagementTeam } from '@/components/stock/ManagementTeam'
 const StockAnalyst = dynamic(() => import('@/components/stock/StockAnalyst').then(mod => mod.StockAnalyst))
 import { StockTabs } from '@/components/stock/StockTabs'
 const ValuationMultiples = dynamic(() => import('@/components/stock/ValuationMultiples').then(mod => mod.ValuationMultiples))
+const PriceVsEarnings = dynamic(() => import('@/components/stock/PriceVsEarnings').then(mod => mod.PriceVsEarnings))
 import { ShareStockModal } from '@/components/stock/ShareStockModal'
 import { SimilarCompanies } from '@/components/stock/SimilarCompanies'
 
@@ -168,8 +170,11 @@ export default async function StockPage({
     })
   ])
 
-  const isPro = dbUser?.plan === 'PRO'
-  const isLoggedIn = !!user
+  // DEV_UNLOCK_PRO no .env.local abre o conteúdo gated em desenvolvimento;
+  // em produção isDevUnlocked() é sempre false (ver lib/devAccess.ts).
+  const devUnlocked = isDevUnlocked()
+  const isPro = dbUser?.plan === 'PRO' || devUnlocked
+  const isLoggedIn = !!user || devUnlocked
 
   // Overlay preliminar: revenue/EPS já reportados (earnings) que ainda não estão
   // nos fundamentais oficiais (10-Q). Mostra-se como barra provisória no gráfico
@@ -323,6 +328,7 @@ export default async function StockPage({
         valuation={
           company.exchange !== 'MACRO' && <>
             <ValuationMultiples ticker={company.ticker} isPro={isPro} isLoggedIn={isLoggedIn} />
+            <PriceVsEarnings ticker={company.ticker} isPro={isPro} isLoggedIn={isLoggedIn} currencySymbol={currencySymbol} />
             {serializedDcfs.length > 0 ? (
               <SavedValuations
                 analyses={serializedDcfs}

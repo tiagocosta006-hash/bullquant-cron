@@ -663,6 +663,29 @@
       "tooltipPs": "P/Sales",
       "tooltipFcf": "FCF Yield",
       "avgLabel": "Moyenne"
+    },
+    "priceVsEarnings": {
+      "title": "Cours vs Bénéfices",
+      "subtitle": "Si la croissance des bénéfices a suivi le cours de l'action",
+      "methodologyLabel": "Méthodologie",
+      "methodology": "Les deux séries sont rebasées à 100 au début de la période, afin de partager une seule échelle — pas de second axe arbitraire. Le bénéfice est celui des douze derniers mois (TTM), rattaché à la date de publication réelle. À noter : le cours est par action alors que le bénéfice est un total, les rachats d'actions peuvent donc légitimement placer le cours devant le bénéfice.",
+      "rangeMax": "MAX",
+      "seriesPrice": "Cours",
+      "seriesEarnings": "Bénéfice net (TTM)",
+      "priceCagr": "TCAC du cours",
+      "earningsCagr": "TCAC du bénéfice",
+      "priceChange": "Variation du cours",
+      "earningsChange": "Variation du bénéfice",
+      "gap": "Écart",
+      "baseNote": "Base 100 = {date}",
+      "logToggle": "Log",
+      "logHint": "Échelle logarithmique — des distances verticales égales correspondent à des variations en pourcentage égales. Utile quand une série se multiplie fortement.",
+      "baseShifted": "base = premier trimestre bénéficiaire de la période",
+      "verdict": {
+        "priceAhead": "Le cours croît plus vite que les bénéfices — expansion du multiple",
+        "earningsAhead": "Les bénéfices croissent plus vite que le cours — compression du multiple",
+        "inLine": "Le cours suit de près la croissance des bénéfices"
+      }
     }
   },
   "dcf": {

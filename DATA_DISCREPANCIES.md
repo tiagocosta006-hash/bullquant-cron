@@ -79,3 +79,18 @@ O Capital Investido (denominador do ROIC) era tradicionalmente calculado deduzin
 O motor foi atualizado para utilizar a abordagem "Financing" estrita:
 `Invested Capital = Total Debt + Total Equity - Cash`
 Isto garante um cálculo de ROIC muito mais robusto, conservador e perfeitamente alinhado com a academia financeira.
+
+---
+
+## 7. Data de disponibilidade dos fundamentais (`filedAt`) nos gráficos point-in-time
+
+**Cenário de Dúvida:**
+Os gráficos que cruzam preço com fundamentais (P/E histórico em *ValuationMultiples*, preço vs lucros em *PriceVsEarnings*) mostravam a série de lucros atrasada quase um ano face ao preço. A AAPL aparecia a 44x lucros em agosto de 2021, quando negociava a ~28x.
+
+**Causa:**
+O campo `filedAt` de muitos trimestres na BD não é a data da filing original (10-Q), mas a data de uma filing **posterior** que reportou aquele trimestre como período comparativo — foi essa a filing de onde a ingestão extraiu a linha. Exemplo real: AAPL FY2025Q1 (período fechado em 2024-12-28, reportado em janeiro de 2025) está gravado com `filedAt = 2026-05-01`; os quatro trimestres de FY2016 estão todos com `filedAt = 2017-11-03`. Os **valores** estão corretos — só a data de disponibilidade está errada.
+
+**A Nossa Metodologia:**
+`/api/valuation/[ticker]` deixou de confiar cegamente no `filedAt`. Continua a ser a fonte preferida, mas apenas quando é plausível face ao calendário da SEC (posterior ao fim do período e até 120 dias depois num trimestre, 150 num anual). Fora dessa janela assume-se o prazo legal típico de reporte: `periodEnd + 45 dias` (10-Q) ou `periodEnd + 75 dias` (10-K). Com isto a série de TTM da AAPL passou de 13 degraus em 5 anos (com saltos de 9 meses) para 22 — um por trimestre, como deve ser — e o P/E de agosto de 2021 passou a 28,5x.
+
+**Dívida técnica:** a correção é uma blindagem no consumo, não na origem. O `filedAt` correto continua a faltar na BD e deve ser corrigido em `scripts/ingest_fundamentals.py` (usar a data da filing de onde o período é o *reporting period*, não a data da filing onde aparece como comparativo). Enquanto isso não acontecer, qualquer nova feature point-in-time deve usar a mesma lógica de plausibilidade.

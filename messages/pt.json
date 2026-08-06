@@ -721,6 +721,29 @@
       "tooltipFcf": "FCF Yield",
       "avgLabel": "Média"
     },
+    "priceVsEarnings": {
+      "title": "Preço vs Lucros",
+      "subtitle": "Se o crescimento dos lucros acompanhou a cotação da ação",
+      "methodologyLabel": "Metodologia",
+      "methodology": "As duas séries são reindexadas a 100 no início da janela, para partilharem uma só escala — sem segundo eixo arbitrário. O lucro é dos últimos doze meses (TTM), associado à data em que foi efetivamente reportado. Nota: o preço é por ação e o lucro é total, pelo que recompras de ações podem legitimamente colocar o preço à frente do lucro.",
+      "rangeMax": "MÁX",
+      "seriesPrice": "Preço",
+      "seriesEarnings": "Lucro líquido (TTM)",
+      "priceCagr": "CAGR do preço",
+      "earningsCagr": "CAGR do lucro",
+      "priceChange": "Variação do preço",
+      "earningsChange": "Variação do lucro",
+      "gap": "Diferença",
+      "baseNote": "Base 100 = {date}",
+      "logToggle": "Log",
+      "logHint": "Escala logarítmica — distâncias verticais iguais são variações percentuais iguais. Útil quando uma das séries cresce várias vezes.",
+      "baseShifted": "base = primeiro trimestre com lucro na janela",
+      "verdict": {
+        "priceAhead": "Preço a crescer mais que os lucros — expansão de múltiplo",
+        "earningsAhead": "Lucros a crescer mais que o preço — compressão de múltiplo",
+        "inLine": "Preço a acompanhar de perto o crescimento dos lucros"
+      }
+    },
     "earnings": {
       "title": "Últimos Resultados",
       "eps": "EPS",

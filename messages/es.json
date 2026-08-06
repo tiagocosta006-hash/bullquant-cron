@@ -663,6 +663,29 @@
       "tooltipPs": "P/Sales",
       "tooltipFcf": "FCF Yield",
       "avgLabel": "Media"
+    },
+    "priceVsEarnings": {
+      "title": "Precio vs Beneficios",
+      "subtitle": "Si el crecimiento de los beneficios ha seguido el ritmo de la cotización",
+      "methodologyLabel": "Metodología",
+      "methodology": "Ambas series se reindexan a 100 al inicio del periodo, para compartir una única escala — sin un segundo eje arbitrario. El beneficio es de los últimos doce meses (TTM), asociado a la fecha en que se publicó realmente. Ojo: el precio es por acción y el beneficio es total, así que las recompras pueden situar legítimamente el precio por delante del beneficio.",
+      "rangeMax": "MÁX",
+      "seriesPrice": "Precio",
+      "seriesEarnings": "Beneficio neto (TTM)",
+      "priceCagr": "CAGR del precio",
+      "earningsCagr": "CAGR del beneficio",
+      "priceChange": "Variación del precio",
+      "earningsChange": "Variación del beneficio",
+      "gap": "Diferencia",
+      "baseNote": "Base 100 = {date}",
+      "logToggle": "Log",
+      "logHint": "Escala logarítmica — distancias verticales iguales son variaciones porcentuales iguales. Útil cuando una serie se multiplica varias veces.",
+      "baseShifted": "base = primer trimestre con beneficio del periodo",
+      "verdict": {
+        "priceAhead": "El precio crece más que los beneficios — expansión de múltiplo",
+        "earningsAhead": "Los beneficios crecen más que el precio — compresión de múltiplo",
+        "inLine": "El precio sigue de cerca el crecimiento de los beneficios"
+      }
     }
   },
   "dcf": {

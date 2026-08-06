@@ -663,6 +663,29 @@
       "tooltipPs": "P/Sales",
       "tooltipFcf": "FCF Yield",
       "avgLabel": "Media"
+    },
+    "priceVsEarnings": {
+      "title": "Prezzo vs Utili",
+      "subtitle": "Se la crescita degli utili ha tenuto il passo con la quotazione",
+      "methodologyLabel": "Metodologia",
+      "methodology": "Le due serie sono riportate a base 100 all'inizio del periodo, così da condividere una sola scala — senza un secondo asse arbitrario. L'utile è quello degli ultimi dodici mesi (TTM), associato alla data di effettiva pubblicazione. Nota: il prezzo è per azione mentre l'utile è un totale, quindi i riacquisti di azioni possono legittimamente portare il prezzo davanti all'utile.",
+      "rangeMax": "MAX",
+      "seriesPrice": "Prezzo",
+      "seriesEarnings": "Utile netto (TTM)",
+      "priceCagr": "CAGR del prezzo",
+      "earningsCagr": "CAGR dell'utile",
+      "priceChange": "Variazione del prezzo",
+      "earningsChange": "Variazione dell'utile",
+      "gap": "Divario",
+      "baseNote": "Base 100 = {date}",
+      "logToggle": "Log",
+      "logHint": "Scala logaritmica — distanze verticali uguali corrispondono a variazioni percentuali uguali. Utile quando una serie si moltiplica.",
+      "baseShifted": "base = primo trimestre in utile del periodo",
+      "verdict": {
+        "priceAhead": "Prezzo in crescita più degli utili — espansione del multiplo",
+        "earningsAhead": "Utili in crescita più del prezzo — compressione del multiplo",
+        "inLine": "Il prezzo segue da vicino la crescita degli utili"
+      }
     }
   },
   "dcf": {

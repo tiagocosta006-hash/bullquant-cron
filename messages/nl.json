@@ -663,6 +663,29 @@
       "tooltipPs": "P/Sales",
       "tooltipFcf": "FCF Yield",
       "avgLabel": "Gem."
+    },
+    "priceVsEarnings": {
+      "title": "Koers vs Winst",
+      "subtitle": "Of de winstgroei de aandelenkoers heeft bijgehouden",
+      "methodologyLabel": "Methodologie",
+      "methodology": "Beide reeksen worden aan het begin van de periode geherindexeerd op 100, zodat ze één schaal delen — geen willekeurige tweede as. De winst is die van de laatste twaalf maanden (TTM), gekoppeld aan de datum van daadwerkelijke publicatie. Let op: de koers is per aandeel en de winst is een totaal, dus inkoop van eigen aandelen kan de koers legitiem voor de winst laten uitlopen.",
+      "rangeMax": "MAX",
+      "seriesPrice": "Koers",
+      "seriesEarnings": "Nettowinst (TTM)",
+      "priceCagr": "CAGR koers",
+      "earningsCagr": "CAGR winst",
+      "priceChange": "Koersverandering",
+      "earningsChange": "Winstverandering",
+      "gap": "Verschil",
+      "baseNote": "Basis 100 = {date}",
+      "logToggle": "Log",
+      "logHint": "Logaritmische schaal — gelijke verticale afstanden betekenen gelijke procentuele veranderingen. Nuttig als een reeks vele malen groeit.",
+      "baseShifted": "basis = eerste winstgevende kwartaal in de periode",
+      "verdict": {
+        "priceAhead": "Koers groeit sneller dan de winst — multiple-expansie",
+        "earningsAhead": "Winst groeit sneller dan de koers — multiple-compressie",
+        "inLine": "Koers volgt de winstgroei nauwgezet"
+      }
     }
   },
   "dcf": {

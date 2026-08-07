@@ -72,6 +72,14 @@ BREAK_DETECT_LO = 1 / BREAK_DETECT
 BREAK_HI = 2.5
 BREAK_LO = 1 / BREAK_HI
 
+# Correspondência entre o split dos preços e a etiqueta do EDGAR. A janela é
+# larga porque a data do EDGAR é o fim do período do facto XBRL, não a data
+# efetiva do split; quem faz a correspondência a sério é o rácio. A tolerância
+# de 5% cobre rácios reportados com arredondamento (yfinance dá 1.957x para um
+# 2:1) sem chegar perto de fatores de spin-off (0.9535x, 0.405x).
+EDGAR_DATE_WINDOW_DAYS = 120
+RATIO_TOLERANCE = 1.05
+
 SPLIT_TAGS = [
     "StockholdersEquityNoteStockSplitConversionRatio1",
     "StockholdersEquityNoteStockSplitConversionRatio",
@@ -114,46 +122,56 @@ def fetch_split_ratios(cik: str) -> list[tuple[str, float]]:
 
 
 def corroborate_with_prices(ticker: str, edgar: list[tuple[str, float]]) -> tuple[list[tuple[str, float]], list[str]]:
-    """Mantém só os rácios do EDGAR confirmados pela fonte dos PREÇOS (yfinance).
+    """Devolve os splits da série de PREÇOS (yfinance) corroborados pelo EDGAR.
 
-    O objetivo do ajuste é pôr os fundamentais na mesma base de split em que
-    estão os preços. Logo a autoridade não é o EDGAR — é quem ajusta os
-    preços. Quando as duas fontes discordam, ajustar pelo EDGAR *cria* a
-    incoerência que se queria eliminar.
+    Repara que o que sai daqui são os eventos do yfinance, não os do EDGAR. É
+    deliberado: o objetivo do ajuste é pôr os fundamentais na mesma base em que
+    estão os preços, portanto o fator correto é o que ajustou os preços. O
+    EDGAR entra só como confirmação de que houve mesmo uma alteração de
+    estrutura acionista, e não um spin-off.
 
-    Caso real: a HON tem no EDGAR uma etiqueta de 0.5x a 2026-06-29, mas o
-    yfinance regista 0.9535x na mesma data — o fator típico de um SPIN-OFF,
-    que mexe no preço e não no número de ações. Sem esta validação o script
-    multiplicava 51 linhas boas por 0.5 para as alinhar com uma única linha
-    recente defeituosa (319M contra 638M no trimestre anterior), destruindo o
-    histórico. A DD, essa, tem 0.333x nas duas fontes — reverse split real,
-    e é ajustada.
+    Duas armadilhas que isto tem de acomodar:
+
+    1. O EDGAR tagga a razão INVERTIDA em muitos filings — um split 5:1 aparece
+       como 0.2x. Aceitamos o rácio ou o seu recíproco.
+    2. A data que temos do EDGAR é o fim do período do facto XBRL, não a data
+       efetiva do split, e pode estar a um trimestre de distância. Daí a janela
+       larga; a correspondência a sério é feita pelo rácio.
+
+    A HON continua a ser rejeitada, que é o caso que isto tem de apanhar:
+    EDGAR 0.5x contra 0.9535x nos preços não bate nem invertido (1/0.5 = 2), e
+    0.9535 é o fator típico de um spin-off, que mexe no preço e não nas ações.
     """
     try:
         yf_splits = yf.Ticker(ticker).splits
     except Exception as e:
         return [], [f"yfinance indisponível ({e}) — nada ajustado, EDGAR sozinho não chega"]
 
-    price_events = [(str(d.date()), float(r)) for d, r in yf_splits.items()] if len(yf_splits) else []
+    price_events = [(str(d.date()), float(r)) for d, r in yf_splits.items() if r and r != 1.0] if len(yf_splits) else []
     kept, warnings = [], []
-    for date, ratio in edgar:
+    for pdate, pratio in price_events:
         match = None
-        for pdate, pratio in price_events:
-            # ±10 dias: a data efetiva e a de registo raramente coincidem
-            if abs((datetime.date.fromisoformat(pdate) - datetime.date.fromisoformat(date)).days) > 10:
+        for edate, eratio in edgar:
+            if eratio <= 0:
                 continue
-            if abs(math.log(pratio / ratio)) < math.log(1.02):
-                match = (pdate, pratio)
+            days = abs((datetime.date.fromisoformat(pdate) - datetime.date.fromisoformat(edate)).days)
+            if days > EDGAR_DATE_WINDOW_DAYS:
+                continue
+            # rácio direto OU invertido — o EDGAR usa as duas convenções
+            if (abs(math.log(pratio / eratio)) < math.log(RATIO_TOLERANCE)
+                    or abs(math.log(pratio * eratio)) < math.log(RATIO_TOLERANCE)):
+                match = (edate, eratio)
                 break
         if match:
-            kept.append((date, ratio))
+            kept.append((pdate, pratio))
         else:
-            near = [f"{d} {r:g}x" for d, r in price_events
-                    if abs((datetime.date.fromisoformat(d) - datetime.date.fromisoformat(date)).days) <= 10]
+            near = [f"{d} {r:g}x" for d, r in edgar
+                    if abs((datetime.date.fromisoformat(pdate) - datetime.date.fromisoformat(d)).days)
+                    <= EDGAR_DATE_WINDOW_DAYS]
             warnings.append(
-                f"EDGAR diz {date} {ratio:g}x mas a série de preços "
-                f"{'diz ' + ', '.join(near) if near else 'não tem split nessa data'} — "
-                f"não é split de ações (provável spin-off), ignorado"
+                f"preços dizem {pdate} {pratio:g}x mas o EDGAR "
+                f"{'tagga ' + ', '.join(near) if near else 'não tagga split nessa altura'} — "
+                f"não confirma um split de ações (provável spin-off), ignorado"
             )
     return kept, warnings
 

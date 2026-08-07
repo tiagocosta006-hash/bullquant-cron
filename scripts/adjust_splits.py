@@ -262,7 +262,7 @@ def main():
 
     with conn.cursor() as cur:
         companies = find_break_companies(cur)
-    print(f"{len(companies)} empresas com quebras de shares >2.5x a validar contra splits EDGAR.")
+    print(f"{len(companies)} empresas com quebras de shares >{BREAK_DETECT}x a validar contra splits EDGAR.")
 
     total_updates = 0
     for company in companies:

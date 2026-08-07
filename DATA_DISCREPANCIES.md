@@ -94,3 +94,24 @@ O campo `filedAt` de muitos trimestres na BD não é a data da filing original (
 `/api/valuation/[ticker]` deixou de confiar cegamente no `filedAt`. Continua a ser a fonte preferida, mas apenas quando é plausível face ao calendário da SEC (posterior ao fim do período e até 120 dias depois num trimestre, 150 num anual). Fora dessa janela assume-se o prazo legal típico de reporte: `periodEnd + 45 dias` (10-Q) ou `periodEnd + 75 dias` (10-K). Com isto a série de TTM da AAPL passou de 13 degraus em 5 anos (com saltos de 9 meses) para 22 — um por trimestre, como deve ser — e o P/E de agosto de 2021 passou a 28,5x.
 
 **Dívida técnica:** a correção é uma blindagem no consumo, não na origem. O `filedAt` correto continua a faltar na BD e deve ser corrigido em `scripts/ingest_fundamentals.py` (usar a data da filing de onde o período é o *reporting period*, não a data da filing onde aparece como comparativo). Enquanto isso não acontecer, qualquer nova feature point-in-time deve usar a mesma lógica de plausibilidade.
+
+---
+
+## 8. Base de splits dos fundamentais vs. a dos preços
+
+**Cenário de Dúvida:**
+O Walmart aparecia com um P/E de 5,4x em 2016, quando o valor real era ~15x. O mesmo padrão afetava qualquer métrica *por ação* (EPS, DPS, P/E) numa fatia significativa das empresas.
+
+**Causa:**
+O `sharesOutstanding` e o `epsDiluted` históricos ficavam numa base de split diferente da dos preços. O `apply_stock_splits()` em `ingest_fundamentals.py` só opera sobre as linhas do lote de ingestão em curso; como a ingestão é incremental, quando um split acontece as linhas antigas já estão na BD e nunca mais são revisitadas. Os **preços**, esses, vêm do yfinance já ajustados. Resultado: WMT com 3.100M ações em 2016 (base pré-split) e 8.202M em 2023 (pós-split 3:1 de 2024), contra preços ajustados nas duas pontas — P/E errado por um fator de exatamente 3.
+
+**A Nossa Metodologia:**
+O `adjust_splits.py` é o script de reparação e corre todas as noites a seguir à ingestão. Três correções foram precisas para ele apanhar os casos reais sem estragar os outros:
+
+1. **Deteção separada da tolerância.** Usava `BREAK_HI = 2.5` para as duas coisas, partindo do princípio de que "splits são >= 3x na prática". Um único 2:1 dá um degrau de exatamente 2,0 e um 3:2 dá 1,5 — ambos passavam despercebidos. A deteção passou para `BREAK_DETECT = 1.4`; a tolerância de encaixe fica nos 2,5.
+
+2. **A autoridade é a série de preços, não o EDGAR.** O objetivo do ajuste é alinhar os fundamentais com a base em que os preços estão, portanto o fator correto é o que ajustou os preços (yfinance). O EDGAR entra só como confirmação de que houve mesmo uma alteração de estrutura acionista. A HON é o caso que isto tem de apanhar: tem no EDGAR uma etiqueta de 0,5x que o yfinance regista como **0,9535x** — o fator típico de um *spin-off*, que mexe no preço e não no número de ações. Sem esta validação o script multiplicava 51 linhas boas por 0,5 para as alinhar com uma única linha recente defeituosa.
+
+3. **O EDGAR tagga a razão invertida.** Um split 5:1 aparece como `0.2x`, um 10:1 como `0.1x`. E a data do facto XBRL é o fim do período, não a data efetiva do split — daí a janela de correspondência ser de 120 dias, com o emparelhamento a sério feito pelo rácio (aceitando-o ou ao seu recíproco, com 5% de tolerância para arredondamentos: o yfinance dá 1,957x num 2:1).
+
+**Guarda no consumo:** enquanto houver empresas por reparar (mergers, IPOs e spin-offs legítimos ficam sempre por ajustar, e bem), `/api/valuation/[ticker]` deteta o degrau na série de ações e deixa de emitir `epsTtm`. O gráfico de preço vs lucros cai sozinho para net income, que é imune a splits por não ser por ação — pior conceptualmente, mas correto.

@@ -78,6 +78,12 @@ export default function PrivacyPolicyPage() {
               que estas transmissões limitam-se ao contexto do pedido financeiro (ex: nome da empresa) e passam de
               forma completamente <strong>anónima</strong>, não contendo dados de identificação pessoal.
             </li>
+            <li>
+              <strong>Marketing e Retargeting (Meta Ads):</strong> Mediante o seu <strong>consentimento expresso</strong> no banner de cookies, utilizamos o Pixel da Meta (Facebook/Instagram) para compreender como interage com a plataforma e poder apresentar-lhe campanhas publicitárias relevantes. Caso ativemos a funcionalidade de "Correspondência Avançada", determinados dados inseridos em formulários (como o seu e-mail) poderão ser processados de forma encriptada (hash) para otimização dessas campanhas, sendo os mesmos eliminados pela Meta se não houver correspondência com as suas bases de dados.
+            </li>
+            <li>
+              <strong>Estatísticas (Google Analytics):</strong> Mediante o seu consentimento, utilizamos o Google Analytics para recolher dados agregados e anónimos sobre as visitas ao site, ajudando-nos a melhorar o desempenho da plataforma.
+            </li>
           </ul>
         </section>
 

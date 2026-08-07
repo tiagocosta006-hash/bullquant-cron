@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { MetaPixel } from "@/components/analytics/MetaPixel";
 
 export function CookieConsent({
   initialConsent = false,
@@ -57,7 +58,10 @@ export function CookieConsent({
   return (
     <>
       {hasConsent && process.env.NODE_ENV === "production" && (
-        <GoogleAnalytics gaId="G-F89FT4052G" />
+        <>
+          <GoogleAnalytics gaId="G-F89FT4052G" />
+          <MetaPixel />
+        </>
       )}
       
       {showBanner && (

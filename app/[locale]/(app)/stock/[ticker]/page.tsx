@@ -76,9 +76,6 @@ export async function generateMetadata({
       title,
       description,
       images: [ogImageUrl],
-    },
-    alternates: {
-      canonical: `${BRAND.siteUrl}/stock/${company.ticker}`,
     }
   }
 }

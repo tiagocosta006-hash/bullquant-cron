@@ -15,7 +15,7 @@ import {
   ResponsiveContainer,
 } from "recharts"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { InfoIcon } from "lucide-react"
+import { InfoIcon, ChevronUp, ChevronDown } from "lucide-react"
 import { getIndexCagr } from "@/lib/finance/indexReturns"
 
 const formatCurrency = (value: number) =>
@@ -45,10 +45,10 @@ function LabelWithTooltip({ label, tooltip }: { label: string, tooltip?: string 
 export function CompoundInterestCalculator() {
   const t = useTranslations("compound")
 
-  const [principal, setPrincipal] = React.useState<number>(20000)
-  const [contribution, setContribution] = React.useState<number>(1000)
-  const [interestRate, setInterestRate] = React.useState<number>(6)
-  const [years, setYears] = React.useState<number>(10)
+  const [principal, setPrincipal] = React.useState<string>("20000")
+  const [contribution, setContribution] = React.useState<string>("1000")
+  const [interestRate, setInterestRate] = React.useState<string>("6")
+  const [years, setYears] = React.useState<string>("10")
 
   const [compoundFreq, setCompoundFreq] = React.useState<string>("1") // Annually
   const [contribFreq, setContribFreq] = React.useState<string>("12") // Monthly
@@ -76,16 +76,17 @@ export function CompoundInterestCalculator() {
   React.useEffect(() => {
     if (presetIndex === "custom") return
     if (presetIndex === "conservative") {
-      setInterestRate(3)
+      setInterestRate("3")
       return
     }
     const cagr = getIndexCagr(presetIndex, parseInt(presetLookback))
-    if (cagr !== null) setInterestRate(cagr)
+    if (cagr !== null) setInterestRate(cagr.toString())
   }, [presetIndex, presetLookback])
 
   const data = React.useMemo(() => {
     const result = []
-    let currentPrincipal = principal
+    const startPrincipal = Number(principal) || 0
+    let currentPrincipal = startPrincipal
     let totalContributions = 0
     let totalInterest = 0
 
@@ -97,9 +98,9 @@ export function CompoundInterestCalculator() {
       total: currentPrincipal,
     })
 
-    const r = interestRate / 100
+    const r = (Number(interestRate) || 0) / 100
     const f = parseInt(contribFreq)
-    const pmt = contribution
+    const pmt = Number(contribution) || 0
 
     // Equivalent rate per contribution period
     let rate_p = 0
@@ -110,7 +111,9 @@ export function CompoundInterestCalculator() {
       rate_p = Math.pow(1 + r / n, n / f) - 1
     }
 
-    for (let y = 1; y <= years; y++) {
+    const maxYears = Number(years) || 0
+
+    for (let y = 1; y <= maxYears; y++) {
       let yearInterest = 0
 
       for (let p = 1; p <= f; p++) {
@@ -132,7 +135,7 @@ export function CompoundInterestCalculator() {
 
       result.push({
         year: y,
-        principal: principal,
+        principal: startPrincipal,
         contributions: totalContributions,
         interest: totalInterest,
         total: currentPrincipal,
@@ -195,6 +198,7 @@ export function CompoundInterestCalculator() {
               onChange={setPrincipal}
               step={100}
               suffix="$"
+              min={0}
             />
 
             <NumberField
@@ -204,6 +208,7 @@ export function CompoundInterestCalculator() {
               onChange={setContribution}
               step={50}
               suffix="$"
+              min={0}
             />
 
             <div className="grid grid-cols-2 gap-4">
@@ -244,6 +249,7 @@ export function CompoundInterestCalculator() {
       onChange={setYears}
       step={1}
       suffix={t("yearsSuffix")}
+      min={0}
     />
         </div >
 
@@ -454,27 +460,75 @@ function NumberField({
   onChange,
   step,
   suffix,
+  min,
 }: {
   label: string
   tooltip?: string
-  value: number
-  onChange: (v: number) => void
+  value: string
+  onChange: (v: string) => void
   step: number
   suffix?: string
+  min?: number
 }) {
+  const handleIncrement = () => {
+    const current = Number(value) || 0
+    const next = parseFloat((current + step).toFixed(4))
+    onChange(next.toString())
+  }
+
+  const handleDecrement = () => {
+    const current = Number(value) || 0
+    let next = parseFloat((current - step).toFixed(4))
+    if (min !== undefined && next < min) {
+      next = min
+    }
+    onChange(next.toString())
+  }
+
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
         <LabelWithTooltip label={label} tooltip={tooltip} />
         {suffix && <span className="text-xs text-muted-foreground/60">{suffix}</span>}
       </div>
-      <Input
-        type="number"
-        step={step}
-        value={Number.isFinite(value) ? value : ""}
-        onChange={(e) => onChange(e.target.value === "" ? 0 : Number(e.target.value))}
-        className="bg-input/30 border-input/30 tabular-nums"
-      />
+      <div className="relative">
+        <Input
+          type="number"
+          step={step}
+          min={min}
+          value={value}
+          onChange={(e) => {
+            let val = e.target.value
+            
+            if (val.length > 1 && val.startsWith("0") && !val.startsWith("0.")) {
+              val = val.replace(/^0+/, "")
+              if (val === "") val = "0"
+            }
+
+            if (min !== undefined && val !== "" && Number(val) < min) {
+              val = min.toString()
+            }
+            onChange(val)
+          }}
+          className="bg-input/30 border-input/30 tabular-nums pr-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        />
+        <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col">
+          <button
+            type="button"
+            onClick={handleIncrement}
+            className="text-muted-foreground hover:text-foreground hover:bg-muted p-0.5 rounded transition-colors"
+          >
+            <ChevronUp className="h-3 w-3" />
+          </button>
+          <button
+            type="button"
+            onClick={handleDecrement}
+            className="text-muted-foreground hover:text-foreground hover:bg-muted p-0.5 rounded transition-colors"
+          >
+            <ChevronDown className="h-3 w-3" />
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

@@ -24,6 +24,10 @@ export default function robots(): MetadataRoute.Robots {
           '/transcripts',
         ],
       },
+      {
+        userAgent: ['Google-Extended', 'GPTBot', 'CCBot', 'ClaudeBot', 'OAI-SearchBot'],
+        disallow: ['/'],
+      },
     ],
     sitemap: `${BRAND.siteUrl}/sitemap.xml`,
   }

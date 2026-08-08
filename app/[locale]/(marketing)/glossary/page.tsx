@@ -62,6 +62,8 @@ function renderDefinitionText(text: string) {
   return parts.length > 0 ? parts : text;
 }
 
+import { GlossaryClientScript } from "./GlossaryClientScript";
+
 export default async function GlossaryPage({
   params,
 }: {
@@ -94,6 +96,7 @@ export default async function GlossaryPage({
 
   return (
     <div className="container relative isolate mx-auto max-w-5xl px-4 py-24 sm:px-6 sm:py-32">
+      <GlossaryClientScript />
       {/* Schema.org DefinedTermSet — Glossário de Value Investing.
           Cada termo é marcado como DefinedTerm para Featured Snippets no Google. */}
       <script

@@ -53,6 +53,8 @@ export async function generateMetadata({
   const title = `${company.name} (${company.ticker}): Cotação, Análise Fundamental e Valor Justo DCF | ${BRAND.name}`
   const description = `Consulte a cotação da ${company.name} (${company.ticker}), demonstrações financeiras de 10 anos, modelo de valor justo DCF e análise de IA do setor ${company.sector || 'financeiro'}.`
 
+  const ogImageUrl = `${BRAND.siteUrl}/api/og/stock/${company.ticker}`
+
   return {
     title,
     description,
@@ -62,10 +64,10 @@ export async function generateMetadata({
       type: 'website',
       images: [
         {
-          url: '/opengraph-image',
+          url: ogImageUrl,
           width: 1200,
           height: 630,
-          alt: title,
+          alt: `${company.name} (${company.ticker}) — Análise Fundamental | ${BRAND.name}`,
         },
       ],
     },
@@ -73,7 +75,7 @@ export async function generateMetadata({
       card: 'summary_large_image',
       title,
       description,
-      images: ['/opengraph-image'],
+      images: [ogImageUrl],
     },
     alternates: {
       canonical: `${BRAND.siteUrl}/stock/${company.ticker}`,

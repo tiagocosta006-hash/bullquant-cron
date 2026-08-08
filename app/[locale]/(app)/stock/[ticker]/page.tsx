@@ -230,6 +230,9 @@ export default async function StockPage({
         "tickerSymbol": company.ticker,
         "exchange": company.exchange,
         "url": `${BRAND.siteUrl}/stock/${company.ticker}`,
+        ...(company.logoUrl && { "logo": company.logoUrl }),
+        ...(company.website && { "sameAs": company.website }),
+        ...(company.description && { "description": company.description })
       },
       {
         "@type": "BreadcrumbList",

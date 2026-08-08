@@ -23,6 +23,45 @@ export async function generateMetadata({
   };
 }
 
+import { Link } from '@/i18n/routing';
+
+// Helper to render markdown-style links [Text](/url) or [Text](#hash) as Link components
+function renderDefinitionText(text: string) {
+  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = linkRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.substring(lastIndex, match.index));
+    }
+    const label = match[1];
+    const url = match[2];
+    
+    if (url.startsWith('#')) {
+      parts.push(
+        <a key={match.index} href={url} className="font-medium text-primary hover:underline underline-offset-4">
+          {label}
+        </a>
+      );
+    } else {
+      parts.push(
+        <Link key={match.index} href={url as any} className="font-medium text-primary hover:underline underline-offset-4">
+          {label}
+        </Link>
+      );
+    }
+    lastIndex = linkRegex.lastIndex;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : text;
+}
+
 export default async function GlossaryPage({
   params,
 }: {

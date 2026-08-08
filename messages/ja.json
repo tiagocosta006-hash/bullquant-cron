@@ -868,7 +868,8 @@
     "rights": "© {year} {brand} 無断転載を禁じます。",
     "terms": "利用規約",
     "privacy": "プライバシー",
-    "refund": "返金ポリシー"
+    "refund": "返金ポリシー",
+    "directory": "Stock Directory"
   },
   "explore": {
     "title": "企業を探索",
@@ -1017,5 +1018,11 @@
       "guestDesc": "無料アカウントを作成してProにアップグレードすると、この企業についてAIアナリストとチャットできます。",
       "guestCta": "無料アカウントを作成"
     }
+  },
+  "directory": {
+    "title": "Stock Directory (A-Z)",
+    "subtitle": "Browse all publicly traded companies available on our platform for fundamental analysis and DCF valuation.",
+    "backToHome": "Back to Home",
+    "empty": "No companies found."
   }
 }

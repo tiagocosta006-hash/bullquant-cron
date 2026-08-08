@@ -1142,7 +1142,8 @@
     "privacy": "Privacy",
     "refund": "Refund Policy",
     "pricing": "Pricing",
-    "about": "About Us"
+    "about": "About Us",
+    "directory": "Stock Directory"
   },
   "cookieConsent": {
     "text": "We use cookies exclusively to understand how you use BullValue and improve your experience. Do you accept their use?",
@@ -1534,5 +1535,11 @@
         "VIX": "Note: Volatility (VIX)"
       }
     }
+  },
+  "directory": {
+    "title": "Stock Directory (A-Z)",
+    "subtitle": "Browse all publicly traded companies available on our platform for fundamental analysis and DCF valuation.",
+    "backToHome": "Back to Home",
+    "empty": "No companies found."
   }
 }

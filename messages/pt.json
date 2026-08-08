@@ -1141,7 +1141,8 @@
     "privacy": "Privacidade",
     "refund": "Política de Reembolso",
     "pricing": "Preços",
-    "about": "Sobre Nós"
+    "about": "Sobre Nós",
+    "directory": "Diretório de Ações"
   },
   "cookieConsent": {
     "text": "Utilizamos cookies exclusivamente para compreender como utiliza o BullValue e melhorar a sua experiência. Aceita a sua utilização?",
@@ -1533,5 +1534,11 @@
         "VIX": "Nota: Volatilidade (VIX)"
       }
     }
+  },
+  "directory": {
+    "title": "Diretório de Ações (A-Z)",
+    "subtitle": "Navega por todas as empresas cotadas em bolsa disponíveis na nossa plataforma para análise fundamental e avaliação DCF.",
+    "backToHome": "Voltar ao Início",
+    "empty": "Nenhuma empresa encontrada."
   }
 }

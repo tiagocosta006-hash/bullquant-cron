@@ -868,7 +868,8 @@
     "rights": "© {year} {brand}. Todos los derechos reservados.",
     "terms": "Términos del Servicio",
     "privacy": "Privacidad",
-    "refund": "Política de Reembolso"
+    "refund": "Política de Reembolso",
+    "directory": "Stock Directory"
   },
   "explore": {
     "title": "Explorar Negocios",
@@ -1017,5 +1018,11 @@
       "guestDesc": "Crea una cuenta gratis y pasa a Pro para chatear con el Analista IA sobre esta empresa.",
       "guestCta": "Crear cuenta gratis"
     }
+  },
+  "directory": {
+    "title": "Stock Directory (A-Z)",
+    "subtitle": "Browse all publicly traded companies available on our platform for fundamental analysis and DCF valuation.",
+    "backToHome": "Back to Home",
+    "empty": "No companies found."
   }
 }

@@ -26,6 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     createSitemapEntry('/', { lastModified: now, changeFrequency: 'weekly', priority: 1 }),
     createSitemapEntry('/explore', { lastModified: now, changeFrequency: 'daily', priority: 0.8 }),
+    createSitemapEntry('/directory', { lastModified: now, changeFrequency: 'daily', priority: 0.8 }),
     createSitemapEntry('/calendar', { lastModified: now, changeFrequency: 'daily', priority: 0.7 }),
     createSitemapEntry('/dcf', { lastModified: now, changeFrequency: 'weekly', priority: 0.7 }),
     createSitemapEntry('/about', { lastModified: now, changeFrequency: 'monthly', priority: 0.7 }),

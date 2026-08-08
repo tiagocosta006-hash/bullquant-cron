@@ -868,7 +868,8 @@
     "rights": "© {year} {brand}。保留所有权利。",
     "terms": "服务条款",
     "privacy": "隐私政策",
-    "refund": "退款政策"
+    "refund": "退款政策",
+    "directory": "Stock Directory"
   },
   "explore": {
     "title": "探索企业",
@@ -1017,5 +1018,11 @@
       "guestDesc": "创建免费账户并升级至 Pro,即可就该公司与 AI 分析师对话。",
       "guestCta": "创建免费账户"
     }
+  },
+  "directory": {
+    "title": "Stock Directory (A-Z)",
+    "subtitle": "Browse all publicly traded companies available on our platform for fundamental analysis and DCF valuation.",
+    "backToHome": "Back to Home",
+    "empty": "No companies found."
   }
 }

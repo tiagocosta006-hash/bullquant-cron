@@ -12,7 +12,10 @@ export async function Footer() {
           {t('rights', { year: new Date().getFullYear(), brand: BRAND.name })}
         </div>
 
-        <div className="flex gap-4 text-sm text-muted-foreground">
+        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+          <Link href="/directory" className="hover:text-foreground transition-colors font-medium text-foreground/80">
+            {t('directory')}
+          </Link>
           <Link href="/about" className="hover:text-foreground transition-colors">
             {t('about')}
           </Link>

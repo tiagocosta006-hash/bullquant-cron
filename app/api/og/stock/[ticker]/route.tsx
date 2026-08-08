@@ -49,7 +49,7 @@ export async function GET(
     const { GET: getPrice } = await import('@/app/api/price/[ticker]/route')
     
     const [priceResponse, ttmFundamentals, latestAnnual] = await Promise.all([
-      getPrice(priceReq, { params: Promise.resolve({ ticker: upper }) }),
+      getPrice(priceReq as any, { params: Promise.resolve({ ticker: upper }) }),
       prisma.fundamental.findMany({
         where: { companyId: company.id, periodType: "QUARTERLY" },
         orderBy: { periodEnd: "desc" },

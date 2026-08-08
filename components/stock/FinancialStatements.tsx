@@ -14,6 +14,7 @@ import {
   DollarSign,
 } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { GlossaryTooltip } from "@/components/ui/glossary-tooltip"
 
 export type StatementType = "INCOME_STATEMENT" | "BALANCE_SHEET" | "CASH_FLOW"
 export type PeriodType = "ANNUAL" | "QUARTERLY" | "TTM"
@@ -238,6 +239,46 @@ const Sparkline: React.FC<{ data: (number | null)[]; isPositiveGood?: boolean }>
   }
 )
 Sparkline.displayName = "Sparkline"
+
+const glossaryKeyMap: Record<string, string> = {
+  revenue: 'revenue',
+  costOfRevenue: 'cost-of-revenue',
+  grossProfit: 'gross-profit',
+  operatingExpenses: 'operating-expenses',
+  researchAndDevelopment: 'research-development',
+  sellingGeneralAndAdmin: 'sg-a',
+  operatingIncome: 'operating-income',
+  depreciationAndAmortization: 'depreciation-amortization',
+  ebitda: 'ebitda',
+  netIncome: 'net-income',
+  epsDiluted: 'eps-diluted',
+  sharesOutstanding: 'shares-outstanding',
+  dividendPerShare: 'dividend-per-share',
+  cash: 'cash-equivalents',
+  accountsReceivable: 'accounts-receivable',
+  inventory: 'inventory',
+  totalCurrentAssets: 'total-current-assets',
+  propertyPlantEquipment: 'ppe',
+  goodwillAndIntangibles: 'goodwill-intangibles',
+  totalAssets: 'total-assets',
+  accountsPayable: 'accounts-payable',
+  shortTermDebt: 'short-term-debt',
+  totalCurrentLiab: 'total-current-liabilities',
+  longTermDebt: 'long-term-debt',
+  totalDebt: 'total-debt',
+  totalLiabilities: 'total-liabilities',
+  retainedEarnings: 'retained-earnings',
+  totalEquity: 'total-equity',
+  operatingCashFlow: 'operating-cash-flow',
+  capex: 'capex',
+  investingCashFlow: 'investing-cash-flow',
+  financingCashFlow: 'financing-cash-flow',
+  stockBasedCompensation: 'stock-based-compensation',
+  shareRepurchases: 'share-repurchases',
+  dividendsPaid: 'dividends-paid',
+  netChangeInCash: 'net-change-in-cash',
+  freeCashFlow: 'fcf'
+};
 
 export function FinancialStatements({
   ticker,
@@ -830,9 +871,15 @@ export function FinancialStatements({
                             >
                               <div className="flex items-center gap-1.5">
                                 {line.isSubtotal && (
-                                  <span className="w-1.5 h-1.5 rounded-full bg-primary/70 mr-1" />
+                                  <span className="w-1.5 h-1.5 rounded-full bg-primary/70 mr-1 shrink-0" />
                                 )}
-                                <span>{line.label}</span>
+                                {glossaryKeyMap[line.key as string] ? (
+                                  <GlossaryTooltip slug={glossaryKeyMap[line.key as string]}>
+                                    <span>{line.label}</span>
+                                  </GlossaryTooltip>
+                                ) : (
+                                  <span>{line.label}</span>
+                                )}
                               </div>
                             </td>
 

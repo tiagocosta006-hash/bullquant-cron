@@ -359,4 +359,390 @@ export const glossaryTerms: GlossaryTerm[] = [
       pt: 'Mostra quanto os investidores estão dispostos a pagar por cada euro de lucro anual da empresa. Conhecido como Rácio Preço/Lucro (Price-to-Earnings), é a métrica de avaliação mais popular do mundo. Um P/E de 20 significa que estás a pagar 20$ por cada 1$ que a empresa lucra. Um P/E alto implica que os investidores esperam muito crescimento futuro (ou a ação está cara). Um P/E baixo implica baixas expectativas (ou a ação está barata). É mais útil quando se compara empresas semelhantes no mesmo setor.'
     }
   }
+,
+  {
+    slug: 'revenue',
+    title: {
+      en: 'Revenue',
+      pt: 'Receita (Vendas)'
+    },
+    definition: {
+      en: 'The total amount of money brought in by a company’s operations, before any expenses are deducted. Also known as the "top line", it is the raw fuel for any business. If revenue isn\'t growing over time, the company is either stagnating or shrinking.',
+      pt: 'O valor total de dinheiro que a empresa traz através das suas vendas, antes de qualquer despesa. Também conhecido como "top line", é o combustível cru de qualquer negócio. Se a receita não cresce ao longo do tempo, a empresa está a estagnar ou a encolher.'
+    }
+  },
+  {
+    slug: 'cost-of-revenue',
+    title: {
+      en: 'Cost of Revenue / COGS',
+      pt: 'Custo da Receita / CMV'
+    },
+    definition: {
+      en: 'The direct costs attributable to the production of the goods or services sold by a company. For a manufacturer, this includes raw materials and factory labor. For a software company, it includes server costs. Subtracting this from revenue gives you Gross Profit.',
+      pt: 'Os custos diretos imputáveis à produção dos bens ou serviços vendidos pela empresa. Para um fabricante, inclui matérias-primas e mão-de-obra da fábrica. Para uma empresa de software, inclui custos de servidores. Subtrair isto à receita dá o Lucro Bruto.'
+    }
+  },
+  {
+    slug: 'gross-profit',
+    title: {
+      en: 'Gross Profit',
+      pt: 'Lucro Bruto'
+    },
+    definition: {
+      en: 'The profit a company makes after deducting the costs associated with making and selling its products. It reveals the fundamental markup a company commands on its products. If gross profit is shrinking, the company might be losing pricing power.',
+      pt: 'O lucro que a empresa tem depois de deduzir os custos diretos de produzir e vender os seus produtos. Revela a margem fundamental que a empresa consegue cobrar pelos seus produtos. Se o lucro bruto está a encolher, a empresa pode estar a perder poder de preço.'
+    }
+  },
+  {
+    slug: 'operating-expenses',
+    title: {
+      en: 'Operating Expenses (OpEx)',
+      pt: 'Despesas Operacionais (OpEx)'
+    },
+    definition: {
+      en: 'The costs required to run the day-to-day business that are not directly tied to the production of goods. This includes rent, administrative salaries, marketing, and R&D. Keeping operating expenses in check is crucial for converting gross profit into operating income.',
+      pt: 'Os custos necessários para gerir o dia-a-dia do negócio que não estão diretamente ligados à produção de bens. Inclui rendas, salários administrativos, marketing e I&D. Manter as despesas operacionais sob controlo é crucial para converter lucro bruto em lucro operacional.'
+    }
+  },
+  {
+    slug: 'research-development',
+    title: {
+      en: 'Research & Development (R&D)',
+      pt: 'Pesquisa e Desenvolvimento (I&D)'
+    },
+    definition: {
+      en: 'Money spent to innovate, create new products, or improve existing ones. While it reduces current profits, heavy R&D spending is often the seed for future growth in tech, pharma, and industrial sectors.',
+      pt: 'Dinheiro gasto para inovar, criar novos produtos ou melhorar os existentes. Embora reduza os lucros atuais, fortes gastos em I&D são frequentemente a semente para o crescimento futuro nos setores tecnológico, farmacêutico e industrial.'
+    }
+  },
+  {
+    slug: 'sg-a',
+    title: {
+      en: 'SG&A',
+      pt: 'Vendas, Gerais e Administrativas'
+    },
+    definition: {
+      en: 'Selling, General, and Administrative expenses represent the overhead of running a business. This includes marketing, sales commissions, executive salaries, and office supplies. Warren Buffett famously avoids companies with excessively high SG&A relative to gross profit.',
+      pt: 'As despesas de Vendas, Gerais e Administrativas representam os custos indiretos de gerir um negócio. Inclui marketing, comissões de vendas, salários de executivos e material de escritório. Warren Buffett evita empresas com SG&A excessivamente alto face ao lucro bruto.'
+    }
+  },
+  {
+    slug: 'operating-income',
+    title: {
+      en: 'Operating Income',
+      pt: 'Lucro Operacional'
+    },
+    definition: {
+      en: 'The profit realized from a business\'s operations, after deducting operating expenses but before deducting interest and taxes. Also known as Operating Profit or EBIT. It tells you how much money the core business actually makes from its daily operations.',
+      pt: 'O lucro obtido pelas operações de um negócio, após deduzir as despesas operacionais mas antes de deduzir juros e impostos. Também conhecido como EBIT. Diz-te quanto dinheiro o negócio central realmente ganha nas suas operações diárias.'
+    }
+  },
+  {
+    slug: 'depreciation-amortization',
+    title: {
+      en: 'Depreciation & Amortization',
+      pt: 'Depreciação e Amortização'
+    },
+    definition: {
+      en: 'An accounting method of allocating the cost of a tangible or intangible asset over its useful life. It is a non-cash expense. For example, if a factory costs $10M and lasts 10 years, the company records a $1M expense each year, even though the cash was already spent.',
+      pt: 'Um método contabilístico para distribuir o custo de um ativo tangível ou intangível ao longo da sua vida útil. É uma despesa não monetária. Por exemplo, se uma fábrica custa 10M€ e dura 10 anos, a empresa regista 1M€ de despesa por ano, embora o dinheiro já tenha sido gasto.'
+    }
+  },
+  {
+    slug: 'net-income',
+    title: {
+      en: 'Net Income',
+      pt: 'Lucro Líquido'
+    },
+    definition: {
+      en: 'What remains in the company\'s bank account after all operating expenses, interest, and taxes have been paid. Often called the "bottom line". While it is the most famous profit metric, it can be distorted by accounting rules and one-off items.',
+      pt: 'O que sobra para a empresa depois de todas as despesas operacionais, juros e impostos terem sido pagos. Frequentemente chamado de "bottom line". Embora seja a métrica de lucro mais famosa, pode ser distorcida por regras contabilísticas e eventos não recorrentes.'
+    }
+  },
+  {
+    slug: 'eps-diluted',
+    title: {
+      en: 'Diluted EPS',
+      pt: 'EPS Diluído (Lucro por Ação)'
+    },
+    definition: {
+      en: 'The portion of a company\'s profit allocated to each outstanding share of common stock, assuming all convertible securities are exercised. It shows how much profit is theoretically tied to one single share. If Net Income goes up but the company issues millions of new shares, EPS might actually drop.',
+      pt: 'A parte do lucro de uma empresa alocada a cada ação em circulação, assumindo que todos os títulos convertíveis (opções) são exercidos. Mostra quanto lucro está teoricamente ligado a uma única ação. Se o Lucro Líquido subir mas a empresa emitir milhões de novas ações, o EPS pode até cair.'
+    }
+  },
+  {
+    slug: 'shares-outstanding',
+    title: {
+      en: 'Shares Outstanding',
+      pt: 'Ações em Circulação'
+    },
+    definition: {
+      en: 'The total number of shares of a company currently owned by all its investors, including company insiders. If this number goes up (dilution), your slice of the company gets smaller. If it goes down (buybacks), your slice gets bigger without you doing anything.',
+      pt: 'O número total de ações de uma empresa atualmente detidas por todos os investidores. Se este número sobe (diluição), a tua fatia da empresa fica mais pequena. Se desce (recompra de ações), a tua fatia fica maior sem fazeres nada.'
+    }
+  },
+  {
+    slug: 'dividend-per-share',
+    title: {
+      en: 'Dividend Per Share (DPS)',
+      pt: 'Dividendo por Ação (DPS)'
+    },
+    definition: {
+      en: 'The total dividends paid out over an entire year divided by the number of outstanding ordinary shares. It tells an investor exactly how much cash they will receive for each share they own.',
+      pt: 'O total de dividendos pagos ao longo de um ano inteiro a dividir pelo número de ações ordinárias em circulação. Diz a um investidor exatamente quanto dinheiro vivo vai receber por cada ação que detém.'
+    }
+  },
+  {
+    slug: 'cash-equivalents',
+    title: {
+      en: 'Cash & Equivalents',
+      pt: 'Caixa e Equivalentes'
+    },
+    definition: {
+      en: 'The most liquid assets on the balance sheet, including physical cash and assets that can be converted into cash immediately, like short-term government bonds. It is the company\'s ultimate safety net and war chest for acquisitions or buybacks.',
+      pt: 'Os ativos mais líquidos do balanço, incluindo dinheiro físico e ativos que podem ser convertidos em dinheiro imediatamente, como obrigações do tesouro de curto prazo. É a rede de segurança máxima da empresa e o "fundo de guerra" para aquisições.'
+    }
+  },
+  {
+    slug: 'accounts-receivable',
+    title: {
+      en: 'Accounts Receivable',
+      pt: 'Contas a Receber'
+    },
+    definition: {
+      en: 'Money owed to a company by its customers for goods or services that have been delivered but not yet paid for. If this grows much faster than revenue, it might mean the company is struggling to collect cash from clients.',
+      pt: 'Dinheiro que os clientes devem à empresa por bens ou serviços que já foram entregues mas ainda não pagos. Se crescer muito mais rápido que a receita, pode significar que a empresa está com dificuldades em cobrar.'
+    }
+  },
+  {
+    slug: 'inventory',
+    title: {
+      en: 'Inventory',
+      pt: 'Inventário'
+    },
+    definition: {
+      en: 'The raw materials, work-in-progress, and finished goods that are ready or will be ready for sale. A massive buildup in inventory can be a red flag that products aren\'t selling and might soon become obsolete or require steep discounts.',
+      pt: 'As matérias-primas, produtos em curso e produtos acabados prontos para venda. Um aumento maciço no inventário pode ser um sinal de alerta de que os produtos não estão a vender e podem ter de ser escoados com desconto.'
+    }
+  },
+  {
+    slug: 'total-current-assets',
+    title: {
+      en: 'Total Current Assets',
+      pt: 'Total de Ativos Correntes'
+    },
+    definition: {
+      en: 'All the assets of a company that are expected to be sold, consumed, or exhausted through standard business operations within one year. Used to calculate liquidity ratios to ensure the company can survive the next 12 months.',
+      pt: 'Todos os ativos de uma empresa que se espera que sejam vendidos, consumidos ou esgotados no prazo de um ano. Usado para calcular rácios de liquidez para garantir que a empresa sobrevive aos próximos 12 meses sem falir.'
+    }
+  },
+  {
+    slug: 'ppe',
+    title: {
+      en: 'Property, Plant & Equipment (PP&E)',
+      pt: 'Ativos Fixos Tangíveis (PP&E)'
+    },
+    definition: {
+      en: 'Long-term physical assets vital to business operations, such as factories, land, buildings, and heavy machinery. Capital intensive businesses (like airlines or steelmakers) have massive PP&E, requiring constant maintenance capital to keep running.',
+      pt: 'Ativos físicos de longo prazo vitais para as operações, como fábricas, terrenos, edifícios e maquinaria pesada. Negócios de capital intensivo (como companhias aéreas ou siderúrgicas) têm um PP&E massivo, exigindo capital de manutenção constante.'
+    }
+  },
+  {
+    slug: 'goodwill-intangibles',
+    title: {
+      en: 'Goodwill & Intangibles',
+      pt: 'Goodwill e Intangíveis'
+    },
+    definition: {
+      en: 'Assets that are not physical in nature. Intangibles include patents, trademarks, and copyrights. Goodwill arises when a company buys another company for a price higher than the fair market value of its net assets. It represents the value of brand reputation and customer loyalty.',
+      pt: 'Ativos que não são de natureza física. Intangíveis incluem patentes, marcas registadas e direitos de autor. Goodwill surge quando uma empresa compra outra por um preço superior ao valor justo dos seus ativos líquidos, representando o valor da marca.'
+    }
+  },
+  {
+    slug: 'total-assets',
+    title: {
+      en: 'Total Assets',
+      pt: 'Total de Ativos'
+    },
+    definition: {
+      en: 'Everything a company owns that has economic value, from cash in the bank to factories and patents. The fundamental accounting equation states that Total Assets must always equal Total Liabilities plus Shareholders\' Equity.',
+      pt: 'Tudo aquilo que a empresa possui e que tem valor económico, desde dinheiro em caixa a edifícios e patentes. A equação fundamental da contabilidade dita que o Total de Ativos tem de ser sempre igual ao Total de Passivos mais o Capital Próprio.'
+    }
+  },
+  {
+    slug: 'accounts-payable',
+    title: {
+      en: 'Accounts Payable',
+      pt: 'Contas a Pagar'
+    },
+    definition: {
+      en: 'Money a company owes to its suppliers or vendors for goods and services purchased on credit. A well-managed company stretches this out as long as possible without damaging relationships, effectively using suppliers as free short-term financing.',
+      pt: 'Dinheiro que a empresa deve aos seus fornecedores por bens e serviços comprados a crédito. Uma empresa bem gerida estica este prazo o máximo possível, usando efetivamente os fornecedores como financiamento gratuito de curto prazo.'
+    }
+  },
+  {
+    slug: 'short-term-debt',
+    title: {
+      en: 'Short-Term Debt',
+      pt: 'Dívida de Curto Prazo'
+    },
+    definition: {
+      en: 'Any financial obligations or loans that must be paid off within one year. High short-term debt during an economic crisis is extremely dangerous, as credit markets may freeze, making it impossible to refinance.',
+      pt: 'Quaisquer obrigações financeiras ou empréstimos que têm de ser pagos no prazo de um ano. Dívida de curto prazo elevada durante uma crise económica é extremamente perigosa, pois se os mercados de crédito congelarem, a empresa pode não conseguir refinanciar.'
+    }
+  },
+  {
+    slug: 'total-current-liabilities',
+    title: {
+      en: 'Total Current Liab.',
+      pt: 'Total de Passivos Correntes'
+    },
+    definition: {
+      en: 'All of a company\'s short-term financial obligations that are due within one year or within a normal operating cycle. Compared against Current Assets to determine if a company is facing an imminent liquidity crisis.',
+      pt: 'Todas as obrigações financeiras de curto prazo de uma empresa que vencem no prazo de um ano. Comparado com os Ativos Correntes para determinar se a empresa está a enfrentar uma crise iminente de liquidez.'
+    }
+  },
+  {
+    slug: 'long-term-debt',
+    title: {
+      en: 'Long-Term Debt',
+      pt: 'Dívida de Longo Prazo'
+    },
+    definition: {
+      en: 'Loans and financial obligations lasting over one year. While cheap debt can amplify shareholder returns, too much long-term debt makes a company fragile to interest rate shocks and economic downturns.',
+      pt: 'Empréstimos e obrigações financeiras com maturidade superior a um ano. Embora dívida barata possa amplificar os retornos dos acionistas, demasiada dívida de longo prazo torna a empresa frágil a choques de taxas de juro e recessões.'
+    }
+  },
+  {
+    slug: 'total-debt',
+    title: {
+      en: 'Total Debt',
+      pt: 'Dívida Total'
+    },
+    definition: {
+      en: 'The sum of all short-term and long-term interest-bearing liabilities. This represents the total amount of money borrowed by the company that must be paid back. Always compare it to the company\'s cash position to find the Net Debt.',
+      pt: 'A soma de todos os passivos remunerados (com juros) de curto e longo prazo. Representa o montante total de dinheiro pedido emprestado pela empresa. Compara sempre com a posição de caixa para encontrar a Dívida Líquida.'
+    }
+  },
+  {
+    slug: 'total-liabilities',
+    title: {
+      en: 'Total Liabilities',
+      pt: 'Total de Passivos'
+    },
+    definition: {
+      en: 'Everything a company owes to outside parties, including all debt, accounts payable, deferred revenues, and pension obligations. If Total Liabilities exceed Total Assets, the company has negative equity.',
+      pt: 'Tudo o que a empresa deve a terceiros, incluindo dívida, contas a pagar, receitas diferidas e obrigações de pensões. Se o Total de Passivos exceder o Total de Ativos, a empresa tem capital próprio negativo (falência técnica).'
+    }
+  },
+  {
+    slug: 'retained-earnings',
+    title: {
+      en: 'Retained Earnings',
+      pt: 'Lucros Retidos'
+    },
+    definition: {
+      en: 'The accumulated portion of a company\'s net income that is not paid out as dividends, but rather retained for reinvestment into the core business or to pay down debt. It represents the historical wealth creation of the firm.',
+      pt: 'A porção acumulada do lucro líquido histórico da empresa que não foi distribuída como dividendos, mas sim retida para reinvestimento no negócio. Representa a verdadeira criação de riqueza histórica da firma.'
+    }
+  },
+  {
+    slug: 'total-equity',
+    title: {
+      en: 'Stockholders\' Equity',
+      pt: 'Capital Próprio'
+    },
+    definition: {
+      en: 'The net worth of a company. Calculated as Total Assets minus Total Liabilities. It represents the amount of money that would be returned to shareholders if all the assets were liquidated and all the company\'s debt was paid off.',
+      pt: 'O valor líquido de uma empresa. Calcula-se subtraindo o Total de Passivos ao Total de Ativos. Representa a quantia de dinheiro que seria devolvida aos acionistas se todos os ativos fossem liquidados e as dívidas pagas.'
+    }
+  },
+  {
+    slug: 'operating-cash-flow',
+    title: {
+      en: 'Operating Cash Flow',
+      pt: 'Fluxo de Caixa Operacional'
+    },
+    definition: {
+      en: 'The cash actually generated by a company\'s normal business operations. It strips out non-cash items (like depreciation) and changes in working capital. It is much harder to manipulate with accounting tricks than Net Income.',
+      pt: 'O dinheiro vivo efetivamente gerado pelas atividades regulares do negócio. Remove itens não monetários (como depreciação) e variações no capital circulante. É muito mais difícil de manipular com truques contabilísticos do que o Lucro Líquido.'
+    }
+  },
+  {
+    slug: 'capex',
+    title: {
+      en: 'Capital Expenditures (CapEx)',
+      pt: 'Despesas de Capital (CapEx)'
+    },
+    definition: {
+      en: 'Funds used by a company to acquire, upgrade, and maintain physical assets such as property, plants, buildings, technology, or equipment. High CapEx businesses often struggle to generate Free Cash Flow because they constantly need to reinvest to survive.',
+      pt: 'Fundos usados pela empresa para adquirir, atualizar e manter ativos físicos como propriedades, fábricas ou tecnologia. Negócios com alto CapEx frequentemente lutam para gerar Fluxo de Caixa Livre porque precisam de reinvestir constantemente para sobreviver.'
+    }
+  },
+  {
+    slug: 'investing-cash-flow',
+    title: {
+      en: 'Investing Cash Flow',
+      pt: 'Fluxo de Caixa de Investimento'
+    },
+    definition: {
+      en: 'Cash generated or spent on long-term assets and investments. This includes buying/selling property, equipment (CapEx), or acquiring other companies. This section is usually negative for growing companies as they invest heavily in their future.',
+      pt: 'Dinheiro gerado ou gasto em ativos de longo prazo e investimentos. Inclui comprar/vender propriedades, equipamentos (CapEx) ou adquirir outras empresas. Esta secção é geralmente negativa para empresas em crescimento.'
+    }
+  },
+  {
+    slug: 'financing-cash-flow',
+    title: {
+      en: 'Financing Cash Flow',
+      pt: 'Fluxo de Caixa de Financiamento'
+    },
+    definition: {
+      en: 'Shows the net flows of cash that are used to fund the company. Includes transactions involving debt, equity, and dividends. Issuing stock or taking on debt brings cash in (positive); buying back stock or paying off debt sends cash out (negative).',
+      pt: 'Mostra os fluxos líquidos de dinheiro usados para financiar a empresa. Inclui transações envolvendo dívida, ações e dividendos. Emitir ações ou contrair dívida traz dinheiro (positivo); recomprar ações ou pagar dívida envia dinheiro para fora (negativo).'
+    }
+  },
+  {
+    slug: 'stock-based-compensation',
+    title: {
+      en: 'Stock-Based Compensation',
+      pt: 'Compensação em Ações (SBC)'
+    },
+    definition: {
+      en: 'Paying employees with equity in the business instead of cash. While it saves the company cash in the short term, it dilutes existing shareholders. Many tech companies report huge Free Cash Flows only because they pay employees in shares rather than cash.',
+      pt: 'Pagar aos empregados com ações do negócio em vez de dinheiro. Embora poupe dinheiro à empresa no curto prazo, dilui os acionistas existentes. Muitas tecnológicas reportam enormes Fluxos de Caixa Livres apenas porque pagam aos empregados em ações.'
+    }
+  },
+  {
+    slug: 'share-repurchases',
+    title: {
+      en: 'Share Repurchases',
+      pt: 'Recompra de Ações'
+    },
+    definition: {
+      en: 'When a company buys its own shares from the open market and retires them. This reduces the total number of shares outstanding, effectively making every remaining share worth a larger slice of the company. It is a highly tax-efficient way to return capital to shareholders.',
+      pt: 'Quando a empresa compra as suas próprias ações no mercado e as retira de circulação. Isto reduz o número total de ações em circulação, fazendo com que cada ação restante valha uma fatia maior da empresa. É uma forma fiscalmente muito eficiente de devolver capital aos acionistas.'
+    }
+  },
+  {
+    slug: 'dividends-paid',
+    title: {
+      en: 'Dividends Paid',
+      pt: 'Dividendos Pagos'
+    },
+    definition: {
+      en: 'The actual cash distributed to shareholders out of the company\'s profits or reserves. Unlike stock buybacks which increase your ownership percentage invisibly, dividends put cold hard cash directly into your brokerage account.',
+      pt: 'O dinheiro vivo efetivamente distribuído aos acionistas a partir dos lucros ou reservas da empresa. Ao contrário das recompras de ações (que aumentam a tua percentagem de posse de forma invisível), os dividendos colocam dinheiro sonante diretamente na tua conta.'
+    }
+  },
+  {
+    slug: 'net-change-in-cash',
+    title: {
+      en: 'Net Change In Cash',
+      pt: 'Variação Líquida de Caixa'
+    },
+    definition: {
+      en: 'The sum of operating, investing, and financing cash flows. It shows exactly how much the company\'s bank account balance went up or down during the period. If this is consistently negative, the company is bleeding cash and will eventually need to raise capital.',
+      pt: 'A soma dos fluxos de caixa operacionais, de investimento e de financiamento. Mostra exatamente quanto o saldo bancário da empresa subiu ou desceu durante o período. Se for consistentemente negativo, a empresa está a sangrar dinheiro e vai precisar de financiamento.'
+    }
+  }
 ];

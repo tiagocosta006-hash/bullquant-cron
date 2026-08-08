@@ -55,6 +55,30 @@ export default async function GlossaryPage({
 
   return (
     <div className="container relative isolate mx-auto max-w-5xl px-4 py-24 sm:px-6 sm:py-32">
+      {/* Schema.org DefinedTermSet — Glossário de Value Investing.
+          Cada termo é marcado como DefinedTerm para Featured Snippets no Google. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "DefinedTermSet",
+            name: currentLocale === "pt" ? "Glossário de Value Investing" : "Value Investing Glossary",
+            url: `${BRAND.siteUrl}/glossary`,
+            description: currentLocale === "pt"
+              ? "Dicionário completo dos termos mais importantes de análise fundamental e value investing."
+              : "Complete dictionary of the most important fundamental analysis and value investing terms.",
+            inDefinedTermSet: `${BRAND.siteUrl}/glossary`,
+            hasDefinedTerm: sortedTerms.map((term) => ({
+              "@type": "DefinedTerm",
+              name: getLocalizedText(term.title),
+              description: getLocalizedText(term.definition),
+              url: `${BRAND.siteUrl}/glossary#${term.slug}`,
+              inDefinedTermSet: `${BRAND.siteUrl}/glossary`,
+            })),
+          }),
+        }}
+      />
       <div
         aria-hidden
         className="brand-watermark pointer-events-none absolute -z-10 left-[68%] top-[10%] h-[min(70vw,560px)] w-[min(70vw,560px)] -translate-x-1/2"

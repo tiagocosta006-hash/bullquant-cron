@@ -14,8 +14,8 @@ export const glossaryTerms: GlossaryTerm[] = [
       pt: 'DCF (Fluxos de Caixa Descontados)'
     },
     definition: {
-      en: 'A valuation method that estimates how much a company is worth today based on the cash it will generate in the future. Each future euro is "discounted" back to the present because a euro today can be invested. You project free cash flows for 5 to 10 years, discount them using the WACC, and add a terminal value. The result is the intrinsic value per share. If the stock trades below that number, you may have found a bargain. If above, the market may be overpaying.',
-      pt: 'Um método de avaliação que estima quanto uma empresa vale hoje com base no dinheiro que vai gerar no futuro. Cada euro futuro é "descontado" ao presente porque um euro hoje pode ser investido. Projetas os fluxos de caixa livres para 5 a 10 anos, descontas usando o WACC, e somas um valor terminal. O resultado é o valor intrínseco por ação. Se a ação está abaixo desse número, podes ter encontrado uma oportunidade. Se acima, o mercado pode estar a pagar demais.'
+      en: 'A valuation method that estimates how much a company is worth today based on the cash it will generate in the future. Each future euro is "discounted" back to the present because a euro today can be invested. You project [free cash flows](#fcf) for 5 to 10 years, discount them using the [WACC](#wacc), and add a terminal value. The result is the intrinsic value per share. If the stock trades below that number, you may have found a bargain with a good [margin of safety](#margin-of-safety).',
+      pt: 'Um método de avaliação que estima quanto uma empresa vale hoje com base no dinheiro que vai gerar no futuro. Cada euro futuro é "descontado" ao presente porque um euro hoje pode ser investido. Projetas os [fluxos de caixa livres](#fcf) para 5 a 10 anos, descontas usando o [WACC](#wacc), e somas um valor terminal. O resultado é o valor intrínseco por ação. Se a ação está abaixo desse número, podes ter encontrado uma oportunidade com uma boa [margem de segurança](#margin-of-safety).'
     }
   },
   {
@@ -25,8 +25,8 @@ export const glossaryTerms: GlossaryTerm[] = [
       pt: 'WACC (Custo Médio Ponderado de Capital)'
     },
     definition: {
-      en: 'The minimum return a company needs to earn to satisfy both its shareholders and creditors. It blends the cost of equity and the after-tax cost of debt, weighted by their share in the capital structure. In a DCF, the WACC is the discount rate: a higher WACC means future cash flows are worth less today, which lowers the fair value. Most mature companies have a WACC between 8% and 12%.',
-      pt: 'O retorno mínimo que uma empresa precisa de gerar para satisfazer acionistas e credores ao mesmo tempo. Combina o custo do capital próprio e o custo da dívida após impostos, ponderados pela sua proporção na estrutura de capital. Num DCF, o WACC é a taxa de desconto: um WACC mais alto faz com que os fluxos de caixa futuros valham menos hoje, o que reduz o valor justo. A maioria das empresas maduras tem um WACC entre 8% e 12%.'
+      en: 'The minimum return a company needs to earn to satisfy both its shareholders and creditors. It blends the cost of equity and the after-tax cost of debt, weighted by their share in the capital structure. In a [DCF](#dcf) analysis, the WACC is the discount rate: a higher WACC means future cash flows are worth less today, which lowers the fair value. Most mature companies have a WACC between 8% and 12%.',
+      pt: 'O retorno mínimo que uma empresa precisa de gerar para satisfazer acionistas e credores ao mesmo tempo. Combina o custo do capital próprio e o custo da dívida após impostos, ponderados pela sua proporção na estrutura de capital. Num [DCF](#dcf), o WACC é a taxa de desconto: um WACC mais alto faz com que os fluxos de caixa futuros valham menos hoje, o que reduz o valor justo. A maioria das empresas maduras tem um WACC entre 8% e 12%.'
     }
   },
   {
@@ -36,8 +36,8 @@ export const glossaryTerms: GlossaryTerm[] = [
       pt: 'FCF (Fluxo de Caixa Livre)'
     },
     definition: {
-      en: 'The cash left over after a company pays its operating costs and capital expenditures. Unlike net income, which accountants can shape with depreciation schedules and one-off charges, FCF represents real money in the bank. It can go to dividends, buybacks, debt repayment, or acquisitions. A company that reports profits but burns cash every year has a serious problem. FCF is the oxygen of a business.',
-      pt: 'O dinheiro que sobra depois de uma empresa pagar os custos operacionais e as despesas de capital. Ao contrário do lucro líquido, que os contabilistas podem moldar com calendários de depreciação e encargos extraordinários, o FCF representa dinheiro real no banco. Pode ir para dividendos, recompra de ações, pagamento de dívida ou aquisições. Uma empresa que reporta lucros mas queima caixa todos os anos tem um problema sério. O FCF é o oxigénio de um negócio.'
+      en: 'The cash left over after a company pays its operating costs and [capital expenditures](#capex). Unlike net income, which accountants can shape with depreciation schedules and one-off charges, FCF represents real money in the bank. It can go to dividends, buybacks, debt repayment, or acquisitions. A company that reports profits but burns cash every year has a serious problem. FCF is the oxygen of a business.',
+      pt: 'O dinheiro que sobra depois de uma empresa pagar os custos operacionais e as [despesas de capital](#capex). Ao contrário do lucro líquido, que os contabilistas podem moldar com calendários de depreciação e encargos extraordinários, o FCF representa dinheiro real no banco. Pode ir para dividendos, recompra de ações, pagamento de dívida ou aquisições. Uma empresa que reporta lucros mas queima caixa todos os anos tem um problema sério. O FCF é o oxigénio de um negócio.'
     }
   },
   {
@@ -58,8 +58,8 @@ export const glossaryTerms: GlossaryTerm[] = [
       pt: 'ROIC (Retorno sobre o Capital Investido)'
     },
     definition: {
-      en: 'Measures how well a company turns its total invested capital (equity plus debt) into operating profits. Calculated as NOPAT divided by invested capital. When the ROIC stays above the WACC year after year, every euro reinvested creates value. This is the strongest quantitative signal of a durable competitive advantage. Companies like Apple, Visa, and LVMH routinely post ROICs above 25%. Commodity businesses struggle to beat their cost of capital.',
-      pt: 'Mede a eficiência com que uma empresa transforma o seu capital total investido (capital próprio mais dívida) em lucros operacionais. Calcula-se como NOPAT dividido pelo capital investido. Quando o ROIC se mantém acima do WACC ano após ano, cada euro reinvestido cria valor. É o sinal quantitativo mais forte de uma vantagem competitiva duradoura. Empresas como a Apple, Visa e LVMH registam ROICs acima de 25%. Negócios de commodities lutam para bater o seu custo de capital.'
+      en: 'Measures how well a company turns its total invested capital (equity plus debt) into operating profits. Calculated as NOPAT divided by invested capital. When the ROIC stays above the [WACC](#wacc) year after year, every euro reinvested creates value. This is the strongest quantitative signal of a durable competitive advantage or [moat](#moat).',
+      pt: 'Mede a eficiência com que uma empresa transforma o seu capital total investido (capital próprio mais dívida) em lucros operacionais. Calcula-se como NOPAT dividido pelo capital investido. Quando o ROIC se mantém acima do [WACC](#wacc) ano após ano, cada euro reinvestido cria valor. É o sinal quantitativo mais forte de uma vantagem competitiva duradoura ou [moat](#moat).'
     }
   },
   {
@@ -69,8 +69,8 @@ export const glossaryTerms: GlossaryTerm[] = [
       pt: 'ROE (Retorno sobre o Capital Próprio)'
     },
     definition: {
-      en: 'Net income divided by shareholders\' equity. Shows how much profit is generated for each euro of equity capital. A ROE above 15-20% is generally good, but needs context: a company can inflate its ROE by loading up on debt, which shrinks the equity base. A 30% ROE backed by moderate debt is excellent. The same 30% fueled by dangerous leverage is a red flag. Always check it alongside the Debt-to-Equity ratio.',
-      pt: 'Lucro líquido dividido pelo capital próprio dos acionistas. Mostra quanto lucro é gerado por cada euro de capital próprio. Um ROE acima de 15-20% é geralmente bom, mas precisa de contexto: uma empresa pode inflacionar o ROE ao carregar-se de dívida, o que encolhe a base de capital. Um ROE de 30% suportado por dívida moderada é excelente. O mesmo 30% alimentado por alavancagem perigosa é um sinal de alerta. Verifica-o sempre em conjunto com o rácio Dívida/Capital Próprio.'
+      en: 'Net income divided by shareholders\' equity. Shows how much profit is generated for each euro of equity capital. A ROE above 15-20% is generally good, but needs context: a company can inflate its ROE by loading up on debt, which shrinks the equity base. A 30% ROE backed by moderate debt is excellent. The same 30% fueled by dangerous leverage is a red flag. Always check it alongside the [Debt-to-Equity](#debt-equity) ratio.',
+      pt: 'Lucro líquido dividido pelo capital próprio dos acionistas. Mostra quanto lucro é gerado por cada euro de capital próprio. Um ROE acima de 15-20% é geralmente bom, mas precisa de contexto: uma empresa pode inflacionar o ROE ao carregar-se de dívida, o que encolhe a base de capital. Um ROE de 30% suportado por dívida moderada é excelente. O mesmo 30% alimentado por alavancagem perigosa é um sinal de alerta. Verifica-o sempre em conjunto com o rácio [Dívida/Capital Próprio](#debt-equity).'
     }
   },
   {
@@ -135,8 +135,8 @@ export const glossaryTerms: GlossaryTerm[] = [
       pt: 'EPS (Lucro por Ação)'
     },
     definition: {
-      en: 'Total net profit divided by the number of shares outstanding. It is the building block behind many valuation metrics, including P/E. There are two versions: basic (actual share count) and diluted (assumes all stock options and convertible securities are exercised). Always use diluted EPS for a conservative analysis. Consistent EPS growth over multiple years is one of the strongest drivers of long-term share price appreciation.',
-      pt: 'Lucro líquido total dividido pelo número de ações em circulação. É a base de muitas métricas de avaliação, incluindo o P/E. Existem duas versões: básico (número real de ações) e diluído (assume que todas as stock options e títulos convertíveis são exercidos). Usa sempre o EPS diluído para uma análise conservadora. Crescimento consistente do EPS ao longo de vários anos é um dos motores mais fortes da valorização do preço da ação a longo prazo.'
+      en: 'Total net profit divided by the number of [shares outstanding](#outstanding-shares). It is the building block behind many valuation metrics, including [P/E](#pe-ratio). There are two versions: basic (actual share count) and diluted (assumes all stock options and convertible securities are exercised). Always use diluted EPS for a conservative analysis.',
+      pt: 'Lucro líquido total dividido pelo número de [ações em circulação](#outstanding-shares). É a base de muitas métricas de avaliação, incluindo o [P/E](#pe-ratio). Existem duas versões: básico (número real de ações) e diluído (assume que todas as stock options e títulos convertíveis são exercidos). Usa sempre o EPS diluído para uma análise conservadora.'
     }
   },
   {

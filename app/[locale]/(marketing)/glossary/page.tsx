@@ -186,7 +186,7 @@ export default async function GlossaryPage({
                     </summary>
                     <div className="px-5 pb-4 pl-12">
                       <p className="text-sm leading-relaxed text-muted-foreground">
-                        {getLocalizedText(term.definition)}
+                        {renderDefinitionText(getLocalizedText(term.definition))}
                       </p>
                     </div>
                   </details>

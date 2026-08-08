@@ -61,18 +61,18 @@ export function GlossaryTooltip({ slug, children, className }: GlossaryTooltipPr
   return (
     <TooltipProvider delay={200}>
       <Tooltip>
-        <TooltipTrigger asChild>
-          <span 
-            className={cn(
-              "cursor-help decoration-muted-foreground/40 underline-offset-4 transition-colors hover:text-foreground",
-              className
-            )}
-            // Underline added directly or conditionally via styling, 
-            // usually dotted underline implies "more info on hover"
-            style={{ textDecorationStyle: 'dotted', textDecorationLine: 'underline' }}
-          >
-            {children}
-          </span>
+        <TooltipTrigger 
+          render={
+            <span 
+              className={cn(
+                "cursor-help decoration-muted-foreground/40 underline-offset-4 transition-colors hover:text-foreground",
+                className
+              )}
+              style={{ textDecorationStyle: 'dotted', textDecorationLine: 'underline' }}
+            />
+          }
+        >
+          {children}
         </TooltipTrigger>
         <TooltipContent 
           side="top" 

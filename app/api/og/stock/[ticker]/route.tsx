@@ -39,11 +39,17 @@ export async function GET(
       return new Response("Not found", { status: 404 })
     }
 
-    const [latestPrice, ttmFundamentals, latestAnnual] = await Promise.all([
-      prisma.price.findFirst({
-        where: { ticker: upper },
-        orderBy: { date: "desc" },
-      }),
+    // Fetch real-time price using the internal API endpoint to match the page header
+    // We pass a dummy URL to the request to simulate a local API call
+    const priceUrl = new URL(`/api/price/${upper}`, request.url)
+    const priceReq = new Request(priceUrl)
+    
+    // We have to dynamically import the GET handler to call it directly 
+    // since we're in the same Next.js server environment
+    const { GET: getPrice } = await import('@/app/api/price/[ticker]/route')
+    
+    const [priceResponse, ttmFundamentals, latestAnnual] = await Promise.all([
+      getPrice(priceReq, { params: Promise.resolve({ ticker: upper }) }),
       prisma.fundamental.findMany({
         where: { companyId: company.id, periodType: "QUARTERLY" },
         orderBy: { periodEnd: "desc" },
@@ -55,8 +61,20 @@ export async function GET(
       }),
     ])
 
+    let price = null
+    if (priceResponse.ok) {
+      const priceData = await priceResponse.json()
+      price = priceData.currentPrice
+    } else {
+      // Fallback to database if API fails
+      const latestPrice = await prisma.price.findFirst({
+        where: { ticker: upper },
+        orderBy: { date: "desc" },
+      })
+      price = latestPrice ? Number(latestPrice.close) : null
+    }
+
     const currency = company.currency === "EUR" ? "€" : "$"
-    const price = latestPrice ? Number(latestPrice.close) : null
 
     // Helper for TTM sum
     const sumTtm = (key: keyof typeof ttmFundamentals[0]) => {

@@ -105,6 +105,7 @@ export default async function LandingPage({
       {
         "@type": "WebSite",
         name: BRAND.name,
+        alternateName: [BRAND.domain],
         url: `${SITE_URL}/`,
       },
       {

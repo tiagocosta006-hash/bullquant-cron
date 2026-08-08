@@ -4,9 +4,7 @@ import { BRAND } from "@/lib/brand";
 export const metadata = {
   title: `Termos de Serviço | ${BRAND.name}`,
   description: `Termos e Condições de Uso da plataforma ${BRAND.name}.`,
-  alternates: {
-    canonical: `${BRAND.siteUrl}/terms`,
-  },
+
 };
 
 export default function TermsOfServicePage() {

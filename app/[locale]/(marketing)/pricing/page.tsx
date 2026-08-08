@@ -21,9 +21,7 @@ export const metadata = {
   title: `Preços | ${BRAND.name}`,
   description:
     `Plano gratuito para sempre ou PRO a €7/mês. Análise fundamental completa do S&P 500, DCF integrada e Analista IA em português com ${BRAND.name}.`,
-  alternates: {
-    canonical: `${BRAND.siteUrl}/pricing`,
-  },
+
 };
 
 import { createClient } from "@/lib/supabase/server";

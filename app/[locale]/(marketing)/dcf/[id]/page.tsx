@@ -56,9 +56,7 @@ export async function generateMetadata({
       description,
       images: [ogUrl.toString()],
     },
-    alternates: {
-      canonical: `${BRAND.siteUrl}/dcf/${id}`,
-    },
+
   }
 }
 

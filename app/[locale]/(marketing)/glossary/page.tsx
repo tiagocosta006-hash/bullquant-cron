@@ -19,7 +19,7 @@ export async function generateMetadata({
     title,
     description: "Glossário Financeiro e Dicionário de Value Investing.",
     openGraph: { title, type: "website" },
-    alternates: { canonical: `${BRAND.siteUrl}/glossary` },
+
   };
 }
 

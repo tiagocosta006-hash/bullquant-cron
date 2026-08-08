@@ -4,9 +4,7 @@ import { BRAND } from "@/lib/brand";
 export const metadata = {
   title: `Política de Reembolso e Cancelamento | ${BRAND.name}`,
   description: `Regras de cancelamento e reembolso para assinaturas na plataforma ${BRAND.name}`,
-  alternates: {
-    canonical: `${BRAND.siteUrl}/refund`,
-  },
+
 };
 
 export default function RefundPolicyPage() {

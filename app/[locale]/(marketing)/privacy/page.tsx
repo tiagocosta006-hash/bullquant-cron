@@ -4,9 +4,7 @@ import { BRAND } from "@/lib/brand";
 export const metadata = {
   title: `Política de Privacidade | ${BRAND.name}`,
   description: `Como a ${BRAND.name} trata e protege os seus dados pessoais.`,
-  alternates: {
-    canonical: `${BRAND.siteUrl}/privacy`,
-  },
+
 };
 
 export default function PrivacyPolicyPage() {

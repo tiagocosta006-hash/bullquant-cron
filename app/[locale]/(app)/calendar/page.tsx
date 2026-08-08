@@ -8,9 +8,7 @@ import { BRAND } from '@/lib/brand'
 export const metadata: Metadata = {
   title: `Calendário de Resultados | ${BRAND.name}`,
   description: `Acompanha as datas de apresentação de resultados (earnings) das 500 maiores empresas americanas. Nunca percas um earnings call do S&P 500 com o ${BRAND.name}.`,
-  alternates: {
-    canonical: `${BRAND.siteUrl}/calendar`,
-  },
+
 }
 
 export default async function CalendarPage() {

@@ -28,7 +28,11 @@ export function GlossaryTooltip({ slug, children, className }: GlossaryTooltipPr
   }
 
   const title = term.title[locale] || term.title.en;
-  const definition = term.definition[locale] || term.definition.en;
+  const fullDefinition = term.definition[locale] || term.definition.en;
+
+  // Extrair apenas a primeira frase (até ao primeiro ponto final seguido de espaço ou fim do texto)
+  const firstSentenceMatch = fullDefinition.match(/^[^.]+\./);
+  const shortDefinition = firstSentenceMatch ? firstSentenceMatch[0] : fullDefinition;
 
   // Simple parser to strip out the markdown links in the tooltip 
   // (turning them into bold text since clicking inside a tooltip can be tricky)
@@ -58,6 +62,8 @@ export function GlossaryTooltip({ slug, children, className }: GlossaryTooltipPr
     return parts;
   };
 
+  const readMoreText = locale === 'pt' ? 'Ler mais no glossário' : 'Read more in glossary';
+
   return (
     <TooltipProvider delay={200}>
       <Tooltip>
@@ -78,7 +84,7 @@ export function GlossaryTooltip({ slug, children, className }: GlossaryTooltipPr
           side="top" 
           align="center" 
           sideOffset={8}
-          className="z-50 max-w-[320px] p-4 shadow-xl !bg-card !border !border-border/50 rounded-xl"
+          className="z-50 max-w-[280px] p-4 shadow-xl !bg-card !border !border-border/50 rounded-xl"
         >
           <div className="flex flex-col gap-2.5">
             <div className="flex items-center gap-2">
@@ -87,9 +93,15 @@ export function GlossaryTooltip({ slug, children, className }: GlossaryTooltipPr
               </div>
               <strong className="text-[13px] font-bold !text-foreground leading-none">{title}</strong>
             </div>
-            <p className="text-[13px] leading-relaxed !text-muted-foreground">
-              {renderDefinition(definition)}
-            </p>
+            <div className="text-[13px] leading-relaxed !text-muted-foreground">
+              {renderDefinition(shortDefinition)}
+              <Link 
+                href={`/glossary#${slug}` as any} 
+                className="mt-2 text-primary hover:underline block font-medium"
+              >
+                {readMoreText} &rarr;
+              </Link>
+            </div>
           </div>
         </TooltipContent>
       </Tooltip>

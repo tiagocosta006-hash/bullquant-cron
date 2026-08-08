@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Calendar, TrendingUp, DollarSign } from "lucide-react";
 import { formatLargeNumber } from "@/lib/finance/format";
+import { GlossaryTooltip } from "@/components/ui/glossary-tooltip";
 
 type LatestResultsProps = {
   fiscalYear: number;
@@ -69,7 +70,7 @@ export function LatestResults({
         <div className="flex flex-col gap-1">
           <span className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
             <TrendingUp className="h-3.5 w-3.5" />
-            {t("eps")}
+            <GlossaryTooltip slug="eps-diluted">{t("eps")}</GlossaryTooltip>
           </span>
           <span className="text-sm text-muted-foreground">
             {t("estimate")}: {epsEstimate !== null ? epsEstimate.toFixed(2) : "---"}
@@ -80,7 +81,7 @@ export function LatestResults({
         <div className="flex flex-col gap-1">
           <span className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
             <DollarSign className="h-3.5 w-3.5" />
-            {t("revenue")}
+            <GlossaryTooltip slug="revenue">{t("revenue")}</GlossaryTooltip>
           </span>
           <span className="text-sm text-muted-foreground">
             {t("estimate")}: {revenueEstimate !== null ? formatLargeNumber(revenueEstimate, currencySymbol) : "---"}

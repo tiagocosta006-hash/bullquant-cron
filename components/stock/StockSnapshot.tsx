@@ -181,17 +181,17 @@ export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$", init
         <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider">{t("valuation")}</h3>
         <Stat label="Market Cap" value={marketCap} currency loading={isLoading} naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} glossarySlug="market-cap" />
         <Stat label="P/E (TTM)" value={pe} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} glossarySlug="pe-ratio" />
-        <Stat label="P/Sales" value={ps} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} />
-        <Stat label="EV/EBITDA" value={evEbitda} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} glossarySlug="ebitda" />
-        <Stat label="P/Book" value={pb} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} />
+        <Stat label="P/Sales" value={ps} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} glossarySlug="ps-ratio" />
+        <Stat label="EV/EBITDA" value={evEbitda} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} glossarySlug="ev-ebitda" />
+        <Stat label="P/Book" value={pb} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} glossarySlug="pb-ratio" />
       </div>
 
       {/* 2. Cash Flow */}
       <div className="glass p-5 rounded-xl flex flex-col gap-3">
         <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider">{t("cashFlow")}</h3>
-        <Stat label="Operating CF" value={ttm.operatingCashFlow} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
+        <Stat label="Operating CF" value={ttm.operatingCashFlow} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} glossarySlug="operating-cash-flow" />
         <Stat label="Free Cash Flow" value={ttm.freeCashFlow} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} glossarySlug="fcf" />
-        <Stat label="FCF Yield" value={fcfYield} percent loading={isLoading} naLabel={naLabel} naReason={naGeneric} />
+        <Stat label="FCF Yield" value={fcfYield} percent loading={isLoading} naLabel={naLabel} naReason={naGeneric} glossarySlug="fcf" />
       </div>
 
       {/* 3. Margins & Growth */}
@@ -205,15 +205,15 @@ export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$", init
       {/* 4. Balance */}
       <div className="glass p-5 rounded-xl flex flex-col gap-3">
         <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider">{t("balance")}</h3>
-        <Stat label="Cash" value={ttm.cash} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
-        <Stat label="Total Assets" value={ttm.totalAssets} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
-        <Stat label="Total Debt" value={ttm.totalDebt} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
+        <Stat label="Cash" value={ttm.cash} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} glossarySlug="cash-equivalents" />
+        <Stat label="Total Assets" value={ttm.totalAssets} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} glossarySlug="total-assets" />
+        <Stat label="Total Debt" value={ttm.totalDebt} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} glossarySlug="total-debt" />
       </div>
 
       {/* 5. Dividend */}
       <div className="glass p-5 rounded-xl flex flex-col gap-3">
         <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider">{t("dividend")}</h3>
-        <Stat label="Div Yield" value={dividendYield} percent loading={isLoading} naLabel={naLabel} naReason={naGeneric} />
+        <Stat label="Div Yield" value={dividendYield} percent loading={isLoading} naLabel={naLabel} naReason={naGeneric} glossarySlug="dividend-yield" />
         <Stat
           label="DPS (TTM)"
           value={ttm.dividendPerShare && ttm.dividendPerShare > 0 ? ttm.dividendPerShare : null}
@@ -221,8 +221,9 @@ export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$", init
           naLabel={naLabel}
           naReason={naGeneric}
           currencySymbol={currencySymbol}
+          glossarySlug="dividend-per-share"
         />
-        <Stat label="Net Debt" value={netDebt} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
+        <Stat label="Net Debt" value={netDebt} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} glossarySlug="total-debt" />
       </div>
     </div>
   )

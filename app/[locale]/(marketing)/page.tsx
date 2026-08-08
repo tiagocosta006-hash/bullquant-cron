@@ -139,6 +139,17 @@ export default async function LandingPage({
           "price": "0",
           "priceCurrency": "EUR"
         }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": ([1, 2, 3, 4, 5] as const).map((n) => ({
+          "@type": "Question",
+          "name": t(`faq.q${n}`),
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": t(`faq.a${n}`)
+          }
+        }))
       }
     ]
   };

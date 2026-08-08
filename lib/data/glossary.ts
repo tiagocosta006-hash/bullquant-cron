@@ -336,5 +336,27 @@ export const glossaryTerms: GlossaryTerm[] = [
       en: 'A sustained period of rising stock prices, generally 20% or more from a recent low, with economic optimism, strong earnings, and investor confidence. Bull markets last significantly longer than bear markets. The average since 1928 ran about 2.7 years with a 114% gain. The longest in U.S. history stretched from March 2009 to February 2020, nearly 11 years. The bull attacks by thrusting its horns upward, symbolizing upward momentum. BullValue\'s name comes directly from this.',
       pt: 'Um período sustentado de subida nos preços das ações, geralmente de 20% ou mais desde um mínimo recente, com otimismo económico, lucros fortes e confiança dos investidores. Os bull markets duram significativamente mais do que os bear markets. A média desde 1928 durou cerca de 2,7 anos com um ganho de 114%. O mais longo da história dos EUA estendeu-se de março de 2009 a fevereiro de 2020, quase 11 anos. O touro ataca empurrando os chifres para cima, simbolizando impulso ascendente. O nome BullValue vem diretamente disto.'
     }
+  },
+  {
+    slug: 'market-cap',
+    title: {
+      en: 'Market Cap',
+      pt: 'Market Cap (Capitalização de Mercado)'
+    },
+    definition: {
+      en: 'Short for Market Capitalization. It represents the total value of all a company\'s shares of stock. Calculated by multiplying the current stock price by the total number of outstanding shares. It tells you how much it would cost to buy the entire company right now. Companies are generally divided into mega-cap ($200B+), large-cap ($10B-$200B), mid-cap ($2B-$10B), and small-cap ($300M-$2B).',
+      pt: 'Abreviatura de Capitalização de Mercado. Representa o valor total de todas as ações de uma empresa. É calculado multiplicando o preço atual da ação pelo número total de ações em circulação. Diz-te quanto custaria comprar a empresa inteira neste momento. As empresas são geralmente divididas em mega-cap (+200B$), large-cap (10B$-200B$), mid-cap (2B$-10B$) e small-cap (300M$-2B$).'
+    }
+  },
+  {
+    slug: 'pe-ratio',
+    title: {
+      en: 'P/E Ratio',
+      pt: 'Rácio P/E (Preço/Lucro)'
+    },
+    definition: {
+      en: 'Price-to-Earnings Ratio. The most popular valuation metric in the world. It shows how much investors are willing to pay for one dollar of a company\'s earnings. A P/E of 20 means you are paying $20 for every $1 the company earns in profit. A high P/E implies investors expect high future growth (or the stock is expensive). A low P/E implies low expectations (or the stock is a bargain). It is most useful when comparing similar companies in the same industry.',
+      pt: 'Rácio Preço/Lucro (Price-to-Earnings). A métrica de avaliação mais popular do mundo. Mostra quanto os investidores estão dispostos a pagar por cada dólar/euro de lucro de uma empresa. Um P/E de 20 significa que estás a pagar 20$ por cada 1$ que a empresa lucra. Um P/E alto implica que os investidores esperam muito crescimento futuro (ou a ação está cara). Um P/E baixo implica baixas expectativas (ou a ação está barata). É mais útil quando se compara empresas semelhantes no mesmo setor.'
+    }
   }
 ];

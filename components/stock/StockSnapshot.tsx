@@ -24,6 +24,8 @@ function formatVal(value: number | null | undefined, isPercent = false, isCurren
   return num.toFixed(2)
 }
 
+import { GlossaryTooltip } from "@/components/ui/glossary-tooltip"
+
 // Linha de métrica: mostra o valor formatado, um skeleton enquanto carrega,
 // ou um "N/A" explicado (tooltip) quando o dado não existe — nunca um 0 enganador.
 function Stat({
@@ -35,7 +37,8 @@ function Stat({
   loading,
   naLabel,
   naReason,
-  currencySymbol
+  currencySymbol,
+  glossarySlug
 }: {
   label: string
   value: number | null
@@ -46,10 +49,17 @@ function Stat({
   naLabel: string
   naReason: string
   currencySymbol?: string
+  glossarySlug?: string
 }) {
   return (
     <div className="flex justify-between items-center">
-      <span className="text-sm font-medium">{label}</span>
+      <span className="text-sm font-medium">
+        {glossarySlug ? (
+          <GlossaryTooltip slug={glossarySlug}>{label}</GlossaryTooltip>
+        ) : (
+          label
+        )}
+      </span>
       {loading ? (
         <div className="h-4 w-14 animate-pulse rounded bg-muted" />
       ) : value === null || value === undefined || isNaN(Number(value)) ? (
@@ -169,10 +179,10 @@ export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$", init
       {/* 1. Valuation */}
       <div className="glass p-5 rounded-xl flex flex-col gap-3">
         <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider">{t("valuation")}</h3>
-        <Stat label="Market Cap" value={marketCap} currency loading={isLoading} naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
-        <Stat label="P/E (TTM)" value={pe} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} />
+        <Stat label="Market Cap" value={marketCap} currency loading={isLoading} naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} glossarySlug="market-cap" />
+        <Stat label="P/E (TTM)" value={pe} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} glossarySlug="pe-ratio" />
         <Stat label="P/Sales" value={ps} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} />
-        <Stat label="EV/EBITDA" value={evEbitda} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} />
+        <Stat label="EV/EBITDA" value={evEbitda} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} glossarySlug="ebitda" />
         <Stat label="P/Book" value={pb} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} />
       </div>
 
@@ -180,16 +190,16 @@ export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$", init
       <div className="glass p-5 rounded-xl flex flex-col gap-3">
         <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider">{t("cashFlow")}</h3>
         <Stat label="Operating CF" value={ttm.operatingCashFlow} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
-        <Stat label="Free Cash Flow" value={ttm.freeCashFlow} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} />
+        <Stat label="Free Cash Flow" value={ttm.freeCashFlow} currency naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} glossarySlug="fcf" />
         <Stat label="FCF Yield" value={fcfYield} percent loading={isLoading} naLabel={naLabel} naReason={naGeneric} />
       </div>
 
       {/* 3. Margins & Growth */}
       <div className="glass p-5 rounded-xl flex flex-col gap-3">
         <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t("marginAndGrowth")}</h3>
-        <Stat label="Gross Margin" value={ttm.grossMargin} percent naLabel={naLabel} naReason={naMargin} />
-        <Stat label="Oper. Margin" value={ttm.operatingMargin} percent naLabel={naLabel} naReason={naMargin} />
-        <Stat label="Net Margin" value={ttm.netMargin} percent naLabel={naLabel} naReason={naGeneric} />
+        <Stat label="Gross Margin" value={ttm.grossMargin} percent naLabel={naLabel} naReason={naMargin} glossarySlug="gross-margin" />
+        <Stat label="Oper. Margin" value={ttm.operatingMargin} percent naLabel={naLabel} naReason={naMargin} glossarySlug="operating-margin" />
+        <Stat label="Net Margin" value={ttm.netMargin} percent naLabel={naLabel} naReason={naGeneric} glossarySlug="net-margin" />
       </div>
 
       {/* 4. Balance */}

@@ -72,10 +72,9 @@ export function GlossaryTooltip({ slug, children, className }: GlossaryTooltipPr
           render={
             <span 
               className={cn(
-                "cursor-help decoration-muted-foreground/40 underline-offset-4 transition-colors hover:text-foreground",
+                "cursor-pointer border-b border-transparent transition-all hover:border-primary/50 hover:text-primary",
                 className
               )}
-              style={{ textDecorationStyle: 'dotted', textDecorationLine: 'underline' }}
             />
           }
         >

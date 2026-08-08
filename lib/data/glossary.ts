@@ -25,8 +25,8 @@ export const glossaryTerms: GlossaryTerm[] = [
       pt: 'WACC (Custo Médio Ponderado de Capital)'
     },
     definition: {
-      en: 'The minimum return a company needs to earn to satisfy both its shareholders and creditors. It blends the cost of equity and the after-tax cost of debt, weighted by their share in the capital structure. In a [DCF](#dcf) analysis, the WACC is the discount rate: a higher WACC means future cash flows are worth less today, which lowers the fair value. Most mature companies have a WACC between 8% and 12%.',
-      pt: 'O retorno mínimo que uma empresa precisa de gerar para satisfazer acionistas e credores ao mesmo tempo. Combina o custo do capital próprio e o custo da dívida após impostos, ponderados pela sua proporção na estrutura de capital. Num [DCF](#dcf), o WACC é a taxa de desconto: um WACC mais alto faz com que os fluxos de caixa futuros valham menos hoje, o que reduz o valor justo. A maioria das empresas maduras tem um WACC entre 8% e 12%.'
+      en: 'The average rate a company pays to finance its business, combining the cost of debt and equity. It represents the minimum return a company needs to earn to satisfy both its shareholders and creditors. In a [DCF](#dcf) analysis, the WACC is the discount rate: a higher WACC means future cash flows are worth less today, which lowers the fair value. Most mature companies have a WACC between 8% and 12%.',
+      pt: 'A taxa média que uma empresa paga para financiar os seus ativos, combinando o custo da dívida e do capital próprio. Representa o retorno mínimo que uma empresa precisa de gerar para satisfazer acionistas e credores ao mesmo tempo. Num [DCF](#dcf), o WACC é a taxa de desconto: um WACC mais alto faz com que os fluxos de caixa futuros valham menos hoje, o que reduz o valor justo. A maioria das empresas maduras tem um WACC entre 8% e 12%.'
     }
   },
   {
@@ -47,8 +47,8 @@ export const glossaryTerms: GlossaryTerm[] = [
       pt: 'EBITDA'
     },
     definition: {
-      en: 'Earnings Before Interest, Taxes, Depreciation, and Amortization. Strips out financing decisions, tax jurisdictions, and non-cash accounting charges to isolate a company\'s core operating profitability. Useful for comparing companies across countries and capital structures. But it ignores capital expenditures entirely, which can be massive. Warren Buffett once asked: "Does management think the tooth fairy pays for capital expenditures?"',
-      pt: 'Lucros Antes de Juros, Impostos, Depreciação e Amortização. Remove as decisões de financiamento, jurisdições fiscais e encargos contabilísticos não monetários para isolar a rentabilidade operacional central de uma empresa. Útil para comparar empresas de diferentes países e estruturas de capital. Mas ignora completamente as despesas de capital, que podem ser enormes. Warren Buffett perguntou uma vez: "A gestão acha que a fada dos dentes é que paga as despesas de capital?"'
+      en: 'A measure of a company\'s core operating profitability, ignoring non-cash expenses, taxes, and capital structure. It stands for Earnings Before Interest, Taxes, Depreciation, and Amortization. Strips out financing decisions and tax jurisdictions to isolate core performance. Useful for comparing companies across countries and capital structures. But it ignores capital expenditures entirely, which can be massive. Warren Buffett once asked: "Does management think the tooth fairy pays for capital expenditures?"',
+      pt: 'Uma medida da rentabilidade operacional central da empresa, excluindo impostos, juros e despesas não monetárias (como depreciação). Significa Lucros Antes de Juros, Impostos, Depreciação e Amortização. Remove as decisões de financiamento e jurisdições fiscais para isolar a performance real. Útil para comparar empresas de diferentes países e estruturas de capital. Mas ignora completamente as despesas de capital, que podem ser enormes. Warren Buffett perguntou uma vez: "A gestão acha que a fada dos dentes é que paga as despesas de capital?"'
     }
   },
   {
@@ -69,8 +69,8 @@ export const glossaryTerms: GlossaryTerm[] = [
       pt: 'ROE (Retorno sobre o Capital Próprio)'
     },
     definition: {
-      en: 'Net income divided by shareholders\' equity. Shows how much profit is generated for each euro of equity capital. A ROE above 15-20% is generally good, but needs context: a company can inflate its ROE by loading up on debt, which shrinks the equity base. A 30% ROE backed by moderate debt is excellent. The same 30% fueled by dangerous leverage is a red flag. Always check it alongside the [Debt-to-Equity](#debt-equity) ratio.',
-      pt: 'Lucro líquido dividido pelo capital próprio dos acionistas. Mostra quanto lucro é gerado por cada euro de capital próprio. Um ROE acima de 15-20% é geralmente bom, mas precisa de contexto: uma empresa pode inflacionar o ROE ao carregar-se de dívida, o que encolhe a base de capital. Um ROE de 30% suportado por dívida moderada é excelente. O mesmo 30% alimentado por alavancagem perigosa é um sinal de alerta. Verifica-o sempre em conjunto com o rácio [Dívida/Capital Próprio](#debt-equity).'
+      en: 'Measures how much net profit a company generates for each dollar invested by its shareholders. Calculated as net income divided by shareholders\' equity. A ROE above 15-20% is generally good, but needs context: a company can inflate its ROE by loading up on debt, which shrinks the equity base. A 30% ROE backed by moderate debt is excellent. The same 30% fueled by dangerous leverage is a red flag. Always check it alongside the [Debt-to-Equity](#debt-equity) ratio.',
+      pt: 'Mede quanto lucro líquido a empresa gera por cada euro investido pelos seus acionistas. Calcula-se como lucro líquido dividido pelo capital próprio. Um ROE acima de 15-20% é geralmente bom, mas precisa de contexto: uma empresa pode inflacionar o ROE ao carregar-se de dívida, o que encolhe a base de capital. Um ROE de 30% suportado por dívida moderada é excelente. O mesmo 30% alimentado por alavancagem perigosa é um sinal de alerta. Verifica-o sempre em conjunto com o rácio [Dívida/Capital Próprio](#debt-equity).'
     }
   },
   {
@@ -80,8 +80,8 @@ export const glossaryTerms: GlossaryTerm[] = [
       pt: 'ROA (Retorno sobre os Ativos)'
     },
     definition: {
-      en: 'Net income divided by total assets. Unlike ROE, it cannot be inflated by debt because it uses the full asset base regardless of how those assets were financed. Particularly useful for banks and financial companies where leverage is part of the business model. A bank with a 1.5% ROA is considered very good. An industrial company needs much higher to justify its capital.',
-      pt: 'Lucro líquido dividido pelo total de ativos. Ao contrário do ROE, não pode ser inflacionado por dívida porque usa a base total de ativos independentemente de como foram financiados. Especialmente útil para bancos e empresas financeiras onde a alavancagem faz parte do modelo de negócio. Um banco com um ROA de 1,5% é considerado muito bom. Uma empresa industrial precisa de valores bem mais altos para justificar o seu capital.'
+      en: 'Measures how efficiently a company uses its total assets to generate net profit. Calculated as net income divided by total assets. Unlike ROE, it cannot be inflated by debt because it uses the full asset base regardless of how those assets were financed. Particularly useful for banks and financial companies where leverage is part of the business model. A bank with a 1.5% ROA is considered very good. An industrial company needs much higher to justify its capital.',
+      pt: 'Mede a eficiência com que uma empresa usa o seu total de ativos para gerar lucros líquidos. Calcula-se como lucro líquido dividido pelo total de ativos. Ao contrário do ROE, não pode ser inflacionado por dívida porque usa a base total de ativos independentemente de como foram financiados. Especialmente útil para bancos e empresas financeiras onde a alavancagem faz parte do modelo de negócio. Um banco com um ROA de 1,5% é considerado muito bom. Uma empresa industrial precisa de valores bem mais altos para justificar o seu capital.'
     }
   },
   {
@@ -256,8 +256,8 @@ export const glossaryTerms: GlossaryTerm[] = [
       pt: 'EV/EBITDA'
     },
     definition: {
-      en: 'Enterprise Value divided by EBITDA. Better than P/E for comparing companies with different debt levels and tax situations because EV includes debt and EBITDA excludes interest and taxes. An EV/EBITDA of 10x means a buyer would pay 10 years of operating cash flow to acquire the whole company, debt included. This is the metric investment banks and private equity firms use most in M&A deal pricing. Lower is generally cheaper.',
-      pt: 'Enterprise Value dividido pelo EBITDA. Melhor que o P/E para comparar empresas com níveis de dívida e situações fiscais diferentes porque o EV inclui a dívida e o EBITDA exclui juros e impostos. Um EV/EBITDA de 10x significa que um comprador pagaria 10 anos de fluxo de caixa operacional para adquirir toda a empresa, dívida incluída. É a métrica que bancos de investimento e fundos de private equity mais usam para avaliar preços em transações de M&A. Menor é geralmente mais barato.'
+      en: 'Shows how many years it would take for a company\'s operating cash to pay back its entire purchase price, including debt. Calculated as Enterprise Value divided by EBITDA. Better than P/E for comparing companies with different debt levels and tax situations because EV includes debt and EBITDA excludes interest and taxes. An EV/EBITDA of 10x means a buyer would pay 10 years of operating cash flow to acquire the whole company, debt included. This is the metric investment banks and private equity firms use most in M&A deal pricing. Lower is generally cheaper.',
+      pt: 'Mostra quantos anos seriam precisos para que o lucro operacional da empresa pagasse o seu preço total de compra (incluindo dívida). Calcula-se como Enterprise Value dividido pelo EBITDA. Melhor que o P/E para comparar empresas com níveis de dívida e situações fiscais diferentes porque o EV inclui a dívida e o EBITDA exclui juros e impostos. Um EV/EBITDA de 10x significa que um comprador pagaria 10 anos de fluxo de caixa operacional para adquirir toda a empresa, dívida incluída. É a métrica que bancos de investimento e fundos de private equity mais usam para avaliar preços em transações de M&A. Menor é geralmente mais barato.'
     }
   },
   {
@@ -267,8 +267,8 @@ export const glossaryTerms: GlossaryTerm[] = [
       pt: 'Liquidez Corrente'
     },
     definition: {
-      en: 'Current assets divided by current liabilities. Measures whether a company can pay its bills over the next 12 months. Above 1.0 means more short-term assets than short-term debts, a healthy sign. Below 1.0 can signal liquidity problems. Very high ratios (above 3.0) can suggest inefficient use of cash. Most healthy companies sit between 1.2 and 2.0.',
-      pt: 'Ativos correntes divididos por passivos correntes. Mede se uma empresa consegue pagar as suas contas nos próximos 12 meses. Acima de 1,0 significa mais ativos de curto prazo do que dívidas de curto prazo, um sinal saudável. Abaixo de 1,0 pode sinalizar problemas de liquidez. Rácios muito altos (acima de 3,0) podem sugerir uso ineficiente do caixa. A maioria das empresas saudáveis situa-se entre 1,2 e 2,0.'
+      en: 'Measures whether a company can pay its short-term bills with its short-term assets over the next 12 months. Calculated as current assets divided by current liabilities. Above 1.0 means more short-term assets than short-term debts, a healthy sign. Below 1.0 can signal liquidity problems. Very high ratios (above 3.0) can suggest inefficient use of cash. Most healthy companies sit between 1.2 and 2.0.',
+      pt: 'Mede se a empresa consegue pagar as suas dívidas de curto prazo (próximos 12 meses) usando apenas os seus ativos mais líquidos. Calcula-se como ativos correntes divididos por passivos correntes. Acima de 1,0 significa mais ativos de curto prazo do que dívidas de curto prazo, um sinal saudável. Abaixo de 1,0 pode sinalizar problemas de liquidez. Rácios muito altos (acima de 3,0) podem sugerir uso ineficiente do caixa. A maioria das empresas saudáveis situa-se entre 1,2 e 2,0.'
     }
   },
   {
@@ -278,8 +278,8 @@ export const glossaryTerms: GlossaryTerm[] = [
       pt: 'Rácio Dívida/Capital Próprio'
     },
     definition: {
-      en: 'Total debt divided by shareholders\' equity. A D/E of 1.0 means equal amounts of debt and equity. Above 1.0 means more debt than equity. Leverage amplifies everything: in good years, borrowed money boosts shareholder returns; in bad years, fixed interest payments can crush a company. Utilities and banks carry D/E ratios above 1.5 routinely. Tech companies often operate with little or no debt. Rising interest rates hit highly leveraged companies hardest.',
-      pt: 'Dívida total dividida pelo capital próprio. Um D/E de 1,0 significa quantidades iguais de dívida e capital próprio. Acima de 1,0 significa mais dívida do que capital. A alavancagem amplifica tudo: em anos bons, o dinheiro emprestado potencia os retornos dos acionistas; em anos maus, os pagamentos fixos de juros podem esmagar uma empresa. Utilities e bancos carregam rácios D/E acima de 1,5 rotineiramente. Empresas tecnológicas frequentemente operam com pouca ou nenhuma dívida. A subida das taxas de juro atinge com mais força as empresas muito alavancadas.'
+      en: 'Shows the proportion of a company\'s assets financed by debt versus shareholders\' equity. Calculated as total debt divided by shareholders\' equity. A D/E of 1.0 means equal amounts of debt and equity. Above 1.0 means more debt than equity. Leverage amplifies everything: in good years, borrowed money boosts shareholder returns; in bad years, fixed interest payments can crush a company. Utilities and banks carry D/E ratios above 1.5 routinely. Tech companies often operate with little or no debt. Rising interest rates hit highly leveraged companies hardest.',
+      pt: 'Mostra a proporção dos ativos de uma empresa que é financiada por dívida face ao capital próprio. Calcula-se como dívida total dividida pelo capital próprio. Um D/E de 1,0 significa quantidades iguais de dívida e capital próprio. Acima de 1,0 significa mais dívida do que capital. A alavancagem amplifica tudo: em anos bons, o dinheiro emprestado potencia os retornos dos acionistas; em anos maus, os pagamentos fixos de juros podem esmagar uma empresa. Utilities e bancos carregam rácios D/E acima de 1,5 rotineiramente. Empresas tecnológicas frequentemente operam com pouca ou nenhuma dívida. A subida das taxas de juro atinge com mais força as empresas muito alavancadas.'
     }
   },
   {
@@ -344,8 +344,8 @@ export const glossaryTerms: GlossaryTerm[] = [
       pt: 'Market Cap (Capitalização de Mercado)'
     },
     definition: {
-      en: 'Short for Market Capitalization. It represents the total value of all a company\'s shares of stock. Calculated by multiplying the current stock price by the total number of outstanding shares. It tells you how much it would cost to buy the entire company right now. Companies are generally divided into mega-cap ($200B+), large-cap ($10B-$200B), mid-cap ($2B-$10B), and small-cap ($300M-$2B).',
-      pt: 'Abreviatura de Capitalização de Mercado. Representa o valor total de todas as ações de uma empresa. É calculado multiplicando o preço atual da ação pelo número total de ações em circulação. Diz-te quanto custaria comprar a empresa inteira neste momento. As empresas são geralmente divididas em mega-cap (+200B$), large-cap (10B$-200B$), mid-cap (2B$-10B$) e small-cap (300M$-2B$).'
+      en: 'Represents the total market value of a company\'s outstanding shares of stock. Short for Market Capitalization, it is calculated by multiplying the current stock price by the total number of outstanding shares. It tells you how much it would cost to buy the entire company right now. Companies are generally divided into mega-cap ($200B+), large-cap ($10B-$200B), mid-cap ($2B-$10B), and small-cap ($300M-$2B).',
+      pt: 'Representa o valor total de mercado de todas as ações em circulação da empresa. Abreviatura de Capitalização de Mercado, é calculado multiplicando o preço atual da ação pelo número total de ações em circulação. Diz-te quanto custaria comprar a empresa inteira neste momento. As empresas são geralmente divididas em mega-cap (+200B$), large-cap (10B$-200B$), mid-cap (2B$-10B$) e small-cap (300M$-2B$).'
     }
   },
   {
@@ -355,8 +355,8 @@ export const glossaryTerms: GlossaryTerm[] = [
       pt: 'Rácio P/E (Preço/Lucro)'
     },
     definition: {
-      en: 'Price-to-Earnings Ratio. The most popular valuation metric in the world. It shows how much investors are willing to pay for one dollar of a company\'s earnings. A P/E of 20 means you are paying $20 for every $1 the company earns in profit. A high P/E implies investors expect high future growth (or the stock is expensive). A low P/E implies low expectations (or the stock is a bargain). It is most useful when comparing similar companies in the same industry.',
-      pt: 'Rácio Preço/Lucro (Price-to-Earnings). A métrica de avaliação mais popular do mundo. Mostra quanto os investidores estão dispostos a pagar por cada dólar/euro de lucro de uma empresa. Um P/E de 20 significa que estás a pagar 20$ por cada 1$ que a empresa lucra. Um P/E alto implica que os investidores esperam muito crescimento futuro (ou a ação está cara). Um P/E baixo implica baixas expectativas (ou a ação está barata). É mais útil quando se compara empresas semelhantes no mesmo setor.'
+      en: 'Shows how much investors are willing to pay for each dollar of the company\'s annual profit. Known as the Price-to-Earnings Ratio, it is the most popular valuation metric in the world. A P/E of 20 means you are paying $20 for every $1 the company earns in profit. A high P/E implies investors expect high future growth (or the stock is expensive). A low P/E implies low expectations (or the stock is a bargain). It is most useful when comparing similar companies in the same industry.',
+      pt: 'Mostra quanto os investidores estão dispostos a pagar por cada euro de lucro anual da empresa. Conhecido como Rácio Preço/Lucro (Price-to-Earnings), é a métrica de avaliação mais popular do mundo. Um P/E de 20 significa que estás a pagar 20$ por cada 1$ que a empresa lucra. Um P/E alto implica que os investidores esperam muito crescimento futuro (ou a ação está cara). Um P/E baixo implica baixas expectativas (ou a ação está barata). É mais útil quando se compara empresas semelhantes no mesmo setor.'
     }
   }
 ];

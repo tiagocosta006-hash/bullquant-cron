@@ -124,6 +124,7 @@ export function TopNav({
           <button
             type="button"
             onClick={() => setCmdOpen(true)}
+            aria-label={t("searchAction")}
             className="flex items-center gap-2 rounded-full border border-border/60 bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
           >
             <Search className="h-4 w-4" />

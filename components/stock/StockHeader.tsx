@@ -180,7 +180,7 @@ export function StockHeader({ company, shareComponent, initialPriceData = null }
       </div>
 
       {/* Right side: Real-time Price */}
-      <div className="glass flex flex-col md:items-end p-4 rounded-xl w-full md:w-auto md:min-w-[200px]">
+      <div className="glass flex flex-col md:items-end p-4 rounded-xl w-full md:w-auto md:min-w-[200px] min-h-[116px]">
         {isLoading ? (
           <div className="animate-pulse flex flex-col items-end gap-2 w-full">
             <div className="h-8 bg-muted rounded w-32"></div>

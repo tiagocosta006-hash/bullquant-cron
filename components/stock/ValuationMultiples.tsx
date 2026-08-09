@@ -7,6 +7,7 @@ import {
   LineChart, Line, YAxis, XAxis, Tooltip, ResponsiveContainer, ReferenceLine
 } from "recharts"
 import { Button } from "@/components/ui/button"
+import { ChartShareButton } from "./ChartShareButton"
 
 type ValuationData = {
   date: string
@@ -20,7 +21,22 @@ type ValuationMultiplesProps = {
   ticker: string
   isPro?: boolean
   isLoggedIn?: boolean
+  isDemo?: boolean
 }
+
+/**
+ * Séries do valuation histórico — a chave de dados e a cor de cada tab, num
+ * sítio só (o gráfico e o cartão de partilha têm de concordar).
+ *
+ * ⚠️ Estes hex são anteriores ao design system e não são tokens `--chart-N`
+ * como o resto dos gráficos. Ficam centralizados aqui em vez de repetidos;
+ * migrá-los para tokens é uma decisão de design por tomar.
+ */
+const SERIES = {
+  pe: { key: "pe", color: "#3b82f6" },
+  ps: { key: "ps", color: "#10b981" },
+  fcf: { key: "fcfYield", color: "#f59e0b" },
+} as const
 
 type TooltipProps = {
   active?: boolean
@@ -67,9 +83,10 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
   return null
 }
 
-export function ValuationMultiples({ ticker, isPro, isLoggedIn }: ValuationMultiplesProps) {
+export function ValuationMultiples({ ticker, isPro, isLoggedIn, isDemo }: ValuationMultiplesProps) {
   const tChart = useTranslations("stock.valuationChart")
   const tGate = useTranslations("stock.proGate")
+  const tDemo = useTranslations("stock.demoBadge")
   const [data, setData] = useState<ValuationData[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<"pe" | "ps" | "fcf">("pe")
@@ -118,6 +135,29 @@ export function ValuationMultiples({ ticker, isPro, isLoggedIn }: ValuationMulti
     return null
   }
 
+  // O cartão de partilha fala a linguagem do DecisionChart (`label` + séries),
+  // por isso a série ativa é reprojetada para essa forma.
+  const shareSeries = {
+    pe: { ...SERIES.pe, name: tChart("tabPe"), avg: avgPe },
+    ps: { ...SERIES.ps, name: tChart("tabPs"), avg: avgPs },
+    fcf: { ...SERIES.fcf, name: tChart("tabFcf"), avg: avgFcf },
+  }[activeTab]
+
+  const shareData = data.map((d) => {
+    const date = new Date(d.date)
+    return {
+      label: `${date.getMonth() + 1}/${String(date.getFullYear()).slice(-2)}`,
+      [shareSeries.key]: d[shareSeries.key as keyof ValuationData],
+    }
+  })
+
+  const shareAvgLabel =
+    shareSeries.avg === undefined
+      ? undefined
+      : `${tChart("avgLabel")}: ${
+          activeTab === "fcf" ? `${(shareSeries.avg * 100).toFixed(1)}%` : `${shareSeries.avg.toFixed(1)}x`
+        }`
+
   return (
     <div className="glass rounded-xl overflow-hidden">
       <div className="p-4 md:p-6 border-b border-border">
@@ -126,6 +166,14 @@ export function ValuationMultiples({ ticker, isPro, isLoggedIn }: ValuationMulti
             <h2 className="text-lg font-bold tracking-tight flex items-center gap-2">
               <LineChartIcon className="w-5 h-5 text-primary" />
               {tChart("title")}
+              {isDemo && (
+                <span
+                  title={tDemo("tooltip")}
+                  className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary"
+                >
+                  {tDemo("label")}
+                </span>
+              )}
             </h2>
             <p className="text-sm text-muted-foreground mt-1">
               {tChart("subtitle")}
@@ -157,6 +205,22 @@ export function ValuationMultiples({ ticker, isPro, isLoggedIn }: ValuationMulti
             >
               {tChart("tabFcf")}
             </button>
+            {/* Só com acesso: exportar o gráfico é exportar dados Pro. */}
+            {isPro && (
+              <ChartShareButton
+                title={`${tChart("title")} · ${shareSeries.name}`}
+                data={shareData}
+                type="LINE"
+                config={{
+                  isPercentage: activeTab === "fcf",
+                  dataKeys: [{ key: shareSeries.key, color: shareSeries.color, type: "line", name: shareSeries.name }],
+                  ...(shareAvgLabel && shareSeries.avg !== undefined
+                    ? { referenceLine: { y: shareSeries.avg, label: shareAvgLabel, color: "var(--muted-foreground)" } }
+                    : {}),
+                }}
+                className="ml-1 px-2 py-1.5 rounded-sm text-muted-foreground hover:text-foreground transition-colors"
+              />
+            )}
           </div>
         </div>
       </div>
@@ -246,30 +310,30 @@ export function ValuationMultiples({ ticker, isPro, isLoggedIn }: ValuationMulti
                 <Line 
                   type="linear" 
                   dataKey="pe" 
-                  stroke="#3b82f6" 
+                  stroke={SERIES.pe.color} 
                   strokeWidth={2}
                   dot={false}
-                  activeDot={{ r: 6, fill: "#3b82f6", stroke: "var(--background)", strokeWidth: 2 }}
+                  activeDot={{ r: 6, fill: SERIES.pe.color, stroke: "var(--background)", strokeWidth: 2 }}
                 />
               )}
               {activeTab === "ps" && (
                 <Line 
                   type="linear" 
                   dataKey="ps" 
-                  stroke="#10b981" 
+                  stroke={SERIES.ps.color} 
                   strokeWidth={2}
                   dot={false}
-                  activeDot={{ r: 6, fill: "#10b981", stroke: "var(--background)", strokeWidth: 2 }}
+                  activeDot={{ r: 6, fill: SERIES.ps.color, stroke: "var(--background)", strokeWidth: 2 }}
                 />
               )}
               {activeTab === "fcf" && (
                 <Line 
                   type="linear" 
                   dataKey="fcfYield" 
-                  stroke="#f59e0b" 
+                  stroke={SERIES.fcf.color} 
                   strokeWidth={2}
                   dot={false}
-                  activeDot={{ r: 6, fill: "#f59e0b", stroke: "var(--background)", strokeWidth: 2 }}
+                  activeDot={{ r: 6, fill: SERIES.fcf.color, stroke: "var(--background)", strokeWidth: 2 }}
                 />
               )}
             </LineChart>

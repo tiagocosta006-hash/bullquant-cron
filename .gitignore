@@ -53,8 +53,21 @@ scratch/
 fundamentals_verification_report.md
 database_health_report.md
 
-# claude code — skills são tooling instalável (8M+), não código de produto
+# claude code / codex / github copilot — skills e agents são tooling
+# instalável (13M+ juntos), não código de produto. Mesmo raciocínio do
+# /.claude/skills/ abaixo, para os outros sítios onde o instalador os pôs.
 /.claude/skills/
+/.agents/skills/
+/.github/agents/
+/.github/skills/
+/skills-lock.json
+
+# impeccable — relatórios de /impeccable critique (artefactos de sessão,
+# nunca versionar). config.json e hook.cache.json ficam de fora desta regra
+# de propósito: config.json guarda as exceções de regras revistas pela
+# equipa (/impeccable hooks ignore-value), é o sítio reviewable a sério.
+/.hero-concepts/
+/.impeccable/critique/
 
 # foundations lab: o HTML final é gerado pelo build (node design/foundations/build-foundations.js)
 design/foundations/bullvision-foundations.html

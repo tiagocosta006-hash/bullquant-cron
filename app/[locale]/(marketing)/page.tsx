@@ -7,7 +7,6 @@ import { ArrowRight, Briefcase, CalendarDays, Check, ChevronDown, LayoutDashboar
 import { buttonVariants } from "@/components/ui/button";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { LiquidGlass } from "@/components/fx/LiquidGlass";
-import { Parallax } from "@/components/fx/Parallax";
 import { Reveal } from "@/components/fx/Reveal";
 import { HeroHorizon } from "@/components/marketing/HeroHorizon";
 import { HeroStage } from "@/components/marketing/HeroStage";
@@ -27,6 +26,8 @@ import { LANDING_MEDIA } from "@/components/marketing/media";
 import { MediaFrame } from "@/components/marketing/MediaFrame";
 import { ScrollShowcase } from "@/components/marketing/ScrollShowcase";
 import { TerminalMock } from "@/components/marketing/TerminalMock";
+import { TeamMemberModal } from "@/components/marketing/TeamMemberModal";
+import { TeamSignature } from "@/components/marketing/TeamSignature";
 import { TickerMarquee } from "@/components/marketing/TickerMarquee";
 import { BRAND } from "@/lib/brand";
 import { getTickerItems, GLOBAL_ETFS } from "@/lib/marketing/ticker";
@@ -76,9 +77,45 @@ const heroWords = (text: string, offset: number, cls?: string) =>
     </span>
   ));
 
+/**
+ * Primeira palavra do título quando é o nome do produto: "Bull" na cor do
+ * texto, "Value" a dourado, tudo 18% maior (a meio dos 10–25% pedidos).
+ *
+ * `text-[1.18em]` e não um px: o h1 muda de tamanho em quatro breakpoints
+ * (5xl → 7xl → 8xl → 7.5rem) e uma medida absoluta desalinhava-se em três
+ * deles. Em `em` a marca fica sempre 18% acima do resto da frase.
+ *
+ * Data-driven de propósito — só dispara se `titleLead` COMEÇAR por
+ * BRAND.name. Em EN a frase é "See the value…", não leva marca, e não recebe
+ * tratamento nenhum. Um `if (locale === "pt")` daria o mesmo resultado hoje e
+ * partia-se no dia em que a copy PT mudasse.
+ */
+const BRAND_SPLIT = 4; // "Bull" | "Value"
+
+function heroLead(text: string) {
+  if (!text.startsWith(BRAND.name)) return heroWords(text, 0);
+  const resto = text.slice(BRAND.name.length); // ex.: ": a plataforma para os"
+  const [cauda, ...palavras] = resto.split(" "); // cauda = ":" colado à marca
+  return (
+    <>
+      <span aria-hidden className="hero-clip">
+        <span className="hero-word text-[1.18em]" style={{ "--w": 0 } as React.CSSProperties}>
+          {BRAND.name.slice(0, BRAND_SPLIT)}
+          <span className="text-primary">{BRAND.name.slice(BRAND_SPLIT)}</span>
+          {cauda}
+        </span>
+      </span>
+      {heroWords(palavras.join(" "), 1)}
+    </>
+  );
+}
+
 export default async function LandingPage({
   searchParams,
 }: {
+  // `dashboardTile` era um andaime de comparação (?dashboardTile=a|b|c) para o
+  // tile do Dashboard no bento. O Alex escolheu o C, que está agora fixo no
+  // componente — daí o parâmetro ter saído.
   searchParams: Promise<{ preview?: string }>;
 }) {
   const [user, { preview }] = await Promise.all([getUser(), searchParams]);
@@ -89,15 +126,19 @@ export default async function LandingPage({
     redirect("/dashboard");
   }
 
-  const [t, tStockTabs, tDashboard, tPortfolio, tCalendar, tExplore, ticker] = await Promise.all([
-    getTranslations("marketing"),
-    getTranslations("stock.tabs"),
-    getTranslations("dashboard"),
-    getTranslations("portfolio"),
-    getTranslations("calendar"),
-    getTranslations("explore"),
-    getTickerItems(),
-  ]);
+  const [t, tStockTabs, tDashboard, tPortfolio, tCalendar, tExplore, tAboutTeam, ticker] =
+    await Promise.all([
+      getTranslations("marketing"),
+      getTranslations("stock.tabs"),
+      getTranslations("dashboard"),
+      getTranslations("portfolio"),
+      getTranslations("calendar"),
+      getTranslations("explore"),
+      // bios e redes da equipa — as MESMAS de /about (about.team.members[]),
+      // não uma cópia: uma segunda fonte divergia ao primeiro update
+      getTranslations("about.team"),
+      getTickerItems(),
+    ]);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -171,8 +212,12 @@ export default async function LandingPage({
           tabs={["sp500", "gainers", "marketCap"].map((k) => tDashboard(`tabs.${k}`))}
           marketCapLabel={tDashboard("marketCap")}
           logos={Object.fromEntries(
-            ["AAPL", "MSFT", "NVDA"].map((tk) => [tk, ticker.items.find((i) => i.ticker === tk)?.logoUrl ?? null]),
+            ["AAPL", "MSFT", "NVDA", "GOOGL", "AMZN", "META", "TSLA", "NFLX", "V"].map((tk) => [
+              tk,
+              ticker.items.find((i) => i.ticker === tk)?.logoUrl ?? null,
+            ]),
           )}
+          variant="C"
         />
       ),
     },
@@ -245,13 +290,19 @@ export default async function LandingPage({
         className="relative isolate flex min-h-[calc(100svh-4rem)] flex-col px-6 pt-20 md:min-h-[calc(74svh-4rem)] md:px-8"
       >
         <div className="hero-aurora" aria-hidden />
+        {/* Imagem de fundo do hero — inerte sem data-v-hero (painel Tweak).
+            Ver "IMAGEM DE FUNDO DO HERO" em app/design-variants.css. */}
+        <div className="hero-art" aria-hidden />
         <HeroHorizon />
-        <HeroStage className="mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center">
+        {/* `relative`: é este o contexto de posicionamento da assinatura da
+            equipa (canto inferior direito). Ancorá-la à <section> punha-a em
+            cima da fita de tickers, que é filha da section mas não do stage. */}
+        <HeroStage className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center">
           <h1
             aria-label={`${t("titleLead")} ${t("titleAccent")}`}
             className="max-w-[15ch] text-balance text-5xl font-extrabold leading-[0.95] tracking-[-0.04em] sm:text-7xl md:text-8xl xl:text-[7.5rem]"
           >
-            {heroWords(t("titleLead"), 0)}
+            {heroLead(t("titleLead"))}
             {heroWords(
               t("titleAccent"),
               t("titleLead").split(" ").length,
@@ -272,7 +323,9 @@ export default async function LandingPage({
               data-track="hero_register"
               className={cn(
                 buttonVariants({ size: "lg" }),
-                "pressable cta-sheen cta-glow h-13 px-8 text-base font-semibold",
+                // cta-glow (pulso 7s) saiu: com o cta-sheen na mesma node eram
+                // dois loops sobrepostos no mesmo botão.
+                "pressable cta-sheen min-h-13 px-8 text-base font-semibold",
               )}
             >
               {t("primaryCta")}
@@ -282,14 +335,37 @@ export default async function LandingPage({
               data-track="hero_demo"
               className={cn(
                 buttonVariants({ size: "lg", variant: "outline" }),
-                "pressable h-13 px-8 text-base",
+                "pressable min-h-13 px-8 text-base",
               )}
             >
               {t("secondaryCta")} <ArrowRight className="ml-1.5 h-4 w-4" />
             </Link>
           </div>
 
-          <p className="hero-in mt-6 text-xs text-muted-foreground/80" style={heroDelay(0.36)}>
+          {/* Assinatura da equipa — as caras em pequeno, no canto inferior
+              direito, à MESMA ALTURA dos botões. O payoff está na secção 9c,
+              com as mesmas três em retrato 4:5 grande.
+
+              `lg:bottom-[26px]` e não `lg:bottom-0`: colada ao fundo, a
+              pílula caía na mesma linha do "Cobertura S&P 500 · …". Com ela
+              fora do fluxo, o fundo da linha dos botões fica a 24px do fundo
+              do stage; +2px alinha os CENTROS (botões 52px, pílula 48px).
+
+              Só a partir de lg: em ecrã estreito não há canto vazio nenhum e
+              a pílula cairia por cima da linha de confiança — abaixo disso
+              volta ao fluxo normal, debaixo dos botões. */}
+          <div
+            className="hero-in mt-8 flex flex-wrap items-center gap-x-3 gap-y-2 lg:absolute lg:bottom-[26px] lg:right-0 lg:mt-0 lg:justify-end"
+            style={heroDelay(0.42)}
+          >
+            <TeamSignature
+              faces={TEAM}
+              label={t("signature")}
+              className="inline-flex items-center gap-3 rounded-full border border-border/60 bg-card/50 py-1.5 pl-1.5 pr-4"
+            />
+          </div>
+
+          <p className="hero-in mt-6 max-w-[70ch] text-xs text-muted-foreground/80" style={heroDelay(0.48)}>
             {t("trust")}
           </p>
         </HeroStage>
@@ -320,8 +396,11 @@ export default async function LandingPage({
           captions={[t("showcase.caption"), t("showcase.caption2"), t("showcase.caption3")]}
         >
           <MediaFrame media={LANDING_MEDIA.showcaseTerminal} alt={t("showcase.alt")}>
+            {/* updatedLabel: hora FIXA de propósito — é um mock. Uma hora real
+                dava mismatch de hidratação (servidor ≠ cliente) e prometia
+                dados ao vivo que este quadro não tem. */}
             <TerminalMock
-              liveLabel={t("showcase.live")}
+              updatedLabel={t("showcase.updated", { time: "16:32" })}
               tabs={{
                 overview: tStockTabs("overview"),
                 financials: tStockTabs("financials"),
@@ -472,37 +551,37 @@ export default async function LandingPage({
         )}
       >
         <div className="relative mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
-          <Reveal data-reveal="zoom" className="mx-auto max-w-3xl text-center">
-            <h2 className="text-balance text-4xl font-extrabold tracking-[-0.03em] sm:text-5xl md:text-6xl">
-              {t("bento.title")}
-            </h2>
-            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">{t("bento.subtitle")}</p>
-          </Reveal>
+        <Reveal data-reveal="zoom" className="mx-auto max-w-3xl text-center">
+          <h2 className="text-balance text-4xl font-extrabold tracking-[-0.03em] sm:text-5xl md:text-6xl">
+            {t("bento.title")}
+          </h2>
+          <p className="mx-auto mt-5 max-w-[62ch] text-lg leading-relaxed text-muted-foreground">{t("bento.subtitle")}</p>
+        </Reveal>
 
-          <div className="mt-14 grid gap-5 md:grid-cols-2">
-            {bentoCards.map(({ key, icon: Icon, href, mock }, i) => (
-              <Reveal key={key} style={{ transitionDelay: `${i * 70}ms` }}>
-                <Parallax amp={i % 2 ? 28 : 44} zoom className="h-full">
-                  <Link
-                    href={href}
-                    data-track={`bento_${key}`}
-                    className="block h-full rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                  >
-                    <LiquidGlass className="group card-lift h-full rounded-3xl p-6">
-                      <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary transition-transform duration-[var(--dur-base)] ease-[var(--spring)] group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100">
-                        <Icon className="h-5 w-5" strokeWidth={2} />
-                      </div>
-                      <h3 className="text-base font-semibold">{t(`bento.${key}.title`)}</h3>
-                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                        {t(`bento.${key}.desc`)}
-                      </p>
-                      {mock}
-                    </LiquidGlass>
-                  </Link>
-                </Parallax>
-              </Reveal>
-            ))}
-          </div>
+        <div data-bento-grid className="mt-14 grid gap-5 md:grid-cols-2">
+          {bentoCards.map(({ key, icon: Icon, href, mock }, i) => (
+            <Reveal key={key} style={{ transitionDelay: `${i * 70}ms` }}>
+              <div className="h-full">
+              <Link
+                href={href}
+                data-track={`bento_${key}`}
+                className="block h-full rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                <LiquidGlass className="group card-lift h-full rounded-3xl p-6">
+                  <div data-icon-tile className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary transition-transform duration-[var(--dur-base)] ease-[var(--spring)] group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100">
+                    <Icon className="h-5 w-5" strokeWidth={2} />
+                  </div>
+                  <h3 className="text-base font-semibold">{t(`bento.${key}.title`)}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                    {t(`bento.${key}.desc`)}
+                  </p>
+                  {mock}
+                </LiquidGlass>
+              </Link>
+              </div>
+            </Reveal>
+          ))}
+        </div>
         </div>
       </section>
 
@@ -515,18 +594,23 @@ export default async function LandingPage({
               { value: 500, suffix: "", label: t("numbers.companies") },
               { value: 40, suffix: "", label: t("numbers.quarters") },
               { value: 0, suffix: " €", label: t("numbers.free") },
-            ].map(({ value, suffix, label }, i) => (
-              <Parallax key={label} amp={i % 2 ? 20 : 36}>
+            /* Sem Parallax: os counters lado a lado tinham amplitudes
+               diferentes (20 vs 36), por isso derivavam uns em relação aos
+               outros — o olho lê isso como desalinhamento, não como
+               profundidade. */
+            ].map(({ value, suffix, label }) => (
+              <div key={label}>
                 <Counter
                   value={value}
                   suffix={suffix}
                   className={cn(
                     "text-5xl font-extrabold tracking-tight text-primary sm:text-7xl",
-                    value === 0 && "gold-sheen-text",
+                    // o brilho do "0 €" vive agora só no cartão de preços — aqui
+                    // era o 2º "0 €" a brilhar na mesma página.
                   )}
                 />
                 <div className="mt-3 text-sm font-medium text-muted-foreground">{label}</div>
-              </Parallax>
+              </div>
             ))}
           </Reveal>
         </div>
@@ -537,26 +621,29 @@ export default async function LandingPage({
       <section data-backdrop="rings" className="relative isolate">
         <div className="relative mx-auto max-w-5xl px-6 py-24 md:px-8 md:py-32">
           <Reveal data-reveal="zoom" className="mx-auto max-w-3xl text-center">
-            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            <div data-kicker className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
               {t("pricing.eyebrow")}
             </div>
             <h2 className="mt-6 text-balance text-4xl font-extrabold tracking-[-0.03em] sm:text-5xl md:text-6xl">
               {t("pricing.title")}
             </h2>
-            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
+            <p className="mx-auto mt-5 max-w-[62ch] text-lg leading-relaxed text-muted-foreground">
               {t("pricing.subtitle")}
             </p>
           </Reveal>
 
           <div className="mt-14 grid gap-5 md:grid-cols-2">
             <Reveal>
-              <Parallax amp={36} className="h-full">
-                <LiquidGlass className="card-lift flex h-full flex-col rounded-3xl p-7">
+              <div className="h-full">
+                <LiquidGlass className="card-lift flex h-full flex-col rounded-3xl border-border p-7 shadow-[inset_0_1px_0_rgb(255_255_255/0.28),0_2px_10px_rgb(40_30_10/0.10)]">
                   <div className="text-sm font-semibold text-muted-foreground">
                     {t("pricing.free.name")}
                   </div>
                   <div className="mt-3 flex items-baseline gap-2">
-                    <span className="gold-sheen-text nums text-5xl font-extrabold tracking-tight text-primary">
+                    {/* O dourado saiu daqui e foi para o Pro: é o acento da
+                        marca e estava a destacar o plano que NÃO se quer
+                        vender. Grátis fica em tinta normal. */}
+                    <span className="nums text-5xl font-extrabold tracking-tight">
                       {t("pricing.free.price")}
                     </span>
                     <span className="text-sm text-muted-foreground">{t("pricing.free.period")}</span>
@@ -574,18 +661,18 @@ export default async function LandingPage({
                     data-track="pricing_free"
                     className={cn(
                       buttonVariants({ size: "lg" }),
-                      "pressable cta-sheen mt-8 h-12 w-full text-base font-semibold",
+                      "pressable mt-8 min-h-12 w-full text-base font-semibold",
                     )}
                   >
                     {t("pricing.free.cta")}
                   </Link>
                 </LiquidGlass>
-              </Parallax>
+              </div>
             </Reveal>
 
             <Reveal style={{ transitionDelay: "90ms" }}>
-              <Parallax amp={22} className="h-full">
-                <LiquidGlass className="card-lift flex h-full flex-col rounded-3xl border-primary/25 p-7">
+              <div className="h-full">
+                <LiquidGlass className="card-lift flex h-full flex-col rounded-3xl border-primary/40 p-7 shadow-[inset_0_1px_0_rgb(255_255_255/0.28),0_2px_10px_rgb(40_30_10/0.10)]">
                   <div className="flex items-center justify-between">
                     <div className="text-sm font-semibold text-muted-foreground">
                       {t("pricing.pro.name")}
@@ -595,7 +682,7 @@ export default async function LandingPage({
                     </span>
                   </div>
                   <div className="mt-3 flex items-baseline gap-2">
-                    <span className="nums text-5xl font-extrabold tracking-tight">
+                    <span className="nums text-5xl font-extrabold tracking-tight text-primary">
                       <DynamicProPrice fallback={t("pricing.pro.price")} />
                     </span>
                     <span className="text-sm text-muted-foreground">{t("pricing.pro.period")}</span>
@@ -604,15 +691,31 @@ export default async function LandingPage({
                     {(["f1", "f2", "f3", "f4", "f5"] as const).map((k) => (
                       <li
                         key={k}
-                        className="flex items-start gap-2.5 text-[15px] leading-relaxed text-muted-foreground"
+                        className="flex items-start gap-2.5 text-[15px] leading-relaxed"
                       >
-                        <Check className="mt-1 h-4 w-4 shrink-0 text-primary/50" strokeWidth={2.5} />
+                        <Check className="mt-1 h-4 w-4 shrink-0 text-primary" strokeWidth={2.5} />
                         {t(`pricing.pro.${k}`)}
                       </li>
                     ))}
                   </ul>
+                  {/* O Pro esteve sem CTA nenhum até 2026-08-05 — um cartão de
+                      preço sem botão converte a zero por construção. Outline (não
+                      sólido) para o grátis continuar a ser a ação primária. */}
+                  <Link
+                    href="/pricing"
+                    data-track="pricing_pro"
+                    className={cn(
+                      buttonVariants({ size: "lg", variant: "outline" }),
+                      "pressable mt-8 min-h-12 w-full text-base font-semibold",
+                    )}
+                  >
+                    {t("pricing.pro.cta")}
+                  </Link>
+                  <p className="mt-3 text-center text-xs text-muted-foreground">
+                    {t("pricing.pro.note")}
+                  </p>
                 </LiquidGlass>
-              </Parallax>
+              </div>
             </Reveal>
           </div>
         </div>
@@ -623,49 +726,59 @@ export default async function LandingPage({
         <div className="relative mx-auto max-w-3xl px-6 py-24 text-center md:px-8 md:py-32">
           <Reveal data-reveal="zoom">
             <BrandMark className="mx-auto h-14 w-14 rounded-2xl shadow-lg" />
-            <div className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            <div data-kicker className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
               {t("about.eyebrow")}
             </div>
             <h2 className="mt-4 text-balance text-4xl font-extrabold tracking-[-0.03em] sm:text-5xl">
               {t("about.title")}
             </h2>
             <span className="gold-rule mx-auto mt-8 block h-px w-24" aria-hidden />
-            <p className="mt-8 text-lg leading-relaxed text-muted-foreground">{t("about.p1")}</p>
-            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">{t("about.p2")}</p>
+            <p className="mx-auto mt-8 max-w-[62ch] text-lg leading-relaxed text-muted-foreground">{t("about.p1")}</p>
+            <p className="mx-auto mt-5 max-w-[62ch] text-lg leading-relaxed text-muted-foreground">{t("about.p2")}</p>
 
-            {/* As caras da equipa — mesmo avatar redondo da página /about
-                (TeamMemberModal): foto com object-cover, iniciais em fallback
-                para quem ainda não tem foto em public/team/. Aqui sem modal:
-                a landing não precisa das bios, só de pôr cara ao projeto.
-                Nomes são nomes próprios → hardcoded (CLAUDE.md §7). */}
-            <ul className="mt-12 flex flex-wrap items-start justify-center gap-x-10 gap-y-8">
-              {TEAM.map((member) => (
-                <li key={member.name} className="flex w-28 flex-col items-center gap-3">
-                  <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border-4 border-background bg-secondary shadow-md">
-                    {member.image ? (
-                      <Image
-                        src={member.image}
-                        alt={member.name}
-                        fill
-                        sizes="80px"
-                        className="object-cover"
-                      />
-                    ) : (
-                      <span className="text-lg font-semibold text-muted-foreground">
-                        {member.initials}
-                      </span>
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold leading-tight">{member.name}</p>
-                    <p className="mt-0.5 text-[11px] leading-tight text-primary">
-                      {t(`about.team.${member.roleKey}`)}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
           </Reveal>
+        </div>
+
+        {/* As caras da equipa, GRANDES — o mesmo cartão da página /about
+            (TeamMemberModal, retrato 4:5 + modal com bio e redes), não uma
+            segunda versão em miniatura.
+            Eram avatares redondos de 80px numa lista: à escala da landing
+            liam-se como ícones decorativos, e a seguir a dois parágrafos
+            sobre "quem somos" isso é o contrário do que a secção promete.
+            Fica FORA do `max-w-3xl` do texto de propósito — os três retratos
+            precisam de largura de sobra. */}
+        <div className="relative mx-auto max-w-5xl px-6 pb-24 md:px-8 md:pb-32">
+          <div className="grid gap-6 sm:grid-cols-3">
+            {TEAM.map((member, index) => (
+              <Reveal key={member.name} style={{ transitionDelay: `${index * 70}ms` }}>
+                <TeamMemberModal
+                  member={{
+                    name: member.name,
+                    /* `members.N.role` e NÃO `marketing.about.team.roleN`:
+                       existem duas cópias dos papéis nos messages, e a que
+                       /about usa é esta. Puxar da outra deixava o papel vazio
+                       no cartão (o fallback do i18n devolve string vazia em
+                       vez do caminho da chave). */
+                    role: tAboutTeam(`members.${index}.role`),
+                    bio: tAboutTeam(`members.${index}.bio`),
+                    initials: member.initials,
+                    image: member.image,
+                    socials: {
+                      linkedin: tAboutTeam.has(`members.${index}.socials.linkedin`)
+                        ? tAboutTeam(`members.${index}.socials.linkedin`)
+                        : "#",
+                      instagram: tAboutTeam.has(`members.${index}.socials.instagram`)
+                        ? tAboutTeam(`members.${index}.socials.instagram`)
+                        : "#",
+                      email: tAboutTeam.has(`members.${index}.socials.email`)
+                        ? tAboutTeam(`members.${index}.socials.email`)
+                        : "#",
+                    },
+                  }}
+                />
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -685,7 +798,7 @@ export default async function LandingPage({
                     {t(`faq.q${n}`)}
                     <ChevronDown className="faq-chevron h-4 w-4 shrink-0 text-muted-foreground" />
                   </summary>
-                  <p className="px-5 pb-5 text-[15px] leading-relaxed text-muted-foreground">
+                  <p className="max-w-[68ch] px-5 pb-5 text-[15px] leading-relaxed text-muted-foreground">
                     {t(`faq.a${n}`)}
                   </p>
                 </details>
@@ -702,7 +815,7 @@ export default async function LandingPage({
       >
         <Reveal data-reveal="zoom" className="flex flex-col items-center text-center">
           <BrandMark className="breathe h-16 w-16 rounded-2xl shadow-lg" />
-          <span className="gold-rule gold-rule-live mt-8 h-px w-28" aria-hidden />
+          <span className="gold-rule mt-8 h-px w-28" aria-hidden />
           {/* título+subtítulo clicáveis: um único link em bloco (um só tab
               stop; heading dentro de link é HTML válido), hover subtil */}
           <Link
@@ -731,7 +844,7 @@ export default async function LandingPage({
                 data-track="footer_register"
                 className={cn(
                   buttonVariants({ size: "lg" }),
-                  "pressable cta-sheen h-16 px-14 text-lg font-semibold",
+                  "pressable cta-sheen min-h-16 px-14 text-lg font-semibold",
                 )}
               >
                 {t("primaryCta")}
@@ -742,7 +855,7 @@ export default async function LandingPage({
               data-track="footer_peek"
               className={cn(
                 buttonVariants({ size: "lg", variant: "outline" }),
-                "pressable h-16 px-10 text-lg",
+                "pressable min-h-16 px-10 text-lg",
               )}
             >
               {t("peekCta")}

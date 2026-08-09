@@ -1,12 +1,28 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "../globals.css";
+// A seguir ao globals de propósito: as variantes precisam de ganhar à cascata
+// base. Inerte sem os atributos data-v-* que o painel Tweak escreve em <html>.
+import "../design-variants.css";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { PulseTracker } from "@/components/pulse/PulseTracker";
 import { BRAND } from "@/lib/brand";
 import { PaddleProvider } from "@/components/providers/PaddleProvider";
 import { CookieConsent } from "@/components/layout/CookieConsent";
+import dynamic from "next/dynamic";
+
+/* Painel de design, só em dev.
+   IMPORTANTE: tem de ser import DINÂMICO dentro de um ramo morto. Com um
+   `import` estático + `{NODE_ENV === "development" && <TweakPanel/>}`, o
+   bundler remove o RENDER mas mantém o MÓDULO — o painel inteiro (~86KB,
+   incluindo messages/pt.json para a pesquisa inversa de chaves) acabava no
+   bundle de produção. Assim, `process.env.NODE_ENV` é substituído no build,
+   o ternário fica morto e o chunk nunca chega a ser gerado. */
+const TweakPanel =
+  process.env.NODE_ENV === "development"
+    ? dynamic(() => import("@/components/devtools/TweakPanel").then((m) => m.TweakPanel))
+    : () => null;
 import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
@@ -211,6 +227,8 @@ export default async function RootLayout({
             __html: `(function(){try{var d=localStorage.getItem("theme")==="dark";if(d)document.documentElement.classList.add("dark");var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",d?"#100f0d":"#fafaf7")}catch(e){}})();`,
           }}
         />
+
+        
       </head>
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground">
         <NextIntlClientProvider messages={messages}>
@@ -222,6 +240,8 @@ export default async function RootLayout({
             showInitialBanner={cookieStore.get("cookie_consent") === undefined}
           />
           <PulseTracker />
+          {/* Painel de design ao vivo — ver a definição no topo do ficheiro. */}
+          <TweakPanel />
         </NextIntlClientProvider>
         {/* GA NÃO é montado aqui: é carregado pelo <CookieConsent> só APÓS
             consentimento (RGPD) — montá-lo aqui disparava GA antes/sem

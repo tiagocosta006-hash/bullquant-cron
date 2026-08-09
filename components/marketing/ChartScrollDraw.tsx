@@ -128,6 +128,9 @@ export function barPath(i: number, v: number, base: number, yFn: (v: number) => 
 export const lineD = (arr: number[], yFn: (v: number) => number) =>
   arr.map((v, i) => `${i === 0 ? "M" : "L"}${cx(i)} ${yFn(v)}`).join(" ");
 
+/** largura do tooltip, em unidades do viewBox (partilhada com o flip em paint) */
+const TT_W = 128;
+
 const OCF_LINE_D = lineD(OCF, yB);
 const CAPEX_LINE_D = lineD(CAPEX, yB);
 const GRID_FRACS = [0.25, 0.5, 0.75];
@@ -153,20 +156,27 @@ export function ChartScrollDraw({
   const ocfLineRef = useRef<SVGPathElement>(null);
   const capexLineRef = useRef<SVGPathElement>(null);
 
-  // ── lente de análise: feixe + dot com cauda de cometa + tooltip glass
-  //    + realce magnético das barras; tudo com lag suave (quickTo),
-  //    independente dos scrubs de scroll (que só tocam scaleY/dash).
+  /**
+   * ── Crosshair de leitura (ex-"lente de análise").
+   *
+   * Era um feixe dourado de 28px de largura com máscara vertical, mais duas
+   * bolas douradas fantasma a arrastar-se atrás do cursor ("cauda de cometa").
+   * Duas coisas más: a coluna de luz acabava a meio do segundo cartão (onde
+   * estava o dot) e lia-se como um artefacto de render, não como um cursor; e
+   * nenhum terminal financeiro a sério desenha isto — é decoração.
+   *
+   * Agora é o que a app real (Recharts) faz: uma hairline vertical neutra por
+   * painel, o dot no ponto lido, e o tooltip. Sobra a interação, desaparece o
+   * brilho. O lag suave (quickTo) mantém-se — isso é feel, não decoração.
+   */
   const svgRef = useRef<SVGSVGElement>(null);
   const cursorRef = useRef<SVGGElement>(null);
   const cursorDotRef = useRef<SVGCircleElement>(null);
-  const trailARef = useRef<SVGCircleElement>(null);
-  const trailBRef = useRef<SVGCircleElement>(null);
   const tooltipRef = useRef<SVGGElement>(null);
   const ttYearRef = useRef<SVGTextElement>(null);
   const ttRevRef = useRef<SVGTextElement>(null);
   const ttFcfRef = useRef<SVGTextElement>(null);
   const fadeToRef = useRef<((v: number) => void) | null>(null);
-  const trailToRef = useRef<Array<{ x: (v: number) => void; y: (v: number) => void }>>([]);
   const hoverRef = useRef(false);
   const proxyRef = useRef({ p: REVENUE.length - 1 });
   const pToRef = useRef<((v: number) => void) | null>(null);
@@ -207,28 +217,23 @@ export function ChartScrollDraw({
     if (ttFcfRef.current) ttFcfRef.current.textContent = `$${Math.round(fcf)}B`;
     if (tooltipRef.current) {
       const flip = nearest >= REVENUE.length - 3;
-      tooltipRef.current.setAttribute("transform", `translate(${flip ? -158 : 14} 0)`);
+      // TT_W + o mesmo afastamento de 12 do outro lado do crosshair
+      tooltipRef.current.setAttribute("transform", `translate(${flip ? -(TT_W + 12) : 12} 0)`);
     }
 
-    // onda gaussiana de luz nas barras (painel A e B, mesmo índice — só opacity)
+    /* Realce das barras: a coluna lida em cheio, as outras recuam — o mesmo
+       que qualquer gráfico faz em hover.
+       Antes era uma onda gaussiana que dava a CADA barra uma opacidade
+       diferente conforme a distância ao cursor. Em movimento lia-se como
+       barras a piscar sem razão, e numa captura estática parecia que as
+       barras tinham valores de opacidade aleatórios — um bug, não um realce.
+       Dois estados só: lida / não lida. */
     if (!barsRef.current.length) {
       barsRef.current = Array.from(svg.querySelectorAll<SVGPathElement>("[data-bar]"));
     }
     barsRef.current.forEach((bar, i) => {
       const idx = Number(bar.dataset.idx ?? i);
-      const d = idx - c;
-      bar.style.opacity = (0.42 + 0.58 * Math.exp(-(d * d) / 1.8)).toFixed(3);
-      bar.style.filter = Math.abs(d) < 0.5 ? "brightness(1.08)" : "";
-    });
-
-    // cauda de cometa: ghosts perseguem a posição suavizada
-    trailToRef.current.forEach((to, k) => {
-      to.x(x);
-      to.y(y);
-      gsap.to(k === 0 ? trailARef.current : trailBRef.current, {
-        opacity: [0.35, 0.15][k],
-        duration: 0.2,
-      });
+      bar.style.opacity = idx === nearest ? "1" : "0.55";
     });
   }, []);
 
@@ -253,19 +258,6 @@ export function ChartScrollDraw({
           onUpdate: () => paint(proxy.p),
         });
         fadeToRef.current = gsap.quickTo(group, "opacity", { duration: 0.25, ease: "power2.out" });
-        for (const el of [trailARef.current, trailBRef.current]) {
-          if (el) gsap.set(el, { x: PAD + STEP / 2 + p * STEP, y: yB(OCF[Math.round(p)]) });
-        }
-        trailToRef.current = [trailARef.current, trailBRef.current].flatMap((el, k) =>
-          el
-            ? [
-                {
-                  x: gsap.quickTo(el, "x", { duration: 0.7 + k * 0.2, ease: "power3.out" }),
-                  y: gsap.quickTo(el, "y", { duration: 0.7 + k * 0.2, ease: "power3.out" }),
-                },
-              ]
-            : [],
-        );
       }
       pToRef.current(p);
       fadeToRef.current?.(1);
@@ -292,13 +284,9 @@ export function ChartScrollDraw({
     if (!group) return;
     if (prefersReducedMotion() || !fadeToRef.current) group.style.opacity = "0";
     else fadeToRef.current(0);
-    for (const el of [trailARef.current, trailBRef.current]) {
-      if (el) gsap.to(el, { opacity: 0, duration: 0.2 });
-    }
     // devolver as barras ao estado de repouso
     svgRef.current?.querySelectorAll<SVGPathElement>("[data-bar]").forEach((bar) => {
       gsap.to(bar, { opacity: 0.9, duration: 0.35, ease: "power2.out", overwrite: "auto" });
-      bar.style.filter = "";
     });
   }, []);
 
@@ -351,6 +339,20 @@ export function ChartScrollDraw({
     };
   }, [showP, hideLens]);
 
+/**
+ * JANELA DE SCROLL ÚNICA para toda a secção.
+ *
+ * Havia quatro `scrollTrigger` com intervalos diferentes (88→34%, 72→26%,
+ * 68→22%, 40→24%): as barras acabavam enquanto as linhas ainda iam a meio e
+ * os cartões corriam num terceiro horário. O olho não lê isso como
+ * profundidade — lê como partes desalinhadas a andar a ritmos diferentes.
+ *
+ * Com uma janela só, tudo progride em conjunto. O escalonamento interno
+ * (stagger das barras) mantém-se, porque esse acontece DENTRO da mesma
+ * timeline e é intencional.
+ */
+const WINDOW = { start: "top 78%", end: "top 32%", scrub: 0.5 } as const;
+
   useGSAP(
     () => {
       const mm = gsap.matchMedia();
@@ -369,7 +371,7 @@ export function ChartScrollDraw({
             scaleY: 1,
             stagger: 0.05,
             ease: "none",
-            scrollTrigger: { trigger: root, start: "top 88%", end: "top 34%", scrub: 0.5 },
+            scrollTrigger: { trigger: root, ...WINDOW },
           },
         );
         gsap.fromTo(
@@ -378,7 +380,7 @@ export function ChartScrollDraw({
           {
             strokeDashoffset: 0,
             ease: "none",
-            scrollTrigger: { trigger: root, start: "top 72%", end: "top 26%", scrub: 0.5 },
+            scrollTrigger: { trigger: root, ...WINDOW },
           },
         );
         gsap.fromTo(
@@ -387,7 +389,7 @@ export function ChartScrollDraw({
           {
             strokeDashoffset: 0,
             ease: "none",
-            scrollTrigger: { trigger: root, start: "top 68%", end: "top 22%", scrub: 0.5 },
+            scrollTrigger: { trigger: root, ...WINDOW },
           },
         );
         gsap.fromTo(
@@ -397,7 +399,7 @@ export function ChartScrollDraw({
             opacity: 1,
             scale: 1,
             ease: "none",
-            scrollTrigger: { trigger: root, start: "top 40%", end: "top 24%", scrub: 0.5 },
+            scrollTrigger: { trigger: root, ...WINDOW },
           },
         );
       });
@@ -522,10 +524,14 @@ export function ChartScrollDraw({
         />
 
         {/* labels diretos (tinta plena — cinzento não se lê em dark) */}
+        {/* ACIMA do dot, este label caía a ~284 e o header do cartão (título +
+            cluster de ícones) acaba a ~265: encostava aos ícones e lia-se como
+            se fizesse parte deles. À ESQUERDA do dot, à mesma altura, tem o
+            espaço todo — a linha de OCF nesse troço vai 20+ unidades abaixo. */}
         <text
           data-pop
-          x={cx(OCF.length - 1) - 10}
-          y={yB(OCF[OCF.length - 1]) - 14}
+          x={cx(OCF.length - 1) - 14}
+          y={yB(OCF[OCF.length - 1]) + 4}
           textAnchor="end"
           className="nums"
           fontSize="12"
@@ -534,11 +540,14 @@ export function ChartScrollDraw({
         >
           {`OCF · $${OCF[OCF.length - 1]}B`}
         </text>
+        {/* Ancorados a END na margem direita, não a MIDDLE sobre a última
+            barra: centrado, o texto passava dos 560 do viewBox e o SVG (que
+            recorta) cortava-lhe o fim. */}
         <text
           data-pop
-          x={barX(FCF.length - 1) + BAR_W / 2}
+          x={W - PAD}
           y={yB(FCF[FCF.length - 1]) - 10}
-          textAnchor="middle"
+          textAnchor="end"
           className="nums"
           fontSize="13"
           fontWeight="600"
@@ -548,9 +557,9 @@ export function ChartScrollDraw({
         </text>
         <text
           data-pop
-          x={barX(REVENUE.length - 1) + BAR_W / 2}
+          x={W - PAD}
           y={yA(REVENUE[REVENUE.length - 1]) - 10}
-          textAnchor="middle"
+          textAnchor="end"
           className="nums"
           fontSize="13"
           fontWeight="600"
@@ -559,58 +568,51 @@ export function ChartScrollDraw({
           {`$${REVENUE[REVENUE.length - 1]}B`}
         </text>
 
-        {/* lente de análise — segue o cursor (ver showP), atravessa os 2 painéis */}
-        <defs>
-          <linearGradient id="csd-beam" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0" stopColor="var(--primary)" stopOpacity="0" />
-            <stop offset="0.5" stopColor="var(--primary)" stopOpacity="0.14" />
-            <stop offset="1" stopColor="var(--primary)" stopOpacity="0" />
-          </linearGradient>
-          {/* fade vertical do feixe — sem fim abrupto em cima/baixo */}
-          <linearGradient id="csd-beam-v" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stopColor="#fff" stopOpacity="0" />
-            <stop offset="0.12" stopColor="#fff" stopOpacity="1" />
-            <stop offset="0.9" stopColor="#fff" stopOpacity="1" />
-            <stop offset="1" stopColor="#fff" stopOpacity="0" />
-          </linearGradient>
-          <mask id="csd-beam-mask">
-            <rect x={-14} y={A_TOP - 4} width={28} height={B_BASE - A_TOP + 4} fill="url(#csd-beam-v)" />
-          </mask>
-        </defs>
-        {/* cauda de cometa (fora do grupo — lags próprios por transform) */}
-        <circle ref={trailBRef} cx={0} cy={0} r="3" fill="var(--primary)" opacity="0" pointerEvents="none" />
-        <circle ref={trailARef} cx={0} cy={0} r="3.6" fill="var(--primary)" opacity="0" pointerEvents="none" />
+        {/* crosshair de leitura — segue o cursor (ver showP) */}
         <g ref={cursorRef} aria-hidden="true" style={{ opacity: 0 }} pointerEvents="none">
-          {/* feixe vertical suave, atravessa Receita + FCF */}
-          <rect
-            x={-14}
-            y={A_TOP - 4}
-            width={28}
-            height={B_BASE - A_TOP + 4}
-            fill="url(#csd-beam)"
-            mask="url(#csd-beam-mask)"
+          {/* DOIS segmentos, um por painel, em vez de uma linha contínua: os
+              cartões têm um gap de 16px entre si e uma linha inteira ficava a
+              atravessar o vazio entre eles, como se flutuasse por cima da
+              composição. Assim a hairline vive dentro de cada cartão. */}
+          <line
+            x1={0}
+            x2={0}
+            y1={A_TOP - 4}
+            y2={A_BASE}
+            stroke="var(--foreground)"
+            strokeOpacity="0.22"
+            strokeWidth="1"
           />
+          <line
+            x1={0}
+            x2={0}
+            y1={B_TOP - 24}
+            y2={B_BASE}
+            stroke="var(--foreground)"
+            strokeOpacity="0.22"
+            strokeWidth="1"
+          />
+          {/* dot no ponto lido da linha de OCF — sem drop-shadow dourado */}
           <circle
             ref={cursorDotRef}
             cx={0}
             cy={yB(OCF[OCF.length - 1])}
-            r="5"
-            fill="var(--primary)"
+            r="4.5"
+            fill="var(--chart-5)"
             stroke="var(--background)"
             strokeWidth="2"
-            style={{
-              filter: "drop-shadow(0 0 6px color-mix(in srgb, var(--primary) 60%, transparent))",
-            }}
           />
-          {/* tooltip glass (rect + textos SVG; flip de lado nas bordas) */}
-          <g ref={tooltipRef} transform="translate(14 0)">
+          {/* tooltip (rect + textos SVG; flip de lado nas bordas) */}
+          <g ref={tooltipRef} transform={`translate(12 0)`}>
+            {/* opaco, não translúcido: por cima das barras, um fundo a 88%
+                deixava passar o ouro e os números perdiam contraste */}
             <rect
               x={0}
               y={A_TOP - 6}
-              width={144}
-              height={62}
-              rx={10}
-              style={{ fill: "color-mix(in srgb, var(--card) 88%, transparent)" }}
+              width={TT_W}
+              height={58}
+              rx={8}
+              fill="var(--card)"
               stroke="var(--border)"
             />
             <text

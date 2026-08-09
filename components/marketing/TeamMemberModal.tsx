@@ -34,34 +34,44 @@ export function TeamMemberModal({ member }: { member: TeamMember }) {
 
   return (
     <Dialog>
-      <DialogTrigger className="w-full text-left">
+      {/* h-full nos dois níveis: sem isto, o cartão com o nome a partir em
+          duas linhas ficava mais alto que os outros e a fila desalinhava em
+          baixo. O grid estica o item, mas o botão e o cartão lá dentro têm
+          de aceitar essa altura. */}
+      <DialogTrigger className="h-full w-full text-left">
         {/* .card-lift é o primitivo partilhado (lift + borda dourada + sombra
             do sistema). Substituiu um transition-all/duration-300/shadow-2xl
             à mão, que fugia aos tokens de motion e ficava fora da cobertura de
             prefers-reduced-motion. */}
-        <span className="card-lift glass group relative flex cursor-pointer flex-col gap-6 overflow-hidden rounded-3xl p-8">
+        {/* Retrato 4:5 a ocupar o topo do cartão, sem padding em cima.
+            Substituiu o avatar redondo de 128px ao centro — que é o cartão de
+            equipa por omissão de qualquer template. Com a fotografia à
+            largura toda, a pessoa passa a ser o objeto do cartão em vez de um
+            ícone dela. Escolhido pelo Alex entre 4 alternativas. */}
+        <span className="card-lift glass group relative flex h-full cursor-pointer flex-col gap-5 overflow-hidden rounded-3xl pb-8">
           {/* Efeito de brilho hover no cartão pequeno */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          
-          {/* Placeholder/Photo for Photo (Small) */}
-          <div className="w-32 h-32 rounded-full bg-secondary flex items-center justify-center border-4 border-background shadow-sm mx-auto relative z-10 overflow-hidden">
+
+          <div className="relative z-10 flex aspect-[4/5] w-full items-center justify-center overflow-hidden bg-secondary">
             {member.image ? (
-              <Image src={member.image} alt={member.name} fill sizes="128px" className="object-cover" />
+              <Image src={member.image} alt={member.name} fill sizes="(min-width: 640px) 420px, 100vw" className="object-cover" />
             ) : (
-              <span className="text-2xl font-sans text-muted-foreground">{member.initials}</span>
+              <span className="text-5xl font-sans text-muted-foreground/40">{member.initials}</span>
             )}
           </div>
-          
-          <div className="text-center flex flex-col gap-1 relative z-10">
+
+          <div className="relative z-10 flex flex-col gap-1 px-8 text-center">
             <h3 className="font-extrabold tracking-[-0.02em] text-2xl group-hover:text-primary transition-colors">{member.name}</h3>
             <span className="text-sm text-primary font-medium tracking-wider uppercase">{member.role}</span>
           </div>
-          
-          <p className="text-muted-foreground text-center text-sm leading-relaxed line-clamp-3 relative z-10">
+
+          <p className="relative z-10 px-8 text-muted-foreground text-center text-sm leading-relaxed line-clamp-3">
             {member.bio}
           </p>
-          
-          <div className="mt-4 text-center relative z-10">
+
+          {/* mt-auto empurra o "ver perfil" para o fundo, para as três setas
+              ficarem alinhadas mesmo com bios de comprimentos diferentes */}
+          <div className="relative z-10 mt-auto px-8 pt-2 text-center">
             <span className="text-xs font-semibold text-primary/70 uppercase tracking-widest group-hover:text-primary flex items-center justify-center gap-2 transition-colors">
               {t("viewProfile")} <span className="text-lg leading-none">&rarr;</span>
             </span>
@@ -75,19 +85,28 @@ export function TeamMemberModal({ member }: { member: TeamMember }) {
          <DialogDescription className="sr-only">{member.bio}</DialogDescription>
          
         <div className="grid sm:grid-cols-[1fr_1.5fr] sm:min-h-[450px]">
-          {/* Esquerda: Foto */}
-          <div className="bg-secondary/30 p-10 flex flex-col items-center justify-center border-b sm:border-b-0 sm:border-r border-border/50 relative overflow-hidden">
-             <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-primary/10 blur-[80px] rounded-full pointer-events-none"></div>
-             
-             <div className="w-56 h-56 sm:w-72 sm:h-72 rounded-full bg-background flex items-center justify-center border-[12px] border-secondary shadow-2xl relative z-10 overflow-hidden">
-               {member.image ? (
-                 <Image src={member.image} alt={member.name} fill sizes="(min-width: 640px) 288px, 224px" className="object-cover" />
-               ) : (
-                 <span className="text-6xl sm:text-7xl font-sans text-muted-foreground/30">{member.initials}</span>
-               )}
-             </div>
+          {/* Esquerda: a fotografia, a preencher a coluna.
+              Era um círculo de 288px com uma borda de 12px a flutuar dentro de
+              40px de padding, mais um blob desfocado atrás — o cartão mostrava
+              um retrato retangular e ao clicar aparecia um avatar redondo, ou
+              seja o modal contradizia aquilo em que se tinha clicado. Agora é
+              a mesma fotografia, à sangria. */}
+          <div className="relative aspect-[4/5] overflow-hidden border-b border-border/50 sm:aspect-auto sm:border-b-0 sm:border-r">
+            {member.image ? (
+              <Image
+                src={member.image}
+                alt={member.name}
+                fill
+                sizes="(min-width: 640px) 40vw, 100vw"
+                className="object-cover"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center bg-secondary/30">
+                <span className="text-6xl sm:text-7xl font-sans text-muted-foreground/30">{member.initials}</span>
+              </div>
+            )}
           </div>
-          
+
           {/* Direita: Texto e Redes */}
           <div className="p-10 sm:p-14 flex flex-col justify-center relative">
             <h2 className="text-4xl sm:text-5xl font-extrabold tracking-[-0.02em] mb-3">{member.name}</h2>

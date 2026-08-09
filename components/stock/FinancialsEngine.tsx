@@ -300,6 +300,9 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
   // gráfico trimestral enganosamente curto. Um reporter trimestral completo tem
   // ~4 Q por ano; abaixo de 3× o nº de anuais = claramente incompleto. Assim a
   // ASML (poucos Q) mostra o aviso, mas a AAPL (histórico completo) não.
+  // Periodicidade em texto — vai no subtítulo do cartão de partilha.
+  const periodLabel = t(`periods.${period.toLowerCase()}`)
+
   const quarterlyCount = data.filter(d => d.periodType === "QUARTERLY").length
   const annualCount = data.filter(d => d.periodType === "ANNUAL").length
   const sparseQuarterly = annualCount > 0 && quarterlyCount < annualCount * 3
@@ -377,7 +380,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            <DecisionChart currencySymbol={currencySymbol}
+            <DecisionChart currencySymbol={currencySymbol} periodLabel={periodLabel}
               title={t('charts.revenue')}
               data={revenueChartData}
               type="BAR"
@@ -387,7 +390,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
             />
 
             {segmentKeys.length > 0 && (
-              <DecisionChart currencySymbol={currencySymbol} 
+              <DecisionChart currencySymbol={currencySymbol} periodLabel={periodLabel} 
                 title={t('charts.revenueBySegment')} 
                 data={chartData} 
                 type="STACKED_BAR" 
@@ -398,7 +401,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
               />
             )}
             
-            <DecisionChart currencySymbol={currencySymbol}
+            <DecisionChart currencySymbol={currencySymbol} periodLabel={periodLabel}
               title={t('charts.epsDiluted')}
               data={epsChartData}
               type="BAR"
@@ -408,7 +411,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
             />
 
             {!isBank && (
-              <DecisionChart currencySymbol={currencySymbol} 
+              <DecisionChart currencySymbol={currencySymbol} periodLabel={periodLabel} 
                 title={isReit ? "AFFO / FCF" : t('charts.freeCashFlow')} 
                 data={chartData} 
                 type="COMPOSED" 
@@ -426,7 +429,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
               />
             )}
 
-            <DecisionChart currencySymbol={currencySymbol} 
+            <DecisionChart currencySymbol={currencySymbol} periodLabel={periodLabel} 
               title={t('charts.netIncome')} 
               data={chartData} 
               type="BAR" 
@@ -435,7 +438,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
             />
 
             {!isBank && (
-              <DecisionChart currencySymbol={currencySymbol} 
+              <DecisionChart currencySymbol={currencySymbol} periodLabel={periodLabel} 
                 title={t('charts.ebitda')} 
                 data={chartData} 
                 type="BAR" 
@@ -444,7 +447,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
               />
             )}
 
-            <DecisionChart currencySymbol={currencySymbol} 
+            <DecisionChart currencySymbol={currencySymbol} periodLabel={periodLabel} 
               title={isBank ? "Operating Expenses" : t('charts.expenses')} 
               data={chartData} 
               type={isBank ? "BAR" : "STACKED_BAR"} 
@@ -460,7 +463,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
               }} 
             />
 
-            <DecisionChart currencySymbol={currencySymbol} 
+            <DecisionChart currencySymbol={currencySymbol} periodLabel={periodLabel} 
               title={t('charts.cashDebt')} 
               data={chartData} 
               type="BAR" 
@@ -473,7 +476,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
               }} 
             />
 
-            <DecisionChart currencySymbol={currencySymbol} 
+            <DecisionChart currencySymbol={currencySymbol} periodLabel={periodLabel} 
               title={t('charts.sharesOutstanding')} 
               data={chartData} 
               type="BAR" 
@@ -481,7 +484,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
               cagr={calcCAGR('sharesOutstanding')}
             />
 
-            <DecisionChart currencySymbol={currencySymbol} 
+            <DecisionChart currencySymbol={currencySymbol} periodLabel={periodLabel} 
               title={t('charts.dividends')} 
               data={chartData} 
               type="BAR" 

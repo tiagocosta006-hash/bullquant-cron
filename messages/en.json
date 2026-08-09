@@ -4,9 +4,11 @@
     "titleLead": "See the value",
     "titleAccent": "others miss.",
     "subtitle": "10 years of fundamentals, a DCF calculator that autofills, and an AI Analyst, free. Serious analysis for long-term investors.",
+    "boot": "Reading the numbers",
     "primaryCta": "Create free account",
     "secondaryCta": "Peek without an account: AAPL",
     "trust": "S&P 500 coverage · SEC EDGAR data · No credit card",
+    "signature": "Built by three Portuguese.",
     "features": {
       "fundamentals": {
         "title": "10 years of fundamentals",
@@ -40,7 +42,7 @@
       "alt": "BullValue terminal demo",
       "caption2": "Live prices, watchlist and earnings calendar, all one ⌘K away.",
       "caption3": "Free, and ready in under a minute.",
-      "live": "Live",
+      "updated": "Updated at {time}",
       "finRows": {
         "gross": "Gross",
         "operating": "Operating"
@@ -172,8 +174,8 @@
         "period": "forever",
         "f1": "Full S&P 500 (500 companies)",
         "f2": "10 years of visual fundamentals",
-        "f3": "Auto-filled DCF calculator",
-        "f4": "5 AI credits per day and curated theme lists",
+        "f3": "Auto-filled DCF calculator with saved scenarios",
+        "f4": "5 AI credits per day (one full Analyst report)",
         "f5": "Watchlist, earnings calendar and insider trading",
         "cta": "Create free account"
       },
@@ -182,11 +184,13 @@
         "badge": "Most popular",
         "price": "€7",
         "period": "per month",
-        "f1": "Unlimited watchlist",
-        "f2": "20 AI credits per day (~6 analyses)",
-        "f3": "Save unlimited DCF scenarios",
-        "f4": "Export financial data to CSV",
-        "f5": "Private community and priority support"
+        "f1": "Everything in the free plan",
+        "f2": "20 AI credits per day (~6 full reports)",
+        "f3": "Chat with the AI Analyst about any company",
+        "f4": "Historical valuation multiples (P/E, P/S, EV/EBITDA)",
+        "f5": "Private community and priority support",
+        "cta": "Start 7-day trial",
+        "note": "7 days free · cancel anytime · payments via Paddle"
       }
     },
     "about": {
@@ -203,7 +207,7 @@
     "faq": {
       "title": "Frequently asked questions",
       "q1": "What's the difference between Free and Pro?",
-      "a1": "Free includes the full S&P 500, 10 years of fundamentals, the DCF calculator, the AI Analyst (5 credits per day, enough for one full analysis), curated theme lists, the earnings calendar and insider trading. Pro adds 20 AI credits per day (~6 analyses), unlimited watchlists, saving DCF scenarios, CSV export, a private community and priority support.",
+      "a1": "Free includes the full S&P 500, 10 years of fundamentals, the DCF calculator (with saved scenarios), the AI Analyst (5 credits per day, enough for one full report), curated theme lists, an unlimited watchlist, the earnings calendar and insider trading. Pro adds 20 AI credits per day (~6 full reports), chat with the Analyst, historical valuation multiples, a private community and priority support.",
       "q2": "Is this financial advice?",
       "a2": "No. BullValue is an analysis and education tool. No value, metric or insight is a recommendation to buy or sell. Decisions are always yours.",
       "q3": "Which companies are available?",
@@ -741,6 +745,23 @@
       "tooltipFcf": "FCF Yield",
       "avgLabel": "Avg"
     },
+    "demoBadge": {
+      "label": "Pro",
+      "tooltip": "This is normally a Pro feature — you're seeing it for free because this is the Apple demo."
+    },
+    "share": {
+      "button": "Share chart",
+      "title": "Share chart",
+      "description": "Generates a ready-to-post image with the company, the price and the chart exactly as you see it.",
+      "download": "Save image",
+      "shareAction": "Share",
+      "copy": "Copy",
+      "copied": "Copied",
+      "working": "Generating…",
+      "cagrLabel": "CAGR",
+      "disclaimer": "Fundamentals from SEC EDGAR. Not investment advice.",
+      "error": "Could not generate the image. Please try again."
+    },
     "priceVsEarnings": {
       "title": "Price vs Earnings",
       "subtitle": "Whether profit growth has kept up with the share price",
@@ -822,7 +843,19 @@
       "guestDesc": "Create a free account and upgrade to Pro to chat with the AI Analyst about this company.",
       "guestCta": "Create free account"
     },
-    "registerCta": "Create free account"
+    "registerCta": "Create free account",
+    "demo": {
+      "badge": "Demo",
+      "tooltip": "Pre-loaded demo analysis — on real accounts this is AI-generated from the official SEC 10-K.",
+      "thinking": "Thinking...",
+      "historyToggle": "View the steps",
+      "steps": [
+        "Fetching the latest earnings...",
+        "Researching the management team...",
+        "Analyzing the official SEC 10-K...",
+        "Calculating the competitive moat..."
+      ]
+    }
   },
   "dcf": {
     "title": "DCF Calculator",
@@ -885,7 +918,16 @@
     "errorWacc": "WACC must be greater than perpetual growth for the model to be valid. Adjust the sliders.",
     "errorShares": "Enter the number of shares outstanding to compute value per share.",
     "errorFcf": "Enter a valid initial Free Cash Flow to start.",
-    "exportImage": "Share Image"
+    "exportImage": "Share Image",
+    "demoLocked": {
+      "badge": "Demo",
+      "tooltip": "In the demo you can only analyze Apple (AAPL). Create a free account to analyze any company.",
+      "placeholder": "Apple (AAPL) only in the demo",
+      "hint": "You're viewing the demo, locked to Apple.",
+      "cta": "Create free account",
+      "saveTitle": "Save your DCF scenarios",
+      "saveDesc": "Create a free account to save and revisit your DCF analyses."
+    }
   },
   "financials": {
     "engineTitle": "Financials & Decision Engine",
@@ -1176,22 +1218,21 @@
         "Full S&P 500 access",
         "10 years of fundamental data",
         "DCF calculator with autofill",
+        "Save and share DCF scenarios",
         "Interactive financial charts",
-        "Watchlist up to 10 companies",
-        "5 AI credits per day (1 Analyst report)",
+        "Watchlist and portfolio, no limit",
+        "5 AI credits per day (one full Analyst report)",
         "Earnings calendar",
-        "Insider Trading data"
+        "Insider trading data"
       ],
       "pro": [
         "Everything in Free",
-        "Unlimited watchlist",
-        "20 AI credits per day (~6 analyses)",
-        "Unlimited saved DCF analyses",
-        "Advanced screener with custom filters",
-        "Export financial data as CSV",
+        "20 AI credits per day (~6 full reports)",
+        "Chat with the AI Analyst about any company",
+        "Historical valuation multiples (P/E, P/S, EV/EBITDA)",
         "Early access to new features",
         "Private value investors community",
-        "Priority 24/7 email support"
+        "Priority email support"
       ]
     },
     "faq": {

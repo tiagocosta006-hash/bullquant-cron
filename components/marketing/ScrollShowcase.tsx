@@ -101,13 +101,12 @@ export function ScrollShowcase({
         // câmara: zoom puro na cena 2, recua na 3 — sem translação lateral
         // (o pan em X/Y dava sensação de deriva; a origem descentrada chega
         // para puxar o olhar ao quadrante das métricas)
-        if (sceneRef.current) {
-          tl.to(
-            sceneRef.current,
-            { scale: 1.07, transformOrigin: "60% 35%", duration: 1.6, ease: "none" },
-            1.8,
-          ).to(sceneRef.current, { scale: 1, duration: 1.6, ease: "none" }, 3.6);
-        }
+        /* Zoom de câmara REMOVIDO. Aproximava a cena a 1.07 e recuava outra
+           vez a 1, DEPOIS de o frame já ter assentado — mexer-lhe na escala
+           quando o olho o acabou de pousar lê-se como instabilidade. As
+           legendas e as barras já contam a progressão das cenas; o
+           enquadramento pode ficar quieto. É a única alteração face ao
+           original desta secção. */
         // saída: o frame afasta-se enquanto o manifesto toma o palco
         if (frameRef.current) {
           tl.to(frameRef.current, { scale: 0.94, opacity: 0.6, duration: 0.8, ease: "none" }, 5.2);
@@ -120,7 +119,16 @@ export function ScrollShowcase({
   return (
     <div ref={trackRef} className="relative h-[240vh]">
       <div className="sticky top-0 flex h-svh flex-col items-center justify-center gap-7 px-4 sm:px-6">
-        <div ref={frameRef} className="w-full max-w-5xl [transform-style:preserve-3d]">
+        {/* data-showcase-frame: gancho estável para as variantes de tamanho
+            das imagens. Estavam presas a `.max-w-5xl:has(> [style*="preserve-3d"])`,
+            que nunca casou — `preserve-3d` aqui é uma classe utilitária do
+            Tailwind, não um atributo `style` inline. Um seletor que depende da
+            forma como a classe foi escrita parte-se ao primeiro refactor. */}
+        <div
+          ref={frameRef}
+          data-showcase-frame
+          className="w-full max-w-5xl [transform-style:preserve-3d]"
+        >
           <div ref={sceneRef} className="will-change-transform">
             {children}
           </div>

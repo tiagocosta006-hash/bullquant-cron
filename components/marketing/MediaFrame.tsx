@@ -50,9 +50,10 @@ export function MediaFrame({
   const hasMedia = Boolean(media?.video || media?.image);
 
   return (
-    <LiquidGlass className={cn("rounded-3xl p-2 sm:p-3", className)}>
-      {/* traço de luz dourada a circular o perímetro (globals .beam-ring) */}
-      <span aria-hidden className="beam-ring" />
+    <LiquidGlass data-media-frame className={cn("rounded-3xl p-2 sm:p-3", className)}>
+      {/* beam-ring (traço de luz a circular o perímetro, 7s) removido a
+          2026-08-05: era mais um loop dourado permanente a competir com o CTA.
+          A moldura já se destaca pela borda + sombra. */}
       {/* chrome do browser */}
       <div className="flex items-center gap-3 px-3 pb-2 pt-1">
         <span className="flex gap-1.5" aria-hidden>
@@ -66,8 +67,16 @@ export function MediaFrame({
         <span className="w-10" aria-hidden />
       </div>
 
+      {/* Com MEDIA, esta div é a moldura que recorta o vídeo/imagem e precisa
+          de borda + fundo próprios. Com o MOCK em JSX, era uma terceira caixa
+          entre a moldura do browser e os cartões lá dentro: quadro > quadro >
+          cartões, três bordas concêntricas para nada. Sem media fica só o
+          contentor de layout, invisível. */}
       <div
-        className="relative overflow-hidden rounded-2xl border border-border/50 bg-card/40"
+        className={cn(
+          "relative overflow-hidden rounded-2xl",
+          hasMedia && "border border-border/50 bg-card/40",
+        )}
         style={hasMedia ? { aspectRatio: aspect } : undefined}
       >
         {media?.video ? (

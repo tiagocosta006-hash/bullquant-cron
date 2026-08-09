@@ -1,4 +1,3 @@
-import { Parallax } from "@/components/fx/Parallax";
 import { Reveal } from "@/components/fx/Reveal";
 import { cn } from "@/lib/utils";
 
@@ -31,7 +30,13 @@ export function FeatureStory({
     <div className="grid items-start gap-12 lg:grid-cols-12 lg:gap-20">
       <Reveal
         className={cn(
-          "relative lg:col-span-5 lg:sticky lg:top-32 lg:self-start",
+          /* SEM `lg:sticky lg:top-32`. A coluna do texto ficava PREGADA no
+             ecrã enquanto o gráfico ao lado subia — duas metades da mesma
+             secção a andar a ritmos diferentes. Era esta a origem do
+             "a secção 01 tem scroll separado": não eram os ScrollTriggers do
+             gráfico, era o texto a não acompanhar. Agora as duas colunas
+             sobem juntas. */
+          "relative lg:col-span-5",
           reverse && "lg:order-2",
         )}
       >
@@ -43,15 +48,17 @@ export function FeatureStory({
             {index}
           </span>
         ) : null}
-        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+        <div data-kicker className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
           {eyebrow}
         </div>
         {/* hairline de capítulo — desenha-se quando o Reveal entra */}
         <span aria-hidden className="chapter-rule mt-5 block h-px w-24" />
         <h2 className="mt-5 max-w-[16ch] text-balance text-4xl font-extrabold leading-[1.02] tracking-[-0.03em] sm:text-5xl md:text-6xl">
           {title}
+          {/* sem gold-sheen-text: com 3 stories, o brilho aparecia 3x e roubava
+              o destaque ao herói e ao preço. O ouro sozinho já marca o acento. */}
           {titleAccent ? (
-            <span className="gold-sheen-text text-primary"> {titleAccent}</span>
+            <span className="text-primary"> {titleAccent}</span>
           ) : null}
         </h2>
         <p className="mt-6 max-w-[46ch] text-lg leading-relaxed text-muted-foreground">{desc}</p>
@@ -68,9 +75,12 @@ export function FeatureStory({
       </Reveal>
 
       <Reveal className={cn("lg:col-span-7", reverse && "lg:order-1")}>
-        <Parallax amp={44} zoom>
+        {/* Sem Parallax: o visual derivava em relacao ao texto imediatamente ao
+            lado, que esta quieto. Duas coisas emparelhadas a moverem-se a
+            ritmos diferentes leem-se como erro de alinhamento. */}
+        <div>
           {children}
-        </Parallax>
+        </div>
       </Reveal>
     </div>
   );

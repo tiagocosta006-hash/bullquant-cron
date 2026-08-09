@@ -1,0 +1,395 @@
+/* ============================================================
+   BullValue — VARIANTES DE DESIGN (andaime de exploração)
+   ============================================================
+
+   Alternativas comutáveis ao vivo para cada padrão que o detector do
+   impeccable marcou como "AI slop" (categoria `slop`) no DOM renderizado.
+   Cada dimensão vive num atributo em <html>, escrito pelo painel Tweak
+   (components/devtools/TweakPanel.tsx → separador "Variantes").
+
+   SEM atributo = comportamento original. Zero risco em produção: se
+   ninguém escrever o atributo, nenhuma destas regras aplica.
+
+   ⚠️ Isto é ANDAIME, não a solução final. Serve para VER as alternativas
+   na página real e escolher. Quando uma variante ganhar, implementa-se
+   como deve ser no componente (markup + Tailwind) e apaga-se a dimensão
+   daqui. Não deixar isto a decidir o design de produção para sempre.
+
+   Hooks no markup: [data-icon-tile] [data-kicker] [data-replica]
+   ============================================================ */
+
+/* ── 1 · ÍCONE DOS CARTÕES ──────────────────────────────────
+   Tell: `icon-tile-stack` — quadrado arredondado com ícone por cima do
+   título. É o template universal de cartão de funcionalidade gerado por
+   IA; 4 na landing + 3 nos preços. */
+
+/* b · ao lado do título, sem caixa */
+[data-v-icon="b"] [data-icon-tile] {
+  float: left;
+  height: 1.5rem;
+  width: 1.5rem;
+  margin: 0.1rem 0.55rem 0 0;
+  border: none;
+  background: none;
+  border-radius: 0;
+}
+[data-v-icon="b"] [data-icon-tile] ~ p {
+  clear: both;
+}
+
+/* c · ícone nu, maior, sem contentor (mantém-se acima) */
+[data-v-icon="c"] [data-icon-tile] {
+  height: auto;
+  width: auto;
+  border: none;
+  background: none;
+  border-radius: 0;
+  margin-bottom: 0.85rem;
+}
+[data-v-icon="c"] [data-icon-tile] svg {
+  height: 1.6rem;
+  width: 1.6rem;
+  stroke-width: 1.5;
+}
+
+/* d · sem ícone — só tipografia */
+[data-v-icon="d"] [data-icon-tile] {
+  display: none;
+}
+
+/* ── 2 · SOBRETÍTULO (KICKER) ───────────────────────────────
+   Tell: `kicker-above-heading` — rótulo minúsculo em maiúsculas com
+   tracking, em bloco próprio por cima do heading. A regra do impeccable
+   diz "banned outright, repeated or not". 2 na landing + 4 no /about. */
+
+/* b · removido — o heading carrega-se a si próprio */
+[data-v-kicker="b"] [data-kicker] {
+  display: none;
+}
+
+/* c · traço + minúsculas, sem caps nem tracking */
+[data-v-kicker="c"] [data-kicker] {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+  font-size: 0.8125rem;
+}
+[data-v-kicker="c"] [data-kicker]::before {
+  content: "";
+  width: 1.5rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+  flex: none;
+}
+/* centrado (secções com text-center) precisa do traço dos dois lados */
+[data-v-kicker="c"] .text-center [data-kicker] {
+  justify-content: center;
+}
+[data-v-kicker="c"] .text-center [data-kicker]::after {
+  content: "";
+  width: 1.5rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+  flex: none;
+}
+
+/* d · discreto: neutro em vez de dourado, sem caps (resolve também o
+   contraste de 3,1:1 destes rótulos) */
+[data-v-kicker="d"] [data-kicker] {
+  text-transform: none;
+  letter-spacing: 0.01em;
+  color: var(--muted-foreground);
+  font-weight: 500;
+}
+
+/* ── 3 · CARTÕES ANINHADOS ──────────────────────────────────
+   Tell: `nested-cards` ×19 — cartões dentro de cartões. As réplicas do
+   bento vivem dentro de um LiquidGlass e trazem as suas próprias caixas. */
+
+/* b · achatado: o interior perde superfície, fica só tipografia+espaço */
+[data-v-nest="b"] [data-replica] .glass,
+[data-v-nest="b"] [data-replica] [class*="rounded-"] {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+/* c · divisores: sem caixas, mas com linhas a separar os blocos */
+[data-v-nest="c"] [data-replica] .glass,
+[data-v-nest="c"] [data-replica] [class*="rounded-"] {
+  background: transparent !important;
+  border-radius: 0 !important;
+  border-width: 0 0 1px 0 !important;
+  border-bottom-color: var(--border) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+/* d · só o cartão exterior tem superfície; o interior desaparece por
+   completo enquanto contentor (mantém o conteúdo) */
+[data-v-nest="d"] [data-replica] {
+  --tw-shadow: none;
+}
+[data-v-nest="d"] [data-replica] * {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+/* ── 4 · TEXTO COM GRADIENTE ────────────────────────────────
+   Tell: `gradient-text` — background-clip:text. Clássico dos tells de IA. */
+
+/* b · cor sólida, sem varrimento */
+[data-v-sheen="b"] .gold-sheen-text,
+[data-v-sheen="b"] .manifesto-sheen {
+  background-image: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: currentColor !important;
+  color: var(--primary) !important;
+  animation: none !important;
+}
+
+/* c · sublinhado dourado em vez de gradiente no texto */
+[data-v-sheen="c"] .gold-sheen-text,
+[data-v-sheen="c"] .manifesto-sheen {
+  background-image: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: currentColor !important;
+  color: inherit !important;
+  animation: none !important;
+  box-shadow: inset 0 -0.12em 0 var(--primary);
+}
+
+/* d · itálico display sem cor de acento (deixa a forma da letra marcar) */
+[data-v-sheen="d"] .gold-sheen-text,
+[data-v-sheen="d"] .manifesto-sheen {
+  background-image: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: currentColor !important;
+  color: inherit !important;
+  animation: none !important;
+}
+
+/* ── 5 · ELEVAÇÃO (borda fina + sombra larga) ───────────────
+   Tell: `gpt-thin-border-wide-shadow` — presente nas 5 páginas. É a
+   assinatura de superfície mais transversal do site. */
+
+/* b · sombra curta e assente, sem borda */
+[data-v-elev="b"] .glass {
+  border-color: transparent !important;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 2px 6px rgb(0 0 0 / 0.05) !important;
+}
+
+/* c · só borda, zero sombra (papel, não vidro) */
+[data-v-elev="c"] .glass {
+  box-shadow: none !important;
+  border-color: var(--border) !important;
+}
+
+/* d · superfície plana: distingue-se pelo tom, não por borda nem sombra */
+[data-v-elev="d"] .glass {
+  box-shadow: none !important;
+  border-color: transparent !important;
+  background: color-mix(in srgb, var(--foreground) 4%, var(--background)) !important;
+  backdrop-filter: none !important;
+}
+
+/* ── 6 · TEXTO FUNCIONAL MINÚSCULO ──────────────────────────
+   Achado: `undersized-ui-text` ×26 (10px) + `tiny-text` ×5 (11px).
+   O piso defensável são 11px; abaixo disso falha em alta densidade. */
+
+[data-v-microtext="b"] .text-\[9px\],
+[data-v-microtext="b"] .text-\[10px\],
+[data-v-microtext="b"] .text-\[11px\] {
+  font-size: 11px !important;
+}
+
+[data-v-microtext="c"] .text-\[9px\],
+[data-v-microtext="c"] .text-\[10px\],
+[data-v-microtext="c"] .text-\[11px\] {
+  font-size: 12px !important;
+  letter-spacing: 0 !important;
+}
+
+/* d · 12px e sem maiúsculas nos micro-rótulos (mais legível ainda) */
+[data-v-microtext="d"] .text-\[9px\],
+[data-v-microtext="d"] .text-\[10px\],
+[data-v-microtext="d"] .text-\[11px\] {
+  font-size: 12px !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+/* ── 7 · CONTRASTE DO DOURADO ───────────────────────────────
+   Achado: `low-contrast` ×54 no site todo. O --primary (#b8873b) sobre
+   papel (#fafaf7) dá 3,1:1 — falha AA para texto normal. */
+
+/* b · dourado escurecido até passar AA em texto pequeno */
+[data-v-contrast="b"] {
+  --primary: #8a6524;
+}
+
+/* c · dourado só em superfícies/CTAs; texto pequeno passa a neutro */
+[data-v-contrast="c"] [data-kicker],
+[data-v-contrast="c"] .text-primary\/80,
+[data-v-contrast="c"] .text-primary\/70,
+[data-v-contrast="c"] .text-primary\/50 {
+  color: var(--foreground) !important;
+  opacity: 0.75;
+}
+
+/* d · as duas coisas: dourado AA + micro-rótulos neutros */
+[data-v-contrast="d"] {
+  --primary: #8a6524;
+}
+[data-v-contrast="d"] [data-kicker] {
+  color: var(--muted-foreground) !important;
+}
+
+/* ── 8 · CONTEÚDO ESCONDIDO EM REPOUSO ──────────────────────
+   Achado (severidade `error`): 83% do texto da landing fica a opacity 0
+   até o Reveal disparar. Se o JS falhar, ou um crawler não fizer scroll,
+   quatro quintos da página não existem. */
+
+/* b · só movimento: o texto está sempre visível, só desliza */
+[data-v-reveal="b"] .reveal,
+[data-v-reveal="b"] .hero-in,
+[data-v-reveal="b"] [data-reveal] {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* c · sem reveal nenhum: tudo assente desde o início */
+[data-v-reveal="c"] .reveal,
+[data-v-reveal="c"] .hero-in,
+[data-v-reveal="c"] [data-reveal] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+/* d · fade curto sem deslocação (menos custo de layout, sem invisibilidade
+   prolongada) */
+[data-v-reveal="d"] .reveal,
+[data-v-reveal="d"] .hero-in,
+[data-v-reveal="d"] [data-reveal] {
+  transform: none !important;
+  transition-duration: 220ms !important;
+  animation-duration: 220ms !important;
+}
+
+/* ── RITMO DA PÁGINA DE PREVIEW ─────────────────────────────
+   O slider "Ar entre secções" do painel injeta uma folha de estilos ao vivo;
+   para a rota /preview a escolha (140px) fica fixa aqui. Equivalente ao que
+   o painel gerava, mas scoped ao wrapper em vez de global. */
+.preview-rhythm .py-24 {
+  padding-block: 105px;
+}
+@media (min-width: 768px) {
+  .preview-rhythm .md\:py-32 {
+    padding-block: 140px;
+  }
+}
+
+/* ── 9 · IMAGEM DE FUNDO DO HERO ────────────────────────────
+   Alternativas geradas (tema gráficos / Wall Street). Cada uma tem versão
+   CLARA e ESCURA — a troca é automática pelo `.dark` do <html>, porque uma
+   imagem pensada para papel fica ilegível sobre preto e vice-versa.
+
+   Os selectores cobrem os dois sítios onde o atributo pode viver: no <html>
+   (escrito pelo painel Tweak) ou num wrapper (rota /preview). Daí o par
+   `.dark[data-v-hero]` + `.dark [data-v-hero]`.
+
+   Posicionada à DIREITA de propósito: as imagens foram geradas com espaço
+   vazio em cima à esquerda, que é onde a headline vive. */
+.hero-art {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: cover;
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-out);
+  pointer-events: none;
+}
+[data-v-hero]:not([data-v-hero="a"]) .hero-art {
+  opacity: 1;
+}
+/* véu por cima da imagem para o texto nunca perder contraste */
+[data-v-hero]:not([data-v-hero="a"]) .hero-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    var(--background) 18%,
+    color-mix(in srgb, var(--background) 55%, transparent) 52%,
+    transparent 78%
+  );
+}
+
+[data-v-hero="b"] .hero-art { background-image: url("/media/hero/candles-light.webp"); }
+[data-v-hero="c"] .hero-art { background-image: url("/media/hero/tape-light.webp"); }
+[data-v-hero="d"] .hero-art { background-image: url("/media/hero/expo-light.webp"); }
+[data-v-hero="e"] .hero-art { background-image: url("/media/hero/floor-light.webp"); }
+
+.dark[data-v-hero="b"] .hero-art, .dark [data-v-hero="b"] .hero-art { background-image: url("/media/hero/candles-dark.webp"); }
+.dark[data-v-hero="c"] .hero-art, .dark [data-v-hero="c"] .hero-art { background-image: url("/media/hero/tape-dark.webp"); }
+.dark[data-v-hero="d"] .hero-art, .dark [data-v-hero="d"] .hero-art { background-image: url("/media/hero/expo-dark.webp"); }
+.dark[data-v-hero="e"] .hero-art, .dark [data-v-hero="e"] .hero-art { background-image: url("/media/hero/floor-dark.webp"); }
+
+/* ── 9 · TAMANHO DAS IMAGENS / MOCKS ────────────────────────
+   Três formas diferentes de dar mais presença ao frame do produto e às
+   réplicas do bento. Não é a mesma coisa com números diferentes: cada uma
+   ataca o problema por um lado.
+
+   O `.glass` do MediaFrame é o quadro do browser; `[data-replica]` são as
+   réplicas dentro dos cartões do bento. */
+
+/* b · MAIS LARGO — o frame sai do contentor de 5xl e vai até 7xl, e o bento
+   passa a uma coluna para cada réplica ter a largura toda. Ganha-se tamanho
+   sem mexer em escala nem cortar nada. */
+[data-v-imgsize="b"] [data-showcase-frame] {
+  max-width: 80rem;
+}
+[data-v-imgsize="b"] [data-bento-grid] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* c · FULL-BLEED — o frame do produto rompe a margem e vai de bordo a bordo.
+   É o gesto mais forte: a imagem deixa de estar "numa página" e passa a ser
+   a página. Só o frame; as réplicas ficam como estão. */
+[data-v-imgsize="c"] [data-showcase-frame] {
+  max-width: none;
+  width: calc(100vw - 2rem);
+  margin-inline: calc(50% - 50vw + 1rem);
+}
+
+/* d · ZOOM NO CONTEÚDO — o contentor fica igual, mas o que está DENTRO das
+   réplicas cresce. Resolve o problema real de fundo (os números eram
+   pequenos de mais para se lerem) em vez de aumentar a moldura à volta. */
+[data-v-imgsize="d"] [data-replica] {
+  font-size: 1.15em;
+}
+[data-v-imgsize="d"] [data-replica] .text-\[10px\] {
+  font-size: 12px;
+}
+[data-v-imgsize="d"] [data-replica] .text-\[11px\] {
+  font-size: 13px;
+}
+[data-v-imgsize="d"] [data-replica] img {
+  transform: scale(1.1);
+}

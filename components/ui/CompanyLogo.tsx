@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
  * O componente <Image> injetado repetidas vezes (ex: marquees) destroi o Main Thread
  * devido aos Observers nativos do React.
  */
-function getOptimizedUrl(src: string, size: number) {
+export function getOptimizedUrl(src: string, size: number) {
   if (!src.startsWith('http')) return src;
   
   // O Next.js apenas aceita widths que estejam na lista do next.config.js (default imageSizes).

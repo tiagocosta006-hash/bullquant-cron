@@ -134,10 +134,26 @@ interface LiquidGlassProps extends React.HTMLAttributes<HTMLDivElement> {
   fade?: boolean;
 }
 
+/**
+ * ORÇAMENTO DE PERFORMANCE (2026-08-06) — lente desligada.
+ *
+ * A lente construía um mapa de deslocamento SDF pixel a pixel num canvas de
+ * até 340px, fazia `toDataURL()` e montava um filtro SVG com 3
+ * `feDisplacementMap` — POR INSTÂNCIA, e voltava a correr em cada resize e no
+ * `document.fonts.ready`. Como o `backdrop-filter` foi removido em
+ * globals.css (ver o bloco "ORÇAMENTO DE PERFORMANCE"), o filtro já nem
+ * tinha onde aplicar: era trabalho puro sem efeito visível.
+ *
+ * Pôr a `true` devolve a lente — mas só faz sentido se o backdrop-filter
+ * também voltar.
+ */
+const LENS_ENABLED = false;
+
 export function LiquidGlass({ frost = false, fade = false, className, children, ...rest }: LiquidGlassProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!LENS_ENABLED) return;
     if (frost) return;
     const el = ref.current;
     if (!el) return;

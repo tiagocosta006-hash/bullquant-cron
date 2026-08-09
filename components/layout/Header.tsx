@@ -125,7 +125,9 @@ export async function Header() {
                   data-track="header_register"
                   className={cn(
                     buttonVariants(),
-                    "pressable cta-sheen h-11 rounded-full font-semibold md:h-8",
+                    // sem cta-sheen: o header é permanente, logo o brilho corria
+                    // durante toda a visita e competia com o CTA do herói.
+                    "pressable h-11 rounded-full font-semibold md:h-8",
                   )}
                 >
                   {t('createAccount')}

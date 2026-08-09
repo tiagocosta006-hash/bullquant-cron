@@ -37,6 +37,20 @@ export async function generateMetadata({
   };
 }
 
+/**
+ * Fotos da equipa, por ordem dos membros em `about.team.members` (messages/*.json).
+ *
+ * Estava num ternário triplo dentro do JSX — para trocar uma foto era preciso
+ * ir lá abaixo desmontar a expressão, e a correspondência entre a posição do
+ * membro no i18n e o ficheiro não se via em lado nenhum.
+ *
+ * Para trocar: põe o ficheiro em `public/team/` e muda a linha. Comprime-o
+ * antes — o `rodrigo.jpg` tem 1,8 MB e o `tiago.jpg` 1,25 MB, o que é muito
+ * para um avatar de 128px (o next/image redimensiona no servidor, mas o
+ * original ainda é lido e processado a cada build).
+ */
+const TEAM_PHOTOS = ["/team/rodrigo.jpg", "/team/tiago.jpg", "/team/alex.jpeg"] as const;
+
 export default function AboutPage() {
   const t = useTranslations("about");
 
@@ -105,7 +119,7 @@ export default function AboutPage() {
           className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center"
         >
           <BrandMark className="h-14 w-14 rounded-2xl shadow-lg" />
-          <div className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+          <div data-kicker className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
             {t("badge")}
           </div>
           <h1 className="text-balance text-4xl font-extrabold leading-[1.02] tracking-[-0.03em] sm:text-6xl">
@@ -123,7 +137,7 @@ export default function AboutPage() {
             <div className="mb-2 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
               <Target className="h-7 w-7 text-primary" />
             </div>
-            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            <div data-kicker className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
               {t("problem.eyebrow")}
             </div>
             <h2 className="text-3xl font-extrabold tracking-[-0.03em] text-foreground sm:text-4xl">
@@ -185,7 +199,7 @@ export default function AboutPage() {
               <div className="mb-2 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
                 <Scale className="h-7 w-7 text-primary" />
               </div>
-              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+              <div data-kicker className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
                 {t("philosophy.eyebrow")}
               </div>
               <h2 className="text-3xl font-extrabold tracking-[-0.03em] text-foreground sm:text-4xl">
@@ -202,7 +216,7 @@ export default function AboutPage() {
         <section className="relative isolate flex flex-col gap-12">
           <SectionBg tone="raised" motif="dots" />
           <Reveal className="mx-auto flex max-w-2xl flex-col gap-4 text-center">
-            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            <div data-kicker className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
               {t("team.eyebrow")}
             </div>
             <h2 className="text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">{t("team.title")}</h2>
@@ -223,7 +237,7 @@ export default function AboutPage() {
                 role: t(`team.members.${index}.role`),
                 bio: t(`team.members.${index}.bio`),
                 initials,
-                image: index === 0 ? "/team/rodrigo.jpg" : index === 1 ? "/team/tiago.jpg" : "/team/alex.jpeg",
+                image: TEAM_PHOTOS[index],
                 socials: {
                   linkedin: t.has(`team.members.${index}.socials.linkedin`) ? t(`team.members.${index}.socials.linkedin`) : "#",
                   instagram: t.has(`team.members.${index}.socials.instagram`) ? t(`team.members.${index}.socials.instagram`) : "#",
@@ -247,7 +261,7 @@ export default function AboutPage() {
         <section className="relative isolate flex flex-col gap-12">
           <SectionBg tone="sunken" motif="stage" />
           <Reveal className="mx-auto flex max-w-2xl flex-col gap-4 text-center">
-            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            <div data-kicker className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
               {t("contact.eyebrow")}
             </div>
             <h2 className="text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">{t("contact.title")}</h2>

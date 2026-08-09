@@ -20,7 +20,9 @@ type MockEvent = { day: number; ticker: string; beat: boolean | null };
 const EVENTS: MockEvent[] = [
   { day: 3, ticker: "AAPL", beat: true },
   { day: 8, ticker: "MSFT", beat: true },
-  { day: 8, ticker: "GOOGL", beat: false },
+  // AMD e não GOOGL: numa célula de calendário a 10px, 5 caracteres não cabem
+  // e saía "GO…". Numa réplica, um ticker cortado lê-se como erro do produto.
+  { day: 8, ticker: "AMD", beat: false },
   { day: 11, ticker: "AMZN", beat: null },
   { day: 14, ticker: "NVDA", beat: null },
 ];
@@ -42,7 +44,7 @@ export function CalendarReplica({
   EVENTS.forEach((e) => byDay.set(e.day, [...(byDay.get(e.day) ?? []), e]));
 
   return (
-    <div className="mt-5 space-y-3">
+    <div data-replica className="mt-5 space-y-3">
       {/* toolbar — cópia fiel de EarningsCalendar.tsx */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="inline-flex rounded-lg border border-border bg-card p-0.5">
@@ -83,8 +85,16 @@ export function CalendarReplica({
                 <div className="space-y-0.5">
                   {events.map((e) => (
                     <div key={e.ticker} className="flex items-center gap-1 truncate text-[10px] font-semibold">
-                      <CompanyLogo src={null} alt={e.ticker} fallback={e.ticker} size={12} className="rounded-[2px]" />
-                      <span className="truncate">{e.ticker}</span>
+                      <CompanyLogo src={null} alt={e.ticker} fallback={e.ticker} size={12} className="shrink-0 rounded-[2px]" />
+                      {/* O ticker só aparece a partir de xl (1280px).
+                          Medido: a 1024px a célula do calendário tem 21px
+                          úteis e o ticker precisa de 27; só a partir de 1280,
+                          com o contentor no seu máximo (max-w-6xl), é que
+                          sobram ~75px por célula. Abaixo disso fica o logo +
+                          o marcador de beat/miss — que é a informação que
+                          interessa — em vez de um ticker cortado, que numa
+                          réplica se lê como defeito do produto. */}
+                      <span className="hidden truncate xl:inline">{e.ticker}</span>
                       {e.beat !== null &&
                         (e.beat ? (
                           <TrendingUp className="h-2.5 w-2.5 shrink-0 text-bull" />

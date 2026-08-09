@@ -197,7 +197,7 @@ export function DcfScrollDemo({
           </div>
         </div>
 
-        <p className="mt-6 border-t border-border/60 pt-4 text-[11px] leading-relaxed text-muted-foreground/80">
+        <p className="mt-6 max-w-[52ch] border-t border-border/60 pt-4 text-[11px] leading-relaxed text-muted-foreground/80">
           {labels.disclaimer}
         </p>
       </LiquidGlass>

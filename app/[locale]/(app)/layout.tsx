@@ -1,7 +1,7 @@
 import { TopNav } from "@/components/layout/TopNav";
 import { MobileDock } from "@/components/layout/MobileDock";
 import { ContourCanvas } from "@/components/fx/ContourCanvas";
-import { InertiaScroll } from "@/components/fx/InertiaScroll";
+import { SmoothScroll } from "@/components/fx/SmoothScroll";
 import { PaddleRetain } from "@/components/providers/PaddleRetain";
 import { getUser } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
@@ -47,7 +47,7 @@ export default async function AppLayout({
     // que usa 100vw para escapar ao max-w-7xl do <main>) não podem gerar scroll
     // horizontal — o 100vw inclui a largura da barra de scroll vertical.
     <div className="relative min-h-screen overflow-x-clip">
-      <InertiaScroll />
+      <SmoothScroll />
       <ContourCanvas />
       <PaddleRetain email={userEmail} customerId={dbUser?.paddleCustomerId} />
       <TopNav

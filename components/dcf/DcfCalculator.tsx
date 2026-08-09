@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Search, Loader2, Wand2, Info } from "lucide-react"
+import { Search, Loader2, Wand2, Info, Lock } from "lucide-react"
 import { Popover as PopoverPrimitive } from "@base-ui/react/popover"
 import { useTranslations } from "next-intl"
 import { Card } from "@/components/ui/card"
@@ -77,8 +77,17 @@ type InitialAnalysis = Omit<SavedAnalysis, "inputs"> & {
   priceAtSave: number | null
 }
 
-export function DcfCalculator({ initialAnalysis, defaultTicker }: { initialAnalysis?: InitialAnalysis; defaultTicker?: string }) {
+export function DcfCalculator({
+  initialAnalysis,
+  defaultTicker,
+  locked,
+}: {
+  initialAnalysis?: InitialAnalysis
+  defaultTicker?: string
+  locked?: boolean
+}) {
   const t = useTranslations("dcf")
+  const tLocked = useTranslations("dcf.demoLocked")
 
   // --- estado dos inputs ---
   const [currency, setCurrency] = React.useState("$") // Poderíamos deduzir da empresa
@@ -110,7 +119,7 @@ export function DcfCalculator({ initialAnalysis, defaultTicker }: { initialAnaly
 
   React.useEffect(() => {
     const fetchResults = async () => {
-      if (debouncedQuery.length < 2) {
+      if (locked || debouncedQuery.length < 2) {
         setResults([])
         setIsOpen(false)
         return
@@ -128,7 +137,7 @@ export function DcfCalculator({ initialAnalysis, defaultTicker }: { initialAnaly
       }
     }
     fetchResults()
-  }, [debouncedQuery])
+  }, [debouncedQuery, locked])
 
   // Fecho por clique-fora/Escape é tratado pelo Popover (Base UI); cliques
   // dentro do wrapper (o próprio input) não fecham a lista.
@@ -313,15 +322,32 @@ export function DcfCalculator({ initialAnalysis, defaultTicker }: { initialAnaly
       <Card className="p-6 gap-0 space-y-5">
         {/* Autopreencher */}
         <div ref={wrapperRef} className="relative z-20">
-          <label className="text-sm font-medium text-foreground mb-2 block">{t("autofillLabel")}</label>
+          <div className="mb-2 flex items-center gap-2">
+            <label className="text-sm font-medium text-foreground block">{t("autofillLabel")}</label>
+            {locked && (
+              <span
+                title={tLocked("tooltip")}
+                className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary"
+              >
+                {tLocked("badge")}
+              </span>
+            )}
+          </div>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder={t("autofillPlaceholder")}
+              placeholder={locked ? tLocked("placeholder") : t("autofillPlaceholder")}
               className="pl-10 bg-input/30 border-input/30"
               value={query}
+              readOnly={locked}
+              onMouseDown={(e) => {
+                if (!locked) return
+                e.preventDefault()
+                window.location.href = "/register"
+              }}
               onChange={(e) => {
+                if (locked) return
                 setQuery(e.target.value)
                 if (e.target.value.length >= 2) setIsOpen(true)
               }}
@@ -329,7 +355,18 @@ export function DcfCalculator({ initialAnalysis, defaultTicker }: { initialAnaly
             {(isSearching || isLoadingData) && (
               <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
             )}
+            {locked && !isSearching && !isLoadingData && (
+              <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/60" />
+            )}
           </div>
+          {locked && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              {tLocked("hint")}{" "}
+              <a href="/register" className="font-semibold text-primary hover:underline">
+                {tLocked("cta")}
+              </a>
+            </p>
+          )}
 
           {/* Portalado (Base UI): o Card usa .glass com overflow hidden, que
               clipava o dropdown absoluto antigo quando saía do card. */}
@@ -505,13 +542,26 @@ export function DcfCalculator({ initialAnalysis, defaultTicker }: { initialAnaly
           inputs={currentForSave?.inputs}
         />
         <WaccBreakdownCard breakdown={waccBreakdown} fcfMode={fcfMode} onUseWacc={handleUseWacc} />
-        <SavedAnalyses
-          ticker={loadedTicker}
-          currency={currency}
-          current={currentForSave}
-          canSave={result.valid && loadedTicker !== null}
-          onLoad={handleLoadSaved}
-        />
+        {locked ? (
+          <Card className="p-5 text-center">
+            <Lock className="mx-auto mb-2 h-5 w-5 text-primary" />
+            <p className="text-sm font-semibold text-foreground">{tLocked("saveTitle")}</p>
+            <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">{tLocked("saveDesc")}</p>
+            <a href="/register">
+              <Button size="sm" className="mt-3">
+                {tLocked("cta")}
+              </Button>
+            </a>
+          </Card>
+        ) : (
+          <SavedAnalyses
+            ticker={loadedTicker}
+            currency={currency}
+            current={currentForSave}
+            canSave={result.valid && loadedTicker !== null}
+            onLoad={handleLoadSaved}
+          />
+        )}
         <p className="text-xs text-muted-foreground leading-relaxed px-1">{t("disclaimer")}</p>
       </div>
     </div>

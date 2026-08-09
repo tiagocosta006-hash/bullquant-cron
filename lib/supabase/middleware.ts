@@ -31,24 +31,32 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // Remove o prefixo do idioma (ex: /pt/login -> /login, /en/dashboard -> /dashboard)
-  const normalizedPath = pathname.replace(/^\/(?:en|pt|es|fr|de|it|zh|ja|nl)(?=\/|$)/, '') || '/'
+  // next-intl usa localePrefix "as-needed": inglês (default) sem prefixo,
+  // português com /pt. Os matchers abaixo comparam contra o caminho SEM
+  // locale — sem isto, todo o gate falhava em silêncio para quem navega em
+  // português (/pt/dashboard nunca batia com pathname === '/dashboard').
+  //
+  // Ambos os lados deste merge corrigiram o mesmo bug em paralelo; a lista
+  // de locales do origin/main (en|pt|es|fr|de|it|zh|ja|nl) ficou reduzida a
+  // en|pt porque as outras 7 línguas foram cortadas neste merge (ver
+  // messages/*.json) — não há rotas /es|/fr|... para desprefixar.
+  const path = pathname.replace(/^\/(en|pt)(?=\/|$)/, '') || '/'
 
   const isAuthRoute =
-    normalizedPath.startsWith('/login') ||
-    normalizedPath.startsWith('/register') ||
-    normalizedPath.startsWith('/forgot-password') ||
-    normalizedPath.startsWith('/reset-password') ||
-    normalizedPath.startsWith('/verify-email')
+    path.startsWith('/login') ||
+    path.startsWith('/register') ||
+    path.startsWith('/forgot-password') ||
+    path.startsWith('/reset-password') ||
+    path.startsWith('/verify-email')
 
   // Filosofia: navegar é PÚBLICO (ver empresas, calculadora DCF, explorar,
   // dashboard, calendário…). Só as páginas PESSOAIS exigem sessão. Guardar
   // dados (posições, watchlist, cenários DCF) protege-se sempre na própria API
   // com 401 — isto é só o gate das PÁGINAS.
   const isPrivateRoute =
-    normalizedPath.startsWith('/portfolio') ||
-    normalizedPath.startsWith('/watchlist') ||
-    normalizedPath.startsWith('/settings')
+    path.startsWith('/portfolio') ||
+    path.startsWith('/watchlist') ||
+    path.startsWith('/settings')
 
   // Redirecionar utilizadores autenticados para fora das páginas de auth.
   if (user && isAuthRoute) {
@@ -67,20 +75,31 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Guest funnel: o resto da app fica atrás de conta, exceto /stock/AAPL — a
-  // demo viva usada no header/CTA "Espreitar sem conta". Objetivo é
+  // demo viva usada no header/CTA "Espreitar sem conta" — e /dcf, que na
+  // demo fica acessível mas TRANCADO à Apple (ver DcfCalculator `locked`
+  // prop, forçado em app/(app)/dcf/page.tsx quando !user). Objetivo é
   // maximizar criação de contas, não deixar o anónimo passear pela app
   // inteira; por isso vai para /register (sem ?redirect — não é suposto
   // voltar a esta página depois de entrar, é suposto criar conta).
-  const upperPath = normalizedPath.toUpperCase()
+  // ⚠️ Checklist: qualquer rota nova em app/(app)/ nasce PÚBLICA por omissão
+  // aqui — quem adicionar uma página tem de decidir explicitamente se entra
+  // em isPrivateRoute (precisa de conta, com redirect de regresso) ou
+  // isGuestOnlyRoute (bloqueada para anónimos, funil de aquisição).
+  //
+  // `/dcf` SAIU desta lista de propósito: o origin/main ainda bloqueava
+  // anónimos aqui, mas a demo de /dcf passou a ficar acessível e TRANCADA à
+  // Apple no próprio server component (ver `locked` em
+  // app/(app)/dcf/page.tsx → DcfCalculator) — bloquear no middleware também
+  // duplicava a regra e nunca deixava o anónimo ver a demo.
+  const upperPath = path.toUpperCase()
   const isGuestOnlyRoute =
-    normalizedPath === '/dashboard' ||
-    normalizedPath.startsWith('/explore') ||
-    normalizedPath.startsWith('/calendar') ||
-    normalizedPath.startsWith('/compare') ||
-    normalizedPath.startsWith('/analytics') ||
-    normalizedPath.startsWith('/transcripts') ||
-    normalizedPath === '/dcf' || // exato — /dcf/[id] é a página pública de DCF partilhada
-    (normalizedPath.startsWith('/stock/') && upperPath !== '/STOCK/AAPL')
+    path === '/dashboard' ||
+    path.startsWith('/explore') ||
+    path.startsWith('/calendar') ||
+    path.startsWith('/compare') ||
+    path.startsWith('/analytics') ||
+    path.startsWith('/transcripts') ||
+    (path.startsWith('/stock/') && upperPath !== '/STOCK/AAPL')
 
   if (!user && isGuestOnlyRoute) {
     const url = request.nextUrl.clone()

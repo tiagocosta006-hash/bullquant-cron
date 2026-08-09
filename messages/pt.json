@@ -1,13 +1,15 @@
 {
   "marketing": {
     "eyebrow": "Análise fundamental · Value investing",
-    "titleLead": "Vê o valor que",
-    "titleAccent": "os outros não veem.",
-    "subtitle": "10 anos de fundamentais, uma calculadora DCF que se autopreenche e um Analista IA, em português e de graça. Análise séria para quem investe a longo prazo.",
+    "titleLead": "BullValue: a plataforma para os",
+    "titleAccent": "value investors.",
+    "subtitle": "10 anos de fundamentais, uma calculadora DCF que se autopreenche, um Analista IA especializado, um novo método de encontrar e perceber empresas. Análise da equipa de gestão. E muito mais num só terminal.",
+    "boot": "A ler os números",
     "primaryCta": "Criar conta grátis",
     "secondaryCta": "Espreitar sem conta: AAPL",
     "peekCta": "Espreitar sem conta",
-    "trust": "Cobertura S&P 500 · Dados da SEC EDGAR · Sem cartão de crédito",
+    "trust": "",
+    "signature": "Feito por três portugueses.",
     "features": {
       "fundamentals": {
         "title": "10 anos de fundamentais",
@@ -39,9 +41,9 @@
     "showcase": {
       "caption": "Dez anos de fundamentais, DCF e Analista IA, num só terminal, sem folhas de cálculo.",
       "alt": "Demonstração do terminal BullValue",
-      "caption2": "Preço em direto, watchlist e calendário de resultados, tudo a um ⌘K de distância.",
+      "caption2": "Preço em direto, watchlist e calendário de resultados, tudo a um clique de distância.",
       "caption3": "Grátis, em português, pronto em menos de um minuto.",
-      "live": "Em direto",
+      "updated": "Atualizado às {time}",
       "finRows": {
         "gross": "Bruta",
         "operating": "Operacional"
@@ -55,19 +57,19 @@
       }
     },
     "manifesto": {
-      "l1": "Menos ruído, mais convicção.",
-      "l2": "Cada decisão apoiada em 10 anos de fundamentais.",
-      "l3": "Isto é investir com estratégia."
+      "l1": "O preço é o que se paga.",
+      "l2": "O valor é o conhecimento.",
+      "l3": "Isto é investir."
     },
     "stories": {
       "fundamentals": {
         "eyebrow": "Fundamentais",
-        "title": "Dez anos de história,",
-        "titleAccent": "num relance.",
-        "desc": "Receitas, margens, ROIC, free cash flow e recompras, 40 trimestres da SEC EDGAR, desenhados para se lerem em segundos.",
-        "b1": "9 gráficos essenciais por empresa, com CAGR automático",
+        "title": "Milhões de dados,",
+        "titleAccent": "todos à tua disposição.",
+        "desc": "Receitas, margens, rácios, free cash flow e muito mais. 40 trimestres das empresas, desenhados para se lerem em segundos.",
+        "b1": "11 gráficos essenciais por empresa.",
         "b2": "Trimestral, TTM ou anual, tu escolhes a lente",
-        "b3": "Dados oficiais da SEC, atualizados toda a semana",
+        "b3": "Tratados semanalmente, atualizados diar.",
         "chartAria": "Gráficos de exemplo: receita anual em barras, e free cash flow em barra com linhas de operating cash flow e capex, ambos a crescer ao longo de dez anos",
         "legendRevenue": "Receita",
         "legendFcf": "FCF",
@@ -78,11 +80,11 @@
       "dcf": {
         "eyebrow": "Valuation",
         "title": "Quanto vale",
-        "titleAccent": "mesmo?",
-        "desc": "A calculadora DCF autopreenche-se com os dados da empresa e recalcula em tempo real enquanto ajustas o crescimento, a WACC e o valor terminal.",
+        "titleAccent": "realmente?",
+        "desc": "A calculadora DCF autopreenche-se com os dados da empresa e recalcula em tempo real enquanto ajustas a WACC e o crescimento a curto e longo prazo.",
         "b1": "Autopreenchida com os fundamentais reais da empresa",
         "b2": "Margem de segurança clara, acima ou abaixo do preço",
-        "b3": "Guarda cenários e volta a eles quando quiseres",
+        "b3": "Partilha os teus cenários, guarda-os e consulta-os mais tarde",
         "growth": "Crescimento anual (anos 1–5)",
         "wacc": "WACC",
         "terminal": "Crescimento terminal",
@@ -98,14 +100,14 @@
         "eyebrow": "Analista IA",
         "title": "Um analista dedicado",
         "titleAccent": "a cada empresa.",
-        "desc": "O Analista lê o 10-K oficial da SEC e devolve tese de investimento, moat, KPIs operacionais e riscos, com citações à fonte, mais os casos bull e bear lado a lado, para decidires com contexto, não com achismo.",
+        "desc": "O Analista lê o 10-K da empresa com citações à fonte e, com o chat IA especializado para cada empresa, ajuda-te a decidir com contexto.",
         "b1": "Tese, moat e KPIs com citações diretas do 10-K",
-        "b2": "Bull case e bear case lado a lado, sem filtro",
-        "b3": "Sempre assinalado: nunca é conselho de investimento",
+        "b2": "Bull case e Bear case lado a lado, sem filtro",
+        "b3": "Pergunta o que quiseres, o Analista responde com contexto",
         "cardTitle": "Analista IA · Empresa exemplo",
         "chipLabel": "IA",
         "thesisLabel": "Tese de investimento",
-        "thesis": "Líder de mercado com receitas recorrentes, margens em expansão e capital devolvido aos acionistas — um compounder clássico a preço razoável.",
+        "thesis": "Líder de mercado com receitas recorrentes, margens em expansão e capital devolvido aos acionistas. Um compounder clássico a preço razoável.",
         "moatLabel": "Moat",
         "moatValue": "Moat largo",
         "kpi1Label": "Receita recorrente",
@@ -125,9 +127,9 @@
     },
     "bento": {
       "title": "Tudo num terminal.",
-      "subtitle": "Watchlist, calendário de resultados, listas curadas e pesquisa instantânea, sem saltar entre separadores.",
+      "subtitle": "Watchlist, Calendário de resultados, Tracking de Portfólio e Pesquisa instantânea.",
       "portfolio": {
-        "title": "Portfólio & watchlist",
+        "title": "Portfólio & Watchlist",
         "desc": "Segue as tuas empresas com preços e variação diária."
       },
       "calendar": {
@@ -135,12 +137,12 @@
         "desc": "Estimativas, beat/miss e as datas que interessam."
       },
       "screener": {
-        "title": "Listas curadas",
+        "title": "Screener de ações",
         "desc": "Growth, Dividend Growth, Buyback Machines e mais."
       },
       "search": {
         "title": "Pesquisa instantânea",
-        "desc": "Qualquer empresa do S&P 500 a um ⌘K de distância."
+        "desc": "Qualquer empresa do S&P 500 a um clique de distância."
       },
       "dashboard": {
         "title": "Dashboard",
@@ -159,7 +161,7 @@
     },
     "numbers": {
       "years": "anos de fundamentais",
-      "companies": "empresas do S&P 500",
+      "companies": "empresas",
       "quarters": "trimestres de dados",
       "free": "no plano gratuito"
     },
@@ -171,10 +173,10 @@
         "name": "Grátis",
         "price": "0 €",
         "period": "para sempre",
-        "f1": "S&P 500 completo (500 empresas)",
-        "f2": "10 anos de fundamentais visuais",
-        "f3": "Calculadora DCF com autopreenchimento",
-        "f4": "5 créditos de IA por dia e listas temáticas curadas",
+        "f1": "Apenas MAG 7 com fundamentais completos",
+        "f2": "10 anos de fundamentais visuais da MAG 7",
+        "f3": "Calculadora DCF com autopreenchimento e cenários guardados",
+        "f4": "5 créditos de IA por dia (uma análise completa do Analista)",
         "f5": "Watchlist, calendário de resultados e insider trading",
         "cta": "Criar conta grátis"
       },
@@ -183,11 +185,13 @@
         "badge": "Mais popular",
         "price": "7 €",
         "period": "por mês",
-        "f1": "Watchlist ilimitada",
-        "f2": "20 créditos de IA por dia (~6 análises)",
-        "f3": "Guardar cenários DCF ilimitados",
-        "f4": "Exportar dados financeiros em CSV",
-        "f5": "Comunidade privada e apoio prioritário"
+        "f1": "Tudo o que está no plano grátis",
+        "f2": "20 créditos de IA por dia (~6 análises completas)",
+        "f3": "Chat com o Analista IA sobre qualquer empresa",
+        "f4": "Múltiplos de avaliação históricos (P/E, P/S, EV/EBITDA)",
+        "f5": "Comunidade privada e apoio prioritário",
+        "cta": "Começar trial de 7 dias",
+        "note": "7 dias grátis · cancela quando quiseres"
       }
     },
     "about": {
@@ -204,7 +208,7 @@
     "faq": {
       "title": "Perguntas frequentes",
       "q1": "Qual é a diferença entre o plano Grátis e o Pro?",
-      "a1": "O Grátis inclui o S&P 500 completo, 10 anos de fundamentais, a calculadora DCF, o Analista IA (5 créditos por dia, que dão uma análise completa), as listas temáticas, o calendário de resultados e o insider trading. O Pro acrescenta 20 créditos de IA por dia (~6 análises), watchlists ilimitadas, guardar cenários DCF, exportar em CSV, comunidade privada e apoio prioritário.",
+      "a1": "O Grátis inclui o S&P 500 completo, 10 anos de fundamentais, a calculadora DCF (com cenários guardados), o Analista IA (5 créditos por dia, que dão uma análise completa), as listas temáticas, a watchlist sem limite, o calendário de resultados e o insider trading. O Pro acrescenta 20 créditos de IA por dia (~6 análises completas), o chat com o Analista, os múltiplos de avaliação históricos, a comunidade privada e o apoio prioritário.",
       "q2": "Isto é aconselhamento financeiro?",
       "a2": "Não. A BullValue é uma ferramenta de análise e educação. Nenhum valor, métrica ou insight constitui recomendação de compra ou venda. As decisões são sempre tuas.",
       "q3": "Que empresas estão disponíveis?",
@@ -766,7 +770,24 @@
     "similarCompaniesExploreAll": "Explorar todas",
     "similarCompaniesCompare": "Comparar concorrentes",
     "peersTitle": "Outras empresas em {group}",
-    "peersTitleGeneric": "Empresas relacionadas"
+    "peersTitleGeneric": "Empresas relacionadas",
+    "demoBadge": {
+      "label": "Pro",
+      "tooltip": "Isto é normalmente uma funcionalidade Pro — estás a vê-la de graça porque é a demo da Apple."
+    },
+    "share": {
+      "button": "Partilhar gráfico",
+      "title": "Partilhar gráfico",
+      "description": "Gera uma imagem pronta a publicar, com a empresa, o preço e o gráfico tal como o estás a ver.",
+      "download": "Guardar imagem",
+      "shareAction": "Partilhar",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "working": "A gerar…",
+      "cagrLabel": "CAGR",
+      "disclaimer": "Fundamentais da SEC EDGAR. Não é conselho de investimento.",
+      "error": "Não foi possível gerar a imagem. Tenta outra vez."
+    }
   },
   "analista": {
     "title": "Analista IA",
@@ -821,6 +842,18 @@
         "Quais são os 3 maiores riscos?",
         "Como evoluiu a margem operacional?",
         "O que impulsiona a receita?"
+      ]
+    },
+    "demo": {
+      "badge": "Demo",
+      "tooltip": "Análise de demonstração pré-carregada — em contas reais, isto é gerado por IA a partir do 10-K oficial da SEC.",
+      "thinking": "A pensar...",
+      "historyToggle": "Ver os passos",
+      "steps": [
+        "A obter os últimos resultados (earnings)...",
+        "A pesquisar a equipa de gestão...",
+        "A analisar o 10-K oficial da SEC...",
+        "A calcular o fosso competitivo (moat)..."
       ]
     }
   },
@@ -884,7 +917,17 @@
     },
     "errorWacc": "O WACC tem de ser superior ao crescimento perpétuo para o modelo ser válido. Ajusta os sliders.",
     "errorShares": "Indica o número de ações em circulação para calcular o valor por ação.",
-    "errorFcf": "Indica um Free Cash Flow inicial válido para começar."
+    "errorFcf": "Indica um Free Cash Flow inicial válido para começar.",
+    "exportImage": "Partilhar imagem",
+    "demoLocked": {
+      "badge": "Demo",
+      "tooltip": "Na demo só podes analisar a Apple (AAPL). Cria uma conta grátis para analisares qualquer empresa.",
+      "placeholder": "Só Apple (AAPL) na demo",
+      "hint": "Estás a ver a demo, trancada à Apple.",
+      "cta": "Criar conta grátis",
+      "saveTitle": "Guarda os teus cenários DCF",
+      "saveDesc": "Cria uma conta grátis para guardares e revisitares as tuas análises DCF."
+    }
   },
   "financials": {
     "engineTitle": "Motor de Decisão & Financeiras",
@@ -1174,23 +1217,22 @@
       "free": [
         "Acesso completo ao S&P 500",
         "10 anos de dados fundamentais",
-        "Calculadora DCF com autopreenche",
+        "Calculadora DCF com autopreenchimento",
+        "Guardar e partilhar cenários DCF",
         "Gráficos financeiros interativos",
-        "Watchlist até 10 empresas",
-        "5 créditos de IA por dia (1 análise do Analista)",
+        "Watchlist e portefólio sem limite",
+        "5 créditos de IA por dia (uma análise completa do Analista)",
         "Calendário de resultados",
-        "Dados de Insider Trading"
+        "Dados de insider trading"
       ],
       "pro": [
         "Tudo do plano Gratuito",
-        "Watchlist ilimitada",
-        "20 créditos de IA por dia (~6 análises)",
-        "Guardar análises DCF ilimitadas",
-        "Screener avançado com filtros customizados",
-        "Exportar dados financeiros em CSV",
+        "20 créditos de IA por dia (~6 análises completas)",
+        "Chat com o Analista IA sobre qualquer empresa",
+        "Múltiplos de avaliação históricos (P/E, P/S, EV/EBITDA)",
         "Acesso antecipado a novas funcionalidades",
         "Comunidade privada de value investors",
-        "Apoio prioritário 24/7 por email"
+        "Apoio prioritário por email"
       ]
     },
     "faq": {

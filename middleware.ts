@@ -66,6 +66,15 @@ export async function middleware(request: NextRequest) {
   // 2. Para rotas UI, combinamos a atualização da sessão (Supabase) e a routing (next-intl)
   // O updateSession pode atualizar cookies de sessão que devem ser propagados.
   const supabaseResponse = await updateSession(request)
+
+  // updateSession pode decidir redirecionar (funil de guest -> /register,
+  // rota pessoal -> /login). Sem este curto-circuito, o `return intlResponse`
+  // no fim desta função ignorava sempre esse redirect (só copiava cookies),
+  // deixando o gate de autenticação completamente inoperante em produção.
+  if (supabaseResponse.headers.get('location')) {
+    return supabaseResponse
+  }
+
   const intlResponse = intlMiddleware(request)
 
   // Copiar os cookies atualizados pelo Supabase para a resposta do Next-Intl

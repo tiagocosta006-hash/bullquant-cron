@@ -22,11 +22,16 @@ export function GrowCta({
     () => {
       const mm = gsap.matchMedia();
       mm.add(MOTION_OK, () => {
+        /* O topo da escala TEM de ser 1. Esteve em 1.2 e partia o layout:
+           o `gap-4` da linha é medido na caixa por escalar, por isso a 120%
+           o botão dourado transbordava ~20% para cima do "Espreitar sem
+           conta" — os dois ficavam colados/sobrepostos. Crescer de 0.86 até
+           ao tamanho natural dá o mesmo efeito sem sair da própria caixa. */
         gsap.fromTo(
           ref.current,
-          { scale: 0.82 },
+          { scale: 0.86 },
           {
-            scale: 1.2,
+            scale: 1,
             ease: "none",
             scrollTrigger: {
               trigger: ref.current,

@@ -44,6 +44,11 @@ interface SettingsClientProps {
 
 export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEnabled }: SettingsClientProps) {
   const t = useTranslations('settings')
+  /* Os cartões de plano abaixo liam listas HARDCODED em português que
+     contradiziam a /pricing e a landing (e anunciavam features que não existem
+     — ver `pricing.features` em messages/). Uma só fonte de verdade: o namespace
+     `pricing`, o mesmo que a página /pricing consome. */
+  const tPricing = useTranslations('pricing')
   const router = useRouter()
 
   const [name, setName] = useState(user.name || '')
@@ -542,13 +547,13 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
                 <div className="grid gap-4 sm:grid-cols-2">
                   {/* Gratuito */}
                   <div className="rounded-xl border border-border bg-muted/20 p-5 flex flex-col">
-                    <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Gratuito</p>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">{tPricing('free.name')}</p>
                     <div className="flex items-end gap-1 mb-1">
-                      <span className="text-3xl font-extrabold">€0</span>
-                      <span className="mb-0.5 text-sm text-muted-foreground">/ para sempre</span>
+                      <span className="text-3xl font-extrabold">{tPricing('free.price')}</span>
+                      <span className="mb-0.5 text-sm text-muted-foreground">/ {tPricing('free.period')}</span>
                     </div>
                     <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-                      {["S&P 500 completo", "10 anos de fundamentais", "DCF com autopreenche", "5 créditos de IA/dia", "Watchlist até 10 empresas"].map(f => (
+                      {(tPricing.raw('features.free') as string[]).slice(0, 5).map(f => (
                         <li key={f} className="flex items-center gap-2">
                           <Check className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                           {f}
@@ -567,16 +572,16 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
                     <div className="absolute -top-3 left-4">
                       <div className="flex items-center gap-1 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold text-primary-foreground">
                         <Star className="h-2.5 w-2.5 fill-current" />
-                        Mais popular
+                        {tPricing('pro.badge')}
                       </div>
                     </div>
-                    <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">PRO</p>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">{tPricing('pro.name')}</p>
                     <div className="flex items-end gap-1 mb-1">
                       <span className="text-3xl font-extrabold">{proPrice}</span>
-                      <span className="mb-0.5 text-sm text-muted-foreground">/ mês</span>
+                      <span className="mb-0.5 text-sm text-muted-foreground">/ {tPricing('pro.period')}</span>
                     </div>
                     <ul className="mt-4 space-y-2 text-sm">
-                      {["Watchlist ilimitada", "20 créditos de IA/dia (~6 análises)", "DCF analyses ilimitadas", "Screener avançado", "Exportar CSV", "Comunidade privada", "Suporte 24/7"].map(f => (
+                      {(tPricing.raw('features.pro') as string[]).slice(1, 6).map(f => (
                         <li key={f} className="flex items-center gap-2">
                           <Check className="h-3.5 w-3.5 shrink-0 text-primary" />
                           {f}

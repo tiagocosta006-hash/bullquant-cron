@@ -1,3 +1,37 @@
+import * as htmlToImage from 'html-to-image';
+
+/**
+ * Rasteriza um cartão de partilha (nó DOM de dimensão fixa) para PNG.
+ *
+ * ⚠️ Renderiza DUAS vezes de propósito. O html-to-image resolve imagens e
+ * webfonts para data-URLs de forma assíncrona, para uma cache interna; na
+ * primeira passagem essa cache está fria e o frame sai sem o logo da empresa
+ * e/ou com a fonte de sistema. A segunda passagem acerta na cache e sai
+ * completa. Sem isto o primeiro download da sessão vem sempre errado.
+ */
+export async function captureCardToBlob(
+  node: HTMLElement,
+  { width, height, background }: { width: number; height: number; background: string },
+): Promise<Blob> {
+  // Sem isto o clone pode ser medido com a fonte de fallback e o texto
+  // reflui na imagem final.
+  await document.fonts?.ready;
+
+  const options = {
+    // O cartão já é desenhado à resolução final (1080px) — 1 basta.
+    pixelRatio: 1,
+    width,
+    height,
+    backgroundColor: background,
+    skipFonts: false,
+  };
+
+  await htmlToImage.toPng(node, options); // aquece a cache (ver acima)
+  const blob = await htmlToImage.toBlob(node, options);
+  if (!blob) throw new Error('Falha a rasterizar o cartão de partilha');
+  return blob;
+}
+
 type ExportOptions = {
   /** Título desenhado no topo do PNG — torna a imagem autossuficiente quando
    *  é partilhada fora do site, onde não há cartão nem cabeçalho à volta. */

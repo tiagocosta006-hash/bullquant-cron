@@ -15,6 +15,7 @@ import {
   Lock,
   RefreshCw,
   ArrowUpRight,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +29,7 @@ import {
 } from "@/components/ui/dialog";
 import { DecisionChart } from "./DecisionChart";
 import { LiquidGlass } from "@/components/fx/LiquidGlass";
+import { BullMarkAnimated } from "@/components/brand/BullMarkAnimated";
 import { buildTextFragmentUrl } from "@/lib/finance/textFragment";
 import { cn } from "@/lib/utils";
 
@@ -82,29 +84,126 @@ const SEGMENT_COLORS = [
   "#eb6834",
 ];
 
+// ── Demo pública (guest em /stock/AAPL) ───────────────────────────────
+// Dossier pré-carregado/hardcoded: nunca chama o Gemini (não gasta créditos
+// nem depende da cache real ter expirado). "Interação" real com IA (o chat)
+// continua sempre trancada — só isto (relatório estático) fica desbloqueado,
+// com uma sequência de loading falsa para dar a sensação de rapidez.
+const DEMO_LOADING_STEP_MS = 1600;
+// Transição "a carregar" -> "pronto": a linha esvai-se (fade-out) durante
+// isto, só depois o dossier monta e revela secção a secção.
+const DEMO_FINISH_FADE_MS = 320;
+// Atraso entre a entrada de cada secção do dossier, em ms — rápido de propósito.
+const DEMO_REVEAL_STAGGER_MS = 90;
+
+const DEMO_AAPL_REPORT: Report = {
+  executiveSummary:
+    "A Apple gera a maior parte do lucro através do iPhone e de um ecossistema de serviços recorrentes (App Store, iCloud, Apple Music, publicidade) que fideliza os utilizadores e sustenta margens elevadas.",
+  businessModel:
+    "O negócio assenta em dois pilares: Hardware (iPhone, Mac, iPad, wearables) com margens mais baixas mas grande volume, e Serviços (App Store, subscrições, publicidade, AppleCare) com margens muito superiores e receita recorrente. O ecossistema fechado entre dispositivos e serviços aumenta os custos de mudança e a retenção.",
+  moat: {
+    rating: "WIDE",
+    text: "O fosso competitivo assenta na marca, no ecossistema fechado de hardware e software e nos elevados custos de mudança para o utilizador — sair do ecossistema Apple implica perder integração entre dispositivos, dados e subscrições.",
+    quote: null,
+  },
+  segmentsSummary: null,
+  operatingKpis: [
+    {
+      name: "Base instalada de dispositivos ativos",
+      value: "+2.2 mil milhões",
+      quote: "",
+      insight: "Ecossistema em expansão contínua, reforçando a retenção de utilizadores e a monetização via Serviços.",
+    },
+    {
+      name: "Peso da receita de Serviços",
+      value: "~25% da receita total",
+      quote: "",
+      insight: "Segmento de margem mais alta, com crescimento consistente impulsionado por assinaturas e App Store.",
+    },
+    {
+      name: "Margem bruta de Serviços",
+      value: "~70%",
+      quote: "",
+      insight: "Muito superior à margem de Hardware — melhora o mix global à medida que o segmento cresce em peso.",
+    },
+    {
+      name: "Recompra de ações próprias",
+      value: "Dezenas de mil milhões / ano",
+      quote: "",
+      insight: "Redução consistente do número de ações em circulação, apoiando o crescimento do EPS.",
+    },
+  ],
+  risks: [
+    {
+      title: "Concentração de receita no iPhone",
+      detail: "Apesar da diversificação para Serviços, o iPhone continua a ser o principal motor de receita — ciclos de renovação mais longos pressionam o crescimento de Hardware.",
+      quote: null,
+    },
+    {
+      title: "Exposição à cadeia de fornecimento e à China",
+      detail: "Uma parte significativa da produção e das vendas depende da China, expondo a empresa a riscos geopolíticos, tarifários e de disrupção logística.",
+      quote: null,
+    },
+    {
+      title: "Escrutínio regulatório sobre a App Store",
+      detail: "Reguladores na UE e nos EUA têm pressionado o modelo de comissões da App Store, o que pode comprimir margens de Serviços no futuro.",
+      quote: null,
+    },
+  ],
+  bull: [
+    "Ecossistema fechado com elevados custos de mudança sustenta preços premium e fidelização.",
+    "Receita de Serviços de alta margem a crescer mais depressa do que o Hardware, melhorando o mix.",
+    "Balanço robusto e devolução consistente de capital via recompras e dividendos.",
+  ],
+  bear: [
+    "Ciclos de upgrade do iPhone cada vez mais longos podem abrandar o crescimento de receita de Hardware.",
+    "Pressão regulatória sobre as comissões da App Store é um risco estrutural para a margem de Serviços.",
+    "Dependência da cadeia de fornecimento chinesa expõe a empresa a choques geopolíticos.",
+  ],
+};
+
 export function StockAnalyst({
   ticker,
   fundamentals,
   isPro,
   isLoggedIn,
+  isDemo,
   currencySymbol = "$",
 }: {
   ticker: string;
   fundamentals: FundamentalRow[];
   isPro?: boolean;
   isLoggedIn?: boolean;
+  isDemo?: boolean;
   currencySymbol?: string;
 }) {
   const t = useTranslations("analista");
 
-  const [status, setStatus] = useState<Status>("loading");
+  const [status, setStatus] = useState<Status>(isDemo ? "empty" : "loading");
   const [report, setReport] = useState<Report | null>(null);
   const [secUrl, setSecUrl] = useState<string | null>(null);
   const [filingLabel, setFilingLabel] = useState<string | null>(null);
   const [sourceDialog, setSourceDialog] = useState<{ quote: string; kpiName: string } | null>(null);
+  const [demoStep, setDemoStep] = useState(0);
+  const [demoFinishing, setDemoFinishing] = useState(false);
+  const [demoHistoryOpen, setDemoHistoryOpen] = useState(false);
+  const demoTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const demoFinishTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Uma linha só, ao estilo Claude: começa em "a pensar" e vai substituindo o
+  // texto no próprio sítio por cada passo — com histórico expansível (como o
+  // "Thought for Xs" do Claude) para quem quiser ver os passos todos.
+  const demoPhases = [t("demo.thinking"), ...((t.raw("demo.steps") as string[]) || [])];
 
-  // ── 1. GET peek (cache) no mount ──────────────────────────────────
   useEffect(() => {
+    return () => {
+      if (demoTimerRef.current) clearInterval(demoTimerRef.current);
+      if (demoFinishTimeoutRef.current) clearTimeout(demoFinishTimeoutRef.current);
+    };
+  }, []);
+
+  // ── 1. GET peek (cache) no mount — não aplicável na demo (nunca chama a API) ──
+  useEffect(() => {
+    if (isDemo) return;
     let alive = true;
     (async () => {
       try {
@@ -126,10 +225,43 @@ export function StockAnalyst({
     return () => {
       alive = false;
     };
-  }, [ticker]);
+  }, [ticker, isDemo]);
 
-  // ── 2. POST gerar ─────────────────────────────────────────────────
+  // ── 2a. Demo: sequência de loading falsa + dossier pré-carregado ──────
+  const runDemoGenerate = useCallback(() => {
+    setStatus("generating");
+    setDemoStep(0);
+    setDemoFinishing(false);
+    setDemoHistoryOpen(false);
+    if (demoTimerRef.current) clearInterval(demoTimerRef.current);
+    if (demoFinishTimeoutRef.current) clearTimeout(demoFinishTimeoutRef.current);
+    let i = 0;
+    demoTimerRef.current = setInterval(() => {
+      i += 1;
+      if (i >= demoPhases.length) {
+        if (demoTimerRef.current) clearInterval(demoTimerRef.current);
+        // Corte suave em vez de seco: a linha "a pensar" esvai-se primeiro
+        // (opacity/translate via CSS), só depois o dossier entra a revelar-se
+        // secção a secção (ver DEMO_REVEAL_STAGGER_MS no render READY).
+        setDemoFinishing(true);
+        demoFinishTimeoutRef.current = setTimeout(() => {
+          setReport(DEMO_AAPL_REPORT);
+          setSecUrl(null);
+          setFilingLabel(null);
+          setStatus("ready");
+        }, DEMO_FINISH_FADE_MS);
+      } else {
+        setDemoStep(i);
+      }
+    }, DEMO_LOADING_STEP_MS);
+  }, [demoPhases.length]);
+
+  // ── 2b. POST gerar (conta real) ────────────────────────────────────
   const handleGenerate = useCallback(async () => {
+    if (isDemo) {
+      runDemoGenerate();
+      return;
+    }
     setStatus("generating");
     try {
       const res = await fetch(`/api/analyst/${ticker}`, { method: "POST" });
@@ -157,7 +289,7 @@ export function StockAnalyst({
     } catch {
       setStatus("error");
     }
-  }, [ticker]);
+  }, [ticker, isDemo, runDemoGenerate]);
 
   // ── Mix de segmentos (dados fiáveis do XBRL, via props) ────────────
   const segmentChart = useMemo(() => {
@@ -268,9 +400,14 @@ export function StockAnalyst({
     return (
       <LiquidGlass className="relative mt-4 flex flex-col items-center gap-6 overflow-hidden rounded-3xl p-8 text-center md:p-14">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-        <div className="rounded-2xl border border-primary/15 bg-primary/10 p-4 text-primary shadow-lg shadow-primary/5">
-          <BrainCircuit className="h-10 w-10" />
-        </div>
+        {/* Na demo a "gerar", o mark já faz de ícone lá em baixo, ao lado do
+            texto — mostrar também este círculo cá em cima duplicava o ícone
+            e desalinhava a composição toda. */}
+        {!(isDemo && status === "generating") && (
+          <div className="rounded-2xl border border-primary/15 bg-primary/10 p-4 text-primary shadow-lg shadow-primary/5">
+            <BrainCircuit className="h-10 w-10" />
+          </div>
+        )}
         {status === "needs_auth" ? (
           <div className="max-w-lg space-y-4">
             <div className="space-y-2">
@@ -297,6 +434,71 @@ export function StockAnalyst({
               {t("retry")}
             </Button>
           </div>
+        ) : isDemo && status === "generating" ? (
+          // Composição enxuta enquanto "pensa": logo + linha de estado, lado
+          // a lado (estilo Claude). Sem badge/título/descrição — esses já se
+          // leram no ecrã anterior; repeti-los aqui ficava a fazer ruído.
+          <div className="mx-auto flex w-96 flex-col gap-1">
+            {/* Largura FIXA (w-96), não max-w a encolher para o conteúdo: se o
+                contentor seguisse o texto, cada frase de tamanho diferente
+                recentrava o grupo inteiro e o logo "saltava" de posição a
+                cada passo. Com largura fixa e tudo alinhado à esquerda, o
+                logo fica sempre no mesmo sítio — só ele é que anima, nunca
+                o espaço que ocupa. 24rem/384px comporta a frase mais longa
+                (medido: 284px em PT) numa linha só — truncate no texto é só
+                rede de segurança, não é suposto disparar. */}
+            <div
+              className={cn(
+                "flex items-center gap-2 transition-all duration-300 ease-out",
+                demoFinishing ? "-translate-y-1 opacity-0" : "translate-y-0 opacity-100",
+              )}
+            >
+              {/* Estilo Claude: pequenino, ao lado do texto, sem saltar de
+                  tamanho nem de posição — só a coreografia interna (.demo-
+                  logo-loop, CSS puro em globals.css) é que se mexe. */}
+              <BullMarkAnimated className="demo-logo-loop h-4 w-4 shrink-0 text-primary" />
+              <span key={demoStep} className="demo-thinking-text flex-1 truncate text-left text-sm font-medium">
+                {demoPhases[demoStep]}
+              </span>
+              {demoStep > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setDemoHistoryOpen((o) => !o)}
+                  aria-label={t("demo.historyToggle")}
+                  className="pressable mt-0.5 shrink-0 rounded-full p-0.5 text-muted-foreground/60 transition-colors hover:bg-primary/10 hover:text-primary"
+                >
+                  <ChevronDown
+                    className={cn("h-3.5 w-3.5 transition-transform", demoHistoryOpen && "rotate-180")}
+                  />
+                </button>
+              )}
+            </div>
+
+            {/* Histórico em linha do tempo (estilo Claude): traço vertical
+                contínuo, ponto por passo — cheio+dourado no atual, vazio
+                nos concluídos, sem caixa/moldura à volta. */}
+            {demoHistoryOpen && !demoFinishing && (
+              <ul className="w-full space-y-0 pt-2 text-left text-xs duration-200 animate-in fade-in slide-in-from-top-1">
+                {demoPhases.slice(0, demoStep + 1).map((phase, i) => {
+                  const isLast = i === demoStep;
+                  return (
+                    <li key={phase} className="relative flex gap-3 pb-3 pl-1 last:pb-0">
+                      {!isLast && (
+                        <span className="absolute left-[7px] top-2 h-full w-px bg-border" aria-hidden />
+                      )}
+                      <span
+                        className={cn(
+                          "relative z-10 mt-1 h-[7px] w-[7px] shrink-0 rounded-full",
+                          isLast ? "bg-primary" : "bg-muted-foreground/40",
+                        )}
+                      />
+                      <span className={isLast ? "text-foreground" : "text-muted-foreground"}>{phase}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
         ) : (
           <div className="max-w-2xl space-y-6">
             <div className="space-y-3">
@@ -304,11 +506,20 @@ export function StockAnalyst({
                 <BrainCircuit className="h-3.5 w-3.5" />
                 {t("badge")}
               </span>
+              {isDemo && (
+                <span
+                  title={t("demo.tooltip")}
+                  className="ml-1.5 inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-primary"
+                >
+                  {t("demo.badge")}
+                </span>
+              )}
               <h3 className="text-2xl font-bold tracking-tight md:text-3xl">
                 {t("generateTitle", { ticker })}
               </h3>
               <p className="mx-auto max-w-lg text-muted-foreground">{t("generateDesc")}</p>
             </div>
+
             <Button
               onClick={handleGenerate}
               size="lg"
@@ -343,15 +554,46 @@ export function StockAnalyst({
         ? "text-primary border-primary/30 bg-primary/10"
         : "text-muted-foreground border-border bg-muted/50";
 
+  // Reveal em cascata (só na demo): cada bloco entra com um pequeno atraso a
+  // seguir ao anterior — o dossier "constrói-se" secção a secção em vez de
+  // aparecer tudo de repente. `backwards` mantém o bloco no estado inicial
+  // (invisível/deslocado) durante o próprio atraso, sem flash.
+  // Recebe a className base e devolve-a já fundida (cn) — nunca aplicar isto
+  // como spread depois de um `className` explícito no JSX: um objecto
+  // espalhado por cima substitui a prop em vez de a fundir, e já perdemos o
+  // padding/overflow do herói dessa forma (o "T" de "Tese" ficava cortado
+  // pelo canto arredondado por falta do p-6).
+  let demoRevealIndex = 0;
+  const demoReveal = (baseClassName?: string): { className?: string; style?: React.CSSProperties } => {
+    if (!isDemo) return { className: baseClassName };
+    const delay = demoRevealIndex * DEMO_REVEAL_STAGGER_MS;
+    demoRevealIndex += 1;
+    return {
+      className: cn(baseClassName, "duration-[420ms] animate-in fade-in slide-in-from-bottom-3 ease-out"),
+      style: { animationDelay: `${delay}ms`, animationFillMode: "backwards" },
+    };
+  };
+
   return (
-    <div className="mt-4 space-y-10 duration-500 animate-in fade-in slide-in-from-bottom-2">
+    // Na demo, a entrada é só a cascata de demoReveal() em cada secção — um
+    // fade-in extra aqui, ao mesmo tempo, compunha com o das secções e lia-se
+    // como um corte (duas curvas de opacidade sobrepostas em vez de uma só).
+    <div className={cn("mt-4 space-y-10", !isDemo && "duration-500 animate-in fade-in slide-in-from-bottom-2")}>
       {/* Cabeçalho + fonte */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div {...demoReveal("flex flex-wrap items-center gap-3")}>
         <h2 className="text-2xl font-bold tracking-tight">{t("title")}</h2>
         <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider text-primary">
           <BrainCircuit className="h-3.5 w-3.5" />
           {t("badge")}
         </span>
+        {isDemo && (
+          <span
+            title={t("demo.tooltip")}
+            className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-primary"
+          >
+            {t("demo.badge")}
+          </span>
+        )}
         {secUrl && filingLabel && (
           <a
             href={secUrl}
@@ -366,7 +608,7 @@ export function StockAnalyst({
       </div>
 
       {/* Herói da tese */}
-      <LiquidGlass className="relative overflow-hidden rounded-3xl p-6 md:p-8">
+      <LiquidGlass {...demoReveal("relative overflow-hidden rounded-3xl p-6 md:p-8")}>
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
         <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
           <div className="max-w-3xl space-y-3">
@@ -401,7 +643,7 @@ export function StockAnalyst({
         {/* ── Coluna esquerda: dossier ─────────────────────────────── */}
         <div className="space-y-8">
           {/* Modelo de negócio */}
-          <EditorialSection eyebrow={t("sections.businessModel")} first>
+          <EditorialSection eyebrow={t("sections.businessModel")} first {...demoReveal()}>
             <p className="max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
               {report.businessModel}
             </p>
@@ -409,7 +651,7 @@ export function StockAnalyst({
 
           {/* Mix de segmentos */}
           {segmentChart && (
-            <EditorialSection eyebrow={t("sections.segments")}>
+            <EditorialSection eyebrow={t("sections.segments")} {...demoReveal()}>
               {report.segmentsSummary && (
                 <p className="max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
                   {report.segmentsSummary}
@@ -427,7 +669,7 @@ export function StockAnalyst({
 
           {/* KPIs operacionais (source-grounded) */}
           {report.operatingKpis.length > 0 && (
-            <EditorialSection eyebrow={t("sections.operatingKpis")}>
+            <EditorialSection eyebrow={t("sections.operatingKpis")} {...demoReveal()}>
               <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border/50 bg-border/50 sm:grid-cols-2 lg:grid-cols-4">
                 {report.operatingKpis.map((kpi, i) => (
                   <div
@@ -456,7 +698,7 @@ export function StockAnalyst({
           )}
 
           {/* Moat */}
-          <EditorialSection eyebrow={t("sections.moat")}>
+          <EditorialSection eyebrow={t("sections.moat")} {...demoReveal()}>
             <p className="max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
               {report.moat.text}
             </p>
@@ -481,7 +723,7 @@ export function StockAnalyst({
 
           {/* Riscos */}
           {report.risks.length > 0 && (
-            <EditorialSection eyebrow={t("sections.risks")}>
+            <EditorialSection eyebrow={t("sections.risks")} {...demoReveal()}>
               <ul className="space-y-4">
                 {report.risks.map((risk, i) => (
                   <li key={i} className="border-l-2 border-bear/40 pl-4">
@@ -502,14 +744,14 @@ export function StockAnalyst({
           )}
 
           {/* Bull vs Bear */}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div {...demoReveal("grid grid-cols-1 gap-4 md:grid-cols-2")}>
             <CasePanel tone="bull" title={t("sections.bullCase")} items={report.bull} />
             <CasePanel tone="bear" title={t("sections.bearCase")} items={report.bear} />
           </div>
         </div>
 
         {/* ── Coluna direita: chat fixo (sticky em lg+) ────────────── */}
-        <div className="lg:sticky lg:top-24 lg:h-[calc(100svh-8rem)]">
+        <div {...demoReveal("lg:sticky lg:top-24 lg:h-[calc(100svh-8rem)]")}>
           <AnalystChat
             ticker={ticker}
             isPro={!!isPro}
@@ -521,7 +763,7 @@ export function StockAnalyst({
         </div>
       </div>
 
-      <p className="text-xs text-muted-foreground/70">{t("disclaimer")}</p>
+      <p {...demoReveal("text-xs text-muted-foreground/70")}>{t("disclaimer")}</p>
 
       {/* Dialog de citação */}
       <Dialog open={!!sourceDialog} onOpenChange={(open) => !open && setSourceDialog(null)}>
@@ -570,13 +812,20 @@ function EditorialSection({
   eyebrow,
   children,
   first,
+  className,
+  style,
 }: {
   eyebrow: string;
   children: React.ReactNode;
   first?: boolean;
+  className?: string;
+  style?: React.CSSProperties;
 }) {
   return (
-    <section className={cn("space-y-4", !first && "border-t border-border/40 pt-8")}>
+    <section
+      className={cn("space-y-4", !first && "border-t border-border/40 pt-8", className)}
+      style={style}
+    >
       <Eyebrow>{eyebrow}</Eyebrow>
       {children}
     </section>

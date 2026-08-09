@@ -66,7 +66,10 @@ export function CookieConsent({
       
       {showBanner && (
         <div className="fixed bottom-0 w-full bg-background border-t p-4 z-50 flex flex-col md:flex-row justify-between items-center gap-4 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
-          <p className="text-sm text-muted-foreground max-w-3xl">
+          {/* 68ch e não max-w-3xl: a 3xl o texto corria 768px = ~110 caracteres
+              por linha, bem acima do limite de leitura confortável (~80). O
+              olho perde-se ao voltar para o início da linha seguinte. */}
+          <p className="max-w-[68ch] text-sm text-muted-foreground">
             {t("text")}
           </p>
           <div className="flex gap-2 shrink-0">

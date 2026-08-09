@@ -1,5 +1,16 @@
 @import "tailwindcss";
 @import "shadcn/tailwind.css";
+/* Faltava: sem isto, `animate-in`/`fade-in`/`slide-in-from-*`/`zoom-in-*`
+   (usados em dialog/popover/select/tooltip do shadcn e nalguns componentes,
+   ex. StockAnalyst) não geravam CSS nenhuma — as classes existiam no JSX mas
+   o Tailwind v4 não as reconhecia (não é core, é sempre um plugin/pacote à
+   parte) e ignorava-as em silêncio. Resultado: entradas/saídas "a direito",
+   sem transição, em todo o lado que usava este padrão. */
+@import "tw-animate-css";
+/* NOTA: design-variants.css NÃO entra por @import — o pipeline do Tailwind v4
+   não resolve o import relativo e as regras desapareciam do bundle. É
+   importado em app/[locale]/layout.tsx, a seguir a este ficheiro, o que
+   também garante a ordem de cascata certa (variantes ganham ao base). */
 
 @custom-variant dark (&:is(.dark *));
 
@@ -119,7 +130,8 @@
   --dur-fast: 260ms;    /* hover, cor — alinhado com --dur-hover */
   --dur-base: 320ms;    /* lift, crossfades */
   --dur-slow: 600ms;    /* success moments */
-  --dur-reveal: 900ms;  /* reveals de scroll */
+  --dur-mini: 460ms;    /* mini reveal de scroll — curto de propósito */
+  --dur-reveal: 900ms;  /* reveals longos (herói, one-shot de entrada) */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   /* Hover: arranca suave e assenta devagar (mais "fade in" que o ease do
@@ -273,16 +285,31 @@
   }
 }
 
-/* Reveal — fade+slide+blur, reversível; respeita reduced-motion */
+/* Reveal — fade+slide, reversível; respeita reduced-motion.
+   SEM blur: animava `filter: blur(10px) -> 0` em 21+ blocos que entram
+   durante o scroll. Animar blur é das operações mais caras que há — o
+   browser tem de refazer o desfoque a cada frame, e blocos inteiros de
+   texto/gráficos não cabem numa camada barata. Opacity+transform são as
+   duas únicas propriedades que o compositor anima de graça, e são
+   exactamente as que a concorrência (Framer Motion no pludata) usa. */
 .reveal {
   opacity: 0;
-  transform: translateY(44px);
-  filter: blur(10px);
+  /* MINI REVEAL: 12px e 460ms, não 44px e 900ms.
+     Um deslocamento grande e lento é o que faz uma página parecer pesada
+     mesmo quando é tecnicamente fluida — o olho espera pelo conteúdo. Curto
+     e pequeno lê-se como "assentou", não como "está a fazer uma animação".
+     É a mesma ordem de grandeza do Framer Motion no site de referência. */
+  transform: translateY(12px);
   transition:
-    opacity var(--dur-reveal) var(--spring),
-    transform var(--dur-reveal) var(--spring),
-    filter var(--dur-reveal) var(--spring);
-  will-change: opacity, transform, filter;
+    opacity var(--dur-mini) var(--ease-out),
+    transform var(--dur-mini) var(--ease-out);
+  /* SEM will-change de propósito. Tinha `opacity, transform, filter`, o que
+     promovia TODOS os <Reveal> ainda por entrar a camadas de compositor
+     próprias — medidos 23 em simultâneo na landing, mais 17 que nunca
+     largavam a camada depois de animar. Uma transição de opacity+transform
+     não precisa da dica: o browser já a trata no compositor. A dica só
+     compensa em elementos que animam de forma contínua (ver .marquee-track),
+     não em 23 blocos à espera de aparecer uma única vez. */
 }
 .reveal.in {
   opacity: 1;
@@ -331,10 +358,13 @@
   .card-lift:hover {
     transform: translateY(var(--lift-y, -3px));
     border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
+    /* Sombra CURTA no hover. Antes ia até 70px de blur e era animada — cada
+       frame do hover obrigava a repintar a sombra inteira por baixo do
+       cartão. O lift já é dado pelo `transform` (de graça no compositor); a
+       sombra só precisa de confirmar que levantou. */
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.28),
-      inset 0 -10px 26px rgba(0, 0, 0, 0.05),
-      0 30px 70px rgba(40, 30, 10, 0.18);
+      0 6px 16px rgba(40, 30, 10, 0.12);
   }
   .dark .card-lift:hover {
     box-shadow:
@@ -557,6 +587,17 @@
     position: relative;
     z-index: 2;
   }
+  /* PERFORMANCE: vidro dentro de vidro não desfoca nada de novo — o que está
+     por trás já foi desfocado pelo pai — mas o compositor paga na mesma o
+     passe completo. Eram 21 dos 40 `.glass` da landing nesta situação.
+     Tiramos-lhes o backdrop-filter e devolvemos-lhes presença com um fundo
+     um pouco mais opaco: fica igual ao olho e liberta metade do custo.
+     Medido com puppeteer (getComputedStyle) antes e depois. */
+  .glass .glass {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: color-mix(in srgb, var(--card) 72%, transparent);
+  }
   /* frost-only — sem lente (usos raros; o default é a lente) */
   .glass-frost {
     -webkit-backdrop-filter: blur(18px) saturate(170%) brightness(1.02);
@@ -688,19 +729,18 @@
    Usados por components/marketing/SectionBg.tsx sobre bandas tonais. */
 @layer components {
   /* papel-milimétrico (tema "dados/fundamentais") */
+  /* SEM imagem de fundo, e sem grelha desenhada.
+     Já teve as duas, e ambas falharam:
+     · a grelha de hairlines era o `codex-grid-background` que o detector marca
+       como assinatura de UI gerada;
+     · a textura de papel gerada NÃO era seamless — ao repetir a 256px criava
+       uma costura horizontal a cada 256px, e como esta camada é `fixed` as
+       costuras ficavam PARADAS enquanto o conteúdo passava por trás. Lia-se
+       exactamente como "partes da página a fazer scroll em separado".
+     Um tom sólido não tem costuras, não tem padrão para reconhecer e não
+     compete com nada. É a superfície mais barata e mais silenciosa que há. */
   .motif-grid {
-    background-image:
-      linear-gradient(
-        to right,
-        color-mix(in srgb, var(--foreground) 6%, transparent) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        to bottom,
-        color-mix(in srgb, var(--foreground) 6%, transparent) 1px,
-        transparent 1px
-      );
-    background-size: 64px 64px;
+    background-image: none;
   }
   /* matriz de pontos (tema "IA") */
   .motif-dots {
@@ -862,6 +902,65 @@
   }
 }
 
+/* Estado "a pensar" da demo do Analista IA (estilo Claude): sheen contínuo
+   sobre uma única linha de texto que troca de conteúdo a cada passo, com um
+   fade + leve deslize da esquerda limpo (sem corte/wipe duro) sempre que o
+   texto muda — o componente remonta o <span> a cada passo (key={demoStep}),
+   o que reinicia esta animação "both" do zero em cada frase nova. O logo
+   animado que acompanha o texto é o mesmo do boot screen (.bull-head/
+   .bull-bar/.bull-arrow, mais abaixo), só que em loop via remount no React.
+   Deliberadamente FORA da lista de loops decorativos mortos no orçamento de
+   performance (ver secção "ORÇAMENTO DE PERFORMANCE" mais abaixo) — aquela
+   lista mata loops permanentes de página (hero, CTA, marquee); isto corre
+   só uns segundos, só quando o utilizador clica em "Gerar Análise" na demo,
+   uma instância de cada vez. */
+@keyframes demo-thinking-sheen {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+@keyframes demo-phase-reveal {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@supports (-webkit-background-clip: text) {
+  .demo-thinking-text {
+    background-image: linear-gradient(
+      105deg,
+      var(--muted-foreground) 30%,
+      var(--primary) 50%,
+      var(--muted-foreground) 70%
+    );
+    background-size: 260% 100%;
+    background-position: 200% 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: inline-block;
+    animation:
+      demo-thinking-sheen 2.2s linear infinite,
+      demo-phase-reveal 0.5s ease-out both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .demo-thinking-text {
+    animation: none;
+    transform: none;
+    background-image: none;
+    -webkit-text-fill-color: currentColor;
+    color: var(--primary);
+  }
+}
+
 /* CTA primário: banda especular atravessa o botão a cada ~8s */
 .cta-sheen {
   position: relative;
@@ -942,15 +1041,17 @@
 }
 
 /* Hero: linha de preço "Gold Horizon" desenha-se atrás da tipografia.
-   pathLength=1 → animável em CSS puro, sem medir o path (SSR-safe). */
+   pathLength=1 → animável em CSS puro, sem medir o path (SSR-safe).
+   (Houve aqui um `filter: blur()` na massa de baixo — o halo comia a serrilha
+   dos 640 passos e a curva voltava a ler-se como uma mancha. Fora.) */
 .hero-horizon-line {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
-  animation: horizon-draw 1.6s var(--ease-out) 0.5s both;
+  animation: horizon-draw 1.6s var(--ease-out) 0.35s both;
 }
 .hero-horizon-fill {
   opacity: 0;
-  animation: horizon-fill 1s var(--ease-out) 1.5s both;
+  animation: horizon-fill 1.1s var(--ease-out) 1.2s both;
 }
 @keyframes horizon-draw {
   to {
@@ -1037,7 +1138,9 @@
   background: linear-gradient(90deg, var(--primary), transparent);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform var(--dur-reveal) var(--spring) 150ms;
+  /* Acompanha o mini reveal (460ms) com um atraso curto, para o traço
+     desenhar-se logo a seguir ao bloco assentar em vez de arrastar-se. */
+  transition: transform var(--dur-mini) var(--ease-out) 120ms;
 }
 .reveal.in .chapter-rule {
   transform: scaleX(1);
@@ -1081,6 +1184,13 @@
   opacity: 0;
   transition: opacity 800ms var(--ease-in-out);
   background-size: 64px 64px; /* herdado pelos motifs que o usam */
+}
+/* O grão de papel precisa de 256px. Esta regra TEM de viver fora do @layer:
+   `.backdrop-layer` (sem layer) ganha a qualquer regra dentro de um layer,
+   por mais específica que seja — a cascata resolve o layer ANTES da
+   especificidade. Dentro do layer, o override não fazia nada. */
+.backdrop-layer.motif-grid {
+  background-size: 256px 256px;
 }
 .backdrop-layer.motif-dots {
   background-size: 26px 26px;
@@ -1323,4 +1433,294 @@
 }
 ::-webkit-scrollbar-corner {
   background: transparent;
+}
+
+/* ── Lenis (components/fx/SmoothScroll.tsx) ────────────────────
+   CSS exigido pelo Lenis. Sem isto o `height: 100%` do html/body
+   trava o cálculo do scroll e a página fica presa a meio. */
+/* Guarda global contra scroll horizontal.
+   A cortina de entrada é `fixed` mas faz `scale(9)` na saída, o que a estende
+   para lá do viewport e criava uma barra horizontal em tablet; a fita do
+   ticker é propositadamente mais larga que o ecrã. `clip` e não `hidden`:
+   `hidden` num antecessor quebra o `position: sticky` das secções. */
+html,
+body {
+  overflow-x: clip;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/* ============================================================
+   ORÇAMENTO DE PERFORMANCE — 2026-08-06
+   ============================================================
+   Medição lado a lado com a concorrência (pludata.com), com o mesmo
+   probe de puppeteer sobre getComputedStyle:
+
+                        pludata      nós (antes)
+     elementos DOM          975             2548
+     backdrop-filter          0               19
+     animações a correr       0               32
+     transições               8              158
+     secções sticky           0                6
+     canvas / filtros SVG   0/0              1/9
+     altura da página     7.9 ecrãs     13.5 ecrãs
+
+   Eles não têm UMA ÚNICA animação CSS em loop. Nós tínhamos 32, cada uma
+   a forçar repintura contínua, mais 19 backdrop-filters (cada um obriga o
+   browser a re-renderizar tudo o que está por trás).
+
+   Decisão do Alex: "prefiro que fique simples e smooth do que cheio de
+   efeitos". Este bloco desliga o custo permanente. Fica tudo num sítio só
+   para ser trivial reverter uma peça de cada vez.
+   ============================================================ */
+
+/* ── 1 · loops infinitos decorativos ────────────────────────
+   Só os `infinite`. As animações one-shot (hero-rise, hero-word-up,
+   horizon-draw, manifesto-sheen) correm uma vez e não custam nada depois,
+   por isso ficam — são elas que dão vida à entrada.
+   O ticker (.marquee-track) TAMBÉM fica: é conteúdo vivo, não decoração. */
+.gold-sheen-text,
+.cta-sheen::after,
+.cta-glow::before,
+.beam-ring,
+.gold-rule-live,
+.kbd-tap,
+.breathe,
+.floating-cta .breathe,
+.live-dot,
+.bento-day-pulse,
+.wall-col,
+.backdrop-layer,
+.hero-aurora::before,
+.hero-aurora::after {
+  animation: none !important;
+}
+
+/* O sheen dourado era um gradiente sobre o texto; sem animação ficava um
+   degradê estático (pior). Volta a cor sólida — e resolve de caminho o
+   `gradient-text` que o detector marcava como tell de IA. */
+.gold-sheen-text,
+.manifesto-sheen {
+  background-image: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: currentColor !important;
+  color: var(--primary) !important;
+}
+
+/* ── 2 · backdrop-filter ────────────────────────────────────
+   O custo isolado mais caro da página: cada um obriga a re-renderizar o
+   que está por trás, e durante o scroll isso é por frame. O vidro passa a
+   ser uma superfície translúcida com borda — mantém a linguagem, sem o
+   desfoque em tempo real. */
+/* SEM sombra de projeção nos cartões INTERIORES. A sombra pertence ao
+   QUADRO, não ao que está lá dentro: com cada cartão a projectar 55px de blur
+   sobre o vizinho, o interior da moldura ficava sujo e sem hierarquia. Fica só
+   o brilho superior de 1px, que é o que faz a superfície ler-se como
+   superfície.
+   TEM de viver fora do @layer: `.glass` sem layer ganha a qualquer regra
+   dentro de um, por mais específica que seja. */
+.glass .glass {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28);
+}
+.dark .glass .glass {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+}
+
+.glass,
+.glass-frost,
+.glass .glass {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+}
+/* o brilho superior do vidro fica; é um gradiente estático, custo zero */
+
+/* ── 3 · aurora do herói ────────────────────────────────────
+   Dois blobs de 60vw com blur enorme e will-change: transform. Blur em
+   superfícies desta dimensão é dos piores custos de compositor que há. */
+.hero-aurora {
+  display: none;
+}
+
+/* ── BOOT SCREEN (components/brand/BootScreen.tsx) ──────────
+   O logo constroi-se: cabeca -> barras 1,2,3 -> a linha atravessa.
+   Tudo em CSS/SVG. Zero bytes de media, nitido em qualquer resolucao.
+   Timeline (curta de proposito, aparece em cada refresh):
+     0ms    cabeca do touro aparece
+     170ms  barra 1 sobe
+     280ms  barra 2
+     390ms  barra 3
+     560ms  a linha desenha-se da esquerda para a direita
+     880ms  a cortina levanta
+     1180ms fim */
+
+.boot-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  background: var(--background);
+  /* `forwards` fixa o estado final: se o JS falhar por completo, a cortina
+     sobe na mesma e o site fica utilizavel. */
+  /* Sem mascara. Tentei o truque do landonorris.com (a cortina com um buraco
+     com a forma do logo a crescer) e falhou por geometria: uma silhueta de
+     touro nunca cobre um ecra rectangular, e nos frames de transicao viam-se
+     DOIS touros — a marca dourada e o buraco preto — ao mesmo tempo.
+
+     Isto e mais simples e nao pode partir: a cortina INTEIRA (com a marca
+     dentro) aproxima-se e desvanece no fim. Um so elemento, um so touro.
+     O fade so entra depois de o zoom ja estar a acontecer, por isso nao se
+     le como "fade" nem como corte — le-se como atravessar. */
+  transform-origin: 50% 44%;
+  animation: boot-out 560ms cubic-bezier(0.6, 0, 0.75, 0.15) 820ms forwards;
+}
+
+@keyframes boot-out {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  /* o zoom arranca sozinho — so a partir daqui e que comeca a desvanecer */
+  45% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(9);
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Gancho para voltar a limitar a cortina a 1x por sessao, se um dia quiser. */
+html[data-booted] .boot-screen {
+  display: none;
+}
+
+.boot-mark {
+  width: 5.5rem;
+  height: auto;
+  color: var(--primary);
+}
+
+/* cabeca: entra inteira, rapida */
+.bull-head {
+  opacity: 0;
+  animation: boot-fade-up 260ms var(--ease-out) both;
+}
+
+/* barras: reveladas de BAIXO para CIMA com clip-path.
+   clip-path e nao scaleY porque cada barra sao duas pecas separadas (a seta
+   corta-a a meio) — com scaleY a metade de cima descolava e flutuava. */
+.bull-bar {
+  clip-path: inset(100% 0 0 0);
+  animation: boot-bar-rise 260ms var(--ease-out) both;
+  animation-delay: calc(170ms + var(--b) * 110ms);
+}
+
+/* a linha: desenha-se da esquerda para a direita */
+.bull-arrow {
+  clip-path: inset(0 100% 0 0);
+  animation: boot-arrow-draw 320ms var(--ease-out) 560ms both;
+}
+
+@keyframes boot-fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes boot-bar-rise {
+  from { clip-path: inset(100% 0 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+@keyframes boot-arrow-draw {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+@keyframes boot-lift {
+  to { opacity: 0; visibility: hidden; pointer-events: none; }
+}
+
+/* Sem motion: nada de coreografia, o logo aparece inteiro e a cortina sai
+   quase de imediato. Quem pede menos movimento nao quer esperar. */
+@media (prefers-reduced-motion: reduce) {
+  .boot-screen { animation: boot-out 1ms linear 1ms forwards; }
+  .boot-mark { animation: none; transform: none; }
+  .bull-head, .bull-bar, .bull-arrow {
+    animation: none;
+    opacity: 1;
+    clip-path: none;
+    transform: none;
+  }
+}
+
+/* Variante em LOOP da mesma coreografia (cabeça -> barras -> seta), usada no
+   indicador "a pensar" da demo do Analista IA. CSS puro, `infinite` — nada de
+   remontar o SVG em JS a cada ciclo: essa abordagem (key={tick} a forçar
+   unmount/mount periódico) tinha uma janela de corrida onde a instância
+   antiga e a nova ficavam ambas pintadas por um frame (dois touros lado a
+   lado). Especificidade `.demo-logo-loop .bull-*` > `.bull-*` sozinho, por
+   isso ganha à coreografia one-shot do boot screen sem precisar de ordem. */
+@keyframes demo-logo-head-loop {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  15%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes demo-logo-bar-loop {
+  0%,
+  10% {
+    clip-path: inset(100% 0 0 0);
+  }
+  30%,
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes demo-logo-arrow-loop {
+  0%,
+  35% {
+    clip-path: inset(0 100% 0 0);
+  }
+  55%,
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+.demo-logo-loop .bull-head {
+  animation: demo-logo-head-loop 1.8s var(--ease-out) infinite;
+}
+.demo-logo-loop .bull-bar {
+  animation: demo-logo-bar-loop 1.8s var(--ease-out) infinite;
+  animation-delay: calc(var(--b, 0) * 70ms);
+}
+.demo-logo-loop .bull-arrow {
+  animation: demo-logo-arrow-loop 1.8s var(--ease-out) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .demo-logo-loop .bull-head,
+  .demo-logo-loop .bull-bar,
+  .demo-logo-loop .bull-arrow {
+    animation: none;
+    opacity: 1;
+    clip-path: none;
+    transform: none;
+  }
 }

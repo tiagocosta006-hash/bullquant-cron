@@ -21,6 +21,8 @@ import {
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { TooltipProvider, Tooltip as UITooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 import { useTranslations } from "next-intl"
+import { RoundedBar, makeAxisFormatter, makeDetailFormatter } from "./chartPrimitives"
+import { ChartShareButton } from "./ChartShareButton"
 
 export type ChartConfig = {
   dataKeys: { key: string; color: string; type: 'bar' | 'line' | 'area'; stackId?: string; name?: string }[]
@@ -63,39 +65,6 @@ const CustomTooltip = ({ active, payload, label, formatTooltipValue }: CustomToo
   return null
 }
 
-/**
- * Barra com cantos arredondados CIENTE DO SINAL. O recharts, com um `radius`
- * estático [4,4,0,0], desenha valores NEGATIVOS ao contrário (a barra apontava
- * para CIMA em vez de para baixo — ex.: FCF negativo da NVDA Q3'23). Aqui o
- * arredondamento é sempre na extremidade AFASTADA do zero (topo p/ positivos,
- * fundo p/ negativos) e o raio é limitado à altura da barra (barras minúsculas
- * não estouram). Normaliza width/height negativos que o recharts possa passar.
- * `active` (hover) alarga ligeiramente e adiciona traço; `maxR=0` para stacks.
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const RoundedBar = (props: any) => {
-  let { x, y, width, height } = props
-  const { fill, fillOpacity, stroke, strokeOpacity, strokeDasharray, value, payload, dataKey } = props
-  const maxR = props.maxR ?? 4
-  const active = props.active
-  if (width < 0) { x += width; width = -width }
-  if (height < 0) { y += height; height = -height }
-  if (width <= 0 || height <= 0) return null
-  if (active) { const grow = Math.min(6, Math.max(3, width * 0.18)); x -= grow / 2; width += grow }
-  const raw = value ?? (payload && dataKey != null ? payload[dataKey] : undefined)
-  const v = Array.isArray(raw) ? raw[raw.length - 1] : raw
-  const negative = Number(v) < 0
-  const r = Math.max(0, Math.min(maxR, width / 2, height))
-  const d = negative
-    ? `M${x},${y} h${width} v${height - r} a${r},${r} 0 0 1 ${-r},${r} h${-(width - 2 * r)} a${r},${r} 0 0 1 ${-r},${-r} Z`
-    : `M${x},${y + r} a${r},${r} 0 0 1 ${r},${-r} h${width - 2 * r} a${r},${r} 0 0 1 ${r},${r} v${height - r} h${-width} Z`
-  return (
-    <path d={d} fill={fill} fillOpacity={fillOpacity ?? 1}
-      stroke={active ? fill : stroke} strokeOpacity={active ? 0.55 : strokeOpacity}
-      strokeDasharray={strokeDasharray} />
-  )
-}
-
 interface DecisionChartProps {
   title: string
   data: Record<string, unknown>[]
@@ -106,9 +75,11 @@ interface DecisionChartProps {
   emptyMessage?: string
   headerExtra?: React.ReactNode
   currencySymbol?: string
+  /** Periodicidade em curso ("Anual"/"Trimestral"/"TTM") — vai para o cartão de partilha. */
+  periodLabel?: string
 }
 
-export function DecisionChart({ title, data, type, config, cagr, infoTooltip, emptyMessage, headerExtra, currencySymbol = "$" }: DecisionChartProps) {
+export function DecisionChart({ title, data, type, config, cagr, infoTooltip, emptyMessage, headerExtra, currencySymbol = "$", periodLabel }: DecisionChartProps) {
   const t = useTranslations("stock.chart")
   const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart')
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -129,6 +100,12 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
     return data.slice(-items);
   }, [data, timeFilter])
 
+  // "Anual · 10Y" — o cartão tem de dizer que recorte é que está a mostrar,
+  // senão a imagem circula sem contexto do período.
+  const shareSubtitle = [periodLabel, timeFilter === 'ALL' ? undefined : timeFilter]
+    .filter(Boolean)
+    .join(' · ') || undefined
+
   const hasValidData = useMemo(() => {
     if (displayData.length === 0) return false;
     return config.dataKeys.some(k => 
@@ -136,49 +113,10 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
     );
   }, [displayData, config.dataKeys])
 
-  const formatValue = (val: number | string | null) => {
-    if (val === null || val === undefined) return "N/A"
-    const num = Number(val)
-    // NaN/Infinity (ex.: margem com revenue 0 em dados antigos) nunca pode
-    // chegar ao ecrã como "NaN%" — é N/A.
-    if (!Number.isFinite(num)) return "N/A"
-    if (config.isPercentage) return `${(num * 100).toFixed(0)}%`
-    
-    const absVal = Math.abs(num)
-    
-    if (config.isCurrency || config.isLargeNumber) {
-      const formatter = new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short", maximumFractionDigits: 1 })
-      const formatted = formatter.format(absVal)
-      if (config.isCurrency) return num < 0 ? `-${currencySymbol}${formatted}` : `${currencySymbol}${formatted}`
-      return num < 0 ? `-${formatted}` : formatted
-    }
-    
-    return num < 0 ? `-${absVal.toFixed(2)}` : absVal.toFixed(2)
-  }
-
-  const formatTooltipValue = (val: number | string | null) => {
-    if (val === null || val === undefined) return "N/A"
-    const num = Number(val)
-    if (!Number.isFinite(num)) return "N/A"
-    if (config.isPercentage) return `${(num * 100).toFixed(2)}%`
-    
-    const absVal = Math.abs(num)
-    
-    if (config.isCurrency || config.isLargeNumber) {
-      let formatted = ""
-      if (absVal >= 1_000_000_000) {
-        formatted = `${(absVal / 1_000_000_000).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}B`
-      } else if (absVal >= 1_000_000) {
-        formatted = `${(absVal / 1_000_000).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}M`
-      } else {
-        formatted = `${absVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-      }
-      if (config.isCurrency) return num < 0 ? `-${currencySymbol}${formatted}` : `${currencySymbol}${formatted}`
-      return num < 0 ? `-${formatted}` : formatted
-    }
-    
-    return num < 0 ? `-${absVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : absVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-  }
+  // Partilhados com o cartão de partilha (ver chartPrimitives.tsx) — a imagem
+  // exportada tem de formatar exatamente como o gráfico no ecrã.
+  const formatValue = useMemo(() => makeAxisFormatter(config, currencySymbol), [config, currencySymbol])
+  const formatTooltipValue = useMemo(() => makeDetailFormatter(config, currencySymbol), [config, currencySymbol])
 
 
 
@@ -409,7 +347,20 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
         </div>
         
         <div className="flex gap-1 shrink-0 bg-muted/50 p-1 rounded-md border border-border/40">
-          <button 
+          {hasValidData && (
+            <ChartShareButton
+              title={title}
+              subtitle={shareSubtitle}
+              data={displayData}
+              type={type}
+              config={config}
+              cagr={cagr}
+              currencySymbol={currencySymbol}
+              hiddenKeys={[...hiddenKeys]}
+              className="p-1.5 rounded-sm text-muted-foreground hover:text-foreground transition-colors"
+            />
+          )}
+          <button
             onClick={() => setViewMode('chart')}
             className={`p-1.5 rounded-sm transition-colors ${viewMode === 'chart' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
             title={t('chartView')}

@@ -7,6 +7,7 @@ import { LiveSpark } from "@/components/marketing/LiveSpark";
 import { ChartCardChrome, MiniChart } from "@/components/marketing/MiniChart";
 import { REVENUE, FCF, calcCagr } from "@/components/marketing/ChartScrollDraw";
 import { cn } from "@/lib/utils";
+import { useIsMac } from "@/hooks/useIsMac";
 
 // CAGR reais dos mesmos dados da Story 01 (ChartScrollDraw) — coerência de
 // números entre as duas cenas do showcase.
@@ -37,13 +38,13 @@ type TabKey = "overview" | "financials" | "analista";
 const TAB_ORDER: TabKey[] = ["overview", "financials", "analista"];
 
 export function TerminalMock({
-  liveLabel,
+  updatedLabel,
   tabs,
   fin,
   analystMock,
 }: {
-  /** pill "Em direto" junto ao nome (i18n via page) */
-  liveLabel?: string;
+  /** "Atualizado às HH:MM" junto ao nome (i18n via page) */
+  updatedLabel?: string;
   /** labels reais das tabs (stock.tabs.*) */
   tabs: { overview: string; financials: string; analista: string };
   /** títulos dos 3 mini-gráficos + hint "há mais" (marketing.stories.fundamentals.* + marketing.showcase.*) */
@@ -66,6 +67,7 @@ export function TerminalMock({
   };
 }) {
   const [tab, setTab] = useState<TabKey>("overview");
+  const isMac = useIsMac();
 
   return (
     <div className="relative p-4 sm:p-6">
@@ -73,18 +75,23 @@ export function TerminalMock({
       <div className="mb-5 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <BrandMark className="h-8 w-8 rounded-lg" />
-          <div className="hidden gap-1 sm:flex">
+          {/* Controlo segmentado: o grupo tem fundo próprio e cada tab inativa
+              tem superfície e borda. Estes botões SEMPRE funcionaram, mas sem
+              afordância nenhuma liam-se como texto decorativo — ninguém
+              descobria que a demo era interativa. Um contentor com fundo diz
+              "isto é um seletor" antes de se ler uma única palavra. */}
+          <div className="hidden items-center gap-1 rounded-full border border-border/60 bg-muted/40 p-1 sm:flex">
             {TAB_ORDER.map((key) => (
               <button
                 key={key}
                 type="button"
                 onClick={() => setTab(key)}
+                aria-pressed={tab === key}
                 className={cn(
-                  // estados idênticos ao pill real de components/stock/StockTabs.tsx
-                  "rounded-full px-3 py-1 text-xs font-medium transition-colors",
+                  "cursor-pointer rounded-full px-3 py-1 text-xs font-medium transition-colors",
                   tab === key
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
+                    ? "bg-primary text-primary-foreground"
+                    : "border border-border/70 bg-card text-foreground/80 hover:border-primary/40 hover:text-foreground",
                 )}
               >
                 {tabs[key]}
@@ -94,7 +101,14 @@ export function TerminalMock({
         </div>
         <span className="flex items-center gap-2 rounded-full border border-border/60 bg-card/50 px-3 py-1.5 text-xs text-muted-foreground">
           <Search className="h-3.5 w-3.5" /> AAPL{" "}
-          <kbd className="rounded border border-border px-1 text-[9px]">⌘K</kbd>
+          {/* O atalho segue a PLATAFORMA de quem está a ver. Estava "⌘K"
+              fixo, o que mostrava o símbolo do Mac a utilizadores de Windows —
+              e numa réplica do produto isso lê-se como se a app fosse só para
+              Mac. Reutiliza o mesmo `useIsMac` do TopNav real, para o mock e o
+              produto nunca divergirem. */}
+          <kbd className="rounded border border-border px-1 font-sans text-[10px]">
+            {isMac ? "⌘K" : "Ctrl K"}
+          </kbd>
         </span>
       </div>
 
@@ -103,13 +117,17 @@ export function TerminalMock({
         <div className="grid gap-4 md:grid-cols-[1.2fr_1fr]">
           <div className="glass rounded-2xl p-5">
             <div className="flex items-center justify-between">
-              <div className="flex items-center text-sm font-semibold">
-                Apple Inc. <span className="ml-1 text-muted-foreground">· AAPL</span>
-                {liveLabel ? (
-                  <span className="ml-2 inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                    <i className="live-dot h-1.5 w-1.5 rounded-full bg-primary" />
-                    {liveLabel}
-                  </span>
+              {/* Timestamp em vez da pill dourada "Em direto" com o ponto a
+                  pulsar: a pill era decoração — não dizia nada que o preço
+                  logo abaixo já não diga, e o par pill+dot-pulsante é dos
+                  tiques mais batidos de UI gerada. Uma hora de atualização
+                  é informação a sério e é o que os terminais reais mostram. */}
+              <div className="flex items-baseline gap-2 text-sm font-semibold">
+                <span>
+                  Apple Inc. <span className="text-muted-foreground">· AAPL</span>
+                </span>
+                {updatedLabel ? (
+                  <span className="nums text-xs font-medium text-muted-foreground">{updatedLabel}</span>
                 ) : null}
               </div>
               <ArrowUpRight className="h-5 w-5 text-muted-foreground/50" />

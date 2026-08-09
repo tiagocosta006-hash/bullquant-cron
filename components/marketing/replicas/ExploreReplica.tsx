@@ -33,7 +33,7 @@ export function ExploreReplica({
   companiesLabels: string[];
 }) {
   return (
-    <div className="mt-5 space-y-3">
+    <div data-replica className="mt-5 space-y-3">
       <h3 className="text-xl font-semibold text-foreground/90">{heading}</h3>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {SECTORS.map(({ name, icon: Icon, color, bg }, i) => (

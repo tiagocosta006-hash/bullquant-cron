@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server"
 import { Calculator, Info } from "lucide-react"
 import { DcfCalculator } from "@/components/dcf/DcfCalculator"
 import { PageHeader, InfoNote } from "@/components/layout/PageHeader"
+import { getUser } from "@/lib/supabase/server"
 
 export default async function DcfPage({
   searchParams,
@@ -10,7 +11,12 @@ export default async function DcfPage({
 }) {
   const t = await getTranslations("dcf")
   const resolvedParams = await searchParams
-  const defaultTicker = resolvedParams.ticker
+  const user = await getUser()
+
+  // Demo pública: anónimo usa a calculadora à vontade, mas trancada à Apple —
+  // ignora qualquer ?ticker= da query, força sempre AAPL.
+  const locked = !user
+  const defaultTicker = locked ? "AAPL" : resolvedParams.ticker
 
   return (
     <div className="space-y-6">
@@ -22,7 +28,7 @@ export default async function DcfPage({
 
       <InfoNote icon={<Info className="h-5 w-5" />}>{t("educationalWarning")}</InfoNote>
 
-      <DcfCalculator defaultTicker={defaultTicker} />
+      <DcfCalculator defaultTicker={defaultTicker} locked={locked} />
     </div>
   )
 }

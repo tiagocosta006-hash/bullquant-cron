@@ -25,6 +25,7 @@ const ValuationMultiples = dynamic(() => import('@/components/stock/ValuationMul
 const PriceVsEarnings = dynamic(() => import('@/components/stock/PriceVsEarnings').then(mod => mod.PriceVsEarnings))
 import { ShareStockModal } from '@/components/stock/ShareStockModal'
 import { SimilarCompanies } from '@/components/stock/SimilarCompanies'
+import { StockShareProvider } from '@/components/stock/StockShareContext'
 
 // Partilhado entre generateMetadata e a página (React.cache = 1 query por pedido,
 // em vez de 2 findUnique idênticos).
@@ -174,6 +175,11 @@ export default async function StockPage({
   const devUnlocked = isDevUnlocked()
   const isPro = dbUser?.plan === 'PRO' || devUnlocked
   const isLoggedIn = !!user || devUnlocked
+  // Demo pública (ver §0 do pedido): anónimo em /stock/AAPL vê tudo o que o
+  // Pro vê, de graça — exceto a interação real com IA (chat do Analista, que
+  // fica sempre trancado). Só desbloqueia widgets Pro (ValuationMultiples);
+  // isLoggedIn continua false para o resto da app tratar como anónimo.
+  const isDemo = !isLoggedIn && company.ticker === 'AAPL'
 
   // Overlay preliminar: revenue/EPS já reportados (earnings) que ainda não estão
   // nos fundamentais oficiais (10-Q). Mostra-se como barra provisória no gráfico
@@ -285,9 +291,18 @@ export default async function StockPage({
         }
       />
 
+      {/* Identidade da empresa para os cartões de partilha dos gráficos */}
+      <StockShareProvider company={{
+        ticker: company.ticker,
+        name: company.name,
+        exchange: company.exchange,
+        logoUrl: company.logoUrl,
+        currency: company.currency,
+      }}>
       {/* Conteúdo organizado por intenção, não por scroll infinito */}
       <StockTabs
         isEtf={company.exchange === 'MACRO'}
+        hasPro={isPro}
         overview={
           <>
             {latestEarnings && (
@@ -324,13 +339,14 @@ export default async function StockPage({
             fundamentals={JSON.parse(JSON.stringify(historicalAnnual))}
             isPro={isPro}
             isLoggedIn={isLoggedIn}
+            isDemo={isDemo}
             currencySymbol={currencySymbol}
           />
         }
         valuation={
           company.exchange !== 'MACRO' && <>
-            <ValuationMultiples ticker={company.ticker} isPro={isPro} isLoggedIn={isLoggedIn} />
-            <PriceVsEarnings ticker={company.ticker} isPro={isPro} isLoggedIn={isLoggedIn} currencySymbol={currencySymbol} />
+            <ValuationMultiples ticker={company.ticker} isPro={isPro || isDemo} isLoggedIn={isLoggedIn} isDemo={isDemo} />
+            <PriceVsEarnings ticker={company.ticker} isPro={isPro || isDemo} isLoggedIn={isLoggedIn} currencySymbol={currencySymbol} />
             {serializedDcfs.length > 0 ? (
               <SavedValuations
                 analyses={serializedDcfs}
@@ -355,6 +371,7 @@ export default async function StockPage({
         }
         news={<StockNews ticker={company.ticker} />}
       />
+      </StockShareProvider>
 
       {company.exchange !== 'MACRO' && similarCompanies.length > 0 && (
         <div className="mt-8">

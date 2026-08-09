@@ -299,15 +299,20 @@ export default async function LandingPage({
             cima da fita de tickers, que é filha da section mas não do stage. */}
         <HeroStage className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center">
           <h1
-            aria-label={`${t("titleLead")} ${t("titleAccent")}`}
             className="max-w-[15ch] text-balance text-5xl font-extrabold leading-[0.95] tracking-[-0.04em] sm:text-7xl md:text-8xl xl:text-[7.5rem]"
           >
-            {heroLead(t("titleLead"))}
-            {heroWords(
-              t("titleAccent"),
-              t("titleLead").split(" ").length,
-              "font-heading font-bold italic text-primary gold-sheen-text",
-            )}
+            {/* Texto real invisível para leitores de ecrã e SEO (Googlebot valoriza texto no H1 e não em atributos) */}
+            <span className="sr-only">{t("titleLead")} {t("titleAccent")}</span>
+            
+            {/* O texto fragmentado para a animação visual, escondido dos motores de busca/screen readers para não duplicar */}
+            <span aria-hidden="true">
+              {heroLead(t("titleLead"))}
+              {heroWords(
+                t("titleAccent"),
+                t("titleLead").split(" ").length,
+                "font-heading font-bold italic text-primary gold-sheen-text",
+              )}
+            </span>
           </h1>
 
           <p

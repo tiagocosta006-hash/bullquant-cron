@@ -1,4 +1,11 @@
 {
+  "notFound": {
+    "title": "404",
+    "heading": "Página não encontrada",
+    "description": "A página que procuras não existe, foi movida ou não tens permissões para aceder.",
+    "backHome": "Voltar ao Início",
+    "explore": "Explorar Empresas"
+  },
   "marketing": {
     "eyebrow": "Análise fundamental · Value investing",
     "titleLead": "BullValue: a plataforma para os",

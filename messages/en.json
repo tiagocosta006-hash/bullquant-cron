@@ -1,4 +1,11 @@
 {
+  "notFound": {
+    "title": "404",
+    "heading": "Page not found",
+    "description": "The page you are looking for does not exist, has been moved, or you lack permissions.",
+    "backHome": "Back to Home",
+    "explore": "Explore Companies"
+  },
   "marketing": {
     "eyebrow": "Fundamental analysis · Value investing",
     "titleLead": "See the value",

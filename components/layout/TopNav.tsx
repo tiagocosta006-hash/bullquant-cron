@@ -20,6 +20,7 @@ import {
   Zap,
   TrendingUp,
   Globe,
+  Newspaper,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn, userInitials } from "@/lib/utils";
@@ -67,6 +68,7 @@ export function TopNav({
     { href: "/watchlist", icon: Star, label: t("watchlist") },
     { href: "/calendar", icon: CalendarDays, label: t("calendar") },
     { href: "/macro", icon: Globe, label: "Macro" },
+    { href: "/news", icon: Newspaper, label: "Notícias" },
     // calculadoras em destaque
     { href: "/dcf", icon: Calculator, label: t("dcfShort") },
     { href: "/compound", icon: TrendingUp, label: t("compound") },

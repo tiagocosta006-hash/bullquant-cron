@@ -13,6 +13,7 @@ import {
   GitCompareArrows,
   Search,
   TrendingUp,
+  Newspaper,
 } from "lucide-react";
 import {
   CommandDialog,
@@ -107,6 +108,7 @@ export function CommandMenu({
     { href: "/portfolio", icon: Briefcase, label: t("portfolio") },
     { href: "/watchlist", icon: Star, label: t("watchlist") },
     { href: "/calendar", icon: CalendarDays, label: t("calendar") },
+    { href: "/news", icon: Newspaper, label: "Notícias" },
     { href: "/dcf", icon: Calculator, label: t("dcf") },
   ];
 

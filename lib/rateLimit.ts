@@ -37,6 +37,11 @@ const BUCKETS = {
   // /api/track (Pulse) é público e chamado em cada navegação — bucket
   // próprio para não consumir o orçamento geral da API.
   track: { tokens: 60, windowMs: 60_000 },
+  // /api/news/* é público: polling do bot de Discord + proxy das imagens.
+  // Generoso de propósito — cada carregamento do terminal pede até 20 imagens
+  // a /api/news/image/*, por isso um limite apertado travaria a navegação
+  // normal de um leitor ao fim de duas ou três páginas.
+  news: { tokens: 200, windowMs: 60_000 },
 } satisfies Record<string, WindowConfig>
 
 export type BucketName = keyof typeof BUCKETS
@@ -69,6 +74,12 @@ if (hasUpstash) {
       redis,
       limiter: Ratelimit.slidingWindow(BUCKETS.track.tokens, "60 s"),
       prefix: "rl:track",
+      analytics: false,
+    }),
+    news: new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(BUCKETS.news.tokens, "60 s"),
+      prefix: "rl:news",
       analytics: false,
     }),
     auth: new Ratelimit({

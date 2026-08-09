@@ -81,3 +81,12 @@ scripts/out/
 # relatórios/dumps de auditoria gerados por scripts (ex: audit_null_fundamentals.txt)
 scripts/audit_*.txt
 scripts/*_audit*.txt
+
+# Scratch e dumps locais — NUNCA versionar.
+# Em 2026-08-09 um commit automático arrastou 268 ficheiros (~29 MB) para cá,
+# incluindo .scratch/bullquant_public_backup.dump: um dump de produção com as
+# tabelas users, portfolios e broker_connections. Não chegou a ser enviado.
+.scratch/
+scratch/
+scripts/backups/
+*.dump

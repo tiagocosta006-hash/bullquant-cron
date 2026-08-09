@@ -1,0 +1,51 @@
+name: Ingest News
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_articles:
+        description: "Nº máximo de artigos a gerar"
+        required: false
+        default: "5"
+  schedule:
+    - cron: "0 * * * *" # de hora a hora
+
+# Uma execução de cada vez — duas em paralelo criariam clusters duplicados
+# para a mesma história.
+concurrency:
+  group: ingest-news
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ingest
+        env:
+          DATABASE_URL: ${{ secrets.DIRECT_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          # Conta Gemini própria do terminal (fallback para a partilhada).
+          NEWS_GEMINI_API_KEY: ${{ secrets.NEWS_GEMINI_API_KEY }}
+          NEWS_GEMINI_MODEL: ${{ secrets.NEWS_GEMINI_MODEL }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ secrets.GEMINI_MODEL }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          # Notificação de aprovação no Discord. Se faltarem, o artigo fica na
+          # mesma em DRAFT e aprova-se em /admin/news.
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_REVIEW_CHANNEL_ID: ${{ secrets.DISCORD_REVIEW_CHANNEL_ID }}
+          DISCORD_ADMIN_USER_IDS: ${{ secrets.DISCORD_ADMIN_USER_IDS }}
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+        run: npx tsx scripts/ingest_news.ts --max=${{ github.event.inputs.max_articles || '5' }}

@@ -285,4 +285,317 @@ O componente mostra chips de resumo no topo com compras e vendas dos **últimos 
 
 ---
 
+## 6. Terminal de Notícias (`/news`)
+
+Pipeline autónomo que lê feeds financeiros internacionais, deteta o que está a
+mover os mercados e publica um mini-artigo em Português de Portugal assinado
+pela Bull Value. É consumido pela plataforma **e** pelo bot de Discord.
+
+Não confundir com a §1: essa é a lista de notícias **por empresa**, em tempo
+real, sem persistência nem tradução.
+
+### 6.1 Origem dos Dados
+
+| Fonte | Endpoint | Notas |
+|---|---|---|
+| Finnhub General | `/api/v1/news?category=general` | Backbone; é a única que traz sempre `summary` utilizável |
+| CNBC (Top/Markets/Economy) | 3 feeds RSS | |
+| Yahoo Finance | `finance.yahoo.com/news/rssindex` | Muito volume, muito conteúdo evergreen — filtrado na triagem |
+| MarketWatch | `feeds.content.dowjones.io/public/rss/mw_topstories` | |
+| Investing.com | `investing.com/rss/news_25.rss` | |
+| Reuters, Bloomberg | Google News RSS como proxy | **Já não têm RSS público próprio** |
+
+**Descarregamento do corpo:** para as histórias aprovadas (≤5 por execução)
+descarregamos o texto do artigo original, para o LLM perceber a notícia em vez
+de escrever a partir da manchete. Ver §6.3.
+
+### 6.2 Fluxo (`scripts/ingest_news.ts`, de hora a hora)
+
+```
+collectAllSources()        ~300-400 itens, dedup por sha1(título normalizado)
+  → janela de 6h           só o que é recente conta como "a bombar"
+  → filtro de já-vistos    news_raw_item.dedupKey é @unique
+  → clusterItems()         Jaccard >= 0.35 sobre tokens; SEM LLM
+  → matchTickers()         cruza com a tabela Company; só para ordenar
+  → rankClusters()         score composto: cobertura, tickers, recência
+  → triageClusters()       1 chamada Gemini para ~40 histórias
+       score >= 70 passa; >= 80 publica automático, 70-79 fica DRAFT
+  → generateArticle()      1 chamada Gemini por história, máx 5/execução
+  → news_cluster + news_article (transação)
+  → purge de news_raw_item órfãos com mais de 30 dias
+```
+
+**Porquê triagem em lote:** entram centenas de manchetes por hora. Uma chamada
+de LLM por manchete seria ~100x mais cara sem ganho de qualidade. O lote de 40
+custa uma chamada e elimina o ruído antes da parte cara (a escrita).
+
+**Porquê o clustering sem LLM primeiro:** uma história que várias fontes
+cobrem na mesma janela é o sinal mais barato e mais fiável de relevância.
+
+### 6.3 Extração do Corpo dos Artigos (`lib/news/extract.ts`)
+
+Três decisões que enquadram isto:
+
+1. **Só na fase de escrita.** As ≤5 histórias aprovadas, não as ~300 recolhidas
+   — ~5 pedidos HTTP por execução, e é onde o texto faz diferença.
+2. **Nunca persistido.** O corpo vive em memória durante a geração e é
+   descartado. O que fica na base de dados é o artigo da Bull Value, com
+   atribuição e link à origem.
+3. **robots.txt respeitado**, verificado *antes* de escolher os alvos (ver
+   abaixo porquê), com cache por host e User-Agent identificável.
+
+Ordem de extração: `articleBody` do JSON-LD schema.org primeiro (não sofre com
+a maquilhagem do HTML), depois heurística de parágrafos sobre `<article>` e
+selectores equivalentes, descartando nav/footer/aside/anúncios. Teto de 6 000
+caracteres.
+
+**Cobertura medida** (2026-08-09, amostra dos feeds a sério):
+
+| Host | Corpo obtido | Notas |
+|---|---|---|
+| finance.yahoo.com | 3/3, ~4 700 chars | |
+| www.cnbc.com | 3/3, ~4 200 chars | |
+| www.bloomberg.com | 0/3 | Paywall — devolve boilerplate, rejeitado |
+| www.marketwatch.com | 0/3 | robots.txt proíbe |
+| www.investing.com | 0/3 | HTTP 403 a bots |
+| news.google.com | 0/3 | robots.txt proíbe; URLs opacos |
+
+Por host isto dá ~33%, mas a métrica que conta é outra: **4 em 5 das histórias
+efetivamente selecionadas obtêm corpo**, com ~5 000 caracteres em média. É o
+que interessa, porque `extractBodies` tenta até 3 fontes distintas por história.
+
+**A Reuters é inalcançável.** Tanto o feed do Google News como o próprio
+Finnhub servem os artigos da Reuters através de `news.google.com/rss/articles/`
+— URLs opacos que o robots.txt do Google proíbe. Contribui manchetes (úteis
+para o clustering), nunca corpo.
+
+Três armadilhas encontradas a medir isto, todas corrigidas e com teste de
+regressão em `tests/news/extract.test.ts`:
+
+- **O header `Accept` parte o Yahoo Finance.** Com ele, o Yahoo devolve uma
+  página reduzida de 111 kB sem corpo; sem ele, o artigo completo de 850 kB.
+  Por isso só enviamos `User-Agent` e `Accept-Language`.
+- **O Bloomberg passava o filtro com o seu rodapé institucional** ("Connecting
+  decision makers to a dynamic network…"), 437 caracteres que iam parar ao
+  prompt como se fossem a notícia. Daí o `MIN_BODY_CHARS` de 600 e a lista
+  `BOILERPLATE_MARKERS`.
+- **O robots.txt tem de ser verificado antes de escolher os alvos.** Verificado
+  durante o fetch, os 3 slots eram gastos com URLs do Google News — mais de
+  metade dos itens recolhidos — e as fontes que dão texto ficavam de fora.
+
+O prompt de escrita trata o corpo como material para *compreender*: proíbe
+tradução frase a frase, cópia da estrutura de parágrafos e citações não
+atribuídas.
+
+### 6.4 Conta Gemini e Custo de LLM
+
+O terminal usa uma **conta Gemini própria** (`NEWS_GEMINI_API_KEY` /
+`NEWS_GEMINI_MODEL`, acessor em `lib/news/model.ts`), separada da do resto da
+app. Duas razões: o cron horário consumiria a quota gratuita que o analista e
+os briefs precisam para servir utilizadores em tempo real, e um 429 no cron é
+adiável enquanto um 429 no analista é uma falha visível. Sem as variáveis
+definidas, cai para `lib/ai/gemini.ts`.
+
+⚠️ Contas Gemini criadas de novo **já não têm acesso ao `gemini-2.5-flash`**
+(404: "no longer available to new users") — que é o fallback de
+`lib/ai/gemini.ts`. Por isso o `NEWS_GEMINI_MODEL` tem de estar explicitamente
+definido. Em 2026-08-09 o `gemini-3.6-flash` responde e escreve bom português
+europeu; o `gemini-2.0-flash` devolve 429 no tier gratuito.
+
+⚠️ `lib/news/model.ts` lê o `process.env` **dentro** das funções, nunca no topo
+do módulo. Em ESM os imports são avaliados antes do corpo do módulo que os
+importa, por isso um `const key = process.env.X` no topo correria antes do
+`dotenv.config()` do `scripts/ingest_news.ts` e a chave apareceria vazia
+("Method doesn't allow unregistered callers"). O mesmo se aplica a qualquer
+módulo novo que leia ambiente e seja usado a partir de `scripts/`.
+
+Por execução: 1 chamada de triagem + no máximo 5 de escrita. Máximo teórico
+de 144 chamadas/dia, tipicamente muito menos (o teto de 5 só é atingido em
+dias de mercado agitados). Cabe no tier gratuito do Gemini Flash.
+
+A ingestão corre em cron, não é iniciada por um utilizador — por isso **não**
+passa por `lib/ai/credits.ts`.
+
+### 6.5 Endpoints
+
+`GET /api/news/latest` — feed público, é o que o **bot de Discord** consulta.
+
+- Ordem **cronológica ascendente** de propósito: o bot lança por ordem de
+  acontecimento e guarda o `nextCursor` para o pedido seguinte, o que garante
+  que nunca repete nem salta artigos, mesmo depois de estar em baixo.
+- `after` (cursor), `since` (ISO), `limit` (1-50, default 10), `category`, `ticker`.
+- O desempate do cursor é `(publishedAt, id)` — dois artigos podem partilhar o
+  `publishedAt` (é herdado do item líder do cluster).
+
+`GET /api/news/article/[slug]` — artigo individual. Drafts e arquivados dão 404.
+
+`GET /api/news/image/[id]` — proxy da imagem do artigo. As imagens vêm de CDNs
+de terceiros arbitrários (`media.zenfs.com`, `image.cnbc.com`, …) e o `img-src`
+da CSP da app (next.config.ts) só permite uma allowlist curta — sem proxy, o
+browser bloqueia-as e a página fica com um rectângulo vazio. Servi-las da nossa
+origem faz com que contem como `'self'`, sem abrir a CSP a `https:` para toda a
+aplicação.
+
+O parâmetro é o **id do artigo, nunca um URL**: aceitar um URL arbitrário
+transformaria o endpoint num proxy aberto. O DTO expõe as duas formas —
+`imageUrl` (original, é o que o bot de Discord usa, porque o Discord vai buscar
+a imagem a partir dos servidores dele) e `imageProxyUrl` (o que as páginas web
+têm de usar).
+
+Os três usam o bucket `news` do `lib/rateLimit.ts` (200/min). O limite é
+generoso porque cada carregamento do terminal pede até 20 imagens ao proxy —
+com 60/min a navegação normal de um leitor travava ao fim de três páginas.
+
+### 6.6 Curadoria e Aprovação
+
+**Nada se publica sozinho.** `AUTO_PUBLISH_THRESHOLD` está em 101 (acima do
+máximo possível), por isso todos os artigos nascem em `DRAFT`. Ficam invisíveis
+no site e no `/api/news/latest` até alguém os aprovar. Ver §6.9.
+
+Dois caminhos de aprovação, sobre a mesma base de dados:
+
+**Discord (telemóvel).** Ao criar um rascunho, o ingestor publica-o num canal
+privado com botões *Publicar* / *Rejeitar* (`lib/discord/client.ts`). O push
+chega pela app do Discord. O clique volta a
+`POST /api/discord/interactions`, que verifica a assinatura Ed25519, confirma
+que o utilizador está em `DISCORD_ADMIN_USER_IDS`, muda o estado e substitui os
+botões por "Publicado por …". O artigo fica visível no site nesse instante, e o
+bot apanha-o no polling seguinte a `/api/news/latest`.
+
+A mensagem é publicada com o **token do bot**, não por webhook de canal: só
+webhooks de aplicação podem enviar componentes interativos — num webhook normal
+o campo `components` é simplesmente ignorado.
+
+**Um só bot, cliques pelo gateway.** O bot "scs" (`1536062992037449728`) serve
+`/analisar` e `/watchlist` pelo **gateway** (discord.py). Registar um
+*Interactions Endpoint URL* nessa aplicação faria o Discord entregar **todas**
+as interações dela por HTTP e partiria esses comandos — por isso **não se
+regista**. O circuito é:
+
+```
+backend  --REST-->  publica rascunho com botões  (token do bot "scs")
+utilizador clica
+Discord  --gateway-->  bot discord.py            (como já faz com os slash commands)
+bot      --HTTP-->  POST /api/news/review        (Bearer NEWS_REVIEW_SECRET)
+backend  muda o estado, o artigo fica visível
+```
+
+Publicar mensagens com componentes é uma chamada REST normal e não exige
+endpoint de interações — só a *entrega dos cliques* é que depende disso.
+
+**`POST /api/news/review`** — `Authorization: Bearer <NEWS_REVIEW_SECRET>`,
+corpo `{ articleId, action: "publish"|"reject", discordUserId }`. Idempotente:
+um duplo-clique devolve `alreadyHandled: true` em vez de erro.
+**`GET /api/news/review`** — rascunhos pendentes, para o bot recuperar depois de
+estar em baixo.
+
+O `custom_id` dos botões é `news:publish:<articleId>` / `news:reject:<articleId>`.
+
+Camadas de autorização, ambas a falhar fechado:
+- segredo em falta ⇒ **503, recusa tudo**. Um deploy incompleto não pode abrir
+  a publicação a quem descubra o URL;
+- `discordUserId` é validado contra `DISCORD_ADMIN_USER_IDS` **além** do
+  segredo. Um bug no bot que reencaminhe o clique de outra pessoa não chega
+  para pôr um artigo no ar.
+
+**`/api/discord/interactions` continua a existir** como alternativa, para o caso
+de algum dia se migrar para uma aplicação dedicada em modo HTTP. Sem
+`DISCORD_PUBLIC_KEY` configurada rejeita tudo, por isso hoje está inerte.
+
+⚠️ `DISCORD_ADMIN_USER_IDS` são **ids numéricos**, não usernames — `tiagocostaf1`
+nunca corresponderia ao `user.id` que o Discord envia, e o resultado seria
+ninguém conseguir aprovar, sem erro visível. O id do Costa é
+`427931236405608448`.
+
+Segurança do endpoint de interações, tudo com teste de regressão em
+
+`tests/news/discordVerify.test.ts`:
+- assinatura Ed25519 obrigatória (sem ela, quem descobrisse o URL publicava);
+- janela de 5 minutos no timestamp, contra reenvio de pedidos antigos;
+- `DISCORD_PUBLIC_KEY` em falta ⇒ **rejeita tudo**. Falhar fechado, porque um
+  deploy sem a variável abria a publicação a qualquer pessoa;
+- `DISCORD_ADMIN_USER_IDS` vazio ⇒ **ninguém aprova**. Toda a gente com acesso
+  ao canal vê os botões, por isso "sem allowlist" não pode significar "todos".
+
+Se as variáveis do Discord não estiverem definidas, o pipeline funciona na
+mesma — só não há notificação.
+
+**Web.** `/{locale}/admin/news` lista os últimos 100 artigos com o score de
+relevância e a justificação da triagem, e permite publicar/despublicar.
+
+Protegido pelo `AdminLayout`
+(`ANALYTICS_ADMIN_EMAILS`) **e** por uma verificação repetida dentro da Server
+Action — as Server Actions são endpoints HTTP próprios e podem ser invocadas
+sem passar pelo layout.
+
+### 6.7 Ficheiros Envolvidos
+
+| Ficheiro | Responsabilidade |
+|---|---|
+| `lib/news/sources.ts` | Lista de feeds, fetch RSS + Finnhub, dedup |
+| `lib/news/normalize.ts` | Normalização de títulos, dedupKey, Jaccard, slug, filtro de imagens |
+| `lib/news/cluster.ts` | Clustering, matching de tickers, ranking |
+| `lib/news/extract.ts` | Descarregamento e extração do corpo dos artigos, robots.txt |
+| `lib/news/model.ts` | Acessor do modelo Gemini com conta própria do terminal |
+| `lib/discord/verify.ts` | Verificação Ed25519 das interações do Discord |
+| `lib/discord/client.ts` | Publicação da mensagem de revisão + allowlist de aprovadores |
+| `app/api/news/review/` | Aprovação chamada pelo bot (é o caminho em uso) |
+| `app/api/discord/interactions/` | Alternativa em modo HTTP, hoje inerte |
+| `scripts/setup_discord_review_channel.ts` | Cria o canal privado de aprovações com as permissões certas |
+| `lib/news/triage.ts` | Triagem Gemini em lote + limiares |
+| `lib/news/generate.ts` | Escrita do mini-artigo em PT-PT |
+| `lib/news/serialize.ts` | DTO público partilhado pelo site e pelo Discord |
+| `scripts/ingest_news.ts` | Orquestração (flags `--dry-run`, `--no-llm`, `--max=N`) |
+| `.github/workflows/ingest-news.yml` | Cron horário |
+| `app/api/news/latest/`, `article/[slug]/`, `image/[id]/` | Endpoints (feed, artigo, proxy de imagem) |
+| `app/[locale]/(app)/news/`, `components/news/` | Terminal na plataforma |
+| `app/[locale]/(app)/admin/news/` | Curadoria |
+
+### 6.8 Limitações Conhecidas
+
+- **Reuters e Bloomberg via Google News**: só manchete + link, sem resumo nem
+  corpo. Se o Google mudar o formato do feed, essas duas fontes silenciam-se (o
+  erro é apanhado por fonte, não derruba a execução).
+- **A extração do corpo é frágil por natureza**: depende do HTML de cada site.
+  Uma redesenhação do CNBC ou do Yahoo pode baixar a cobertura sem avisar. O
+  `console.warn` do `generate.ts` regista quando uma história é escrita só com
+  manchetes — vale a pena vigiar nos logs do workflow.
+- **Fins de semana e fora de horas**: quase nada tem cobertura multi-fonte, pelo
+  que o ranking passa a depender dos tickers e da recência. Foi por isto que o
+  `rankClusters` usa score composto e não ordenação lexicográfica.
+- **Sem tradução por locale**: os artigos são sempre PT-PT, mesmo em `/en/news`.
+  É conteúdo editorial da marca para a audiência da Bullocracy.
+- O `publishedAt` do artigo é o do item líder do cluster, não o do momento da
+  geração — de propósito, para o feed refletir quando a notícia aconteceu.
+
+
+### 6.9 Autoria e Responsabilidade Editorial
+
+Os artigos **não indicam** que foram escritos por IA (decisão do Costa,
+2026-08-09). O rodapé (`ArticleFooter`) diz apenas "Artigo da redação da Bull
+Value", mantém a atribuição às fontes e o aviso de não-recomendação.
+
+O que fica registado para quem vier a seguir:
+
+O Artigo 50.º, n.º 4 do Regulamento (UE) 2024/1689 (Regulamento da IA) obriga a
+identificar texto gerado por IA quando é publicado **para informar o público
+sobre matérias de interesse público** — notícias financeiras enquadram-se aí. A
+mesma norma abre uma exceção expressa: a obrigação **não se aplica** quando o
+conteúdo passou por **revisão humana ou controlo editorial** e existe uma
+pessoa singular ou coletiva com **responsabilidade editorial** pela publicação.
+
+**É nessa exceção que o terminal assenta** (desde 2026-08-09):
+`AUTO_PUBLISH_THRESHOLD` está em 101, portanto nenhum artigo fica visível sem
+aprovação humana explícita — pelo botão no Discord ou por `/admin/news`. A
+publicação é um ato de uma pessoa identificada, registada nos logs
+(`[discord] publicado por <utilizador>: <título>`).
+
+Baixar `AUTO_PUBLISH_THRESHOLD` para 80 repõe o auto-publish e **retira a
+revisão humana do circuito** — o que também retira a base da exceção.
+
+A **atribuição às fontes não é negociável** e mantém-se: é o que sustenta o uso
+do material original, e é matéria de direitos de autor, não de rotulagem de IA.
+
+---
+
 *Documento gerado a 29/06/2026 — revisitar após alterações nos scripts de ingestão ou na estrutura da BD.*

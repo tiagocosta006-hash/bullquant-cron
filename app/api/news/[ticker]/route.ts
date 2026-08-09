@@ -1,19 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+// Partilhado com o pipeline do Terminal de Notícias (lib/news/*).
+import { isRealImage } from "@/lib/news/normalize";
 
 const FINNHUB_KEY = process.env.FINNHUB_API_KEY!;
-
-// Generic/placeholder images that should be treated as "no image"
-const GENERIC_IMAGE_PATTERNS = [
-  "s.yimg.com/rz/stage",           // Yahoo Finance generic logo
-  "yahoo_finance_en-US_h_p",       // Yahoo Finance generic logo variant
-  "static.finnhub",                 // Finnhub placeholder
-  "finnhub.io/static",
-];
-
-function isRealImage(url: string | undefined): boolean {
-  if (!url || url.trim() === "") return false;
-  return !GENERIC_IMAGE_PATTERNS.some((pattern) => url.includes(pattern));
-}
 
 export async function GET(
   req: NextRequest,

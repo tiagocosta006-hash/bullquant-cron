@@ -9,13 +9,9 @@ import { cn } from "@/lib/utils"
  * devido aos Observers nativos do React.
  */
 export function getOptimizedUrl(src: string, size: number) {
-  if (!src.startsWith('http')) return src;
-  
-  // O Next.js apenas aceita widths que estejam na lista do next.config.js (default imageSizes).
-  const sizes = [16, 32, 48, 64, 96, 128, 256, 384];
-  const nextSize = sizes.find(s => s >= size) || 256;
-  
-  return `/_next/image?url=${encodeURIComponent(src)}&w=${nextSize}&q=75`;
+  // Devido ao limite do plano gratuito do Vercel ter sido atingido (Erro 402), 
+  // bypassamos a otimização de imagens e servimos a imagem original diretamente.
+  return src;
 }
 
 /**

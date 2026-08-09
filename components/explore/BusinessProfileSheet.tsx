@@ -60,7 +60,7 @@ export function BusinessProfileSheet({ open, onOpenChange, company }: BusinessPr
       >
         {/* Foco inicial aponta aqui (não no primeiro link focável, "Comparar", lá em baixo) —
             senão o browser faz scroll automático da dialog para esse link ao abrir. */}
-        <div ref={scrollRef} tabIndex={-1} className="flex-1 overflow-y-auto outline-none">
+        <div ref={scrollRef} tabIndex={-1} className="flex-1 overflow-y-auto outline-none" data-lenis-prevent>
           {/* Header */}
           <div className="p-6 border-b border-border">
             <div className="flex items-start justify-between mb-4">

@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 /** Valores iniciais para o modo edição (números podem vir como string do JSON). */
 export type PositionInitial = {
@@ -132,7 +133,7 @@ export function AddPositionDialog({
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) reset(); onOpenChange(o) }}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
             {mode === "edit" ? t("editTitle", { ticker: ticker ?? "" }) : t("title", { ticker: ticker ?? "" })}
@@ -141,7 +142,7 @@ export function AddPositionDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
-            <div>
+            <div className="flex flex-col justify-end">
               <label htmlFor="position-quantity" className="mb-1.5 block text-sm font-medium text-foreground">
                 {t("quantityLabel")}
               </label>
@@ -154,9 +155,10 @@ export function AddPositionDialog({
                 autoFocus
               />
             </div>
-            <div>
-              <label htmlFor="position-price" className="mb-1.5 block text-sm font-medium text-foreground">
-                {t("priceLabel")}
+            <div className="flex flex-col justify-end">
+              <label htmlFor="position-price" className="mb-1.5 flex items-baseline justify-between text-sm font-medium text-foreground">
+                <span className="truncate">{t("priceLabel")}</span>
+                <span className="ml-1 text-[10px] text-muted-foreground whitespace-nowrap">(USD)</span>
               </label>
               <Input
                 id="position-price"
@@ -169,7 +171,7 @@ export function AddPositionDialog({
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <div>
+            <div className="flex flex-col justify-end">
               <label htmlFor="position-date" className="mb-1.5 block text-sm font-medium text-foreground">
                 {t("dateLabel")}
               </label>
@@ -181,7 +183,7 @@ export function AddPositionDialog({
                 onChange={(e) => setBuyDate(e.target.value)}
               />
             </div>
-            <div>
+            <div className="flex flex-col justify-end">
               <label htmlFor="position-broker" className="mb-1.5 block text-sm font-medium text-foreground">
                 {t("brokerLabel")}
               </label>
@@ -196,20 +198,27 @@ export function AddPositionDialog({
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <div>
+            <div className="flex flex-col justify-end">
               <label htmlFor="position-currency" className="mb-1.5 block text-sm font-medium text-foreground">
                 {t("currencyLabel")}
               </label>
-              <Input
-                id="position-currency"
-                placeholder="USD"
-                maxLength={6}
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-                className="uppercase"
-              />
+              <Select value={currency || undefined} onValueChange={(val) => setCurrency(val || "")}>
+                <SelectTrigger id="position-currency">
+                  <SelectValue placeholder="USD" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="USD">USD</SelectItem>
+                  <SelectItem value="EUR">EUR</SelectItem>
+                  <SelectItem value="GBP">GBP</SelectItem>
+                  <SelectItem value="CHF">CHF</SelectItem>
+                  <SelectItem value="CAD">CAD</SelectItem>
+                  <SelectItem value="AUD">AUD</SelectItem>
+                  <SelectItem value="JPY">JPY</SelectItem>
+                  <SelectItem value="BRL">BRL</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div>
+            <div className="flex flex-col justify-end">
               <label htmlFor="position-fees" className="mb-1.5 block text-sm font-medium text-foreground">
                 {t("feesLabel")}
               </label>

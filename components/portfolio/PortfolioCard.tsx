@@ -81,10 +81,10 @@ export function PortfolioCard({ item, price, onRemove, onAddPosition, onEdit }: 
             onAddPosition(item.company.ticker)
           }}
           aria-label={t('card.addPosition')}
-          title={t('card.addPosition')}
-          className="absolute top-3 right-11 z-10 p-1.5 rounded-full bg-background/80 border border-border/60 text-muted-foreground/70 hover:text-primary hover:border-primary/40 transition-all"
+          className="absolute top-2.5 right-12 z-10 px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 hover:scale-105 transition-all flex items-center gap-1.5 shadow-lg"
         >
-          <Briefcase className="w-3.5 h-3.5" />
+          <Briefcase className="w-4 h-4" />
+          <span>{t('card.addPosition')}</span>
         </button>
       )}
       <Link href={`/stock/${item.company.ticker}`} className="block">

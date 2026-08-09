@@ -26,6 +26,7 @@ const PriceVsEarnings = dynamic(() => import('@/components/stock/PriceVsEarnings
 import { ShareStockModal } from '@/components/stock/ShareStockModal'
 import { SimilarCompanies } from '@/components/stock/SimilarCompanies'
 import { StockShareProvider } from '@/components/stock/StockShareContext'
+import { ProGate } from '@/components/ui/ProGate'
 
 // Partilhado entre generateMetadata e a página (React.cache = 1 query por pedido,
 // em vez de 2 findUnique idênticos).
@@ -175,11 +176,11 @@ export default async function StockPage({
   const devUnlocked = isDevUnlocked()
   const isPro = dbUser?.plan === 'PRO' || devUnlocked
   const isLoggedIn = !!user || devUnlocked
-  // Demo pública (ver §0 do pedido): anónimo em /stock/AAPL vê tudo o que o
-  // Pro vê, de graça — exceto a interação real com IA (chat do Analista, que
-  // fica sempre trancado). Só desbloqueia widgets Pro (ValuationMultiples);
-  // isLoggedIn continua false para o resto da app tratar como anónimo.
-  const isDemo = !isLoggedIn && company.ticker === 'AAPL'
+  const MAG_7 = ['AAPL', 'MSFT', 'NVDA', 'AMZN', 'GOOGL', 'GOOG', 'META', 'TSLA']
+  const isMag7 = MAG_7.includes(company.ticker.toUpperCase())
+  
+  const canViewFinancials = isPro || isMag7
+  const canViewProTabs = isPro
 
   // Overlay preliminar: revenue/EPS já reportados (earnings) que ainda não estão
   // nos fundamentais oficiais (10-Q). Mostra-se como barra provisória no gráfico
@@ -331,43 +332,66 @@ export default async function StockPage({
           </>
         }
         financials={
-          company.exchange !== 'MACRO' && <FinancialsEngine ticker={company.ticker} sector={company.sector} currencySymbol={currencySymbol} preliminary={preliminaryQuarter} />
+          company.exchange !== 'MACRO' && (
+            <div className="relative min-h-[400px]">
+              {!canViewFinancials && <ProGate isPro={isPro} isLoggedIn={isLoggedIn} ticker={company.ticker} />}
+              <div className={!canViewFinancials ? "pointer-events-none select-none" : ""}>
+                <FinancialsEngine ticker={company.ticker} sector={company.sector} currencySymbol={currencySymbol} preliminary={preliminaryQuarter} />
+              </div>
+            </div>
+          )
         }
         analista={
-          company.exchange !== 'MACRO' && <StockAnalyst
-            ticker={company.ticker}
-            fundamentals={JSON.parse(JSON.stringify(historicalAnnual))}
-            isPro={isPro}
-            isLoggedIn={isLoggedIn}
-            isDemo={isDemo}
-            currencySymbol={currencySymbol}
-          />
+          company.exchange !== 'MACRO' && (
+            <div className="relative min-h-[400px]">
+              {!canViewProTabs && <ProGate isPro={isPro} isLoggedIn={isLoggedIn} ticker={company.ticker} />}
+              <div className={!canViewProTabs ? "pointer-events-none select-none" : ""}>
+                <StockAnalyst
+                  ticker={company.ticker}
+                  fundamentals={JSON.parse(JSON.stringify(historicalAnnual))}
+                  isPro={isPro}
+                  isLoggedIn={isLoggedIn}
+                  currencySymbol={currencySymbol}
+                />
+              </div>
+            </div>
+          )
         }
         valuation={
-          company.exchange !== 'MACRO' && <>
-            <ValuationMultiples ticker={company.ticker} isPro={isPro || isDemo} isLoggedIn={isLoggedIn} isDemo={isDemo} />
-            <PriceVsEarnings ticker={company.ticker} isPro={isPro || isDemo} isLoggedIn={isLoggedIn} currencySymbol={currencySymbol} />
-            {serializedDcfs.length > 0 ? (
-              <SavedValuations
-                analyses={serializedDcfs}
-                ticker={company.ticker}
-                currency={currencySymbol}
-              />
-            ) : (
-              <div className="glass rounded-2xl p-8 text-center">
-                <p className="text-sm text-muted-foreground">{t('tabs.valuationEmpty')}</p>
-                <a href={`/dcf?ticker=${company.ticker}`} className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">
-                  {t('tabs.valuationCta')}
-                </a>
+          company.exchange !== 'MACRO' && (
+            <div className="relative min-h-[400px]">
+              {!canViewProTabs && <ProGate isPro={isPro} isLoggedIn={isLoggedIn} ticker={company.ticker} />}
+              <div className={!canViewProTabs ? "pointer-events-none select-none space-y-6" : "space-y-6"}>
+                <ValuationMultiples ticker={company.ticker} isPro={isPro} isLoggedIn={isLoggedIn} />
+                <PriceVsEarnings ticker={company.ticker} isPro={isPro} isLoggedIn={isLoggedIn} currencySymbol={currencySymbol} />
+                {serializedDcfs.length > 0 ? (
+                  <SavedValuations
+                    analyses={serializedDcfs}
+                    ticker={company.ticker}
+                    currency={currencySymbol}
+                  />
+                ) : (
+                  <div className="glass rounded-2xl p-8 text-center">
+                    <p className="text-sm text-muted-foreground">{t('tabs.valuationEmpty')}</p>
+                    <a href={`/dcf?ticker=${company.ticker}`} className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">
+                      {t('tabs.valuationCta')}
+                    </a>
+                  </div>
+                )}
               </div>
-            )}
-          </>
+            </div>
+          )
         }
         company={
-          company.exchange !== 'MACRO' && <>
-            <ManagementTeam ticker={company.ticker} />
-            <InsiderActivity ticker={company.ticker} currencySymbol={currencySymbol} />
-          </>
+          company.exchange !== 'MACRO' && (
+            <div className="relative min-h-[400px]">
+              {!canViewProTabs && <ProGate isPro={isPro} isLoggedIn={isLoggedIn} ticker={company.ticker} />}
+              <div className={!canViewProTabs ? "pointer-events-none select-none space-y-6" : "space-y-6"}>
+                <ManagementTeam ticker={company.ticker} />
+                <InsiderActivity ticker={company.ticker} currencySymbol={currencySymbol} />
+              </div>
+            </div>
+          )
         }
         news={<StockNews ticker={company.ticker} />}
       />

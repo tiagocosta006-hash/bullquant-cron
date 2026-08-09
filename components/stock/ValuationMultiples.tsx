@@ -226,41 +226,7 @@ export function ValuationMultiples({ ticker, isPro, isLoggedIn, isDemo }: Valuat
       </div>
 
       <div className="p-4 md:p-6 relative">
-        {/* Gating overlay: guest -> criar conta; FREE -> upgrade Pro */}
-        {!isPro && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 backdrop-blur-[4px] p-6 text-center">
-            <div className="bg-muted p-4 rounded-full mb-4">
-              <Lock className="w-8 h-8 text-muted-foreground" />
-            </div>
-            {isLoggedIn ? (
-              <>
-                <h3 className="text-xl font-bold mb-2">{tGate("title")}</h3>
-                <p className="text-muted-foreground max-w-md mb-6">
-                  {tGate("desc", { ticker })}
-                </p>
-                <a href="/pricing">
-                  <Button size="lg" className="font-semibold shadow-lg shadow-primary/20">
-                    {tGate("upgradeCta")}
-                  </Button>
-                </a>
-              </>
-            ) : (
-              <>
-                <h3 className="text-xl font-bold mb-2">{tGate("guestTitle")}</h3>
-                <p className="text-muted-foreground max-w-md mb-6">
-                  {tGate("guestDesc", { ticker })}
-                </p>
-                <a href="/register">
-                  <Button size="lg" className="font-semibold shadow-lg shadow-primary/20">
-                    {tGate("guestCta")}
-                  </Button>
-                </a>
-              </>
-            )}
-          </div>
-        )}
-
-        <div className={`h-[350px] w-full ${!isPro ? 'opacity-30 pointer-events-none blur-[2px]' : ''}`}>
+        <div className="h-[350px] w-full">
           <ResponsiveContainer width="100%" height="100%" className="outline-none focus:outline-none">
             <LineChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <XAxis 

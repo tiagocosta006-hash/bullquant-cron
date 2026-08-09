@@ -617,7 +617,7 @@
       "title": "Add position, {ticker}",
       "description": "Enter the quantity and average buy price. To follow without a position, use the watchlist.",
       "quantityLabel": "Quantity",
-      "priceLabel": "Average buy price (USD)",
+      "priceLabel": "Average buy price",
       "cancel": "Cancel",
       "confirm": "Add",
       "error": "Couldn't add the position. Please try again.",
@@ -728,9 +728,11 @@
     "proGate": {
       "title": "Pro feature",
       "desc": "Unlock historical valuation charts to see whether {ticker} trades at a premium or discount to its historical averages.",
+      "descGeneric": "This feature is exclusive to Pro accounts. Unlock your full analytical potential.",
       "upgradeCta": "Upgrade to Pro",
-      "guestTitle": "Create an account to see historical valuation",
+      "guestTitle": "Create an account to access",
       "guestDesc": "Sign up for free to unlock {ticker}'s historical valuation charts and see whether it trades at a premium or discount to its averages.",
+      "guestDescGeneric": "Sign up for free and upgrade to Pro to access exclusive investment tools.",
       "guestCta": "Create free account"
     },
     "valuationChart": {
@@ -1215,24 +1217,22 @@
     "features": {
       "title": "What's included",
       "free": [
-        "Full S&P 500 access",
-        "10 years of fundamental data",
-        "DCF calculator with autofill",
-        "Save and share DCF scenarios",
-        "Interactive financial charts",
-        "Watchlist and portfolio, no limit",
-        "5 AI credits per day (one full Analyst report)",
-        "Earnings calendar",
-        "Insider trading data"
+        "Portfolio Management",
+        "Personal WatchList",
+        "Magnificent 7 Financials",
+        "Market News",
+        "Compound Interest Calculator",
+        "Macro Data (Briefings)"
       ],
       "pro": [
         "Everything in Free",
-        "20 AI credits per day (~6 full reports)",
-        "Chat with the AI Analyst about any company",
-        "Historical valuation multiples (P/E, P/S, EV/EBITDA)",
-        "Early access to new features",
-        "Private value investors community",
-        "Priority email support"
+        "Financials for all companies",
+        "AI Analyst & Company Profile",
+        "DCF Calculator (Valuation)",
+        "Explore & Stock Screener",
+        "Peer Comparison",
+        "Earnings Calendar",
+        "Priority 24/7 email support"
       ]
     },
     "faq": {

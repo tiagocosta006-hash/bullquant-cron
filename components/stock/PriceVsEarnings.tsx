@@ -268,33 +268,7 @@ export function PriceVsEarnings({
       </div>
 
       <div className="p-4 md:p-6 relative">
-        {/* Gating alinhado com o resto da aba de avaliação */}
-        {!isPro && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 backdrop-blur-[4px] p-6 text-center">
-            <div className="bg-muted p-4 rounded-full mb-4">
-              <Lock className="w-8 h-8 text-muted-foreground" />
-            </div>
-            {isLoggedIn ? (
-              <>
-                <h3 className="text-xl font-bold mb-2">{tGate("title")}</h3>
-                <p className="text-muted-foreground max-w-md mb-6">{tGate("desc", { ticker })}</p>
-                <Link href="/pricing">
-                  <Button size="lg" className="font-semibold shadow-lg shadow-primary/20">{tGate("upgradeCta")}</Button>
-                </Link>
-              </>
-            ) : (
-              <>
-                <h3 className="text-xl font-bold mb-2">{tGate("guestTitle")}</h3>
-                <p className="text-muted-foreground max-w-md mb-6">{tGate("guestDesc", { ticker })}</p>
-                <Link href="/register">
-                  <Button size="lg" className="font-semibold shadow-lg shadow-primary/20">{tGate("guestCta")}</Button>
-                </Link>
-              </>
-            )}
-          </div>
-        )}
-
-        <div className={!isPro ? "opacity-30 pointer-events-none blur-[2px]" : ""}>
+        <div>
           {/* Sumário: o gráfico mostra a forma, estes números dão o veredicto */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-5">
             <div className="rounded-lg border border-border/40 bg-muted/20 p-3">

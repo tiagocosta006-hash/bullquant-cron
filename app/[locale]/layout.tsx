@@ -135,7 +135,7 @@ export async function generateMetadata({
       type: "website",
       images: [
         {
-          url: "/opengraph-image",
+          url: `${BRAND.siteUrl}/og-image.png`,
           width: 1200,
           height: 630,
           alt: `${BRAND.name} — Análise Fundamental de Ações`,
@@ -147,7 +147,7 @@ export async function generateMetadata({
       title: `${BRAND.name} — Análise Fundamental de Ações`,
       description:
         "Vê o valor que os outros não veem. Fundamentais de 10 anos, DCF e Analista IA, em português.",
-      images: ["/opengraph-image"],
+      images: [`${BRAND.siteUrl}/og-image.png`],
     },
   };
 }

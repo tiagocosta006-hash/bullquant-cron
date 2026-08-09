@@ -497,6 +497,14 @@ function NumberField({
           step={step}
           min={min}
           value={value}
+          onKeyDown={(e) => {
+            if (e.key === "e" || e.key === "E" || e.key === "+") {
+              e.preventDefault()
+            }
+            if (min !== undefined && min >= 0 && e.key === "-") {
+              e.preventDefault()
+            }
+          }}
           onChange={(e) => {
             let val = e.target.value
             

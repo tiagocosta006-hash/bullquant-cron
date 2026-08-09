@@ -4,6 +4,9 @@ import { GitCompareArrows } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { PeerComparisonDashboard } from '@/components/compare/PeerComparisonDashboard'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { getUser } from "@/lib/supabase/server"
+import { isDevUnlocked } from "@/lib/devAccess"
+import { ProGate } from "@/components/ui/ProGate"
 
 export default async function ComparePage({
   searchParams,
@@ -60,19 +63,31 @@ export default async function ComparePage({
   // Para otimizar, o Dashboard vai fazer o fetch do peer selecionado no lado do cliente, ou passamos tudo de uma vez.
   // Como as indústrias podem ter entre 2 a 15 empresas, vamos passar os peers (nome, ticker) e o dashboard faz fetch dos fundamentais.
   
+  const user = await getUser()
+  const dbUser = user ? await prisma.user.findUnique({ where: { id: user.id } }) : null
+  const devUnlocked = isDevUnlocked()
+  
+  const isPro = dbUser?.plan === "PRO" || devUnlocked
+  const isLoggedIn = !!user || devUnlocked
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative min-h-[70vh]">
       <PageHeader
         icon={<GitCompareArrows className="h-6 w-6" />}
         title={t('title', { industry: baseCompany.industry ?? '' })}
         subtitle={t('subtitle')}
       />
 
-      <PeerComparisonDashboard
-        baseCompany={baseCompany} 
-        baseFundamentals={baseFundamentals}
-        availablePeers={allPeers}
-      />
+      {!isPro && (
+        <ProGate isPro={isPro} isLoggedIn={isLoggedIn} />
+      )}
+      <div className={!isPro ? "pointer-events-none select-none" : ""}>
+        <PeerComparisonDashboard
+          baseCompany={baseCompany} 
+          baseFundamentals={baseFundamentals}
+          availablePeers={allPeers}
+        />
+      </div>
     </div>
   )
 }

@@ -1059,45 +1059,7 @@ function AnalystChat({
     [messages, streaming, ticker, t],
   );
 
-  if (!isPro) {
-    // LiquidGlass aqui (superfície grande do rail) — mesma composição já
-    // usada no estado vazio/erro do dossier (linha ~269): border-dashed +
-    // p-8 text-center, agora também h-full flex-col centrado para preencher
-    // o rail sticky sem "flutuar" a meio.
-    return (
-      <LiquidGlass
-        className={cn(
-          "relative flex flex-col items-center justify-center overflow-hidden rounded-2xl border-dashed border-primary/30 p-8 text-center",
-          className,
-        )}
-      >
-        <div className="mx-auto mb-3 w-fit rounded-xl border border-primary/20 bg-primary/10 p-3 text-primary">
-          <Lock className="h-5 w-5" />
-        </div>
-        {isLoggedIn ? (
-          <>
-            <p className="text-sm font-semibold text-primary">{t("chat.proOnly")}</p>
-            <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">{t("chat.proDesc")}</p>
-            <a href="/pricing">
-              <Button size="sm" className="pressable mt-4 gap-2">
-                {t("chat.upgradeCta")}
-              </Button>
-            </a>
-          </>
-        ) : (
-          <>
-            <p className="text-sm font-semibold text-primary">{t("chat.guestTitle")}</p>
-            <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">{t("chat.guestDesc")}</p>
-            <a href="/register">
-              <Button size="sm" className="pressable mt-4 gap-2">
-                {t("chat.guestCta")}
-              </Button>
-            </a>
-          </>
-        )}
-      </LiquidGlass>
-    );
-  }
+
 
   return (
     <div className={cn("flex h-full flex-col overflow-hidden rounded-2xl border border-border/50 bg-card/60", className)}>

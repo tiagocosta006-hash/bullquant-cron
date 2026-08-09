@@ -617,7 +617,7 @@
       "title": "Adicionar posição, {ticker}",
       "description": "Indica a quantidade e o preço médio de compra. Para acompanhar sem posição, usa a watchlist.",
       "quantityLabel": "Quantidade",
-      "priceLabel": "Preço médio de compra (USD)",
+      "priceLabel": "Preço médio de compra",
       "cancel": "Cancelar",
       "confirm": "Adicionar",
       "error": "Não foi possível adicionar a posição. Tenta novamente.",
@@ -708,9 +708,11 @@
     "proGate": {
       "title": "Funcionalidade Pro",
       "desc": "Desbloqueia os gráficos de valuation histórico para veres se a {ticker} negoceia com prémio ou desconto face às suas médias históricas.",
+      "descGeneric": "Esta funcionalidade é exclusiva para contas Pro. Desbloqueia o teu potencial de análise.",
       "upgradeCta": "Passar a Pro",
-      "guestTitle": "Cria uma conta para veres o valuation histórico",
+      "guestTitle": "Cria uma conta para aceder",
       "guestDesc": "Regista-te grátis para desbloquear os gráficos de valuation histórico da {ticker} e ver se negoceia com prémio ou desconto face às médias.",
+      "guestDescGeneric": "Regista-te grátis e passa a Pro para acederes a ferramentas exclusivas de investimento.",
       "guestCta": "Criar conta grátis"
     },
     "valuationChart": {
@@ -1215,24 +1217,22 @@
     "features": {
       "title": "O que está incluído",
       "free": [
-        "Acesso completo ao S&P 500",
-        "10 anos de dados fundamentais",
-        "Calculadora DCF com autopreenchimento",
-        "Guardar e partilhar cenários DCF",
-        "Gráficos financeiros interativos",
-        "Watchlist e portefólio sem limite",
-        "5 créditos de IA por dia (uma análise completa do Analista)",
-        "Calendário de resultados",
-        "Dados de insider trading"
+        "Gestão de Portfólio",
+        "WatchList Pessoal",
+        "Fundamentais MAG 7",
+        "Notícias do Mercado",
+        "Calculadora de Juro Composto",
+        "Dados Macro (Briefing)"
       ],
       "pro": [
         "Tudo do plano Gratuito",
-        "20 créditos de IA por dia (~6 análises completas)",
-        "Chat com o Analista IA sobre qualquer empresa",
-        "Múltiplos de avaliação históricos (P/E, P/S, EV/EBITDA)",
-        "Acesso antecipado a novas funcionalidades",
-        "Comunidade privada de value investors",
-        "Apoio prioritário por email"
+        "Fundamentais de todas as empresas",
+        "Analista IA & Perfil da Empresa",
+        "Calculadora DCF (Valuation)",
+        "Ferramenta Explorar & Screener",
+        "Comparador de Empresas",
+        "Calendário de Resultados",
+        "Apoio prioritário 24/7 por email"
       ]
     },
     "faq": {
@@ -1288,8 +1288,8 @@
       "leadership": "Liderança",
       "mainMarket": "Mercado Principal",
       "globalPresence": "Atuação Global",
-      "bullCase": "Tese do Touro (Bull)",
-      "bearCase": "Tese do Urso (Bear)",
+      "bullCase": "Bull Case",
+      "bearCase": "Bear Case",
       "swotTitle": "Análise SWOT",
       "swotStrengths": "S - Forças",
       "swotWeaknesses": "W - Fraquezas",

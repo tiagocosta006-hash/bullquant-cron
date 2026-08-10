@@ -305,14 +305,12 @@ export default async function LandingPage({
             <span className="sr-only">{t("titleLead")} {t("titleAccent")}</span>
             
             {/* O texto fragmentado para a animação visual, escondido dos motores de busca/screen readers para não duplicar */}
-            <span aria-hidden="true">
-              {heroLead(t("titleLead"))}
+            {heroLead(t("titleLead"))}
               {heroWords(
                 t("titleAccent"),
                 t("titleLead").split(" ").length,
                 "font-heading font-bold italic text-primary gold-sheen-text",
               )}
-            </span>
           </h1>
 
           <p

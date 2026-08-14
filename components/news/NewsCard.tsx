@@ -2,12 +2,13 @@ import Link from "next/link";
 import type { NewsArticleDTO } from "@/lib/news/serialize";
 import { CategoryBadge, SentimentBadge, TickerBadges, timeAgoPt } from "./shared";
 
+import { ImageWithFallback } from "./ImageWithFallback";
+
 export function NewsCard({ article, locale }: { article: NewsArticleDTO; locale: string }) {
   return (
     <article className="group relative flex gap-4 rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/40">
       {article.imageProxyUrl && (
-        // eslint-disable-next-line @next/next/no-img-element -- imagens de domínios de terceiros arbitrários
-        <img
+        <ImageWithFallback
           src={article.imageProxyUrl}
           alt=""
           loading="lazy"

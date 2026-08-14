@@ -13,6 +13,7 @@ import {
   TickerBadges,
   timeAgoPt,
 } from "@/components/news/shared";
+import { ImageWithFallback } from "@/components/news/ImageWithFallback";
 
 export const revalidate = 300;
 
@@ -108,13 +109,9 @@ export default async function NewsArticlePage({
         )}
 
         {article.imageProxyUrl && (
-          // eslint-disable-next-line @next/next/no-img-element -- domínios de terceiros arbitrários
-          <img
+          <ImageWithFallback
             src={article.imageProxyUrl}
             alt=""
-            // O `bg-muted` evita o rectângulo branco enorme quando o CDN da
-            // fonte deixa de servir a imagem: fica um bloco neutro em vez de
-            // um ícone de imagem partida no meio da página.
             className="mt-6 aspect-video w-full rounded-xl bg-muted object-cover"
           />
         )}

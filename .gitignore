@@ -90,3 +90,17 @@ scripts/*_audit*.txt
 scratch/
 scripts/backups/
 *.dump
+
+# venv local do pipeline python (scripts/requirements.txt)
+.venv/
+
+# lixo de sessões de debug na raiz — nunca deve ser commitado
+/test_*.ts
+/test_*.py
+/test_*.js
+/debug_*.py
+/scratch_*.py
+/scratch_*.ts
+/out.json
+/deploy_log.txt
+/chunks_swot/

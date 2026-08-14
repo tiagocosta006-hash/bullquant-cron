@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export function ImageWithFallback({
   src,
@@ -14,6 +14,16 @@ export function ImageWithFallback({
   loading?: "eager" | "lazy";
 }) {
   const [error, setError] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    // If the image already failed to load before React hydrated:
+    if (imgRef.current) {
+      if (imgRef.current.complete && imgRef.current.naturalWidth === 0) {
+        setError(true);
+      }
+    }
+  }, [src]);
 
   if (error) {
     return null;
@@ -22,6 +32,7 @@ export function ImageWithFallback({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
+      ref={imgRef}
       src={src}
       alt={alt}
       className={className}

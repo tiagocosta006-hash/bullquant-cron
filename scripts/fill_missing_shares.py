@@ -71,15 +71,30 @@ TOL_EPS = 0.35                       # |eps*shares - NI| / |NI|
 
 
 def combinar(valores: list) -> float | None:
-    """Um número de ações a partir dos valores do período (ver docstring)."""
+    """Um número de ações a partir das fatias POR CLASSE de um período.
+
+    Conservador de propósito. A tentação é somar as classes, e para a Workday
+    isso até dava certo — mas a Visa prova que não se pode generalizar: a sua
+    Classe A DILUÍDA (2.029 M) já inclui as Classes B e C convertidas, e ao
+    lado publica ainda B1 (97 M), B2 (74 M) e C (29 M). Somar dava 2.229 M
+    contra os ~2.040 M reais, e somando também o básico dava 3.839 M — o dobro.
+
+    Por isso:
+      - uma só fatia -> é a resposta;
+      - várias com rácio > 100x -> são a MESMA participação em unidades
+        diferentes (BRK: Classe A vs Classe B), fica a maior, que é a que casa
+        com a série de preços do ticker;
+      - várias de grandeza comparável -> AMBÍGUO. Devolve None e a linha fica
+        NULL. Antes NULL que um número inventado que contamina o P/E.
+    """
     vs = sorted({float(v) for v in valores if v and float(v) > 1000})
     if not vs:
         return None
     if len(vs) == 1:
         return vs[0]
-    if vs[-1] / vs[0] > RACIO_CLASSES_EQUIVALENTES:
+    if vs[0] > 0 and vs[-1] / vs[0] > RACIO_CLASSES_EQUIVALENTES:
         return vs[-1]
-    return sum(vs)
+    return None
 
 
 def shares_do_filing(filing) -> dict:
@@ -103,16 +118,56 @@ def shares_do_filing(filing) -> dict:
     d = d[d["concept"].isin(SHARE_CONCEPTS)]
     if len(d) == 0:
         return {}
-    porperiodo = defaultdict(list)
+    # SEPARAR o facto não-dimensionado das fatias por classe. A Workday publica
+    # os TRÊS: total 187,39 M + Classe A 106,6 M + Classe B 80,8 M — e as duas
+    # classes somam exatamente o total. Somar tudo dava o DOBRO. O total, quando
+    # existe, é a resposta; as classes só servem de recurso.
+    dimcols = [c for c in d.columns if c.startswith("dim_")]
+    total_por_periodo: dict = {}
+    # Por (período, CONCEITO). Básico e diluído são medidas ALTERNATIVAS da
+    # mesma coisa — juntá-las na mesma lista e somar dava o dobro na Visa.
+    classes_por_periodo = defaultdict(list)
     for _, r in d.iterrows():
-        porperiodo[(str(r["period_start"])[:10], str(r["period_end"])[:10])].append(r["numeric_value"])
-    return {k: combinar(v) for k, v in porperiodo.items() if combinar(v)}
+        chave = (str(r["period_start"])[:10], str(r["period_end"])[:10])
+        sem_dim = all(
+            r.get(c) is None or (isinstance(r.get(c), float) and r.get(c) != r.get(c))
+            or str(r.get(c)) == "nan"
+            for c in dimcols
+        ) if dimcols else True
+        if sem_dim:
+            # Vários totais para o mesmo período (básico e diluído) — fica o
+            # maior, que é o diluído.
+            v = float(r["numeric_value"])
+            total_por_periodo[chave] = max(total_por_periodo.get(chave, 0), v)
+        else:
+            classes_por_periodo[(chave, str(r["concept"]))].append(r["numeric_value"])
+
+    out: dict = {}
+    for chave, v in total_por_periodo.items():
+        if v:
+            out[chave] = v
+    # Só onde NÃO há total não-dimensionado: resolver por conceito e, entre
+    # conceitos, ficar com o maior (o diluído).
+    por_periodo_resolvido = defaultdict(list)
+    for (chave, _conceito), vals in classes_por_periodo.items():
+        if chave in out:
+            continue
+        v = combinar(vals)
+        if v:
+            por_periodo_resolvido[chave].append(v)
+    for chave, vals in por_periodo_resolvido.items():
+        out[chave] = max(vals)
+    return out
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--tickers")
     ap.add_argument("--apply", action="store_true")
+    ap.add_argument("--overwrite", action="store_true",
+                    help="também corrige linhas JÁ preenchidas cujo valor difira "
+                         ">5%% do extraído do XBRL (usar para reparar uma passagem "
+                         "anterior com lógica errada)")
     ap.add_argument("--tenks", type=int, default=12)
     ap.add_argument("--tenqs", type=int, default=40)
     ap.add_argument("--twentyfs", type=int, default=10)
@@ -128,12 +183,13 @@ def main() -> None:
         filtro, params = "AND c.ticker = ANY(%s)", [alvos]
 
     # Só empresas que TÊM buracos — não se re-extrai quem já está completo.
+    tendo = "" if args.overwrite else 'HAVING count(*) FILTER (WHERE f."sharesOutstanding" IS NULL) > 0'
     cur.execute(
         f'''SELECT c.ticker, c.cik, count(*) FILTER (WHERE f."sharesOutstanding" IS NULL)
             FROM fundamentals f JOIN companies c ON c.id = f."companyId"
             WHERE c.cik IS NOT NULL {filtro}
             GROUP BY c.ticker, c.cik
-            HAVING count(*) FILTER (WHERE f."sharesOutstanding" IS NULL) > 0
+            {tendo}
             ORDER BY count(*) FILTER (WHERE f."sharesOutstanding" IS NULL) DESC''',
         params,
     )
@@ -172,13 +228,13 @@ def main() -> None:
 
             # Linhas em falta, com o que é preciso para validar.
             cur.execute(
-                '''SELECT f.id, f."periodType", f."periodEnd"::date, f."netIncome", f."epsDiluted"
+                '''SELECT f.id, f."periodType", f."periodEnd"::date, f."netIncome", f."epsDiluted", f."sharesOutstanding"
                    FROM fundamentals f JOIN companies c ON c.id = f."companyId"
-                   WHERE c.ticker = %s AND f."sharesOutstanding" IS NULL''',
+                   WHERE c.ticker = %s''' + ("" if args.overwrite else ' AND f."sharesOutstanding" IS NULL'),
                 (ticker,),
             )
             escritas = rejeitadas = 0
-            for rid, ptype, pend, ni, eps in cur.fetchall():
+            for rid, ptype, pend, ni, eps, sh_atual in cur.fetchall():
                 # Casar pela DURAÇÃO certa: anual 350-380d, trimestral 80-100d.
                 lo, hi = (350, 380) if ptype == "ANNUAL" else (80, 100)
                 import datetime as _dt
@@ -192,6 +248,12 @@ def main() -> None:
                         break
                 if cand is None:
                     continue
+                # Já lá está e bate com o XBRL -> nada a fazer.
+                if sh_atual is not None:
+                    if abs(float(sh_atual) - cand) <= 0.05 * cand:
+                        continue
+                    if not args.overwrite:
+                        continue
                 # Guard: EPS x acoes tem de bater com o resultado liquido.
                 if eps is not None and ni is not None and abs(float(ni)) > 1e7 and float(eps) != 0:
                     desvio = abs(float(eps) * cand - float(ni)) / abs(float(ni))

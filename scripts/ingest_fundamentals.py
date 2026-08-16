@@ -1258,6 +1258,11 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
     # recupera a gross margin sem depender dessa única tag XBRL.
     # (Bancos/seguradoras não têm COGS → continua None, que é o correto.)
     cost_of_rev = dur.get("costOfRevenue")
+    # Não existe custo das vendas negativo. Vem de tags trocadas ou de um Q4
+    # derivado por subtração com bases diferentes; deixá-lo passar arrastava o
+    # lucro bruto para cima da receita e partia a identidade GP.
+    if cost_of_rev is not None and cost_of_rev < 0:
+        cost_of_rev = None
     if gross_profit is None and revenue is not None and cost_of_rev is not None:
         gross_profit = revenue - cost_of_rev
 
@@ -1916,6 +1921,13 @@ def synthesize_q4(periods: set, period_ends: dict, period_filed: dict,
             # significa capex FY em falta/tag errada (REITs) — o abs() do
             # build_row transformá-lo-ia em lixo positivo. Fica NULL (N/A).
             if field == "capex" and val < 0:
+                continue
+            # Mesma lógica para o custo das vendas: não existe custo negativo.
+            # Um Q4 derivado por subtração (FY − Q1 − Q2 − Q3) fica negativo
+            # quando o anual e os trimestres usam tags diferentes — e depois
+            # arrasta o lucro bruto, que passava a exceder a receita (17 dos 22
+            # casos na BD eram exatamente Q4 assim). Melhor NULL.
+            if field == "costOfRevenue" and val < 0:
                 continue
             derived[field] = val
 

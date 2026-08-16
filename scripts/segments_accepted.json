@@ -1,5 +1,82 @@
 {
   "_doc": "Exceções de qualidade de segmentos REVISTAS e aceites como realidade, não bugs. Chave: TICKER|PERIODTYPE|PERIODEND|RULE[|SEGMENT_KEY] — exatamente a chave que o validate_segments.py imprime. Cada entrada EXIGE um racional; sem racional não é uma exceção, é um bug escondido debaixo do tapete.",
   "_convencao": "Espelha o formato de validator_accepted.json e period_identity_accepted.json. Preferir sempre corrigir a origem a aceitar a exceção — esta lista deve encolher, não crescer.",
-  "accepted": []
+  "accepted": [
+    {
+      "key": "BP|ANNUAL|2019-12-31|SEG_SUM_MAJOR_OVER",
+      "rationale": "Downstream=249.924bn vem de ifrs-full:RevenueAndOperatingIncome, o único conceito limpo (sem 'Gross'/'Intersegment' no nome) disponível para 2019-2020 no eixo bp:SegmentsAxis. Petrolíferas reportam 'receita + outro rendimento operacional' ao nível do segmento incluindo o throughput de trading/supply, estruturalmente maior que a receita consolidada — a BP reestruturou os segmentos em FY2021 para Crude oil/Oil products/Natural gas, que já reconciliam (sem P0). Não fabricar uma alocação externa-apenas que a própria BP não publicou nesse conceito para estes dois anos."
+    },
+    {
+      "key": "BP|ANNUAL|2019-12-31|SEG_VALUE_EXCEEDS_REVENUE|Downstream",
+      "rationale": "Mesma causa do SEG_SUM_MAJOR_OVER acima."
+    },
+    {
+      "key": "BP|ANNUAL|2020-12-31|SEG_SUM_MAJOR_OVER",
+      "rationale": "Mesma causa do FY2019 — ifrs-full:RevenueAndOperatingIncome inclui trading/supply, sem alternativa limpa disponível para este ano."
+    },
+    {
+      "key": "BP|ANNUAL|2020-12-31|SEG_VALUE_EXCEEDS_REVENUE|Downstream",
+      "rationale": "Mesma causa do SEG_SUM_MAJOR_OVER acima."
+    },
+    {
+      "key": "DEO|ANNUAL|2018-06-30|SEG_SUM_MAJOR_OVER",
+      "rationale": "A Diageo só publica a repartição por produto (Spirits/Beer/RTD) sob ifrs-full:Revenue, que é BRUTO (inclui impostos especiais) — a nossa receita consolidada é líquida, por convenção Compustat já decidida para tabaco/álcool/refinação/utilities. A repartição líquida de impostos especiais só existe por geografia (deo:NetSales), nunca por produto. Não há dado nenhum para 'consertar' sem fabricar uma alocação; mesma família do cohort ELIMINATION_GROSS já documentado em segments-data-quality-2026-08.md."
+    },
+    {
+      "key": "DEO|ANNUAL|2018-06-30|SEG_VALUE_EXCEEDS_REVENUE|Spirits",
+      "rationale": "Mesma causa do SEG_SUM_MAJOR_OVER acima."
+    },
+    {
+      "key": "DEO|ANNUAL|2019-06-30|SEG_SUM_MAJOR_OVER",
+      "rationale": "Mesma causa do FY2018."
+    },
+    {
+      "key": "DEO|ANNUAL|2019-06-30|SEG_VALUE_EXCEEDS_REVENUE|Spirits",
+      "rationale": "Mesma causa do FY2018."
+    },
+    {
+      "key": "DEO|ANNUAL|2020-06-30|SEG_SUM_MAJOR_OVER",
+      "rationale": "Mesma causa do FY2018."
+    },
+    {
+      "key": "DEO|ANNUAL|2020-06-30|SEG_VALUE_EXCEEDS_REVENUE|Spirits",
+      "rationale": "Mesma causa do FY2018."
+    },
+    {
+      "key": "DEO|ANNUAL|2021-06-30|SEG_SUM_MAJOR_OVER",
+      "rationale": "Mesma causa do FY2018."
+    },
+    {
+      "key": "DEO|ANNUAL|2021-06-30|SEG_VALUE_EXCEEDS_REVENUE|Spirits",
+      "rationale": "Mesma causa do FY2018."
+    },
+    {
+      "key": "DEO|ANNUAL|2022-06-30|SEG_SUM_MAJOR_OVER",
+      "rationale": "Mesma causa do FY2018."
+    },
+    {
+      "key": "DEO|ANNUAL|2022-06-30|SEG_VALUE_EXCEEDS_REVENUE|Spirits",
+      "rationale": "Mesma causa do FY2018."
+    },
+    {
+      "key": "DEO|ANNUAL|2023-06-30|SEG_SUM_MAJOR_OVER",
+      "rationale": "Mesma causa do FY2018 — o rácio 1,305x (o mais baixo da série) confirma que é a mesma distorção bruto/líquido, apenas menor por ano."
+    },
+    {
+      "key": "DEO|ANNUAL|2023-06-30|SEG_VALUE_EXCEEDS_REVENUE|Spirits",
+      "rationale": "Mesma causa do FY2018."
+    },
+    {
+      "key": "NVS|ANNUAL|2021-12-31|SEG_SUM_MAJOR_OVER",
+      "rationale": "Sandoz (9.631bn) + Innovative Medicines (41.995bn) = 51.626bn vs receita consolidada 42.781bn. A Novartis cindiu a Sandoz em 2023; nos anos anteriores ao spin-off os dois segmentos podem reportar em bases não inteiramente aditivas ao grupo consolidado (transferências entre divisões, ou reapresentação comparativa pós-cisão). Sem uma terceira fonte (DERA não cobre segmentos), não há como decidir qual dos dois números reafirmar sem adivinhar."
+    },
+    {
+      "key": "NVS|ANNUAL|2022-12-31|SEG_SUM_MAJOR_OVER",
+      "rationale": "Mesma causa do FY2021."
+    },
+    {
+      "key": "NVS|ANNUAL|2022-12-31|SEG_GRAND_TOTAL_VALUE|Innovative Medicines",
+      "rationale": "Innovative Medicines=42.121bn não é um total mal rotulado — é genuinamente ~99,8% da receita consolidada (42.206bn), porque a Sandoz (a outra divisão) representava só ~9,4bn antes da cisão de 2023. Não é uma linha de rollup a duplicar-se; é a estrutura real e muito concentrada do negócio nesse ano."
+    }
+  ]
 }

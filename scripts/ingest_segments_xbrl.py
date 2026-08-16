@@ -438,6 +438,27 @@ def _label_key(label: str) -> str:
     return _re.sub(r"[^a-z0-9]+", "", s)
 
 
+def _tem_sufixo_redundante(rotulo: str) -> bool:
+    """'Gas segment' / 'Consulting Revenue' num gráfico chamado "Receitas por
+    Segmento" — o sufixo não acrescenta nada e só rouba espaço à legenda."""
+    low = " ".join((rotulo or "").lower().split())
+    return any(low.endswith(suf) for suf in _LABEL_SUFFIXES)
+
+
+def escolher_canonico(variantes: list) -> str:
+    """Qual das grafias fica, dada a lista JÁ ordenada da mais recente para a
+    mais antiga.
+
+    Preferir a mais recente parecia o mais fiel (é como a empresa lhe chama
+    hoje), mas medido sobre a BD toda deixava 94 rótulos com sufixo redundante
+    — 'Gas segment', 'Corporate Segment', 'Energy generation and storage
+    segment'. Preferir a mais limpa baixa isso para 27, e nesses 27 nenhuma
+    variante existe sem sufixo. Desempate pela mais recente, que é a ordem em
+    que a lista chega.
+    """
+    return min(variantes, key=lambda r: (_tem_sufixo_redundante(r), len(r)))
+
+
 def canonicalize_labels(merged: dict) -> int:
     """Unifica variantes do MESMO rótulo dentro da mesma empresa.
 
@@ -448,17 +469,20 @@ def canonicalize_labels(merged: dict) -> int:
     segmento, cada uma com metade do histórico e um buraco na outra metade —
     é o cohort LABEL_CHURN da auditoria.
 
-    Escolhe a variante do período MAIS RECENTE (a nomenclatura atual da
-    empresa) e reescreve as antigas. Só toca onde há de facto duas grafias da
-    mesma chave: uma empresa com rótulos estáveis fica byte a byte igual.
+    Só toca onde há de facto duas grafias da mesma chave: uma empresa com
+    rótulos estáveis fica byte a byte igual.
     """
-    # Da mais recente para a mais antiga, para a primeira grafia vista ganhar.
+    # Da mais recente para a mais antiga: é a ordem que escolher_canonico usa
+    # para desempatar.
     ordem = sorted(merged.keys(), key=lambda k: str(k[1]), reverse=True)
-    canonico: dict[tuple, str] = {}
+    vistas: dict[tuple, list] = {}
     for chave in ordem:
         for eixo, seg in merged[chave].items():
             for rotulo in seg:
-                canonico.setdefault((eixo, _label_key(rotulo)), rotulo)
+                vistas.setdefault((eixo, _label_key(rotulo)), [])
+                if rotulo not in vistas[(eixo, _label_key(rotulo))]:
+                    vistas[(eixo, _label_key(rotulo))].append(rotulo)
+    canonico = {k: escolher_canonico(v) for k, v in vistas.items()}
 
     trocas = 0
     for chave in merged:

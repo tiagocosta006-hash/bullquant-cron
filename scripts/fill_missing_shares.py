@@ -254,8 +254,22 @@ def main() -> None:
                         continue
                     if not args.overwrite:
                         continue
+                # O EPS guardado é REFERÊNCIA FIÁVEL? Se o par (eps, acoes) que
+                # está na BD já satisfaz eps x acoes = NI ao cêntimo, então esse
+                # EPS foi DERIVADO daquelas ações — e se as ações estavam
+                # erradas, o EPS herdou o mesmo erro. Validar o valor novo
+                # contra ele rejeitaria o correto por discordar do corrompido
+                # (foi o que aconteceu à STZ: desvio de exatamente 50%).
+                # Nesse caso o EPS é recalculado JUNTO com as ações.
+                eps_e_derivado = (
+                    eps is not None and sh_atual is not None and ni is not None
+                    and float(sh_atual) != 0
+                    and abs(float(eps) * float(sh_atual) - float(ni)) <= 0.01 * abs(float(ni))
+                )
+
                 # Guard: EPS x acoes tem de bater com o resultado liquido.
-                if eps is not None and ni is not None and abs(float(ni)) > 1e7 and float(eps) != 0:
+                if (eps is not None and ni is not None and abs(float(ni)) > 1e7
+                        and float(eps) != 0 and not eps_e_derivado):
                     desvio = abs(float(eps) * cand - float(ni)) / abs(float(ni))
                     if desvio > TOL_EPS:
                         rejeitadas += 1
@@ -269,7 +283,7 @@ def main() -> None:
                 # ações corretas — na BRK o companyfacts também só tem EPS até
                 # 2013, e em termos de Classe A. Só se escreve onde está NULL.
                 eps_derivado = None
-                if eps is None and ni is not None and cand:
+                if (eps is None or eps_e_derivado) and ni is not None and cand:
                     eps_derivado = float(ni) / cand
                     if abs(eps_derivado) > 100_000:   # escala absurda -> não escrever
                         eps_derivado = None

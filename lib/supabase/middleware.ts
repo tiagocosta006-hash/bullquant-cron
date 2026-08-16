@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { isDevUnlocked } from '@/lib/devAccess'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -101,7 +102,12 @@ export async function updateSession(request: NextRequest) {
     path.startsWith('/transcripts') ||
     (path.startsWith('/stock/') && upperPath !== '/STOCK/AAPL')
 
-  if (!user && isGuestOnlyRoute) {
+  // DEV_UNLOCK_PRO desbloqueia "login + plano Pro" (ver lib/devAccess.ts), mas
+  // só era consultado DENTRO das páginas — o funil de guest continuava a
+  // expulsar o anónimo daqui antes de a página sequer correr, deixando só a
+  // /stock/AAPL inspecionável em desenvolvimento. isDevUnlocked() tem guard de
+  // NODE_ENV: num build de produção é sempre false.
+  if (!user && isGuestOnlyRoute && !isDevUnlocked()) {
     const url = request.nextUrl.clone()
     url.pathname = '/register'
     return NextResponse.redirect(url)

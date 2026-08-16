@@ -89,6 +89,18 @@ def purge_edgar_cache_if_big(limit_gb: float) -> bool:
 # não a us-gaap: a SAP publica ifrs-full_SegmentsAxis. Sem estas entradas, 23 das
 # 43 empresas sem segmentos eram estrangeiras (AZN, BP, SAP, SHEL, UBS, NVS...)
 # e falhavam por o eixo simplesmente não ser procurado.
+# ⚠️ NÃO acrescentar dim_us-gaap_ProductOrServiceAxis nem
+# dim_us-gaap_StatementGeographicalAxis aqui. A tentação é óbvia — a SEC moveu
+# estes eixos de `us-gaap` para `srt` por volta de 2018, e parece que se ganha
+# o histórico anterior. Testado a 2026-08-16: não se ganha, estraga.
+#   · A Chipotle declara us-gaap:ProductOrServiceAxis em 2016/2017, mas o único
+#     membro é NonChipotleRestaurantsMember com NumberOfRestaurants=23 — não há
+#     receita nenhuma lá. Os anos vazios no gráfico são ausência real de
+#     divulgação (a repartição só começa com a adoção do ASC 606 em 2018).
+#   · Em contrapartida a KKR 2017/2019 passou a apanhar uma repartição por tipo
+#     de comissão que soma 43% da receita: reconcilia contra o subtotal de
+#     comissões e não contra o total, logo passa o guard e grava uma partição
+#     falsa onde antes não havia nenhuma.
 AXES = {
     "segment": ("dim_us-gaap_StatementBusinessSegmentsAxis",
                 "dim_ifrs-full_SegmentsAxis",
@@ -406,6 +418,66 @@ def _best_partition(xbrl, sub, axis_col, allowed, total):
     return None
 
 
+_LABEL_SUFFIXES = (
+    " revenue", " revenues", " net revenue", " net revenues",
+    " sales", " net sales", " revenue net", " segment",
+)
+
+
+def _label_key(label: str) -> str:
+    """Chave de comparação de rótulos: minúsculas, sem sufixo de receita e sem
+    pontuação. 'Delivery service revenue' e 'Delivery Service' colapsam."""
+    s = " ".join((label or "").lower().split())
+    changed = True
+    while changed:
+        changed = False
+        for suf in _LABEL_SUFFIXES:
+            if s.endswith(suf) and len(s) > len(suf) + 1:
+                s = s[: -len(suf)].strip()
+                changed = True
+    return _re.sub(r"[^a-z0-9]+", "", s)
+
+
+def canonicalize_labels(merged: dict) -> int:
+    """Unifica variantes do MESMO rótulo dentro da mesma empresa.
+
+    O membro XBRL é estável entre filings, mas o texto do label linkbase não:
+    a Chipotle chama 'Delivery Service' ao segmento até 2021 e 'Delivery
+    service revenue' a partir de 2022, com o mesmo cmg:DeliveryServiceMember
+    por baixo. Sem unificar, o gráfico desenha DUAS séries para o mesmo
+    segmento, cada uma com metade do histórico e um buraco na outra metade —
+    é o cohort LABEL_CHURN da auditoria.
+
+    Escolhe a variante do período MAIS RECENTE (a nomenclatura atual da
+    empresa) e reescreve as antigas. Só toca onde há de facto duas grafias da
+    mesma chave: uma empresa com rótulos estáveis fica byte a byte igual.
+    """
+    # Da mais recente para a mais antiga, para a primeira grafia vista ganhar.
+    ordem = sorted(merged.keys(), key=lambda k: str(k[1]), reverse=True)
+    canonico: dict[tuple, str] = {}
+    for chave in ordem:
+        for eixo, seg in merged[chave].items():
+            for rotulo in seg:
+                canonico.setdefault((eixo, _label_key(rotulo)), rotulo)
+
+    trocas = 0
+    for chave in merged:
+        for eixo, seg in list(merged[chave].items()):
+            novo: dict = {}
+            for rotulo, valor in seg.items():
+                alvo = canonico.get((eixo, _label_key(rotulo)), rotulo)
+                if alvo != rotulo:
+                    trocas += 1
+                # Duas grafias no MESMO período seriam segmentos distintos que
+                # colapsaram por engano — manter a maior e não somar às cegas.
+                if alvo in novo:
+                    novo[alvo] = max(novo[alvo], valor)
+                else:
+                    novo[alvo] = valor
+            merged[chave][eixo] = novo
+    return trocas
+
+
 def pick_primary(by_axis):
     """Partição principal para a coluna revenueSegments (mapa plano).
 
@@ -652,6 +724,14 @@ def main():
                         continue
                     merged.setdefault(k, {}).update(v)
                 time.sleep(args.sleep)
+
+            # Depois de juntar TODOS os filings da empresa (só aqui se vê a
+            # série completa e, com ela, as grafias que mudaram ao longo dos
+            # anos).
+            trocas = canonicalize_labels(merged)
+            if trocas:
+                stats["rotulos_unificados"] += trocas
+                print(f"    {ticker}: {trocas} rótulos unificados (grafia mudou entre filings)", flush=True)
 
             if not merged:
                 print(f"[{i}/{total_co}] {ticker}: 0 períodos que reconciliem", flush=True)

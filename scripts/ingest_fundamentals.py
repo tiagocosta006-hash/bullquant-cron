@@ -1275,7 +1275,15 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
 
     # ── Level 1 Accounting Integrity ──
     if revenue is not None and gross_profit is not None and gross_profit > revenue:
-        gross_profit = revenue  # Força a integridade se a extração colidir tags residuais
+        # Forçar gp = revenue FABRICAVA um valor: a NiSource ficava com lucro
+        # bruto igual à receita (5.053 M) tendo custo das vendas taggado de
+        # 1.534 M — margem bruta de 100% numa utility, e a identidade
+        # gp = revenue − cogs partida em 13 linhas. Com o custo disponível, o
+        # lucro bruto DERIVA-SE; sem ele, fica NULL, que é honesto.
+        if cost_of_rev is not None and 0 <= cost_of_rev <= revenue:
+            gross_profit = revenue - cost_of_rev
+        else:
+            gross_profit = None
 
     op_income = dur.get("operatingIncome")
 

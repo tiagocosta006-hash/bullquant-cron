@@ -1602,6 +1602,13 @@ html.lenis body {
     transform: scale(9);
     opacity: 0;
     visibility: hidden;
+    /* redundante com `visibility: hidden` de propósito: no Safari/WebKit, um
+       elemento que só passa a invisível através do fim de uma animação CSS
+       por vezes continua a intercetar cliques/scroll (o hit-testing não
+       acompanha o fim da animação). Sem isto, a cortina inteira (fixed,
+       inset:0, z-index:90) ficava invisível mas viva — página congelada
+       sem nenhum erro na consola. */
+    pointer-events: none;
   }
 }
 

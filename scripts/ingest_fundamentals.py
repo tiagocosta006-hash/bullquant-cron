@@ -174,6 +174,12 @@ DURATION_TAGS = {
         # EPS total; preferível a null e o guard NI/EPS continua a validar.
         "DilutedEarningsLossPerShareFromContinuingOperations",
         "BasicEarningsLossPerShareFromContinuingOperations",
+        # ÚLTIMO recurso. A Berkshire publica SÓ EarningsPerShareBasic — nem
+        # Diluted nem a variante combinada — e ficava com epsDiluted a null em
+        # toda a série. Numa empresa sem instrumentos diluidores materiais o
+        # básico É o diluído; onde houver diluição real, o diluído aparece
+        # antes na lista e este nunca chega a ser usado.
+        "EarningsPerShareBasic",
     ],
     "sharesOutstandingDur": [
         "WeightedAverageNumberOfDilutedSharesOutstanding",

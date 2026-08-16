@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
 
-// Sincroniza revenueSegments/businessKpis da BD LOCAL (fonte da verdade,
+// Sincroniza revenueSegments/businessKpis/revenueSegmentsByAxis da BD LOCAL (fonte da verdade,
 // trabalho de extração do Tiago) para a produção Supabase. Local é dono
 // destes dois campos; tudo o resto (revenue, netIncome, etc.) NÃO é tocado —
 // a produção continua dona dos valores financeiros normais. Um campo só é
@@ -20,7 +20,10 @@ const envLocal = dotenv.parse(fs.readFileSync(path.join(__dirname, '..', '.env.d
 const envProd = dotenv.parse(fs.readFileSync(path.join(__dirname, '..', '.env')));
 
 const LOCAL_URL = envLocal.DIRECT_URL;
-const PROD_URL = envProd.DIRECT_URL;
+// PROD_DIRECT_URL no ambiente tem prioridade sobre o .env: assim nunca é
+// preciso repontar o .env para produção (isso mudaria o alvo de TODOS os
+// scripts que o leem). Exportar a variável só para esta invocação.
+const PROD_URL = process.env.PROD_DIRECT_URL || envProd.DIRECT_URL;
 
 if (!LOCAL_URL || !PROD_URL) {
   console.error('DIRECT_URL em falta em .env.dev ou .env');
@@ -48,10 +51,16 @@ async function main() {
   console.log(`Modo: ${APPLY ? 'APLICAR (escreve em produção)' : 'DRY-RUN (só relatório, nada é escrito)'}`);
 
   const localRows = await localPrisma.fundamental.findMany({
-    where: { OR: [{ revenueSegments: { not: Prisma.DbNull } }, { businessKpis: { not: Prisma.DbNull } }] },
+    where: {
+      OR: [
+        { revenueSegments: { not: Prisma.DbNull } },
+        { businessKpis: { not: Prisma.DbNull } },
+        { revenueSegmentsByAxis: { not: Prisma.DbNull } },
+      ],
+    },
     select: {
       periodType: true, fiscalYear: true, fiscalQuarter: true,
-      revenueSegments: true, businessKpis: true,
+      revenueSegments: true, businessKpis: true, revenueSegmentsByAxis: true,
       company: { select: { ticker: true } },
     },
   });
@@ -84,7 +93,10 @@ async function main() {
   for (const [ticker, prodCompanyId] of prodCompanyIdByTicker) {
     const prodRows = await prodPrisma.fundamental.findMany({
       where: { companyId: prodCompanyId },
-      select: { periodType: true, fiscalYear: true, fiscalQuarter: true, revenueSegments: true, businessKpis: true },
+      select: {
+        periodType: true, fiscalYear: true, fiscalQuarter: true,
+        revenueSegments: true, businessKpis: true, revenueSegmentsByAxis: true,
+      },
     });
     for (const pr of prodRows) {
       const k = keyOf(ticker, pr.periodType, pr.fiscalYear, pr.fiscalQuarter);
@@ -103,6 +115,12 @@ async function main() {
       if (local.businessKpis != null) {
         if (JSON.stringify(local.businessKpis) !== JSON.stringify(pr.businessKpis ?? null)) {
           data.businessKpis = local.businessKpis as Prisma.InputJsonValue;
+          changed = true;
+        }
+      }
+      if (local.revenueSegmentsByAxis != null) {
+        if (JSON.stringify(local.revenueSegmentsByAxis) !== JSON.stringify(pr.revenueSegmentsByAxis ?? null)) {
+          data.revenueSegmentsByAxis = local.revenueSegmentsByAxis as Prisma.InputJsonValue;
           changed = true;
         }
       }
@@ -139,10 +157,14 @@ async function main() {
   for (let i = 0; i < updates.length; i += CONCURRENCY) {
     const batch = updates.slice(i, i + CONCURRENCY);
     // updateMany (não update com a chave composta): fiscalQuarter NULL nas
-    // linhas ANNUAL não é aceite pelo tipo gerado da chave composta — como
-    // filtro simples de updateMany não há esse problema, e o @@unique garante
-    // que isto afeta no máximo 1 linha (equivalente a um update singular).
-    await Promise.all(batch.map((u) =>
+    // linhas ANNUAL não é aceite pelo tipo gerado da chave composta.
+    // ⚠️ O @@unique NÃO garante 1 linha só nas anuais — em Postgres, NULLs são
+    // distintos num índice único, logo fiscalQuarter=NULL não é protegido
+    // (ver docs/audit/db-state-2026-08-05.md). Verificado antes de cada corrida
+    // que não há duplicados anuais em produção (count(*)>1 GROUP BY
+    // companyId,fiscalYear WHERE periodType='ANNUAL'); result.count é
+    // registado para confirmar 1 por atualização.
+    const results = await Promise.all(batch.map((u) =>
       prodPrisma.fundamental.updateMany({
         where: {
           companyId: u.prodCompanyId,
@@ -153,6 +175,8 @@ async function main() {
         data: u.data,
       })
     ));
+    const multi = results.filter((r) => r.count > 1).length;
+    if (multi > 0) console.error(`⚠️ ${multi} updateMany deste lote afetaram MAIS DE 1 linha`);
     done += batch.length;
     if (done % 500 < CONCURRENCY) console.log(`  ${done}/${updates.length}`);
   }

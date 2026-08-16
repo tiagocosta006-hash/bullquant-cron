@@ -1,0 +1,136 @@
+{
+  "_doc": "Léxico de classificação de nomes de segmento para validate_segments.py. DADOS, não código — editar aqui, nunca hardcoded nas regras. Calibrado contra os 4021 nomes distintos realmente presentes na BD (2026-08-03).",
+
+  "_matching_contract": "TODAS as listas são casadas por FRONTEIRA DE PALAVRA (\\b...\\b) sobre o nome normalizado, NUNCA por substring. É deliberado: o build_segment_map.py:104-111 usa substring e por isso 'cAPACity' casa com 'apac' e 'Access and capacity fees' é classificado como geografia. Ver também geo_requires_purity.",
+
+  "geo_requires_purity": true,
+  "_geo_purity_doc": "Um nome só é GEO quando, depois de remover geo_filler, TODOS os tokens substantivos restantes são tokens geográficos. 'North America' e 'North America segment' → GEO. 'International Site Leasing' (SBAC), 'Aflac Japan' (AFL), 'Beverage packaging, South America' (BLL), 'United States Mechanical Construction And Facilities Services' (EME) → NÃO GEO: são segmentos de negócio reportáveis que apenas CONTÊM uma palavra geográfica. Sem esta regra de pureza, ~110 dos 164 nomes que contêm um token geográfico seriam mal classificados, e o SEG_AXIS_MIX_GEO enchia-se de falsos positivos.",
+
+  "geo_filler": [
+    "segment", "segments", "region", "regions", "regional", "operations",
+    "operating", "markets", "market", "geography", "geographic", "geographical",
+    "area", "areas", "zone", "other", "all", "and", "the", "of", "rest",
+    "total", "net", "revenue", "revenues", "sales"
+  ],
+  "_geo_filler_excluded": "'group' foi DELIBERADAMENTE removido do filler: com ele, 'American Group' (44x, uma unidade de negócio) classificava como GEO porque 'american' é token geográfico e 'group' era filler. Palavras que denotam uma ENTIDADE organizacional (group, division, company, unit, holdings) não são filler geográfico.",
+
+  "geo_tokens": [
+    "africa", "america", "americas", "american", "apac", "asia", "asian",
+    "atlantic", "australasia", "australia", "austria", "belgium", "benelux",
+    "brazil", "brazilian", "canada", "canadian", "caribbean", "cemea",
+    "central", "chile", "china", "chinese", "colombia", "continental",
+    "czech", "denmark", "domestic", "eame", "eastern", "emea", "emena",
+    "europe", "european", "finland", "france", "french", "germany", "german",
+    "global", "greater", "iberia", "india", "indian", "indonesia",
+    "international", "ireland", "israel", "italy", "japan", "japanese",
+    "korea", "latam", "latin", "mea", "mexico", "mexican", "middle east",
+    "nafta", "netherlands", "nordic", "nordics", "north", "northern",
+    "norway", "oceania", "overseas", "pacific", "philippines", "poland",
+    "portugal", "russia", "scandinavia", "singapore", "south", "southeast",
+    "southern", "spain", "sweden", "switzerland", "taiwan", "thailand",
+    "turkey", "u.k.", "u.s.", "uk", "us", "usa", "united kingdom",
+    "united states", "vietnam", "west", "western", "world", "worldwide",
+    "countries", "country", "foreign", "non-us", "nonus", "ex-us"
+  ],
+  "_geo_tokens_doc": "'us'/'uk' entram porque a normalização remove pontuação ('U.S.' → 'us'); a fronteira de palavra impede que casem dentro de outras palavras. 'east' sozinho NÃO entra (casaria 'East Coast Distribution'); 'middle east' entra como bigrama.",
+
+  "total_labels_exact": [
+    "total", "totals", "subtotal", "subtotals", "operatings", "operating",
+    "operating segment", "operating segments", "reportable",
+    "reportable segment", "reportable segments", "all segments",
+    "consolidated", "consolidated total", "sales", "net sales", "revenue",
+    "revenues", "net revenue", "net revenues", "total revenue",
+    "total revenues", "total net sales", "total sales"
+  ],
+  "_total_labels_exact_doc": "Casamento do nome INTEIRO normalizado. Presentes na BD: 'Operatings' (54x, o us-gaap:OperatingSegmentsMember mutilado pelo .replace('Segment','') em build_segment_map.py:48-61), 'Sales' (33x), 'Net Sales' (17x), 'Net sales' (5x), 'Reportable' (3x), 'Operating Segments' (2x). 'Sales'/'Net Sales' podem ser um segmento legítimo num punhado de emitentes — é por isso que SEG_TOTAL_LABEL é P1 sozinho e só sobe a P0 quando co-ocorre com excesso de soma ou quando o valor iguala a receita.",
+
+  "total_labels_prefix": [
+    "total", "subtotal", "sum of", "aggregate"
+  ],
+  "_total_labels_prefix_doc": "Prefixo com fronteira de palavra. Apanha 'Total Hardware' (CDW, rollup pai), 'Subtotal: Biosimilars' (AMGN), 'Total revenue from contracts with customers' (AXON, 32x). ATENÇÃO: apanha também segmentos genuinamente reportáveis cujo rótulo do emitente começa por 'Total' ('Total U.S. Information Solutions' EFX, 'Total Workforce Solutions'). Por isso o prefixo sozinho é P2 informativo; o detetor preciso de duplicação é o SEG_PARENT_ROLLUP (valor = soma de um subconjunto dos próprios irmãos), que não depende do rótulo.",
+
+  "consolidation_tokens": [
+    "operatings", "operating segments", "intersegment", "elimination",
+    "eliminations", "reconciling", "reconciliation", "unallocated",
+    "corporate and other", "corporate other", "corporate unallocated",
+    "all other", "other segments", "intercompany"
+  ],
+
+  "elimination_tokens": [
+    "intersegment", "elimination", "eliminations", "intercompany",
+    "reconciling", "unallocated"
+  ],
+  "_elimination_doc": "Presentes na BD: 'Intersegment Elimination' (30x), 'Other Operatings And Intersegment Eliminations' (12x), 'Other Operatings With Intersegment' (8x), 'Corporate Unallocated', 'Unallocated And Other'. Uma linha de eliminações com valor POSITIVO num período onde a soma excede a receita é o SEG_ELIMINATION_KEY_PRESENT.",
+
+  "timing_tokens": [
+    "point in time", "over time", "transferred at", "transferred over",
+    "at a point in time", "principal", "agent"
+  ],
+  "_timing_doc": "Eixo ASC-606 (timing-of-transfer). Exatamente 5 nomes na BD, 13 ocorrências cada: 'Transferred At Point In Time', '... Principal', '... Agent', 'Transferred Over Time', 'Transferred Over Time Principal'. Este eixo NUNCA deve coexistir com um eixo de produto — quando coexiste, a receita é contada duas vezes na íntegra (CDW). 'principal'/'agent' só contam como TIMING quando acompanhados de 'transferred'.",
+
+  "customer_tokens": [
+    "government", "governmental", "public sector", "private sector",
+    "small business", "small and medium", "smb", "enterprise customers",
+    "education", "educational", "healthcare customers", "corporate customers",
+    "retail customers", "wholesale customers", "institutional",
+    "third party", "related party", "affiliates", "franchise", "franchised",
+    "company operated", "company-operated", "licensed"
+  ],
+
+  "non_revenue_decisive": [
+    "cost of",
+    "cost of revenue",
+    "cost of revenues",
+    "cost of sales",
+    "operating expenses",
+    "operating expense",
+    "income tax",
+    "income taxes",
+    "interest expense",
+    "depreciation",
+    "impairment",
+    "goodwill impairment",
+    "restructuring"
+  ],
+  "_non_revenue_decisive_doc": "P0 — não são nomes errados, são VALORES errados: linhas de custo/despesa raspadas de filas adjacentes da mesma tabela do filing. Presentes na BD: 'Cost of products sold (excluding amortization of intangible assets)' (12x), 'Cost of services provided (...)' (12x), 'Professional services cost of revenue' (6x), 'Subscription cost of revenue' (6x), 'Regulatory fees cost of revenues' (3x), 'Cost of software and rentals' (3x), 'Cost of product' (3x), 'Cost of other revenue' (2x), 'Cost of services' (1x), 'Cost of products' (1x). NOTA: 'cost of' é decisivo mesmo quando o nome contém 'revenue' — 'cost of revenue' é um custo, não receita.",
+
+  "non_revenue_prefix_decisive": [
+    "gain", "gains", "loss", "losses"
+  ],
+  "_non_revenue_prefix_doc": "Só como PREFIXO do nome, senão apanhava segmentos legítimos. Presentes na BD: 'Gains (Losses) on Asset Dispositions, Net' (11x), 'Gains (Losses) on Mark-to-Market Commodity Derivative Contracts' (10x), 'Losses on Mark-to-Market Financial Commodity Derivative Contracts' (1x). Deliberadamente NÃO apanha 'Mark-to-Market Products' (1x), que é plausivelmente uma categoria de receita — é por isto que a regra exige o prefixo e não o substring 'mark-to-market'.",
+
+  "non_revenue_ambiguous": [
+    "amortization"
+  ],
+  "_non_revenue_ambiguous_doc": "P1, não P0. 'Intangible amortization' (12x) pode ser um custo OU a abreviatura de uma linha de receita. Regra: NÃO disparar quando o nome contém 'revenue'/'revenues' — 'Intangible amortization and other revenues' (11x, VST) e 'Amortization of/(Reserve for) Revenues Subject to Refund' (5x, utilities) são componentes de receita genuínos (frequentemente negativos), não custos.",
+
+  "table_header_suffixes": [":", ": ", " :"],
+  "_table_header_doc": "Nome terminado em dois-pontos = fila de cabeçalho de secção da tabela do filing, não um segmento. Na BD: 'Capital Access Platforms:', 'Collaboration Revenue by Strategic Collaborator:', 'Financial Technology:', 'Veterinary software, services and diagnostic imaging systems:', 'Wholesale and Competitive Retail Revenues:'.",
+
+  "xbrl_residue_patterns": [
+    "(?i)^[a-z0-9_-]+:",
+    "(?i)\\[member\\]",
+    "(?i)\\bmember\\]?\\s*$",
+    "(?i)segmentmember",
+    "(?i)\\bdomain\\]?\\s*$"
+  ],
+  "_xbrl_residue_doc": "Resíduo do nome XBRL cru que a normalização do build_segment_map.py não limpou. Na BD: 'HomeBuildingMember' (15x, camelCase intacto), 'Media And Entertainment [member]' (27x), 'Other Products Member' (37x), 'Beverage Member' (36x), 'Food Member' (32x), 'Supplemental Revenue Member' (10x), 'Competitive businesses natural gas revenues Member]' (bracket partido). 284 pares no total.",
+
+  "html_entity_pattern": "&(amp|lt|gt|quot|apos|nbsp|#[0-9]+|#x[0-9a-fA-F]+);",
+  "_html_entity_doc": "1749 pares (2,7%), 179 nomes distintos — o build_segment_map.py nunca faz html.unescape(). Renderiza literalmente 'Fabric &amp; Home Care' na UI.",
+
+  "footnote_pattern": "(\\(\\d{1,2}\\)|\\[\\d{1,2}\\]|[*†‡§])\\s*$",
+  "_footnote_doc": "Marcador de nota de rodapé colado ao nome, ex. 'COVID(1)'. ~31 na BD.",
+
+  "camel_artifact_patterns": [
+    "(?<![A-Za-z])[A-Z]\\s+[a-z]",
+    "\\b[A-Z]{2}\\s+[A-Z][a-z]"
+  ],
+  "_camel_artifact_doc": "Artefactos do splitter camelCase por caractere em build_segment_map.py:52-59, que não trata acrónimos: 'IPhoneMember' → 'I Phone', 'IPadMember' → 'I Pad', 'NGLs' → 'NG Ls' ('Transportation And Storage Of Natural Gas And NG Ls And Other Services', 8x), 'Networkand Communications' e 'Waterand Wastewater' (falta o espaço antes de 'and').",
+
+  "nonprinting_pattern": "[\\u00a0\\u200b\\u200c\\u200d\\u200e\\u200f\\u2028\\u2029\\ufeff]",
+  "_nonprinting_doc": "Caracteres invisíveis. É a causa do par 'North America'/'North America' da AOS, que difere só por um caractere não imprimível e por isso fragmenta a série no gráfico sem que ninguém veja porquê.",
+
+  "collision_stopwords": ["and", "the", "of", "for", "a", "an", "&"],
+  "_collision_doc": "Removidos na escada de normalização (nível 3) antes do token-sort, para que 'Europe, Middle East and North Africa' / 'Europe, Middle East And North Africa' / 'Europe, Middle East, And North Africa' (COP) colapsem na mesma forma canónica. 241 grupos de colisão em 123 tickers."
+}

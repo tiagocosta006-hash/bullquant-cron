@@ -1,0 +1,101 @@
+name: Ingest Revenue Segments
+
+on:
+  workflow_dispatch:
+    inputs:
+      tickers:
+        description: "Lista separada por vírgulas (vazio = todas)"
+        required: false
+        default: ""
+  # Encadeado por workflow_run, NÃO por hora: este script faz UPDATE sobre
+  # linhas que o ingest de fundamentals APAGA e reinsere. Depender de "3h + 1h"
+  # era frágil — o ingest tem timeout de 180 min, logo podia ainda estar a
+  # correr às 4h e os segmentos escreviam em linhas em processo de DELETE.
+  workflow_run:
+    workflows: ["Ingest Fundamentals"]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    # Só corre se o ingest de fundamentals tiver terminado COM SUCESSO — se
+    # falhou, as linhas podem estar num estado intermédio.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    concurrency:
+      # Nunca em paralelo com outra escrita em fundamentals.
+      group: fundamentals-write
+      cancel-in-progress: false
+
+    steps:
+      # O workflow_run dispara todos os dias (segue o cron diário do ingest de
+      # fundamentals), mas esta passagem lê ~54 filings por empresa e demora
+      # horas. Os 10-K/10-Q não mudam de um dia para o outro, logo basta ao
+      # sábado. Acionamento manual corre sempre.
+      - name: Gate semanal
+        id: gate
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$(date -u +%u)" = "6" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "Não é sábado — passagem de segmentos ignorada."
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.run == 'true'
+
+      - uses: actions/setup-python@v5
+        if: steps.gate.outputs.run == 'true'
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: scripts/requirements.txt
+
+      - name: Install dependencies
+        if: steps.gate.outputs.run == 'true'
+        run: pip install -r scripts/requirements.txt
+
+      - name: Run segment ingest
+        if: steps.gate.outputs.run == 'true'
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          SEC_IDENTITY: ${{ secrets.SEC_IDENTITY }}
+        run: |
+          python scripts/ingest_segments_xbrl.py \
+            ${{ inputs.tickers && format('--tickers {0}', inputs.tickers) || '' }}
+
+      # O Q4 não tem 10-Q próprio (a SEC não o exige, porque nesse período as
+      # empresas entregam o 10-K), logo não há facto XBRL trimestral para ele e
+      # a extração deixa-o vazio — 2% de cobertura contra ~77% nos outros
+      # trimestres. Aqui é obtido por diferença (anual − Q1 − Q2 − Q3), com as
+      # mesmas salvaguardas do synthesize_q4. Tem de correr DEPOIS da extração,
+      # senão os quatro períodos ainda não existem.
+      - name: Derive Q4 segments
+        if: steps.gate.outputs.run == 'true'
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: python scripts/derive_q4_segments.py
+
+      # Interesses não-controlados: sem eles o balanço não fecha. O ingestor
+      # diário já os extrai para linhas novas; isto apanha o histórico que ainda
+      # esteja por preencher (só escreve onde está NULL).
+      - name: Backfill minority interest
+        if: steps.gate.outputs.run == 'true'
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          SEC_IDENTITY: ${{ secrets.SEC_IDENTITY }}
+        run: python scripts/backfill_minority_interest.py --tenks 9 --tenqs 24
+
+      # O cargo do insider não vem no plano gratuito do Finnhub e é ele que dá
+      # sinal à transação — uma venda do CEO não é uma venda de um diretor
+      # qualquer. Vem dos Formulários 4 da SEC.
+      - name: Fill insider titles
+        if: steps.gate.outputs.run == 'true'
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          SEC_IDENTITY: ${{ secrets.SEC_IDENTITY }}
+        run: python scripts/fill_insider_titles.py

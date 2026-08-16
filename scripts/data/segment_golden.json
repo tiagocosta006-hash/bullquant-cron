@@ -1,0 +1,137 @@
+{
+  "_doc": "Golden set — fixtures para validar O VALIDADOR. Corre com `python scripts/validate_segments.py --golden`. Afirma que (a) todas as regras em expectedFindings disparam e (b) nenhum P0 INESPERADO dispara nos controlos limpos (isCleanControl).",
+  "_estrategia": "Estratificado por COORTE × RANKING DE IMPACTO: em cada coorte não trivial, a empresa #1 em impacto (assim o trabalho manual é também o mais valioso), uma mediana, e um controlo limpo (prova ausência de falsos positivos). Meta da fase 2: 24 fixtures verificados contra os footnotes dos 10-K. Esta é a semente da fase 1 — os valores em expectedSegments abaixo estão confirmados contra a BD, e os marcados _needsFilingVerification ainda NÃO foram conferidos contra o filing original.",
+  "_aviso": "expectedSegments só deve conter valores VERIFICADOS no footnote do 10-K. Copiar da BD apenas serve para travar regressões de extração, não para validar correção — é por isso que os fixtures não verificados estão marcados.",
+  "fixtures": [
+    {
+      "ticker": "AAPL",
+      "periodType": "ANNUAL",
+      "fiscalYear": 2024,
+      "periodEnd": "2024-09-28",
+      "cohort": "CLEAN",
+      "isCleanControl": true,
+      "source": "10-K FY2024, Note — Segment/product disaggregation",
+      "expectedAxis": "srt:ProductOrServiceAxis",
+      "expectedSegments": {
+        "iPhone": 201183000000,
+        "Services": 96169000000,
+        "Wearables, Home and Accessories": 37005000000,
+        "Mac": 29984000000,
+        "iPad": 26694000000
+      },
+      "expectedTotal": 391035000000,
+      "expectedFindings": [],
+      "notes": "Controlo negativo. Eixo de produto único e limpo, soma exata (ratio 1.0000), sem contaminação geográfica. Qualquer P0 aqui é falso positivo do harness."
+    },
+    {
+      "ticker": "MSFT",
+      "periodType": "ANNUAL",
+      "fiscalYear": 2024,
+      "periodEnd": "2024-06-30",
+      "cohort": "CLEAN",
+      "isCleanControl": true,
+      "source": "10-K FY2024, Note 19 — Segment information / revenue disaggregation",
+      "expectedTotal": 245122000000,
+      "expectedFindings": [],
+      "notes": "Segundo controlo negativo, 10 segmentos, soma exata. Exercita o caso de cardinalidade média-alta sem defeitos — se o SEG_KEY_CARDINALITY disparar aqui, o limiar está mal calibrado."
+    },
+    {
+      "ticker": "UBER",
+      "periodType": "ANNUAL",
+      "fiscalYear": 2024,
+      "periodEnd": "2024-12-31",
+      "cohort": "AXIS_STACKED",
+      "source": "10-K FY2024 — Note: Segment information and geographic information",
+      "expectedAxis": "us-gaap:StatementBusinessSegmentsAxis",
+      "expectedSegments": {
+        "Mobility": 25087000000,
+        "Delivery": 13750000000,
+        "Freight": 5141000000
+      },
+      "expectedTotal": 43978000000,
+      "expectedFindings": [
+        "SEG_SUM_MAJOR_OVER",
+        "SEG_GRAND_TOTAL_VALUE",
+        "SEG_TOTAL_LABEL",
+        "SEG_RECONCILING_SUBSET",
+        "SEG_AXIS_MIX_GEO",
+        "SEG_Q4_CLONE_OF_ANNUAL"
+      ],
+      "notes": "O caso canónico de empilhamento: eixo de produto (soma 43,978B = receita ✓) + eixo geográfico (US&Canada 23,618B + All Other Countries 14,176B) + o total 'Operatings' 43,978B → 2,859x. O SEG_RECONCILING_SUBSET tem de nomear exatamente {Mobility, Delivery, Freight} e mandar remover as outras 3."
+    },
+    {
+      "ticker": "CDW",
+      "periodType": "ANNUAL",
+      "fiscalYear": 2024,
+      "periodEnd": "2024-12-31",
+      "cohort": "AXIS_STACKED",
+      "source": "10-K FY2024 — revenue disaggregation by product/customer/timing",
+      "expectedTotal": 20998700000,
+      "expectedFindings": [
+        "SEG_SUM_EXPLOSIVE",
+        "SEG_TOTAL_LABEL",
+        "SEG_PARENT_ROLLUP",
+        "SEG_AXIS_MIX_TIMING"
+      ],
+      "notes": "Pior caso do corpus: QUATRO eixos (produto, cliente, timing ASC-606) + o rollup 'Total Hardware' 15,219B a par dos próprios filhos + o total 'Operatings' → 3,725x na anual e ~15x na Q4. Exercita o SEG_PARENT_ROLLUP e o SEG_AXIS_MIX_TIMING. O SEG_PARENT_ROLLUP é agora ao nível da EMPRESA (persistência em >=3 períodos), por isso o seu periodEnd não coincide com o da linha — o verificador trata as regras de âmbito de empresa como COMPANY_SCOPED."
+    },
+    {
+      "ticker": "MO",
+      "periodType": "ANNUAL",
+      "fiscalYear": 2024,
+      "periodEnd": "2024-12-31",
+      "cohort": "ELIMINATION_GROSS",
+      "source": "10-K FY2024 — Note: Segment reporting (receitas BRUTAS de impostos especiais)",
+      "expectedTotal": 20444000000,
+      "expectedFindings": [
+        "SEG_SUM_MAJOR_OVER",
+        "SEG_VALUE_NEGATIVE"
+      ],
+      "notes": "NÃO é bug de extração: os segmentos da MO são brutos de excise tax e o total é líquido → 1,175x consistente em 44 períodos (MAD baixo). Cai na banda MAJOR_OVER (1,10-1,90), NÃO em MINOR_OVER — é o caso que mostra que a banda do rácio e a COORTE respondem a perguntas diferentes: a regra diz 'os números não fecham' (P0, o gráfico está errado), a coorte ELIMINATION_GROSS diz 'é uma DECISÃO DE PRODUTO, não um bug' (bruto vs líquido, a registar em DATA_DISCREPANCIES.md). O 'All Other' = -2M exercita o SEG_VALUE_NEGATIVE."
+    },
+    {
+      "ticker": "GOOGL",
+      "periodType": "ANNUAL",
+      "fiscalYear": 2024,
+      "periodEnd": "2024-12-31",
+      "cohort": "AXIS_UNSTABLE",
+      "source": "10-K FY2024 — Note 15 Segment information",
+      "expectedSegments": {
+        "Google Services": 304930000000,
+        "Google Cloud": 43229000000,
+        "Other Bets": 1648000000
+      },
+      "expectedTotal": 350018000000,
+      "expectedFindings": [
+        "SEG_AXIS_SWITCH"
+      ],
+      "notes": "A soma FECHA (0,999x) e por isso a reconciliação sozinha NÃO apanha o defeito — é o caso que prova que o teste de soma é insuficiente. O defeito real é o eixo mudar entre FY2023 (eixo de desagregação: 'Google advertising' ⊃ 'YouTube ads', com Cloud e Other Bets AUSENTES) e FY2024 (eixo de segmentos operacionais), abrindo um buraco no gráfico de 'Google Cloud ao longo do tempo'. Só o SEG_AXIS_SWITCH o deteta."
+    },
+    {
+      "ticker": "FITB",
+      "periodType": "QUARTERLY",
+      "fiscalYear": 2024,
+      "cohort": "BANK_PARTIAL",
+      "_needsFilingVerification": true,
+      "expectedFindings": [
+        "SEG_SUM_SEVERE_UNDER"
+      ],
+      "notes": "Banco: rácio 0,058 em 2024Q1 — só a desagregação de noninterest income foi extraída, falta o net interest income inteiro. Causa: as 5 tags hardcoded em ingest_segments.py:89-95 não incluem nenhuma tag de juros. NOTA: a FITB não tem NENHUMA linha ANNUAL com segmentos — é também um caso de cobertura, não só de extração parcial. Valores por confirmar contra o 10-Q.",
+      "fiscalQuarter": 1
+    },
+    {
+      "ticker": "TSCO",
+      "periodType": "QUARTERLY",
+      "fiscalYear": 2025,
+      "cohort": "TOTAL_ROW_INJECTED",
+      "_needsFilingVerification": true,
+      "expectedFindings": [
+        "SEG_TOTAL_LABEL",
+        "SEG_Q4_CLONE_OF_ANNUAL",
+        "SEG_SUM_EXPLOSIVE"
+      ],
+      "notes": "Chave 'Reportable' = 15,524B (o us-gaap:ReportableSegmentsMember, um total de dimensão, ingerido como membro). A linha ANNUAL FY2025 e a QUARTERLY Q4 partilham periodEnd 2025-12-27 e o MESMO dict — o SEG_Q4_CLONE_OF_ANNUAL apanha-o. Na ANNUAL o rácio é 1,000 (o total está certo para o ano); na Q4 é 3,982. O SEG_GRAND_TOTAL_VALUE NÃO dispara na Q4, e corretamente: 15,5B não iguala a receita trimestral de 3,9B — o total corresponde ao ANO. Q1-Q3 FY2025 não têm segmentos.",
+      "fiscalQuarter": 4
+    }
+  ]
+}

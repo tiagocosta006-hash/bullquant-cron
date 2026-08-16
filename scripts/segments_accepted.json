@@ -1,0 +1,5 @@
+{
+  "_doc": "Exceções de qualidade de segmentos REVISTAS e aceites como realidade, não bugs. Chave: TICKER|PERIODTYPE|PERIODEND|RULE[|SEGMENT_KEY] — exatamente a chave que o validate_segments.py imprime. Cada entrada EXIGE um racional; sem racional não é uma exceção, é um bug escondido debaixo do tapete.",
+  "_convencao": "Espelha o formato de validator_accepted.json e period_identity_accepted.json. Preferir sempre corrigir a origem a aceitar a exceção — esta lista deve encolher, não crescer.",
+  "accepted": []
+}

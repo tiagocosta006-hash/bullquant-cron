@@ -87,7 +87,11 @@ def combinar(valores: list) -> float | None:
       - várias de grandeza comparável -> AMBÍGUO. Devolve None e a linha fica
         NULL. Antes NULL que um número inventado que contamina o P/E.
     """
-    vs = sorted({float(v) for v in valores if v and float(v) > 1000})
+    # Piso de 1 MILHÃO, não de mil. Nenhuma cotada do S&P 500 tem menos de um
+    # milhão de ações em circulação, e valores como 100 (BKR, VTRS) ou 1.000
+    # (PSKY) são fatias residuais de uma classe ou marcadores — passavam o piso
+    # antigo e produziam saltos de 100 -> 428.000.000 no trimestre seguinte.
+    vs = sorted({float(v) for v in valores if v and float(v) >= 1_000_000})
     if not vs:
         return None
     if len(vs) == 1:
@@ -138,7 +142,8 @@ def shares_do_filing(filing) -> dict:
             # Vários totais para o mesmo período (básico e diluído) — fica o
             # maior, que é o diluído.
             v = float(r["numeric_value"])
-            total_por_periodo[chave] = max(total_por_periodo.get(chave, 0), v)
+            if v >= 1_000_000:   # mesmo piso das fatias por classe
+                total_por_periodo[chave] = max(total_por_periodo.get(chave, 0), v)
         else:
             classes_por_periodo[(chave, str(r["concept"]))].append(r["numeric_value"])
 

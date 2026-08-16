@@ -30,6 +30,10 @@
     { "key": "SNY|ANNUAL|2024|None|GP_IDENTITY",
       "rationale": "Idem Sanofi other revenues." },
     { "key": "SNY|ANNUAL|2025|None|GP_IDENTITY",
-      "rationale": "Idem Sanofi other revenues." }
+      "rationale": "Idem Sanofi other revenues." },
+    { "key": "ARES|QUARTERLY|2020|1|SHARES_QOQ_JUMP",
+      "rationale": "115,2M→247,6M ações (2,15x) coincide com resultado líquido a virar negativo no mesmo trimestre (-31,0M vs +38,5M no Q4 2019) — sinal de evento real (conversão/diluição da estrutura Up-C da Ares Management em 2020), não de split: um split preserva o NI, isto não preserva." },
+    { "key": "CVNA|QUARTERLY|2023|4|SHARES_QOQ_JUMP",
+      "rationale": "110,9M→200,6M ações (1,81x) no Q4 2023 é a troca de dívida por capital que resolveu a crise de dívida da Carvana, bem documentada publicamente — emissão massiva de ações a bondholders, não um split nem erro de extração." }
   ]
 }

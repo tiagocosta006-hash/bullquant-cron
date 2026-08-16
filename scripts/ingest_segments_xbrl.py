@@ -424,10 +424,24 @@ _LABEL_SUFFIXES = (
 )
 
 
+def _limpa_marcadores(s: str) -> str:
+    """Tira '[member]' / '[domain]' do rótulo. O _member_label já os remove, mas
+    só na grafia '[Member]' — a Autodesk publica 'Media And Entertainment
+    [member]' em minúsculas e o marcador ia parar à legenda do gráfico."""
+    return _re.sub(r"\[\s*(member|domain)\s*\]", " ", s, flags=_re.I)
+
+
 def _label_key(label: str) -> str:
-    """Chave de comparação de rótulos: minúsculas, sem sufixo de receita e sem
-    pontuação. 'Delivery service revenue' e 'Delivery Service' colapsam."""
-    s = " ".join((label or "").lower().split())
+    """Chave de comparação de rótulos: minúsculas, sem marcadores XBRL, sem
+    sufixo de receita e sem pontuação. 'Delivery service revenue' e 'Delivery
+    Service' colapsam; 'Health & Public Service' e 'Health And Public Service
+    Segment' também (a Accenture usa as duas grafias)."""
+    s = " ".join(_limpa_marcadores((label or "").lower()).split())
+    # '&' e 'and' são a mesma palavra para efeitos de identidade do segmento —
+    # tem de ser ANTES de tirar a pontuação, senão '&' desaparece e as duas
+    # grafias deixam de casar.
+    s = s.replace("&", " and ")
+    s = " ".join(s.split())
     changed = True
     while changed:
         changed = False
@@ -440,9 +454,24 @@ def _label_key(label: str) -> str:
 
 def _tem_sufixo_redundante(rotulo: str) -> bool:
     """'Gas segment' / 'Consulting Revenue' num gráfico chamado "Receitas por
-    Segmento" — o sufixo não acrescenta nada e só rouba espaço à legenda."""
+    Segmento" — o sufixo não acrescenta nada e só rouba espaço à legenda.
+    Um marcador '[member]' pendurado conta como o mesmo tipo de ruído."""
     low = " ".join((rotulo or "").lower().split())
+    if _re.search(r"\[\s*(member|domain)\s*\]", low):
+        return True
     return any(low.endswith(suf) for suf in _LABEL_SUFFIXES)
+
+
+def limpar_display(rotulo: str) -> str:
+    """Normaliza o rótulo para exibição, sem lhe mudar o sentido.
+
+    Tira marcadores XBRL pendurados e troca espaços Unicode (a Accenture
+    publica 'Health\\xa0& Public Service' com espaço não-quebrável) por espaço
+    normal: invisível ao ler, mas parte a pesquisa e a comparação de strings.
+    """
+    s = _limpa_marcadores(rotulo or "")
+    s = _re.sub(r"[      - ]", " ", s)
+    return " ".join(s.split())
 
 
 def escolher_canonico(variantes: list) -> str:
@@ -456,7 +485,7 @@ def escolher_canonico(variantes: list) -> str:
     variante existe sem sufixo. Desempate pela mais recente, que é a ordem em
     que a lista chega.
     """
-    return min(variantes, key=lambda r: (_tem_sufixo_redundante(r), len(r)))
+    return limpar_display(min(variantes, key=lambda r: (_tem_sufixo_redundante(r), len(r))))
 
 
 def canonicalize_labels(merged: dict) -> int:

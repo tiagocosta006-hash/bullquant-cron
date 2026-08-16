@@ -110,6 +110,9 @@ def main() -> None:
                 if isinstance(mapa, dict):
                     for rot in mapa:
                         _ver(ticker, eixo, rot)
+    # escolher_canonico já devolve o rótulo limpo, o que também apanha os casos
+    # de variante ÚNICA com '[member]' pendurado ou espaço não-quebrável — não
+    # é churn, é ruído de exibição, e vale a pena tirá-lo na mesma passagem.
     canonico = {k: _escolher_canonico(v) for k, v in vistas.items()}
 
     def _reescrever(ticker, eixo, mapa):

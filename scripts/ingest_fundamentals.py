@@ -2163,38 +2163,77 @@ def process_company(conn, company: dict, dry_run: bool = False,
     # NÃO reescreve — senão o wipe apagava-os. Ancorados na identidade FÍSICA do
     # período (periodType, periodEnd), não no rótulo (fy, fq) que pode mudar com a
     # relabelagem. Reaplicados por (periodType, periodEnd::date) após reinserir.
+    # QUATRO colunas, não duas. revenueSegmentsByAxis (gráficos por
+    # produto/geografia) e minorityInterest (identidade do balanço) são
+    # escritos por pipelines separados tal como revenueSegments — deixá-los de
+    # fora do preserve fazia o wipe apagá-los em cada ingestão. Em 2026-08-16
+    # isto destruiu o eixo de 6 empresas (BP, BRK.B, BUD, CVNA, ERIE, V) e o
+    # minorityInterest da CVNA numa única passagem.
     preserved: dict[tuple, tuple] = {}
-    try:
+
+    def _read_preserved() -> dict:
+        out: dict[tuple, tuple] = {}
         with conn.cursor() as cur:
             cur.execute(
-                'SELECT "periodType", "periodEnd"::date, "revenueSegments", "businessKpis" '
+                'SELECT "periodType", "periodEnd"::date, "revenueSegments", '
+                '"revenueSegmentsByAxis", "businessKpis", "minorityInterest" '
                 'FROM fundamentals WHERE "companyId" = %s '
-                'AND ("revenueSegments" IS NOT NULL OR "businessKpis" IS NOT NULL)',
+                'AND ("revenueSegments" IS NOT NULL OR "revenueSegmentsByAxis" IS NOT NULL '
+                '     OR "businessKpis" IS NOT NULL OR "minorityInterest" IS NOT NULL)',
                 (company_id,),
             )
-            for pt, pe, seg, kpi in cur.fetchall():
-                preserved[(pt, pe.isoformat())] = (seg, kpi)
-    except Exception:
+            for pt, pe, seg, axis, kpi, nci in cur.fetchall():
+                out[(pt, pe.isoformat())] = (seg, axis, kpi, nci)
+        return out
+
+    try:
+        preserved = _read_preserved()
+    except Exception as e1:
         conn.rollback()
-        preserved = {}
+        time.sleep(1)
+        try:
+            preserved = _read_preserved()
+        except Exception as e2:
+            conn.rollback()
+            # NUNCA seguir com preserved={} em silêncio: um SELECT falhado não
+            # significa "sem enriquecimentos", e o wipe a seguir apagaria
+            # segmentos/eixos reais sem aviso. Abortar esta empresa.
+            print(f"    ⚠️ ERRO ao ler preserved para {ticker or company_id}: "
+                  f"{e1!r} / {e2!r} — empresa SALTADA (nada apagado)")
+            return 0
 
     def _reattach(cur):
         if not preserved:
             return
+        matched = 0
         for row in rows:
             key = (row["periodType"], str(row["periodEnd"])[:10])
             enr = preserved.get(key)
             if not enr:
                 continue
-            seg, kpi = enr
+            matched += 1
+            seg, axis, kpi, nci = enr
             cur.execute(
-                'UPDATE fundamentals SET "revenueSegments" = %s, "businessKpis" = %s '
+                'UPDATE fundamentals SET "revenueSegments" = %s, '
+                '"revenueSegmentsByAxis" = %s, "businessKpis" = %s, '
+                # A extração fresca ganha se trouxer valor; o preservado só
+                # entra onde ela não tem nada.
+                '"minorityInterest" = COALESCE("minorityInterest", %s) '
                 'WHERE "companyId" = %s AND "periodType" = %s::"period_type" '
                 'AND "periodEnd"::date = %s::date',
                 (Json(seg) if seg is not None else None,
+                 Json(axis) if axis is not None else None,
                  Json(kpi) if kpi is not None else None,
+                 nci,
                  company_id, row["periodType"], str(row["periodEnd"])[:10]),
             )
+        # Um periodEnd reafirmado pela EDGAR faz o payload preservado não casar
+        # com nenhuma linha nova — sem contador, esses segmentos desapareciam
+        # sem deixar rasto.
+        dropped = len(preserved) - matched
+        if dropped > 0:
+            print(f"    ⚠️ {ticker or company_id}: {dropped} períodos preservados SEM "
+                  f"correspondência nas linhas novas (enriquecimentos perdidos)")
 
     inserted = 0
     try:

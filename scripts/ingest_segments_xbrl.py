@@ -145,6 +145,18 @@ _NON_REVENUE_PREFIXES = (
     "CostOf",  # CostOfRevenue contém "revenue" e passava o teste
 )
 
+# Tokens que denunciam um conceito IFRS que NÃO é receita externa comparável,
+# mesmo tendo "revenue" no nome — apanhados na BP e na Novartis, cujo eixo de
+# segmento reportava o dobro/1,3x a receita consolidada:
+#   bp:RevenueAndOtherOperatingIncomeGross — "Gross" + inclui outro rendimento
+#     operacional, não é receita pura, e é ANTES da eliminação intersegmento.
+#   bp:RevenueAndOtherOperatingIncomeIntersegment — a própria eliminação.
+#   nvs:RevenueFromSaleOfGoodsSalesToOtherSegments — vendas intersegmento; por
+#     definição não entra numa reconciliação com a receita externa consolidada.
+# Isto é o mesmo padrão já coberto por _NON_REVENUE_PREFIXES, só que a marca
+# vem a meio do nome do conceito (Gross/Intersegment), não no prefixo.
+_NON_REVENUE_TOKENS = ("gross", "intersegment", "toothersegments")
+
 # Rótulos que denunciam uma linha de custo/despesa. A Autodesk reutiliza o mesmo
 # membro para a receita e para o respetivo custo, e o terseLabel do linkbase vem
 # na versão de custo ("Cost of subscription and maintenance revenue") — o VALOR
@@ -194,6 +206,8 @@ def _is_revenue_concept(concept: str) -> bool:
     if c.startswith(_NON_REVENUE_PREFIXES):
         return False
     cl = c.lower()
+    if any(tok in cl for tok in _NON_REVENUE_TOKENS):
+        return False
     return "revenue" in cl or cl.startswith("sales") or "netsales" in cl
 
 

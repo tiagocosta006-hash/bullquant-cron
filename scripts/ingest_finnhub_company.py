@@ -93,12 +93,35 @@ def serie_por_periodo(series: dict) -> dict:
     return out
 
 
-def reconstruir(m: dict) -> dict | None:
-    """Demonstrações a partir dos rácios de UM período. None se não fechar."""
+def reconstruir(m: dict, acoes_ref: float | None = None) -> dict | None:
+    """Demonstrações a partir dos rácios de UM período. None se não fechar.
+
+    `acoes_ref` é obrigatório nos TRIMESTRES. Nas séries trimestrais da Finnhub
+    o evRevenue é TTM (doze meses) mas o salesPerShare é do trimestre — dividir
+    um pelo outro dava ~4x as ações reais, e a Dassault aparecia com 8,1 mil
+    milhões de ações em vez de 1,33 mil milhões, oscilando de trimestre para
+    trimestre. Com o número de ações do exercício (que é estável), o trimestre
+    calcula-se diretamente: receita = salesPerShare x acoes.
+    """
     ev, evrev = m.get("ev"), m.get("evRevenue") or m.get("evRevenueTTM")
     sps, eps = m.get("salesPerShare"), m.get("eps")
     if not (sps and eps):
         return None
+
+    if acoes_ref:
+        receita = sps * acoes_ref
+        acoes = acoes_ref
+        resultado = eps * acoes
+        d = {"revenue": receita, "netIncome": resultado, "sharesOutstanding": acoes,
+             "epsDiluted": eps, "ebitda": m.get("ebitda"), "totalEquity": m.get("bookValue"),
+             "grossMargin": m.get("grossMargin"), "operatingMargin": m.get("operatingMargin"),
+             "netMargin": m.get("netMargin")}
+        if m.get("grossMargin") is not None:
+            d["grossProfit"] = receita * m["grossMargin"]
+            d["costOfRevenue"] = receita - d["grossProfit"]
+        if m.get("operatingMargin") is not None:
+            d["operatingIncome"] = receita * m["operatingMargin"]
+        return d
 
     receita = None
     if ev and evrev:
@@ -190,12 +213,45 @@ def main() -> None:
     print(f"  {len(metricas)} métricas, séries anuais {len(series.get('annual',{}))}, "
           f"trimestrais {len(series.get('quarterly',{}))}")
 
+    # Primeiro os anuais: o número de ações que daí sai serve de referência
+    # para os trimestres do mesmo exercício.
+    acoes_por_ano: dict = {}
+    receita_anual: dict = {}
+    for periodo, m in serie_por_periodo(series.get("annual", {})).items():
+        r = reconstruir(m)
+        if r:
+            ano_a = dt.date.fromisoformat(periodo).year
+            acoes_por_ano[ano_a] = r["sharesOutstanding"]
+            receita_anual[ano_a] = r["revenue"]
+    semestres = [0]
+
     linhas = []
     for freq, ptype in (("annual", "ANNUAL"), ("quarterly", "QUARTERLY")):
         for periodo, m in sorted(serie_por_periodo(series.get(freq, {})).items()):
-            rec = reconstruir(m)
+            ano = dt.date.fromisoformat(periodo).year
+            ref = None
+            if ptype == "QUARTERLY":
+                ref = acoes_por_ano.get(ano) or acoes_por_ano.get(ano - 1)
+                if not ref:
+                    continue          # sem referência não se inventa
+            rec = reconstruir(m, ref)
             if not rec:
                 continue
+            # SEMESTRES DISFARÇADOS DE TRIMESTRES. As europeias reportam
+            # semestralmente: a Finnhub mete essas linhas na série "quarterly"
+            # e elas trazem METADE do ano, não um quarto. A Dassault só passou
+            # a trimestral em 2025, por isso a série mistura os dois — e um
+            # gráfico com 3.634 seguido de 1.715 dá a impressão de a receita ter
+            # caído para metade. O schema só tem QUARTERLY e ANNUAL, portanto
+            # não há como etiquetar um semestre: fica de fora.
+            # Comparar AQUI, antes da conversão cambial e da escala: a
+            # referência anual está na mesma unidade que este rec.
+            if ptype == "QUARTERLY":
+                anual = receita_anual.get(ano) or receita_anual.get(ano - 1)
+                if anual and rec.get("revenue", 0) > 0.35 * anual:
+                    semestres[0] += 1
+                    continue
+
             fim = dt.date.fromisoformat(periodo)
             if fim.year < args.desde:
                 continue
@@ -214,6 +270,9 @@ def main() -> None:
                     if m.get(k) is not None}
             linhas.append((ptype, fim, rec, kpis))
 
+    if semestres[0]:
+        print(f"  {semestres[0]} períodos semestrais descartados (o schema só "
+              f"tem QUARTERLY/ANNUAL)")
     anuais = sum(1 for l in linhas if l[0] == "ANNUAL")
     print(f"  reconstruídas {len(linhas)} linhas ({anuais} anuais, {len(linhas)-anuais} trimestrais)")
     if linhas:

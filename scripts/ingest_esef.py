@@ -85,17 +85,46 @@ MAPA = {
     "operatingCashFlow": ["CashFlowsFromUsedInOperatingActivities"],
     "investingCashFlow": ["CashFlowsFromUsedInInvestingActivities"],
     "financingCashFlow": ["CashFlowsFromUsedInFinancingActivities"],
-    "capex": ["PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities",
+    # A taxonomia IFRS tem várias grafias para a mesma coisa e as empresas
+    # escolhem a que lhes serve. Estes nomes saíram de ler o que a Dassault
+    # realmente publica — sem eles ficavam 16 colunas vazias, incluindo capex,
+    # dívida e dividendo, que são exatamente as que decidem uma tese.
+    "capex": ["PurchaseOfPropertyPlantAndEquipmentIntangibleAssetsOtherThanGoodwill"
+              "InvestmentPropertyAndOtherNoncurrentAssets",
+              "PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities",
               "PurchaseOfPropertyPlantAndEquipment"],
     "epsDiluted": ["DilutedEarningsLossPerShare"],
     "sharesOutstanding": ["AdjustedWeightedAverageShares", "WeightedAverageShares"],
-    "dividendPerShare": ["DividendsPaidOrdinarySharePerShare"],
-    "longTermDebt": ["NoncurrentPortionOfNoncurrentBorrowings"],
-    "shortTermDebt": ["CurrentPortionOfNoncurrentBorrowings"],
-    "depreciationAndAmortization": ["DepreciationAndAmortisationExpense"],
+    "dividendPerShare": ["DividendsRecognisedAsDistributionsToOwnersPerShare",
+                         "DividendsPaidOrdinarySharePerShare"],
+    "dividendsPaid": ["DividendsPaidClassifiedAsFinancingActivities", "DividendsPaid"],
+    "longTermDebt": ["LongtermBorrowings", "NoncurrentPortionOfNoncurrentBorrowings"],
+    "shortTermDebt": ["CurrentBorrowingsAndCurrentPortionOfNoncurrentBorrowings",
+                      "CurrentPortionOfNoncurrentBorrowings"],
+    # A última entrada é um conceito PRÓPRIO da Dassault. O ESEF permite às
+    # empresas estender a taxonomia, e várias publicam a amortização só assim —
+    # o mapa tem de aceitar extensões, não apenas nomes ifrs-full.
+    "depreciationAndAmortization": ["DepreciationAndAmortisationExpense",
+                                    "DepreciationAmortisationAndImpairmentLossReversalOf"
+                                    "ImpairmentLossRecognisedInProfitOrLoss",
+                                    "AmortizationOfAcquiredIntangibleAssetsAndOf"
+                                    "TangibleAssetsRevaluation"],
+    "interestExpense": ["InterestPaidClassifiedAsOperatingActivities", "InterestExpense"],
+    "accountsPayable": ["TradeAndOtherCurrentPayables"],
+    "retainedEarnings": ["RetainedEarnings"],
+    "shareRepurchases": ["Paymentstoacquireorredeementitysshares",
+                         "PaymentsForRepurchaseOfEntitysOwnEquityInstruments"],
+    "sellingGeneralAndAdmin": ["SalesAndMarketingExpense"],
+    "netChangeInCash": ["IncreaseDecreaseInCashAndCashEquivalents"],
+}
+# O passivo total raramente é tagged: deriva-se do que EXISTE, que é o corrente
+# e o não corrente, ou pela identidade do balanço.
+DERIVADAS = {
+    "totalLiabilities": [("CurrentLiabilities", "NoncurrentLiabilities")],
 }
 POR_ACAO = {"epsDiluted", "dividendPerShare"}
-SEM_CONVERSAO = {"sharesOutstanding"}
+SEM_CONVERSAO = {"sharesOutstanding", "roic", "returnOnEquity",
+                 "grossMargin", "operatingMargin", "netMargin"}
 
 
 def api(caminho: str, **params) -> dict:
@@ -249,6 +278,44 @@ def main() -> None:
                         break
             if "revenue" not in rec or "netIncome" not in rec:
                 continue          # sem os dois pilares não vale a pena gravar
+
+            def facto(nome):
+                return blocos["dur"].get(nome, blocos["inst"].get(nome))
+
+            # Passivo total: soma do corrente com o não corrente. Se faltar um,
+            # a identidade do balanço fecha a conta (Ativo = Passivo + Capital).
+            if "totalLiabilities" not in rec:
+                cl, ncl = facto("CurrentLiabilities"), facto("NoncurrentLiabilities")
+                if cl is not None and ncl is not None:
+                    rec["totalLiabilities"] = cl + ncl
+                elif rec.get("totalAssets") and rec.get("totalEquity"):
+                    rec["totalLiabilities"] = rec["totalAssets"] - rec["totalEquity"]
+
+            # Dívida total = curto + longo prazo. É o que alimenta o EV e a
+            # alavancagem; sem ela ambos ficam errados.
+            partes = [rec.get("shortTermDebt"), rec.get("longTermDebt")]
+            if any(p is not None for p in partes):
+                rec["totalDebt"] = sum(p for p in partes if p is not None)
+
+            # Despesas operacionais: as três linhas que a Dassault publica.
+            opex = [facto("SalesAndMarketingExpense"), facto("ResearchAndDevelopmentExpense"),
+                    facto("GeneralAndAdministrativeExpense")]
+            if all(x is not None for x in opex):
+                rec["operatingExpenses"] = sum(opex)
+
+            # FCF = fluxo operacional − capex, a definição corrente.
+            if rec.get("operatingCashFlow") is not None and rec.get("capex") is not None:
+                rec["freeCashFlow"] = rec["operatingCashFlow"] - abs(rec["capex"])
+
+            # Retornos: ROE sobre o capital próprio, ROIC sobre capital investido
+            # (capital próprio + dívida), que é a convenção usada no resto da BD.
+            if rec.get("totalEquity"):
+                rec["returnOnEquity"] = rec["netIncome"] / rec["totalEquity"]
+                investido = rec["totalEquity"] + (rec.get("totalDebt") or 0)
+                if investido:
+                    base = rec.get("operatingIncome", rec["netIncome"])
+                    rec["roic"] = base / investido
+
             linhas.append((fim, rec, blocos["moeda"] or "EUR"))
         print(f"  {pend}: {len(factos)} factos consolidados")
 
@@ -292,6 +359,7 @@ def main() -> None:
         for k, v in rec.items():
             if v is None:
                 continue
+            # Rácios e contagens são adimensionais — converter dava disparate.
             campos[k] = v if k in SEM_CONVERSAO else v * taxa
         # Margens, para o frontend não ter de as calcular.
         if campos.get("revenue"):

@@ -96,6 +96,7 @@ export async function generateMetadata({
 
   return {
     metadataBase: new URL(BRAND.siteUrl),
+    applicationName: BRAND.name,
     title: {
       default: `${BRAND.name} — Análise Fundamental de Ações`,
       template: `%s · ${BRAND.name}`,
@@ -197,6 +198,7 @@ export default async function RootLayout({
                 "@context": "https://schema.org",
                 "@type": "WebSite",
                 name: BRAND.name,
+                alternateName: ["The BullValue", "TheBullValue", "thebullvalue", "Bull Value"],
                 url: BRAND.siteUrl,
                 potentialAction: {
                   "@type": "SearchAction",

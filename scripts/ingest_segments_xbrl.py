@@ -598,7 +598,13 @@ def extract_segments_from_filing(filing):
             ).days
         except Exception:
             continue
-        if 85 <= days <= 100:
+        # 80 dias, não 85: os calendários 4-4-5 fecham trimestres de 12 semanas
+        # (84 dias) e a Costco chega a 83. Com o limite em 85 ficavam de fora
+        # por dois dias — e a COST, PEP e WM apareciam com ZERO segmentos
+        # trimestrais apesar de os publicarem no 10-Q. É a MESMA janela que o
+        # is_quarterly_duration do ingest_fundamentals já usa (:716); tê-las
+        # diferentes fazia a linha existir na BD sem o segmento nunca lhe chegar.
+        if 80 <= days <= 100:
             ptype = "QUARTERLY"
         elif 340 <= days <= 380:
             ptype = "ANNUAL"
@@ -625,6 +631,13 @@ def extract_segments_from_filing(filing):
                         reverse=True)[:3]
         if not totais:
             continue
+        # ...mas o subtotal tem de ser MATERIAL. Sem este piso, os bancos
+        # reconciliavam contra o total de COMISSÕES e gravavam uma partição que
+        # cobre 13-19% da receita: a Citizens Financial mostrava 227 M de
+        # segmentos contra 1.750 M de receita. Para quem olha o gráfico, isso
+        # não é "a repartição do banco" — é uma fatia estreita a fingir que é o
+        # todo. A AstraZeneca (55,6 de 58,7 mM = 95%) continua a passar.
+        totais = [t for t in totais if t >= 0.5 * totais[0]]
         total = totais[0]
 
         by_axis = {}
@@ -803,6 +816,25 @@ def main():
                     primary = pick_primary(by_axis)
                     if not primary:
                         continue
+                    # A partição reconcilia dentro do FILING, mas a receita da
+                    # nossa BD pode ser outro conceito. Nos bancos é: o XBRL
+                    # reparte só as comissões e a BD guarda a receita com margem
+                    # financeira incluída — a Citizens Financial ficava com
+                    # 227 M de segmentos contra 1.750 M de receita (13%). Um
+                    # gráfico assim não é a repartição do banco, é uma fatia
+                    # estreita a fingir que é o todo. Verificar contra o valor
+                    # REALMENTE gravado, que é o que o utilizador vê ao lado.
+                    cur.execute(
+                        'SELECT revenue FROM fundamentals WHERE "companyId" = %s '
+                        'AND "periodType" = %s::"period_type" AND "periodEnd"::date = %s::date',
+                        (company_id, ptype, pend),
+                    )
+                    _row = cur.fetchone()
+                    _rev = float(_row[0]) if _row and _row[0] else None
+                    if _rev and _rev > 0:
+                        if sum(primary.values()) < 0.5 * _rev:
+                            stats["cobertura_insuficiente"] += 1
+                            continue
                     cur.execute(
                         'UPDATE fundamentals SET "revenueSegments" = %s, '
                         '"revenueSegmentsByAxis" = %s '

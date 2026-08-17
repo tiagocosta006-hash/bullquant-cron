@@ -254,18 +254,25 @@ def main() -> None:
         campos = {k: v for k, v in rec.items() if v is not None}
         cols = ", ".join(f'"{k}"' for k in campos)
         vals = ", ".join(["%s"] * len(campos))
-        cur.execute(
-            # Sem coluna `currency`: por convenção do projeto os fundamentais
-            # estão SEMPRE em USD, e a conversão já foi feita acima.
-            f'''INSERT INTO fundamentals (id, "companyId", "periodType", "fiscalYear",
-                    "fiscalQuarter", "periodEnd", "businessKpis",
-                    "createdAt", "updatedAt", {cols})
-                VALUES (%s,%s,%s::"period_type",%s,%s,%s,%s,NOW(),NOW(), {vals})
-                ON CONFLICT ("companyId","periodType","fiscalYear","fiscalQuarter")
-                DO UPDATE SET "businessKpis"=EXCLUDED."businessKpis", "updatedAt"=NOW()''',
-            [uuid.uuid4().hex, cid, ptype, fy, fq, fim, Json(kpis) if kpis else None]
-            + list(campos.values()),
-        )
+        # NADA de ON CONFLICT: a @@unique inclui fiscalQuarter, NULL nas anuais,
+        # e em Postgres dois NULLs são DISTINTOS num índice único — o conflito
+        # nunca dispara e cada corrida inseria uma linha anual nova.
+        cur.execute('SELECT id FROM fundamentals WHERE "companyId"=%s '
+                    'AND "periodType"=%s::"period_type" AND "periodEnd"::date=%s::date',
+                    (cid, ptype, fim))
+        existente = cur.fetchone()
+        if existente:
+            sets = ", ".join(f'"{k}" = %s' for k in campos)
+            cur.execute(f'UPDATE fundamentals SET {sets}, "businessKpis"=%s, "updatedAt"=NOW() WHERE id=%s',
+                        list(campos.values()) + [Json(kpis) if kpis else None, existente[0]])
+        else:
+            cur.execute(
+                f'''INSERT INTO fundamentals (id, "companyId", "periodType", "fiscalYear",
+                        "fiscalQuarter", "periodEnd", "businessKpis",
+                        "createdAt", "updatedAt", {cols})
+                    VALUES (%s,%s,%s::"period_type",%s,%s,%s,%s,NOW(),NOW(), {vals})''',
+                [uuid.uuid4().hex, cid, ptype, fy, fq, fim, Json(kpis) if kpis else None]
+                + list(campos.values()))
         escritas += 1
     conn.commit()
     print(f"\n{escritas} linhas gravadas para {ticker} (companyId={cid}).")

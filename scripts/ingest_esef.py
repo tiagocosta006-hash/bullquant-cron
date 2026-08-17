@@ -97,7 +97,9 @@ MAPA = {
     "sharesOutstanding": ["AdjustedWeightedAverageShares", "WeightedAverageShares"],
     "dividendPerShare": ["DividendsRecognisedAsDistributionsToOwnersPerShare",
                          "DividendsPaidOrdinarySharePerShare"],
-    "dividendsPaid": ["DividendsPaidClassifiedAsFinancingActivities", "DividendsPaid"],
+    "dividendsPaid": ["DividendsPaidToEquityHoldersOfParentClassifiedAsFinancingActivities",
+                      "DividendsRecognisedAsDistributionsToOwnersOfParent",
+                      "DividendsPaidClassifiedAsFinancingActivities", "DividendsPaid"],
     "longTermDebt": ["LongtermBorrowings", "NoncurrentPortionOfNoncurrentBorrowings"],
     "shortTermDebt": ["CurrentBorrowingsAndCurrentPortionOfNoncurrentBorrowings",
                       "CurrentPortionOfNoncurrentBorrowings"],
@@ -155,6 +157,22 @@ def procurar(termo: str, paises=("FR", "DE", "NL", "IT", "ES", "SE", "FI", "DK",
             if len(d.get("data", [])) < 100:
                 break
     return achados
+
+
+INDICE = "/tmp/esef_index.json"
+
+
+def filings_do_indice(lei: str) -> dict:
+    """Usa o índice local se existir — varrer a API por país a cada empresa
+    demora minutos e o índice inteiro constrói-se uma vez."""
+    if not os.path.exists(INDICE):
+        return {}
+    try:
+        with open(INDICE) as f:
+            idx = json.load(f)
+    except Exception:
+        return {}
+    return (idx.get(lei) or {}).get("filings", {})
 
 
 def filings_do_lei(lei: str) -> dict:
@@ -248,7 +266,7 @@ def main() -> None:
     if not (args.lei and args.ticker):
         sys.exit("--lei e --ticker obrigatórios (ou usa --procurar)")
 
-    periodos = filings_do_lei(args.lei)
+    periodos = filings_do_indice(args.lei) or filings_do_lei(args.lei)
     if not periodos:
         sys.exit(f"nenhum relatório ESEF para o LEI {args.lei}")
     print(f"{len(periodos)} períodos com relatório ESEF: {', '.join(sorted(periodos))}")
@@ -324,6 +342,17 @@ def main() -> None:
                     base = rec.get("operatingIncome", rec["netIncome"])
                     rec["roic"] = base / investido
 
+            # GUARDA DE SANIDADE nos campos POR AÇÃO. As colunas são
+            # Decimal(10,4) e rebentam acima de um milhão — mas o problema real
+            # é semântico: nenhuma ação vale 922 milhões por unidade. A Randstad
+            # publica DividendsRecognisedAsDistributionsToOwnersOfParent, que é
+            # um MONTANTE, com um nome quase igual ao da versão por ação. Em vez
+            # de caçar nomes um a um, rejeita-se pela magnitude.
+            for campo in POR_ACAO:
+                v = rec.get(campo)
+                if v is not None and abs(v) > 10_000:
+                    rec.pop(campo)
+
             linhas.append((fim, rec, blocos["moeda"] or "EUR"))
         print(f"  {pend}: {len(factos)} factos consolidados")
 
@@ -347,9 +376,26 @@ def main() -> None:
     cur = conn.cursor()
     cur.execute("SELECT id FROM companies WHERE ticker = %s", (args.ticker,))
     row = cur.fetchone()
-    if not row:
-        sys.exit(f"empresa {args.ticker} não existe na BD — criar primeiro")
-    cid = row[0]
+    if row:
+        cid = row[0]
+    else:
+        # Criar a empresa a partir do índice: sem isto era preciso passar antes
+        # pelo ingestor da Finnhub só para ter a linha, e nem todas as europeias
+        # têm ADR para a Finnhub conhecer.
+        cid = uuid.uuid4().hex
+        nome = args.nome or args.ticker
+        pais = "EU"
+        if os.path.exists(INDICE):
+            with open(INDICE) as f:
+                ent = json.load(f).get(args.lei) or {}
+            nome = args.nome or ent.get("nome") or args.ticker
+            pais = ent.get("pais") or "EU"
+        cur.execute('INSERT INTO companies (id, ticker, name, exchange, country, currency, '
+                    '"isActive", "createdAt", "updatedAt") '
+                    'VALUES (%s,%s,%s,%s,%s,%s,TRUE,NOW(),NOW())',
+                    (cid, args.ticker, nome, "Euronext", pais, "USD"))
+        conn.commit()
+        print(f"empresa criada: {args.ticker} — {nome} ({pais})")
 
     escritas = 0
     for fim in sorted(melhor):

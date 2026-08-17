@@ -165,6 +165,30 @@ def reconstruir(m: dict, acoes_ref: float | None = None) -> dict | None:
         d["freeCashFlow"] = receita * m["fcfMargin"]
     if m.get("ebitPerShare") is not None:
         d.setdefault("operatingIncome", m["ebitPerShare"] * acoes)
+
+    # BALANÇO A PARTIR DOS RÁCIOS. Antes de 2020 não há ESEF (a obrigação legal
+    # começou nesse ano), portanto estes anos só têm demonstração de resultados
+    # e o ativo, a dívida e o dividendo ficavam vazios. Derivam-se:
+    #     dívida = (dívida/capital próprio) x capital próprio
+    #     ativo  = dívida / (dívida/ativo)
+    #     DPS    = payout x EPS
+    # Validado contra o oficial de 2024: dá 15.545 M de ativo, que é exatamente
+    # o que o ESEF reporta, e 3.061 M de dívida contra 3.049 M reais.
+    bv, tde, tda = m.get("bookValue"), m.get("totalDebtToEquity"), m.get("totalDebtToTotalAsset")
+    if bv and tde:
+        d["totalDebt"] = tde * bv
+        if tda:
+            d["totalAssets"] = d["totalDebt"] / tda
+            if d.get("totalEquity"):
+                d["totalLiabilities"] = d["totalAssets"] - d["totalEquity"]
+    if m.get("longtermDebtTotalEquity") and bv:
+        d["longTermDebt"] = m["longtermDebtTotalEquity"] * bv
+    if m.get("payoutRatio") is not None and eps:
+        d["dividendPerShare"] = m["payoutRatio"] * eps
+    if m.get("roe") is not None:
+        d["returnOnEquity"] = m["roe"]
+    if m.get("roic") is not None:
+        d["roic"] = m["roic"]
     return d
 
 
@@ -258,11 +282,13 @@ def main() -> None:
             taxa = taxa_para(moeda, periodo)
             # Rácios e valores por ação NÃO se convertem; montantes sim.
             for campo in ("revenue", "netIncome", "ebitda", "totalEquity", "grossProfit",
-                          "costOfRevenue", "operatingIncome", "freeCashFlow"):
+                          "costOfRevenue", "operatingIncome", "freeCashFlow",
+                          "totalDebt", "totalAssets", "totalLiabilities", "longTermDebt"):
                 if rec.get(campo) is not None:
                     rec[campo] = rec[campo] * taxa * 1e6   # Finnhub reporta em milhões
-            if rec.get("epsDiluted") is not None:
-                rec["epsDiluted"] = rec["epsDiluted"] * taxa
+            for campo in ("epsDiluted", "dividendPerShare"):
+                if rec.get(campo) is not None:
+                    rec[campo] = rec[campo] * taxa
             if rec.get("sharesOutstanding") is not None:
                 rec["sharesOutstanding"] = rec["sharesOutstanding"] * 1e6
 

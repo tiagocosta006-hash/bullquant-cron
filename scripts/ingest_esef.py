@@ -80,7 +80,7 @@ MAPA = {
     "totalCurrentLiab": ["CurrentLiabilities"],
     "inventory": ["Inventories"],
     "accountsReceivable": ["TradeAndOtherCurrentReceivables"],
-    "goodwillAndIntangibles": ["Goodwill"],
+    "goodwillAndIntangibles": ["Goodwill"],   # somado com os intangíveis abaixo
     "propertyPlantEquipment": ["PropertyPlantAndEquipment"],
     "operatingCashFlow": ["CashFlowsFromUsedInOperatingActivities"],
     "investingCashFlow": ["CashFlowsFromUsedInInvestingActivities"],
@@ -116,6 +116,8 @@ MAPA = {
                          "PaymentsForRepurchaseOfEntitysOwnEquityInstruments"],
     "sellingGeneralAndAdmin": ["SalesAndMarketingExpense"],
     "netChangeInCash": ["IncreaseDecreaseInCashAndCashEquivalents"],
+    "minorityInterest": ["NoncontrollingInterests"],
+    "stockBasedCompensation": ["IncreaseDecreaseThroughSharebasedPaymentTransactions"],
 }
 # O passivo total raramente é tagged: deriva-se do que EXISTE, que é o corrente
 # e o não corrente, ou pela identidade do balanço.
@@ -281,6 +283,12 @@ def main() -> None:
 
             def facto(nome):
                 return blocos["dur"].get(nome, blocos["inst"].get(nome))
+
+            # Goodwill + intangíveis: a coluna representa os dois, e a Dassault
+            # publica-os em rubricas separadas (2.641 M só de intangíveis).
+            intang = facto("IntangibleAssetsOtherThanGoodwill")
+            if intang is not None:
+                rec["goodwillAndIntangibles"] = (rec.get("goodwillAndIntangibles") or 0) + intang
 
             # Passivo total: soma do corrente com o não corrente. Se faltar um,
             # a identidade do balanço fecha a conta (Ativo = Passivo + Capital).

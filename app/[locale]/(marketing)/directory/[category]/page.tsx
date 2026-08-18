@@ -1,32 +1,66 @@
 import { Metadata } from "next"
+import { notFound } from "next/navigation"
 import { getTranslations } from "next-intl/server"
 import { Link } from "@/i18n/routing"
 import { prisma } from "@/lib/prisma"
 import { BRAND } from "@/lib/brand"
-import { SECTORS } from "@/lib/data/sectors"
-import { Building2 } from "lucide-react"
+import { getSectorNameBySlug, SECTORS } from "@/lib/data/sectors"
+import { Building2, ArrowLeft } from "lucide-react"
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("directory")
-  
+export async function generateStaticParams() {
+  return SECTORS.map((sector) => ({
+    category: sector.slug,
+  }))
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; category: string }>
+}): Promise<Metadata> {
+  const resolvedParams = await params
+  const { category, locale } = resolvedParams
+  const sectorName = getSectorNameBySlug(category)
+
+  if (!sectorName) {
+    return { title: "Categoria não encontrada" }
+  }
+
+  // Assuming we might want to translate "Sector: {name}" in the future, 
+  // but for now we use the direct name for simplicity in SEO.
+  const title = `Ações de ${sectorName} | ${BRAND.name}`
+  const description = `Descubra as melhores empresas e ações do setor de ${sectorName} para investir. Análise fundamental completa na ${BRAND.name}.`
+
   return {
-    title: t("title"),
-    description: t("subtitle"),
-
+    title,
+    description,
     openGraph: {
-      title: `${t("title")} | ${BRAND.name}`,
-      description: t("subtitle"),
-      url: `${BRAND.siteUrl}/directory`,
+      title,
+      description,
+      url: `${BRAND.siteUrl}/directory/${category}`,
     }
   }
 }
 
-export default async function DirectoryPage() {
-  const t = await getTranslations("directory")
-  
+export default async function CategoryDirectoryPage({
+  params,
+}: {
+  params: Promise<{ locale: string; category: string }>
+}) {
+  const resolvedParams = await params
+  const { category } = resolvedParams
+  const sectorName = getSectorNameBySlug(category)
+
+  if (!sectorName) {
+    notFound()
+  }
+
   const companies = await prisma.company.findMany({
-    where: { isActive: true },
-    select: { ticker: true, name: true, sector: true, logoUrl: true },
+    where: { 
+      isActive: true,
+      sector: sectorName
+    },
+    select: { ticker: true, name: true, logoUrl: true },
     orderBy: { ticker: 'asc' }
   })
 
@@ -44,52 +78,50 @@ export default async function DirectoryPage() {
 
   return (
     <div className="container mx-auto px-4 py-16 md:py-24 max-w-6xl">
-      <div className="mb-12 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-          {t("title")}
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          {t("subtitle")}
-        </p>
+      
+      {/* Back link */}
+      <div className="mb-8">
+        <Link 
+          href="/directory"
+          className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Voltar ao Diretório
+        </Link>
       </div>
 
-      {/* Categories Navigation */}
       <div className="mb-16">
-        <h2 className="text-xl font-bold mb-6 flex items-center justify-center gap-2">
-          <Building2 className="h-5 w-5 text-primary" />
-          Explorar por Setor
-        </h2>
-        <div className="flex flex-wrap gap-3 justify-center max-w-4xl mx-auto">
-          {SECTORS.map(sector => (
-            <Link 
-              key={sector.slug} 
-              href={`/directory/${sector.slug}`}
-              className="px-4 py-2 rounded-full border border-border bg-card hover:bg-primary/10 hover:border-primary/50 text-sm font-medium transition-colors"
-            >
-              {sector.name}
-            </Link>
-          ))}
+        <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-primary/10 text-primary mb-6">
+          <Building2 className="h-8 w-8" />
         </div>
+        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+          Ações de {sectorName}
+        </h1>
+        <p className="text-lg text-muted-foreground max-w-2xl">
+          Lista completa de empresas do setor de {sectorName} disponíveis para análise na {BRAND.name}.
+        </p>
       </div>
 
       {companies.length === 0 ? (
         <div className="text-center text-muted-foreground p-12 glass rounded-xl">
-          {t("empty")}
+          Nenhuma empresa encontrada neste setor.
         </div>
       ) : (
         <div className="space-y-12">
           {/* Alphabet quick navigation */}
-          <div className="flex flex-wrap gap-2 justify-center pb-8 border-b border-border/40">
-            {sortedLetters.map(letter => (
-              <a 
-                key={letter} 
-                href={`#letter-${letter}`}
-                className="w-8 h-8 flex items-center justify-center rounded-md bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground font-medium transition-colors"
-              >
-                {letter}
-              </a>
-            ))}
-          </div>
+          {sortedLetters.length > 1 && (
+            <div className="flex flex-wrap gap-2 pb-8 border-b border-border/40">
+              {sortedLetters.map(letter => (
+                <a 
+                  key={letter} 
+                  href={`#letter-${letter}`}
+                  className="w-8 h-8 flex items-center justify-center rounded-md bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground font-medium transition-colors"
+                >
+                  {letter}
+                </a>
+              ))}
+            </div>
+          )}
 
           {/* Directory Grid */}
           <div className="space-y-16">
@@ -126,11 +158,6 @@ export default async function DirectoryPage() {
                         <span className="text-sm text-muted-foreground truncate">
                           {company.name}
                         </span>
-                        {company.sector && (
-                          <span className="text-xs font-medium text-muted-foreground/70 truncate mt-1">
-                            {company.sector}
-                          </span>
-                        )}
                       </div>
                     </Link>
                   ))}

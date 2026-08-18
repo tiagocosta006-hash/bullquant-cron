@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
 import { BRAND } from '@/lib/brand'
 import { routing } from '@/i18n/routing'
+import { SECTORS } from '@/lib/data/sectors'
 
 function createSitemapEntry(path: string, options: Partial<MetadataRoute.Sitemap[0]>): MetadataRoute.Sitemap[0] {
   const url = path === '/' ? BRAND.siteUrl : `${BRAND.siteUrl}${path}`
@@ -36,6 +37,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     createSitemapEntry('/refund', { lastModified: now, changeFrequency: 'yearly', priority: 0.3 }),
   ]
 
+  // Category pages
+  const categoryPages: MetadataRoute.Sitemap = SECTORS.map(sector => 
+    createSitemapEntry(`/directory/${sector.slug}`, {
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    })
+  )
+
   // Dynamic stock pages
   try {
     const companies = await prisma.company.findMany({
@@ -51,8 +61,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })
     )
 
-    return [...staticPages, ...stockPages]
+    return [...staticPages, ...categoryPages, ...stockPages]
   } catch {
-    return staticPages
+    return [...staticPages, ...categoryPages]
   }
 }

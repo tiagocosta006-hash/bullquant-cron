@@ -111,6 +111,18 @@ def problema(alvo: dict, rev) -> str:
     soma = sum(float(v) for v in alvo.values() if v is not None)
     if rev and float(rev) > 0 and soma / float(rev) > SOMA_MAXIMA:
         return f"soma {soma / float(rev):.3f}x a receita"
+    # PARTIÇÃO DEGENERADA: uma fatia leva quase tudo e as outras ficam a zero.
+    # A Welltower saía com 'Seniors Housing Operating' = 100% da receita e
+    # 'Triple-net' e 'Outpatient Medical' a 0,000 — o extrator apanhou um
+    # conceito que só existe para um dos segmentos. A soma reconcilia, por isso
+    # o teste anterior deixa passar, mas isto não é uma repartição: é o total
+    # com dois rótulos decorativos. Uma receita de segmento exatamente zero é
+    # quase sempre um valor em falta, não um zero verdadeiro.
+    if len(alvo) >= 3:
+        vs = [float(v) for v in alvo.values() if v is not None]
+        soma = sum(vs)
+        if soma > 0 and max(vs) / soma >= 0.98:
+            return f"partição degenerada — uma fatia é {max(vs) / soma:.0%} do total"
     return ""
 
 

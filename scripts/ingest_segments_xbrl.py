@@ -331,6 +331,28 @@ def _candidate_partitions(vals, allowed, total):
             trimmed = {k: v for k, v in plain.items() if k not in totals}
             if len(trimmed) >= 2:
                 cands.append(trimmed)
+
+        # MEMBRO TRANSVERSAL: não é rollup dos irmãos nem é o total sozinho, mas
+        # sobrepõe-se a eles. A Visa acrescentou v:ValueAddedServicesMember
+        # (10,9 mil M$) ao ProductOrServiceAxis no 10-K de 2025 — receita de
+        # serviços de valor acrescentado que já está distribuída pelos outros
+        # membros. Os cinco verdadeiros somam exatamente os 40,0 mil M$ de
+        # receita; com o sexto vão a 1,27x e a partição era rejeitada inteira,
+        # deixando 2025 sem repartição de produto.
+        #
+        # Testa-se remover UM membro de cada vez e fica-se com o que faz o resto
+        # reconciliar. Só se aceita quando a solução é ÚNICA: se dois membros
+        # diferentes servirem, não há como saber qual é o intruso e não se
+        # arrisca. É seguro por construção — numa partição verdadeira, tirar um
+        # membro real deixa a soma em total-membro, que não reconcilia.
+        if total > 0 and len(plain) >= 3:
+            unicos = [k for k in plain
+                      if abs(sum(v for j, v in plain.items() if j != k) - total)
+                      / total <= RECONCILE_TOL]
+            if len(unicos) == 1:
+                trimmed = {k: v for k, v in plain.items() if k != unicos[0]}
+                if len(trimmed) >= 2:
+                    cands.append(trimmed)
     return cands
 
 

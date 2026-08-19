@@ -77,6 +77,26 @@
     {
       "key": "NVS|ANNUAL|2022-12-31|SEG_GRAND_TOTAL_VALUE|Innovative Medicines",
       "rationale": "Innovative Medicines=42.121bn não é um total mal rotulado — é genuinamente ~99,8% da receita consolidada (42.206bn), porque a Sandoz (a outra divisão) representava só ~9,4bn antes da cisão de 2023. Não é uma linha de rollup a duplicar-se; é a estrutura real e muito concentrada do negócio nesse ano."
+    },
+    {
+      "key": "AMP|COMPANY|2024-09-30|SEG_PARENT_ROLLUP|Management and financial advice fees",
+      "rationale": "O rollup está no eixo 'product' (Management and financial advice fees sobre Advisory/Financial planning fees), que NÃO é o eixo selecionado para a coluna renderizada — essa tem os cinco segmentos operacionais limpos. Defeito real mas num payload não apresentado; corrigir exige reextrair o eixo de produto."
+    },
+    {
+      "key": "CBRE|ANNUAL|2016-12-31|SEG_RECONCILING_SUBSET",
+      "rationale": "Não é mistura de eixos: Americas, EMEA, Asia Pacific, Global Investment Management e Development Services SÃO os cinco segmentos reportáveis da CBRE em 2016. Três deles são geográficos por construção do próprio negócio. Soma 1,032x (eliminações)."
+    },
+    {
+      "key": "CBRE|ANNUAL|2016-12-31|SEG_AXIS_MIX_GEO",
+      "rationale": "Não é mistura de eixos: Americas, EMEA, Asia Pacific, Global Investment Management e Development Services SÃO os cinco segmentos reportáveis da CBRE em 2016. Três deles são geográficos por construção do próprio negócio. Soma 1,032x (eliminações)."
+    },
+    {
+      "key": "FCX|ANNUAL|2025-12-31|SEG_AXIS_MIX_GEO",
+      "rationale": "Falso positivo do classificador de eixos: 16 rótulos, todos países (Chile, Egito, Indonésia, Filipinas, Singapura e Suíça não estão na lista de lugares do validador e são lidos como 'produto'). Partição geográfica legítima, soma 1,029x."
+    },
+    {
+      "key": "GE|ANNUAL|2016-12-31|SEG_AXIS_MIX_GEO",
+      "rationale": "'United States' + 'Non US' é uma repartição geográfica de duas vias; o validador lê 'Non US' como produto por não bater na lista de lugares. Soma 1,084x são eliminações."
     }
   ]
 }

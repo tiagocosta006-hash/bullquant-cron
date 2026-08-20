@@ -87,8 +87,13 @@ export function TopNav({
           <Logo href="/dashboard" size="sm" className="mr-2 hidden sm:flex" />
           <Logo href="/dashboard" size="sm" iconOnly className="mr-1 sm:hidden" />
 
-          {/* destinos primários (desktop) */}
-          <nav className="hidden items-center gap-0.5 md:flex">
+          {/* Destinos primários (desktop).
+              min-w-0 + overflow-hidden: sem isto, nove destinos com rótulo
+              ocupam mais do que os 1280px do max-w-7xl, nada encolhe (os
+              rótulos têm whitespace-nowrap) e o EXCESSO EMPURRA os controlos da
+              direita para fora do ecrã — o menu de conta ficava inalcançável, o
+              que impedia até de ver com que conta se está autenticado. */}
+          <nav className="hidden min-w-0 items-center gap-0.5 overflow-hidden md:flex">
             {primary.map(({ href, icon: Icon, label }) => (
               <Link
                 key={href}
@@ -103,18 +108,18 @@ export function TopNav({
                 )}
               >
                 <Icon className="h-4 w-4 shrink-0" strokeWidth={2} />
-                <span className="hidden whitespace-nowrap lg:inline">{label}</span>
+                <span className="hidden whitespace-nowrap xl:inline">{label}</span>
               </Link>
             ))}
           </nav>
 
-          <div className="flex-1" />
+          <div className="min-w-0 flex-1" />
 
           {/* Botão de Upgrade para contas FREE */}
           {plan === "FREE" && (
             <Link
               href="/pricing"
-              className="hidden items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20 hover:border-primary/50 md:flex mr-1"
+              className="hidden shrink-0 items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20 hover:border-primary/50 md:flex mr-1"
               title="Dar Upgrade"
             >
               <Zap className="h-3.5 w-3.5 fill-current" />
@@ -127,7 +132,7 @@ export function TopNav({
             type="button"
             onClick={() => setCmdOpen(true)}
             aria-label={t("searchAction")}
-            className="flex items-center gap-2 rounded-full border border-border/60 bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+            className="flex shrink-0 items-center gap-2 rounded-full border border-border/60 bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
           >
             <Search className="h-4 w-4" />
             <span className="hidden md:inline">{t("searchAction")}</span>
@@ -140,7 +145,7 @@ export function TopNav({
 
           {/* Auth ou Menu de Perfil */}
           {!userEmail ? (
-            <div className="flex items-center gap-1.5 ml-1">
+            <div className="flex shrink-0 items-center gap-1.5 ml-1">
               <Link
                 href="/login"
                 className="hidden items-center justify-center rounded-full px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground sm:flex"

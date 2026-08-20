@@ -267,6 +267,26 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
     }
   })
 
+  // O gráfico de segmentos recebe a série APARADA NAS PONTAS. A Uber só foi a
+  // bolsa em Maio de 2019 e o primeiro 10-K traz 2017 e 2018 por comparativo,
+  // mas só com repartição geográfica — logo a série de segmentos começava com
+  // dois anos de barras vazias. A Visa mostrava um "2016" sem barra nenhuma.
+  //
+  // Aparam-se só as EXTREMIDADES, nunca os buracos interiores: um ano sem
+  // segmentos entre dois anos com eles é informação — sabemos os vizinhos e não
+  // sabemos aquele —, enquanto uma ponta vazia é só o gráfico a reservar espaço
+  // para antes de a empresa existir em bolsa.
+  const segmentChartData = useMemo(() => {
+    if (segmentKeys.length === 0) return chartData
+    const temSegmentos = (d: Record<string, unknown>) =>
+      segmentKeys.some(k => d[k] !== null && d[k] !== undefined)
+    const primeiro = chartData.findIndex(temSegmentos)
+    if (primeiro === -1) return chartData
+    let ultimo = chartData.length - 1
+    while (ultimo > primeiro && !temSegmentos(chartData[ultimo] as Record<string, unknown>)) ultimo--
+    return chartData.slice(primeiro, ultimo + 1)
+  }, [chartData, segmentKeys])
+
   // Barra preliminar: revenue/EPS já reportados (earnings) mas ainda sem 10-Q.
   // Só no modo trimestral e só se o trimestre ainda não existir nos oficiais.
   const showPreliminary = useMemo(() => {
@@ -392,7 +412,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
             {segmentKeys.length > 0 && (
               <DecisionChart currencySymbol={currencySymbol} periodLabel={periodLabel} 
                 title={t('charts.revenueBySegment')} 
-                data={chartData} 
+                data={segmentChartData} 
                 type="STACKED_BAR" 
                 config={{ 
                   isCurrency: true, 

@@ -132,6 +132,15 @@ DURATION_TAGS = {
         "CostOfGoodsAndServicesSold",
         "CostOfGoodsSold",
         "CostOfServices",
+        # A Uber (e outras plataformas) apresentam "Cost of revenue, exclusive of
+        # depreciation and amortization" como a primeira linha de despesa e NÃO
+        # publicam GrossProfit nenhum — daí a margem bruta vazia de 2019 a 2025.
+        # É uma tag us-gaap padrão. Fica DEPOIS das mais precisas: quem tagga
+        # CostOfRevenue ou CostOfSales continua a usar essas, e esta só entra
+        # quando não há outra. A D&A fora do custo torna a margem bruta um pouco
+        # mais generosa do que se estivesse dentro, mas é a repartição que o
+        # próprio emitente apresenta e a que os provedores de dados usam.
+        "CostOfGoodsAndServiceExcludingDepreciationDepletionAndAmortization",
         "CostOfPurchasedPower",
         "CostOfSalesEnergy",
         "FuelCosts",

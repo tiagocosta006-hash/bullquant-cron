@@ -1,10 +1,9 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { getTranslations } from "next-intl/server"
 import { Link } from "@/i18n/routing"
 import { prisma } from "@/lib/prisma"
 import { BRAND } from "@/lib/brand"
-import { getSectorNameBySlug, SECTORS } from "@/lib/data/sectors"
+import { getSectorNameBySlug, getLocalizedSectorName } from "@/lib/data/sectors"
 import { Building2, ArrowLeft } from "lucide-react"
 import { DirectorySearch } from "@/components/marketing/DirectorySearch"
 
@@ -15,16 +14,22 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const resolvedParams = await params
   const { category, locale } = resolvedParams
-  const sectorName = getSectorNameBySlug(category)
+  
+  // We need the raw sector name for internal logic if needed, but for SEO we use the localized one
+  const localizedSectorName = getLocalizedSectorName(category, locale)
 
-  if (!sectorName) {
-    return { title: "Categoria não encontrada" }
+  if (localizedSectorName === category) {
+    // If it returned the raw slug, it means it wasn't found in SECTORS
+    return { title: locale === "pt" ? "Categoria não encontrada" : "Category not found" }
   }
 
-  // Assuming we might want to translate "Sector: {name}" in the future, 
-  // but for now we use the direct name for simplicity in SEO.
-  const title = `Ações de ${sectorName} | ${BRAND.name}`
-  const description = `Descubra as melhores empresas e ações do setor de ${sectorName} para investir. Análise fundamental completa na ${BRAND.name}.`
+  const title = locale === "pt" 
+    ? `Ações de ${localizedSectorName} | ${BRAND.name}`
+    : `${localizedSectorName} Stocks | ${BRAND.name}`
+    
+  const description = locale === "pt"
+    ? `Descubra as melhores empresas e ações do setor de ${localizedSectorName} para investir. Análise fundamental completa na ${BRAND.name}.`
+    : `Discover the best companies and stocks in the ${localizedSectorName} sector to invest in. Complete fundamental analysis on ${BRAND.name}.`
 
   return {
     title,
@@ -43,8 +48,9 @@ export default async function CategoryDirectoryPage({
   params: Promise<{ locale: string; category: string }>
 }) {
   const resolvedParams = await params
-  const { category } = resolvedParams
-  const sectorName = getSectorNameBySlug(category)
+  const { category, locale } = resolvedParams
+  const sectorName = getSectorNameBySlug(category) // We still need the English DB name to query Prisma
+  const localizedSectorName = getLocalizedSectorName(category, locale)
 
   if (!sectorName) {
     notFound()
@@ -69,7 +75,7 @@ export default async function CategoryDirectoryPage({
           className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          Voltar ao Diretório
+          {locale === "pt" ? "Voltar ao Diretório" : "Back to Directory"}
         </Link>
       </div>
 
@@ -78,14 +84,20 @@ export default async function CategoryDirectoryPage({
           <Building2 className="h-8 w-8" />
         </div>
         <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-          Ações de {sectorName}
+          {locale === "pt" ? `Ações de ${localizedSectorName}` : `${localizedSectorName} Stocks`}
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl">
-          Lista completa de empresas do setor de {sectorName} disponíveis para análise na {BRAND.name}.
+          {locale === "pt" 
+            ? `Lista completa de empresas do setor de ${localizedSectorName} disponíveis para análise na ${BRAND.name}.`
+            : `Complete list of companies in the ${localizedSectorName} sector available for analysis on ${BRAND.name}.`
+          }
         </p>
       </div>
 
-      <DirectorySearch companies={companies} emptyMessage="Nenhuma empresa encontrada neste setor." />
+      <DirectorySearch 
+        companies={companies} 
+        emptyMessage={locale === "pt" ? "Nenhuma empresa encontrada neste setor." : "No companies found in this sector."} 
+      />
     </div>
   )
 }

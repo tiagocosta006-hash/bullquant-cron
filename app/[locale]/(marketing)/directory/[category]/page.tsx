@@ -8,12 +8,6 @@ import { getSectorNameBySlug, SECTORS } from "@/lib/data/sectors"
 import { Building2, ArrowLeft } from "lucide-react"
 import { DirectorySearch } from "@/components/marketing/DirectorySearch"
 
-export async function generateStaticParams() {
-  return SECTORS.map((sector) => ({
-    category: sector.slug,
-  }))
-}
-
 export async function generateMetadata({
   params,
 }: {

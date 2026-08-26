@@ -9,8 +9,9 @@ export const routing = defineRouting({
   // partidos. Reintroduzir um locale = adicionar aqui + traduzir o ficheiro
   // COMPLETO em messages/ (o teste em __tests__/i18n-parity.test.ts falha se faltar chave).
   locales: ['en', 'pt'],
-  defaultLocale: 'en',
-  localePrefix: 'as-needed'
+  defaultLocale: 'pt',
+  localePrefix: 'as-needed',
+  localeDetection: false
 });
  
 export const { Link, redirect, usePathname, useRouter, getPathname } = createNavigation(routing);

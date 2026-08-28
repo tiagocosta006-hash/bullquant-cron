@@ -90,7 +90,7 @@ const heroWords = (text: string, offset: number, cls?: string) =>
  * tratamento nenhum. Um `if (locale === "pt")` daria o mesmo resultado hoje e
  * partia-se no dia em que a copy PT mudasse.
  */
-const BRAND_SPLIT = 4; // "Bull" | "Value"
+const BRAND_SPLIT = 8; // "The Bull" | "Value"
 
 function heroLead(text: string) {
   if (!text.startsWith(BRAND.name)) return heroWords(text, 0);

@@ -187,41 +187,41 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://static2.finnhub.io" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://static2.finnhub.io" />
 
-        {/* Schema.org — WebSite: permite ao Google mostrar "BullValue" como Site
-            Name nos resultados de pesquisa (o nome pequeno por cima do URL).
-            Organization: fornece contexto de marca para rich results e Knowledge Panel. */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify([
-              {
+        {/* Schema.org — WebSite: Apenas na homepage, como exigido pelo Google!
+            Se estiver em todas as páginas, o Google ignora e o Site Name falha. */}
+        {cleanPath === "" && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
                 "@context": "https://schema.org",
-                "@type": "WebSite",
-                name: BRAND.name,
-                alternateName: ["The BullValue", "TheBullValue", "thebullvalue", "Bull Value"],
-                url: BRAND.siteUrl,
-                potentialAction: {
-                  "@type": "SearchAction",
-                  target: {
-                    "@type": "EntryPoint",
-                    urlTemplate: `${BRAND.siteUrl}/explore?q={search_term_string}`,
+                "@graph": [
+                  {
+                    "@type": "WebSite",
+                    name: BRAND.name,
+                    alternateName: ["The BullValue", "TheBullValue", "thebullvalue", "Bull Value"],
+                    url: `${BRAND.siteUrl}${canonicalPath}`,
+                    potentialAction: {
+                      "@type": "SearchAction",
+                      target: {
+                        "@type": "EntryPoint",
+                        urlTemplate: `${BRAND.siteUrl}/explore?q={search_term_string}`,
+                      },
+                      "query-input": "required name=search_term_string",
+                    },
                   },
-                  "query-input": "required name=search_term_string",
-                },
-              },
-              {
-                "@context": "https://schema.org",
-                "@type": "Organization",
-                name: BRAND.name,
-                url: BRAND.siteUrl,
-                logo: `${BRAND.siteUrl}${BRAND.logoSrc}`,
-                sameAs: [
-                  "https://www.instagram.com/thebullocracy",
+                  {
+                    "@type": "Organization",
+                    name: BRAND.name,
+                    url: BRAND.siteUrl,
+                    logo: `${BRAND.siteUrl}${BRAND.logoSrc}`,
+                    sameAs: ["https://www.instagram.com/thebullocracy"],
+                  },
                 ],
-              },
-            ]),
-          }}
-        />
+              }),
+            }}
+          />
+        )}
 
         {/* Tema anti-FOUC inlined para evitar render-blocking. */}
         <script

@@ -5,12 +5,17 @@ import { routing } from '@/i18n/routing'
 import { SECTORS } from '@/lib/data/sectors'
 
 function createSitemapEntry(path: string, options: Partial<MetadataRoute.Sitemap[0]>): MetadataRoute.Sitemap[0] {
-  const url = path === '/' ? BRAND.siteUrl : `${BRAND.siteUrl}${path}`
+  // Root path must have a trailing slash to match Next.js canonical generation for `/`
+  const url = path === '/' ? `${BRAND.siteUrl}/` : `${BRAND.siteUrl}${path}`
   
   const languages: Record<string, string> = {}
   routing.locales.forEach((l) => {
-    const prefix = l === routing.defaultLocale ? '' : `/${l}`
-    languages[l] = `${BRAND.siteUrl}${prefix}${path === '/' ? '' : path}`
+    // If routing prefix is as-needed, the default locale has NO prefix.
+    const prefix = (l === routing.defaultLocale && routing.localePrefix === 'as-needed') ? '' : `/${l}`
+    // If it's the root path and there is no prefix, it must be `/`. Otherwise, prefix + path.
+    const cleanPath = path === '/' ? '' : path
+    const canonicalPath = `${prefix}${cleanPath}` || '/'
+    languages[l] = `${BRAND.siteUrl}${canonicalPath}`
   })
 
   return {

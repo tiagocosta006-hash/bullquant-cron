@@ -176,6 +176,14 @@ export default async function RootLayout({
   const messages = await getMessages();
   const cookieStore = await cookies();
 
+  // Obter o pathname real para conditionally renderizar o schema
+  const headersList = await headers();
+  const fullPathname = headersList.get("x-pathname") || "/";
+  const pathWithoutLocale = fullPathname.replace(new RegExp(`^/(${routing.locales.join('|')})(/|$)`), '/');
+  const cleanPath = pathWithoutLocale === '/' ? '' : (pathWithoutLocale.startsWith('/') ? pathWithoutLocale : `/${pathWithoutLocale}`);
+  const currentPrefix = (locale === routing.defaultLocale && routing.localePrefix === 'as-needed') ? "" : `/${locale}`;
+  const canonicalPath = `${currentPrefix}${cleanPath}` || "/";
+
   return (
     <html
       lang={locale}

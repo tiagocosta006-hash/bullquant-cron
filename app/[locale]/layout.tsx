@@ -83,16 +83,18 @@ export async function generateMetadata({
   // Limpar barras duplas no caso do path base ser apenas '/'
   const cleanPath = pathWithoutLocale === '/' ? '' : (pathWithoutLocale.startsWith('/') ? pathWithoutLocale : `/${pathWithoutLocale}`);
 
+  // URLs ABSOLUTOS para canonical e hreflang — Next.js com caminhos relativos
+  // remove a barra final da raiz, criando inconsistência com o sitemap.
   const languages: Record<string, string> = {};
   routing.locales.forEach((l) => {
-    // Se for o default locale e tivermos 'as-needed' configurado, a rota base não tem o prefixo do locale
     const prefix = (l === routing.defaultLocale && routing.localePrefix === 'as-needed') ? "" : `/${l}`;
-    languages[l] = `${prefix}${cleanPath}` || "/";
+    const langPath = `${prefix}${cleanPath}` || "/";
+    languages[l] = `${BRAND.siteUrl}${langPath}`;
   });
 
-  // O Canonical principal vai ser a rota do default locale (Inglês) se não tiver prefixo
   const currentPrefix = (locale === routing.defaultLocale && routing.localePrefix === 'as-needed') ? "" : `/${locale}`;
   const canonicalPath = `${currentPrefix}${cleanPath}` || "/";
+  const canonicalUrl = `${BRAND.siteUrl}${canonicalPath}`;
 
   return {
     metadataBase: new URL(BRAND.siteUrl),
@@ -124,7 +126,7 @@ export async function generateMetadata({
       },
     },
     alternates: {
-      canonical: canonicalPath,
+      canonical: canonicalUrl,
       languages,
     },
     openGraph: {

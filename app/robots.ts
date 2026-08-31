@@ -39,7 +39,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow,
       },
       {
-        userAgent: ['Google-Extended', 'GPTBot', 'CCBot', 'ClaudeBot', 'OAI-SearchBot'],
+        userAgent: ['Google-Extended', 'GPTBot', 'CCBot'],
         disallow: ['/'],
       },
     ],

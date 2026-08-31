@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next'
+export const revalidate = 86400 // Revalidate daily to pick up new companies
 import { prisma } from '@/lib/prisma'
 import { BRAND } from '@/lib/brand'
 import { routing } from '@/i18n/routing'

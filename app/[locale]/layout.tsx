@@ -130,7 +130,10 @@ export async function generateMetadata({
       languages,
     },
     openGraph: {
-      title: `${BRAND.name} — Análise Fundamental de Ações`,
+      title: {
+        default: `${BRAND.name} — Análise Fundamental de Ações`,
+        template: `%s · ${BRAND.name}`,
+      },
       description:
         "Vê o valor que os outros não veem. Fundamentais de 10 anos, DCF e Analista IA, em português.",
       siteName: BRAND.name,
@@ -141,13 +144,16 @@ export async function generateMetadata({
           url: `${BRAND.siteUrl}/og-image.png`,
           width: 1200,
           height: 630,
-          alt: `${BRAND.name} — Análise Fundamental de Ações`,
+          alt: BRAND.name,
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${BRAND.name} — Análise Fundamental de Ações`,
+      title: {
+        default: `${BRAND.name} — Análise Fundamental de Ações`,
+        template: `%s · ${BRAND.name}`,
+      },
       description:
         "Vê o valor que os outros não veem. Fundamentais de 10 anos, DCF e Analista IA, em português.",
       images: [`${BRAND.siteUrl}/og-image.png`],

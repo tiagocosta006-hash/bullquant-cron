@@ -19,6 +19,8 @@ import {
   LogOut,
   Zap,
   TrendingUp,
+  Globe,
+  Newspaper,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn, userInitials } from "@/lib/utils";
@@ -65,11 +67,8 @@ export function TopNav({
     { href: "/portfolio", icon: Briefcase, label: t("portfolio") },
     { href: "/watchlist", icon: Star, label: t("watchlist") },
     { href: "/calendar", icon: CalendarDays, label: t("calendar") },
-    // /macro e /news fora do menu até terem dados a sério: o macro depende da
-    // FRED_API_KEY (que não existe em ambiente nenhum) e mostra taxas do
-    // Tesouro com semanas de atraso como se fossem actuais; as notícias têm 2
-    // artigos publicados para 577 empresas. As páginas continuam a responder
-    // por URL — é só o menu que não as anuncia antes de tempo.
+    { href: "/macro", icon: Globe, label: "Macro" },
+    { href: "/news", icon: Newspaper, label: "Notícias" },
     // calculadoras em destaque
     { href: "/dcf", icon: Calculator, label: t("dcfShort") },
     { href: "/compound", icon: TrendingUp, label: t("compound") },

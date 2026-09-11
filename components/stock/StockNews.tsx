@@ -131,12 +131,6 @@ export function StockNews({ ticker }: { ticker: string }) {
       : articles.slice(0, DEFAULT_LIMIT)
     : null;
 
-  // Enquanto a cobertura de notícias for residual, uma empresa sem notícias não
-  // mostra secção nenhuma em vez de mostrar um cartão vazio. O estado vazio é
-  // honesto quando é excepção; repetido em quase todas as empresas lê-se como
-  // funcionalidade por acabar. Volta sozinho assim que houver artigos.
-  if (visible !== null && visible.length === 0) return null;
-
   return (
     <div>
       {/* Header */}

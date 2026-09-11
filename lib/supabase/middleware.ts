@@ -28,7 +28,16 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  // O getUser() é uma ida à rede. Quando o projeto Supabase não resolve, isto
+  // atira — e um throw aqui rebenta TODOS os pedidos, incluindo os públicos.
+  // Segue como anónimo: as regras abaixo já sabem lidar com isso.
+  let user = null
+  try {
+    const res = await supabase.auth.getUser()
+    user = res.data.user
+  } catch {
+    user = null
+  }
 
   const { pathname } = request.nextUrl
 
@@ -68,7 +77,12 @@ export async function updateSession(request: NextRequest) {
 
   // Anónimos numa página pessoal vão para o login (com ?redirect para voltarem
   // ao sítio depois de entrar).
-  if (!user && isPrivateRoute) {
+  // O middleware corre em Edge, onde não há Prisma — por isso a sessão de
+  // desenvolvimento do getUser() (ver lib/supabase/server.ts) não é visível
+  // aqui. Em dev, este funil deixa passar e é o getUser(), já no runtime Node,
+  // que resolve quem é o utilizador. Em produção isDevUnlocked() é sempre
+  // falso e a regra fica exatamente como estava.
+  if (!user && isPrivateRoute && !isDevUnlocked()) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('redirect', pathname)

@@ -7,7 +7,6 @@ import {
   Activity,
   LayoutDashboard,
   SearchCode,
-  Briefcase,
   Star,
   CalendarDays,
   Calculator,
@@ -19,7 +18,6 @@ import {
   LogOut,
   Zap,
   TrendingUp,
-  Globe,
   Newspaper,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -64,10 +62,10 @@ export function TopNav({
   const primary = [
     { href: "/dashboard", icon: LayoutDashboard, label: t("dashboard") },
     { href: "/explore", icon: SearchCode, label: t("explore") },
-    { href: "/portfolio", icon: Briefcase, label: t("portfolio") },
+    // /portfolio e /macro fora do menu para já (pedido do Costa). As páginas
+    // continuam a responder por URL — é só o menu que não as anuncia.
     { href: "/watchlist", icon: Star, label: t("watchlist") },
     { href: "/calendar", icon: CalendarDays, label: t("calendar") },
-    { href: "/macro", icon: Globe, label: "Macro" },
     { href: "/news", icon: Newspaper, label: "Notícias" },
     // calculadoras em destaque
     { href: "/dcf", icon: Calculator, label: t("dcfShort") },

@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getUser } from "@/lib/supabase/server";
+import { isDevUnlocked } from "@/lib/devAccess";
 
 import {
   getCategoryCompaniesPage,
@@ -21,7 +22,9 @@ export default async function DashboardPage({
 }) {
   const user = await getUser();
 
-  if (!user) {
+  // DEV_UNLOCK_PRO desbloqueia esta página em dev sem login real (ver
+  // lib/devAccess.ts); isDevUnlocked() é sempre false em produção.
+  if (!user && !isDevUnlocked()) {
     redirect("/login");
   }
 

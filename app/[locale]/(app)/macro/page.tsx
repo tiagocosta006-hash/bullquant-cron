@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { MacroDashboardClient } from "./MacroDashboardClient";
 import { getUser } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { isDevUnlocked } from "@/lib/devAccess";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -14,7 +15,9 @@ const MACRO_TICKERS = [
 export default async function MacroPage() {
   const user = await getUser();
 
-  if (!user) {
+  // DEV_UNLOCK_PRO desbloqueia esta página em dev sem login real (ver
+  // lib/devAccess.ts); isDevUnlocked() é sempre false em produção.
+  if (!user && !isDevUnlocked()) {
     redirect("/login");
   }
 

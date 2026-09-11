@@ -23,7 +23,14 @@ def main():
 
     print("Fetching companies from database...")
     with conn.cursor() as cur:
-        cur.execute('SELECT ticker FROM companies WHERE "isActive" = TRUE')
+        # As cotadas na Euronext ficam DE FORA: o símbolo do yfinance precisa de
+        # sufixo de bolsa (MC.PA, PHIA.AS) e, sem ele, o ticker nu resolve para
+        # uma empresa americana completamente diferente — MC devolve a Moelis &
+        # Company em vez da LVMH, DSY devolve a Big Tree Cloud em vez da
+        # Dassault. Não falha: grava silenciosamente o preço da empresa errada.
+        # Estas são servidas pelo ingest_prices_euronext.py.
+        cur.execute('SELECT ticker FROM companies WHERE "isActive" = TRUE '
+                    "AND COALESCE(exchange, '') !~* 'euronext'")
         tickers = [r[0] for r in cur.fetchall()]
 
     if not tickers:
@@ -32,7 +39,12 @@ def main():
 
     print("Determining backfill start date...")
     with conn.cursor() as cur:
-        cur.execute('SELECT MIN(max_date) FROM (SELECT MAX(date) as max_date FROM prices WHERE ticker = ANY(%s)) sub', (tickers,))
+        # O GROUP BY é essencial: sem ele a subquery devolve o MAX global e o
+        # MIN passa a ser esse mesmo valor, pelo que a janela arranca sempre na
+        # data do ticker MAIS adiantado. Qualquer ticker que fique para trás
+        # (fetch falhado, ticker novo) nunca mais era apanhado — a DG ficou
+        # parada em 2024-07-31 exactamente por isto.
+        cur.execute('SELECT MIN(max_date) FROM (SELECT ticker, MAX(date) as max_date FROM prices WHERE ticker = ANY(%s) GROUP BY ticker) sub', (tickers,))
         min_max_date = cur.fetchone()[0]
 
     if not min_max_date:
@@ -43,17 +55,23 @@ def main():
     end_date = (datetime.date.today() + datetime.timedelta(days=1)).isoformat()
 
     print(f"Downloading prices from {start_date} to {end_date} for {len(tickers)} companies via yfinance...")
-    
-    data = yf.download(tickers, start=start_date, end=end_date, group_by="ticker", auto_adjust=False)
-    
+
+    # As classes de ações levam ponto na BD (BRK.B) e hífen no yfinance (BRK-B).
+    # Sem esta tradução o fetch devolve vazio e a empresa fica sem preços —
+    # BRK.B e BF.B, duas das maiores do índice, estavam paradas por causa disto.
+    yf_symbol = {t: t.replace(".", "-") for t in tickers}
+    data = yf.download(list(yf_symbol.values()), start=start_date, end=end_date,
+                       group_by="ticker", auto_adjust=False)
+
     rows = []
-    
+
     for ticker in tickers:
         try:
             if len(tickers) > 1:
-                if ticker not in data.columns.levels[0]:
+                symbol = yf_symbol[ticker]
+                if symbol not in data.columns.levels[0]:
                     continue
-                ticker_data = data[ticker]
+                ticker_data = data[symbol]
             else:
                 ticker_data = data
             

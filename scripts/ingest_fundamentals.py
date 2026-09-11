@@ -1764,14 +1764,22 @@ def apply_fx_conversion(company_currency: str, periods_data: list[dict]) -> bool
 
 def apply_stock_splits(ticker: str, periods_data: list[dict]):
     periods_data.sort(key=lambda x: x['periodEnd'])
+    # O yfinance usa hífen nas classes de ações (BRK-B), o EDGAR usa ponto
+    # (BRK.B). Sem esta tradução o fetch devolve vazio e a empresa perdia a
+    # ingestão inteira todos os dias.
+    yf_ticker = ticker.replace(".", "-")
     try:
-        t = yf.Ticker(ticker)
+        t = yf.Ticker(yf_ticker)
         splits = t.splits
     except Exception as e:
         print(f"    Erro ao extrair splits do yfinance para {ticker}: {e}")
         return
-        
-    if splits.empty:
+
+    # Quando a chamada ao Yahoo falha (rate limit, rede), o yfinance devolve
+    # None em vez de levantar — o `except` acima não apanha isso e o
+    # `splits.empty` rebentava com AttributeError, abortando a empresa toda.
+    # Os fundamentais da SEC não têm culpa do split não vir: seguem na mesma.
+    if splits is None or splits.empty:
         return
         
     for split_date, ratio in splits.items():
@@ -2169,7 +2177,14 @@ def process_company(conn, company: dict, dry_run: bool = False,
                 conn.rollback()
 
     if ticker:
-        apply_stock_splits(ticker, rows)
+        # O ajuste de splits depende do Yahoo, que falha com frequência. É um
+        # refinamento sobre os dados da SEC — nunca motivo para perder a
+        # ingestão da empresa. A linha fica por ajustar e o adjust_splits.py
+        # (que corre a seguir) apanha-a na próxima passagem.
+        try:
+            apply_stock_splits(ticker, rows)
+        except Exception as e:
+            print(f"    Splits por ajustar em {ticker} ({type(e).__name__}: {e})")
 
     if dry_run:
         if collector is not None:

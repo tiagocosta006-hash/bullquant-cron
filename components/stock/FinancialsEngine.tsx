@@ -368,7 +368,15 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
 
         {mainView === "charts" && (
           <div className="flex bg-muted/50 p-1 rounded-lg border border-border/40 w-fit">
-            {(["QUARTERLY", "TTM", "ANNUAL"] as PeriodType[]).map(p => (
+            {/* Sem um único trimestre não há Trimestral nem TTM para mostrar:
+                os foreign private issuers (ASML, Novo Nordisk, SAP, Spotify)
+                reportam 20-F anual à SEC e a lei não lhes exige 10-Q. Deixar os
+                botões lá dava um gráfico vazio ao clicar — parece avaria, é
+                só a periodicidade que não existe. O default já é ANNUAL. */}
+            {(quarterlyCount === 0
+              ? (["ANNUAL"] as PeriodType[])
+              : (["QUARTERLY", "TTM", "ANNUAL"] as PeriodType[])
+            ).map(p => (
               <button
                 key={p}
                 onClick={() => setPeriod(p)}

@@ -33,3 +33,13 @@ jobs:
         env:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
         run: python scripts/adjust_splits.py
+
+      # Gate de IDENTIDADES CONTABILÍSTICAS, aqui e não só no validate-database
+      # semanal: uma ingestão má ficava até 7 dias a apodrecer antes de alguém
+      # saber. Valida o que ACABOU de ser escrito, no momento em que ainda se
+      # sabe o que mudou. Compara com scripts/out/validator_baseline.json e só
+      # falha com violações NOVAS, portanto a dívida conhecida não bloqueia.
+      - name: Accounting identities gate
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: python scripts/validate_fundamentals.py

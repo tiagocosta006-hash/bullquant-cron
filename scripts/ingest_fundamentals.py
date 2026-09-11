@@ -2438,6 +2438,7 @@ def main():
 
     total_periods = 0
     errors = 0
+    failed: list[str] = []
     collector: dict = {}
 
     for i, company in enumerate(companies):
@@ -2459,9 +2460,11 @@ def main():
             except Exception as e2:
                 print(f"ERRO na reconexão: {e2}")
                 errors += 1
+                failed.append(ticker or company.get("id", "?"))
         except Exception as e:
             print(f"ERRO: {e}")
             errors += 1
+            failed.append(ticker or company.get("id", "?"))
 
         if last_fetch_was_network:
             time.sleep(SLEEP_BETWEEN)
@@ -2489,6 +2492,17 @@ def main():
 
     conn.close()
     print(f"\nConcluído. {total_periods} períodos inseridos. {errors} erros.")
+
+    # Terminar com 0 mesmo havendo erros é o que deixou a BRK.B e a BF.B falharem
+    # todos os dias durante semanas com o workflow verde: a contagem de erros ia
+    # para o log, e um log que ninguém lê não é um alarme. Enquanto um erro de
+    # dados não pintar o CI de vermelho, ninguém o vê. Sair != 0 aqui é
+    # deliberadamente barulhento — uma falha transitória da SEC vai chumbar a
+    # corrida, e é isso que se pretende: a alternativa é não saber.
+    if errors:
+        print(f"FALHA: {errors} empresa(s) sem ingestão — {', '.join(sorted(failed)[:20])}"
+              + (" ..." if len(failed) > 20 else ""))
+        sys.exit(1)
 
 
 if __name__ == "__main__":

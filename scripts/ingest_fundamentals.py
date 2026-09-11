@@ -1335,6 +1335,22 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         if not gp_reportado:
             gross_profit = None
 
+    # Custo que CONTRADIZ o lucro bruto reportado pelo emitente: a tag de custo
+    # escolhida não é a contraparte daquele lucro bruto. Diferenças de definição
+    # (pharma que deixa a amortização de intangíveis fora do custo) ficam abaixo
+    # dos 15% da receita; acima de 25% é outra coisa. A Centene, seguradora de
+    # saúde, apanhava um CostOfServices residual de 702M contra uma receita de
+    # 44.655M — o custo a sério de uma seguradora são os encargos médicos, ~85%
+    # dos prémios. O lucro bruto reportado (5.650M, 12,6% de margem) está certo
+    # para o setor; o custo é que não é aquele.
+    #
+    # O lucro bruto taggado é fonte primária e fica. O custo cai para N/A, que
+    # é a verdade: não sabemos qual é o custo da receita desta empresa.
+    if (gp_reportado and revenue is not None and cost_of_rev is not None
+            and gross_profit is not None and revenue > 0
+            and abs(gross_profit - (revenue - cost_of_rev)) > 0.25 * revenue):
+        cost_of_rev = None
+
     # ── Level 1 Accounting Integrity ──
     if revenue is not None and gross_profit is not None and gross_profit > revenue:
         # Forçar gp = revenue FABRICAVA um valor: a NiSource ficava com lucro

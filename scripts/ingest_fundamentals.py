@@ -978,6 +978,25 @@ def safe_clamp(v, lo, hi):
     return max(lo, min(hi, v))
 
 
+def plausivel(v, lo, hi):
+    """Fora da banda devolve None (→ N/A), em vez de truncar para o limite.
+
+    O safe_clamp(-99, 99) que aqui estava é uma banda de ±9900%: não filtra
+    nada na prática, e um ROIC de 300% chegava intacto ao gráfico. Truncar
+    também não serve — um ROIC truncado em 200% continua a ser um número
+    inventado a ocupar o lugar de "não sabemos".
+
+    Estes rácios saem quase sempre de um denominador residual (capital
+    investido ou capital próprio perto de zero, típico de quem fez recompras
+    agressivas). Nesses casos o quociente não tem significado económico
+    nenhum, e a regra da casa é clara: quando não se sabe, mostra-se N/A,
+    nunca um número.
+    """
+    if v is None:
+        return None
+    return v if lo <= v <= hi else None
+
+
 # ── Identidade de período fiscal derivada da DATA (não dos campos fy/fp) ──────
 # Os campos fy/fp do XBRL da SEC são frequentemente ERRADOS em factos
 # comparativos de filings posteriores (a mesma data reportada com fy diferente),
@@ -1449,9 +1468,9 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
 
     total_equity = inst.get("totalEquity")
 
-    gross_margin = safe_clamp(safe_div(gross_profit, revenue), -99.0, 99.0)
-    op_margin = safe_clamp(safe_div(op_income, revenue), -99.0, 99.0)
-    net_margin = safe_clamp(safe_div(net_income, revenue), -99.0, 99.0)
+    gross_margin = plausivel(safe_div(gross_profit, revenue), -1.0, 1.0)
+    op_margin = plausivel(safe_div(op_income, revenue), -10.0, 2.0)
+    net_margin = plausivel(safe_div(net_income, revenue), -10.0, 2.0)
 
     roic = None
     if op_income is not None and total_assets is not None:
@@ -1469,9 +1488,9 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
             inv_cap = total_debt + (total_equity or 0) - (cash or 0)
         else:
             inv_cap = (total_assets or 0) - (curr_liab or 0) - (cash or 0)
-        roic = safe_clamp(safe_div(nopat, inv_cap) if inv_cap > 0 else None, -99.0, 99.0)
+        roic = plausivel(safe_div(nopat, inv_cap) if inv_cap > 0 else None, -2.0, 2.0)
 
-    roe = safe_clamp(safe_div(net_income, total_equity) if total_equity and total_equity > 0 else None, -99.0, 99.0)
+    roe = plausivel(safe_div(net_income, total_equity) if total_equity and total_equity > 0 else None, -5.0, 5.0)
 
     ebitda_raw = dur.get("ebitda")
     if ebitda_raw is not None:

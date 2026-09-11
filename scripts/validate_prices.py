@@ -46,7 +46,13 @@ BASELINE = os.path.join(os.path.dirname(__file__), "out", "prices_baseline.json"
 
 # Pseudo-tickers de séries macro (^T10Y2Y, ^CPI_YOY...) não são cotações: têm
 # valores negativos legítimos e não têm OHLC nem volume.
-FILTRO_REAL = "ticker NOT LIKE '^%'"
+#
+# Empresas retiradas (isActive = false) também ficam de fora: foram retiradas
+# precisamente por terem dados parados, portanto acusá-las de série
+# desactualizada é ruído garantido — e um validador ruidoso é um validador que
+# se passa a ignorar. Voltam a ser vigiadas no dia em que voltarem ao produto.
+FILTRO_REAL = ("ticker NOT LIKE '^%' AND ticker IN "
+               "(SELECT ticker FROM companies WHERE \"isActive\")")
 
 REGRAS = {
     "CLOSE_NAO_POSITIVO": f"""

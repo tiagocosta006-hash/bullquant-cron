@@ -1261,6 +1261,10 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
 
     revenue = dur.get("revenue")
     gross_profit = dur.get("grossProfit")
+    # Guardar se o lucro bruto veio TAGGADO pelo emitente ou se foi derivado
+    # abaixo: se for derivado de um custo que se venha a descobrir incoerente,
+    # tem de cair com ele.
+    gp_reportado = gross_profit is not None
 
     # Fallback: muitas empresas reportam Revenue e CostOfRevenue mas NÃO a tag
     # explícita GrossProfit. Calcular grossProfit = revenue − costOfRevenue
@@ -1286,6 +1290,21 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         if (abs(gross_profit - (revenue - cost_of_rev)) > 0.05 * revenue
                 and 0.5 * revenue < net_rev < 0.98 * revenue):
             revenue = net_rev
+
+    # Custo das vendas ACIMA da receita: as duas grandezas não são do mesmo
+    # âmbito. A correção de excise acima só sabe ENCOLHER a receita
+    # (net_rev < 0.98·revenue), por isso o caso inverso — receita parcial
+    # (um segmento) contra custo consolidado — passava incólume. A DLTR de 2023
+    # ficava com receita 3.932M contra custo 5.089M, ou seja margem bruta
+    # negativa numa retalhista, e daí saíam gráficos de margem a mentir.
+    # Não há como saber qual dos dois é o certo, e inventar é pior do que
+    # admitir: o custo cai, e com ele o lucro bruto se tiver sido derivado dele.
+    # O lucro bruto taggado pelo emitente sobrevive — esse é fonte primária.
+    if (revenue is not None and cost_of_rev is not None
+            and revenue > 0 and cost_of_rev > revenue):
+        cost_of_rev = None
+        if not gp_reportado:
+            gross_profit = None
 
     # ── Level 1 Accounting Integrity ──
     if revenue is not None and gross_profit is not None and gross_profit > revenue:
@@ -1598,7 +1617,12 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         "periodEnd": period_end,
         "filedAt": filed_at,
         "revenue": revenue,
-        "costOfRevenue": dur.get("costOfRevenue"),
+        # cost_of_rev e NÃO dur.get("costOfRevenue"): o valor cru ignorava toda a
+        # limpeza feita acima. O guard de custo negativo estava escrito desde
+        # sempre mas só afectava o lucro bruto derivado — o custo em si era
+        # gravado cru, e a BD tinha 2 linhas com custo negativo e 90 com custo
+        # acima da receita a provar isso mesmo.
+        "costOfRevenue": cost_of_rev,
         "grossProfit": gross_profit,
         "operatingExpenses": op_expenses,
         "operatingIncome": op_income,

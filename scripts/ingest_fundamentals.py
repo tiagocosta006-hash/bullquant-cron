@@ -1108,7 +1108,17 @@ def discover_periods(us_gaap: dict, cal: dict, min_fy: int) -> tuple[set, dict, 
         best_end = Counter(x[0] for x in lst).most_common(1)[0][0]
         fileds = [x[1] for x in lst if x[0] == best_end and x[1]]
         period_ends[key] = best_end
-        period_filed[key] = max(fileds) if fileds else None
+        # min e NÃO max: um período aparece nas companyfacts uma vez na filing
+        # que o reporta e OUTRA VEZ em cada filing posterior que o traz como
+        # comparativo. O max ficava sempre com a mais recente dessas, ou seja
+        # com uma data que nada tem que ver com a disponibilidade do dado — o
+        # FY2025Q1 da AAPL (fechado em Dez/2024) estava gravado como filed em
+        # Maio/2026, e os quatro trimestres de 2016 todos em Nov/2017. A
+        # primeira filing a reportar o período é, por definição, aquela em que
+        # ele é o período de reporte, e é quando o mercado soube. Se vier de um
+        # 8-K de resultados anterior ao 10-Q, melhor ainda: foi mesmo aí que a
+        # informação passou a ser pública.
+        period_filed[key] = min(fileds) if fileds else None
     return set(cand.keys()), period_ends, period_filed
 
 

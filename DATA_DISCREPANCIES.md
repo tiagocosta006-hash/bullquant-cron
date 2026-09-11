@@ -93,7 +93,18 @@ O campo `filedAt` de muitos trimestres na BD não é a data da filing original (
 **A Nossa Metodologia:**
 `/api/valuation/[ticker]` deixou de confiar cegamente no `filedAt`. Continua a ser a fonte preferida, mas apenas quando é plausível face ao calendário da SEC (posterior ao fim do período e até 120 dias depois num trimestre, 150 num anual). Fora dessa janela assume-se o prazo legal típico de reporte: `periodEnd + 45 dias` (10-Q) ou `periodEnd + 75 dias` (10-K). Com isto a série de TTM da AAPL passou de 13 degraus em 5 anos (com saltos de 9 meses) para 22 — um por trimestre, como deve ser — e o P/E de agosto de 2021 passou a 28,5x.
 
-**Dívida técnica:** a correção é uma blindagem no consumo, não na origem. O `filedAt` correto continua a faltar na BD e deve ser corrigido em `scripts/ingest_fundamentals.py` (usar a data da filing de onde o período é o *reporting period*, não a data da filing onde aparece como comparativo). Enquanto isso não acontecer, qualquer nova feature point-in-time deve usar a mesma lógica de plausibilidade.
+**Dívida técnica — RESOLVIDA na origem (2026-09-11).** A causa estava numa linha do `resolve_periods()` em `scripts/ingest_fundamentals.py`:
+
+```python
+period_filed[key] = max(fileds)   # errado
+period_filed[key] = min(fileds)   # correto
+```
+
+Um período aparece nas `companyfacts` uma vez na filing que o reporta e **outra vez em cada filing posterior** que o traz como comparativo. O `max` ficava sempre com a mais recente dessas — daí os quatro trimestres de 2016 da AAPL carimbados com Nov/2017. A primeira filing a reportar o período é, por definição, aquela em que ele é o *reporting period*, e é quando o mercado soube; se vier de um 8-K de resultados anterior ao 10-Q, melhor ainda.
+
+Depois da reingestão das 527 empresas ativas: linhas com `filedAt` implausível passaram de **14 788 para 559**, e nenhuma tem data anterior ao fim do período. A AAPL passou a ter todos os trimestres a `periodEnd + 32-34 dias`, a cadência real dela.
+
+A blindagem de plausibilidade em `/api/valuation/[ticker]` **fica na mesma**: continua a proteger dos 559 casos que sobram (filings atrasadas, restatements) e de emitentes novos com padrões estranhos. Deixou é de ser a única coisa entre os dados e o utilizador.
 
 ---
 

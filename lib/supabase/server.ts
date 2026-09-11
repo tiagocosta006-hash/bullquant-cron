@@ -48,21 +48,23 @@ export const createClient = cache(async () => {
   // falso, portanto não há como abrir sessão a ninguém sem autenticação real.
   if (isDevUnlocked() && process.env.DEV_LOGIN_EMAIL) {
     const original = client.auth.getUser.bind(client.auth)
-    client.auth.getUser = async (jwt?: string) => {
-      let res
-      try {
-        res = await original(jwt)
-      } catch {
-        res = { data: { user: null }, error: null }
-      }
-      if (res.data?.user) return res as Awaited<ReturnType<typeof original>>
-
+    client.auth.getUser = async () => {
+      // Não se chama o original de todo. Apanhar o erro não chegava: com um
+      // cookie de sessão antigo, o cliente tenta renovar o token e esse
+      // trabalho em segundo plano escapa ao try/catch, deixando o pedido
+      // pendurado — página em branco eterna. Se há sessão de dev, ela manda.
       const { prisma } = await import('@/lib/prisma')
       const local = await prisma.user.findUnique({
         where: { email: process.env.DEV_LOGIN_EMAIL! },
         select: { id: true, email: true },
       })
-      if (!local) return res as Awaited<ReturnType<typeof original>>
+      // Sem o utilizador local configurado não há sessão nenhuma a fingir —
+      // segue como anónimo, sem tocar na rede.
+      if (!local) {
+        return { data: { user: null }, error: null } as unknown as Awaited<
+          ReturnType<typeof original>
+        >
+      }
 
       return {
         data: {

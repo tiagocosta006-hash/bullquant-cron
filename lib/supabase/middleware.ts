@@ -28,15 +28,23 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // O getUser() é uma ida à rede. Quando o projeto Supabase não resolve, isto
-  // atira — e um throw aqui rebenta TODOS os pedidos, incluindo os públicos.
-  // Segue como anónimo: as regras abaixo já sabem lidar com isso.
+  // Com sessão de desenvolvimento configurada, NEM SE TENTA falar com o
+  // Supabase. Apanhar o erro não chegava: com um cookie de sessão antigo no
+  // browser, o cliente tenta RENOVAR o token — outro caminho, com trabalho em
+  // segundo plano que escapa ao try/catch e deixa o pedido pendurado. O
+  // resultado era uma página em branco eterna. Quem é o utilizador resolve-se
+  // a seguir, no runtime Node (ver lib/supabase/server.ts).
+  const sessaoDev = isDevUnlocked() && !!process.env.DEV_LOGIN_EMAIL
+
   let user = null
-  try {
-    const res = await supabase.auth.getUser()
-    user = res.data.user
-  } catch {
-    user = null
+  if (!sessaoDev) {
+    try {
+      const res = await supabase.auth.getUser()
+      user = res.data.user
+    } catch {
+      // Rede indisponível: segue como anónimo, as regras abaixo lidam com isso.
+      user = null
+    }
   }
 
   const { pathname } = request.nextUrl

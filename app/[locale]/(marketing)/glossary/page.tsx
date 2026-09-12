@@ -97,28 +97,42 @@ export default async function GlossaryPage({
   return (
     <div className="container relative isolate mx-auto max-w-5xl px-4 py-24 sm:px-6 sm:py-32">
       <GlossaryClientScript />
-      {/* Schema.org DefinedTermSet — Glossário de Value Investing.
-          Cada termo é marcado como DefinedTerm para Featured Snippets no Google. */}
+      {/* Schema.org DefinedTermSet e FAQPage.
+          O DefinedTerm alimenta o Knowledge Graph, e o FAQPage gera caixas expansíveis (Rich Results) no Google. */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "DefinedTermSet",
-            name: currentLocale === "pt" ? "Glossário de Value Investing" : "Value Investing Glossary",
-            url: `${BRAND.siteUrl}/glossary`,
-            description: currentLocale === "pt"
-              ? "Dicionário completo dos termos mais importantes de análise fundamental e value investing."
-              : "Complete dictionary of the most important fundamental analysis and value investing terms.",
-            inDefinedTermSet: `${BRAND.siteUrl}/glossary`,
-            hasDefinedTerm: sortedTerms.map((term) => ({
-              "@type": "DefinedTerm",
-              name: getLocalizedText(term.title),
-              description: getLocalizedText(term.definition),
-              url: `${BRAND.siteUrl}/glossary#${term.slug}`,
+          __html: JSON.stringify([
+            {
+              "@context": "https://schema.org",
+              "@type": "DefinedTermSet",
+              name: currentLocale === "pt" ? "Glossário de Value Investing" : "Value Investing Glossary",
+              url: `${BRAND.siteUrl}/glossary`,
+              description: currentLocale === "pt"
+                ? "Dicionário completo dos termos mais importantes de análise fundamental e value investing."
+                : "Complete dictionary of the most important fundamental analysis and value investing terms.",
               inDefinedTermSet: `${BRAND.siteUrl}/glossary`,
-            })),
-          }),
+              hasDefinedTerm: sortedTerms.map((term) => ({
+                "@type": "DefinedTerm",
+                name: getLocalizedText(term.title),
+                description: getLocalizedText(term.definition).replace(/\[([^\]]+)\]\([^)]+\)/g, "$1"), // Strip markdown links
+                url: `${BRAND.siteUrl}/glossary#${term.slug}`,
+                inDefinedTermSet: `${BRAND.siteUrl}/glossary`,
+              })),
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: sortedTerms.map((term) => ({
+                "@type": "Question",
+                name: currentLocale === "pt" ? `O que é ${getLocalizedText(term.title)}?` : `What is ${getLocalizedText(term.title)}?`,
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: getLocalizedText(term.definition).replace(/\[([^\]]+)\]\([^)]+\)/g, "$1"),
+                },
+              })),
+            }
+          ]),
         }}
       />
       <div

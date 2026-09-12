@@ -83,19 +83,22 @@ export async function generateMetadata({
   // Limpar barras duplas no caso do path base ser apenas '/'
   const cleanPath = pathWithoutLocale === '/' ? '' : (pathWithoutLocale.startsWith('/') ? pathWithoutLocale : `/${pathWithoutLocale}`);
 
+  // URLs ABSOLUTOS para canonical e hreflang — Next.js com caminhos relativos
+  // remove a barra final da raiz, criando inconsistência com o sitemap.
   const languages: Record<string, string> = {};
   routing.locales.forEach((l) => {
-    // Se for o default locale e tivermos 'as-needed' configurado, a rota base não tem o prefixo do locale
     const prefix = (l === routing.defaultLocale && routing.localePrefix === 'as-needed') ? "" : `/${l}`;
-    languages[l] = `${prefix}${cleanPath}` || "/";
+    const langPath = `${prefix}${cleanPath}` || "/";
+    languages[l] = `${BRAND.siteUrl}${langPath}`;
   });
 
-  // O Canonical principal vai ser a rota do default locale (Inglês) se não tiver prefixo
   const currentPrefix = (locale === routing.defaultLocale && routing.localePrefix === 'as-needed') ? "" : `/${locale}`;
   const canonicalPath = `${currentPrefix}${cleanPath}` || "/";
+  const canonicalUrl = `${BRAND.siteUrl}${canonicalPath}`;
 
   return {
     metadataBase: new URL(BRAND.siteUrl),
+    applicationName: BRAND.name,
     title: {
       default: `${BRAND.name} — Análise Fundamental de Ações`,
       template: `%s · ${BRAND.name}`,
@@ -123,11 +126,14 @@ export async function generateMetadata({
       },
     },
     alternates: {
-      canonical: canonicalPath,
+      canonical: canonicalUrl,
       languages,
     },
     openGraph: {
-      title: `${BRAND.name} — Análise Fundamental de Ações`,
+      title: {
+        default: `${BRAND.name} — Análise Fundamental de Ações`,
+        template: `%s · ${BRAND.name}`,
+      },
       description:
         "Vê o valor que os outros não veem. Fundamentais de 10 anos, DCF e Analista IA, em português.",
       siteName: BRAND.name,
@@ -138,13 +144,16 @@ export async function generateMetadata({
           url: `${BRAND.siteUrl}/og-image.png`,
           width: 1200,
           height: 630,
-          alt: `${BRAND.name} — Análise Fundamental de Ações`,
+          alt: BRAND.name,
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${BRAND.name} — Análise Fundamental de Ações`,
+      title: {
+        default: `${BRAND.name} — Análise Fundamental de Ações`,
+        template: `%s · ${BRAND.name}`,
+      },
       description:
         "Vê o valor que os outros não veem. Fundamentais de 10 anos, DCF e Analista IA, em português.",
       images: [`${BRAND.siteUrl}/og-image.png`],
@@ -175,6 +184,14 @@ export default async function RootLayout({
   const messages = await getMessages();
   const cookieStore = await cookies();
 
+  // Obter o pathname real para conditionally renderizar o schema
+  const headersList = await headers();
+  const fullPathname = headersList.get("x-pathname") || "/";
+  const pathWithoutLocale = fullPathname.replace(new RegExp(`^/(${routing.locales.join('|')})(/|$)`), '/');
+  const cleanPath = pathWithoutLocale === '/' ? '' : (pathWithoutLocale.startsWith('/') ? pathWithoutLocale : `/${pathWithoutLocale}`);
+  const currentPrefix = (locale === routing.defaultLocale && routing.localePrefix === 'as-needed') ? "" : `/${locale}`;
+  const canonicalPath = `${currentPrefix}${cleanPath}` || "/";
+
   return (
     <html
       lang={locale}
@@ -186,40 +203,41 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://static2.finnhub.io" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://static2.finnhub.io" />
 
-        {/* Schema.org — WebSite: permite ao Google mostrar "BullValue" como Site
-            Name nos resultados de pesquisa (o nome pequeno por cima do URL).
-            Organization: fornece contexto de marca para rich results e Knowledge Panel. */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify([
-              {
+        {/* Schema.org — WebSite: Apenas na homepage, como exigido pelo Google!
+            Se estiver em todas as páginas, o Google ignora e o Site Name falha. */}
+        {cleanPath === "" && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
                 "@context": "https://schema.org",
-                "@type": "WebSite",
-                name: BRAND.name,
-                url: BRAND.siteUrl,
-                potentialAction: {
-                  "@type": "SearchAction",
-                  target: {
-                    "@type": "EntryPoint",
-                    urlTemplate: `${BRAND.siteUrl}/explore?q={search_term_string}`,
+                "@graph": [
+                  {
+                    "@type": "WebSite",
+                    name: BRAND.name,
+                    alternateName: ["The BullValue", "TheBullValue", "thebullvalue", "Bull Value"],
+                    url: `${BRAND.siteUrl}${canonicalPath}`,
+                    potentialAction: {
+                      "@type": "SearchAction",
+                      target: {
+                        "@type": "EntryPoint",
+                        urlTemplate: `${BRAND.siteUrl}/explore?q={search_term_string}`,
+                      },
+                      "query-input": "required name=search_term_string",
+                    },
                   },
-                  "query-input": "required name=search_term_string",
-                },
-              },
-              {
-                "@context": "https://schema.org",
-                "@type": "Organization",
-                name: BRAND.name,
-                url: BRAND.siteUrl,
-                logo: `${BRAND.siteUrl}${BRAND.logoSrc}`,
-                sameAs: [
-                  "https://www.instagram.com/thebullocracy",
+                  {
+                    "@type": "Organization",
+                    name: BRAND.name,
+                    url: BRAND.siteUrl,
+                    logo: `${BRAND.siteUrl}${BRAND.logoSrc}`,
+                    sameAs: ["https://www.instagram.com/thebullocracy"],
+                  },
                 ],
-              },
-            ]),
-          }}
-        />
+              }),
+            }}
+          />
+        )}
 
         {/* Tema anti-FOUC inlined para evitar render-blocking. */}
         <script

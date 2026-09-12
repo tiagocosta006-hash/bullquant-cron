@@ -90,7 +90,7 @@ const heroWords = (text: string, offset: number, cls?: string) =>
  * tratamento nenhum. Um `if (locale === "pt")` daria o mesmo resultado hoje e
  * partia-se no dia em que a copy PT mudasse.
  */
-const BRAND_SPLIT = 4; // "Bull" | "Value"
+const BRAND_SPLIT = 8; // "The Bull" | "Value"
 
 function heroLead(text: string) {
   if (!text.startsWith(BRAND.name)) return heroWords(text, 0);
@@ -143,33 +143,6 @@ export default async function LandingPage({
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
-      {
-        "@type": "WebSite",
-        name: BRAND.name,
-        alternateName: [BRAND.domain],
-        url: `${SITE_URL}/`,
-      },
-      {
-        "@type": "Organization",
-        "name": BRAND.name,
-        "url": BRAND.siteUrl,
-        "logo": `${SITE_URL}${BRAND.logoSrc}`,
-        "description": "Plataforma portuguesa de análise fundamental de ações com dados da SEC, DCF integrada e Analista IA.",
-        "foundingDate": "2024",
-        "parentOrganization": {
-          "@type": "Organization",
-          "name": BRAND.parent,
-          "sameAs": [
-            "https://www.instagram.com/thebullocracy/",
-            "https://www.tiktok.com/@thebullocracy"
-          ]
-        },
-        "contactPoint": {
-          "@type": "ContactPoint",
-          "email": "suporte@thebullvalue.com",
-          "contactType": "customer support"
-        }
-      },
       {
         "@type": "SoftwareApplication",
         "name": BRAND.name,

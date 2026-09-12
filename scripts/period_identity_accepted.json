@@ -60,6 +60,10 @@
     {
       "key": "LHX|2019|None|ANNUAL_MONTH_MISMATCH",
       "rationale": "LHX (fusão L3+Harris, 2019) mudou de calendário fiscal — período de transição; rótulos do stub não alinham num modelo de calendário único."
+    },
+    {
+      "key": "VRT|2016|2|QUARTER_MONTH_MISMATCH",
+      "rationale": "VRT nasceu de um SPAC em 2020; as linhas de 2016-2018 são filings-resto do registante anterior. Esta fecha a 25 de abril de 2016, uma data que não é fecho de trimestre em calendário nenhum, e a linha não traz demonstração de resultados — não há rótulo certo a atribuir-lhe."
     }
   ]
 }

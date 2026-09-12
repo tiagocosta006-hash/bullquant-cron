@@ -1046,6 +1046,19 @@ def build_fiscal_calendar(us_gaap: dict) -> dict | None:
         for e in extract_tag_entries(us_gaap, tag):
             if not is_annual_duration(e):
                 continue
+            # Uma duração de 12 meses dentro de um 10-Q são DOZE MESES MÓVEIS,
+            # não um fecho de exercício. A Amazon publica-os em cada trimestre
+            # (NetIncomeLoss de 2024-04-01 a 2025-03-31, form=10-Q), e sem este
+            # filtro o calendário fiscal dela ficava com QUATRO "fechos anuais"
+            # por ano. A âncora caía em março, e a partir daí todos os rótulos
+            # saíam desfasados de um trimestre: junho de 2025 ficava Q1 de 2026.
+            # Pior, a chave (fy,"Q4") passava a existir — era o período de março
+            # — e a síntese de Q4 via-a preenchida, nunca derivando o trimestre
+            # de dezembro que falta mesmo.
+            forma = (e.get("form") or "").upper()
+            periodo = (e.get("fp") or "").upper()
+            if forma.startswith("10-Q") or (periodo and periodo != "FY"):
+                continue
             try:
                 d = datetime.date.fromisoformat(e["end"])
             except (ValueError, KeyError, TypeError):
@@ -1119,6 +1132,16 @@ def discover_periods(us_gaap: dict, cal: dict, min_fy: int) -> tuple[set, dict, 
                 continue
             if "start" in e:
                 if is_annual_duration(e):
+                    # Mesma armadilha do build_fiscal_calendar: 12 meses dentro
+                    # de um 10-Q são móveis, não um exercício. Deixá-los passar
+                    # criava um (fy,"FY") fantasma — a Amazon ficava com uma
+                    # linha anual de 2026 fechada a 31 de março e sem receita
+                    # nenhuma, porque nenhum facto anual a sério casa com essa
+                    # data. Não é trimestre nem ano: ignora-se de todo.
+                    forma = (e.get("form") or "").upper()
+                    periodo = (e.get("fp") or "").upper()
+                    if forma.startswith("10-Q") or (periodo and periodo != "FY"):
+                        continue
                     is_ann = True
                 else:
                     days = (d - datetime.date.fromisoformat(e["start"])).days
@@ -1928,6 +1951,62 @@ def apply_fx_conversion(company_currency: str, periods_data: list[dict]) -> bool
 
 
 
+def realinhar_rotulos_de_calendario(periods_data: list[dict]) -> int:
+    """
+    Ano e trimestre fiscais de quem fecha o ano em dezembro.
+
+    Os campos `fy`/`fp` das companyfacts descrevem a FILING, não o período que
+    a filing reporta. Na Amazon esse desencontro valia um trimestre inteiro de
+    desfasamento: o período que acaba a 30 de junho de 2025 ficava etiquetado
+    Q1 de 2026, e o ano fechado a 31 de dezembro de 2025 ficava FY2026.
+
+    Quando o ano fiscal coincide com o civil, o rótulo não precisa de ser
+    inferido — lê-se da data. Recuar 15 dias antes de ler o ano e o trimestre
+    absorve os calendários de 52/53 semanas, em que o trimestre fecha uns dias
+    dentro do mês seguinte: a J&J fechou o Q1 de 2016 a 3 de abril, e ler o mês
+    diretamente far-lhe-ia Q2.
+
+    Empresas com fecho fora de dezembro (Apple em setembro, Walmart em janeiro)
+    ficam de fora: aí o ano fiscal e o civil divergem de propósito, e a data
+    sozinha não diz qual é qual.
+    """
+    anuais = [p for p in periods_data
+              if p.get("periodType") == "ANNUAL" and p.get("periodEnd")]
+    if len(anuais) < 3:
+        return 0
+
+    meses = [int(str(p["periodEnd"])[5:7]) for p in anuais]
+    if max(set(meses), key=meses.count) != 12:
+        return 0
+
+    novos = []
+    for p in periods_data:
+        pe = p.get("periodEnd")
+        if not pe:
+            # Sem data não há rótulo a derivar, e deixar esta linha com o
+            # rótulo antigo ao lado das realinhadas convidava a uma colisão.
+            return 0
+        d = (datetime.date.fromisoformat(str(pe)[:10])
+             - datetime.timedelta(days=15))
+        q = ((d.month - 1) // 3 + 1) if p.get("periodType") == "QUARTERLY" else None
+        novos.append((p, d.year, q))
+
+    # Duas linhas a cair na mesma chave única violariam
+    # @@unique([companyId, periodType, fiscalYear, fiscalQuarter]). Abortar em
+    # bloco é melhor do que realinhar metade e deixar a empresa incoerente.
+    chaves = [(p["periodType"], fy, q) for p, fy, q in novos]
+    if len(set(chaves)) != len(chaves):
+        return 0
+
+    mudadas = 0
+    for p, fy, q in novos:
+        if p.get("fiscalYear") != fy or p.get("fiscalQuarter") != q:
+            p["fiscalYear"] = fy
+            p["fiscalQuarter"] = q
+            mudadas += 1
+    return mudadas
+
+
 def corrigir_escala_de_dividendos(periods_data: list[dict]) -> int:
     """
     Dividendo por ação numa unidade que não é a das outras linhas da empresa.
@@ -2279,9 +2358,22 @@ def synthesize_q4(periods: set, period_ends: dict, period_filed: dict,
 
         derived: dict = {}
         for field in SUBTRACTIVE:
-            if existing.get(field) is not None:
-                continue  # extração EDGAR é fonte de verdade
             fv = fy_dur.get(field)
+            ja_extraido = existing.get(field)
+            # Um "Q4" idêntico ao exercício inteiro não é um trimestre: é o
+            # valor anual a vazar pela data de fecho, que é a MESMA nos dois
+            # períodos (a Oracle fecha o ano e o Q4 a 31 de maio). A receita do
+            # Q4 de 2022 ficava em 42.440 M — o ano completo — e o gráfico
+            # trimestral dava um pico de 4× em todos os anos afetados.
+            #
+            # Nestes casos a extração não é fonte de verdade nenhuma: não há
+            # facto trimestral, há um facto anual mal atribuído. Trata-se como
+            # ausente para que a subtração FY − Q1 − Q2 − Q3 o substitua.
+            if (ja_extraido is not None and fv is not None and fv != 0
+                    and abs(ja_extraido - fv) <= abs(fv) * 1e-6):
+                ja_extraido = None
+            if ja_extraido is not None:
+                continue  # extração EDGAR é fonte de verdade
             vals = [d.get(field) for d in q_durs]
             if fv is None or any(v is None for v in vals):
                 continue
@@ -2534,6 +2626,10 @@ def process_company(conn, company: dict, dry_run: bool = False,
                 conn.commit()
             except Exception:
                 conn.rollback()
+
+    n_rot = realinhar_rotulos_de_calendario(rows)
+    if n_rot:
+        print(f"    {n_rot} rótulo(s) de período realinhados pelo calendário civil")
 
     n_div = corrigir_escala_de_dividendos(rows)
     if n_div:

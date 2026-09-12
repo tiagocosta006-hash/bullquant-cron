@@ -126,6 +126,26 @@ DURATION_TAGS = {
         # parciais), RevenueAndOperatingIncome (semântica IFRS incerta),
         # *ProForma* (não são resultados reais).
     ],
+    # As duas metades do custo de uma seguradora que também vende produtos,
+    # extraídas à parte para poderem ser SOMADAS. A CVS tem 221,2 mM de custo
+    # de produtos (farmácia) E 125,5 mM de sinistros (seguros): são custos de
+    # segmentos diferentes, ambos acima da linha do lucro bruto. Ver o bloco
+    # que os junta em build_row.
+    #
+    # O BenefitsLossesAndExpenses fica de FORA das duas listas de propósito:
+    # é um agregado que já contém os sinistros (Humana: 127,0 contra 110,8) e
+    # somá-lo duplicaria a mesma despesa.
+    "policyholderClaims": [
+        "PolicyholderBenefitsAndClaimsIncurredHealthCare",
+        "PolicyholderBenefitsAndClaimsIncurredNet",
+    ],
+    "costOfProducts": [
+        "CostOfGoodsAndServicesSold",
+        "CostOfGoodsSold",
+        "CostOfServices",
+        "CostOfSales",
+        "CostOfRevenue",
+    ],
     "costOfRevenue": [
         # As seguradoras vêm PRIMEIRO, e de propósito. O custo de uma
         # seguradora de saúde são os encargos médicos — à volta de 75-85 % dos
@@ -136,8 +156,12 @@ DURATION_TAGS = {
         # CostOfGoodsAndServicesSold residual de 367 milhões e a plataforma
         # mostrava 95 % de margem bruta numa seguradora.
         #
-        # Estar no topo não afecta mais ninguém: quem não é seguradora não
-        # publica estas etiquetas, e a procura segue para as seguintes.
+        # Quem não é seguradora não publica estas etiquetas, e a procura segue
+        # para as seguintes. Quem publica AS DUAS — a CVS, a Cigna, a
+        # UnitedHealth — é que ficava mal servido por esta ordem: escolhiam-se
+        # os sinistros e ignorava-se o custo dos produtos, que na CVS é o maior
+        # dos dois. Esse caso deixou de se resolver pela ordem da lista e
+        # passou a somar-se em build_row.
         "PolicyholderBenefitsAndClaimsIncurredHealthCare",
         "PolicyholderBenefitsAndClaimsIncurredNet",
         "BenefitsLossesAndExpenses",
@@ -1360,6 +1384,37 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
     # lucro bruto para cima da receita e partia a identidade GP.
     if cost_of_rev is not None and cost_of_rev < 0:
         cost_of_rev = None
+
+    # Seguradoras que também vendem produtos: o custo é a SOMA das duas linhas.
+    #
+    # A lista de tags escolhe UMA, com os sinistros no topo por causa da
+    # Centene, que é seguradora pura. Mas a CVS e a Cigna reportam as duas
+    # coisas, e ficar-se pela primeira dava 69% e 88% de margem bruta em
+    # empresas cujo setor inteiro trabalha abaixo dos 20%.
+    #
+    # Os dois guardas tornam a soma verificável: não pode passar a receita, e
+    # o lucro bruto que dela resulta não pode ficar abaixo do resultado
+    # operacional — isso significaria despesas operacionais negativas.
+    sinistros = dur.get("policyholderClaims")
+    custo_produtos = dur.get("costOfProducts")
+    if (sinistros and custo_produtos and sinistros > 0 and custo_produtos > 0
+            and revenue is not None and revenue > 0
+            # AS DUAS metades têm de ser materiais. Sem esta condição a regra
+            # apanhava bancos: o Citigroup tagga 87 M de sinistros (0,1% de 72,4
+            # mil milhões de receita) ao lado de um custo de serviços residual, e
+            # a soma das duas migalhas dava um custo grande que chegue para
+            # escapar ao guarda dos 95% — 90% de margem bruta num banco, que é
+            # precisamente o que esse guarda existe para apagar.
+            #
+            # Também protege a seguradora pura: na Centene o custo de produtos é
+            # 1,5% da receita, a soma não se aplica, e ficam os sinistros
+            # sozinhos, que é o custo dela.
+            and sinistros >= 0.05 * revenue
+            and custo_produtos >= 0.05 * revenue):
+        soma = sinistros + custo_produtos
+        op_prov = dur.get("operatingIncome")
+        if soma < revenue and (op_prov is None or revenue - soma >= op_prov):
+            cost_of_rev = soma
     if gross_profit is None and revenue is not None and cost_of_rev is not None:
         gross_profit = revenue - cost_of_rev
 
@@ -2331,6 +2386,7 @@ def synthesize_q4(periods: set, period_ends: dict, period_filed: dict,
                   dur_map: dict, inst_map: dict) -> list[int]:
     SUBTRACTIVE = [
         "revenue", "costOfRevenue", "grossProfit", "operatingExpenses",
+        "policyholderClaims", "costOfProducts",
         "operatingIncome", "interestExpense", "taxExpense", "netIncome",
         "operatingCashFlow", "capex", "researchAndDevelopment",
         "sellingGeneralAndAdmin", "ebitda", "depreciationAndAmortization",

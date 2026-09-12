@@ -102,7 +102,12 @@ async function queryCompanies(
   const sectorFilter = sector ? Prisma.sql`AND c.sector = ${sector}` : Prisma.empty;
   const etfFilter = isEtf 
     ? Prisma.sql`AND c.exchange = 'MACRO' AND c.ticker NOT LIKE '^%'`
-    : Prisma.sql`AND (c.exchange IS NULL OR c.exchange != 'MACRO')`;
+    // O `^` exclui índices (^GSPC, ^DJI, ^VIX): estão em `companies` para
+    // alimentar gráficos de contexto, não são empresas. Não têm ações em
+    // circulação nem fundamentais, por isso caíam no fim do Market Cap — mas
+    // nas Maiores Subidas/Descidas ordena-se por variação, e aí um índice
+    // entrava na grelha ao lado da Dell.
+    : Prisma.sql`AND (c.exchange IS NULL OR c.exchange != 'MACRO') AND c.ticker NOT LIKE '^%'`;
 
   const rows = await prisma.$queryRaw<RawRow[]>`
     SELECT

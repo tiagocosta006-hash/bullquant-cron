@@ -16,6 +16,12 @@ export async function GET(request: Request) {
         // autocomplete e levava a uma página sem dados — o screener e o
         // /explore já filtravam, só a pesquisa é que não.
         isActive: true,
+        // Índices (^GSPC, ^IXIC, ^VIX) vivem em `companies` para alimentar
+        // gráficos de contexto, mas não são empresas: procurar "Nasdaq"
+        // devolvia o ^IXIC e o clique levava a uma página de ação com todos
+        // os blocos de fundamentais a N/A. Com a aba Macro fora, não há
+        // sequer destino onde um índice faça sentido.
+        NOT: { ticker: { startsWith: '^' } },
         OR: [
           { ticker: { contains: query, mode: 'insensitive' } },
           { name: { contains: query, mode: 'insensitive' } },

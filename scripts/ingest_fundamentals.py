@@ -1444,6 +1444,53 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         if revenue is not None and revenue > 0 and gross_profit >= 0.999 * revenue:
             gross_profit = None
 
+    # Despesas operacionais que JÁ INCLUEM o custo da receita.
+    #
+    # A identidade é `lucro bruto − despesas operacionais = resultado
+    # operacional`. Quando não fecha, mas fecha com a RECEITA no lugar do lucro
+    # bruto, está provado que as despesas do emitente já trazem o custo lá
+    # dentro — e o custo da receita extraído é então um subconjunto que não
+    # serve para nada.
+    #
+    # A Exelon é o caso limpo: receita 35 978, despesas 32 143, resultado
+    # operacional 3 891. Receita menos despesas dá 3 835, que bate. Mas o lucro
+    # bruto (30 987, derivado de um custo de 4 991) menos despesas dá -1 156,
+    # que não bate por 5 mil milhões. Resultado: 86 % de margem bruta numa
+    # eléctrica, onde o combustível é o maior custo que existe.
+    #
+    # A Apple passa no teste e fica intacta: 180 683 de lucro bruto menos
+    # 57 467 de despesas dá exactamente os 123 216 de resultado operacional.
+    #
+    # Eram 17 utilities, 13 industriais e 14 imobiliárias com margens acima de
+    # 85 %.
+    # Margem bruta de 95%+ que NINGUÉM reportou.
+    #
+    # A UPS aparecia com 96%, a Southern com 96%, o Citigroup com 100%. Nenhuma
+    # das três taggou lucro bruto: o valor foi derivado de um custo residual que
+    # a tag XBRL apanhou por acaso — 87 M de "custo" contra 85.225 M de receita
+    # no caso do Citigroup. Uma transportadora não tem margem bruta de 96%, e um
+    # banco não tem margem bruta nenhuma: o conceito não se aplica.
+    #
+    # A regra é deliberadamente cega ao setor, porque o setor não é o problema —
+    # o problema é derivar uma grandeza a partir de um custo que não é o custo.
+    # Quem reporta a rubrica sobrevive: o emitente que taggou GrossProfit está a
+    # afirmá-lo, e aí 97% é uma afirmação dele e não uma inferência nossa.
+    #
+    # Custa algumas margens verdadeiras (há REITs triple-net genuinamente nos
+    # 99%), e é um preço que se paga: um N/A é honesto, 96% na UPS é falso.
+    if (not gp_reportado and gross_profit is not None
+            and revenue is not None and revenue > 0
+            and gross_profit >= 0.95 * revenue):
+        gross_profit = None
+
+    if (gross_profit is not None and op_expenses is not None
+            and op_income is not None and revenue is not None and revenue > 0):
+        tol = 0.02 * revenue
+        fecha_com_lucro_bruto = abs(gross_profit - op_expenses - op_income) <= tol
+        fecha_com_receita = abs(revenue - op_expenses - op_income) <= tol
+        if fecha_com_receita and not fecha_com_lucro_bruto:
+            gross_profit = None
+
     net_income = dur.get("netIncome")
     tax_expense = dur.get("taxExpense")
     total_assets = inst.get("totalAssets")
@@ -1879,6 +1926,63 @@ def apply_fx_conversion(company_currency: str, periods_data: list[dict]) -> bool
         print(f"    Erro FX Frankfurter {company_currency}→USD: {e}")
         return False
 
+
+
+def descartar_custo_incoerente(periods_data: list[dict]) -> int:
+    """
+    Custo das vendas que contradiz a própria empresa.
+
+    A Deere reporta custo a ~75% da receita em quase todos os períodos e a 0,6%
+    em oito — não mudou de negócio, mudou de tag XBRL. O mesmo acontece à UPS,
+    à Southern, à Regeneron e a mais uma dúzia, e daí saíam margens brutas de
+    99% em empresas industriais.
+
+    Um limiar global não serve de discriminador: a Booking tem custo a 2% da
+    receita em TODOS os períodos, e aí os 2% são verdade. O que distingue um
+    caso do outro não é o valor, é a incoerência — por isso a referência é a
+    mediana da própria empresa.
+
+    Só se pronuncia sobre empresas que TÊM um custo com expressão (mediana
+    acima de 10% da receita). Abaixo disso não há norma contra a qual comparar,
+    e calar-se é melhor do que adivinhar.
+    """
+    racios = []
+    for p in periods_data:
+        rev, cogs = p.get("revenue"), p.get("costOfRevenue")
+        if rev and cogs and rev > 0 and cogs > 0:
+            racios.append(cogs / rev)
+
+    # Menos de seis períodos não fazem uma norma — uma mediana de três valores
+    # muda de sítio com uma linha errada.
+    if len(racios) < 6:
+        return 0
+
+    racios.sort()
+    mediana = racios[len(racios) // 2]
+    if mediana < 0.10:
+        return 0
+
+    limite = mediana / 5
+    descartados = 0
+    for p in periods_data:
+        rev, cogs = p.get("revenue"), p.get("costOfRevenue")
+        if not (rev and cogs and rev > 0 and cogs > 0):
+            continue
+        if cogs / rev >= limite:
+            continue
+
+        gp = p.get("grossProfit")
+        # O lucro bruto só cai se tiver SIDO DERIVADO deste custo. Um lucro
+        # bruto que o emitente taggou à parte é fonte primária e sobrevive ao
+        # custo que o acompanhava.
+        derivado = gp is not None and abs(gp - (rev - cogs)) <= 0.01 * rev
+        p["costOfRevenue"] = None
+        if derivado:
+            p["grossProfit"] = None
+            p["grossMargin"] = None
+        descartados += 1
+
+    return descartados
 
 
 def corrigir_escala_de_acoes(periods_data: list[dict]) -> int:
@@ -2356,6 +2460,10 @@ def process_company(conn, company: dict, dry_run: bool = False,
                 conn.commit()
             except Exception:
                 conn.rollback()
+
+    n_custo = descartar_custo_incoerente(rows)
+    if n_custo:
+        print(f"    {n_custo} linha(s) com custo das vendas fora da norma da empresa — descartado")
 
     # Antes dos splits: uma linha com a escala trocada envenenaria a deteção
     # de degraus, que é toda feita por rácios entre períodos consecutivos.

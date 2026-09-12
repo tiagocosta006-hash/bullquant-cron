@@ -17,6 +17,7 @@ import { SHARE_PALETTE } from "@/lib/shareTheme"
 import { CARD_H, CARD_W, ChartShareCard, type SharePrice } from "./ChartShareCard"
 import type { ChartConfig } from "./DecisionChart"
 import { useShareCompany } from "./StockShareContext"
+import { obterPrecoAoVivo } from "@/lib/precoAoVivo"
 
 type ChartShareButtonProps = {
   title: string
@@ -94,13 +95,12 @@ export function ChartShareButton({
   useEffect(() => {
     if (!open || !ticker) return
     let cancelled = false
-    fetch(`/api/price/${ticker}`)
-      .then((res) => (res.ok ? res.json() : null))
+    obterPrecoAoVivo(ticker)
       .then((json) => {
         if (cancelled) return
         setPrice(
-          json
-            ? { currentPrice: json.currentPrice, change: json.change, changePercent: json.changePercent }
+          json && json.currentPrice !== null
+            ? { currentPrice: json.currentPrice, change: json.change ?? 0, changePercent: json.changePercent ?? 0 }
             : null,
         )
       })

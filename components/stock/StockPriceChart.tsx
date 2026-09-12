@@ -13,6 +13,7 @@ import {
 } from "recharts"
 import { TrendingUp, TrendingDown, Download } from "lucide-react"
 import { exportSvgToPng } from "@/lib/exportChart"
+import { obterPrecoAoVivo } from "@/lib/precoAoVivo"
 
 type PricePoint = {
   date: string
@@ -37,18 +38,18 @@ export function StockPriceChart({ ticker, currencySymbol = "$" }: { ticker: stri
   useEffect(() => {
     async function fetchPrices() {
       try {
-        const [histRes, liveRes] = await Promise.all([
+        const [histRes, live] = await Promise.all([
           // period=max → histórico completo (até 10 anos onde existe); a tab MÁX mostra tudo
           fetch(`/api/prices/${ticker}?period=max`),
-          fetch(`/api/price/${ticker}`)
+          obterPrecoAoVivo(ticker)
         ])
         
         if (histRes.ok) {
           const data: PricePoint[] = await histRes.json()
           
           // Se o Finnhub estiver a funcionar, injetamos o preço AO VIVO no final do gráfico histórico!
-          if (liveRes.ok) {
-            const liveData = await liveRes.json()
+          {
+            const liveData = live
             if (liveData && liveData.currentPrice && data.length > 0) {
               const lastHistoricalDate = new Date(data[data.length - 1].date)
               const today = new Date()

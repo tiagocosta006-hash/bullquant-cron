@@ -8,6 +8,7 @@ import { useTranslations, useLocale } from "next-intl"
 import { Link, useRouter } from '@/i18n/routing';
 import { getCurrencySymbol } from "@/lib/finance/format"
 import { CompanyLogo } from "@/components/ui/CompanyLogo"
+import { obterPrecoAoVivo } from "@/lib/precoAoVivo"
 
 type CompanyProp = {
   ticker: string;
@@ -38,13 +39,14 @@ export function StockHeader({ company, shareComponent, initialPriceData = null }
 
   const fetchPrice = async () => {
     try {
-      const res = await fetch(`/api/price/${company.ticker}`)
-      if (res.ok) {
-        const data = await res.json()
+      const data = await obterPrecoAoVivo(company.ticker)
+      // Sem preço não se mexe no que está no ecrã: escrever zeros em cima de
+      // uma cotação válida é pior do que deixá-la envelhecer um minuto.
+      if (data && data.currentPrice !== null) {
         setPriceData({
           currentPrice: data.currentPrice,
-          change: data.change,
-          changePercent: data.changePercent,
+          change: data.change ?? 0,
+          changePercent: data.changePercent ?? 0,
         })
         setLastUpdate(new Date())
       }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react"
 import { useTranslations } from "next-intl"
+import { obterPrecoAoVivo } from "@/lib/precoAoVivo"
 import type { Fundamental } from "@prisma/client"
 
 type StockSnapshotProps = {
@@ -84,11 +85,8 @@ export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$", init
   useEffect(() => {
     const fetchPrice = async () => {
       try {
-        const res = await fetch(`/api/price/${ticker}`)
-        if (res.ok) {
-          const data = await res.json()
-          setPrice(data.currentPrice)
-        }
+        const data = await obterPrecoAoVivo(ticker)
+        if (data) setPrice(data.currentPrice)
       } catch (err) {
         console.error("Failed to fetch price for snapshot", err)
       } finally {

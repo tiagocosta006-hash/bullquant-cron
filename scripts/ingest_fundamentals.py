@@ -1296,6 +1296,25 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
             if abs(derived_eps) < 100_000:
                 eps_g = derived_eps
 
+    # A verificação acima só entra com lucro acima de 10 milhões — e bem, que
+    # abaixo disso o arredondamento do EPS domina. Só que é exactamente aí que
+    # se escondiam os piores: a DELL no 4T de 2022 tinha EPS de -40 000 com 2
+    # milhões de lucro, e a VTRS -9 071 com menos de um milhão.
+    #
+    # Estes não precisam de comparação de rácios: -40 000 dólares por acção com
+    # 791 milhões de acções implica um prejuízo de 31 BILIÕES, mais do que o PIB
+    # de qualquer país. Um valor destes não é uma empresa a ter um mau
+    # trimestre, é uma etiqueta com a escala trocada.
+    if eps_g is not None and abs(eps_g) > 5_000:
+        substituto = None
+        if ni_g is not None and shares is not None and shares >= 100_000:
+            candidato = ni_g / shares
+            if abs(candidato) < 5_000:
+                substituto = candidato
+        # Sem forma de corroborar fica N/A. O maior EPS real do índice é o da
+        # NVR, à volta de 500 dólares — nada legítimo se aproxima dos 5 000.
+        eps_g = substituto
+
     capex_raw = dur.get("capex")
     capex = abs(capex_raw) if capex_raw is not None else None
     op_cf = dur.get("operatingCashFlow")

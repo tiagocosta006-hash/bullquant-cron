@@ -25,10 +25,23 @@ model User {
   watchlists        Watchlist[]
 
   // Paddle Billing Fields
+  // SUSPENSO: o acesso passou a ser concedido pela comunidade no Whop (ver
+  // abaixo). Os campos ficam porque não há ninguém a pagar por aqui — os
+  // planos PRO atuais foram definidos à mão — e apagá-los seria perder a
+  // integração se algum dia se voltar ao checkout próprio.
   paddleCustomerId     String? @unique
   paddleSubscriptionId String? @unique
   paddleStatus         String?
   paddlePriceId        String?
+
+  // Whop — a fonte de verdade do acesso pago.
+  // O plano continua a ser lido de `plan` em todo o lado: o webhook do Whop
+  // limita-se a escrevê-lo. Assim as páginas gated não precisam de saber que
+  // o Whop existe, e trocar de fornecedor volta a ser mudar uma rota só.
+  whopUserId       String? @unique
+  whopMembershipId String? @unique
+  whopStatus       String?
+  whopProductId    String?
 
   @@map("users")
 }

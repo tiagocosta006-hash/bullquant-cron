@@ -62,6 +62,20 @@ export function PricingCards({ userEmail, userId }: PricingCardsProps = {}) {
   }, [paddle, priceId]);
 
   const handleCheckout = () => {
+    // Checkout próprio SUSPENSO. Nesta fase o acesso vem da comunidade privada
+    // no Whop: quem tem membership ativa recebe PRO pelo webhook
+    // (app/api/webhooks/whop), e não há checkout a fazer aqui. Mandar alguém
+    // ao Paddle criaria uma segunda fonte de verdade para o mesmo campo `plan`
+    // — um cancelamento de um lado despromovia quem paga do outro.
+    //
+    // O código do Paddle fica intacto: ninguém paga por aqui (os planos PRO
+    // atuais foram definidos à mão) e reativar é apagar este bloco.
+    const whopUrl = process.env.NEXT_PUBLIC_WHOP_URL;
+    if (whopUrl) {
+      window.open(whopUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+
     if (!paddle || !priceId) return;
 
     if (!userId) {

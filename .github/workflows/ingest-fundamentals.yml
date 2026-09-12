@@ -55,6 +55,18 @@ jobs:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
         run: python scripts/adjust_splits.py
 
+      # A API companyfacts da SEC descarta factos dimensionados, e empresas de
+      # classes múltiplas (Visa A/B/C, Constellation A/B) taggam as ações por
+      # classe — ficam sem nº de ações NENHUM, logo sem capitalização, logo no
+      # fundo da lista de maiores empresas. Preenche com o Finnhub, validando
+      # a unidade contra a capitalização que o próprio Finnhub declara.
+      # Depois da re-ingestão, que apaga e reescreve as linhas da empresa.
+      - name: Backfill shares outstanding (multi-class)
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+        run: python scripts/backfill_shares.py
+
       # Gate de IDENTIDADES CONTABILÍSTICAS, aqui e não só no validate-database
       # semanal: uma ingestão má ficava até 7 dias a apodrecer antes de alguém
       # saber. Valida o que ACABOU de ser escrito, no momento em que ainda se

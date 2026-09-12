@@ -2,6 +2,16 @@ name: Ingest Fundamentals
 
 on:
   workflow_dispatch:
+    inputs:
+      tickers:
+        description: "Lista separada por vírgulas. Vazio = seleção event-driven normal."
+        required: false
+        default: ""
+      refresh_cache:
+        description: "Ir à SEC em vez de usar a cache local (mais lento, traz filings novas)"
+        type: boolean
+        required: false
+        default: false
   schedule:
     - cron: "0 3 * * *" # diário 3h UTC
 
@@ -22,10 +32,21 @@ jobs:
       - name: Install dependencies
         run: pip install -r scripts/requirements.txt
 
+      # A seleção normal é event-driven: só toca em quem reportou há pouco ou
+      # não é atualizado há mais de 95 dias. Isso é o correto no dia a dia, mas
+      # não repara histórico — uma linha de 2016 com um defeito de extração
+      # nunca mais é revisitada. Os inputs existem para essas reparações.
       - name: Run ingest
         env:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
-        run: python scripts/ingest_fundamentals.py
+          TICKERS: ${{ github.event.inputs.tickers }}
+          REFRESH: ${{ github.event.inputs.refresh_cache }}
+        run: |
+          ARGS=""
+          [ -n "$TICKERS" ] && ARGS="$ARGS --tickers $TICKERS"
+          [ "$REFRESH" = "true" ] && ARGS="$ARGS --refresh-cache"
+          echo "ingest_fundamentals.py$ARGS"
+          python scripts/ingest_fundamentals.py $ARGS
 
       # A re-ingestão repõe o histórico de shares na base pré-split do EDGAR
       # (só reapresenta 2-3 anos comparativos) — ajustar sempre a seguir.

@@ -118,3 +118,7 @@ scripts/backups/
 /out.json
 /deploy_log.txt
 /chunks_swot/
+
+# Saída do esbuild (scripts/ingest_news.ts → dist/). É artefacto de
+# build: 95 mil linhas geradas que tornavam qualquer PR irrevisível.
+dist/

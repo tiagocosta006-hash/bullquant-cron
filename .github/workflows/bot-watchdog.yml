@@ -1,0 +1,117 @@
+name: Discord Bot Watchdog
+
+# Vive AQUI, fora da Fly, de propósito: um alarme alojado no mesmo sítio que o
+# bot morre com ele. O GitHub Actions é o agendador que já corre a ingestão.
+#
+# O bot expõe /health que devolve 503 enquanto não estiver ligado ao gateway do
+# Discord, por isso este check distingue "processo vivo" de "bot realmente
+# ligado" — foi essa diferença que deixou o bot em baixo 26 horas sem ninguém
+# saber.
+
+on:
+  schedule:
+    - cron: "*/10 * * * *" # a cada 10 minutos
+  workflow_dispatch:
+    inputs:
+      simular_falha:
+        description: "Forçar o caminho de alarme, para testar o aviso"
+        required: false
+        default: "false"
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: bot-watchdog
+  cancel-in-progress: false
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      HEALTH_URL: https://bullvalue-bot-prod.fly.dev/health
+      DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+      DISCORD_REVIEW_CHANNEL_ID: ${{ secrets.DISCORD_REVIEW_CHANNEL_ID }}
+      DISCORD_ADMIN_USER_IDS: ${{ secrets.DISCORD_ADMIN_USER_IDS }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      SIMULAR: ${{ github.event.inputs.simular_falha }}
+      ISSUE_TITLE: "🚨 Bot de Discord em baixo"
+    steps:
+      - name: Verificar o bot e avisar no Discord
+        run: |
+          set -u
+
+          # Avisa no canal de revisão com o token do BOT via REST. Isto funciona
+          # mesmo com o bot em baixo: a API REST do Discord não depende da
+          # WebSocket do gateway que o bot usa.
+          avisar_discord() {
+            local texto="$1"
+            if [ -z "${DISCORD_BOT_TOKEN:-}" ] || [ -z "${DISCORD_REVIEW_CHANNEL_ID:-}" ]; then
+              echo "::warning::Sem DISCORD_BOT_TOKEN/DISCORD_REVIEW_CHANNEL_ID — aviso não enviado"
+              return
+            fi
+            # Faz ping a cada admin da allowlist para gerar notificação a sério.
+            # `allowed_mentions.parse: []` com `users` explícito garante que só
+            # estes ids são mencionáveis — nunca um @everyone por acidente.
+            jq -n --arg texto "$texto" --arg ids "${DISCORD_ADMIN_USER_IDS:-}" '
+              ($ids | split(",") | map(gsub("^\\s+|\\s+$";"")) | map(select(length > 0))) as $u
+              | { content: (($u | map("<@" + . + ">") | join(" ")) + " " + $texto),
+                  allowed_mentions: { parse: [], users: $u } }
+            ' > /tmp/payload.json
+
+            curl -sS --max-time 20 -X POST \
+              -H "Authorization: Bot ${DISCORD_BOT_TOKEN}" \
+              -H "Content-Type: application/json" \
+              -H "User-Agent: DiscordBot (https://thebullvalue.com, 1.0)" \
+              --data @/tmp/payload.json \
+              "https://discord.com/api/v10/channels/${DISCORD_REVIEW_CHANNEL_ID}/messages" \
+              -o /tmp/resp.json -w 'discord HTTP %{http_code}\n'
+          }
+
+          # O issue aberto é o estado: garante UM aviso por incidente em vez de
+          # um a cada 10 minutos enquanto o bot estiver em baixo.
+          issue_aberto() {
+            gh issue list --repo "$GITHUB_REPOSITORY" --state open \
+              --search "\"$ISSUE_TITLE\" in:title" \
+              --json number --jq '.[0].number // empty'
+          }
+
+          if [ "${SIMULAR:-false}" = "true" ]; then
+            CODE="000"; BODY="(simulação forçada via workflow_dispatch)"
+            echo "::notice::Simulação de falha pedida"
+          else
+            BODY="$(curl -sS --max-time 25 -o /tmp/health.txt -w '%{http_code}' "$HEALTH_URL" 2>&1)" || BODY="000"
+            CODE="$BODY"
+            BODY="$(cat /tmp/health.txt 2>/dev/null | head -c 300)"
+          fi
+
+          EXISTING="$(issue_aberto)"
+
+          if [ "$CODE" = "200" ]; then
+            echo "✓ bot OK — $BODY"
+            if [ -n "$EXISTING" ]; then
+              echo "Bot recuperou — a fechar o issue #${EXISTING}"
+              avisar_discord "✅ **O bot voltou a responder.** \`/health\` devolveu 200. Incidente fechado."
+              gh issue close "$EXISTING" --repo "$GITHUB_REPOSITORY" \
+                --comment "Recuperado em $(date -u +'%Y-%m-%d %H:%M UTC'). /health devolveu 200."
+            fi
+            exit 0
+          fi
+
+          echo "::error::Bot em baixo — HTTP ${CODE}"
+
+          if [ -n "$EXISTING" ]; then
+            echo "Incidente #${EXISTING} já aberto — só a comentar, sem repetir o aviso no Discord."
+            gh issue comment "$EXISTING" --repo "$GITHUB_REPOSITORY" \
+              --body "Ainda em baixo em $(date -u +'%Y-%m-%d %H:%M UTC') — HTTP \`${CODE}\`. Run: ${RUN_URL}"
+          else
+            avisar_discord "$(printf '🚨 **O bot de Discord está em baixo.**\n`%s` devolveu HTTP `%s`.\nAs notícias não estão a ser publicadas e os botões de aprovação não respondem.\nLogs: `fly logs -a bullvalue-bot-prod`\nRun: %s' "$HEALTH_URL" "$CODE" "$RUN_URL")"
+            gh issue create --repo "$GITHUB_REPOSITORY" \
+              --title "$ISSUE_TITLE" \
+              --body "$(printf '**Endpoint:** `%s`\n**HTTP:** `%s`\n**Resposta:**\n```\n%s\n```\n\n**Diagnóstico:**\n```\nfly status -a bullvalue-bot-prod\nfly logs -a bullvalue-bot-prod\n```\n\n**Run:** %s' "$HEALTH_URL" "$CODE" "$BODY" "$RUN_URL")"
+          fi
+
+          exit 1

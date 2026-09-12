@@ -259,8 +259,44 @@ export async function GET(
       }
     }
 
+    // ── Emagrecer a resposta ────────────────────────────────────────────────
+    //
+    // A série vinha com 2 482 pontos diários e 417 KB para a AAPL. Dois
+    // desperdícios, ambos medidos:
+    //
+    // 1. Precisão a mais. O P/E ia com treze casas decimais
+    //    (16.936526946107783) para ser desenhado com duas. Arredondar ao que
+    //    se mostra corta 25 % sem perder um único ponto.
+    //
+    // 2. Pontos a mais. Um gráfico tem ~800 px de largura; acima disso os
+    //    pontos caem uns por cima dos outros. Cinco em cada seis eram
+    //    invisíveis. O último ponto é sempre preservado — é o valor de hoje,
+    //    e perdê-lo mudava o número que o utilizador lê.
+    //
+    // Não se removem campos: os três consumidores (ValuationMultiples,
+    // PriceVsEarnings, PeerComparisonDashboard) usam conjuntos diferentes.
+    const ALVO_PONTOS = 800
+    const passo = Math.max(1, Math.ceil(results.length / ALVO_PONTOS))
+
+    const enxuto = results
+      .filter((_, i) => i % passo === 0 || i === results.length - 1)
+      .map((r) => {
+        const n = (v: unknown, casas: number) =>
+          typeof v === "number" && Number.isFinite(v)
+            ? Number(v.toFixed(casas))
+            : v
+        return {
+          ...r,
+          price: n(r.price, 2),
+          epsTtm: n(r.epsTtm, 4),
+          pe: n(r.pe, 2),
+          ps: n(r.ps, 2),
+          fcfYield: n(r.fcfYield, 5),
+        }
+      })
+
     // Rota pesada (histórico completo + série de múltiplos) — a CDN absorve os hits
-    return NextResponse.json(results, {
+    return NextResponse.json(enxuto, {
       headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" },
     })
   } catch (error) {

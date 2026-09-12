@@ -1928,6 +1928,80 @@ def apply_fx_conversion(company_currency: str, periods_data: list[dict]) -> bool
 
 
 
+def corrigir_escala_de_dividendos(periods_data: list[dict]) -> int:
+    """
+    Dividendo por ação numa unidade que não é a das outras linhas da empresa.
+
+    Dois erros com a mesma aparência. A Rockwell aparecia com 835 $/ação em dois
+    trimestres de 2018, quando o dividendo real era 0,835 — a tag vinha 1000×
+    acima. A BAT e a GSK, ADRs britânicas, reportavam em PENCE nas filings até
+    2019: 243,20 é 243,20p, ou seja 2,43 £, e a conversão GBP→USD multiplicava
+    o erro em vez de o apanhar (a unidade dizia "GBP", só o valor é que estava
+    em centésimos).
+
+    O que distingue um erro de unidade de um dividendo extraordinário a sério é
+    a REPETIÇÃO. Uma convenção de tagging errada persiste de filing para filing;
+    um extraordinário acontece uma vez. A Keurig Dr Pepper distribuiu 103,75 $
+    por ação num único trimestre de 2018 como contrapartida da fusão — valor
+    verdadeiro, 700× a norma dela, e que tem de sobreviver a esta função.
+
+    Por isso: só corrige quando há DOIS OU MAIS períodos fora de escala, e só
+    pelo fator exato (100 ou 1000) que traz o valor para junto da norma.
+    """
+    from collections import defaultdict
+
+    por_tipo = defaultdict(list)
+    for p in periods_data:
+        v = p.get("dividendPerShare")
+        if v and v > 0:
+            por_tipo[p.get("periodType")].append(p)
+
+    def mediana_de(tipo):
+        periodos = por_tipo.get(tipo) or []
+        if len(periodos) < 6:
+            return None
+        valores = sorted(p["dividendPerShare"] for p in periodos)
+        m = valores[len(valores) // 2]
+        return m if m > 0 else None
+
+    # Trimestres e anos têm normas diferentes (um ano são quatro trimestres);
+    # comparar entre eles alargaria a banda até ela não discriminar nada.
+    med_anual = mediana_de("ANNUAL")
+    med_trim = mediana_de("QUARTERLY")
+
+    # Quando um dos grupos não tem períodos suficientes para formar norma
+    # própria, empresta-se a do outro com o fator de escala entre eles. A BAT
+    # tem exatamente DUAS linhas trimestrais com dividendo — e ambas em pence,
+    # portanto a norma que saísse delas seria a do próprio erro.
+    if med_trim is None and med_anual is not None:
+        med_trim = med_anual / 4
+    if med_anual is None and med_trim is not None:
+        med_anual = med_trim * 4
+
+    referencia = {"ANNUAL": med_anual, "QUARTERLY": med_trim}
+
+    corrigidos = 0
+    for tipo, periodos in por_tipo.items():
+        mediana = referencia.get(tipo)
+        if mediana is None:
+            continue
+
+        fora = [p for p in periodos if p["dividendPerShare"] >= 50 * mediana]
+        if len(fora) < 2:
+            continue
+
+        for p in fora:
+            v = p["dividendPerShare"]
+            for fator in (1000, 100):
+                candidato = v / fator
+                if 0.4 * mediana <= candidato <= 2.5 * mediana:
+                    p["dividendPerShare"] = candidato
+                    corrigidos += 1
+                    break
+
+    return corrigidos
+
+
 def descartar_custo_incoerente(periods_data: list[dict]) -> int:
     """
     Custo das vendas que contradiz a própria empresa.
@@ -2460,6 +2534,10 @@ def process_company(conn, company: dict, dry_run: bool = False,
                 conn.commit()
             except Exception:
                 conn.rollback()
+
+    n_div = corrigir_escala_de_dividendos(rows)
+    if n_div:
+        print(f"    {n_div} dividendo(s) por ação fora de escala — unidade reposta")
 
     n_custo = descartar_custo_incoerente(rows)
     if n_custo:

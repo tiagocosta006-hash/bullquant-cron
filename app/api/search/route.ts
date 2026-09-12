@@ -12,6 +12,10 @@ export async function GET(request: Request) {
   try {
     const companies = await prisma.company.findMany({
       where: {
+        // Sem o isActive, uma empresa retirada continuava a aparecer no
+        // autocomplete e levava a uma página sem dados — o screener e o
+        // /explore já filtravam, só a pesquisa é que não.
+        isActive: true,
         OR: [
           { ticker: { contains: query, mode: 'insensitive' } },
           { name: { contains: query, mode: 'insensitive' } },

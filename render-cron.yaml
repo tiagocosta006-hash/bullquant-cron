@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: bullquant-cron
+    env: docker
+    plan: free
+    autoDeploy: false # Optional, mas útil se quiseres controlar os deploys
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: NEWS_GEMINI_API_KEY
+        sync: false
+      - key: NEWS_GEMINI_MODEL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        sync: false
+      - key: FINNHUB_API_KEY
+        sync: false
+      - key: DISCORD_BOT_TOKEN
+        sync: false
+      - key: DISCORD_REVIEW_CHANNEL_ID
+        sync: false
+      - key: DISCORD_ADMIN_USER_IDS
+        sync: false
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false

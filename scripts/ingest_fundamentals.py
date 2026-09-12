@@ -132,6 +132,15 @@ DURATION_TAGS = {
         "CostOfGoodsAndServicesSold",
         "CostOfGoodsSold",
         "CostOfServices",
+        # A Uber (e outras plataformas) apresentam "Cost of revenue, exclusive of
+        # depreciation and amortization" como a primeira linha de despesa e NÃO
+        # publicam GrossProfit nenhum — daí a margem bruta vazia de 2019 a 2025.
+        # É uma tag us-gaap padrão. Fica DEPOIS das mais precisas: quem tagga
+        # CostOfRevenue ou CostOfSales continua a usar essas, e esta só entra
+        # quando não há outra. A D&A fora do custo torna a margem bruta um pouco
+        # mais generosa do que se estivesse dentro, mas é a repartição que o
+        # próprio emitente apresenta e a que os provedores de dados usam.
+        "CostOfGoodsAndServiceExcludingDepreciationDepletionAndAmortization",
         "CostOfPurchasedPower",
         "CostOfSalesEnergy",
         "FuelCosts",
@@ -174,6 +183,12 @@ DURATION_TAGS = {
         # EPS total; preferível a null e o guard NI/EPS continua a validar.
         "DilutedEarningsLossPerShareFromContinuingOperations",
         "BasicEarningsLossPerShareFromContinuingOperations",
+        # ÚLTIMO recurso. A Berkshire publica SÓ EarningsPerShareBasic — nem
+        # Diluted nem a variante combinada — e ficava com epsDiluted a null em
+        # toda a série. Numa empresa sem instrumentos diluidores materiais o
+        # básico É o diluído; onde houver diluição real, o diluído aparece
+        # antes na lista e este nunca chega a ser usado.
+        "EarningsPerShareBasic",
     ],
     "sharesOutstandingDur": [
         "WeightedAverageNumberOfDilutedSharesOutstanding",
@@ -963,6 +978,25 @@ def safe_clamp(v, lo, hi):
     return max(lo, min(hi, v))
 
 
+def plausivel(v, lo, hi):
+    """Fora da banda devolve None (→ N/A), em vez de truncar para o limite.
+
+    O safe_clamp(-99, 99) que aqui estava é uma banda de ±9900%: não filtra
+    nada na prática, e um ROIC de 300% chegava intacto ao gráfico. Truncar
+    também não serve — um ROIC truncado em 200% continua a ser um número
+    inventado a ocupar o lugar de "não sabemos".
+
+    Estes rácios saem quase sempre de um denominador residual (capital
+    investido ou capital próprio perto de zero, típico de quem fez recompras
+    agressivas). Nesses casos o quociente não tem significado económico
+    nenhum, e a regra da casa é clara: quando não se sabe, mostra-se N/A,
+    nunca um número.
+    """
+    if v is None:
+        return None
+    return v if lo <= v <= hi else None
+
+
 # ── Identidade de período fiscal derivada da DATA (não dos campos fy/fp) ──────
 # Os campos fy/fp do XBRL da SEC são frequentemente ERRADOS em factos
 # comparativos de filings posteriores (a mesma data reportada com fy diferente),
@@ -1093,7 +1127,17 @@ def discover_periods(us_gaap: dict, cal: dict, min_fy: int) -> tuple[set, dict, 
         best_end = Counter(x[0] for x in lst).most_common(1)[0][0]
         fileds = [x[1] for x in lst if x[0] == best_end and x[1]]
         period_ends[key] = best_end
-        period_filed[key] = max(fileds) if fileds else None
+        # min e NÃO max: um período aparece nas companyfacts uma vez na filing
+        # que o reporta e OUTRA VEZ em cada filing posterior que o traz como
+        # comparativo. O max ficava sempre com a mais recente dessas, ou seja
+        # com uma data que nada tem que ver com a disponibilidade do dado — o
+        # FY2025Q1 da AAPL (fechado em Dez/2024) estava gravado como filed em
+        # Maio/2026, e os quatro trimestres de 2016 todos em Nov/2017. A
+        # primeira filing a reportar o período é, por definição, aquela em que
+        # ele é o período de reporte, e é quando o mercado soube. Se vier de um
+        # 8-K de resultados anterior ao 10-Q, melhor ainda: foi mesmo aí que a
+        # informação passou a ser pública.
+        period_filed[key] = min(fileds) if fileds else None
     return set(cand.keys()), period_ends, period_filed
 
 
@@ -1246,12 +1290,21 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
 
     revenue = dur.get("revenue")
     gross_profit = dur.get("grossProfit")
+    # Guardar se o lucro bruto veio TAGGADO pelo emitente ou se foi derivado
+    # abaixo: se for derivado de um custo que se venha a descobrir incoerente,
+    # tem de cair com ele.
+    gp_reportado = gross_profit is not None
 
     # Fallback: muitas empresas reportam Revenue e CostOfRevenue mas NÃO a tag
     # explícita GrossProfit. Calcular grossProfit = revenue − costOfRevenue
     # recupera a gross margin sem depender dessa única tag XBRL.
     # (Bancos/seguradoras não têm COGS → continua None, que é o correto.)
     cost_of_rev = dur.get("costOfRevenue")
+    # Não existe custo das vendas negativo. Vem de tags trocadas ou de um Q4
+    # derivado por subtração com bases diferentes; deixá-lo passar arrastava o
+    # lucro bruto para cima da receita e partia a identidade GP.
+    if cost_of_rev is not None and cost_of_rev < 0:
+        cost_of_rev = None
     if gross_profit is None and revenue is not None and cost_of_rev is not None:
         gross_profit = revenue - cost_of_rev
 
@@ -1267,9 +1320,48 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
                 and 0.5 * revenue < net_rev < 0.98 * revenue):
             revenue = net_rev
 
+    # Custo das vendas ACIMA da receita: as duas grandezas não são do mesmo
+    # âmbito. A correção de excise acima só sabe ENCOLHER a receita
+    # (net_rev < 0.98·revenue), por isso o caso inverso — receita parcial
+    # (um segmento) contra custo consolidado — passava incólume. A DLTR de 2023
+    # ficava com receita 3.932M contra custo 5.089M, ou seja margem bruta
+    # negativa numa retalhista, e daí saíam gráficos de margem a mentir.
+    # Não há como saber qual dos dois é o certo, e inventar é pior do que
+    # admitir: o custo cai, e com ele o lucro bruto se tiver sido derivado dele.
+    # O lucro bruto taggado pelo emitente sobrevive — esse é fonte primária.
+    if (revenue is not None and cost_of_rev is not None
+            and revenue > 0 and cost_of_rev > revenue):
+        cost_of_rev = None
+        if not gp_reportado:
+            gross_profit = None
+
+    # Custo que CONTRADIZ o lucro bruto reportado pelo emitente: a tag de custo
+    # escolhida não é a contraparte daquele lucro bruto. Diferenças de definição
+    # (pharma que deixa a amortização de intangíveis fora do custo) ficam abaixo
+    # dos 15% da receita; acima de 25% é outra coisa. A Centene, seguradora de
+    # saúde, apanhava um CostOfServices residual de 702M contra uma receita de
+    # 44.655M — o custo a sério de uma seguradora são os encargos médicos, ~85%
+    # dos prémios. O lucro bruto reportado (5.650M, 12,6% de margem) está certo
+    # para o setor; o custo é que não é aquele.
+    #
+    # O lucro bruto taggado é fonte primária e fica. O custo cai para N/A, que
+    # é a verdade: não sabemos qual é o custo da receita desta empresa.
+    if (gp_reportado and revenue is not None and cost_of_rev is not None
+            and gross_profit is not None and revenue > 0
+            and abs(gross_profit - (revenue - cost_of_rev)) > 0.25 * revenue):
+        cost_of_rev = None
+
     # ── Level 1 Accounting Integrity ──
     if revenue is not None and gross_profit is not None and gross_profit > revenue:
-        gross_profit = revenue  # Força a integridade se a extração colidir tags residuais
+        # Forçar gp = revenue FABRICAVA um valor: a NiSource ficava com lucro
+        # bruto igual à receita (5.053 M) tendo custo das vendas taggado de
+        # 1.534 M — margem bruta de 100% numa utility, e a identidade
+        # gp = revenue − cogs partida em 13 linhas. Com o custo disponível, o
+        # lucro bruto DERIVA-SE; sem ele, fica NULL, que é honesto.
+        if cost_of_rev is not None and 0 <= cost_of_rev <= revenue:
+            gross_profit = revenue - cost_of_rev
+        else:
+            gross_profit = None
 
     op_income = dur.get("operatingIncome")
 
@@ -1392,9 +1484,9 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
 
     total_equity = inst.get("totalEquity")
 
-    gross_margin = safe_clamp(safe_div(gross_profit, revenue), -99.0, 99.0)
-    op_margin = safe_clamp(safe_div(op_income, revenue), -99.0, 99.0)
-    net_margin = safe_clamp(safe_div(net_income, revenue), -99.0, 99.0)
+    gross_margin = plausivel(safe_div(gross_profit, revenue), -1.0, 1.0)
+    op_margin = plausivel(safe_div(op_income, revenue), -10.0, 2.0)
+    net_margin = plausivel(safe_div(net_income, revenue), -10.0, 2.0)
 
     roic = None
     if op_income is not None and total_assets is not None:
@@ -1412,9 +1504,9 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
             inv_cap = total_debt + (total_equity or 0) - (cash or 0)
         else:
             inv_cap = (total_assets or 0) - (curr_liab or 0) - (cash or 0)
-        roic = safe_clamp(safe_div(nopat, inv_cap) if inv_cap > 0 else None, -99.0, 99.0)
+        roic = plausivel(safe_div(nopat, inv_cap) if inv_cap > 0 else None, -2.0, 2.0)
 
-    roe = safe_clamp(safe_div(net_income, total_equity) if total_equity and total_equity > 0 else None, -99.0, 99.0)
+    roe = plausivel(safe_div(net_income, total_equity) if total_equity and total_equity > 0 else None, -5.0, 5.0)
 
     ebitda_raw = dur.get("ebitda")
     if ebitda_raw is not None:
@@ -1570,7 +1662,12 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         "periodEnd": period_end,
         "filedAt": filed_at,
         "revenue": revenue,
-        "costOfRevenue": dur.get("costOfRevenue"),
+        # cost_of_rev e NÃO dur.get("costOfRevenue"): o valor cru ignorava toda a
+        # limpeza feita acima. O guard de custo negativo estava escrito desde
+        # sempre mas só afectava o lucro bruto derivado — o custo em si era
+        # gravado cru, e a BD tinha 2 linhas com custo negativo e 90 com custo
+        # acima da receita a provar isso mesmo.
+        "costOfRevenue": cost_of_rev,
         "grossProfit": gross_profit,
         "operatingExpenses": op_expenses,
         "operatingIncome": op_income,
@@ -1736,14 +1833,22 @@ def apply_fx_conversion(company_currency: str, periods_data: list[dict]) -> bool
 
 def apply_stock_splits(ticker: str, periods_data: list[dict]):
     periods_data.sort(key=lambda x: x['periodEnd'])
+    # O yfinance usa hífen nas classes de ações (BRK-B), o EDGAR usa ponto
+    # (BRK.B). Sem esta tradução o fetch devolve vazio e a empresa perdia a
+    # ingestão inteira todos os dias.
+    yf_ticker = ticker.replace(".", "-")
     try:
-        t = yf.Ticker(ticker)
+        t = yf.Ticker(yf_ticker)
         splits = t.splits
     except Exception as e:
         print(f"    Erro ao extrair splits do yfinance para {ticker}: {e}")
         return
-        
-    if splits.empty:
+
+    # Quando a chamada ao Yahoo falha (rate limit, rede), o yfinance devolve
+    # None em vez de levantar — o `except` acima não apanha isso e o
+    # `splits.empty` rebentava com AttributeError, abortando a empresa toda.
+    # Os fundamentais da SEC não têm culpa do split não vir: seguem na mesma.
+    if splits is None or splits.empty:
         return
         
     for split_date, ratio in splits.items():
@@ -1902,6 +2007,13 @@ def synthesize_q4(periods: set, period_ends: dict, period_filed: dict,
             # significa capex FY em falta/tag errada (REITs) — o abs() do
             # build_row transformá-lo-ia em lixo positivo. Fica NULL (N/A).
             if field == "capex" and val < 0:
+                continue
+            # Mesma lógica para o custo das vendas: não existe custo negativo.
+            # Um Q4 derivado por subtração (FY − Q1 − Q2 − Q3) fica negativo
+            # quando o anual e os trimestres usam tags diferentes — e depois
+            # arrasta o lucro bruto, que passava a exceder a receita (17 dos 22
+            # casos na BD eram exatamente Q4 assim). Melhor NULL.
+            if field == "costOfRevenue" and val < 0:
                 continue
             derived[field] = val
 
@@ -2134,7 +2246,14 @@ def process_company(conn, company: dict, dry_run: bool = False,
                 conn.rollback()
 
     if ticker:
-        apply_stock_splits(ticker, rows)
+        # O ajuste de splits depende do Yahoo, que falha com frequência. É um
+        # refinamento sobre os dados da SEC — nunca motivo para perder a
+        # ingestão da empresa. A linha fica por ajustar e o adjust_splits.py
+        # (que corre a seguir) apanha-a na próxima passagem.
+        try:
+            apply_stock_splits(ticker, rows)
+        except Exception as e:
+            print(f"    Splits por ajustar em {ticker} ({type(e).__name__}: {e})")
 
     if dry_run:
         if collector is not None:
@@ -2388,6 +2507,7 @@ def main():
 
     total_periods = 0
     errors = 0
+    failed: list[str] = []
     collector: dict = {}
 
     for i, company in enumerate(companies):
@@ -2409,9 +2529,11 @@ def main():
             except Exception as e2:
                 print(f"ERRO na reconexão: {e2}")
                 errors += 1
+                failed.append(ticker or company.get("id", "?"))
         except Exception as e:
             print(f"ERRO: {e}")
             errors += 1
+            failed.append(ticker or company.get("id", "?"))
 
         if last_fetch_was_network:
             time.sleep(SLEEP_BETWEEN)
@@ -2439,6 +2561,17 @@ def main():
 
     conn.close()
     print(f"\nConcluído. {total_periods} períodos inseridos. {errors} erros.")
+
+    # Terminar com 0 mesmo havendo erros é o que deixou a BRK.B e a BF.B falharem
+    # todos os dias durante semanas com o workflow verde: a contagem de erros ia
+    # para o log, e um log que ninguém lê não é um alarme. Enquanto um erro de
+    # dados não pintar o CI de vermelho, ninguém o vê. Sair != 0 aqui é
+    # deliberadamente barulhento — uma falha transitória da SEC vai chumbar a
+    # corrida, e é isso que se pretende: a alternativa é não saber.
+    if errors:
+        print(f"FALHA: {errors} empresa(s) sem ingestão — {', '.join(sorted(failed)[:20])}"
+              + (" ..." if len(failed) > 20 else ""))
+        sys.exit(1)
 
 
 if __name__ == "__main__":

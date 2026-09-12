@@ -5,7 +5,6 @@ import { Link } from '@/i18n/routing';
 import {
   LayoutDashboard,
   SearchCode,
-  Briefcase,
   Star,
   CalendarDays,
   Calculator,
@@ -26,7 +25,7 @@ export function MobileDock() {
   const items = [
     { href: "/dashboard", icon: LayoutDashboard, label: t("dashboard") },
     { href: "/explore", icon: SearchCode, label: t("explore") },
-    { href: "/portfolio", icon: Briefcase, label: t("portfolio") },
+    // /portfolio fora da navegação para já — ver TopNav.
     { href: "/watchlist", icon: Star, label: t("watchlist") },
     { href: "/calendar", icon: CalendarDays, label: t("calendar") },
     { href: "/dcf", icon: Calculator, label: t("dcfShort") },

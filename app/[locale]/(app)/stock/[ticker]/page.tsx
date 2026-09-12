@@ -99,7 +99,10 @@ export default async function StockPage({
   ])
 
   // If company doesn't exist in our DB, 404
-  if (!company) {
+  // Uma empresa retirada (isActive = false) é tratada como inexistente: já não
+  // aparece na pesquisa nem no screener, mas sem isto um link antigo continuava
+  // a abrir a página com os dados congelados que motivaram a retirada.
+  if (!company || !company.isActive) {
     notFound()
   }
 

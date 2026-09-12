@@ -6,7 +6,6 @@ import { useTranslations } from "next-intl";
 import {
   LayoutDashboard,
   SearchCode,
-  Briefcase,
   Star,
   CalendarDays,
   Calculator,
@@ -105,7 +104,7 @@ export function CommandMenu({
     { href: "/dashboard", icon: LayoutDashboard, label: t("dashboard") },
     { href: "/explore", icon: SearchCode, label: t("explore") },
     { href: "/compare", icon: GitCompareArrows, label: t("compare") },
-    { href: "/portfolio", icon: Briefcase, label: t("portfolio") },
+    // /portfolio fora da navegação para já — ver TopNav.
     { href: "/watchlist", icon: Star, label: t("watchlist") },
     { href: "/calendar", icon: CalendarDays, label: t("calendar") },
     { href: "/news", icon: Newspaper, label: "Notícias" },

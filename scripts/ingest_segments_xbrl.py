@@ -331,6 +331,28 @@ def _candidate_partitions(vals, allowed, total):
             trimmed = {k: v for k, v in plain.items() if k not in totals}
             if len(trimmed) >= 2:
                 cands.append(trimmed)
+
+        # MEMBRO TRANSVERSAL: não é rollup dos irmãos nem é o total sozinho, mas
+        # sobrepõe-se a eles. A Visa acrescentou v:ValueAddedServicesMember
+        # (10,9 mil M$) ao ProductOrServiceAxis no 10-K de 2025 — receita de
+        # serviços de valor acrescentado que já está distribuída pelos outros
+        # membros. Os cinco verdadeiros somam exatamente os 40,0 mil M$ de
+        # receita; com o sexto vão a 1,27x e a partição era rejeitada inteira,
+        # deixando 2025 sem repartição de produto.
+        #
+        # Testa-se remover UM membro de cada vez e fica-se com o que faz o resto
+        # reconciliar. Só se aceita quando a solução é ÚNICA: se dois membros
+        # diferentes servirem, não há como saber qual é o intruso e não se
+        # arrisca. É seguro por construção — numa partição verdadeira, tirar um
+        # membro real deixa a soma em total-membro, que não reconcilia.
+        if total > 0 and len(plain) >= 3:
+            unicos = [k for k in plain
+                      if abs(sum(v for j, v in plain.items() if j != k) - total)
+                      / total <= RECONCILE_TOL]
+            if len(unicos) == 1:
+                trimmed = {k: v for k, v in plain.items() if k != unicos[0]}
+                if len(trimmed) >= 2:
+                    cands.append(trimmed)
     return cands
 
 
@@ -424,10 +446,24 @@ _LABEL_SUFFIXES = (
 )
 
 
+def _limpa_marcadores(s: str) -> str:
+    """Tira '[member]' / '[domain]' do rótulo. O _member_label já os remove, mas
+    só na grafia '[Member]' — a Autodesk publica 'Media And Entertainment
+    [member]' em minúsculas e o marcador ia parar à legenda do gráfico."""
+    return _re.sub(r"\[\s*(member|domain)\s*\]", " ", s, flags=_re.I)
+
+
 def _label_key(label: str) -> str:
-    """Chave de comparação de rótulos: minúsculas, sem sufixo de receita e sem
-    pontuação. 'Delivery service revenue' e 'Delivery Service' colapsam."""
-    s = " ".join((label or "").lower().split())
+    """Chave de comparação de rótulos: minúsculas, sem marcadores XBRL, sem
+    sufixo de receita e sem pontuação. 'Delivery service revenue' e 'Delivery
+    Service' colapsam; 'Health & Public Service' e 'Health And Public Service
+    Segment' também (a Accenture usa as duas grafias)."""
+    s = " ".join(_limpa_marcadores((label or "").lower()).split())
+    # '&' e 'and' são a mesma palavra para efeitos de identidade do segmento —
+    # tem de ser ANTES de tirar a pontuação, senão '&' desaparece e as duas
+    # grafias deixam de casar.
+    s = s.replace("&", " and ")
+    s = " ".join(s.split())
     changed = True
     while changed:
         changed = False
@@ -436,6 +472,42 @@ def _label_key(label: str) -> str:
                 s = s[: -len(suf)].strip()
                 changed = True
     return _re.sub(r"[^a-z0-9]+", "", s)
+
+
+def _tem_sufixo_redundante(rotulo: str) -> bool:
+    """'Gas segment' / 'Consulting Revenue' num gráfico chamado "Receitas por
+    Segmento" — o sufixo não acrescenta nada e só rouba espaço à legenda.
+    Um marcador '[member]' pendurado conta como o mesmo tipo de ruído."""
+    low = " ".join((rotulo or "").lower().split())
+    if _re.search(r"\[\s*(member|domain)\s*\]", low):
+        return True
+    return any(low.endswith(suf) for suf in _LABEL_SUFFIXES)
+
+
+def limpar_display(rotulo: str) -> str:
+    """Normaliza o rótulo para exibição, sem lhe mudar o sentido.
+
+    Tira marcadores XBRL pendurados e troca espaços Unicode (a Accenture
+    publica 'Health\\xa0& Public Service' com espaço não-quebrável) por espaço
+    normal: invisível ao ler, mas parte a pesquisa e a comparação de strings.
+    """
+    s = _limpa_marcadores(rotulo or "")
+    s = _re.sub(r"[      - ]", " ", s)
+    return " ".join(s.split())
+
+
+def escolher_canonico(variantes: list) -> str:
+    """Qual das grafias fica, dada a lista JÁ ordenada da mais recente para a
+    mais antiga.
+
+    Preferir a mais recente parecia o mais fiel (é como a empresa lhe chama
+    hoje), mas medido sobre a BD toda deixava 94 rótulos com sufixo redundante
+    — 'Gas segment', 'Corporate Segment', 'Energy generation and storage
+    segment'. Preferir a mais limpa baixa isso para 27, e nesses 27 nenhuma
+    variante existe sem sufixo. Desempate pela mais recente, que é a ordem em
+    que a lista chega.
+    """
+    return limpar_display(min(variantes, key=lambda r: (_tem_sufixo_redundante(r), len(r))))
 
 
 def canonicalize_labels(merged: dict) -> int:
@@ -448,17 +520,20 @@ def canonicalize_labels(merged: dict) -> int:
     segmento, cada uma com metade do histórico e um buraco na outra metade —
     é o cohort LABEL_CHURN da auditoria.
 
-    Escolhe a variante do período MAIS RECENTE (a nomenclatura atual da
-    empresa) e reescreve as antigas. Só toca onde há de facto duas grafias da
-    mesma chave: uma empresa com rótulos estáveis fica byte a byte igual.
+    Só toca onde há de facto duas grafias da mesma chave: uma empresa com
+    rótulos estáveis fica byte a byte igual.
     """
-    # Da mais recente para a mais antiga, para a primeira grafia vista ganhar.
+    # Da mais recente para a mais antiga: é a ordem que escolher_canonico usa
+    # para desempatar.
     ordem = sorted(merged.keys(), key=lambda k: str(k[1]), reverse=True)
-    canonico: dict[tuple, str] = {}
+    vistas: dict[tuple, list] = {}
     for chave in ordem:
         for eixo, seg in merged[chave].items():
             for rotulo in seg:
-                canonico.setdefault((eixo, _label_key(rotulo)), rotulo)
+                vistas.setdefault((eixo, _label_key(rotulo)), [])
+                if rotulo not in vistas[(eixo, _label_key(rotulo))]:
+                    vistas[(eixo, _label_key(rotulo))].append(rotulo)
+    canonico = {k: escolher_canonico(v) for k, v in vistas.items()}
 
     trocas = 0
     for chave in merged:
@@ -545,7 +620,13 @@ def extract_segments_from_filing(filing):
             ).days
         except Exception:
             continue
-        if 85 <= days <= 100:
+        # 80 dias, não 85: os calendários 4-4-5 fecham trimestres de 12 semanas
+        # (84 dias) e a Costco chega a 83. Com o limite em 85 ficavam de fora
+        # por dois dias — e a COST, PEP e WM apareciam com ZERO segmentos
+        # trimestrais apesar de os publicarem no 10-Q. É a MESMA janela que o
+        # is_quarterly_duration do ingest_fundamentals já usa (:716); tê-las
+        # diferentes fazia a linha existir na BD sem o segmento nunca lhe chegar.
+        if 80 <= days <= 100:
             ptype = "QUARTERLY"
         elif 340 <= days <= 380:
             ptype = "ANNUAL"
@@ -572,6 +653,13 @@ def extract_segments_from_filing(filing):
                         reverse=True)[:3]
         if not totais:
             continue
+        # ...mas o subtotal tem de ser MATERIAL. Sem este piso, os bancos
+        # reconciliavam contra o total de COMISSÕES e gravavam uma partição que
+        # cobre 13-19% da receita: a Citizens Financial mostrava 227 M de
+        # segmentos contra 1.750 M de receita. Para quem olha o gráfico, isso
+        # não é "a repartição do banco" — é uma fatia estreita a fingir que é o
+        # todo. A AstraZeneca (55,6 de 58,7 mM = 95%) continua a passar.
+        totais = [t for t in totais if t >= 0.5 * totais[0]]
         total = totais[0]
 
         by_axis = {}
@@ -750,6 +838,25 @@ def main():
                     primary = pick_primary(by_axis)
                     if not primary:
                         continue
+                    # A partição reconcilia dentro do FILING, mas a receita da
+                    # nossa BD pode ser outro conceito. Nos bancos é: o XBRL
+                    # reparte só as comissões e a BD guarda a receita com margem
+                    # financeira incluída — a Citizens Financial ficava com
+                    # 227 M de segmentos contra 1.750 M de receita (13%). Um
+                    # gráfico assim não é a repartição do banco, é uma fatia
+                    # estreita a fingir que é o todo. Verificar contra o valor
+                    # REALMENTE gravado, que é o que o utilizador vê ao lado.
+                    cur.execute(
+                        'SELECT revenue FROM fundamentals WHERE "companyId" = %s '
+                        'AND "periodType" = %s::"period_type" AND "periodEnd"::date = %s::date',
+                        (company_id, ptype, pend),
+                    )
+                    _row = cur.fetchone()
+                    _rev = float(_row[0]) if _row and _row[0] else None
+                    if _rev and _rev > 0:
+                        if sum(primary.values()) < 0.5 * _rev:
+                            stats["cobertura_insuficiente"] += 1
+                            continue
                     cur.execute(
                         'UPDATE fundamentals SET "revenueSegments" = %s, '
                         '"revenueSegmentsByAxis" = %s '

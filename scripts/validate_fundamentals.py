@@ -12,7 +12,7 @@ Regras (cada violação = (ticker, período, regra)):
   SHARES_QOQ_JUMP  shares mudam >50% QoQ sem ser split (corre pós-splits)
   DPS_NEGATIVE     dividendPerShare < 0
   CAPEX_NEGATIVE   capex < 0
-  FY_RANGE         fiscalYear fora de [2016, 2028]
+  FY_RANGE         fiscalYear fora de [2015, 2028]
 
 Modos:
   --baseline                 grava o conjunto de violações atual como baseline
@@ -37,7 +37,22 @@ if hasattr(sys.stdout, "reconfigure"):
 sys.path.insert(0, os.path.dirname(__file__))
 import ingest_fundamentals as ing
 
-BASELINE_PATH = os.path.join(os.path.dirname(__file__), "out", "validator_baseline.json")
+# ANCORADA NO HOST, pelo mesmo motivo que o validate_segments.py documenta: a
+# base de dados de produção e a de desenvolvimento têm estados diferentes, e
+# comparar uma com a baseline da outra faz o gate chumbar todas as noites sem
+# nada de novo ter acontecido.
+def _host_do_url(url: str) -> str:
+    return url.split("@")[-1].split("/")[0] if "@" in url else "localhost"
+
+
+def _slug(host: str) -> str:
+    return "".join(ch if ch.isalnum() else "_" for ch in host)
+
+
+BASELINE_PATH = os.path.join(
+    os.path.dirname(__file__), "out",
+    f"validator_baseline.{_slug(_host_do_url(os.getenv('DIRECT_URL') or ''))}.json",
+)
 
 FIELDS = [
     "revenue", "costOfRevenue", "grossProfit", "netIncome", "epsDiluted",
@@ -97,6 +112,19 @@ def validate(rows):
         by_company[r["ticker"]].append(r)
 
     for ticker, rs in by_company.items():
+        # Escala normal de receita da empresa, por tipo de período. Uma margem
+        # calculada sobre receita quase nula não é sinal — é ruído aritmético:
+        # a NCLH no Q4 2020 teve 10 M de receita e 739 M de prejuízo (cruzeiros
+        # parados na covid), o que dá -77 de margem e é PERFEITAMENTE REAL. O
+        # mesmo para a MRNA pré-vacina. Marcá-las é ruído que esconde os
+        # problemas a sério, e aceitá-las uma a uma seriam 55 exceções.
+        mediana_rev = {}
+        for pt in ("ANNUAL", "QUARTERLY"):
+            vals = sorted(abs(x["revenue"]) for x in rs
+                          if x["periodType"] == pt and x["revenue"])
+            if vals:
+                mediana_rev[pt] = vals[len(vals) // 2]
+
         for r in rs:
             rev, cogs, gp = r["revenue"], r["costOfRevenue"], r["grossProfit"]
             if rev is not None and cogs is not None and gp is not None and abs(rev) > 0:
@@ -118,15 +146,39 @@ def validate(rows):
                 # deriva eps=NI/shares quando o desvio excede 50%/troca sinal.
                 if abs(eps * sh - ni) > 0.50 * abs(ni):
                     add(r, "EPS_X_SHARES", f"eps*sh={eps*sh:.0f} ni={ni:.0f}")
+            # Receita imaterial face à escala da própria empresa -> a margem não
+            # é avaliável. Um erro de ESCALA na receita (taggada em milhares)
+            # cairia aqui também, mas esse é apanhado pelo REV_YOY_JUMP, que
+            # compara anos consecutivos.
+            base_rev = mediana_rev.get(r["periodType"])
+            rev_imaterial = (
+                base_rev is not None
+                and r["revenue"] is not None
+                and abs(r["revenue"]) < 0.10 * base_rev
+            )
+            # Limites por tipo de período. Um ganho ÚNICO (reforma fiscal de
+            # 2017, venda de participação, ganho de investimento) inflaciona um
+            # trimestre e dilui-se no ano — daí 30 violações trimestrais contra
+            # 2 anuais com o mesmo limite. A eBay teve 10.734 M de lucro num
+            # trimestre de 2.668 M ao vender a Adevinta: margem 4,0 e REAL.
+            # Um ano inteiro acima de 150% de margem líquida é que é raro a
+            # sério, e aí o limite apertado mantém-se.
+            lo, hi = (-5.0, 1.5) if r["periodType"] == "ANNUAL" else (-8.0, 6.0)
             for m in ("grossMargin", "operatingMargin", "netMargin"):
                 v = r[m]
-                if v is not None and abs(v) < 90 and not (-5.0 <= v <= 1.5):
+                if v is not None and abs(v) < 90 and not (lo <= v <= hi):
+                    if rev_imaterial:
+                        continue
                     add(r, "MARGIN_BOUNDS", f"{m}={v:.3f}")
             if r["dividendPerShare"] is not None and r["dividendPerShare"] < 0:
                 add(r, "DPS_NEGATIVE", f"dps={r['dividendPerShare']}")
             if r["capex"] is not None and r["capex"] < 0:
                 add(r, "CAPEX_NEGATIVE", f"capex={r['capex']:.0f}")
-            if not (2016 <= r["fiscalYear"] <= 2028):
+            # A janela começa em 2015, não em 2016: a BD tem 10 linhas de 2015
+            # (AMZN, GPN, LHX) que são dados REAIS — a regra é que estava mais
+            # estreita do que o histórico. Apagá-las para calar o validador
+            # seria destruir dados corretos.
+            if not (2015 <= r["fiscalYear"] <= 2028):
                 add(r, "FY_RANGE", f"fy={r['fiscalYear']}")
 
         annuals = sorted((r for r in rs if r["periodType"] == "ANNUAL"),
@@ -176,12 +228,19 @@ def main():
         print(f"\nBaseline gravada: {len(keys)} violações em {BASELINE_PATH}")
         return
 
-    baseline = set()
-    if os.path.exists(BASELINE_PATH):
-        with open(BASELINE_PATH, encoding="utf-8") as f:
-            baseline = set(json.load(f)["keys"])
-    else:
-        print("\n(aviso: sem baseline — todas as violações contam como novas)")
+    # Sem baseline para ESTE host o gate não chumba: "ainda não calibrado" não é
+    # o mesmo que "regressão". Chumbar à entrada numa base de dados nova é um
+    # alarme falso — e um gate que chumba à entrada é um gate que alguém
+    # desliga. Calibrar é um gesto deliberado (--baseline), revisto em código.
+    if not os.path.exists(BASELINE_PATH):
+        print(f"\n{len(keys)} violações neste host. Ainda não há baseline em "
+              f"{os.path.basename(BASELINE_PATH)} — o gate passa sem comparar.")
+        print("Para calibrar depois de rever as violações: "
+              "python scripts/validate_fundamentals.py --baseline")
+        return
+
+    with open(BASELINE_PATH, encoding="utf-8") as f:
+        baseline = set(json.load(f)["keys"])
 
     # Violações REVISTAS E ACEITES (eventos reais: ganho RAI da BTI 2017,
     # reestruturações, pré-conversões) — cada entrada tem racional humano.

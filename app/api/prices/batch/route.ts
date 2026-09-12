@@ -16,6 +16,17 @@ interface PriceResult {
 const CHUNK_SIZE = 5;
 const CHUNK_DELAY_MS = 250;
 
+// Cache em memória por ticker, com o mesmo TTL do Cache-Control da resposta.
+//
+// O `next: { revalidate: 60 }` já evitava a ida à Finnhub, mas NÃO evitava o
+// ciclo: a pausa de 250ms entre chunks corria à mesma, porque é incondicional.
+// Resultado: o dashboard pede 24 tickers, tudo vem de cache, e mesmo assim
+// esperava-se 1 segundo em pausas — medido em 1049ms no browser. Filtrando os
+// tickers frescos ANTES de entrar no ciclo, um pedido inteiramente em cache
+// não paga pausa nenhuma.
+const PRICE_TTL_MS = 60_000;
+const priceCache = new Map<string, { at: number; value: PriceResult }>();
+
 async function fetchWithDelay(tickers: string[], apiKey: string): Promise<PriceResult[]> {
   const results: PriceResult[] = [];
   
@@ -97,9 +108,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Finnhub API key not configured' }, { status: 500 })
     }
 
-    const results = await fetchWithDelay(tickers, apiKey);
-    
-    const pricesRecord = results.reduce((acc, curr) => {
+    // Só vão ao ciclo (e às pausas) os tickers cujo preço já expirou.
+    const agora = Date.now()
+    const emCache: PriceResult[] = []
+    const porBuscar: string[] = []
+    for (const t of tickers) {
+      const hit = priceCache.get(t)
+      if (hit && agora - hit.at < PRICE_TTL_MS) emCache.push(hit.value)
+      else porBuscar.push(t)
+    }
+
+    const buscados = porBuscar.length > 0 ? await fetchWithDelay(porBuscar, apiKey) : []
+    for (const r of buscados) {
+      // Um erro não entra em cache: à próxima tenta outra vez.
+      if (!r.error) priceCache.set(r.ticker, { at: agora, value: r })
+    }
+
+    const pricesRecord = [...emCache, ...buscados].reduce((acc, curr) => {
       acc[curr.ticker] = curr
       return acc
     }, {} as Record<string, PriceResult>)

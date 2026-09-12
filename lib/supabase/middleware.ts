@@ -28,7 +28,24 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  // Com sessão de desenvolvimento configurada, NEM SE TENTA falar com o
+  // Supabase. Apanhar o erro não chegava: com um cookie de sessão antigo no
+  // browser, o cliente tenta RENOVAR o token — outro caminho, com trabalho em
+  // segundo plano que escapa ao try/catch e deixa o pedido pendurado. O
+  // resultado era uma página em branco eterna. Quem é o utilizador resolve-se
+  // a seguir, no runtime Node (ver lib/supabase/server.ts).
+  const sessaoDev = isDevUnlocked() && !!process.env.DEV_LOGIN_EMAIL
+
+  let user = null
+  if (!sessaoDev) {
+    try {
+      const res = await supabase.auth.getUser()
+      user = res.data.user
+    } catch {
+      // Rede indisponível: segue como anónimo, as regras abaixo lidam com isso.
+      user = null
+    }
+  }
 
   const { pathname } = request.nextUrl
 
@@ -68,7 +85,12 @@ export async function updateSession(request: NextRequest) {
 
   // Anónimos numa página pessoal vão para o login (com ?redirect para voltarem
   // ao sítio depois de entrar).
-  if (!user && isPrivateRoute) {
+  // O middleware corre em Edge, onde não há Prisma — por isso a sessão de
+  // desenvolvimento do getUser() (ver lib/supabase/server.ts) não é visível
+  // aqui. Em dev, este funil deixa passar e é o getUser(), já no runtime Node,
+  // que resolve quem é o utilizador. Em produção isDevUnlocked() é sempre
+  // falso e a regra fica exatamente como estava.
+  if (!user && isPrivateRoute && !isDevUnlocked()) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('redirect', pathname)

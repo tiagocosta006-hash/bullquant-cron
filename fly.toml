@@ -1,0 +1,32 @@
+app = "bullquant-cron"
+primary_region = "cdg"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+  NODE_OPTIONS = "--max-old-space-size=256"
+
+[processes]
+  app = "npx tsx scripts/cron_server.ts"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 8080
+  processes = ["app"]
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+# Adicionamos 2048MB de memória virtual (Swap) para que o servidor 
+# suporte todo o processo pesado do Node e do Prisma sem rebentar o limite do plano grátis
+[machine]
+  size = "shared-cpu-1x"
+  swap_size_mb = 2048

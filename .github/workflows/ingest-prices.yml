@@ -27,3 +27,15 @@ jobs:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
         run: python scripts/ingest_prices.py
+
+      # Gate de QUALIDADE DOS PREÇOS. O script existia no repo desde sempre e
+      # nunca corria — abre com "a tabela tem 2 058 782 linhas e NUNCA foi
+      # validada". A regra SALTO_ABSURDO apanha no próprio dia o preço da
+      # empresa errada (um ticker europeu sem sufixo resolve para uma empresa
+      # americana e cai 90% de um dia para o outro) e a SERIE_DESATUALIZADA
+      # apanha o cron parado, que de outra forma só se nota quando um
+      # utilizador repara. Só falha com achados NOVOS vs a baseline.
+      - name: Price quality gate
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: python scripts/validate_prices.py

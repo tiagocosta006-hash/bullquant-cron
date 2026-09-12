@@ -112,7 +112,7 @@ async function main() {
   const candidatos = clusters.filter((c) => c.items.some((i) => novosKeys.has(i.dedupKey)));
   console.log(`[news] ${candidatos.length} histórias candidatas a triagem`);
 
-  if (NO_LLM || DRY_RUN) printPreview(candidatos.slice(0, 15));
+  if (NO_LLM || DRY_RUN) printPreview(candidatos.slice(0, 500));
   if (NO_LLM) return;
 
   if (candidatos.length === 0) {

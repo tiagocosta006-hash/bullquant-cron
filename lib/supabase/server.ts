@@ -1,6 +1,7 @@
 import { cache } from 'react'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { isDevUnlocked } from '@/lib/devAccess'
 
 /**
  * Cliente Supabase por pedido, memoizado com React.cache(): layout, página,
@@ -11,7 +12,7 @@ import { cookies } from 'next/headers'
 export const createClient = cache(async () => {
   const cookieStore = await cookies()
 
-  return createServerClient(
+  const client = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -31,6 +32,57 @@ export const createClient = cache(async () => {
       },
     }
   )
+
+  // Sessão de DESENVOLVIMENTO, aplicada no PRÓPRIO cliente para que as 28
+  // rotas de API que chamam supabase.auth.getUser() directamente a herdem
+  // sem serem tocadas uma a uma.
+  //
+  // Com DEV_UNLOCK_PRO ligado e DEV_LOGIN_EMAIL preenchido, um pedido sem
+  // sessão passa a correr como esse utilizador local — que tem de existir já
+  // na base de dados; aqui não se cria ninguém. Serve para inspeccionar as
+  // páginas que dependem de um utilizador real (watchlist, portfólio,
+  // definições) sem depender do Supabase, que hoje nem resolve em DNS e
+  // deixa o login pendurado para sempre.
+  //
+  // isDevUnlocked() tem guard de NODE_ENV: num build de produção é sempre
+  // falso, portanto não há como abrir sessão a ninguém sem autenticação real.
+  if (isDevUnlocked() && process.env.DEV_LOGIN_EMAIL) {
+    const original = client.auth.getUser.bind(client.auth)
+    client.auth.getUser = async () => {
+      // Não se chama o original de todo. Apanhar o erro não chegava: com um
+      // cookie de sessão antigo, o cliente tenta renovar o token e esse
+      // trabalho em segundo plano escapa ao try/catch, deixando o pedido
+      // pendurado — página em branco eterna. Se há sessão de dev, ela manda.
+      const { prisma } = await import('@/lib/prisma')
+      const local = await prisma.user.findUnique({
+        where: { email: process.env.DEV_LOGIN_EMAIL! },
+        select: { id: true, email: true },
+      })
+      // Sem o utilizador local configurado não há sessão nenhuma a fingir —
+      // segue como anónimo, sem tocar na rede.
+      if (!local) {
+        return { data: { user: null }, error: null } as unknown as Awaited<
+          ReturnType<typeof original>
+        >
+      }
+
+      return {
+        data: {
+          user: {
+            id: local.id,
+            email: local.email,
+            app_metadata: {},
+            user_metadata: { name: 'Dev Session' },
+            aud: 'authenticated',
+            created_at: new Date(0).toISOString(),
+          },
+        },
+        error: null,
+      } as unknown as Awaited<ReturnType<typeof original>>
+    }
+  }
+
+  return client
 })
 
 /**
@@ -41,8 +93,13 @@ export const createClient = cache(async () => {
  */
 export const getUser = cache(async () => {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  return user
+  // O fallback de desenvolvimento e o try/catch de rede vivem no createClient,
+  // para que as rotas que usam o cliente directamente tenham o mesmo
+  // comportamento que este helper.
+  try {
+    const { data } = await supabase.auth.getUser()
+    return data.user
+  } catch {
+    return null
+  }
 })

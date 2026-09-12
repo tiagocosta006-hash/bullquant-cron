@@ -8,6 +8,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { AuthError } from '@supabase/supabase-js'
 import { sendWelcomeEmail, sendPasswordResetEmail, sendConfirmationEmail, isEmailEnabled } from '@/lib/resend'
 import { prisma } from '@/lib/prisma'
+import { resgatarPagamentoWhop } from '@/lib/whop'
 import { recordServerEvent } from '@/lib/pulse/server'
 
 function translateError(error: AuthError | { message?: string }) {
@@ -118,6 +119,10 @@ export async function signup(formData: FormData) {
         // Não bloqueamos o processo — se o trigger já criou o registo, isto falha
         // por conflito de chave, o que é esperado e inofensivo.
       }
+      // FORA do try, de propósito: o create falha sempre que o trigger chegou
+      // primeiro, e esse é o caso normal. Lá dentro, quem pagou no Whop ficava
+      // em FREE por causa de uma corrida que não é dele.
+      await resgatarPagamentoWhop(linkData.user.id, linkData.user.email!)
     }
 
     // Construímos o link manualmente para forçar o envio do token por Query String (?token_hash=)
@@ -160,6 +165,10 @@ export async function signup(formData: FormData) {
     } catch {
       // conflito de chave esperado se o trigger já criou o registo
     }
+    // Fora do try: se o registo já existia (trigger), o pagamento pendente tem
+    // de ser resgatado à mesma — senão quem pagou ficava em FREE por causa de
+    // uma condição de corrida que não é dele.
+    await resgatarPagamentoWhop(data.user.id, data.user.email!)
     await recordServerEvent(await headers(), 'signup', '/register')
   }
 

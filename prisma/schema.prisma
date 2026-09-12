@@ -46,6 +46,34 @@ model User {
   @@map("users")
 }
 
+/// Pagamento no Whop de quem ainda não tem conta aqui.
+///
+/// A conta NÃO nasce do webhook: cada site tem o seu login e a password é
+/// sempre a que a pessoa define no thebullvalue.com. Quando o Whop avisa de
+/// uma membership válida sem conta local correspondente, o pagamento fica
+/// aqui à espera — e é resgatado no momento do registo, se o email bater
+/// certo.
+///
+/// A chave é o email, não o id da membership: é o email que liga as duas
+/// contas, porque é a única coisa que a pessoa escreve dos dois lados.
+model WhopPendingMembership {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  whopUserId   String?
+  membershipId String    @unique
+  productId    String?
+  status       String
+  /// Preenchido quando alguém se regista com este email e recebe o PRO.
+  /// Mantém-se a linha depois de resgatada: serve de rasto para perceber
+  /// porque é que uma conta ficou PRO sem ter passado por um checkout.
+  claimedAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([email])
+  @@map("whop_pending_memberships")
+}
+
 model Company {
   id                     String               @id @default(cuid())
   ticker                 String               @unique

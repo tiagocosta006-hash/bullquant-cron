@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { prisma } from "@/lib/prisma";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { isEmailEnabled, sendConfirmationEmail } from "@/lib/resend";
 
 /**
  * Webhook do Whop — a fonte de verdade do acesso pago.
@@ -106,6 +108,15 @@ export async function POST(request: Request) {
   const temAcesso =
     typeof d.valid === "boolean" ? d.valid : ESTADOS_COM_ACESSO.has(estado);
 
+  // Uma membership que concede acesso TEM de trazer email: é com ele que a
+  // conta nasce. 500 para o Whop repetir — se o payload nunca trouxer email, é
+  // permissão a corrigir no endpoint do Whop, e um 400 (que o Whop trata como
+  // definitivo) escondia isso para sempre, deixando alguém a pagar sem acesso.
+  if (temAcesso && !email) {
+    console.error("[whop] membership válida sem email no payload:", d.id, acao);
+    return NextResponse.json({ error: "Payload sem email" }, { status: 500 });
+  }
+
   if (!email && !whopUserId) {
     console.error("[whop] evento sem email nem user_id:", acao);
     return NextResponse.json({ error: "Sem identificação do utilizador" }, { status: 400 });
@@ -115,16 +126,97 @@ export async function POST(request: Request) {
     // Procura-se primeiro pelo id do Whop (estável) e só depois pelo email,
     // que a pessoa pode mudar. Na primeira compra só há email, e é aí que a
     // ligação entre as duas contas fica registada.
-    const utilizador =
+    let utilizador =
       (whopUserId ? await prisma.user.findUnique({ where: { whopUserId } }) : null) ??
       (email ? await prisma.user.findUnique({ where: { email } }) : null);
 
     if (!utilizador) {
-      // Pagou no Whop antes de criar conta aqui. Não se inventa um utilizador:
-      // o registo passa pelo Supabase Auth e um registo órfão em Prisma ficaria
-      // sem sessão possível. Regista-se o caso para quem estiver a ver os logs.
-      console.warn(`[whop] ${acao}: sem conta local para ${email || whopUserId}`);
-      return NextResponse.json({ pendente: "utilizador ainda não registado" }, { status: 200 });
+      // Quem cancela sem nunca ter tido conta aqui não precisa de uma criada
+      // agora só para nascer em FREE.
+      if (!temAcesso) {
+        return NextResponse.json({ ignorado: "sem conta e sem acesso" }, { status: 200 });
+      }
+
+      // (a ausência de email já foi recusada com 500 mais acima)
+
+      // A conta nasce sozinha: quem paga no Whop não passa por um ecrã de
+      // registo. Cria-se PRIMEIRO no Supabase Auth, porque é isso que permite
+      // abrir sessão — um registo só em Prisma seria um utilizador sem forma
+      // de entrar. O convite por email é o que a pessoa recebe para definir
+      // acesso; não há password inicial nem formulário.
+      const adminAuth = createAdminClient().auth;
+      let authId: string | undefined;
+
+      // createUser em vez de inviteUserByEmail: o convite do Supabase sai pelo
+      // serviço de email DELE, que esta aplicação não usa — todos os outros
+      // emails saem pelo Resend. Com o invite, um Supabase sem SMTP configurado
+      // criava a conta e não enviava nada, e ninguém dava por isso. Aqui a
+      // criação e o envio são passos separados, e cada um falha à vista.
+      const criado = await adminAuth.admin.createUser({
+        email,
+        email_confirm: true, // veio de uma compra: o email já está provado
+        user_metadata: { name: "Investidor", origem: "whop" },
+      });
+      authId = criado.data?.user?.id;
+
+      if (!authId) {
+        // Já existir no Auth é o caso normal de quem se registou antes de
+        // comprar: procura-se o id em vez de falhar.
+        const existente = await adminAuth.admin.listUsers({ perPage: 200 });
+        authId = existente.data?.users?.find(
+          (u) => u.email?.toLowerCase() === email
+        )?.id;
+      }
+
+      if (!authId) {
+        console.error(`[whop] não foi possível criar/encontrar Auth para ${email}:`,
+          criado.error?.message);
+        return NextResponse.json({ error: "Falha a criar conta" }, { status: 500 });
+      }
+
+      // O id do Prisma é o MESMO do Auth — é assim que o resto da aplicação
+      // liga a sessão ao utilizador (ver o registo normal em (auth)/actions.ts).
+      utilizador = await prisma.user.upsert({
+        where: { id: authId },
+        create: {
+          id: authId,
+          email,
+          plan: "PRO",
+          whopUserId,
+          whopMembershipId: d.id ?? null,
+          whopStatus: estado,
+          whopProductId: produto ?? null,
+        },
+        update: { plan: "PRO", whopStatus: estado },
+      });
+
+      // O link de entrada sai pelo Resend, como todos os outros emails da
+      // aplicação. Um erro aqui NÃO desfaz a conta nem devolve 500: a pessoa
+      // já tem acesso e pode entrar pelo "entrar com email" do site. Repetir
+      // o webhook criaria emails a dobrar sem resolver nada.
+      if (isEmailEnabled()) {
+        try {
+          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://thebullvalue.com";
+          const { data: link } = await adminAuth.admin.generateLink({
+            type: "magiclink",
+            email,
+            options: { redirectTo: `${siteUrl}/auth/callback?next=/dashboard&welcome=1` },
+          });
+          const token = link?.properties?.hashed_token;
+          if (token) {
+            await sendConfirmationEmail(
+              email,
+              "Investidor",
+              `${siteUrl}/auth/callback?token_hash=${token}&type=magiclink&next=/dashboard&welcome=1`
+            );
+          }
+        } catch (e) {
+          console.error(`[whop] conta criada mas email falhou para ${email}:`, e);
+        }
+      }
+
+      console.log(`[whop] conta criada para ${email} — plano PRO, link de entrada enviado`);
+      return NextResponse.json({ criado: true }, { status: 200 });
     }
 
     await prisma.user.update({

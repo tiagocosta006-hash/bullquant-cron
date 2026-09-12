@@ -1862,6 +1862,68 @@ def apply_fx_conversion(company_currency: str, periods_data: list[dict]) -> bool
 
 
 
+def corrigir_escala_de_acoes(periods_data: list[dict]) -> int:
+    """Repõe linhas soltas com o nº de ações em MILHARES em vez de unidades.
+
+    O guard do build_row usa netIncome/epsDiluted como referência, mas quando a
+    filing não reporta EPS não há referência nenhuma — e 1,25 milhões de acções
+    passa no piso de 100 mil. O EPS é depois derivado a partir desse valor e sai
+    um número absurdo: a COP no 1T de 2017 ficava com EPS de 469 dólares, a ROL
+    com 97, a DLR com 257.
+
+    Aqui a referência é a PRÓPRIA série da empresa, que só existe depois de
+    todos os períodos estarem carregados. Uma linha mil vezes abaixo da mediana
+    das outras não é uma empresa diferente — é a mesma empresa com a escala
+    trocada.
+
+    Conservador de propósito: só corrige quando multiplicar por mil aterra
+    perto da mediana (dentro de 30 %). Uma empresa que fez um agrupamento de
+    acções a sério não encaixa nesse teste e fica intacta. A NVR, que tem
+    mesmo 3,3 milhões de acções e EPS de 500 dólares, também não é tocada —
+    porque a série dela é consistente e a mediana acompanha.
+    """
+    # A referência são os períodos VIZINHOS, não a mediana de toda a série: uma
+    # empresa que emitiu acções muda de patamar, e a mediana global fica presa
+    # ao patamar antigo. A ECHO passou de 84 para 270 milhões de acções — a
+    # linha estragada encaixava nos vizinhos (272 M) e falhava contra a mediana.
+    ordenados = sorted(
+        [p for p in periods_data if p.get("periodEnd")],
+        key=lambda p: str(p["periodEnd"]),
+    )
+    if len(ordenados) < 4:
+        return 0
+
+    corrigidas = 0
+    for i, p in enumerate(ordenados):
+        s = p.get("sharesOutstanding")
+        if not s or s <= 0:
+            continue
+
+        # Até quatro vizinhos de cada lado, saltando os que não têm valor.
+        perto = [
+            v["sharesOutstanding"]
+            for v in ordenados[max(0, i - 4): i + 5]
+            if v is not p and v.get("sharesOutstanding") and v["sharesOutstanding"] > 0
+        ]
+        if len(perto) < 3:
+            continue
+        perto.sort()
+        ref = perto[len(perto) // 2]
+
+        if s >= ref / 100:
+            continue
+        candidato = s * 1000
+        if 0.7 * ref <= candidato <= 1.3 * ref:
+            p["sharesOutstanding"] = candidato
+            # O EPS que tenha sido derivado deste nº de acções vem mil vezes
+            # inflacionado e tem de acompanhar.
+            if p.get("epsDiluted") is not None:
+                p["epsDiluted"] = p["epsDiluted"] / 1000
+            corrigidas += 1
+
+    return corrigidas
+
+
 def apply_stock_splits(ticker: str, periods_data: list[dict]):
     periods_data.sort(key=lambda x: x['periodEnd'])
     # O yfinance usa hífen nas classes de ações (BRK-B), o EDGAR usa ponto
@@ -2276,6 +2338,12 @@ def process_company(conn, company: dict, dry_run: bool = False,
             except Exception:
                 conn.rollback()
 
+    # Antes dos splits: uma linha com a escala trocada envenenaria a deteção
+    # de degraus, que é toda feita por rácios entre períodos consecutivos.
+    n_escala = corrigir_escala_de_acoes(rows)
+    if n_escala:
+        print(f"    {n_escala} linha(s) com nº de ações em milhares — escala reposta")
+
     if ticker:
         # O ajuste de splits depende do Yahoo, que falha com frequência. É um
         # refinamento sobre os dados da SEC — nunca motivo para perder a
@@ -2285,6 +2353,16 @@ def process_company(conn, company: dict, dry_run: bool = False,
             apply_stock_splits(ticker, rows)
         except Exception as e:
             print(f"    Splits por ajustar em {ticker} ({type(e).__name__}: {e})")
+
+        # Outra vez DEPOIS dos splits, e não por excesso de zelo: o ajuste
+        # multiplica linhas inteiras por um factor, e uma linha que estivesse
+        # correcta pode sair de lá com a escala trocada. A ROL era exactamente
+        # isso — chegava sã a esta altura e saía do ajuste a 0,49 M de acções
+        # com EPS de 97 dólares. A função não faz nada quando não há nada fora
+        # de escala, portanto correr duas vezes não custa.
+        n_pos = corrigir_escala_de_acoes(rows)
+        if n_pos:
+            print(f"    {n_pos} linha(s) fora de escala após o ajuste de splits — repostas")
 
     if dry_run:
         if collector is not None:

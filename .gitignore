@@ -123,3 +123,6 @@ scripts/backups/
 # build: 95 mil linhas geradas que tornavam qualquer PR irrevisível.
 dist/
 .env.dev
+
+# rascunhos de depuração — nunca versionar (já saiu daqui uma password)
+scratch_*.py

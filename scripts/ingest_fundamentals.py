@@ -127,6 +127,20 @@ DURATION_TAGS = {
         # *ProForma* (não são resultados reais).
     ],
     "costOfRevenue": [
+        # As seguradoras vêm PRIMEIRO, e de propósito. O custo de uma
+        # seguradora de saúde são os encargos médicos — à volta de 75-85 % dos
+        # prémios — e não uma linha de serviços. A Centene publica
+        # PolicyholderBenefitsAndClaimsIncurredHealthCare (30,6 mil milhões em
+        # 2016 contra 40,6 de receita, ou seja 25 % de margem bruta), mas a
+        # lista só tinha a variante ...IncurredNet, que ela não usa. Caía-se no
+        # CostOfGoodsAndServicesSold residual de 367 milhões e a plataforma
+        # mostrava 95 % de margem bruta numa seguradora.
+        #
+        # Estar no topo não afecta mais ninguém: quem não é seguradora não
+        # publica estas etiquetas, e a procura segue para as seguintes.
+        "PolicyholderBenefitsAndClaimsIncurredHealthCare",
+        "PolicyholderBenefitsAndClaimsIncurredNet",
+        "BenefitsLossesAndExpenses",
         "CostOfRevenue",
         "CostOfSales",
         "CostOfGoodsAndServicesSold",
@@ -148,7 +162,6 @@ DURATION_TAGS = {
         "DirectCostsOfLeasedAndRentedPropertyOrEquipment",
         "PropertyOperatingExpense",
         "RealEstateTaxExpense",
-        "PolicyholderBenefitsAndClaimsIncurredNet"
     ],
     "grossProfit": ["GrossProfit"],
     "operatingExpenses": ["OperatingExpenses", "NoninterestExpense", "OperatingCostsAndExpenses", "OtherOperatingIncomeExpense", "AdministrativeExpense"],
@@ -1391,8 +1404,26 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         
     if gross_profit is None and op_income is not None and op_expenses is not None:
         gross_profit = op_income + op_expenses
-        if revenue is not None and gross_profit > revenue:
-            gross_profit = revenue
+        # Se a soma ultrapassa a receita, a derivação está errada — normalmente
+        # porque as "despesas operacionais" do emitente já incluem o custo da
+        # receita. Fixá-la na receita era FABRICAR um número: o lucro bruto
+        # passava a ser exactamente a receita e a plataforma anunciava 100 % de
+        # margem bruta em gestoras de activos, seguradoras e hospitais — a BEN,
+        # a PYPL, a UHS e a ERIE estavam todas assim.
+        #
+        # Sem custo da receita fiável não há margem bruta para mostrar. N/A é a
+        # resposta honesta, e é a regra da casa ("N/A vs 0" no CLAUDE.md).
+        # Atenção ao caso DEGENERADO, que era o mais comum: numa empresa sem
+        # linha de custo da receita, o emitente reporta
+        # `receita − despesas operacionais = resultado operacional`. Somar as
+        # duas parcelas reconstrói a receita EXACTAMENTE, e o "lucro bruto"
+        # resultante não é informação nenhuma — é a receita outra vez, com
+        # outro nome. Daí os 100 % de margem na BEN, PYPL, UHS e ERIE.
+        #
+        # Por isso o limiar é 99,9 % da receita e não "maior que": o caso que
+        # interessa apanhar cai em cima do valor, não acima dele.
+        if revenue is not None and revenue > 0 and gross_profit >= 0.999 * revenue:
+            gross_profit = None
 
     net_income = dur.get("netIncome")
     tax_expense = dur.get("taxExpense")

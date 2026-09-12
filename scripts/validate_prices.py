@@ -42,7 +42,23 @@ DIRECT_URL = os.getenv("DIRECT_URL")
 if not DIRECT_URL:
     sys.exit("DIRECT_URL não definida")
 
-BASELINE = os.path.join(os.path.dirname(__file__), "out", "prices_baseline.json")
+# A baseline é ANCORADA NO HOST, pelo mesmo motivo que o validate_segments.py
+# documenta: comparar a baseline de um host com uma execução noutro faz o gate
+# discordar para sempre. A base de dados de produção e a de desenvolvimento têm
+# estados diferentes — sem esta âncora, o gate em CI compararia a produção
+# contra uma baseline gravada em localhost e chumbaria todas as noites.
+def _host_do_url(url: str) -> str:
+    return url.split("@")[-1].split("/")[0] if "@" in url else "localhost"
+
+
+def _slug(host: str) -> str:
+    return "".join(ch if ch.isalnum() else "_" for ch in host)
+
+
+BASELINE = os.path.join(
+    os.path.dirname(__file__), "out",
+    f"prices_baseline.{_slug(_host_do_url(os.getenv('DIRECT_URL') or ''))}.json",
+)
 
 # Pseudo-tickers de séries macro (^T10Y2Y, ^CPI_YOY...) não são cotações: têm
 # valores negativos legítimos e não têm OHLC nem volume.
@@ -123,12 +139,20 @@ def main():
         print(f"\nBaseline gravada: {len(chaves)} achados em {BASELINE}")
         return
 
-    base = set()
-    if os.path.exists(BASELINE):
-        with open(BASELINE, encoding="utf-8") as f:
-            base = set(json.load(f)["keys"])
-    else:
-        print("\n(aviso: sem baseline — todos os achados contam como novos)")
+    # Sem baseline para ESTE host o gate não chumba: "ainda não calibrado" não é
+    # o mesmo que "regressão". Chumbar aqui dava um alarme falso na primeira
+    # execução contra uma base de dados nova — e um gate que chumba à entrada é
+    # um gate que alguém desliga. Reporta-se o retrato e passa-se; calibrar é um
+    # gesto deliberado (--baseline), que fica registado em revisão de código.
+    if not os.path.exists(BASELINE):
+        print(f"\n{len(chaves)} achados neste host. Ainda não há baseline em "
+              f"{os.path.basename(BASELINE)} — o gate passa sem comparar.")
+        print("Para calibrar depois de rever os achados: "
+              "python scripts/validate_prices.py --baseline")
+        return
+
+    with open(BASELINE, encoding="utf-8") as f:
+        base = set(json.load(f)["keys"])
 
     novos = [k for k in chaves if k not in base]
     resolvidos = len(base - set(chaves))

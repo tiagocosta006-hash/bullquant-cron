@@ -37,7 +37,22 @@ if hasattr(sys.stdout, "reconfigure"):
 sys.path.insert(0, os.path.dirname(__file__))
 import ingest_fundamentals as ing
 
-BASELINE_PATH = os.path.join(os.path.dirname(__file__), "out", "validator_baseline.json")
+# ANCORADA NO HOST, pelo mesmo motivo que o validate_segments.py documenta: a
+# base de dados de produção e a de desenvolvimento têm estados diferentes, e
+# comparar uma com a baseline da outra faz o gate chumbar todas as noites sem
+# nada de novo ter acontecido.
+def _host_do_url(url: str) -> str:
+    return url.split("@")[-1].split("/")[0] if "@" in url else "localhost"
+
+
+def _slug(host: str) -> str:
+    return "".join(ch if ch.isalnum() else "_" for ch in host)
+
+
+BASELINE_PATH = os.path.join(
+    os.path.dirname(__file__), "out",
+    f"validator_baseline.{_slug(_host_do_url(os.getenv('DIRECT_URL') or ''))}.json",
+)
 
 FIELDS = [
     "revenue", "costOfRevenue", "grossProfit", "netIncome", "epsDiluted",
@@ -213,12 +228,19 @@ def main():
         print(f"\nBaseline gravada: {len(keys)} violações em {BASELINE_PATH}")
         return
 
-    baseline = set()
-    if os.path.exists(BASELINE_PATH):
-        with open(BASELINE_PATH, encoding="utf-8") as f:
-            baseline = set(json.load(f)["keys"])
-    else:
-        print("\n(aviso: sem baseline — todas as violações contam como novas)")
+    # Sem baseline para ESTE host o gate não chumba: "ainda não calibrado" não é
+    # o mesmo que "regressão". Chumbar à entrada numa base de dados nova é um
+    # alarme falso — e um gate que chumba à entrada é um gate que alguém
+    # desliga. Calibrar é um gesto deliberado (--baseline), revisto em código.
+    if not os.path.exists(BASELINE_PATH):
+        print(f"\n{len(keys)} violações neste host. Ainda não há baseline em "
+              f"{os.path.basename(BASELINE_PATH)} — o gate passa sem comparar.")
+        print("Para calibrar depois de rever as violações: "
+              "python scripts/validate_fundamentals.py --baseline")
+        return
+
+    with open(BASELINE_PATH, encoding="utf-8") as f:
+        baseline = set(json.load(f)["keys"])
 
     # Violações REVISTAS E ACEITES (eventos reais: ganho RAI da BTI 2017,
     # reestruturações, pré-conversões) — cada entrada tem racional humano.

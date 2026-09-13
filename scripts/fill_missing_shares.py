@@ -53,7 +53,39 @@ if not DIRECT_URL:
     sys.exit("DIRECT_URL não definida")
 
 import edgar  # noqa: E402
-edgar.set_identity(os.getenv("SEC_IDENTITY", "Tiago Costa costa@engimov.pt"))
+
+# getenv com default NÃO chega: no GitHub Actions um secret inexistente chega
+# como STRING VAZIA, não como variável por definir, e o default nunca entra.
+# O edgar.set_identity("") passa e só falha lá à frente, na SEC, como se fosse
+# outra coisa qualquer.
+edgar.set_identity(os.getenv("SEC_IDENTITY") or "Tiago Costa costa@engimov.pt")
+
+
+def purge_edgar_cache_if_big(limit_gb: float = 3.0) -> bool:
+    """Esvazia a cache HTTP do edgartools se passar de `limit_gb`.
+
+    O edgartools guarda tudo o que descarrega em ~/.edgar/_tcache e nunca
+    limpa. O ingest_segments_xbrl.py já traz este guarda — documenta que a
+    cache chegou a 22 GB e encheu o disco a meio de uma passagem. Este script
+    percorre o mesmo caminho e não o tinha: uma passagem por todas as empresas
+    em falta encheu um disco de 460 GB e deixou a máquina sem conseguir sequer
+    escrever um ficheiro temporário.
+
+    A cache é só um espelho de sec.gov — apagá-la custa re-descarregar.
+    """
+    import shutil
+    from pathlib import Path
+    from edgar.httpclient import get_cache_directory
+    try:
+        cache = get_cache_directory()
+        total = sum(f.stat().st_size for f in Path(cache).rglob("*") if f.is_file())
+        if total > limit_gb * 1024 ** 3:
+            shutil.rmtree(cache, ignore_errors=True)
+            print(f"    (cache do edgar tinha {total/1024**3:.1f} GB — limpa)", flush=True)
+            return True
+    except Exception as e:
+        print(f"    (aviso: não consegui medir/limpar a cache: {e!r})", flush=True)
+    return False
 
 SHARE_CONCEPTS = (
     "us-gaap:WeightedAverageNumberOfDilutedSharesOutstanding",
@@ -206,6 +238,9 @@ def main() -> None:
     rejeitados_ex: list = []
 
     for i, (ticker, cik, n_falta) in enumerate(empresas, 1):
+        # Antes de cada empresa, não no fim: cada uma lê dezenas de filings, e
+        # a cache do edgartools cresce durante a passagem, não entre passagens.
+        purge_edgar_cache_if_big()
         try:
             co = edgar.Company(int(cik))
             filings = []

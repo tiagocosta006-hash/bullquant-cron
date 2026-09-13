@@ -4,3 +4,8 @@ python-dotenv>=1.0.0
 pandas>=2.0.0
 lxml>=4.9.0
 yfinance>=0.2.30
+# Módulo `edgar`. Usado por sete scripts, três deles no workflow semanal de
+# segmentos — que falhava TODOS os sábados com ModuleNotFoundError porque esta
+# linha nunca cá esteve. Com ela iam-se abaixo os segmentos de receita, os
+# interesses não-controlados e os cargos dos insiders.
+edgartools>=3.0.0

@@ -34,9 +34,14 @@ export async function GET(
     // portanto qualquer conta gratuita gastava IA em conteúdo pago.
     const acesso = await exigirPro()
     if (!acesso.ok) return acesso.resposta
-    // `userId` só é null no ramo da demo anónima, que esta chamada não pede —
-    // sem `demoAnonima` o guarda já devolveu 401 a quem não tem sessão.
-    const user = { id: acesso.userId as string }
+    // `userId` é null em dois casos: a demo anónima (que esta chamada não
+    // pede) e o desbloqueio de desenvolvimento sem utilizador local. Em
+    // qualquer deles não há a quem cobrar créditos, e o AIUsageLog.userId tem
+    // chave estrangeira para users — escrever ali um id inexistente rebenta.
+    if (!acesso.userId) {
+      return NextResponse.json({ error: 'Sessão necessária' }, { status: 401 })
+    }
+    const user = { id: acesso.userId }
 
     // 1. Check Cache
     const cached = await prisma.managementProfile.findUnique({

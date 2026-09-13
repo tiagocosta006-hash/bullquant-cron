@@ -80,8 +80,19 @@ export async function exigirPro(opcoes: Opcoes = {}): Promise<Autorizado | Recus
   // O desbloqueio de desenvolvimento tem guard de NODE_ENV lá dentro: num
   // build de produção devolve sempre false, mesmo que a variável apareça no
   // ambiente por engano.
+  //
+  // Resolve-se o id REAL da sessão de desenvolvimento em vez de inventar um.
+  // O getUser() em dev não toca na rede — devolve o utilizador local
+  // configurado em DEV_LOGIN_EMAIL, lido do Prisma (ver lib/supabase/server.ts).
+  // A primeira versão disto devolvia a string "dev", e quem cobra créditos
+  // escrevia-a em AIUsageLog.userId, que tem chave estrangeira para users:
+  // rebentava em qualquer rota de IA que não servisse da cache.
   if (isDevUnlocked()) {
-    return { ok: true, userId: "dev", pro: true };
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    return { ok: true, userId: user?.id ?? null, pro: true };
   }
 
   // A demo é decidida ANTES de se procurar sessão: é o que um anónimo vê, e

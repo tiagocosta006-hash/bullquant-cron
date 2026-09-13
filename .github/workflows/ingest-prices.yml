@@ -45,13 +45,21 @@ jobs:
 
       # Fica como passo opcional: no dia em que houver chave da Polygon, é a
       # fonte preferida (ver CLAUDE.md §5). Não falha o workflow sem ela.
+      # A verificação da chave é feita no SHELL e não num `if:` do passo: o
+      # contexto `secrets` não é permitido em condições de passo, e usá-lo
+      # invalidava o ficheiro inteiro — o GitHub deixava de conseguir ler o
+      # `name:` e passava a listar o workflow pelo caminho do ficheiro.
       - name: Run ingest (Polygon, se houver chave)
-        if: ${{ secrets.POLYGON_API_KEY != '' }}
         continue-on-error: true
         env:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
-        run: python scripts/ingest_prices.py
+        run: |
+          if [ -z "$POLYGON_API_KEY" ]; then
+            echo "POLYGON_API_KEY vazia — passo ignorado (o yfinance acima já ingeriu)."
+            exit 0
+          fi
+          python scripts/ingest_prices.py
 
       # Gate de QUALIDADE DOS PREÇOS. O script existia no repo desde sempre e
       # nunca corria — abre com "a tabela tem 2 058 782 linhas e NUNCA foi

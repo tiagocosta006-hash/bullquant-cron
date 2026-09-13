@@ -136,6 +136,41 @@ async function main() {
         if (netIncome !== null) netMargin = netIncome / revenue;
       }
 
+      // NUNCA sobrepor um valor existente com null.
+      //
+      // O `update` escrevia todos os campos incondicionalmente. Quando a Yahoo
+      // ainda não tem a demonstração de resultados do trimestre — que é o caso
+      // NORMAL nos primeiros dias depois do anúncio, justamente quando este
+      // script é útil — devolve o período com os números a null, e isso
+      // apagava os dados que a SEC já tinha carregado.
+      //
+      // Aconteceu à Oracle a 2026-09-13: o trimestre de agosto fora absorvido
+      // da filing no dia 11, com receita e lucro, e uma passagem deste script
+      // pôs os dois a null.
+      //
+      // Esta é uma fonte de PREENCHIMENTO, não de substituição: só escreve
+      // onde traz valor.
+      const soPreenchidos = <T extends Record<string, unknown>>(o: T) =>
+        Object.fromEntries(
+          Object.entries(o).filter(([, v]) => v !== null && v !== undefined),
+        );
+
+      const campos = {
+        revenue, costOfRevenue, grossProfit, operatingExpenses,
+        ebitda, operatingIncome, netIncome, operatingCashFlow,
+        capex, freeCashFlow, totalAssets, totalDebt,
+        grossMargin, operatingMargin, netMargin,
+      };
+      const preenchidos = soPreenchidos(campos);
+
+      // Sem UM único número não se cria período nenhum. Uma linha trimestral
+      // vazia no fim da série não é "sem dados" no gráfico — é uma barra a
+      // zero, que se lê como uma receita que colapsou.
+      if (Object.keys(preenchidos).length === 0) {
+        console.log(`[${ticker}] Ignorado: a Yahoo tem o período de ${periodEnd.toISOString().split('T')[0]} mas ainda sem números.`);
+        continue;
+      }
+
       await prisma.fundamental.upsert({
         where: {
           companyId_periodType_fiscalYear_fiscalQuarter: {
@@ -145,22 +180,14 @@ async function main() {
             fiscalQuarter,
           }
         },
-        update: {
-          revenue, costOfRevenue, grossProfit, operatingExpenses,
-          ebitda, operatingIncome, netIncome, operatingCashFlow,
-          capex, freeCashFlow, totalAssets, totalDebt,
-          grossMargin, operatingMargin, netMargin
-        },
+        update: preenchidos,
         create: {
           companyId: company.id,
           periodType: 'QUARTERLY',
           fiscalYear,
           fiscalQuarter,
           periodEnd,
-          revenue, costOfRevenue, grossProfit, operatingExpenses,
-          ebitda, operatingIncome, netIncome, operatingCashFlow,
-          capex, freeCashFlow, totalAssets, totalDebt,
-          grossMargin, operatingMargin, netMargin
+          ...preenchidos,
         }
       });
 

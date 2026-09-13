@@ -145,6 +145,22 @@ Escrever um nome que não se consegue verificar é como se estragam dados.
 **Como resolver a sério.** Uma API paga de perfis, ou ler o nome do próprio
 10-K/20-F via edgartools, que já é usado para os segmentos.
 
+**A antiguidade do CEO saiu por completo.** Mostrava-se "CEO · Desde 2014", e
+a data vinha da memória do modelo: a ficha da Intel dizia "Desde 2024" quando
+o Lip-Bu Tan entrou em 2025. Não há fonte para datas — os dados de insiders
+começam em agosto de 2025, e por isso não distinguem quem entrou ontem de quem
+lá está há vinte anos. As colunas `tenure_en`/`tenure_pt` ficaram na tabela
+(mudá-las obrigava a mexer no schema de produção) e passam a ser gravadas
+vazias.
+
+O resto do texto passou a andar sobre números nossos: os últimos oito anos de
+receita, resultado líquido, FCF, dividendo por ação, ações em circulação e
+dívida vão com a pergunta, e o modelo está instruído a não fazer nenhuma
+afirmação quantitativa fora deles, a não escrever datas e a não nomear
+aquisições. A nota de alocação de capital deixou de ser uma recordação: a
+Intel sai POOR com o FCF a passar de +21.605M para −15.656M, que é o que está
+na nossa base.
+
 ---
 
 ## 8. Base de dados a 335 MB de 500 MB

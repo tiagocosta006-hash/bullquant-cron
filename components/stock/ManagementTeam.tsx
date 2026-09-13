@@ -2,14 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Users, Crown, CheckCircle2, AlertTriangle, XCircle, ChevronRight, Briefcase, Info } from 'lucide-react'
+import { Users, Crown, CheckCircle2, AlertTriangle, XCircle, Briefcase, Info } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { useLocale } from 'next-intl'
 
 type ManagementProfile = {
   ceoName: string
-  tenure_en: string
-  tenure_pt: string
   isFamilyRun: boolean
   familyInfluence_en: string | null
   familyInfluence_pt: string | null
@@ -22,7 +20,10 @@ type ManagementProfile = {
   generatedAt: string
 }
 
-const RatingIcon = ({ rating, type }: { rating: string, type: 'capital' | 'skin' }) => {
+/** Marca de erro sem mensagem própria — o texto escolhe-se ao renderizar. */
+const GENERICO = "__generico__"
+
+const RatingIcon = ({ rating }: { rating: string }) => {
   if (rating === 'EXCELLENT' || rating === 'HIGH') return <CheckCircle2 className="h-4 w-4 text-bull" />
   if (rating === 'AVERAGE' || rating === 'MODERATE') return <AlertTriangle className="h-4 w-4 text-gold-500" />
   return <XCircle className="h-4 w-4 text-bear" />
@@ -52,8 +53,11 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
         }
         setSemCeoVerificado(Boolean(data.semCeoVerificado))
         setProfile(data.profile)
-      } catch (e: any) {
-        setError(e.message || "Não foi possível obter os dados da equipa de gestão.")
+      } catch (e) {
+        // A mensagem traduz-se na renderização, não aqui: usar o `locale`
+        // dentro do efeito punha-o nas dependências e voltava a buscar tudo
+        // de cada vez que a pessoa trocasse de idioma.
+        setError(e instanceof Error && e.message ? e.message : GENERICO)
       } finally {
         setLoading(false)
       }
@@ -121,7 +125,13 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
             <AlertTriangle className="h-5 w-5 text-bear shrink-0 mt-0.5" />
             <div>
               <h4 className="text-sm font-bold text-bear">{locale === 'pt' ? 'Aviso' : 'Warning'}</h4>
-              <p className="text-sm text-grey-400 mt-1">{error || (locale === 'pt' ? 'Perfil não encontrado.' : 'Profile not found.')}</p>
+              <p className="text-sm text-grey-400 mt-1">
+                {error && error !== GENERICO
+                  ? error
+                  : locale === 'pt'
+                    ? 'Não foi possível obter os dados da equipa de gestão.'
+                    : 'Could not load the management team data.'}
+              </p>
             </div>
           </div>
         </CardContent>
@@ -129,7 +139,6 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
     )
   }
 
-  const tenure = locale === 'pt' ? profile.tenure_pt : profile.tenure_en
   const familyInfluence = locale === 'pt' ? profile.familyInfluence_pt : profile.familyInfluence_en
   const capitalAllocationSummary = locale === 'pt' ? profile.capitalAllocationSummary_pt : profile.capitalAllocationSummary_en
   const analysis = locale === 'pt' ? profile.analysis_pt : profile.analysis_en
@@ -170,9 +179,12 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-parchment-100">{profile.ceoName}</h3>
-                <p className="text-sm text-grey-400 flex items-center gap-1.5 mt-1">
-                  CEO <ChevronRight className="h-3 w-3" /> {tenure}
-                </p>
+                {/* A antiguidade saiu. Era uma data dita de memória: a ficha da
+                    Intel mostrava "Desde 2024" quando o Lip-Bu Tan entrou em
+                    2025. Não há fonte para datas — os dados de insiders só
+                    começam em agosto de 2025 — e um "desde" errado é pior do
+                    que não haver "desde" nenhum. */}
+                <p className="text-sm text-grey-400 mt-1">CEO</p>
               </div>
             </div>
 
@@ -214,7 +226,7 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
                   {locale === 'pt' ? 'Alocação de Capital' : 'Capital Allocation'}
                 </span>
                 <Badge variant="outline" className={RatingColor({ rating: profile.capitalAllocationRating })}>
-                  <RatingIcon rating={profile.capitalAllocationRating} type="capital" />
+                  <RatingIcon rating={profile.capitalAllocationRating} />
                   <span className="ml-1.5">{profile.capitalAllocationRating}</span>
                 </Badge>
               </div>
@@ -231,7 +243,7 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
                   {locale === 'pt' ? 'Skin in the Game (Alinhamento)' : 'Skin in the Game (Alignment)'}
                 </span>
                 <Badge variant="outline" className={RatingColor({ rating: profile.skinInTheGame })}>
-                  <RatingIcon rating={profile.skinInTheGame} type="skin" />
+                  <RatingIcon rating={profile.skinInTheGame} />
                   <span className="ml-1.5">{profile.skinInTheGame}</span>
                 </Badge>
               </div>

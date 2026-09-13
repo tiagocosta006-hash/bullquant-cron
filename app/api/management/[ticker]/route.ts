@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
-import { createClient } from '@/lib/supabase/server'
 import { generateObject } from 'ai'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { z } from 'zod'
@@ -18,7 +17,7 @@ export const maxDuration = 60; // Vercel function timeout (60s is good for AI)
  * muda só o modelo. Um perfil com outra revisão é tratado como expirado, o que
  * evita ter de mexer na base de dados de produção para os invalidar.
  */
-const REVISAO_PERFIL = "r2-ceo-ancorado";
+const REVISAO_PERFIL = "r3-numeros-ancorados";
 
 /**
  * O nome do CEO NÃO é do modelo.
@@ -128,6 +127,52 @@ export async function GET(
       return NextResponse.json(rateLimitError, { status: 429 })
     }
 
+    /**
+     * Os números vão com a pergunta.
+     *
+     * A nota de alocação de capital e o resumo saíam da memória do modelo —
+     * "recompras agressivas", "dividendo em crescimento" — sobre uma empresa
+     * que ele talvez não visse desde o treino. Temos os números todos na base
+     * de dados: dividendo por ação, ações em circulação (que é a prova das
+     * recompras), fluxo de caixa livre, dívida e resultado líquido.
+     *
+     * Passam com a pergunta e a instrução é explícita: qualquer afirmação
+     * quantitativa sai daqui, ou não se faz.
+     */
+    const anuais = await prisma.fundamental.findMany({
+      where: { companyId: company.id, periodType: "ANNUAL" },
+      orderBy: { fiscalYear: "desc" },
+      take: 8,
+      select: {
+        fiscalYear: true,
+        revenue: true,
+        netIncome: true,
+        freeCashFlow: true,
+        dividendPerShare: true,
+        sharesOutstanding: true,
+        totalDebt: true,
+      },
+    })
+
+    const milhoes = (v: Prisma.Decimal | null) =>
+      v === null ? "n/d" : `${(Number(v) / 1e6).toFixed(0)}M`
+
+    const tabela = anuais
+      .slice()
+      .reverse()
+      .map((f) =>
+        [
+          `FY${f.fiscalYear}`,
+          `receita ${milhoes(f.revenue)}`,
+          `resultado líquido ${milhoes(f.netIncome)}`,
+          `FCF ${milhoes(f.freeCashFlow)}`,
+          `dividendo/ação ${f.dividendPerShare === null ? "n/d" : Number(f.dividendPerShare).toFixed(2)}`,
+          `ações ${milhoes(f.sharesOutstanding)}`,
+          `dívida total ${milhoes(f.totalDebt)}`,
+        ].join(", ")
+      )
+      .join("\n")
+
     // 2. Generate AI Assessment
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json({ error: 'GEMINI_API_KEY not configured' }, { status: 500 })
@@ -140,10 +185,6 @@ export async function GET(
       model: google(modelName),
       schema: z.object({
         ceoName: z.string(),
-        tenure: z.object({
-          en: z.string().describe("e.g. 'Since 2014'"),
-          pt: z.string().describe("e.g. 'Desde 2014'")
-        }).describe("How long the CEO has been in charge"),
         isFamilyRun: z.boolean().describe("True if founding family controls it"),
         familyInfluence: z.object({
           en: z.string(),
@@ -160,11 +201,25 @@ export async function GET(
           pt: z.string()
         }).describe("1 paragraph summary of track record")
       }),
-      system: "You are a senior Wall Street value investor analyzing a management team. You MUST provide all textual descriptions in BOTH English ('en') and European Portuguese ('pt', strictly pt-PT, avoid Brazilian Portuguese). Be highly critical, concise, and professional.",
+      system: [
+        "You are a senior Wall Street value investor analyzing a management team.",
+        "You MUST provide all textual descriptions in BOTH English ('en') and European Portuguese ('pt', strictly pt-PT, avoid Brazilian Portuguese).",
+        "Be highly critical, concise, and professional.",
+        // Sem isto, o modelo enche os buracos com o que se lembra, e o que se
+        // lembra tem o corte de treino dele. Datas de nomeação, valores de
+        // aquisições e números de recompras eram tudo memória apresentada com
+        // ar de facto.
+        "CRITICAL: every quantitative claim — figures, percentages, growth rates, share counts, dividend levels, debt levels — must come from the financial data supplied in the prompt, and from nothing else.",
+        "Never state a date: no appointment years, no tenure lengths, no dates of acquisitions or events. You do not have a reliable source for dates.",
+        "Never name a specific acquisition, product launch or event unless it is implied by the supplied figures. Where you lack data, write about what the supplied figures show instead.",
+      ].join(" "),
       prompt: [
         `Analyze the management team and CEO of ${company.name} (${company.ticker}).`,
         `The current CEO is ${ceoDaBase}. This is verified company profile data, refreshed monthly, and is more recent than your training data: use this name, do not substitute anyone else, and write the tenure, capital allocation history and track record about ${ceoDaBase}. If you believe someone else holds the role, you are out of date.`,
         `Also assess whether it is a family/founder-run business and their skin in the game.`,
+        anuais.length > 0
+          ? `Base every quantitative statement — and the capital allocation grade in particular — on these annual figures from our database, and on nothing else. The share count is the evidence for buybacks or dilution; the dividend per share is the evidence for the dividend policy.\n${tabela}`
+          : `We have no annual financial data for this company, so make no quantitative claims at all.`,
       ].join(" ")
     })
 
@@ -175,11 +230,18 @@ export async function GET(
     const profileData = {
       // A âncora ganha ao modelo. Chegar aqui já garante que existe.
       ceoName: ceoDaBase,
+      // A antiguidade saiu: era uma DATA, dita de memória, e não temos fonte
+      // nenhuma para datas. A ficha da Intel dizia "Desde 2024" e o Lip-Bu Tan
+      // entrou em 2025. Os dados de insiders não servem — a janela do Finnhub
+      // começa em agosto de 2025, portanto nem sequer distingue quem entrou
+      // ontem de quem lá está há vinte anos. As colunas ficam (mudar o schema
+      // obrigava a mexer na base de produção) e ficam vazias; o componente já
+      // não as mostra.
+      tenure_en: "",
+      tenure_pt: "",
       isFamilyRun: object.isFamilyRun,
       capitalAllocationRating: object.capitalAllocationRating,
       skinInTheGame: object.skinInTheGame,
-      tenure_en: object.tenure.en,
-      tenure_pt: object.tenure.pt,
       familyInfluence_en: object.familyInfluence?.en || null,
       familyInfluence_pt: object.familyInfluence?.pt || null,
       capitalAllocationSummary_en: object.capitalAllocationSummary.en,

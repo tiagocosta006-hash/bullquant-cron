@@ -110,6 +110,12 @@ documentado em `lib/supabase/middleware.ts`), e o investimento em SEO existe
 (JSON-LD, glossário, diretório). Qual das duas cede é uma decisão de negócio,
 não um bug a corrigir sozinho.
 
+**O que JÁ foi corrigido.** Havia uma parte que não era decisão nenhuma: o
+sitemap anunciava `/explore` e `/calendar`, que respondem 307 a um anónimo, e
+omitia `/glossary`, que responde 200. Ou seja, anunciava o que redireciona e
+calava o que não redireciona. O glossário entrou. As outras duas ficam, porque
+tirá-las é escolher um lado do conflito acima.
+
 ---
 
 ## 7. Base de dados a 335 MB de 500 MB

@@ -35,6 +35,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...createSitemapEntries('/calendar', { lastModified: now, changeFrequency: 'daily', priority: 0.7 }),
     ...createSitemapEntries('/dcf', { lastModified: now, changeFrequency: 'weekly', priority: 0.7 }),
     ...createSitemapEntries('/about', { lastModified: now, changeFrequency: 'monthly', priority: 0.7 }),
+    // O glossário estava de fora, e é das poucas páginas aqui que um anónimo
+    // consegue MESMO abrir: /explore e /calendar acima respondem 307 para o
+    // registo, inclusive ao Googlebot. Era o inverso do que devia — anunciar o
+    // que redireciona e calar o que não redireciona.
+    ...createSitemapEntries('/glossary', { lastModified: now, changeFrequency: 'monthly', priority: 0.6 }),
     ...createSitemapEntries('/pricing', { lastModified: now, changeFrequency: 'monthly', priority: 0.6 }),
     ...createSitemapEntries('/terms', { lastModified: now, changeFrequency: 'yearly', priority: 0.3 }),
     ...createSitemapEntries('/privacy', { lastModified: now, changeFrequency: 'yearly', priority: 0.3 }),

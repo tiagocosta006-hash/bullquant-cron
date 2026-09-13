@@ -36,8 +36,31 @@ def main():
         # Company em vez da LVMH, DSY devolve a Big Tree Cloud em vez da
         # Dassault. Não falha: grava silenciosamente o preço da empresa errada.
         # Estas são servidas pelo ingest_prices_euronext.py.
+        # A AVB fica de FORA pela mesma razão de fundo que as da Euronext: o
+        # símbolo deixou de resolver para a empresa certa no Yahoo e o erro é
+        # SILENCIOSO — não falha, grava o preço de outra coisa.
+        #
+        # Medido a 2026-09-13: a série da AVB caía de 195,50 para 68,93 de um
+        # dia para o outro (17 de julho) e ficava presa nos 63-69 até parar a
+        # 24 de agosto. O Finnhub, consultado em paralelo, devolvia 184,06 para
+        # "AvalonBay Communities Inc" na NYSE, com capitalização de 26,3 mil
+        # milhões — 143 M de ações a 184 $, que é a AvalonBay a sério. O Yahoo
+        # ainda reportava um "split" de 2,793 a 17 de agosto, um rácio que não
+        # corresponde a operação nenhuma e é o sintoma de duas séries
+        # diferentes coladas uma à outra.
+        #
+        # Foram apagadas 27 linhas (cópia em scratchpad/avb_corrompido_prod.csv)
+        # e a série volta a terminar a 16 de julho nos 195,50. Sem esta exclusão
+        # a ingestão seguinte reescrevia tudo outra vez.
+        #
+        # ⚠️ Antes de tirar daqui um ticker, confirmar com uma SEGUNDA fonte
+        # que o símbolo resolve para a empresa certa. Foi assim que este e os
+        # seis da Euronext foram apanhados.
+        SIMBOLOS_QUE_RESOLVEM_MAL = ('AVB',)
+
         cur.execute('SELECT ticker FROM companies WHERE "isActive" = TRUE '
-                    "AND COALESCE(exchange, '') !~* 'euronext'")
+                    "AND COALESCE(exchange, '') !~* 'euronext' "
+                    "AND ticker <> ALL(%s)", (list(SIMBOLOS_QUE_RESOLVEM_MAL),))
         tickers = [r[0] for r in cur.fetchall()]
 
     if not tickers:

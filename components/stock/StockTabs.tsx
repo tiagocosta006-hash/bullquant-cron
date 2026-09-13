@@ -34,6 +34,32 @@ export function StockTabs({
   const t = useTranslations("stock.tabs");
   const tProGate = useTranslations("stock.proGate");
   const [active, setActive] = useState<TabKey>("overview");
+  /**
+   * Só se monta o separador que a pessoa abriu.
+   *
+   * Os seis eram montados todos de uma vez e escondidos com `hidden`. Estar
+   * escondido não impede nada de correr: o React monta na mesma, os `useEffect`
+   * disparam na mesma, e cada componente vai buscar os seus dados. Abrir uma
+   * página de ação para ver a Visão geral pedia ao servidor os fundamentais,
+   * os múltiplos de avaliação, o preço contra lucros, os insiders, o perfil de
+   * gestão, o relatório do analista e as notícias — sete pedidos que ninguém
+   * pediu, cada um deles a validar a sessão no Supabase duas vezes (uma no
+   * middleware, outra no handler).
+   *
+   * O pior era o perfil de gestão: para quem tem PRO, esse pedido pode gerar
+   * uma análise no Gemini, com até 60 segundos de limite, e gasta um crédito
+   * de IA — tudo isto sem a pessoa alguma vez abrir o separador Empresa.
+   *
+   * Uma vez aberto, fica montado: o `hidden` continua a servir para preservar
+   * o estado e não voltar a pedir os dados quando se troca de separador e se
+   * volta atrás. O que muda é o "de uma vez, à cabeça" para "quando for
+   * preciso".
+   */
+  const [abertos, setAbertos] = useState<Set<TabKey>>(() => new Set<TabKey>(["overview"]));
+  const abrir = (key: TabKey) => {
+    setActive(key);
+    setAbertos((anteriores) => (anteriores.has(key) ? anteriores : new Set(anteriores).add(key)));
+  };
   const slots: Record<TabKey, React.ReactNode> = { overview, financials, analista, valuation, company, news };
 
   const tabsToShow = isEtf
@@ -48,7 +74,7 @@ export function StockTabs({
             <button
               key={key}
               type="button"
-              onClick={() => setActive(key)}
+              onClick={() => abrir(key)}
               className={cn(
                 "flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors",
                 active === key
@@ -77,7 +103,7 @@ export function StockTabs({
 
       {tabsToShow.map((key) => (
         <div key={key} className={cn("space-y-8", active !== key && "hidden")}>
-          {slots[key]}
+          {abertos.has(key) ? slots[key] : null}
         </div>
       ))}
     </div>

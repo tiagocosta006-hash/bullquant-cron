@@ -22,7 +22,32 @@ jobs:
       - name: Install dependencies
         run: pip install -r scripts/requirements.txt
 
-      - name: Run ingest
+      # O ingest_prices.py depende da Polygon, e o POLYGON_API_KEY está VAZIO
+      # nos secrets. O script saía logo com "POLYGON_API_KEY não definida" e
+      # código 1 — ou seja, este cron falhava TODOS OS DIAS, em silêncio, e o
+      # gate de qualidade a seguir nunca chegava a correr.
+      #
+      # Os preços em produção estavam a cinco dias de atraso quando isto foi
+      # descoberto. Numa plataforma de análise de ações, isso é capitalização,
+      # gráficos e maiores subidas todos errados.
+      #
+      # O fast_prices.py faz o mesmo trabalho pelo yfinance e é o que tem sido
+      # corrido à mão. Passa a ser ele o cron. Traz três salvaguardas que o
+      # histórico deste repositório justificou: exclui a Euronext (sem sufixo
+      # de bolsa o ticker nu resolve para a empresa errada — MC devolvia a
+      # Moelis em vez da LVMH), agrupa por ticker ao calcular a data de início
+      # (senão os tickers atrasados nunca eram apanhados) e mapeia os pontos
+      # das classes de ações para hífen (BRK.B → BRK-B).
+      - name: Run ingest (yfinance)
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: python scripts/fast_prices.py
+
+      # Fica como passo opcional: no dia em que houver chave da Polygon, é a
+      # fonte preferida (ver CLAUDE.md §5). Não falha o workflow sem ela.
+      - name: Run ingest (Polygon, se houver chave)
+        if: ${{ secrets.POLYGON_API_KEY != '' }}
+        continue-on-error: true
         env:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}

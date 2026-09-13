@@ -8,10 +8,17 @@ import pandas as pd
 from dotenv import load_dotenv
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
-ENV_FILE = os.path.join(ROOT, ".env.dev")
-if not os.path.exists(ENV_FILE):
-    sys.exit("ERRO: ficheiro .env.dev não encontrado.")
-load_dotenv(ENV_FILE)
+
+# No GitHub Actions as credenciais vêm dos secrets do repositório — não há
+# .env.dev nenhum, e exigi-lo era o que impedia este script de correr em cron.
+# Fora do Actions mantém-se a regra: só contra a base de desenvolvimento.
+if os.environ.get("GITHUB_ACTIONS") == "true":
+    pass
+else:
+    ENV_FILE = os.path.join(ROOT, ".env.dev")
+    if not os.path.exists(ENV_FILE):
+        sys.exit("ERRO: ficheiro .env.dev não encontrado.")
+    load_dotenv(ENV_FILE)
 
 DIRECT_URL = os.getenv("DIRECT_URL")
 if not DIRECT_URL:

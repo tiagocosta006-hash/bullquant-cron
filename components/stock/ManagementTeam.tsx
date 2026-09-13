@@ -38,6 +38,8 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
   const [profile, setProfile] = useState<ManagementProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  // Não é a mesma coisa que um erro: é a plataforma a dizer que não sabe.
+  const [semCeoVerificado, setSemCeoVerificado] = useState(false)
   const locale = useLocale()
 
   useEffect(() => {
@@ -48,6 +50,7 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
         if (!res.ok) {
           throw new Error(data.message || data.error || 'Failed to fetch')
         }
+        setSemCeoVerificado(Boolean(data.semCeoVerificado))
         setProfile(data.profile)
       } catch (e: any) {
         setError(e.message || "Não foi possível obter os dados da equipa de gestão.")
@@ -64,7 +67,7 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
         <CardHeader className="border-b border-ink-800 pb-4">
           <CardTitle className="text-lg flex items-center gap-2">
             <Users className="h-5 w-5 text-gold-500" />
-            Equipa de Gestão
+            {locale === 'pt' ? 'Equipa de Gestão' : 'Management Team'}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6 space-y-4">
@@ -76,21 +79,49 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
     )
   }
 
+  if (semCeoVerificado) {
+    return (
+      <Card className="border-ink-700 bg-ink-900 overflow-hidden relative">
+        <CardHeader className="border-b border-ink-800 pb-4">
+          <CardTitle className="text-lg flex items-center gap-2 text-parchment-100">
+            <Users className="h-5 w-5 text-gold-500" />
+            {locale === 'pt' ? 'Equipa de Gestão' : 'Management Team'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="bg-ink-800/50 border border-ink-700 rounded-lg p-4 flex items-start gap-3">
+            <Info className="h-5 w-5 text-grey-400 shrink-0 mt-0.5" />
+            <div>
+              <h4 className="text-sm font-semibold text-parchment-100">
+                {locale === 'pt' ? 'Sem dados verificados' : 'No verified data'}
+              </h4>
+              <p className="text-sm text-grey-400 mt-1">
+                {locale === 'pt'
+                  ? 'Não temos o CEO desta empresa confirmado por uma fonte fiável, e por isso não mostramos nada aqui. Preferimos não ter secção a ter um nome que não conseguimos garantir.'
+                  : 'We have no reliable source confirming this company\u2019s CEO, so we show nothing here. We would rather have no section than a name we cannot stand behind.'}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   if (error || !profile) {
     return (
       <Card className="border-ink-700 bg-ink-900 overflow-hidden relative">
         <CardHeader className="border-b border-ink-800 pb-4">
           <CardTitle className="text-lg flex items-center gap-2 text-parchment-100">
             <Users className="h-5 w-5 text-gold-500" />
-            Equipa de Gestão
+            {locale === 'pt' ? 'Equipa de Gestão' : 'Management Team'}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6">
           <div className="bg-bear/10 border border-bear/20 rounded-lg p-4 flex items-start gap-3">
             <AlertTriangle className="h-5 w-5 text-bear shrink-0 mt-0.5" />
             <div>
-              <h4 className="text-sm font-bold text-bear">Aviso</h4>
-              <p className="text-sm text-grey-400 mt-1">{error || "Perfil não encontrado."}</p>
+              <h4 className="text-sm font-bold text-bear">{locale === 'pt' ? 'Aviso' : 'Warning'}</h4>
+              <p className="text-sm text-grey-400 mt-1">{error || (locale === 'pt' ? 'Perfil não encontrado.' : 'Profile not found.')}</p>
             </div>
           </div>
         </CardContent>
@@ -112,7 +143,7 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
           <div className="flex items-center gap-3">
             <CardTitle className="text-lg flex items-center gap-2 text-parchment-100">
               <Users className="h-5 w-5 text-gold-500" />
-              Equipa de Gestão
+              {locale === 'pt' ? 'Equipa de Gestão' : 'Management Team'}
             </CardTitle>
             <div 
               className="flex items-center gap-1 text-[10px] bg-ink-800/50 text-grey-400 px-2 py-0.5 rounded-full border border-ink-700 cursor-help"

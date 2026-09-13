@@ -90,10 +90,31 @@ export async function GET(
 
     const ceoDaBase = nomeDeCeoLimpo(company.ceo)
 
+    // Sem CEO verificado, não há perfil. Ponto.
+    //
+    // São 67 das 559 empresas activas — ADRs e europeias, que o
+    // `companyOfficers` do yfinance cobre mal. A tentação é deixar o modelo
+    // dizer quem é, já que "é melhor que nada": não é. Um nome que ninguém
+    // verificou aparece com o mesmo ar de certeza que um verificado, e é
+    // assim que a Intel mostrou o Gelsinger durante meses.
+    //
+    // E não se trata só do nome: a antiguidade, a alocação de capital e o
+    // texto da análise são TODOS sobre a pessoa que o modelo escolheu. Se o
+    // nome não se pode confiar, o parágrafo sobre o percurso dele também não.
+    //
+    // Também não se serve o que está em cache: o que foi gerado sem âncora
+    // continua sem âncora. E poupa-se um crédito de IA por empresa.
+    if (!ceoDaBase) {
+      return NextResponse.json(
+        { profile: null, semCeoVerificado: true },
+        { status: 200, headers: { "Cache-Control": "no-store" } }
+      )
+    }
+
     const daRevisaoAtual = cached?.modelVersion?.startsWith(`${REVISAO_PERFIL}:`) ?? false
     if (cached && cached.expiresAt > new Date() && daRevisaoAtual) {
       // O nome vem da base mesmo quando o resto vem da cache.
-      return NextResponse.json({ profile: { ...cached, ceoName: ceoDaBase ?? cached.ceoName } })
+      return NextResponse.json({ profile: { ...cached, ceoName: ceoDaBase } })
     }
 
     // 1b. Créditos
@@ -142,9 +163,7 @@ export async function GET(
       system: "You are a senior Wall Street value investor analyzing a management team. You MUST provide all textual descriptions in BOTH English ('en') and European Portuguese ('pt', strictly pt-PT, avoid Brazilian Portuguese). Be highly critical, concise, and professional.",
       prompt: [
         `Analyze the management team and CEO of ${company.name} (${company.ticker}).`,
-        ceoDaBase
-          ? `The current CEO is ${ceoDaBase}. This is verified company profile data, refreshed monthly, and is more recent than your training data: use this name, do not substitute anyone else, and write the tenure, capital allocation history and track record about ${ceoDaBase}. If you believe someone else holds the role, you are out of date.`
-          : `There is no verified CEO on record for this company, so state who you believe currently holds the role.`,
+        `The current CEO is ${ceoDaBase}. This is verified company profile data, refreshed monthly, and is more recent than your training data: use this name, do not substitute anyone else, and write the tenure, capital allocation history and track record about ${ceoDaBase}. If you believe someone else holds the role, you are out of date.`,
         `Also assess whether it is a family/founder-run business and their skin in the game.`,
       ].join(" ")
     })
@@ -154,9 +173,8 @@ export async function GET(
     expiresAt.setDate(expiresAt.getDate() + 30)
 
     const profileData = {
-      // A âncora ganha sempre ao modelo; só quando a base não tem ninguém é
-      // que se aceita o que ele diz.
-      ceoName: ceoDaBase ?? object.ceoName,
+      // A âncora ganha ao modelo. Chegar aqui já garante que existe.
+      ceoName: ceoDaBase,
       isFamilyRun: object.isFamilyRun,
       capitalAllocationRating: object.capitalAllocationRating,
       skinInTheGame: object.skinInTheGame,

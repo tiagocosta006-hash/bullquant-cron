@@ -121,9 +121,16 @@ tirá-las é escolher um lado do conflito acima.
 ## 7. CEO desconhecido em 67 empresas
 
 **O que se vê.** O `companies.ceo` está a `null` em 67 das 559 activas, e é
-essa coluna que ancora o nome mostrado no separador Empresa. Sem ela, o nome
-volta a ser o que o Gemini se lembra — HSBC, Netflix, SAP, Shell, Spotify,
-Ferrari estão nesse grupo.
+essa coluna que ancora o nome mostrado no separador Empresa — HSBC, Netflix,
+SAP, Shell, Spotify e Ferrari estão nesse grupo. Nessas, o separador diz que
+não há dados verificados, e não mostra secção nenhuma. A Visão geral também
+não mostra a linha do CEO: o `.filter(d => !!d.value)` já a deixava cair.
+
+**Porque não se mostra o palpite do modelo.** Chegou a mostrar, e foi assim
+que a Intel apareceu com o Pat Gelsinger durante meses depois de ele sair. Um
+nome que ninguém verificou aparece com o mesmo ar de certeza que um
+verificado — e não é só o nome, porque a antiguidade, a alocação de capital e
+a análise são todas sobre a pessoa que o modelo escolheu.
 
 **Porque acontece.** O `ingest_ceos.py` lê o `companyOfficers` do yfinance, que
 é esparso fora dos EUA: 28 das 67 são de fora. A corrida de 1 de setembro

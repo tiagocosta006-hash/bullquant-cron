@@ -210,6 +210,23 @@ export async function POST(request: Request) {
 
   const email = (d.user?.email ?? "").toLowerCase().trim();
   const whopUserId = d.user?.id ?? d.user_id ?? null;
+
+  /**
+   * Diagnóstico devolvido em TODAS as respostas de sucesso.
+   *
+   * Saber se o Whop nos manda o email é a diferença entre um pagamento que dá
+   * acesso e um pagamento que fica à espera de alguém o tratar à mão — e o
+   * email só vem se o webhook tiver a permissão `member:email:read` no painel.
+   *
+   * Isto vivia só num `console.error`, e os logs de execução da Vercel não o
+   * devolvem por esta via: uma entrega aparece como POST 200 e mais nada. Na
+   * resposta, aparece no painel do Whop ao lado de cada entrega — incluindo o
+   * botão de testar — e é lá que a pergunta se responde sem depender de nós.
+   *
+   * Não leva o endereço, só se ele veio: a resposta é para diagnosticar a
+   * configuração, não para transportar dados de quem paga.
+   */
+  const diagnostico = { tipo, temEmail: Boolean(email), temWhopUserId: Boolean(whopUserId) };
   const estado = d.status ?? (daAcesso ? "active" : "canceled");
   const temAcesso = daAcesso;
 
@@ -246,7 +263,7 @@ export async function POST(request: Request) {
 
   if (!email && !whopUserId && !d.id) {
     console.error("[whop] evento sem email, sem user_id e sem membership id:", tipo);
-    return NextResponse.json({ ignorado: "sem identificação" }, { status: 200 });
+    return NextResponse.json({ ignorado: "sem identificação", ...diagnostico }, { status: 200 });
   }
 
   try {
@@ -264,7 +281,7 @@ export async function POST(request: Request) {
         await prisma.whopPendingMembership.deleteMany({
           where: { OR: [...(email ? [{ email }] : []), ...(d.id ? [{ membershipId: d.id }] : [])] },
         });
-        return NextResponse.json({ ignorado: "sem conta e sem acesso" }, { status: 200 });
+        return NextResponse.json({ ignorado: "sem conta e sem acesso", ...diagnostico }, { status: 200 });
       }
 
       // A conta NÃO nasce aqui. Cada site tem o seu login, e a password é
@@ -298,7 +315,7 @@ export async function POST(request: Request) {
       console.log(
         `[whop] pagamento guardado à espera de registo: ${email || `(sem email, membership ${membershipId})`}`,
       );
-      return NextResponse.json({ pendente: true }, { status: 200 });
+      return NextResponse.json({ pendente: true, ...diagnostico }, { status: 200 });
     }
 
     await prisma.user.update({
@@ -330,7 +347,7 @@ export async function POST(request: Request) {
     }
 
     console.log(`[whop] ${tipo}: ${utilizador.email} → ${temAcesso ? "PRO" : "FREE"}`);
-    return NextResponse.json({ recebido: true }, { status: 200 });
+    return NextResponse.json({ recebido: true, ...diagnostico }, { status: 200 });
   } catch (erro) {
     // Aqui SIM vale a pena repetir: uma falha de base de dados é transitória, e
     // as escritas acima são idempotentes (o mesmo evento aplicado duas vezes

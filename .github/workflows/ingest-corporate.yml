@@ -2,8 +2,15 @@ name: Ingest Corporate Events
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 7 * * *" # diário 7h UTC (junto com earnings)
+  # SEM agendamento: o /stock/dividend e o /stock/split do Finnhub devolvem
+  # 403 no plano gratuito, portanto esta ingestão não tem nada para trazer.
+  # Corria todos os dias a fazer 1.118 chamadas (duas por empresa) que eram
+  # todas rejeitadas — contra a mesma quota de 60/minuto de que dependem as
+  # cotações ao vivo — e terminava em sucesso, com a tabela corporate_events
+  # a zero linhas desde sempre.
+  #
+  # Fica acionável à mão: no dia em que houver plano pago, basta correr. O
+  # script sonda o acesso antes de percorrer as empresas e diz porque para.
 
 jobs:
   ingest:

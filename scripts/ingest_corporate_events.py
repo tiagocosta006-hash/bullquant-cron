@@ -58,6 +58,10 @@ def get_companies(cur) -> list[dict]:
     return [{"id": r[0], "ticker": r[1]} for r in cur.fetchall()]
 
 
+class SemAcessoAoEndpoint(Exception):
+    """A chave do Finnhub não cobre este endpoint (403)."""
+
+
 def _get(url: str) -> list[dict]:
     try:
         r = requests.get(url, timeout=30)
@@ -66,11 +70,26 @@ def _get(url: str) -> list[dict]:
             time.sleep(60)
             r = requests.get(url, timeout=30)
         if r.status_code == 403:
-            print("    403 — endpoint não disponível neste plano Finnhub, a saltar")
-            return []
+            # Parar à PRIMEIRA, não 559 vezes.
+            #
+            # O /stock/dividend e o /stock/split são endpoints pagos. Com uma
+            # chave do plano gratuito, TODAS as empresas dão 403 — e o que
+            # este `return []` fazia era transformar isso em "sem dados",
+            # repetido 559 vezes, com o cron a terminar em sucesso e a tabela
+            # corporate_events a ficar em ZERO linhas desde sempre.
+            #
+            # Pior do que o silêncio: eram 1.118 chamadas por dia (duas por
+            # empresa) contra a mesma quota de 60/minuto de que dependem as
+            # cotações ao vivo que os visitantes veem. Vinte minutos diários a
+            # martelar a API para receber recusas.
+            raise SemAcessoAoEndpoint(url.split("?")[0].rsplit("/", 1)[-1])
         r.raise_for_status()
         data = r.json()
         return data if isinstance(data, list) else []
+    except SemAcessoAoEndpoint:
+        # TEM de escapar: é a única que não se resolve a tentar outra vez, e
+        # apanhá-la aqui era o que a transformava em "sem dados" 559 vezes.
+        raise
     except Exception as e:
         print(f"    Finnhub error: {e}")
         return []
@@ -137,6 +156,13 @@ def upsert_corporate_events(cur, rows: dict[tuple, tuple]) -> int:
     return len(payload)
 
 
+def _verificar_acesso() -> None:
+    """Uma chamada de sonda antes de percorrer as 559 empresas."""
+    hoje = datetime.date.today().isoformat()
+    _get(f"{FINNHUB_BASE}/stock/dividend?symbol=AAPL&from={hoje}&to={hoje}"
+         f"&token={FINNHUB_API_KEY}")
+
+
 def main():
     print(f"A ligar a {urlparse(DIRECT_URL).hostname}...")
     conn = psycopg2.connect(DIRECT_URL)
@@ -153,6 +179,19 @@ def main():
 
     inserted = 0
     errors = 0
+
+    try:
+        _verificar_acesso()
+    except SemAcessoAoEndpoint as e:
+        print(
+            f"\nO endpoint /stock/{e} devolve 403 com esta chave do Finnhub.\n"
+            "Dividendos e splits são recursos do plano pago: sem upgrade, esta\n"
+            "ingestão não tem nada para trazer, e insistir nas 559 empresas só\n"
+            "gastava quota que as cotações ao vivo precisam.\n"
+            "Nada a fazer — a sair sem erro."
+        )
+        conn.close()
+        return
 
     for i, company in enumerate(companies):
         ticker = company["ticker"]

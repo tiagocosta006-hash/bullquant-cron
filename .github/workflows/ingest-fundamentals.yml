@@ -55,6 +55,25 @@ jobs:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
         run: python scripts/adjust_splits.py
 
+      # A API companyfacts descarta factos dimensionados, e empresas de classes
+      # múltiplas passam a publicar as ações SÓ por classe — a partir daí o
+      # companyfacts fica sem nada. Este script vai buscá-las ao XBRL do filing,
+      # que as tem, e trata a regra das classes (na Berkshire fica o maior, que
+      # é o equivalente em classe B; na Alphabet soma A+B+C). Valida cada valor
+      # contra `EPS × ações ≈ resultado líquido` e não escreve o que falhar.
+      #
+      # Existia no repositório e NUNCA correu, por não estar em workflow nenhum:
+      # a Visa e a Berkshire estavam sem uma única linha de ações em 52
+      # períodos, e com elas sem capitalização, sem P/E e sem múltiplos.
+      #
+      # Antes do passo do Finnhub, de propósito: esta fonte traz HISTÓRICO, a
+      # outra só o número de hoje.
+      - name: Fill missing shares from XBRL
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          SEC_IDENTITY: ${{ secrets.SEC_IDENTITY }}
+        run: python scripts/fill_missing_shares.py --apply
+
       # A API companyfacts da SEC descarta factos dimensionados, e empresas de
       # classes múltiplas (Visa A/B/C, Constellation A/B) taggam as ações por
       # classe — ficam sem nº de ações NENHUM, logo sem capitalização, logo no

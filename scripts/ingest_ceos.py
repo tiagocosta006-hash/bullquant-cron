@@ -22,7 +22,14 @@ from dotenv import load_dotenv
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
 
-if os.environ.get("GITHUB_ACTIONS") == "true":
+# Um DIRECT_URL já no ambiente MANDA, e o .env.dev nem se lê.
+#
+# O .env.dev aponta para a base local. Sem esta distinção, correr
+# `DIRECT_URL='...produção...' python scripts/ingest_ceos.py AAPL` dependia de
+# um detalhe do load_dotenv para não escrever na base errada — e uma
+# ingestão que escreve no sítio errado é o tipo de engano que só se descobre
+# quando já não tem volta.
+if os.environ.get("GITHUB_ACTIONS") == "true" or os.environ.get("DIRECT_URL"):
     pass
 else:
     ENV_FILE = os.path.join(ROOT, ".env.dev")
@@ -114,6 +121,17 @@ def extract_ceo(ticker: str) -> str | None:
 
 
 def main() -> None:
+    # Tickers à linha de comandos = só esses.
+    #
+    # A corrida completa leva 9 minutos e só acontece uma vez por dia. Quando
+    # um CEO muda, é agora que se quer a correcção — a Apple trocou o Tim Cook
+    # pelo John Ternus depois da passagem de 1 de setembro e ficou treze dias
+    # com o nome errado, no ticker da demo pública, que é o único que quem não
+    # tem conta consegue abrir.
+    #
+    #   DIRECT_URL='...' python scripts/ingest_ceos.py AAPL
+    escolhidos = [a.strip().upper() for a in sys.argv[1:] if a.strip()]
+
     conn = psycopg2.connect(DIRECT_URL)
     conn.autocommit = False
 
@@ -121,9 +139,21 @@ def main() -> None:
 
     try:
         with conn.cursor() as cur:
-            cur.execute('SELECT ticker FROM companies WHERE "isActive" = TRUE ORDER BY ticker')
+            if escolhidos:
+                cur.execute(
+                    'SELECT ticker FROM companies WHERE ticker = ANY(%s) ORDER BY ticker',
+                    (escolhidos,),
+                )
+            else:
+                cur.execute('SELECT ticker FROM companies WHERE "isActive" = TRUE ORDER BY ticker')
             rows = cur.fetchall()
             tickers = [r[0] for r in rows]
+
+        em_falta = sorted(set(escolhidos) - set(tickers))
+        if em_falta:
+            print(f"Não existem na base: {', '.join(em_falta)}")
+        if not tickers:
+            sys.exit("Nenhum ticker para processar.")
 
         total = len(tickers)
 
@@ -134,12 +164,21 @@ def main() -> None:
 
             if ceo_name:
                 with conn.cursor() as cur:
+                    cur.execute('SELECT ceo FROM companies WHERE ticker = %s', (ticker,))
+                    linha = cur.fetchone()
+                    anterior = linha[0] if linha else None
                     cur.execute(
                         'UPDATE companies SET ceo = %s, "updatedAt" = NOW() WHERE ticker = %s',
                         (ceo_name, ticker),
                     )
                 conn.commit()
-                print(f"ok -> {ceo_name}")
+                # Dizer o que MUDOU, e não só o que ficou: a corrida de 1 de
+                # setembro escreveu "542 atualizados" e ninguém soube que a
+                # Apple tinha trocado de CEO logo a seguir.
+                if anterior and anterior != ceo_name:
+                    print(f"ALTERADO: {anterior} -> {ceo_name}")
+                else:
+                    print(f"ok -> {ceo_name}")
                 updated += 1
             else:
                 print("nenhum CEO encontrado.")

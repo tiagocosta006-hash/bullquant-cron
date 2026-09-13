@@ -208,11 +208,133 @@ def main():
             print(f"  {ticker}: sem períodos para escrever")
             rejeitadas += 1
 
+    corrigir_unidades_de_adr(conn)
+
     conn.close()
     print(f"\n{escritas} empresa(s) com nº de ações preenchido, "
           f"{rejeitadas} rejeitada(s)."
           + (" (dry-run: nada gravado)" if DRY_RUN else ""))
 
+
+
+# ── ADR: ações ordinárias a multiplicar por um preço de ADS ─────────────────
+
+# Acima deste rácio, a nossa capitalização e a do Finnhub não podem estar a
+# falar da mesma coisa. Um ADR britânico vale tipicamente 2, 4 ou 5 ordinárias,
+# portanto o erro aparece em múltiplos — bem acima de qualquer diferença de
+# preço ou de momento de leitura.
+RACIO_QUE_DENUNCIA_UNIDADE = 1.5
+
+# Um ADS representa entre 1 e 20 ordinárias. Uma correção que implique um rácio
+# fora disto não é um ADR, é outra coisa qualquer — e aí não se escreve.
+ADR_MIN, ADR_MAX = 1.0, 20.0
+
+
+def corrigir_unidades_de_adr(conn) -> None:
+    """Corrige o nº de ações onde ele está em ORDINÁRIAS e o preço é o do ADS.
+
+    A capitalização é calculada como `ações x preco` no momento em que a página
+    carrega (nunca guardada — ver CLAUDE.md §5). Isso exige que as duas
+    grandezas estejam na MESMA unidade, e nos ADR britânicos não estavam: o
+    XBRL dá as ordinárias de Londres e o preço é o do recibo de Nova Iorque,
+    que vale várias delas.
+
+    Medido a 2026-09-13, no topo da lista de maiores empresas:
+
+        HSBC   1.835.063 M   contra   262.369 M      7,0x
+        BCS      376.790 M   contra    64.943 M      5,8x
+        DEO      196.130 M   contra    35.650 M      5,5x
+        SHEL     570.053 M   contra   202.348 M      2,8x
+        GSK      194.975 M   contra    71.145 M      2,7x
+
+    Os rácios são os rácios de ADR destas empresas (1:5, 1:4, 1:4, 1:2, 1:2)
+    mais o efeito da libra. A HSBC aparecia como a SÉTIMA maior empresa cotada
+    do mundo, à frente da Broadcom e da Meta, no primeiro ecrã que alguém vê
+    depois de entrar.
+
+    Guarda-se o equivalente em ADS, que é a unidade do preço — e também a
+    unidade do ticker que se negoceia aqui.
+    """
+    with conn.cursor() as cur:
+        # Só as de fora dos Estados Unidos: é onde os ADR vivem. Poupa ~480
+        # chamadas ao Finnhub por passagem, e o problema não existe nas
+        # domésticas — confirmado comparando as 70 maiores.
+        cur.execute(
+            '''
+            SELECT c.ticker, c.id, lf.s, lp.close
+            FROM companies c
+            JOIN LATERAL (
+                SELECT f."sharesOutstanding" s FROM fundamentals f
+                WHERE f."companyId" = c.id AND f."sharesOutstanding" > 0
+                ORDER BY f."periodEnd" DESC LIMIT 1
+            ) lf ON true
+            JOIN LATERAL (
+                SELECT close FROM prices WHERE ticker = c.ticker
+                ORDER BY date DESC LIMIT 1
+            ) lp ON true
+            WHERE c."isActive" = TRUE
+              AND COALESCE(c.country, 'US') <> 'US'
+              AND c.ticker NOT LIKE '^%'
+            ORDER BY c.ticker
+            ''',
+        )
+        candidatos = [(t, cid, float(s), float(px)) for t, cid, s, px in cur.fetchall()]
+
+    if not candidatos:
+        return
+
+    print(f"\nA verificar a unidade do nº de ações em {len(candidatos)} empresa(s) fora dos EUA...")
+    corrigidas = 0
+
+    for ticker, company_id, acoes, preco in candidatos:
+        perfil = perfil_finnhub(ticker)
+        time.sleep(PAUSA)
+        if not perfil:
+            continue
+        cap_ref_m = perfil.get("marketCapitalization")
+        if not cap_ref_m or cap_ref_m <= 0:
+            continue
+
+        nossa_m = acoes * preco / 1e6
+        if nossa_m <= 0:
+            continue
+        racio = max(nossa_m / cap_ref_m, cap_ref_m / nossa_m)
+        if racio <= RACIO_QUE_DENUNCIA_UNIDADE:
+            continue
+
+        # Só se corrige para BAIXO, e só quando o rácio implícito é o de um
+        # ADR. A nossa capitalização MAIOR do que a de referência é o sintoma
+        # de contar ordinárias a preço de ADS; o caso inverso é outra coisa e
+        # fica por resolver em vez de ser adivinhado.
+        implicito = nossa_m / cap_ref_m
+        if not (ADR_MIN <= implicito <= ADR_MAX):
+            print(f"  {ticker}: {racio:.1f}x ao lado mas o rácio implícito ({implicito:.2f}) não é de um ADR — não corrigido.")
+            continue
+
+        corrigido = cap_ref_m * 1e6 / preco
+
+        if DRY_RUN:
+            print(f"  {ticker}: {acoes/1e6:,.0f}M -> {corrigido/1e6:,.0f}M ações (cap {nossa_m/1e3:,.0f} mM -> {cap_ref_m/1e3:,.0f} mM)")
+            corrigidas += 1
+            continue
+
+        with conn.cursor() as cur:
+            cur.execute(
+                '''
+                UPDATE fundamentals SET "sharesOutstanding" = %s, "updatedAt" = NOW()
+                WHERE id = (
+                    SELECT id FROM fundamentals
+                    WHERE "companyId" = %s AND "sharesOutstanding" > 0
+                    ORDER BY "periodEnd" DESC LIMIT 1
+                )
+                ''',
+                (corrigido, company_id),
+            )
+        conn.commit()
+        print(f"  {ticker}: {acoes/1e6:,.0f}M -> {corrigido/1e6:,.0f}M ações (cap {nossa_m/1e3:,.0f} mM -> {cap_ref_m/1e3:,.0f} mM)")
+        corrigidas += 1
+
+    print(f"  {corrigidas} unidade(s) de ADR corrigida(s)." + (" (dry-run)" if DRY_RUN else ""))
 
 if __name__ == "__main__":
     main()

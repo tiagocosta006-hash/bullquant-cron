@@ -35,18 +35,33 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
+              // ⚠️ Ao reactivar vendas próprias (VENDAS_PROPRIAS_ATIVAS em
+              // components/providers/PaddleProvider.tsx) é preciso repor aqui
+              // https://cdn.paddle.com em script-src e style-src,
+              // https://*.paddle.com em connect-src e
+              // https://paddle.com https://*.paddle.com em frame-src —
+              // senão o script fica bloqueado pelo CSP e o checkout não abre.
+              //
+              // Saíram também o Google Tag Manager, o Google Analytics e o
+              // ProfitWell: nenhum dos três é carregado por código nenhum
+              // desta aplicação. Um domínio no allowlist que não se usa é só
+              // superfície de ataque a mais — é exactamente por onde um script
+              // injectado exfiltra dados sem violar a política.
+              //
+              // O Facebook fica: o MetaPixel é montado a sério, pelo
+              // CookieConsent, depois de o visitante aceitar.
               process.env.NODE_ENV === 'production'
-                ? "script-src 'self' 'unsafe-inline' https://cdn.paddle.com https://public.profitwell.com https://www.googletagmanager.com https://connect.facebook.net"
-                : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.paddle.com https://public.profitwell.com https://www.googletagmanager.com https://connect.facebook.net",
-              "style-src 'self' 'unsafe-inline' https://cdn.paddle.com",
+                ? "script-src 'self' 'unsafe-inline' https://connect.facebook.net"
+                : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://connect.facebook.net",
+              "style-src 'self' 'unsafe-inline'",
               // Os logos são servidos diretamente ao browser (otimizador desligado), e
       // static2.finnhub.io responde 302 para static9.finnhub.io. O CSP é
       // reavaliado em cada redirect, por isso o allowlist tem de cobrir o
       // domínio inteiro — a Finnhub roda o número do host sem aviso.
       "img-src 'self' data: blob: https://*.finnhub.io https://*.supabase.co https://*.googleusercontent.com https://avatars.githubusercontent.com https://www.facebook.com",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vitals.vercel-insights.com https://*.paddle.com https://public.profitwell.com https://www.google-analytics.com https://www.facebook.com https://connect.facebook.net",
-              "frame-src 'self' https://paddle.com https://*.paddle.com",
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vitals.vercel-insights.com https://www.facebook.com https://connect.facebook.net",
+              "frame-src 'self'",
               "frame-ancestors 'none'",
             ].join('; '),
           },

@@ -25,9 +25,17 @@ const TAMANHOS = [
   { id: "d", label: "Zoom dentro", hint: "A moldura fica, o conteúdo cresce 15%" },
 ] as const;
 
-export function generateStaticParams() {
-  return TAMANHOS.map((t) => ({ v: t.id }));
-}
+// SEM generateStaticParams, de propósito.
+//
+// Com ele, o Next marcava estas rotas como SSG e tentava renderizá-las no
+// build — mas a página importa a landing REAL (`import LandingPage`), que usa
+// APIs dinâmicas de servidor. O resultado era DYNAMIC_SERVER_USAGE, e em
+// produção /fotos/a e /tamanho/a devolviam 500 em vez do 404 que o guarda de
+// NODE_ENV pretendia. As /preview-* nunca tiveram o problema justamente por
+// não terem esta função: são dinâmicas, e aí o notFound() resolve-se em tempo
+// de pedido.
+//
+// É andaime de design: pré-renderizar não trazia nada.
 
 export default async function TamanhoVariant({ params }: { params: Promise<{ v: string }> }) {
   if (process.env.NODE_ENV !== "development") notFound();

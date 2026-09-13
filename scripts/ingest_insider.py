@@ -112,6 +112,31 @@ def upsert_insider(cur, company_id: str, rows: list[dict]) -> int:
             tx.get("filingDate"),
         ))
 
+    # Desduplicar pela CHAVE NATURAL antes de enviar o lote.
+    #
+    # O índice único é (companyId, insiderName, transactionDate,
+    # transactionCode, sharesChange), e o Finnhub devolve com frequência duas
+    # linhas que colidem nele — o mesmo insider a vender o mesmo número de
+    # ações no mesmo dia, reportado em duas entradas. O Postgres recusa um
+    # INSERT ... ON CONFLICT DO UPDATE em que a mesma chave apareça duas vezes
+    # no MESMO comando: "ON CONFLICT DO UPDATE command cannot affect row a
+    # second time".
+    #
+    # O erro rebentava a transação inteira daquela empresa, não só a linha
+    # repetida. Na passagem de 2026-09-06 foram 224 empresas em 559 — quarenta
+    # por cento sem dados de insiders, incluindo a Apple, que tem 116
+    # transações na fonte e zero na base.
+    #
+    # Fica a ÚLTIMA ocorrência de cada chave: as linhas vêm da mais recente
+    # para a mais antiga e a última a ser escrita é a que o ON CONFLICT
+    # deixaria de pé de qualquer forma.
+    por_chave = {}
+    for linha in payload:
+        # (companyId, insiderName, transactionDate, transactionCode, sharesChange)
+        chave = (linha[1], linha[2], linha[11], linha[5], linha[7])
+        por_chave[chave] = linha
+    payload = list(por_chave.values())
+
     if not payload:
         return 0
 

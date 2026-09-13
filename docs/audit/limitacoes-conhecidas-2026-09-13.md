@@ -118,14 +118,36 @@ tirá-las é escolher um lado do conflito acima.
 
 ---
 
-## 7. Base de dados a 335 MB de 500 MB
+## 7. CEO desconhecido em 67 empresas
+
+**O que se vê.** O `companies.ceo` está a `null` em 67 das 559 activas, e é
+essa coluna que ancora o nome mostrado no separador Empresa. Sem ela, o nome
+volta a ser o que o Gemini se lembra — HSBC, Netflix, SAP, Shell, Spotify,
+Ferrari estão nesse grupo.
+
+**Porque acontece.** O `ingest_ceos.py` lê o `companyOfficers` do yfinance, que
+é esparso fora dos EUA: 28 das 67 são de fora. A corrida de 1 de setembro
+preencheu 517 e não encontrou nada em 42.
+
+**Porque não foi corrigido.** As alternativas estão avaliadas e rejeitadas no
+cabeçalho do próprio script: o Finnhub gratuito não tem o campo, o Form 4 da
+SEC apanha CEOs de divisão (o "CEO CCB" da JPMorgan em vez do CEO do banco), e
+o Wikidata tem o serviço instável e a modelação de tickers inconsistente.
+Escrever um nome que não se consegue verificar é como se estragam dados.
+
+**Como resolver a sério.** Uma API paga de perfis, ou ler o nome do próprio
+10-K/20-F via edgartools, que já é usado para os segmentos.
+
+---
+
+## 8. Base de dados a 335 MB de 500 MB
 
 O plano gratuito do Supabase são 500 MB. A tabela `prices` sozinha são 239 MB
 e cresce ~190 mil linhas por ano. Não é urgente; é para saber antes de ser.
 
 ---
 
-## 8. Nº de ações a alternar entre dois valores (CVNA, AMCR e mais 4)
+## 9. Nº de ações a alternar entre dois valores (CVNA, AMCR e mais 4)
 
 **O que se vê.** O gráfico de ações em circulação da Carvana ziguezagueia: 133,
 661, 143, 716, 146, 1121, 148, 740 milhões, trimestre a trimestre. A Amcor faz

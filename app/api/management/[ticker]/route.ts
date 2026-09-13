@@ -7,9 +7,49 @@ import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { z } from 'zod'
 import { assertCreditsAvailable, chargeCredits } from '@/lib/ai/credits'
 import { exigirPro } from '@/lib/api/acessoPro'
+import { nomeDeCeoLimpo } from '@/lib/ceo'
 
 export const maxDuration = 60; // Vercel function timeout (60s is good for AI)
 
+/**
+ * Revisão do perfil de gestão.
+ *
+ * Sobe quando muda algo que torna os perfis já gravados errados — e não quando
+ * muda só o modelo. Um perfil com outra revisão é tratado como expirado, o que
+ * evita ter de mexer na base de dados de produção para os invalidar.
+ */
+const REVISAO_PERFIL = "r2-ceo-ancorado";
+
+/**
+ * O nome do CEO NÃO é do modelo.
+ *
+ * Este separador pedia ao Gemini que identificasse o CEO, e o Gemini responde
+ * de memória — com o corte de treino que tiver. Medido contra a base de dados:
+ * 35 divergências em 82 perfis, e as que interessam não são de grafia:
+ *
+ *   INTC  Lip-Bu Tan          → dizia Pat Gelsinger (saiu em 2024)
+ *   UNH   Stephen Hemsley     → dizia Andrew Witty (saiu em 2025)
+ *   WMT   John Furner         → dizia Doug McMillon
+ *   ORCL  Michael Sicilia     → dizia Safra Catz
+ *   TMUS  Srinivasan Gopalan  → dizia Mike Sievert
+ *   ISRG  David Rosa          → dizia Gary Guthart
+ *
+ * A validade de 30 dias não corrigia isto: o perfil da ISRG foi regenerado a
+ * 12 de setembro e devolveu na mesma o CEO antigo, porque voltar a perguntar
+ * ao mesmo modelo dá a mesma resposta. A validade refrescava a cache, não a
+ * verdade.
+ *
+ * E não era só o nome. O texto da análise, a antiguidade e o histórico de
+ * alocação de capital eram todos sobre a pessoa errada — na Intel, o percurso
+ * do Gelsinger a fazer de percurso do Tan.
+ *
+ * Passa a haver uma âncora: `companies.ceo`, que o `ingest_ceos.py` actualiza
+ * todos os meses (517 de 559 na corrida de 1 de setembro). Vai para o prompt
+ * como facto, e sobrepõe-se à resposta do modelo à saída — também nos perfis
+ * que já estão em cache, para o nome deixar de depender do modelo em qualquer
+ * caminho. A limpeza do nome está em `lib/ceo.ts`, partilhada com os outros
+ * sítios que mostram um CEO.
+ */
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ ticker: string }> }
@@ -48,8 +88,12 @@ export async function GET(
       where: { companyId: company.id }
     })
 
-    if (cached && cached.expiresAt > new Date()) {
-      return NextResponse.json({ profile: cached })
+    const ceoDaBase = nomeDeCeoLimpo(company.ceo)
+
+    const daRevisaoAtual = cached?.modelVersion?.startsWith(`${REVISAO_PERFIL}:`) ?? false
+    if (cached && cached.expiresAt > new Date() && daRevisaoAtual) {
+      // O nome vem da base mesmo quando o resto vem da cache.
+      return NextResponse.json({ profile: { ...cached, ceoName: ceoDaBase ?? cached.ceoName } })
     }
 
     // 1b. Créditos
@@ -96,7 +140,13 @@ export async function GET(
         }).describe("1 paragraph summary of track record")
       }),
       system: "You are a senior Wall Street value investor analyzing a management team. You MUST provide all textual descriptions in BOTH English ('en') and European Portuguese ('pt', strictly pt-PT, avoid Brazilian Portuguese). Be highly critical, concise, and professional.",
-      prompt: `Analyze the management team and CEO of ${company.name} (${company.ticker}). Identify the current CEO, whether it is a family/founder-run business, their capital allocation history, and their skin in the game.`
+      prompt: [
+        `Analyze the management team and CEO of ${company.name} (${company.ticker}).`,
+        ceoDaBase
+          ? `The current CEO is ${ceoDaBase}. This is verified company profile data, refreshed monthly, and is more recent than your training data: use this name, do not substitute anyone else, and write the tenure, capital allocation history and track record about ${ceoDaBase}. If you believe someone else holds the role, you are out of date.`
+          : `There is no verified CEO on record for this company, so state who you believe currently holds the role.`,
+        `Also assess whether it is a family/founder-run business and their skin in the game.`,
+      ].join(" ")
     })
 
     // 3. Save to Cache (Expire in 30 days since management doesn't change daily)
@@ -104,7 +154,9 @@ export async function GET(
     expiresAt.setDate(expiresAt.getDate() + 30)
 
     const profileData = {
-      ceoName: object.ceoName,
+      // A âncora ganha sempre ao modelo; só quando a base não tem ninguém é
+      // que se aceita o que ele diz.
+      ceoName: ceoDaBase ?? object.ceoName,
       isFamilyRun: object.isFamilyRun,
       capitalAllocationRating: object.capitalAllocationRating,
       skinInTheGame: object.skinInTheGame,
@@ -123,14 +175,14 @@ export async function GET(
       update: {
         ...profileData,
         expiresAt,
-        modelVersion: modelName,
+        modelVersion: `${REVISAO_PERFIL}:${modelName}`,
         generatedAt: new Date()
       },
       create: {
         companyId: company.id,
         ...profileData,
         expiresAt,
-        modelVersion: modelName
+        modelVersion: `${REVISAO_PERFIL}:${modelName}`
       }
     })
 

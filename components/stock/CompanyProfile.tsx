@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { Globe, User, Users, Briefcase, Building2, MapPin, Landmark } from "lucide-react"
+import { nomeDeCeoLimpo } from "@/lib/ceo"
 
 interface CompanyProfileProps {
   company: {
@@ -25,7 +26,8 @@ export function CompanyProfile({ company, isEtf }: CompanyProfileProps) {
   const details = [
     {
       label: "CEO",
-      value: company.ceo,
+      // Mesmo nome, mesma grafia, que o separador Empresa mostra a seguir.
+      value: nomeDeCeoLimpo(company.ceo),
       icon: User
     },
     {

@@ -7,6 +7,7 @@ import { CompanyLogo } from "@/components/ui/CompanyLogo"
 import { Building2, X, Users, ArrowRight, Activity, HandCoins, ExternalLink, Scale, Globe, TrendingUp, TrendingDown } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { nomeDeCeoLimpo } from "@/lib/ceo"
 
 export interface BusinessProfileSheetProps {
   open: boolean
@@ -137,10 +138,10 @@ export function BusinessProfileSheet({ open, onOpenChange, company }: BusinessPr
                   </h3>
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/60 border border-border">
                     <div className="w-10 h-10 rounded-full bg-primary/12 flex items-center justify-center text-primary font-bold shrink-0">
-                      {company.ceo.charAt(0)}
+                      {nomeDeCeoLimpo(company.ceo)?.charAt(0)}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-foreground font-medium truncate">{company.ceo}</p>
+                      <p className="text-foreground font-medium truncate">{nomeDeCeoLimpo(company.ceo)}</p>
                       <p className="text-xs text-muted-foreground">CEO</p>
                     </div>
                   </div>

@@ -217,6 +217,18 @@ def main():
     conn.close()
     print(f"\nConcluído. {inserted} eventos upserted, {errors} erros.")
 
+    # Mesma lógica do ingest_insider.py: chumba pela TAXA, não pelo primeiro
+    # erro. Uma empresa sem dados é ruído da fonte; um décimo delas a falhar é
+    # coisa nossa. Foi um destes contadores, ignorado, que deixou 40% das
+    # empresas sem transações de insiders durante meses.
+    limite = max(5, int(total * 0.10))
+    if errors > limite:
+        print(
+            f"\nFALHA: {errors} empresas com erro em {total} "
+            f"({errors / total:.0%}) — acima do limite de {limite}."
+        )
+        sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

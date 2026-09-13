@@ -208,6 +208,28 @@ def main():
     conn.close()
     print(f"\nConcluído. {inserted} transações upserted, {errors} erros.")
 
+    # Chumbar quando a TAXA de erro é alta, não quando há um erro.
+    #
+    # Uma empresa a falhar entre 559 é ruído — a Finnhub tem buracos, e um
+    # cron vermelho por causa disso depressa deixa de ser lido. Mas quarenta
+    # por cento a falhar é outra coisa: é o que aconteceu a 2026-09-06, com
+    # 224 empresas a rebentar num ON CONFLICT duplicado. A mensagem final
+    # dizia "33475 transações upserted, 224 erros" e o processo saía com
+    # código zero.
+    #
+    # Um número grande à frente de um número pequeno, e ninguém olha para o
+    # pequeno. A Apple ficou com o separador de insiders vazio durante meses
+    # sem nada que o denunciasse.
+    limite = max(5, int(total * 0.10))
+    if errors > limite:
+        print(
+            f"\nFALHA: {errors} empresas com erro em {total} "
+            f"({errors / total:.0%}) — acima do limite de {limite}.\n"
+            "Uma taxa destas não é a fonte a ter buracos, é alguma coisa\n"
+            "sistemática do nosso lado."
+        )
+        sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

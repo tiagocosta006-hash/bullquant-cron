@@ -196,8 +196,8 @@
         "f3": "Chat with the AI Analyst about any company",
         "f4": "Historical valuation multiples (P/E, P/S, EV/EBITDA)",
         "f5": "Private community and priority support",
-        "cta": "Start 7-day trial",
-        "note": "7 days free · cancel anytime · payments via Paddle"
+        "cta": "See what PRO includes",
+        "note": "Exclusive to the private community"
       }
     },
     "about": {
@@ -221,8 +221,8 @@
       "a3": "The 500 companies of the S&P 500. European coverage (including Euronext Lisbon) is on the roadmap.",
       "q4": "How often is the data updated?",
       "a4": "Stock prices and financial filings are updated daily, with essential metrics and charts processed shortly after the companies' official releases.",
-      "q5": "Can I try Pro and cancel?",
-      "a5": "Yes. Pro has a 7-day free trial and you can cancel anytime, no penalty. Payments are securely processed by Paddle."
+      "q5": "How do I get access to Pro?",
+      "a5": "For now, Pro is exclusive to the private community on Whop. Members sign up at thebullvalue.com with the same email as their subscription and the account starts on Pro."
     },
     "floatingNote": "€0 · no card",
     "mission": {
@@ -1204,7 +1204,7 @@
   "pricing": {
     "badge": "Simple and transparent",
     "title": "Invest with more confidence.",
-    "subtitle": "Start for free or try the PRO plan with a 7-day free trial. Cancel anytime.",
+    "subtitle": "Start for free. For now, the PRO plan is exclusive to the private community.",
     "monthly": "Month",
     "free": {
       "name": "Free",
@@ -1249,27 +1249,27 @@
       "items": [
         {
           "q": "Can I cancel at any time?",
-          "a": "Yes, with no penalty. Your PRO access continues until the end of the paid period, then reverts to the free plan."
+          "a": "Yes, with no penalty. You cancel on Whop and your PRO access continues until the end of the paid period, then reverts to the free plan."
         },
         {
           "q": "Is there a free trial?",
-          "a": "Yes, we offer a 7-day free trial for you to test the PRO platform. During those 7 days, you'll have access to all advanced features, except the private community."
+          "a": "Not at this stage. The free plan has no time limit and is enough to get to know the platform; PRO is, for now, exclusive to members of the private community."
         },
         {
           "q": "Who processes the payments?",
-          "a": "Payments are processed by Paddle, acting as Merchant of Record and handling invoicing, taxes, and legal compliance across the EU."
+          "a": "Whop, which hosts the private community and handles the subscription, invoicing and taxes. We never see or store payment details."
         },
         {
           "q": "Does the subscription renew automatically?",
-          "a": "Yes, monthly. You will always receive an advance email notice before any charge, and you can cancel at any time."
+          "a": "Yes, following the terms of your Whop subscription — that is where you manage and cancel it, at any time."
         },
         {
           "q": "Is my financial data safe?",
-          "a": "We never store card data, all payment information is managed exclusively by Paddle with bank-grade encryption."
+          "a": "We never store card data. All payment information is handled by Whop; thebullvalue.com only receives confirmation that your subscription is active."
         }
       ]
     },
-    "trust": "Secure payments via Paddle · Cancel anytime · EU VAT compliant"
+    "trust": "Access through the private community · Cancel anytime · Subscription managed on Whop"
   },
   "explore": {
     "title": "Explore Businesses",

@@ -50,10 +50,10 @@ export default function TermsOfServicePage() {
           </p>
           <ul className="list-disc pl-6 space-y-2 mb-4">
             <li>
-              <strong>Comerciante de Registo (Merchant of Record):</strong> Todos os pagamentos, transações financeiras,
-              recolha automatizada de impostos (incluindo IVA aplicável consoante a sua jurisdição) e processamento
-              de faturação são geridos integralmente pelo nosso parceiro autorizado, o <strong>Paddle</strong>. Ao efetuar
-              a subscrição, estará a sujeitar-se também aos termos e condições de processamento do Paddle.
+              <strong>Plataforma de pagamento:</strong> Nesta fase o acesso ao Plano PRO é obtido através da
+              comunidade privada alojada na <strong>Whop</strong>. Todos os pagamentos, transações financeiras,
+              recolha de impostos e processamento de faturação são geridos pela Whop, e ao subscrever estará
+              também a sujeitar-se aos termos e condições dela. A BullValue não processa pagamentos.
             </li>
             <li>
               <strong>Renovação Automática:</strong> A subscrição do Plano PRO é recorrente, podendo ser mensal ou anual.

@@ -65,10 +65,11 @@ export default function PrivacyPolicyPage() {
               eletrónico) são processadas e armazenadas através do Supabase.
             </li>
             <li>
-              <strong>Dados de Faturação e Transações Financeiras (Paddle):</strong> A BullValue <strong>não recolhe nem armazena</strong>
-              os seus dados bancários ou números de cartão de crédito. Todo o processo de checkout, subscrição, recolha
-              de impostos e faturação é efetuado integralmente pelo nosso parceiro Paddle (na qualidade de Merchant of Record).
-              Poderemos receber da Paddle informação de faturação para gerir o seu estatuto (Plano PRO).
+              <strong>Dados de Faturação e Transações Financeiras (Whop):</strong> A BullValue <strong>não recolhe nem armazena</strong>
+              os seus dados bancários ou números de cartão de crédito. Nesta fase, todo o processo de subscrição,
+              pagamento, recolha de impostos e faturação é efetuado pela <strong>Whop</strong>, que aloja a comunidade
+              privada. A BullValue recebe da Whop apenas a confirmação de que a subscrição está ativa e o endereço de
+              correio eletrónico associado, que servem para atribuir o estatuto de Plano PRO à conta correspondente.
             </li>
             <li>
               <strong>Inteligência Artificial (Google Gemini API):</strong> De forma a gerar as análises do Analista IA da plataforma,

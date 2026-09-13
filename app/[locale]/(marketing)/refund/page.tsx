@@ -19,9 +19,9 @@ export default function RefundPolicyPage() {
           </p>
           <p>
             Esta política estabelece os termos e condições relativos a cancelamentos e reembolsos aplicáveis aos
-            planos de subscrição (Plano PRO) adquiridos na <strong>BullValue</strong>. Como a faturação é gerida
-            pelo nosso parceiro integrado <strong>Paddle</strong>, enquanto *Merchant of Record*, aderimos estritamente
-            a estes processos padronizados e transparentes.
+            planos de subscrição (Plano PRO). Nesta fase o acesso PRO é obtido através da comunidade
+            privada alojada na <strong>Whop</strong>, que gere a subscrição, o pagamento e a faturação —
+            o cancelamento e o reembolso seguem os processos da Whop.
           </p>
         </section>
 
@@ -58,10 +58,10 @@ export default function RefundPolicyPage() {
           </p>
           <p className="mb-4 font-semibold">Como Cancelar:</p>
           <ul className="list-decimal pl-6 space-y-2 mb-4">
-            <li>Efetue o login na sua conta BullValue.</li>
-            <li>Aceda à secção de definições de conta (<strong>Configurações / O Meu Perfil</strong>).</li>
-            <li>Navegue até ao painel de Faturação, que conectará diretamente ao portal self-service e seguro do <strong>Paddle</strong>.</li>
-            <li>Selecione a opção para cancelar a subscrição ativa.</li>
+            <li>Aceda à sua conta na <strong>Whop</strong>, onde a subscrição foi adquirida.</li>
+            <li>Abra a secção de subscrições (<strong>Memberships</strong>).</li>
+            <li>Selecione a subscrição da BullValue e escolha a opção de cancelar.</li>
+            <li>O acesso PRO no thebullvalue.com é retirado automaticamente no fim do período pago.</li>
           </ul>
           <p>
             <strong>Efeitos do Cancelamento:</strong> O cancelamento não resulta num reembolso pelo tempo já pago
@@ -75,7 +75,7 @@ export default function RefundPolicyPage() {
         <section>
           <h2 className="text-2xl font-bold mb-4">4. Anomalias Técnicas, Cobranças Indevidas ou Erros</h2>
           <p>
-            Caso seja identificada uma cobrança dupla, erro de sistema no momento do checkout via Paddle,
+            Caso seja identificada uma cobrança dupla, erro de sistema no momento do pagamento na Whop,
             ou incapacidade técnica devidamente comprovada em aceder à infraestrutura PRO nas primeiras 48 horas
             pós-compra (por responsabilidade exclusiva do BullValue), deverá contactar imediatamente a equipa
             através de <strong>suporte@thebullvalue.com</strong>. Estes casos manifestamente excecionais serão

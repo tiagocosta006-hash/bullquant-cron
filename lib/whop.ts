@@ -32,6 +32,28 @@ export async function resgatarPagamentoWhop(userId: string, email: string) {
     })
     if (!pendente || !ESTADOS_COM_ACESSO.has(pendente.status)) return false
 
+    // Uma linha JÁ RESGATADA não volta a dar acesso.
+    //
+    // O `claimedAt` era escrito e nunca lido, e isso abria o caminho de volta
+    // ao PRO a quem cancelou:
+    //
+    //   1. paga sem ter conta        → fica pendente, status "active"
+    //   2. regista-se / entra        → PRO, `claimedAt` marcado, LINHA FICA
+    //   3. cancela                   → o webhook põe FREE e apaga o pendente
+    //                                  PELO EMAIL — mas se o evento de
+    //                                  cancelamento vier sem email (que é o
+    //                                  que acontece sem a permissão
+    //                                  `member:email:read`), a linha sobrevive
+    //                                  com o status antigo
+    //   4. volta a fazer login       → o resgate encontra-a e devolve o PRO
+    //
+    // Ou seja: cancelar e voltar a entrar era um PRO gratuito e permanente.
+    // A partir do momento em que a conta existe, quem manda no acesso é o
+    // webhook, que a encontra por email ou por `whopUserId` e escreve o plano
+    // directamente. O resgate serve só para o pagamento que chegou ANTES da
+    // conta — uma vez só, que é o que o `claimedAt` sempre quis dizer.
+    if (pendente.claimedAt) return false
+
     await prisma.user.update({
       where: { id: userId },
       data: {

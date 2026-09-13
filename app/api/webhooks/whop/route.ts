@@ -313,10 +313,20 @@ export async function POST(request: Request) {
     });
 
     // Já há conta, portanto não há nada à espera de registo. Deixar um pendente
-    // para trás faria o PRO voltar sozinho se a pessoa alguma vez se
-    // registasse de novo com o mesmo email depois de cancelar.
-    if (email) {
-      await prisma.whopPendingMembership.deleteMany({ where: { email } });
+    // para trás faria o PRO voltar sozinho no login seguinte, mesmo depois de
+    // cancelar — o resgate olha para o status da linha, não para o plano.
+    //
+    // Pelo `membershipId` TAMBÉM, e não só pelo email: um evento sem email
+    // (falta a permissão `member:email:read`) não apagava nada, e era esse o
+    // caso em que a linha sobrevivia a um cancelamento. Uma subscrição é
+    // identificada pelo seu id; o email é só a forma cómoda de a encontrar.
+    const chaves = [
+      ...(email ? [{ email }] : []),
+      ...(d.id ? [{ membershipId: d.id }] : []),
+      ...(whopUserId ? [{ whopUserId }] : []),
+    ];
+    if (chaves.length > 0) {
+      await prisma.whopPendingMembership.deleteMany({ where: { OR: chaves } });
     }
 
     console.log(`[whop] ${tipo}: ${utilizador.email} → ${temAcesso ? "PRO" : "FREE"}`);

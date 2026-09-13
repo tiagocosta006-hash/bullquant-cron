@@ -116,3 +116,37 @@ não um bug a corrigir sozinho.
 
 O plano gratuito do Supabase são 500 MB. A tabela `prices` sozinha são 239 MB
 e cresce ~190 mil linhas por ano. Não é urgente; é para saber antes de ser.
+
+---
+
+## 8. Nº de ações a alternar entre dois valores (CVNA, AMCR e mais 4)
+
+**O que se vê.** O gráfico de ações em circulação da Carvana ziguezagueia: 133,
+661, 143, 716, 146, 1121, 148, 740 milhões, trimestre a trimestre. A Amcor faz
+o mesmo entre 288 e 1.444. São 12 períodos em 6 empresas (CVNA, AMCR, ECHO,
+AIG, SPOT, TRGP).
+
+**Porque acontece.** A extração alterna entre duas tags XBRL que medem coisas
+diferentes — provavelmente uma classe de ações contra o total.
+
+**Porque não foi corrigido.** A regra que detecta isto é fiável (um período
+que está a mais de 3× de AMBOS os vizinhos, com os vizinhos a concordarem
+entre si), mas não diz qual dos dois ramos é o certo — e como os valores
+ALTERNAM, os dois ficam sinalizados. Corrigir ambos seria pior do que não
+fazer nada.
+
+Tentou-se uma referência externa e as fontes não concordam:
+
+| empresa | ramo A | ramo B | Finnhub |
+|---|---|---|---|
+| CVNA | ~148 M | 661-1121 M | 1.100 M |
+| AMCR | ~288 M | ~1.444 M | 462 M |
+
+Nem o Finnhub bate com nenhum dos ramos na Amcor. Sem verdade estabelecida,
+escolher é adivinhar — e adivinhar é como se destroem dados, não como se
+corrigem.
+
+**Como resolver a sério.** Ler as tags dimensionadas do filing (via
+edgartools, como o fill_missing_shares.py já faz) para ver quantas classes a
+empresa tem e somá-las explicitamente, em vez de aceitar a primeira tag que
+aparece.

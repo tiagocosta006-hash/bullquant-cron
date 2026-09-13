@@ -83,7 +83,7 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
 
   // Preço localizado (Paddle)
   const { paddle } = usePaddle()
-  const [proPrice, setProPrice] = useState('€7')
+  const [proPrice, setProPrice] = useState('€10')
 
   useEffect(() => {
     const priceId = process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_PRO

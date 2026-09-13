@@ -20,7 +20,7 @@ import { BRAND } from "@/lib/brand";
 export const metadata = {
   title: `Preços | ${BRAND.name}`,
   description:
-    `Plano gratuito para sempre ou PRO a €7/mês. Análise fundamental completa do S&P 500, DCF integrada e Analista IA em português com ${BRAND.name}.`,
+    `Plano gratuito para sempre ou PRO a €10/mês. Análise fundamental completa do S&P 500, DCF integrada e Analista IA em português com ${BRAND.name}.`,
 
 };
 
@@ -76,7 +76,7 @@ export default async function PricingPage() {
           {
             "@type": "Offer",
             "name": "Plano PRO",
-            "price": "7",
+            "price": "10",
             "priceCurrency": "EUR",
             "availability": "https://schema.org/InStock",
             "billingIncrement": "P1M",

@@ -189,7 +189,7 @@
       "pro": {
         "name": "Pro",
         "badge": "Most popular",
-        "price": "€7",
+        "price": "€10",
         "period": "per month",
         "f1": "Everything in the free plan",
         "f2": "20 AI credits per day (~6 full reports)",
@@ -197,7 +197,7 @@
         "f4": "Historical valuation multiples (P/E, P/S, EV/EBITDA)",
         "f5": "Private community and priority support",
         "cta": "See what PRO includes",
-        "note": "Exclusive to the private community"
+        "note": "7-day free trial · community exclusive"
       }
     },
     "about": {
@@ -222,7 +222,7 @@
       "q4": "How often is the data updated?",
       "a4": "Stock prices and financial filings are updated daily, with essential metrics and charts processed shortly after the companies' official releases.",
       "q5": "How do I get access to Pro?",
-      "a5": "For now, Pro is exclusive to the private community on Whop. Members sign up at thebullvalue.com with the same email as their subscription and the account starts on Pro."
+      "a5": "Yes. Pro comes through the private community on Whop and includes a 7-day free trial — cancel there anytime, no penalty. Then sign up at thebullvalue.com with the same email as your subscription."
     },
     "floatingNote": "€0 · no card",
     "mission": {
@@ -455,7 +455,7 @@
         "pro": "PRO",
         "priceLabel": "Price",
         "priceFree": "€0",
-        "pricePro": "€7/month",
+        "pricePro": "€10/month",
         "priceNote": "Provisional price, the final price will be announced at launch.",
         "quotesLabel": "Quotes and 10 years of fundamentals",
         "aiLabel": "AI analyses",
@@ -1204,7 +1204,7 @@
   "pricing": {
     "badge": "Simple and transparent",
     "title": "Invest with more confidence.",
-    "subtitle": "Start for free. For now, the PRO plan is exclusive to the private community.",
+    "subtitle": "Start for free. For now, the PRO plan is exclusive to the private community and includes a 7-day free trial.",
     "monthly": "Month",
     "free": {
       "name": "Free",
@@ -1215,13 +1215,13 @@
     },
     "pro": {
       "name": "PRO",
-      "price": "€7",
+      "price": "€10",
       "period": "per month",
       "description": "For the serious investor who wants to go deeper in their analysis.",
       "cta": "See what PRO includes",
       "badge": "Most popular",
-      "accessNote": "For now, PRO is exclusive to the private community. Members sign in with the same email as their subscription.",
-      "note": "For now, PRO is exclusive to the private community."
+      "accessNote": "For now, PRO is exclusive to the private community and includes a 7-day free trial. Members sign in with the same email as their subscription.",
+      "note": "7-day free trial · community exclusive"
     },
     "features": {
       "title": "What's included",
@@ -1253,7 +1253,7 @@
         },
         {
           "q": "Is there a free trial?",
-          "a": "Not at this stage. The free plan has no time limit and is enough to get to know the platform; PRO is, for now, exclusive to members of the private community."
+          "a": "Yes. The community's PRO plan includes a 7-day free trial. Cancel on Whop before it ends and you pay nothing."
         },
         {
           "q": "Who processes the payments?",
@@ -1269,7 +1269,7 @@
         }
       ]
     },
-    "trust": "Access through the private community · Cancel anytime · Subscription managed on Whop"
+    "trust": "7-day free trial · Cancel anytime · Subscription managed on Whop"
   },
   "explore": {
     "title": "Explore Businesses",

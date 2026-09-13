@@ -190,7 +190,7 @@
       "pro": {
         "name": "Pro",
         "badge": "Mais popular",
-        "price": "7 €",
+        "price": "10 €",
         "period": "por mês",
         "f1": "Tudo o que está no plano grátis",
         "f2": "20 créditos de IA por dia (~6 análises completas)",
@@ -198,7 +198,7 @@
         "f4": "Múltiplos de avaliação históricos (P/E, P/S, EV/EBITDA)",
         "f5": "Comunidade privada e apoio prioritário",
         "cta": "Ver o que inclui o PRO",
-        "note": "Exclusivo da comunidade privada"
+        "note": "7 dias grátis · exclusivo da comunidade"
       }
     },
     "about": {
@@ -223,7 +223,7 @@
       "q4": "Com que frequência os dados são atualizados?",
       "a4": "Os preços das ações e os relatórios financeiros são atualizados diariamente, com as métricas essenciais e os gráficos a serem processados pouco tempo após a publicação oficial por parte das empresas.",
       "q5": "Como se ganha acesso ao Pro?",
-      "a5": "Nesta fase o Pro é exclusivo da comunidade privada na Whop. Quem for membro entra no thebullvalue.com com o mesmo email da subscrição e a conta nasce já em Pro."
+      "a5": "Sim. O Pro é obtido através da comunidade privada na Whop e inclui 7 dias grátis — cancelas lá quando quiseres, sem penalização. Depois entras no thebullvalue.com com o mesmo email da subscrição."
     },
     "floatingNote": "0 € · sem cartão",
     "mission": {
@@ -455,7 +455,7 @@
         "pro": "PRO",
         "priceLabel": "Preço",
         "priceFree": "0 €",
-        "pricePro": "7 €/mês",
+        "pricePro": "10 €/mês",
         "priceNote": "Preço provisório — o valor final será anunciado no lançamento.",
         "quotesLabel": "Cotações e 10 anos de fundamentais",
         "aiLabel": "Análises de IA",
@@ -1204,7 +1204,7 @@
   "pricing": {
     "badge": "Simples e transparente",
     "title": "Investe com mais confiança.",
-    "subtitle": "Começa gratuitamente. Nesta fase o plano PRO é exclusivo da comunidade privada.",
+    "subtitle": "Começa gratuitamente. Nesta fase o plano PRO é exclusivo da comunidade privada e inclui 7 dias grátis.",
     "monthly": "Mês",
     "free": {
       "name": "Gratuito",
@@ -1215,13 +1215,13 @@
     },
     "pro": {
       "name": "PRO",
-      "price": "€7",
+      "price": "€10",
       "period": "por mês",
       "description": "Para o investidor sério que quer ir mais fundo na análise.",
       "cta": "Ver o que inclui o PRO",
       "badge": "Mais popular",
-      "accessNote": "Nesta fase o PRO é exclusivo da comunidade privada. Quem já é membro entra com o mesmo email da subscrição.",
-      "note": "Nesta fase o PRO é exclusivo da comunidade privada."
+      "accessNote": "Nesta fase o PRO é exclusivo da comunidade privada e inclui 7 dias grátis. Quem já é membro entra com o mesmo email da subscrição.",
+      "note": "7 dias grátis · exclusivo da comunidade"
     },
     "features": {
       "title": "O que está incluído",
@@ -1253,7 +1253,7 @@
         },
         {
           "q": "Existe um período experimental?",
-          "a": "Não nesta fase. O plano gratuito não tem limite de tempo e dá para conhecer a plataforma; o PRO é, para já, exclusivo de quem é membro da comunidade privada."
+          "a": "Sim. O plano PRO da comunidade inclui 7 dias grátis. Cancelas na Whop antes de terminarem e não pagas nada."
         },
         {
           "q": "Quem processa os pagamentos?",
@@ -1269,7 +1269,7 @@
         }
       ]
     },
-    "trust": "Acesso pela comunidade privada · Cancela quando quiseres · Subscrição gerida na Whop"
+    "trust": "7 dias grátis · Cancela quando quiseres · Subscrição gerida na Whop"
   },
   "explore": {
     "title": "Explorar Negócios",

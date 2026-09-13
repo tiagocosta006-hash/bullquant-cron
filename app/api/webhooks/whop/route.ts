@@ -64,6 +64,14 @@ function chavesCandidatas(segredo: string): Buffer[] {
   const semPrefixo = segredo.replace(/^(ws_|whsec_)/, "");
   if (semPrefixo !== segredo) {
     chaves.push(Buffer.from(semPrefixo, "utf8"));
+
+    // Hexadecimal ANTES de base64: o segredo do Whop vem como `ws_` seguido
+    // de 64 caracteres hex, e é essa a leitura provável. O Standard Webhooks
+    // define os segredos `whsec_` em base64, por isso essa fica também — não
+    // custa nada e cobre o caso de eles mudarem de formato.
+    if (/^[0-9a-fA-F]+$/.test(semPrefixo) && semPrefixo.length % 2 === 0) {
+      chaves.push(Buffer.from(semPrefixo, "hex"));
+    }
     try {
       const bytes = Buffer.from(semPrefixo, "base64");
       if (bytes.length > 0) chaves.push(bytes);

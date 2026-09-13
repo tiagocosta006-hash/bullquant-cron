@@ -111,9 +111,19 @@ export async function GET(
     }
 
     const daRevisaoAtual = cached?.modelVersion?.startsWith(`${REVISAO_PERFIL}:`) ?? false
-    if (cached && cached.expiresAt > new Date() && daRevisaoAtual) {
-      // O nome vem da base mesmo quando o resto vem da cache.
-      return NextResponse.json({ profile: { ...cached, ceoName: ceoDaBase } })
+
+    // Se o CEO MUDOU desde que o perfil foi gerado, o perfil inteiro caducou.
+    //
+    // Trocar só o nome e deixar o resto seria pior do que não ter nada: a
+    // antiguidade, a alocação de capital e a análise continuavam a ser sobre
+    // o antecessor, agora com o nome do sucessor por cima. A Apple acabou de
+    // dar o exemplo — o Tim Cook passou a Executive Chairman e o John Ternus
+    // a CEO, e um perfil gerado na véspera descreve o percurso do homem
+    // errado.
+    const mesmoCeo = cached?.ceoName === ceoDaBase
+
+    if (cached && cached.expiresAt > new Date() && daRevisaoAtual && mesmoCeo) {
+      return NextResponse.json({ profile: cached })
     }
 
     // 1b. Créditos

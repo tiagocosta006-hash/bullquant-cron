@@ -1,9 +1,20 @@
-name: Ingest CEOs (Monthly)
+name: Ingest CEOs (Daily)
 
 on:
   schedule:
-    # Corre às 02:00 do primeiro dia de cada mês
-    - cron: '0 2 1 * *'
+    # Diário às 02:00.
+    #
+    # Era mensal, no dia 1. A 1 de setembro de 2026 a corrida gravou o Tim
+    # Cook como CEO da Apple; dias depois ele passou a Executive Chairman e o
+    # John Ternus a CEO, e a plataforma continuou a dizer Tim Cook — na
+    # empresa mais vista de todas, que é também o ticker da demo pública, o
+    # único que quem não tem conta consegue abrir. Só mudaria a 1 de outubro.
+    #
+    # Uma mudança de CEO é rara mas é notícia, e é exactamente quando alguém
+    # vai confirmar à plataforma. A corrida leva 9 minutos e o repositório é
+    # público, portanto os minutos do GitHub Actions são grátis: não há razão
+    # nenhuma para esperar um mês.
+    - cron: '0 2 * * *'
   workflow_dispatch:
 
 jobs:

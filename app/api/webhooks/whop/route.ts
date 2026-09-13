@@ -55,6 +55,28 @@ function assinaturaValida(corpo: string, cabecalho: string | null, segredo: stri
 
 export async function POST(request: Request) {
   const segredo = process.env.WHOP_WEBHOOK_SECRET;
+
+  // Um valor de espera NÃO é um segredo. A variável esteve em produção com o
+  // literal "POR_PREENCHER" à espera de ser trocada, e nesse estado o endpoint
+  // parecia protegido — devolvia 401 a quem não assinasse — mas aceitava
+  // qualquer pedido assinado com a própria palavra. Ou seja: quem a
+  // adivinhasse dava a si mesmo PRO.
+  //
+  // Tratar isto como "não configurado" fecha a porta sem esperar por ninguém.
+  // Em troca, se alguém puser um destes valores por engano, o webhook para em
+  // vez de aceitar tudo — que é o lado certo para falhar.
+  const PLACEHOLDERS = new Set([
+    "por_preencher", "porpreencher", "preencher", "changeme", "change_me",
+    "todo", "to_do", "placeholder", "secret", "segredo", "xxx", "test",
+  ]);
+  if (segredo && PLACEHOLDERS.has(segredo.trim().toLowerCase())) {
+    console.error(
+      "[whop] WHOP_WEBHOOK_SECRET ainda tem um valor de espera " +
+      `("${segredo}") — pedido recusado. Põe o signing secret real do Whop.`
+    );
+    return NextResponse.json({ error: "Webhook não configurado" }, { status: 500 });
+  }
+
   if (!segredo) {
     // Sem segredo configurado NÃO se processa nada. A alternativa — aceitar
     // sem verificar — deixaria qualquer pessoa com o URL dar-se acesso PRO.

@@ -57,6 +57,12 @@ export default async function SettingsPage() {
     name: dbUser.name,
     plan: dbUser.plan,
     hasSubscription: !!dbUser.paddleCustomerId,
+    // Quem veio da comunidade não tem cliente Paddle nenhum. Sem esta
+    // distinção, o cartão de PRO oferecia-lhe um botão "Gerir subscrição"
+    // desativado e a explicação "ID de subscrição não encontrado na base de
+    // dados" — uma mensagem de diagnóstico nosso, mostrada a um cliente que
+    // pagou e está a ver o que parece uma avaria.
+    viaWhop: !!dbUser.whopMembershipId,
   }
 
   return (

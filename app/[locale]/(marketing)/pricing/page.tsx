@@ -111,7 +111,9 @@ export default async function PricingPage() {
 
       {/* ── Cards de Preço ───────────────────────────────────── */}
       <section className="mx-auto max-w-5xl px-6 pb-6 md:px-8">
-        <PricingCards userEmail={user?.email} userId={user?.id} />
+        {/* Sem props: o cartão deixou de ter checkout, logo já não precisa de
+            saber quem está autenticado. Ver o comentário em PricingCards. */}
+        <PricingCards />
 
         {/* Trust badge */}
         <Reveal className="mt-6 flex justify-center">

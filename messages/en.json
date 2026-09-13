@@ -1218,8 +1218,10 @@
       "price": "€7",
       "period": "per month",
       "description": "For the serious investor who wants to go deeper in their analysis.",
-      "cta": "Start 7-day free trial",
-      "badge": "Most popular"
+      "cta": "See what PRO includes",
+      "badge": "Most popular",
+      "accessNote": "For now, PRO is exclusive to the private community. Members sign in with the same email as their subscription.",
+      "note": "For now, PRO is exclusive to the private community."
     },
     "features": {
       "title": "What's included",

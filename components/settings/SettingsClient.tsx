@@ -35,6 +35,8 @@ interface SettingsClientProps {
     name: string | null
     plan: string
     hasSubscription?: boolean
+    /** Veio da comunidade privada no Whop, não do Paddle. */
+    viaWhop?: boolean
   }
   locale: string
   aiUsedToday: number
@@ -523,20 +525,31 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
                 <div className="rounded-lg border border-primary/20 bg-primary/5 p-5">
                   <p className="font-semibold text-primary mb-1">Plano PRO Activo</p>
                   <p className="text-sm text-muted-foreground">
-                    Tens acesso completo a todas as funcionalidades PRO. Para gerir a tua subscrição (cancelar, actualizar dados de pagamento), utiliza o portal de faturação abaixo.
+                    {user.viaWhop
+                      ? 'Tens acesso completo a todas as funcionalidades PRO através da comunidade. A subscrição é gerida no Whop — é lá que alteras o pagamento ou cancelas.'
+                      : 'Tens acesso completo a todas as funcionalidades PRO. Para gerir a tua subscrição (cancelar, actualizar dados de pagamento), utiliza o portal de faturação abaixo.'}
                   </p>
                 </div>
-                <Button
-                  onClick={handleManageSubscription}
-                  disabled={isGeneratingPortal || !user.hasSubscription}
-                  className="gap-2"
-                >
-                  {isGeneratingPortal ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                  Gerir subscrição (Alterar/Cancelar) →
-                </Button>
-                {portalError && <p className="text-sm text-destructive font-medium">{portalError}</p>}
-                {!user.hasSubscription && !portalError && (
-                  <p className="text-xs text-muted-foreground">ID de subscrição não encontrado na base de dados.</p>
+
+                {/* O portal de faturação é do Paddle e só serve quem tem cliente
+                    Paddle. A membros da comunidade não se mostra — o botão
+                    aparecia desativado com "ID de subscrição não encontrado na
+                    base de dados", que é uma mensagem para nós, não para eles. */}
+                {!user.viaWhop && (
+                  <>
+                    <Button
+                      onClick={handleManageSubscription}
+                      disabled={isGeneratingPortal || !user.hasSubscription}
+                      className="gap-2"
+                    >
+                      {isGeneratingPortal ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                      Gerir subscrição (Alterar/Cancelar) →
+                    </Button>
+                    {portalError && <p className="text-sm text-destructive font-medium">{portalError}</p>}
+                    {!user.hasSubscription && !portalError && (
+                      <p className="text-xs text-muted-foreground">ID de subscrição não encontrado na base de dados.</p>
+                    )}
+                  </>
                 )}
               </div>
             ) : (

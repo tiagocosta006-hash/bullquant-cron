@@ -1,103 +1,44 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Link } from '@/i18n/routing';
 import { useTranslations } from "next-intl";
 
-import { Check, Zap, ArrowRight, Loader2 } from "lucide-react";
-import { buttonVariants, Button } from "@/components/ui/button";
+import { Check, Zap, ArrowRight } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
 import { LiquidGlass } from "@/components/fx/LiquidGlass";
 import { Reveal } from "@/components/fx/Reveal";
 import { cn } from "@/lib/utils";
-import { usePaddle } from "@/components/providers/PaddleProvider";
-import { useRouter } from '@/i18n/routing';
 
-interface PricingCardsProps {
-  userEmail?: string;
-  userId?: string;
-}
-
-export function PricingCards({ userEmail, userId }: PricingCardsProps = {}) {
+/**
+ * Cartões de preço SEM checkout.
+ *
+ * Nesta fase o PRO não se compra aqui: o acesso vem da comunidade privada no
+ * Whop, e quem tem membership ativa recebe PRO pelo webhook
+ * (app/api/webhooks/whop). Um botão de compra nesta página criava uma segunda
+ * fonte de verdade para o mesmo campo `plan` — um cancelamento de um lado
+ * despromovia quem paga do outro.
+ *
+ * Por isso saiu daqui o Paddle INTEIRO, e não só o botão:
+ *
+ *   · O `PricePreview` ia buscar o preço localizado à API do Paddle. Sem
+ *     checkout isso era uma chamada de rede, um spinner e um estado de
+ *     carregamento para mostrar um número que já está no ficheiro de
+ *     traduções.
+ *   · O botão estava `disabled={!paddle || loadingPrice}`, ou seja, dependia
+ *     de um script que as extensões de bloqueio de anúncios bloqueiam com
+ *     frequência — e aí ficava morto para sempre.
+ *   · Com NEXT_PUBLIC_WHOP_URL vazia (era o caso em produção), o clique caía
+ *     no `paddle.Checkout.open` apesar de o comentário dizer que o checkout
+ *     estava suspenso. Quem clicasse com sessão iniciada abria mesmo um
+ *     pagamento pelo Paddle.
+ *
+ * Para reativar vendas próprias: repor o Paddle aqui e o CTA no cartão.
+ */
+export function PricingCards() {
   const t = useTranslations("pricing");
-  const router = useRouter();
-  const { paddle } = usePaddle();
-
-  const [proPrice, setProPrice] = useState<string>(t("pro.price"));
-  const [loadingPrice, setLoadingPrice] = useState(true);
-
-  const priceId = process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_PRO;
 
   const freeFeatures = t.raw("features.free") as string[];
   const proFeatures = t.raw("features.pro") as string[];
-
-  useEffect(() => {
-    if (!paddle || !priceId) {
-      // Se faltarem as chaves de ambiente, parar o loading passado 2s para não ficar infinito
-      const timer = setTimeout(() => setLoadingPrice(false), 2000);
-      return () => clearTimeout(timer);
-    }
-
-    // Fetch localized price
-    const request = {
-      items: [
-        {
-          priceId: priceId,
-          quantity: 1,
-        },
-      ],
-    };
-
-    paddle.PricePreview(request)
-      .then((preview) => {
-        if (preview.data.details.lineItems.length > 0) {
-          setProPrice(preview.data.details.lineItems[0].formattedTotals.total);
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching Paddle price preview:", error);
-      })
-      .finally(() => {
-        setLoadingPrice(false);
-      });
-  }, [paddle, priceId]);
-
-  const handleCheckout = () => {
-    // Checkout próprio SUSPENSO. Nesta fase o acesso vem da comunidade privada
-    // no Whop: quem tem membership ativa recebe PRO pelo webhook
-    // (app/api/webhooks/whop), e não há checkout a fazer aqui. Mandar alguém
-    // ao Paddle criaria uma segunda fonte de verdade para o mesmo campo `plan`
-    // — um cancelamento de um lado despromovia quem paga do outro.
-    //
-    // O código do Paddle fica intacto: ninguém paga por aqui (os planos PRO
-    // atuais foram definidos à mão) e reativar é apagar este bloco.
-    const whopUrl = process.env.NEXT_PUBLIC_WHOP_URL;
-    if (whopUrl) {
-      window.open(whopUrl, "_blank", "noopener,noreferrer");
-      return;
-    }
-
-    if (!paddle || !priceId) return;
-
-    if (!userId) {
-      // Se não tiver conta, obrigar a criar conta primeiro
-      router.push("/register");
-      return;
-    }
-
-    paddle.Checkout.open({
-      items: [
-        {
-          priceId: priceId,
-          quantity: 1,
-        },
-      ],
-      customer: userEmail ? { email: userEmail } : undefined,
-      customData: userId ? { userId } : undefined,
-      settings: {
-        successUrl: "https://thebullvalue.com/dashboard",
-      }
-    });
-  };
 
   return (
     <Reveal className="grid gap-5 md:grid-cols-2">
@@ -160,21 +101,13 @@ export function PricingCards({ userEmail, userId }: PricingCardsProps = {}) {
           <p className="text-sm font-semibold uppercase tracking-widest text-primary">
             {t("pro.name")}
           </p>
-          <div className="mt-4 flex items-end justify-center gap-1 min-h-[56px]">
-            {loadingPrice ? (
-              <div className="flex items-center justify-center h-[56px]">
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-              </div>
-            ) : (
-              <>
-                <span className="text-5xl font-extrabold tracking-tight">
-                  {proPrice}
-                </span>
-                <span className="mb-1.5 text-muted-foreground">
-                  / {t("pro.period")}
-                </span>
-              </>
-            )}
+          <div className="mt-4 flex items-end justify-center gap-1">
+            <span className="text-5xl font-extrabold tracking-tight">
+              {t("pro.price")}
+            </span>
+            <span className="mb-1.5 text-muted-foreground">
+              / {t("pro.period")}
+            </span>
           </div>
           <p className="mt-3 text-sm text-muted-foreground">
             {t("pro.description")}
@@ -192,17 +125,10 @@ export function PricingCards({ userEmail, userId }: PricingCardsProps = {}) {
           ))}
         </ul>
 
-        <div className="mt-auto">
-          <Button
-            size="lg"
-            id="pricing-pro-cta"
-            onClick={handleCheckout}
-            disabled={!paddle || loadingPrice}
-            className="w-full shadow-[0_4px_30px_-6px_hsl(var(--primary)/0.5)]"
-          >
-            {t("pro.cta")}
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
+        <div className="mt-auto w-full">
+          <p className="rounded-xl border border-primary/25 bg-primary/5 px-4 py-3 text-sm leading-relaxed text-muted-foreground">
+            {t("pro.accessNote")}
+          </p>
         </div>
       </div>
     </Reveal>

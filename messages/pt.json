@@ -1218,8 +1218,10 @@
       "price": "€7",
       "period": "por mês",
       "description": "Para o investidor sério que quer ir mais fundo na análise.",
-      "cta": "Começar trial de 7 dias",
-      "badge": "Mais popular"
+      "cta": "Ver o que inclui o PRO",
+      "badge": "Mais popular",
+      "accessNote": "Nesta fase o PRO é exclusivo da comunidade privada. Quem já é membro entra com o mesmo email da subscrição.",
+      "note": "Nesta fase o PRO é exclusivo da comunidade privada."
     },
     "features": {
       "title": "O que está incluído",

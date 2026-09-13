@@ -1221,7 +1221,8 @@
       "cta": "Ver o que inclui o PRO",
       "badge": "Mais popular",
       "accessNote": "Nesta fase o PRO é exclusivo da comunidade privada e inclui 7 dias grátis. Quem já é membro entra com o mesmo email da subscrição.",
-      "note": "7 dias grátis · exclusivo da comunidade"
+      "note": "7 dias grátis · exclusivo da comunidade",
+      "communityLink": "Ver a comunidade"
     },
     "features": {
       "title": "O que está incluído",

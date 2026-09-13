@@ -37,6 +37,8 @@ import { cn } from "@/lib/utils";
 export function PricingCards() {
   const t = useTranslations("pricing");
 
+  const whopUrl = process.env.NEXT_PUBLIC_WHOP_URL;
+
   const freeFeatures = t.raw("features.free") as string[];
   const proFeatures = t.raw("features.pro") as string[];
 
@@ -129,6 +131,21 @@ export function PricingCards() {
           <p className="rounded-xl border border-primary/25 bg-primary/5 px-4 py-3 text-sm leading-relaxed text-muted-foreground">
             {t("pro.accessNote")}
           </p>
+          {/* Link de texto, NÃO um botão de compra: a página dizia "exclusivo
+              da comunidade privada" e não dava forma nenhuma de lá chegar —
+              um beco para quem quisesse entrar. Não abre checkout nenhum,
+              leva à página da comunidade. */}
+          {whopUrl && (
+            <a
+              href={whopUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 hover:underline"
+            >
+              {t("pro.communityLink")}
+              <ArrowRight className="h-3.5 w-3.5" />
+            </a>
+          )}
         </div>
       </div>
     </Reveal>

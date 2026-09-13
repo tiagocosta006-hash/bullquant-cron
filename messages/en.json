@@ -1221,7 +1221,8 @@
       "cta": "See what PRO includes",
       "badge": "Most popular",
       "accessNote": "For now, PRO is exclusive to the private community and includes a 7-day free trial. Members sign in with the same email as their subscription.",
-      "note": "7-day free trial · community exclusive"
+      "note": "7-day free trial · community exclusive",
+      "communityLink": "View the community"
     },
     "features": {
       "title": "What's included",

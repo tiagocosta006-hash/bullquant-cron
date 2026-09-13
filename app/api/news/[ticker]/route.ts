@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 // Partilhado com o pipeline do Terminal de Notícias (lib/news/*).
 import { isRealImage } from "@/lib/news/normalize";
+import { normalizarTicker } from "@/lib/ticker";
 
 const FINNHUB_KEY = process.env.FINNHUB_API_KEY!;
 
@@ -8,7 +9,14 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ ticker: string }> }
 ) {
-  const { ticker } = await params;
+  const bruto = await params;
+  // Validado antes de construir o URL da Finnhub: sem isto, cada ticker
+  // inventado era uma chave de cache nova e uma chamada nova, contornando o
+  // `revalidate: 900` que protege a quota. Ver lib/ticker.ts.
+  const ticker = normalizarTicker(bruto.ticker);
+  if (!ticker) {
+    return NextResponse.json({ error: "Ticker inválido" }, { status: 400 });
+  }
 
   // Fetch last 60 days for a fuller feed
   const to = new Date();

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { normalizarTicker } from "@/lib/ticker"
 
 async function getDbPriceFallback(ticker: string) {
   try {
@@ -35,7 +36,13 @@ export async function GET(
   { params }: { params: Promise<{ ticker: string }> }
 ) {
   const resolvedParams = await params
-  const ticker = resolvedParams.ticker.toUpperCase()
+  // Validar ANTES de construir o URL da Finnhub: um ticker inventado gera uma
+  // chave de cache nova e, com ela, uma chamada nova — que é como se contorna
+  // o `revalidate: 60` que protege a quota. Ver lib/ticker.ts.
+  const ticker = normalizarTicker(resolvedParams.ticker)
+  if (!ticker) {
+    return NextResponse.json({ error: "Ticker inválido" }, { status: 400 })
+  }
 
   const apiKey = process.env.FINNHUB_API_KEY
   if (!apiKey) {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { deriveFcff, deriveEffectiveTaxRate, type FcfSourceRecord } from "@/lib/finance/fcf"
 import { exigirPro } from "@/lib/api/acessoPro"
+import { normalizarTicker } from "@/lib/ticker"
 
 function num(val: unknown): number | null {
   if (val === null || val === undefined) return null
@@ -53,11 +54,15 @@ export async function GET(
 ) {
   try {
     const { ticker } = await params
-    const upper = ticker.toUpperCase()
+    // Validado antes de chegar à Finnhub (duas chamadas abaixo) — ver lib/ticker.ts.
+    const upper = normalizarTicker(ticker)
+    if (!upper) {
+      return NextResponse.json({ error: "Ticker inválido" }, { status: 400 })
+    }
 
     // A calculadora DCF é uma página PRO (ver (app)/dcf/page.tsx). O
     // autopreencher é o que a torna útil, e estava aberto a toda a gente.
-    const acesso = await exigirPro({ ticker, demoAnonima: true })
+    const acesso = await exigirPro({ ticker: upper, demoAnonima: true })
     if (!acesso.ok) return acesso.resposta
 
     const company = await prisma.company.findUnique({

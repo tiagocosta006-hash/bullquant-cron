@@ -1,12 +1,17 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { normalizarTicker } from "@/lib/ticker"
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ ticker: string }> }
 ) {
   try {
-    const { ticker } = await params
+    const bruto = await params
+    const ticker = normalizarTicker(bruto.ticker)
+    if (!ticker) {
+      return NextResponse.json({ error: "Ticker inválido" }, { status: 400 })
+    }
     const { searchParams } = new URL(request.url)
     const period = searchParams.get('period') ?? '5y'
 

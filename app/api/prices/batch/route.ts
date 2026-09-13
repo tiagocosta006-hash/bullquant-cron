@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { normalizarTicker } from '@/lib/ticker'
 
 interface PriceResult {
   ticker: string
@@ -97,8 +98,20 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Tickers parameter is required' }, { status: 400 })
     }
 
-    const tickers = tickersParam.split(',').map(t => t.trim().toUpperCase()).filter(Boolean)
-    
+    // Validar CADA ticker e limitar quantos: esta rota faz uma chamada à
+    // Finnhub por ticker pedido, e não tinha nem uma coisa nem outra. Um
+    // pedido com dez mil símbolos inventados eram dez mil chamadas — e cada
+    // símbolo diferente é também uma chave de cache nova, portanto o
+    // `revalidate: 60` não travava nada. O plano gratuito da Finnhub são 60
+    // chamadas por minuto: bastava um pedido para os preços ao vivo pararem
+    // para toda a gente.
+    //
+    // 100 é folgado para o que a aplicação pede de facto (o dashboard pede 24,
+    // a watchlist e o portefólio raramente passam de algumas dezenas).
+    const MAX_TICKERS = 100
+    const pedidos = tickersParam.split(',').map(t => normalizarTicker(t)).filter(Boolean) as string[]
+    const tickers = pedidos.slice(0, MAX_TICKERS)
+
     if (tickers.length === 0) {
       return NextResponse.json({ error: 'Valid tickers are required' }, { status: 400 })
     }

@@ -226,17 +226,26 @@ export async function POST(request: Request) {
   // permissão `member:email:read` não está dada ao webhook no painel do Whop,
   // e repetir mil vezes não a concede. É uma configuração a corrigir, e o log
   // é que a faz aparecer.
+  // Uma membership válida SEM email continua a ser gravada.
+  //
+  // A versão anterior devolvia 200 e descartava-a: o pagamento desaparecia
+  // sem deixar rasto, e o único sinal era uma linha nos logs da Vercel que
+  // ninguém lê a meio de um lançamento. Sem email não há como resgatar — o
+  // resgate procura por email — mas há toda a diferença entre "perdemos o
+  // pagamento" e "há uma linha para reconciliar à mão".
+  //
+  // O email falta quando o webhook não tem a permissão `member:email:read`
+  // no painel do Whop. Não é transitório: repetir a entrega não a concede.
   if (temAcesso && !email) {
     console.error(
-      "[whop] MEMBERSHIP VÁLIDA SEM EMAIL — o webhook não tem a permissão " +
-      `member:email:read. membership=${d.id} tipo=${tipo} user=${whopUserId}. ` +
-      "Sem email não há como ligar o pagamento a uma conta."
+      "[whop] MEMBERSHIP VÁLIDA SEM EMAIL — falta a permissão member:email:read " +
+      `no painel do Whop. membership=${d.id} tipo=${tipo} user=${whopUserId}. ` +
+      "Fica gravada sem email, para reconciliação manual."
     );
-    return NextResponse.json({ ignorado: "sem email" }, { status: 200 });
   }
 
-  if (!email && !whopUserId) {
-    console.error("[whop] evento sem email nem user_id:", tipo);
+  if (!email && !whopUserId && !d.id) {
+    console.error("[whop] evento sem email, sem user_id e sem membership id:", tipo);
     return NextResponse.json({ ignorado: "sem identificação" }, { status: 200 });
   }
 
@@ -251,9 +260,10 @@ export async function POST(request: Request) {
     if (!utilizador) {
       // Quem cancela sem nunca ter tido conta aqui não precisa de rasto nenhum.
       if (!temAcesso) {
-        if (email) {
-          await prisma.whopPendingMembership.deleteMany({ where: { email } });
-        }
+        // Pelo membershipId TAMBÉM: as linhas sem email só se apanham por aí.
+        await prisma.whopPendingMembership.deleteMany({
+          where: { OR: [...(email ? [{ email }] : []), ...(d.id ? [{ membershipId: d.id }] : [])] },
+        });
         return NextResponse.json({ ignorado: "sem conta e sem acesso" }, { status: 200 });
       }
 
@@ -262,19 +272,32 @@ export async function POST(request: Request) {
       // no Supabase Auth a partir do webhook deixava-a com um registo que não
       // sabe abrir. O pagamento fica à espera e é resgatado no momento do
       // registo, se o email bater certo (ver (auth)/actions.ts).
+      // Chaveado pelo membershipId e não pelo email: o email pode faltar (ver
+      // acima), e uma subscrição é identificada pelo seu id, não por quem a
+      // comprou. Com a chave no email, uma membership sem ele nem conseguia
+      // ser escrita — a coluna era NOT NULL.
+      const membershipId = d.id ?? `sem-id-${whopUserId ?? email}`;
       await prisma.whopPendingMembership.upsert({
-        where: { email },
+        where: { membershipId },
         create: {
-          email,
+          email: email || null,
           whopUserId,
-          membershipId: d.id ?? `sem-id-${email}`,
+          membershipId,
           productId: produto ?? null,
           status: estado,
         },
-        update: { status: estado, whopUserId, productId: produto ?? null, claimedAt: null },
+        update: {
+          email: email || undefined,
+          status: estado,
+          whopUserId,
+          productId: produto ?? null,
+          claimedAt: null,
+        },
       });
 
-      console.log(`[whop] pagamento guardado à espera de registo: ${email}`);
+      console.log(
+        `[whop] pagamento guardado à espera de registo: ${email || `(sem email, membership ${membershipId})`}`,
+      );
       return NextResponse.json({ pendente: true }, { status: 200 });
     }
 

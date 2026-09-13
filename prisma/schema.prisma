@@ -58,8 +58,18 @@ model User {
 /// contas, porque é a única coisa que a pessoa escreve dos dois lados.
 model WhopPendingMembership {
   id           String    @id @default(cuid())
-  email        String    @unique
+  /// Nulo quando o Whop manda a membership SEM email — acontece se o webhook
+  /// não tiver a permissão `member:email:read`. Antes era NOT NULL, e o
+  /// pagamento nesse caso não chegava a ser gravado: perdia-se em silêncio,
+  /// com o endpoint a devolver 200 e ninguém a receber acesso.
+  ///
+  /// Com a coluna anulável a linha fica, visível e reconciliável à mão. Não é
+  /// resgatável (o resgate procura por email), mas existir é a diferença entre
+  /// "perdemos o pagamento" e "há uma linha para tratar".
+  email        String?   @unique
   whopUserId   String?
+  /// A chave natural de uma subscrição é ESTA, não o email do comprador: o
+  /// email pode faltar, mudar, ou ser partilhado entre produtos.
   membershipId String    @unique
   productId    String?
   status       String

@@ -6,6 +6,7 @@ import { generateObject } from 'ai'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { z } from 'zod'
 import { assertCreditsAvailable, chargeCredits } from '@/lib/ai/credits'
+import { exigirPro } from '@/lib/api/acessoPro'
 
 export const maxDuration = 60; // Vercel function timeout (60s is good for AI)
 
@@ -28,12 +29,12 @@ export async function GET(
       return NextResponse.json({ error: 'Company not found' }, { status: 404 })
     }
 
-    // Require auth because it consumes AI quota
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    // Sessão E plano: vive no separador que a página protege com
+    // `canViewProTabs`, e além disso consome quota de IA. Tinha só a sessão,
+    // portanto qualquer conta gratuita gastava IA em conteúdo pago.
+    const acesso = await exigirPro()
+    if (!acesso.ok) return acesso.resposta
+    const user = { id: acesso.userId }
 
     // 1. Check Cache
     const cached = await prisma.managementProfile.findUnique({

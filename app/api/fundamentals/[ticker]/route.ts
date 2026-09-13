@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { exigirPro, CACHE_PRIVADO } from "@/lib/api/acessoPro"
 
 // Sem isto, o Next.js cacheia o resultado deste GET internamente por rota
 // resolvida (por ticker) até ao próximo deploy — tickers visitados antes de
@@ -15,7 +16,13 @@ export async function GET(
 ) {
   try {
     const { ticker } = await params
-    
+
+    // As sete grandes passam sem PRO — é o mesmo `isPro || isMag7` da página
+    // de ação. O resto exige plano: este endpoint devolvia 117 KB do
+    // histórico financeiro completo a quem não tinha sequer conta.
+    const acesso = await exigirPro(ticker)
+    if (!acesso.ok) return acesso.resposta
+
     const company = await prisma.company.findUnique({
       where: { ticker: ticker.toUpperCase() }
     })
@@ -54,7 +61,7 @@ export async function GET(
     })
 
     return NextResponse.json(serialized, {
-      headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' },
+      headers: { 'Cache-Control': CACHE_PRIVADO },
     })
   } catch (error) {
     console.error("Error fetching fundamentals:", error)

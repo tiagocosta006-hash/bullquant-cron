@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { exigirPro, CACHE_PRIVADO } from "@/lib/api/acessoPro"
 
 export async function GET(
   request: Request,
@@ -7,7 +8,12 @@ export async function GET(
 ) {
   try {
     const { ticker } = await params
-    
+
+    // Separador de avaliação: PRO, sem excepção de tickers. Este endpoint
+    // devolvia 72 KB de múltiplos a quem não tinha conta nenhuma.
+    const acesso = await exigirPro()
+    if (!acesso.ok) return acesso.resposta
+
     const company = await prisma.company.findUnique({
       where: { ticker: ticker.toUpperCase() }
     })
@@ -297,7 +303,7 @@ export async function GET(
 
     // Rota pesada (histórico completo + série de múltiplos) — a CDN absorve os hits
     return NextResponse.json(enxuto, {
-      headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" },
+      headers: { "Cache-Control": CACHE_PRIVADO },
     })
   } catch (error) {
     console.error("Error fetching valuation:", error)

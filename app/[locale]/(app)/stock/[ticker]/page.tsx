@@ -1,5 +1,6 @@
 import { cache } from 'react'
 import dynamic from 'next/dynamic'
+import { eMag7 } from '@/lib/api/acessoPro'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
@@ -179,8 +180,10 @@ export default async function StockPage({
   const devUnlocked = isDevUnlocked()
   const isPro = dbUser?.plan === 'PRO' || devUnlocked
   const isLoggedIn = !!user || devUnlocked
-  const MAG_7 = ['AAPL', 'MSFT', 'NVDA', 'AMZN', 'GOOGL', 'GOOG', 'META', 'TSLA']
-  const isMag7 = MAG_7.includes(company.ticker.toUpperCase())
+  // A lista vive em lib/api/acessoPro: a API que serve estes dados tem de
+  // aplicar exactamente a mesma regra, e com a lista declarada só aqui ficava
+  // livre de a contradizer — foi assim que o conteúdo pago acabou aberto.
+  const isMag7 = eMag7(company.ticker)
   
   const canViewFinancials = isPro || isMag7
   const canViewProTabs = isPro

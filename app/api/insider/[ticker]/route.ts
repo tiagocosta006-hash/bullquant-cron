@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { exigirPro, CACHE_PRIVADO } from "@/lib/api/acessoPro"
 
 /**
  * GET /api/insider/[ticker]
@@ -14,6 +15,10 @@ export async function GET(
   { params }: { params: Promise<{ ticker: string }> },
 ) {
   const { ticker } = await params;
+
+  // Vive no separador que a página protege com `canViewProTabs` (só PRO).
+  const acesso = await exigirPro();
+  if (!acesso.ok) return acesso.resposta;
 
   try {
     const company = await prisma.company.findUnique({
@@ -66,7 +71,7 @@ export async function GET(
 
     return NextResponse.json(
       { transactions, summary },
-      { headers: { "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=86400" } },
+      { headers: { "Cache-Control": CACHE_PRIVADO } },
     );
   } catch (error) {
     // Tabela ainda não migrada/populada → degrada graciosamente

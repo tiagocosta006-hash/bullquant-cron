@@ -318,20 +318,37 @@ def corrigir_unidades_de_adr(conn) -> None:
             corrigidas += 1
             continue
 
+        # A conversão aplica-se à SÉRIE INTEIRA e a TODAS as grandezas por
+        # ação, não só ao nº de ações do último período.
+        #
+        # Corrigir só as ações partia a identidade `EPS × ações = resultado
+        # líquido`: o EPS continuava em base ordinária e as ações passavam a
+        # ADS. O validador apanhou-o de imediato — seis violações
+        # EPS_X_SHARES em produção que não existiam antes, todas destas
+        # empresas. E o P/E, que é preço-de-ADS a dividir por EPS, ficava
+        # errado pelo mesmo fator.
+        #
+        # Dividir as ações e multiplicar o EPS e o dividendo pelo mesmo rácio
+        # deixa tudo coerente com o preço: a identidade fecha, o P/E fica
+        # certo, e o gráfico de ações muda de patamar mas mantém a forma.
+        racio = acoes / corrigido
         with conn.cursor() as cur:
             cur.execute(
                 '''
-                UPDATE fundamentals SET "sharesOutstanding" = %s, "updatedAt" = NOW()
-                WHERE id = (
-                    SELECT id FROM fundamentals
-                    WHERE "companyId" = %s AND "sharesOutstanding" > 0
-                    ORDER BY "periodEnd" DESC LIMIT 1
-                )
+                UPDATE fundamentals
+                   SET "sharesOutstanding" = "sharesOutstanding" / %s,
+                       "epsDiluted"        = "epsDiluted" * %s,
+                       "dividendPerShare"  = "dividendPerShare" * %s,
+                       "updatedAt"         = NOW()
+                 WHERE "companyId" = %s
                 ''',
-                (corrigido, company_id),
+                (racio, racio, racio, company_id),
             )
+            afetadas = cur.rowcount
         conn.commit()
-        print(f"  {ticker}: {acoes/1e6:,.0f}M -> {corrigido/1e6:,.0f}M ações (cap {nossa_m/1e3:,.0f} mM -> {cap_ref_m/1e3:,.0f} mM)")
+        print(f"  {ticker}: {acoes/1e6:,.0f}M -> {corrigido/1e6:,.0f}M ações "
+              f"(cap {nossa_m/1e3:,.0f} mM -> {cap_ref_m/1e3:,.0f} mM, "
+              f"rácio {racio:.2f} aplicado a {afetadas} períodos)")
         corrigidas += 1
 
     print(f"  {corrigidas} unidade(s) de ADR corrigida(s)." + (" (dry-run)" if DRY_RUN else ""))

@@ -40,7 +40,7 @@ export async function login(formData: FormData) {
     password: formData.get('password') as string,
   }
 
-  const { error } = await supabase.auth.signInWithPassword(data)
+  const { data: sessao, error } = await supabase.auth.signInWithPassword(data)
   if (error) {
     // Conta ainda por confirmar → ecrã que explica isso (com reenvio),
     // em vez de um erro solto na página de login.
@@ -48,6 +48,25 @@ export async function login(formData: FormData) {
       redirect(`/verify-email?email=${encodeURIComponent(email)}&unconfirmed=1`)
     }
     redirect(`/login?error=${encodeURIComponent(translateError(error))}&email=${encodeURIComponent(email)}`)
+  }
+
+  // Resgatar um pagamento do Whop também NO LOGIN, e não só no registo.
+  //
+  // O webhook, quando encontra a conta pelo email, promove-a logo a PRO — e
+  // esse é o caminho normal. O pagamento só fica em `whop_pending_memberships`
+  // quando não há conta NENHUMA com aquele email.
+  //
+  // Só que "não há conta" e "não há REGISTO NA APLICAÇÃO" não são a mesma
+  // coisa. Existem contas em auth.users sem linha em public.users — sete,
+  // quando isto foi escrito, duas delas com email confirmado. Para essas o
+  // webhook não encontra nada e grava um pendente; depois a pessoa faz LOGIN,
+  // não um registo, e o resgate do registo nunca corre. Ficava a pagar sem
+  // nunca receber acesso, e sem nada que o denunciasse.
+  //
+  // É uma consulta por login, indexada pelo email, e silenciosa por desenho:
+  // uma falha aqui não pode impedir ninguém de entrar.
+  if (sessao?.user?.email) {
+    await resgatarPagamentoWhop(sessao.user.id, sessao.user.email)
   }
 
   revalidatePath('/', 'layout')

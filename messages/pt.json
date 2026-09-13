@@ -1592,5 +1592,12 @@
     "subtitle": "Navega por todas as empresas cotadas em bolsa disponíveis na nossa plataforma para análise fundamental e avaliação DCF.",
     "backToHome": "Voltar ao Início",
     "empty": "Nenhuma empresa encontrada."
+  },
+  "errorPage": {
+    "title": "ERRO",
+    "heading": "Alguma coisa correu mal",
+    "description": "Não conseguimos carregar esta página. O problema foi registado e já estamos a par — tenta outra vez daqui a pouco.",
+    "retry": "Tentar de novo",
+    "backHome": "Voltar ao início"
   }
 }

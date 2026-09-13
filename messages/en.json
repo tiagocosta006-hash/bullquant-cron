@@ -1592,5 +1592,12 @@
     "subtitle": "Browse all publicly traded companies available on our platform for fundamental analysis and DCF valuation.",
     "backToHome": "Back to Home",
     "empty": "No companies found."
+  },
+  "errorPage": {
+    "title": "ERROR",
+    "heading": "Something went wrong",
+    "description": "We couldn't load this page. The problem has been logged and we're aware of it — try again in a moment.",
+    "retry": "Try again",
+    "backHome": "Back home"
   }
 }

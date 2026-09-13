@@ -1,6 +1,6 @@
 import { cache } from 'react'
 import dynamic from 'next/dynamic'
-import { eMag7 } from '@/lib/api/acessoPro'
+import { eTickerDemo } from '@/lib/api/acessoPro'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
@@ -180,12 +180,18 @@ export default async function StockPage({
   const devUnlocked = isDevUnlocked()
   const isPro = dbUser?.plan === 'PRO' || devUnlocked
   const isLoggedIn = !!user || devUnlocked
-  // A lista vive em lib/api/acessoPro: a API que serve estes dados tem de
-  // aplicar exactamente a mesma regra, e com a lista declarada só aqui ficava
-  // livre de a contradizer — foi assim que o conteúdo pago acabou aberto.
-  const isMag7 = eMag7(company.ticker)
+  // Uma conta gratuita vê EXACTAMENTE o que vê quem não faz login: só o
+  // ticker da demo. Antes via os fundamentais completos das sete grandes —
+  // Apple, Microsoft, Nvidia, Amazon, Google, Meta e Tesla — e isso fazia do
+  // registo um atalho para conteúdo pago: bastava criar conta para ter sete
+  // das empresas mais procuradas por inteiro.
+  //
+  // A lista vive em lib/demoPublica: a API que serve estes dados aplica a
+  // mesma regra, e com ela declarada só aqui ficava livre de a contradizer —
+  // foi assim que o conteúdo pago acabou aberto da primeira vez.
+  const eDemo = eTickerDemo(company.ticker)
   
-  const canViewFinancials = isPro || isMag7
+  const canViewFinancials = isPro || eDemo
   const canViewProTabs = isPro
 
   // Overlay preliminar: revenue/EPS já reportados (earnings) que ainda não estão

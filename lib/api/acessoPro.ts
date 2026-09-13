@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { isDevUnlocked } from "@/lib/devAccess";
-import { eMag7, eTickerDemo } from "@/lib/demoPublica";
+import { eTickerDemo } from "@/lib/demoPublica";
 
 export { MAG_7, eMag7, TICKER_DEMO, eTickerDemo } from "@/lib/demoPublica";
 
@@ -34,9 +34,13 @@ export { MAG_7, eMag7, TICKER_DEMO, eTickerDemo } from "@/lib/demoPublica";
  * olhar para o ticker, e com isso partiu a demo pública (/stock/AAPL e /dcf,
  * as duas rotas que o middleware deixa passar a anónimos).
  *
- *   anónimo          → só o TICKER_DEMO, e só onde a demo o mostra
- *   conta gratuita   → mais as sete grandes, onde a página as abre
- *   PRO              → tudo
+ *   anónimo ou gratuito → só o TICKER_DEMO, e só onde a demo o mostra
+ *   PRO                 → tudo
+ *
+ * Chegou a haver um nível intermédio, em que uma conta gratuita via as sete
+ * grandes por inteiro. Saiu: fazia do registo um atalho para conteúdo pago —
+ * bastava criar conta para ter a Apple, a Microsoft, a Nvidia, a Amazon, a
+ * Google, a Meta e a Tesla completas, que são justamente as mais procuradas.
  *
  * ── Cache ────────────────────────────────────────────────────────────────
  *
@@ -60,8 +64,6 @@ type Opcoes = {
   ticker?: string | null;
   /** Deixa o TICKER_DEMO passar SEM sessão nenhuma (demo do funil). */
   demoAnonima?: boolean;
-  /** Deixa as sete grandes passarem com sessão mas sem PRO. */
-  mag7ComConta?: boolean;
 };
 
 function recusa(status: number, corpo: Record<string, unknown>): Recusado {
@@ -75,7 +77,7 @@ function recusa(status: number, corpo: Record<string, unknown>): Recusado {
 }
 
 export async function exigirPro(opcoes: Opcoes = {}): Promise<Autorizado | Recusado> {
-  const { ticker = null, demoAnonima = false, mag7ComConta = false } = opcoes;
+  const { ticker = null, demoAnonima = false } = opcoes;
 
   // O desbloqueio de desenvolvimento tem guard de NODE_ENV lá dentro: num
   // build de produção devolve sempre false, mesmo que a variável apareça no
@@ -116,7 +118,7 @@ export async function exigirPro(opcoes: Opcoes = {}): Promise<Autorizado | Recus
   });
   const pro = dbUser?.plan === "PRO";
 
-  if (pro || (mag7ComConta && eMag7(ticker))) {
+  if (pro) {
     return { ok: true, userId: user.id, pro };
   }
 

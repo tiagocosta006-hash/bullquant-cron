@@ -17,11 +17,14 @@ export async function GET(
   try {
     const { ticker } = await params
 
-    // Três níveis: anónimo vê só a demo (/stock/AAPL é público), conta
-    // gratuita vê as sete grandes, PRO vê tudo. Espelha o `isPro || isMag7`
-    // de ação. O resto exige plano: este endpoint devolvia 117 KB do
-    // histórico financeiro completo a quem não tinha sequer conta.
-    const acesso = await exigirPro({ ticker, demoAnonima: true, mag7ComConta: true })
+    // DOIS níveis, não três: o ticker da demo é aberto a toda a gente e o
+    // resto exige PRO. Uma conta gratuita vê exactamente o que vê quem não
+    // faz login — antes via os fundamentais completos das sete grandes, e
+    // isso fazia do registo um atalho para conteúdo pago.
+    //
+    // Espelha o `isPro || eDemo` da página de ação. Sem guarda nenhum, este
+    // endpoint devolvia 117 KB do histórico financeiro a quem não tinha conta.
+    const acesso = await exigirPro({ ticker, demoAnonima: true })
     if (!acesso.ok) return acesso.resposta
 
     const company = await prisma.company.findUnique({

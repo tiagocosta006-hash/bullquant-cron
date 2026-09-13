@@ -1,15 +1,14 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { createClient } from "@/lib/supabase/server"
 import type { Prisma } from "@prisma/client"
+import { exigirPro } from "@/lib/api/acessoPro"
 
 export async function GET(request: Request) {
-  const supabase = await createClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-  if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+  // A página /explore está inteira debaixo de um ProGate (ver
+  // (app)/explore/layout.tsx), mas esta rota só pedia SESSÃO — qualquer conta
+  // gratuita tinha o screener completo por baixo da cortina.
+  const acesso = await exigirPro()
+  if (!acesso.ok) return acesso.resposta
 
   const { searchParams } = new URL(request.url)
   const sector = searchParams.get("sector")

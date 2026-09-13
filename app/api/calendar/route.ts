@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { createClient } from '@/lib/supabase/server'
+import { exigirPro, CACHE_PRIVADO } from '@/lib/api/acessoPro'
 
 type Kind = 'earnings' | 'corporate' | 'macro'
 const ALL_KINDS: Kind[] = ['earnings', 'corporate', 'macro']
@@ -37,6 +38,12 @@ export async function GET(request: NextRequest) {
   if (isNaN(from.getTime()) || isNaN(to.getTime())) {
     return NextResponse.json({ error: 'Invalid date range' }, { status: 400 })
   }
+
+  // A página /calendar é PRO (ProGate por cima), mas o ramo `scope=all` não
+  // pedia nada a ninguém — e servia 12 KB do calendário de resultados em
+  // `public, s-maxage=1800`, ou seja também na cache partilhada do CDN.
+  const acesso = await exigirPro()
+  if (!acesso.ok) return acesso.resposta
 
   try {
     let companyIds: string[] | undefined
@@ -140,9 +147,9 @@ export async function GET(request: NextRequest) {
     // são por-utilizador e NUNCA podem ir para a cache partilhada da CDN.
     return NextResponse.json(data, {
       headers: {
-        'Cache-Control': scope === 'all'
-          ? 'public, s-maxage=1800, stale-while-revalidate=86400'
-          : 'private, no-store',
+        // Nunca `public`: a resposta passou a depender de quem pergunta, e
+        // uma cópia na cache do CDN serviria conteúdo pago a quem não paga.
+        'Cache-Control': scope === 'all' ? CACHE_PRIVADO : 'private, no-store',
       },
     })
   } catch (error) {

@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { isDevUnlocked } from "@/lib/devAccess";
+import { eMag7, eTickerDemo } from "@/lib/demoPublica";
+
+export { MAG_7, eMag7, TICKER_DEMO, eTickerDemo } from "@/lib/demoPublica";
 
 /**
  * Guarda de acesso para as rotas de API que servem conteúdo PRO.
@@ -10,7 +13,7 @@ import { isDevUnlocked } from "@/lib/devAccess";
  *
  * As páginas gated não RETINHAM o conteúdo: renderizavam-no por inteiro e
  * punham-lhe um `<ProGate>` por cima com `pointer-events-none select-none`.
- * O que estava por baixo continuava a ser carregado — e os componentes que o
+ * O que estava por baixo continuava a carregar, e os componentes que o
  * carregam (FinancialsEngine, ValuationMultiples, DcfCalculator,
  * InsiderActivity) buscam os dados a rotas de API que não pediam nada a
  * ninguém.
@@ -24,9 +27,20 @@ import { isDevUnlocked } from "@/lib/devAccess";
  * Ou seja: o produto inteiro, para as 530 empresas, a um `curl` de distância.
  * O `ProGate` é uma cortina; isto é a porta.
  *
+ * ── Três níveis, não dois ────────────────────────────────────────────────
+ *
+ * O funil de aquisição depende de haver coisas visíveis sem conta, e a
+ * primeira versão deste guarda esqueceu-se disso: exigia sessão antes de
+ * olhar para o ticker, e com isso partiu a demo pública (/stock/AAPL e /dcf,
+ * as duas rotas que o middleware deixa passar a anónimos).
+ *
+ *   anónimo          → só o TICKER_DEMO, e só onde a demo o mostra
+ *   conta gratuita   → mais as sete grandes, onde a página as abre
+ *   PRO              → tudo
+ *
  * ── Cache ────────────────────────────────────────────────────────────────
  *
- * Estas rotas serviam `public, s-maxage=3600`, o que as punha na cache do CDN
+ * Estas rotas serviam `public, s-maxage=3600`, ou seja a cache do CDN
  * PARTILHADA por toda a gente. Pôr um guarda e deixar esse cabeçalho seria
  * pior do que não ter guarda nenhum: o CDN guardava a resposta de um
  * utilizador com acesso e servia-a a quem não tem — ou guardava um 401 e
@@ -38,39 +52,42 @@ import { isDevUnlocked } from "@/lib/devAccess";
  */
 export const CACHE_PRIVADO = "private, max-age=3600, stale-while-revalidate=86400";
 
-/**
- * As sete grandes ficam abertas a qualquer conta autenticada — é o que a
- * página de ação mostra a quem ainda não paga, para a plataforma se poder
- * experimentar com empresas que as pessoas reconhecem.
- *
- * Vive aqui e não na página porque a regra tem de ser a MESMA nos dois
- * sítios: com a lista declarada só no componente, a API ficava livre de a
- * contradizer — e foi exactamente assim que o conteúdo pago acabou aberto.
- */
-export const MAG_7 = ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "GOOG", "META", "TSLA"];
-
-export function eMag7(ticker: string | null | undefined): boolean {
-  return !!ticker && MAG_7.includes(ticker.toUpperCase());
-}
-
-type Autorizado = { ok: true; userId: string; pro: boolean };
+type Autorizado = { ok: true; userId: string | null; pro: boolean };
 type Recusado = { ok: false; resposta: NextResponse };
 
-/**
- * Exige sessão e plano PRO.
- *
- * @param tickerLivreSeMag7 quando dado, uma das sete grandes passa sem PRO
- *        (mas continua a exigir sessão) — espelha o `isPro || isMag7` da
- *        página de ação.
- */
-export async function exigirPro(
-  tickerLivreSeMag7?: string | null,
-): Promise<Autorizado | Recusado> {
+type Opcoes = {
+  /** O ticker pedido, para as excepções abaixo. */
+  ticker?: string | null;
+  /** Deixa o TICKER_DEMO passar SEM sessão nenhuma (demo do funil). */
+  demoAnonima?: boolean;
+  /** Deixa as sete grandes passarem com sessão mas sem PRO. */
+  mag7ComConta?: boolean;
+};
+
+function recusa(status: number, corpo: Record<string, unknown>): Recusado {
+  return {
+    ok: false,
+    resposta: NextResponse.json(corpo, {
+      status,
+      headers: { "Cache-Control": "no-store" },
+    }),
+  };
+}
+
+export async function exigirPro(opcoes: Opcoes = {}): Promise<Autorizado | Recusado> {
+  const { ticker = null, demoAnonima = false, mag7ComConta = false } = opcoes;
+
   // O desbloqueio de desenvolvimento tem guard de NODE_ENV lá dentro: num
   // build de produção devolve sempre false, mesmo que a variável apareça no
   // ambiente por engano.
   if (isDevUnlocked()) {
     return { ok: true, userId: "dev", pro: true };
+  }
+
+  // A demo é decidida ANTES de se procurar sessão: é o que um anónimo vê, e
+  // procurar-lhe uma sessão que não tem só o mandaria embora.
+  if (demoAnonima && eTickerDemo(ticker)) {
+    return { ok: true, userId: null, pro: false };
   }
 
   const supabase = await createClient();
@@ -79,13 +96,7 @@ export async function exigirPro(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return {
-      ok: false,
-      resposta: NextResponse.json(
-        { error: "Autenticação necessária" },
-        { status: 401, headers: { "Cache-Control": "no-store" } },
-      ),
-    };
+    return recusa(401, { error: "Autenticação necessária" });
   }
 
   const dbUser = await prisma.user.findUnique({
@@ -94,17 +105,11 @@ export async function exigirPro(
   });
   const pro = dbUser?.plan === "PRO";
 
-  if (pro || eMag7(tickerLivreSeMag7)) {
+  if (pro || (mag7ComConta && eMag7(ticker))) {
     return { ok: true, userId: user.id, pro };
   }
 
   // 403 e não 401: a pessoa está identificada, o que falta é o plano. Um 401
   // levaria o cliente a mandá-la para o login, onde ela já esteve.
-  return {
-    ok: false,
-    resposta: NextResponse.json(
-      { error: "Plano PRO necessário", upgrade: true },
-      { status: 403, headers: { "Cache-Control": "no-store" } },
-    ),
-  };
+  return recusa(403, { error: "Plano PRO necessário", upgrade: true });
 }

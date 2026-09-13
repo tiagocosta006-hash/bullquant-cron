@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { createClient } from '@/lib/supabase/server'
+import { exigirPro, CACHE_PRIVADO } from '@/lib/api/acessoPro'
 
 /**
  * GET /api/earnings?from=YYYY-MM-DD&to=YYYY-MM-DD[&watchlist=1]
@@ -8,6 +9,14 @@ import { createClient } from '@/lib/supabase/server'
  * Com watchlist=1 restringe ao portfólio do utilizador autenticado.
  */
 export async function GET(request: NextRequest) {
+  // Sem consumidores na aplicação — o calendário passou a usar /api/calendar
+  // — mas continuava a servir 10 KB do calendário de resultados a quem
+  // passasse por aqui, em cache partilhada do CDN. Fica com o mesmo guarda do
+  // /api/calendar em vez de se apagar: se algo externo ainda lhe bater, um
+  // 401 diz-nos isso, um 404 seria só silêncio.
+  const acesso = await exigirPro()
+  if (!acesso.ok) return acesso.resposta
+
   const { searchParams } = request.nextUrl
   const fromParam = searchParams.get('from')
   const toParam = searchParams.get('to')
@@ -68,9 +77,7 @@ export async function GET(request: NextRequest) {
     // por-utilizador e NUNCA pode ir para a cache partilhada da CDN.
     return NextResponse.json(data, {
       headers: {
-        'Cache-Control': watchlistOnly
-          ? 'private, no-store'
-          : 'public, s-maxage=1800, stale-while-revalidate=86400',
+        'Cache-Control': watchlistOnly ? 'private, no-store' : CACHE_PRIVADO,
       },
     })
   } catch (error) {

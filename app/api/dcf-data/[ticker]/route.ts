@@ -57,7 +57,7 @@ export async function GET(
 
     // A calculadora DCF é uma página PRO (ver (app)/dcf/page.tsx). O
     // autopreencher é o que a torna útil, e estava aberto a toda a gente.
-    const acesso = await exigirPro()
+    const acesso = await exigirPro({ ticker, demoAnonima: true })
     if (!acesso.ok) return acesso.resposta
 
     const company = await prisma.company.findUnique({

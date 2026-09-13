@@ -34,7 +34,9 @@ export async function GET(
     // portanto qualquer conta gratuita gastava IA em conteúdo pago.
     const acesso = await exigirPro()
     if (!acesso.ok) return acesso.resposta
-    const user = { id: acesso.userId }
+    // `userId` só é null no ramo da demo anónima, que esta chamada não pede —
+    // sem `demoAnonima` o guarda já devolveu 401 a quem não tem sessão.
+    const user = { id: acesso.userId as string }
 
     // 1. Check Cache
     const cached = await prisma.managementProfile.findUnique({

@@ -24,5 +24,10 @@ jobs:
 
       - name: Run fast ingest
         env:
+          # O schema do Prisma lê `url = env("DATABASE_URL")` — só o DIRECT_URL
+          # não chega, e o cliente rebentava na validação antes de tocar na base.
+          # Este cron falhava TODOS OS DIAS por causa disto, e sem alarme nenhum:
+          # o único sinal era ficar-se sem fundamentais rápidos da Yahoo.
+          DATABASE_URL: ${{ secrets.DIRECT_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
         run: npx tsx scripts/ingest_fast_fundamentals.ts

@@ -78,4 +78,29 @@ jobs:
             echo "✓ /api/prices/AAPL OK"
           fi
 
+          # 4) FRESCURA dos preços, não só a forma.
+          #
+          # As três verificações acima passavam todas enquanto os preços em
+          # produção envelheciam CINCO DIAS: o cron diário falhava desde sempre
+          # (POLYGON_API_KEY vazia) e ninguém deu por isso, porque a resposta
+          # continuava a ser um JSON com "close" lá dentro. Procurar a forma
+          # não distingue um preço de ontem de um preço da semana passada.
+          #
+          # O limite é 5 dias por causa dos fins de semana e feriados: uma
+          # sexta-feira feriada deixa a última cotação a 4 dias na segunda de
+          # manhã. Abaixo disso haveria falsos alarmes todas as semanas, e um
+          # alarme que toca sem motivo deixa de ser lido.
+          OUT="$(curl -sS --max-time 30 "$BASE_URL/api/prices/AAPL?period=1m" 2>&1 || true)"
+          ULTIMA="$(printf '%s' "$OUT" | jq -r '[.[].date] | max // empty' 2>/dev/null | cut -c1-10)"
+          if [ -z "$ULTIMA" ]; then
+            report_failure "/api/prices/AAPL (frescura)" "Não consegui ler nenhuma data da resposta: ${OUT:0:300}"
+          else
+            IDADE=$(( ( $(date -u +%s) - $(date -u -d "$ULTIMA" +%s) ) / 86400 ))
+            if [ "$IDADE" -gt 5 ]; then
+              report_failure "/api/prices/AAPL (frescura)" "A cotação mais recente é de ${ULTIMA}, ou seja ${IDADE} dias. O cron de preços deve estar parado."
+            else
+              echo "✓ frescura dos preços OK (última: ${ULTIMA}, ${IDADE} dias)"
+            fi
+          fi
+
           exit "$FAILED"

@@ -128,7 +128,13 @@ def main() -> None:
                             data.get("mercadoGeografico"),
                             data.get("bullCase"),
                             data.get("bearCase"),
-                            json.dumps(data.get("swot", {})),
+                            # NULL e não "{}": um objeto vazio passava pela
+                            # guarda do painel (`typeof === 'object'`) e
+                            # desenhava a caixa do SWOT com os quatro títulos
+                            # e nada por baixo. Sem SWOT não há secção.
+                            (json.dumps(data["swot"])
+                             if isinstance(data.get("swot"), (dict, list)) and data["swot"]
+                             else None),
                             data.get("outrasInformacoesRelevantes"),
                             comp_id
                         ),

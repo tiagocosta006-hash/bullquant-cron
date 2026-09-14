@@ -4,10 +4,10 @@ import { useRef, useState, useEffect } from "react"
 import { useTranslations } from "next-intl"
 import { Link } from '@/i18n/routing';
 import { CompanyLogo } from "@/components/ui/CompanyLogo"
-import { Building2, X, Users, ArrowRight, Activity, HandCoins, ExternalLink, Scale, Globe, TrendingUp, TrendingDown } from "lucide-react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { Building2, Users, ArrowRight, Activity, HandCoins, ExternalLink, Scale, Globe, TrendingUp, TrendingDown } from "lucide-react"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { nomeDeCeoLimpo } from "@/lib/ceo"
+import { lerSwot } from "@/lib/swot"
 
 export interface BusinessProfileSheetProps {
   open: boolean
@@ -21,11 +21,11 @@ export interface BusinessProfileSheetProps {
     industry: string
     description: string | null
     ceo: string | null
-    revenueSegments: any
+    revenueSegments: unknown
     geographicFocus?: string | null
     bullCase?: string | null
     bearCase?: string | null
-    swot?: any
+    swot?: unknown
     extraInfo?: string | null
   } | null
 }
@@ -56,6 +56,8 @@ export function BusinessProfileSheet({ open, onOpenChange, company: initialCompa
   if (!initialCompany) return null
 
   const company = { ...initialCompany, ...details }
+
+  const swot = lerSwot(company.swot)
 
   // Parse revenue segments se existirem
   const segmentsObj = typeof company.revenueSegments === 'string' 
@@ -219,38 +221,29 @@ export function BusinessProfileSheet({ open, onOpenChange, company: initialCompa
               </section>
             )}
 
-            {/* SWOT Matrix — 4 quadrantes, identidade fixa (não é série de dados) */}
-            {company.swot && (typeof company.swot === 'object') && (
+            {/* SWOT — só os quadrantes com conteúdo; sem conteúdo, sem secção */}
+            {swot && (
               <section>
                 <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                   <Activity size={18} className="text-primary" />
                   {t("sheet.swotTitle")}
                 </h3>
                 <div className="grid grid-cols-2 gap-px bg-border rounded-xl overflow-hidden border border-border">
-                  <div className="bg-card p-4 space-y-2">
-                    <h4 className="font-bold text-bull text-sm">{t("sheet.swotStrengths")}</h4>
-                    <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-3">
-                      {(company.swot as any).forcas?.map((item: string, i: number) => <li key={i}>{item}</li>)}
-                    </ul>
-                  </div>
-                  <div className="bg-card p-4 space-y-2">
-                    <h4 className="font-bold text-bear text-sm">{t("sheet.swotWeaknesses")}</h4>
-                    <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-3">
-                      {(company.swot as any).fraquezas?.map((item: string, i: number) => <li key={i}>{item}</li>)}
-                    </ul>
-                  </div>
-                  <div className="bg-card p-4 space-y-2">
-                    <h4 className="font-bold text-primary text-sm">{t("sheet.swotOpportunities")}</h4>
-                    <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-3">
-                      {(company.swot as any).oportunidades?.map((item: string, i: number) => <li key={i}>{item}</li>)}
-                    </ul>
-                  </div>
-                  <div className="bg-card p-4 space-y-2">
-                    <h4 className="font-bold text-chart-4 text-sm">{t("sheet.swotThreats")}</h4>
-                    <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-3">
-                      {(company.swot as any).ameacas?.map((item: string, i: number) => <li key={i}>{item}</li>)}
-                    </ul>
-                  </div>
+                  {([
+                    ["forcas", "sheet.swotStrengths", "text-bull"],
+                    ["fraquezas", "sheet.swotWeaknesses", "text-bear"],
+                    ["oportunidades", "sheet.swotOpportunities", "text-primary"],
+                    ["ameacas", "sheet.swotThreats", "text-chart-4"],
+                  ] as const)
+                    .filter(([chave]) => swot[chave].length > 0)
+                    .map(([chave, titulo, cor]) => (
+                      <div key={chave} className="bg-card p-4 space-y-2">
+                        <h4 className={`font-bold ${cor} text-sm`}>{t(titulo)}</h4>
+                        <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-3">
+                          {swot[chave].map((item, i) => <li key={i}>{item}</li>)}
+                        </ul>
+                      </div>
+                    ))}
                 </div>
               </section>
             )}

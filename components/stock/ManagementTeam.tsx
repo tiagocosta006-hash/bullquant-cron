@@ -41,6 +41,8 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
   const [error, setError] = useState<string | null>(null)
   // Não é a mesma coisa que um erro: é a plataforma a dizer que não sabe.
   const [semCeoVerificado, setSemCeoVerificado] = useState(false)
+  // Nem isto: é a IA ocupada, e passa daqui a pouco.
+  const [ocupado, setOcupado] = useState(false)
   const locale = useLocale()
 
   useEffect(() => {
@@ -48,6 +50,10 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
       try {
         const res = await fetch(`/api/management/${ticker}`)
         const data = await res.json()
+        if (res.status === 503 && data.indisponivelTemporariamente) {
+          setOcupado(true)
+          return
+        }
         if (!res.ok) {
           throw new Error(data.message || data.error || 'Failed to fetch')
         }
@@ -78,6 +84,34 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
           <div className="h-16 bg-ink-800 rounded-md animate-pulse" />
           <div className="h-24 bg-ink-800 rounded-md animate-pulse" />
           <div className="h-20 bg-ink-800 rounded-md animate-pulse" />
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (ocupado) {
+    return (
+      <Card className="border-ink-700 bg-ink-900 overflow-hidden relative">
+        <CardHeader className="border-b border-ink-800 pb-4">
+          <CardTitle className="text-lg flex items-center gap-2 text-parchment-100">
+            <Users className="h-5 w-5 text-gold-500" />
+            {locale === 'pt' ? 'Equipa de Gestão' : 'Management Team'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="bg-ink-800/50 border border-ink-700 rounded-lg p-4 flex items-start gap-3">
+            <Info className="h-5 w-5 text-grey-400 shrink-0 mt-0.5" />
+            <div>
+              <h4 className="text-sm font-semibold text-parchment-100">
+                {locale === 'pt' ? 'A análise está a demorar' : 'The analysis is taking a while'}
+              </h4>
+              <p className="text-sm text-grey-400 mt-1">
+                {locale === 'pt'
+                  ? 'O serviço de IA está com muita procura neste momento. Volta a abrir este separador daqui a um bocado — a análise é gerada uma vez e depois fica guardada.'
+                  : 'The AI service is under heavy demand right now. Open this tab again in a moment — the analysis is generated once and then kept.'}
+              </p>
+            </div>
+          </div>
         </CardContent>
       </Card>
     )

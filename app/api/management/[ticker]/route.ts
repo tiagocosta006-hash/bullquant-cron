@@ -191,7 +191,7 @@ export async function GET(
     const google = createGoogleGenerativeAI({ apiKey: process.env.GEMINI_API_KEY })
     const modelName = process.env.GEMINI_MODEL || 'gemini-3.5-flash'
 
-    const { object } = await generateObject({
+    const gerarPerfil = () => generateObject({
       model: google(modelName),
       schema: z.object({
         ceoName: z.string(),
@@ -232,6 +232,37 @@ export async function GET(
           : `We have no annual financial data for this company, so make no quantitative claims at all.`,
       ].join(" ")
     })
+
+    /**
+     * Quando o Gemini não atende, não se deita o separador abaixo.
+     *
+     * O modelo devolve "This model is currently experiencing high demand" em
+     * picos de procura, e o SDK ainda tenta de novo antes de desistir —
+     * medido: 8 a 26 segundos de espera para acabar num 500, com o separador a
+     * mostrar o cartão vermelho de erro. Mas isto não está partido, está
+     * ocupado, e as duas coisas não se dizem da mesma maneira.
+     *
+     * Havendo um perfil guardado do MESMO CEO, serve-se esse. É de uma revisão
+     * anterior — o texto pode não ter os números ancorados — mas descreve a
+     * pessoa certa, e isso vale mais do que um erro. Não havendo, ou sendo de
+     * outra pessoa, diz-se que está indisponível por agora.
+     */
+    let object: Awaited<ReturnType<typeof gerarPerfil>>["object"]
+    try {
+      object = (await gerarPerfil()).object
+    } catch (erro) {
+      console.error(`[management] ${company.ticker}: a geração falhou —`, erro)
+      if (cached && mesmoCeo) {
+        return NextResponse.json(
+          { profile: cached, desatualizado: true },
+          { headers: { "Cache-Control": "no-store" } },
+        )
+      }
+      return NextResponse.json(
+        { indisponivelTemporariamente: true },
+        { status: 503, headers: { "Cache-Control": "no-store" } },
+      )
+    }
 
     // 3. Save to Cache (Expire in 30 days since management doesn't change daily)
     const expiresAt = new Date()

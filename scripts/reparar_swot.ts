@@ -32,8 +32,9 @@
  * empresa com duas forças verdadeiras e nenhuma ameaça mostra duas forças,
  * que é melhor do que quatro categorias inventadas.
  *
- * Ficando tudo vazio, a coluna vai a NULL e o painel deixa de mostrar a
- * secção — a mesma regra do CEO: quando não há, não se inventa.
+ * E ou é um SWOT inteiro — quatro categorias, dois itens cada — ou vai a
+ * NULL e o painel não mostra secção nenhuma. Meia análise tem o aspecto de
+ * estar completa, e é por isso que engana.
  *
  *   npx tsx scripts/reparar_swot.ts            (simulação, não escreve)
  *   npx tsx scripts/reparar_swot.ts --aplicar  (grava, com cópia antes)
@@ -47,6 +48,21 @@ const APLICAR = process.argv.includes('--aplicar')
 
 /** Aparecer em 3+ empresas é deixar de ser sobre alguma delas. */
 const LIMITE_GENERICA = 3
+
+/**
+ * Frase que acaba em preposição, artigo ou conjunção = frase cortada a meio.
+ *
+ * A geração tinha um limite de comprimento e várias saíram truncadas: a Align
+ * Technology tem "Cortes profundos e instantâneos no consumo familiar não
+ * essencial de", e a Allstate três assim.
+ *
+ * O `\b` do JavaScript NÃO serve aqui: não conhece acentos, portanto vê uma
+ * fronteira de palavra dentro de "saúde" e dá a frase por cortada. Com ele, a
+ * primeira medição acusou 98 frases e 68 empresas — quatro vezes mais do que
+ * a realidade. São 23 em 14. Daí o `(?:^|\s)`.
+ */
+const CORTADA_A_MEIO =
+  /(?:^|\s)(de|da|do|das|dos|em|no|na|nos|nas|com|para|por|e|ou|que|ao|à|aos|às|um|uma|pelo|pela|entre|sobre|sem|até)$/i
 
 type Swot = { forcas: string[]; fraquezas: string[]; oportunidades: string[]; ameacas: string[] }
 
@@ -123,21 +139,27 @@ async function main() {
     if (!s) { paraNull.push(l.ticker); continue }
     const limpo: Swot = { forcas: [], fraquezas: [], oportunidades: [], ameacas: [] }
     for (const [k, v] of Object.entries(s) as Array<[keyof Swot, string[]]>) {
-      limpo[k] = v.filter((f) => !eGenerica(f, l.ticker, l.nome))
+      limpo[k] = v.filter(
+        (f) => !eGenerica(f, l.ticker, l.nome) && !CORTADA_A_MEIO.test(f.trim().replace(/[.!?]$/, "")),
+      )
     }
     /**
-     * Um mínimo para aquilo ainda ser um SWOT.
+     * Ou é um SWOT inteiro, ou não é nada.
      *
-     * Depois de tirar os moldes sobrava, em vários casos, uma linha só numa
-     * categoria — a HSBC ficou com "HSBC HOLDINGS PLC has a strong market
-     * position." e mais nada. Quatro títulos, três vazios e uma frase que não
-     * diz nada é pior do que não haver secção: parece uma análise a meio.
+     * As QUATRO categorias com pelo menos DOIS itens cada — que é o que a
+     * própria ingestão pede ao modelo ("Array de 2 a 3 strings curtas").
      *
-     * Duas categorias com conteúdo e três itens no total. Abaixo disso, NULL.
+     * Um critério mais frouxo deixava passar coisas como o JPMorgan com duas
+     * forças, uma oportunidade e mais nada: quatro títulos, dois vazios, e o
+     * leitor a concluir que o banco não tem fraquezas nem ameaças. Meia
+     * análise não é meio útil — é enganadora, porque tem o aspecto de estar
+     * completa.
+     *
+     * Quem não chegar lá fica a NULL e não mostra secção nenhuma.
      */
-    const categoriasComConteudo = Object.values(limpo).filter((x) => x.length).length
-    const totalItens = Object.values(limpo).flat().length
-    if (categoriasComConteudo < 2 || totalItens < 3) { paraNull.push(l.ticker); continue }
+    const completo = (["forcas", "fraquezas", "oportunidades", "ameacas"] as const)
+      .every((c) => limpo[c].length >= 2)
+    if (!completo) { paraNull.push(l.ticker); continue }
     const antes = Object.values(s).flat().length
     const depois = Object.values(limpo).flat().length
     if (depois < antes) perderamFrases++

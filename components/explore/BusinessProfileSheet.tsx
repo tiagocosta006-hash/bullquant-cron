@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef } from "react"
+import { useRef, useState, useEffect } from "react"
 import { useTranslations } from "next-intl"
 import { Link } from '@/i18n/routing';
 import { CompanyLogo } from "@/components/ui/CompanyLogo"
@@ -30,11 +30,32 @@ export interface BusinessProfileSheetProps {
   } | null
 }
 
-export function BusinessProfileSheet({ open, onOpenChange, company }: BusinessProfileSheetProps) {
+export function BusinessProfileSheet({ open, onOpenChange, company: initialCompany }: BusinessProfileSheetProps) {
   const t = useTranslations("explore")
   const scrollRef = useRef<HTMLDivElement>(null)
+  
+  const [details, setDetails] = useState<{bullCase?: string|null, bearCase?: string|null, swot?: any, extraInfo?: string|null} | null>(null)
+  const [loading, setLoading] = useState(false)
 
-  if (!company) return null
+  useEffect(() => {
+    if (open && initialCompany?.ticker) {
+      if (details) return
+      setLoading(true)
+      fetch(`/api/explore/details/${initialCompany.ticker}`)
+        .then(res => res.json())
+        .then(data => setDetails(data))
+        .catch(console.error)
+        .finally(() => setLoading(false))
+    }
+    if (!open && details) {
+      setDetails(null)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, initialCompany?.ticker])
+
+  if (!initialCompany) return null
+
+  const company = { ...initialCompany, ...details }
 
   // Parse revenue segments se existirem
   const segmentsObj = typeof company.revenueSegments === 'string' 

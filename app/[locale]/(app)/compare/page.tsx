@@ -48,14 +48,35 @@ export default async function ComparePage({
         industry: baseCompany.industry,
         ticker: { not: baseCompany.ticker }
       },
-      orderBy: { name: 'asc' }
+      orderBy: { name: 'asc' },
+      select: {
+        id: true,
+        ticker: true,
+        name: true,
+        // Mantemos os campos mínimos para o PeerComparisonDashboard funcionar
+      }
     }),
     prisma.fundamental.findMany({
       where: {
         companyId: baseCompany.id,
         periodType: 'ANNUAL'
       },
-      orderBy: { periodEnd: 'asc' }
+      orderBy: { periodEnd: 'asc' },
+      select: {
+        fiscalYear: true,
+        periodEnd: true,
+        revenue: true,
+        netIncome: true,
+        freeCashFlow: true,
+        grossMargin: true,
+        netMargin: true,
+        sharesOutstanding: true,
+        totalDebt: true,
+        cash: true,
+        ebitda: true,
+        roic: true,
+        returnOnEquity: true
+      }
     })
   ])
 
@@ -85,7 +106,7 @@ export default async function ComparePage({
         <PeerComparisonDashboard
           baseCompany={baseCompany} 
           baseFundamentals={baseFundamentals}
-          availablePeers={allPeers}
+          availablePeers={allPeers as any}
         />
       </div>
     </div>

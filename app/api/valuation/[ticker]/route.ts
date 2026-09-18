@@ -24,7 +24,11 @@ export async function GET(
 
     const allPrices = await prisma.price.findMany({
       where: { ticker: ticker.toUpperCase() },
-      orderBy: { date: 'asc' }
+      orderBy: { date: 'asc' },
+      select: {
+        date: true,
+        close: true,
+      }
     })
 
     if (allPrices.length === 0) {
@@ -33,7 +37,21 @@ export async function GET(
 
     const allFundamentals = await prisma.fundamental.findMany({
       where: { companyId: company.id },
-      orderBy: { periodEnd: 'asc' }
+      orderBy: { periodEnd: 'asc' },
+      select: {
+        periodType: true,
+        fiscalYear: true,
+        fiscalQuarter: true,
+        periodEnd: true,
+        filedAt: true,
+        epsDiluted: true,
+        netIncome: true,
+        sharesOutstanding: true,
+        revenue: true,
+        freeCashFlow: true,
+        operatingCashFlow: true,
+        capex: true,
+      }
     })
 
     // Data em que o período passou a ser público. `filedAt` é a fonte

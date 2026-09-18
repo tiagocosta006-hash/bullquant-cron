@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { carregarSeriesReduzidas } from "@/lib/finance/seriesMacro"
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -10,38 +10,20 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Missing tickers parameter" }, { status: 400 })
   }
 
-  const tickers = tickersParam.split(",")
-  const whereClause: any = { ticker: { in: tickers } }
+  const tickers = tickersParam.split(",").map((t) => t.trim()).filter(Boolean)
 
+  let desde: Date | undefined
   if (startDateParam) {
-    const startDate = new Date(startDateParam)
-    if (!isNaN(startDate.getTime())) {
-      whereClause.date = { gte: startDate }
-    }
+    const d = new Date(startDateParam)
+    if (!isNaN(d.getTime())) desde = d
   }
 
   try {
-    const prices = await prisma.price.findMany({
-      where: whereClause,
-      select: {
-        ticker: true,
-        date: true,
-        close: true,
-      },
-      orderBy: { date: "asc" },
-    })
-
-    // Group by ticker for easier consumption on frontend
-    const grouped = prices.reduce((acc, curr) => {
-      if (!acc[curr.ticker]) {
-        acc[curr.ticker] = []
-      }
-      acc[curr.ticker].push({
-        date: curr.date.toISOString().split("T")[0],
-        value: Number(curr.close),
-      })
-      return acc
-    }, {} as Record<string, { date: string; value: number }[]>)
+    // A redução para ~800 pontos acontece no SQL, não aqui (ver
+    // lib/finance/seriesMacro.ts). Antes trazia-se a série inteira da base e
+    // reduzia-se em JavaScript — o browser ficava leve e o Postgres continuava
+    // a mandar megabytes por chamada.
+    const grouped = await carregarSeriesReduzidas(tickers, { desde })
 
     return NextResponse.json(grouped, {
       headers: {

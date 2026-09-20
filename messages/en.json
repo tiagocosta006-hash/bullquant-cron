@@ -182,7 +182,7 @@
         "f1": "MAG 7 only with full fundamentals",
         "f2": "10 years of visual fundamentals for MAG 7",
         "f3": "Auto-filled DCF calculator with saved scenarios",
-        "f4": "3 AI credits per day (one full Analyst report)",
+        "f4": "3 AI credits per day",
         "f5": "Watchlist, earnings calendar and insider trading",
         "cta": "Create free account"
       },
@@ -192,7 +192,7 @@
         "price": "€10",
         "period": "per month",
         "f1": "Everything in the free plan",
-        "f2": "8 AI credits per day (~2 full reports or 2 chats)",
+        "f2": "8 AI credits per day",
         "f3": "Chat with the AI Analyst about any company",
         "f4": "Historical valuation multiples (P/E, P/S, EV/EBITDA)",
         "f5": "Private community and priority support",
@@ -214,7 +214,7 @@
     "faq": {
       "title": "Frequently asked questions",
       "q1": "What's the difference between Free and Pro?",
-      "a1": "The Free plan includes access to full 10-year fundamentals for the MAG 7 companies, the DCF calculator (with saved scenarios), the AI Analyst (3 credits per day, enough for one full report), curated theme lists, unlimited watchlist, earnings calendar and insider trading. The Pro plan unlocks access to the entire S&P 500 (500 companies), and adds 8 AI credits per day, chat with the AI Analyst, historical valuation multiples, a private community and priority support. Anything already generated is cached and can be read as often as you like — credits are only spent when a new analysis has to be written.",
+      "a1": "The Free plan includes access to full 10-year fundamentals for the MAG 7 companies, the DCF calculator (with saved scenarios), the AI Analyst with 3 AI credits per day, curated theme lists, unlimited watchlist, earnings calendar and insider trading. The Pro plan unlocks access to the entire S&P 500 (500 companies), and adds 8 AI credits per day, chat with the AI Analyst, historical valuation multiples, a private community and priority support. Each action costs credits according to the work it takes: a company brief or a management profile cost 1 credit, a full Analyst report costs 3, and each chat message costs 4. Anything already generated is cached and can be read as often as you like — credits are only spent when a new analysis has to be written.",
       "q2": "Is this financial advice?",
       "a2": "No. BullValue is an analysis and education tool. No value, metric or insight is a recommendation to buy or sell. Decisions are always yours.",
       "q3": "Which companies are available?",

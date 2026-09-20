@@ -327,7 +327,7 @@ as chama (esconde as API keys). Tudo o que é histórico fica cacheado em Postgr
 | **SEC EDGAR** | Fundamentais históricos (10-K, 10-Q) | `data.sec.gov/api/xbrl/companyfacts/{CIK}.json`. User-Agent obrigatório, ≤10 req/s. Tags XBRL variam por empresa → ingestão tenta múltiplos tags por ordem. |
 | **Polygon.io** | Preços EOD históricos | `api.polygon.io/v2/aggs/...`. Free tier 5 req/min → sleep 13s. Atualização diária pede só dias novos (`SELECT MAX(date)`). |
 | **Finnhub** | Preço atual (on-demand) | `/quote?symbol=...`. Só quando o user abre `/stock/[ticker]`. Free tier 60 calls/min. |
-| **Gemini** | AI Insights | Modelo Flash via config. Free tier 15 req/min, 1M tokens/dia. Output JSON estruturado, em português. |
+| **Gemini** | AI Insights | Modelo Flash via config. Output JSON estruturado, em português. **Free tier medido no AI Studio a 2026-09-20: 5 req/min, 250K tokens/min, 20 req/DIA** — não os 15/min e 1M/dia que aqui estavam. Os 20/dia são do project inteiro, não por utilizador: ver `lib/ai/orcamento.ts` (tecto global) e `lib/news/ritmo.ts` (espaçamento). |
 
 ### Scripts de ingestão (Python, em GitHub Actions)
 - `seed_companies.py` — manual, 1x. Download de `company_tickers.json`, filtra S&P 500, insere em `companies` (ticker, nome, CIK, exchange, sector) + logos via Finnhub.

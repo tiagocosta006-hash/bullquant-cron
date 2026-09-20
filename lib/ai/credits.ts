@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { Plan } from "@prisma/client";
+import { assertOrcamentoGlobal } from "@/lib/ai/orcamento";
 
 // Preço em créditos por ação, calibrado ao custo real da API Gemini 2.5 Flash
 // ($0.30/M tokens input, $2.50/M output) — 1 crédito ≈ $0.006. Ver plano em
@@ -42,14 +43,32 @@ export async function getCreditsStatus(userId: string, plan: Plan): Promise<Cred
 /**
  * Verifica se há créditos para a ação ANTES de gerar. Devolve null se pode
  * prosseguir, ou um objeto de erro 429-shaped pronto a devolver ao cliente.
+ *
+ * São DOIS tectos, e passam-se os dois:
+ *
+ *  1. o do próprio utilizador, em créditos — pesa o custo em tokens de cada
+ *     ação (um chat do analista custa quatro vezes um brief);
+ *  2. o da plataforma inteira, em PEDIDOS — a quota do Gemini é do project,
+ *     não da pessoa, e no nível gratuito são 20 por dia para toda a gente.
+ *
+ * O global vem primeiro de propósito: se a plataforma já não tem orçamento,
+ * não interessa quantos créditos a pessoa ainda tinha, e é mais honesto
+ * dizer-lhe isso do que deixá-la gastar um crédito num pedido que vai apanhar
+ * 429 do lado do Google.
  */
 export async function assertCreditsAvailable(
   userId: string,
   plan: Plan,
   action: AiAction,
 ): Promise<{ error: string; message: string; status: CreditsStatus } | null> {
-  const cost = AI_ACTION_COSTS[action];
   const status = await getCreditsStatus(userId, plan);
+
+  const global = await assertOrcamentoGlobal();
+  if (global) {
+    return { error: global.error, message: global.message, status };
+  }
+
+  const cost = AI_ACTION_COSTS[action];
   if (status.remaining < cost) {
     return {
       error: "rate_limit",

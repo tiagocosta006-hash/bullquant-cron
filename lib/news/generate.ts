@@ -1,4 +1,5 @@
 import { generateObject } from "ai";
+import { comRitmo } from "@/lib/news/ritmo";
 import { z } from "zod";
 import { newsModel, newsModelName } from "./model";
 import { SENTIMENTS } from "./types";
@@ -95,11 +96,15 @@ export async function generateArticle(triaged: TriageResult): Promise<GeneratedA
     );
   }
 
-  const { object } = await generateObject({
-    model: newsModel(),
-    schema: articleSchema,
-    system: WRITER_SYSTEM,
-    prompt: `Escreve o mini-artigo para esta história.
+  // Ver `lib/news/ritmo.ts`: 5 pedidos/minuto no nível gratuito, e as
+  // repetições do AI SDK não passavam pela fila.
+  const { object } = await comRitmo(() =>
+    generateObject({
+      model: newsModel(),
+      schema: articleSchema,
+      system: WRITER_SYSTEM,
+      maxRetries: 0,
+      prompt: `Escreve o mini-artigo para esta história.
 
 Categoria atribuída: ${triaged.category}
 ${triaged.tickers.length > 0 ? `Tickers envolvidos: ${triaged.tickers.join(", ")}` : ""}
@@ -107,8 +112,9 @@ ${triaged.tickers.length > 0 ? `Tickers envolvidos: ${triaged.tickers.join(", ")
 MATERIAL DE ORIGEM (${sources.length} fonte(s)):
 
 ${material}`,
-    temperature: 0.4,
-  });
+      temperature: 0.4,
+    }),
+  );
 
   const imageUrl = cluster.items.find((i) => i.imageUrl)?.imageUrl ?? null;
 

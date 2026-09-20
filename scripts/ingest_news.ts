@@ -31,6 +31,7 @@ import { generateArticle } from "../lib/news/generate";
 import { slugify } from "../lib/news/normalize";
 import { serializeArticle } from "../lib/news/serialize";
 import { postArticleForReview } from "../lib/discord/client";
+import { eQuotaExcedida } from "../lib/news/ritmo";
 import type { RawNewsItem, StoryCluster } from "../lib/news/types";
 
 const prisma = new PrismaClient();
@@ -171,6 +172,17 @@ async function main() {
       }
     } catch (err) {
       console.error(`[news] falha a gerar "${triado.cluster.lead.title}":`, (err as Error).message);
+
+      // Quota esgotada não melhora dentro da mesma corrida: o tecto é do
+      // project inteiro e reinicia à meia-noite do Pacífico. Continuar o ciclo
+      // só gastava os pedidos da janela seguinte a apanhar o mesmo 429 — e era
+      // isso que deixava o cron a zero artigos durante horas. As histórias
+      // ficam por escrever, mas o cluster não foi marcado, por isso a corrida
+      // seguinte reencontra-as.
+      if (eQuotaExcedida(err)) {
+        console.error("[news] quota do Gemini esgotada — a interromper esta corrida");
+        break;
+      }
     }
   }
 

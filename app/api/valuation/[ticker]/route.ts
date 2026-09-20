@@ -22,14 +22,20 @@ export async function GET(
       return NextResponse.json({ error: "Company not found" }, { status: 404 })
     }
 
-    const allPrices = await prisma.price.findMany({
-      where: { ticker: ticker.toUpperCase() },
-      orderBy: { date: 'asc' },
-      select: {
-        date: true,
-        close: true,
-      }
-    })
+    // Só `date` e `close`: é o que o cálculo usa, e sem `select` o Prisma
+    // trazia também open, high, low e volume — quatro colunas por linha que
+    // ninguém lê, em milhares de linhas por empresa.
+    //
+    // E uma por semana, não uma por dia. A variável a jusante já se chamava
+    // `weeklyPrices`, mas a amostragem nunca chegou a existir: puxavam-se as
+    // cotações diárias todas desde o início da série. Para uma linha de
+    // múltiplos históricos, o ponto semanal é indistinguível do diário.
+    const allPrices = await prisma.$queryRawUnsafe<Array<{ date: Date; close: number }>>(
+      `SELECT DISTINCT ON (date_trunc('week', date)) date, close
+       FROM prices WHERE ticker = $1
+       ORDER BY date_trunc('week', date), date DESC`,
+      ticker.toUpperCase(),
+    )
 
     if (allPrices.length === 0) {
       return NextResponse.json({ error: "No prices found" }, { status: 404 })
@@ -178,7 +184,7 @@ export async function GET(
 
     for (const p of weeklyPrices) {
       const priceTime = p.date.getTime()
-      const priceVal = p.close.toNumber()
+      const priceVal = Number(p.close)
       
       let ttmEps: number | null = null
       let ttmRev: number | null = null

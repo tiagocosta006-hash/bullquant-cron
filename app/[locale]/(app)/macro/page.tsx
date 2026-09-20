@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { carregarSeriesReduzidas } from "@/lib/finance/seriesMacro";
 import { MacroDashboardClient } from "./MacroDashboardClient";
 import { getUser } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -25,45 +26,22 @@ const MACRO_TICKERS = [
  *
  * Duas correções, ambas já usadas noutros sítios do código:
  *
- *   · Redução para ~800 pontos por série, como em /api/valuation. O ÚLTIMO
- *     ponto é sempre preservado — é o valor de hoje, e perdê-lo mudava o
- *     número que a pessoa lê.
- *   · `unstable_cache` à volta da leitura, como em lib/finance/screener.ts.
- *     A página é `force-dynamic` porque lê a sessão, e por isso o CDN nunca a
- *     pode guardar; o que se cacheia é o TRABALHO DE BASE DE DADOS, que é onde
- *     está o custo. Estas séries mudam uma vez por dia, na ingestão macro.
+ *   · Redução para ~800 pontos por série. O ÚLTIMO ponto é sempre preservado
+ *     — é o valor de hoje, e perdê-lo mudava o número que a pessoa lê.
+ *   · `unstable_cache` à volta da leitura. A página é `force-dynamic` porque
+ *     lê a sessão, e por isso o CDN nunca a pode guardar; o que se cacheia é o
+ *     trabalho de base de dados. Estas séries mudam uma vez por dia.
+ *
+ * ── E uma correcção à correcção ──────────────────────────────────────────
+ *
+ * A primeira versão reduzia os pontos EM JAVASCRIPT, depois de trazer tudo da
+ * base. Isso arrumou a página (2,5 MB → 362 KB) e não mexeu no que saía do
+ * Postgres: continuava a ler 136.257 linhas e 2,2 MB por chamada. Foi essa
+ * consulta que esgotou o egress do Supabase e deixou a autenticação em baixo.
+ * A redução vive agora no SQL, em lib/finance/seriesMacro.ts.
  */
-const ALVO_PONTOS = 800;
-
 const carregarSeriesMacro = unstable_cache(
-  async (): Promise<Record<string, { date: string; value: number }[]>> => {
-    const rawData = await prisma.price.findMany({
-      where: { ticker: { in: MACRO_TICKERS } },
-      orderBy: { date: 'asc' },
-      select: { ticker: true, date: true, close: true },
-    });
-
-    const completas: Record<string, { date: string; value: number }[]> = {};
-    for (const ticker of MACRO_TICKERS) completas[ticker] = [];
-
-    for (const row of rawData) {
-      if (completas[row.ticker]) {
-        completas[row.ticker].push({
-          date: row.date.toISOString().split("T")[0],
-          value: Number(row.close),
-        });
-      }
-    }
-
-    const reduzidas: Record<string, { date: string; value: number }[]> = {};
-    for (const [ticker, pontos] of Object.entries(completas)) {
-      const passo = Math.max(1, Math.ceil(pontos.length / ALVO_PONTOS));
-      reduzidas[ticker] = pontos.filter(
-        (_, i) => i % passo === 0 || i === pontos.length - 1,
-      );
-    }
-    return reduzidas;
-  },
+  () => carregarSeriesReduzidas(MACRO_TICKERS),
   ["series-macro"],
   { revalidate: 3600, tags: ["macro"] },
 );

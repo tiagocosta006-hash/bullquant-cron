@@ -183,7 +183,7 @@
         "f1": "Apenas MAG 7 com fundamentais completos",
         "f2": "10 anos de fundamentais visuais da MAG 7",
         "f3": "Calculadora DCF com autopreenchimento e cenários guardados",
-        "f4": "5 créditos de IA por dia (uma análise completa do Analista)",
+        "f4": "3 créditos de IA por dia (uma análise completa do Analista)",
         "f5": "Watchlist, calendário de resultados e insider trading",
         "cta": "Criar conta grátis"
       },
@@ -193,7 +193,7 @@
         "price": "10 €",
         "period": "por mês",
         "f1": "Tudo o que está no plano grátis",
-        "f2": "20 créditos de IA por dia (~6 análises completas)",
+        "f2": "8 créditos de IA por dia (~2 análises completas ou 2 conversas)",
         "f3": "Chat com o Analista IA sobre qualquer empresa",
         "f4": "Múltiplos de avaliação históricos (P/E, P/S, EV/EBITDA)",
         "f5": "Comunidade privada e apoio prioritário",
@@ -215,7 +215,7 @@
     "faq": {
       "title": "Perguntas frequentes",
       "q1": "Qual é a diferença entre o plano Grátis e o Pro?",
-      "a1": "O plano Grátis inclui o acesso aos fundamentais completos das empresas MAG 7, à calculadora DCF (com cenários guardados), ao Analista IA (5 créditos por dia, que dão para uma análise completa), às listas temáticas, à watchlist sem limite, ao calendário de resultados e ao insider trading. O plano Pro desbloqueia o acesso a todo o S&P 500 (500 empresas), além de incluir 20 créditos de IA por dia, o chat com o Analista IA sobre qualquer empresa, os múltiplos de avaliação históricos, a comunidade privada e o apoio prioritário.",
+      "a1": "O plano Grátis inclui o acesso aos fundamentais completos das empresas MAG 7, à calculadora DCF (com cenários guardados), ao Analista IA (3 créditos por dia, que dão para uma análise completa), às listas temáticas, à watchlist sem limite, ao calendário de resultados e ao insider trading. O plano Pro desbloqueia o acesso a todo o S&P 500 (500 empresas), além de incluir 8 créditos de IA por dia, o chat com o Analista IA sobre qualquer empresa, os múltiplos de avaliação históricos, a comunidade privada e o apoio prioritário. Tudo o que já foi gerado fica em cache e pode ser consultado à vontade — os créditos só contam quando há uma análise nova a ser escrita.",
       "q2": "Isto é aconselhamento financeiro?",
       "a2": "Não. A BullValue é uma ferramenta de análise e educação. Nenhum valor, métrica ou insight constitui recomendação de compra ou venda. As decisões são sempre tuas.",
       "q3": "Que empresas estão disponíveis?",

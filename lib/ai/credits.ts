@@ -16,9 +16,34 @@ export const AI_ACTION_COSTS = {
 
 export type AiAction = keyof typeof AI_ACTION_COSTS;
 
+/**
+ * Créditos por dia, por plano.
+ *
+ * ── Porque é que desceram de 5/20 para 3/8 ────────────────────────────────
+ *
+ * Os números antigos foram escolhidos a pensar no *custo* das chamadas. O que
+ * os limita na prática é outra coisa: o nível gratuito do Gemini dá 20 PEDIDOS
+ * por dia ao project inteiro (medido no AI Studio a 2026-09-20). Com PRO a 20
+ * créditos, um único utilizador a gerar briefs — que custam 1 crédito e 1
+ * pedido cada — esgotava sozinho o orçamento de toda a gente.
+ *
+ * Prometer 20 e entregar 429 é pior do que prometer 8 e cumprir.
+ *
+ * O tecto real de pedidos por pessoa é o pior caso, tudo gasto na ação mais
+ * barata: 3 pedidos no FREE, 8 no PRO. Três PRO no limite ocupam os 18
+ * utilizáveis (20 menos a reserva) — a partir daí o `lib/ai/orcamento.ts`
+ * trava com uma mensagem honesta em vez de um erro do Google.
+ *
+ * O FREE fica em 3 e não em 2 de propósito: `analyst_report` custa 3, e a
+ * página de preços promete uma análise completa por dia ao plano gratuito.
+ * Descer a 2 quebrava essa promessa em vez de a ajustar.
+ *
+ * Ambos se sobrepõem por variável de ambiente — no dia em que houver
+ * faturação no Google AI Studio, isto sobe sem tocar em código.
+ */
 export const PLAN_DAILY_CREDITS: Record<Plan, number> = {
-  FREE: 5,
-  PRO: 20,
+  FREE: Number(process.env.AI_CREDITOS_FREE ?? 3),
+  PRO: Number(process.env.AI_CREDITOS_PRO ?? 8),
 };
 
 function startOfToday(): Date {

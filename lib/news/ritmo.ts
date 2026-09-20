@@ -64,6 +64,36 @@ export async function comRitmo<T>(fn: () => Promise<T>): Promise<T> {
   return resultado;
 }
 
+/**
+ * Corre `fn` com ritmo E com tentativas — a distinção está no tipo de erro.
+ *
+ * O AI SDK tentava 3 vezes por conta própria, mas as repetições dele não
+ * passavam por esta fila e eram elas a furar os 5 pedidos/minuto. Tirar as
+ * repetições todas (`maxRetries: 0`) resolveu isso e criou outro problema, que
+ * a primeira corrida a sério apanhou: um `This model is currently experiencing
+ * high demand` — transitório, passa em segundos — matava a corrida inteira à
+ * primeira, logo na triagem.
+ *
+ * Então: repete-se o transitório, com cada tentativa espaçada pela fila, e
+ * desiste-se de imediato quando é quota. Insistir numa quota esgotada não a
+ * repõe; só gasta os pedidos da janela seguinte.
+ */
+export async function comRitmoETentativas<T>(
+  fn: () => Promise<T>,
+  tentativas = 3,
+): Promise<T> {
+  let ultimoErro: unknown;
+  for (let i = 0; i < tentativas; i++) {
+    try {
+      return await comRitmo(fn);
+    } catch (erro) {
+      ultimoErro = erro;
+      if (eQuotaExcedida(erro)) throw erro;
+    }
+  }
+  throw ultimoErro;
+}
+
 /** O erro do Google quando se fura a quota (por minuto ou por dia). */
 export function eQuotaExcedida(erro: unknown): boolean {
   const texto = erro instanceof Error ? `${erro.message}` : String(erro);

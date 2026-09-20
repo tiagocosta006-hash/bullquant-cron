@@ -1,5 +1,5 @@
 import { generateObject } from "ai";
-import { comRitmo } from "@/lib/news/ritmo";
+import { comRitmoETentativas } from "@/lib/news/ritmo";
 import { z } from "zod";
 import { newsModel } from "./model";
 import { NEWS_CATEGORIES, type StoryCluster } from "./types";
@@ -89,7 +89,7 @@ export async function triageClusters(clusters: StoryCluster[]): Promise<TriageRe
   // `maxRetries: 0` porque as repetições do AI SDK não passam pelo `comRitmo`
   // e furavam o limite de 5 pedidos/minuto — era a repetição a causar o 429
   // que a repetição seguinte ia encontrar.
-  const { object } = await comRitmo(() =>
+  const { object } = await comRitmoETentativas(() =>
     generateObject({
       model: newsModel(),
       schema: triageSchema,

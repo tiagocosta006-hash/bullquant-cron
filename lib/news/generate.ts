@@ -1,5 +1,5 @@
 import { generateObject } from "ai";
-import { comRitmo } from "@/lib/news/ritmo";
+import { comRitmoETentativas } from "@/lib/news/ritmo";
 import { z } from "zod";
 import { newsModel, newsModelName } from "./model";
 import { SENTIMENTS } from "./types";
@@ -98,7 +98,7 @@ export async function generateArticle(triaged: TriageResult): Promise<GeneratedA
 
   // Ver `lib/news/ritmo.ts`: 5 pedidos/minuto no nível gratuito, e as
   // repetições do AI SDK não passavam pela fila.
-  const { object } = await comRitmo(() =>
+  const { object } = await comRitmoETentativas(() =>
     generateObject({
       model: newsModel(),
       schema: articleSchema,

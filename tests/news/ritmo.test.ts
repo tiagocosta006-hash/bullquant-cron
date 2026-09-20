@@ -70,6 +70,52 @@ describe("comRitmo — espaçamento entre chamadas ao Gemini", () => {
   });
 });
 
+describe("comRitmoETentativas — repete o transitório, desiste da quota", () => {
+  afterEach(() => {
+    delete process.env.NEWS_GEMINI_INTERVALO_MS;
+  });
+
+  it("repete quando o modelo está sobrecarregado e acaba por passar", async () => {
+    const { comRitmoETentativas } = await carregarRitmo(20);
+    let chamadas = 0;
+    const fn = async () => {
+      chamadas++;
+      // Foi este erro que matou a primeira corrida a sério: transitório, mas
+      // sem repetições o `maxRetries: 0` deixava-o derrubar a triagem inteira.
+      if (chamadas < 3) throw new Error("This model is currently experiencing high demand.");
+      return "escrito";
+    };
+
+    await expect(comRitmoETentativas(fn)).resolves.toBe("escrito");
+    expect(chamadas).toBe(3);
+  });
+
+  it("não insiste numa quota esgotada", async () => {
+    const { comRitmoETentativas } = await carregarRitmo(20);
+    let chamadas = 0;
+    const fn = async () => {
+      chamadas++;
+      throw new Error("You exceeded your current quota, limit: 5");
+    };
+
+    await expect(comRitmoETentativas(fn)).rejects.toThrow("exceeded your current quota");
+    // Uma só: repetir não repõe a quota, só gasta a janela seguinte.
+    expect(chamadas).toBe(1);
+  });
+
+  it("desiste depois de esgotar as tentativas do transitório", async () => {
+    const { comRitmoETentativas } = await carregarRitmo(10);
+    let chamadas = 0;
+    const fn = async () => {
+      chamadas++;
+      throw new Error("This model is currently experiencing high demand.");
+    };
+
+    await expect(comRitmoETentativas(fn, 2)).rejects.toThrow("high demand");
+    expect(chamadas).toBe(2);
+  });
+});
+
 describe("eQuotaExcedida", () => {
   it("reconhece a mensagem real do Google", async () => {
     const { eQuotaExcedida } = await carregarRitmo(10);

@@ -35,13 +35,23 @@ export function newsModelName(): string {
  * 00:41 depois de três tentativas espaçadas em 31 segundos, e o terminal ficou
  * sem artigo novo desde 13 de Setembro.
  *
- * O flash-lite tem fila própria e orçamento diário próprio (RPM 10, RPD 20,
- * contra RPM 5 e RPD 20 do flash), por isso não é só uma segunda tentativa:
- * é uma segunda porta. Escreve pior do que o flash, mas um artigo escrito por
- * um modelo mais fraco vale mais do que um terminal parado.
+ * O flash-lite tem fila própria e orçamento diário próprio, por isso não é só
+ * uma segunda tentativa: é uma segunda porta. Escreve pior do que o flash, mas
+ * um artigo escrito por um modelo mais fraco vale mais do que um terminal
+ * parado.
+ *
+ * É a 3.5 e não a 2.5 porque o Google já fechou a 2.5-flash-lite a contas
+ * novas — a primeira tentativa desta correcção apanhou exactamente isso:
+ *
+ *     This model models/gemini-2.5-flash-lite is no longer available to new
+ *     users. Please update your code to use models/gemini-3.5-flash-lite
+ *
+ * O nome sai do ambiente (`NEWS_GEMINI_MODEL_FALLBACK`) justamente porque isto
+ * volta a acontecer: os modelos do nível gratuito são descontinuados sem aviso
+ * e a alternativa não pode exigir um deploy.
  */
 export function newsModelFallbackName(): string {
-  return process.env.NEWS_GEMINI_MODEL_FALLBACK || "gemini-2.5-flash-lite";
+  return process.env.NEWS_GEMINI_MODEL_FALLBACK || "gemini-3.5-flash-lite";
 }
 
 /**

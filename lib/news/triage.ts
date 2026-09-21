@@ -89,9 +89,9 @@ export async function triageClusters(clusters: StoryCluster[]): Promise<TriageRe
   // `maxRetries: 0` porque as repetições do AI SDK não passam pelo `comRitmo`
   // e furavam o limite de 5 pedidos/minuto — era a repetição a causar o 429
   // que a repetição seguinte ia encontrar.
-  const { object } = await comRitmoETentativas(() =>
+  const { object } = await comRitmoETentativas((tentativa) =>
     generateObject({
-      model: newsModel(),
+      model: newsModel(tentativa),
       schema: triageSchema,
       system: TRIAGE_SYSTEM,
       prompt: `Avalia as ${batch.length} histórias seguintes. Devolve exatamente um resultado por índice.\n\n${input}`,

@@ -86,7 +86,7 @@ describe("comRitmoETentativas — repete o transitório, desiste da quota", () =
       return "escrito";
     };
 
-    await expect(comRitmoETentativas(fn)).resolves.toBe("escrito");
+    await expect(comRitmoETentativas(() => fn())).resolves.toBe("escrito");
     expect(chamadas).toBe(3);
   });
 
@@ -98,7 +98,7 @@ describe("comRitmoETentativas — repete o transitório, desiste da quota", () =
       throw new Error("You exceeded your current quota, limit: 5");
     };
 
-    await expect(comRitmoETentativas(fn)).rejects.toThrow("exceeded your current quota");
+    await expect(comRitmoETentativas(() => fn())).rejects.toThrow("exceeded your current quota");
     // Uma só: repetir não repõe a quota, só gasta a janela seguinte.
     expect(chamadas).toBe(1);
   });
@@ -111,8 +111,60 @@ describe("comRitmoETentativas — repete o transitório, desiste da quota", () =
       throw new Error("This model is currently experiencing high demand.");
     };
 
-    await expect(comRitmoETentativas(fn, 2)).rejects.toThrow("high demand");
+    await expect(comRitmoETentativas(() => fn(), 2)).rejects.toThrow("high demand");
     expect(chamadas).toBe(2);
+  });
+});
+
+describe("troca de modelo quando o principal está sobrecarregado", () => {
+  afterEach(() => {
+    delete process.env.NEWS_GEMINI_INTERVALO_MS;
+  });
+
+  it("passa o número da tentativa, para o chamador poder mudar de modelo", async () => {
+    const { comRitmoETentativas } = await carregarRitmo(10);
+    const tentativasVistas: number[] = [];
+
+    await expect(
+      comRitmoETentativas(async (t) => {
+        tentativasVistas.push(t);
+        // A sobrecarga do Google dura minutos; é a partir da terceira
+        // tentativa que o `newsModel(tentativa)` troca para o flash-lite.
+        if (t < 2) throw new Error("This model is currently experiencing high demand.");
+        return "escrito pelo modelo alternativo";
+      }, 4),
+    ).resolves.toBe("escrito pelo modelo alternativo");
+
+    expect(tentativasVistas).toEqual([0, 1, 2]);
+  });
+
+  it("não chega a trocar de modelo quando o erro é de quota", async () => {
+    const { comRitmoETentativas } = await carregarRitmo(10);
+    const tentativasVistas: number[] = [];
+
+    await expect(
+      comRitmoETentativas(async (t) => {
+        tentativasVistas.push(t);
+        throw new Error("You exceeded your current quota, limit: 5");
+      }, 4),
+    ).rejects.toThrow("exceeded your current quota");
+
+    // Trocar de modelo não repõe a quota do project — desiste-se à primeira.
+    expect(tentativasVistas).toEqual([0]);
+  });
+});
+
+describe("eSobrecarga", () => {
+  it("distingue capacidade do Google de quota nossa", async () => {
+    const { eSobrecarga, eQuotaExcedida } = await carregarRitmo(10);
+    const sobrecarga = new Error("This model is currently experiencing high demand.");
+    const quota = new Error("You exceeded your current quota, limit: 5");
+
+    expect(eSobrecarga(sobrecarga)).toBe(true);
+    expect(eQuotaExcedida(sobrecarga)).toBe(false);
+
+    expect(eSobrecarga(quota)).toBe(false);
+    expect(eQuotaExcedida(quota)).toBe(true);
   });
 });
 

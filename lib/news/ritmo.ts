@@ -79,19 +79,41 @@ export async function comRitmo<T>(fn: () => Promise<T>): Promise<T> {
  * repõe; só gasta os pedidos da janela seguinte.
  */
 export async function comRitmoETentativas<T>(
-  fn: () => Promise<T>,
-  tentativas = 3,
+  fn: (tentativa: number) => Promise<T>,
+  tentativas = 4,
 ): Promise<T> {
   let ultimoErro: unknown;
   for (let i = 0; i < tentativas; i++) {
     try {
-      return await comRitmo(fn);
+      return await comRitmo(() => fn(i));
     } catch (erro) {
       ultimoErro = erro;
       if (eQuotaExcedida(erro)) throw erro;
+      if (i < tentativas - 1) {
+        console.warn(
+          `[news] tentativa ${i + 1}/${tentativas} falhou (${(erro as Error).message?.slice(0, 60)}) — a repetir`,
+        );
+      }
     }
   }
   throw ultimoErro;
+}
+
+/**
+ * O Google está sem capacidade para este modelo agora — não é quota nossa.
+ *
+ * Distingue-se da quota porque a resposta é diferente: a quota não melhora até
+ * à meia-noite do Pacífico, a sobrecarga costuma passar em segundos ou minutos.
+ * Vale a pena insistir, e a partir de certa altura vale a pena trocar de
+ * modelo — ver `newsModel(tentativa)`.
+ */
+export function eSobrecarga(erro: unknown): boolean {
+  const texto = erro instanceof Error ? `${erro.message}` : String(erro);
+  return (
+    texto.includes("experiencing high demand") ||
+    texto.includes("overloaded") ||
+    texto.includes("UNAVAILABLE")
+  );
 }
 
 /** O erro do Google quando se fura a quota (por minuto ou por dia). */

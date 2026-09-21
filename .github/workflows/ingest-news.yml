@@ -6,19 +6,21 @@ on:
       max_articles:
         description: "Nº máximo de artigos a gerar"
         required: false
-        default: "4"
+        default: "2"
   schedule:
-    # De 6 em 6 horas, e não de hora a hora, porque o orçamento é de PEDIDOS.
+    # De 4 em 4 horas, e não de hora a hora, porque o orçamento é de PEDIDOS.
     #
     # O nível gratuito do Gemini dá 20 pedidos/dia ao projeto inteiro (medido
     # no AI Studio a 2026-09-20: RPM 5, TPM 250K, RPD 20). Cada corrida gasta
     # 1 pedido de triagem + 1 por artigo, portanto:
     #
-    #     4 corridas x (1 triagem + 4 artigos) = 20 pedidos/dia
+    #     6 corridas x (1 triagem + 2 artigos) = 18 pedidos/dia
     #
-    # De hora a hora eram 24 triagens antes de se escrever um único artigo — o
-    # orçamento acabava sem nunca chegar à parte que produz notícias.
-    - cron: "0 5,11,17,23 * * *"
+    # Seis fatias e não quatro porque o GitHub SALTA slots agendados quando a
+    # frota está ocupada — e saltou mesmo o das 05:00 de 2026-09-21. Com quatro
+    # corridas, perder uma custava um quarto da capacidade do dia; com seis
+    # fatias mais pequenas, custa um sexto e as seguintes compensam.
+    - cron: "0 1,5,9,13,17,21 * * *"
 
 # Uma execução de cada vez — duas em paralelo criariam clusters duplicados
 # para a mesma história.
@@ -58,4 +60,4 @@ jobs:
           DISCORD_REVIEW_CHANNEL_ID: ${{ secrets.DISCORD_REVIEW_CHANNEL_ID }}
           DISCORD_ADMIN_USER_IDS: ${{ secrets.DISCORD_ADMIN_USER_IDS }}
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
-        run: npx tsx scripts/ingest_news.ts --max=${{ github.event.inputs.max_articles || '4' }}
+        run: npx tsx scripts/ingest_news.ts --max=${{ github.event.inputs.max_articles || '2' }}

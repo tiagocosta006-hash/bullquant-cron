@@ -6,7 +6,13 @@ export const GEMINI_MODEL_NAME = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
 const google = createGoogleGenerativeAI({ apiKey: process.env.GEMINI_API_KEY });
 
-/** Instância do modelo Gemini para usar com generateObject / streamText. */
-export function geminiModel() {
-  return google(GEMINI_MODEL_NAME);
+/**
+ * Instância do modelo Gemini para usar com generateObject / streamText.
+ *
+ * O `nome` permite pedir outro modelo que não o configurado — usado pelo
+ * ingestor de notícias para cair no flash-lite quando o flash está
+ * sobrecarregado (ver `lib/news/model.ts`). Sem argumento, nada muda.
+ */
+export function geminiModel(nome: string = GEMINI_MODEL_NAME) {
+  return google(nome);
 }

@@ -26,9 +26,34 @@ export function newsModelName(): string {
   return process.env.NEWS_GEMINI_MODEL || GEMINI_MODEL_NAME;
 }
 
-/** Instância a usar em triage.ts e generate.ts. */
-export function newsModel() {
+/**
+ * Modelo alternativo, para quando o principal responde "experiencing high
+ * demand".
+ *
+ * Esse erro não é quota nossa — é capacidade do Google no nível gratuito, e
+ * chega a durar minutos. A 21 de Setembro de 2026 derrubou a corrida das
+ * 00:41 depois de três tentativas espaçadas em 31 segundos, e o terminal ficou
+ * sem artigo novo desde 13 de Setembro.
+ *
+ * O flash-lite tem fila própria e orçamento diário próprio (RPM 10, RPD 20,
+ * contra RPM 5 e RPD 20 do flash), por isso não é só uma segunda tentativa:
+ * é uma segunda porta. Escreve pior do que o flash, mas um artigo escrito por
+ * um modelo mais fraco vale mais do que um terminal parado.
+ */
+export function newsModelFallbackName(): string {
+  return process.env.NEWS_GEMINI_MODEL_FALLBACK || "gemini-2.5-flash-lite";
+}
+
+/**
+ * Instância a usar em triage.ts e generate.ts.
+ *
+ * `tentativa` é o número da tentativa em curso (0 = primeira). As primeiras
+ * insistem no modelo principal, porque a sobrecarga costuma passar sozinha; a
+ * partir da terceira troca-se de modelo, que é quando já não está a passar.
+ */
+export function newsModel(tentativa = 0) {
   const apiKey = process.env.NEWS_GEMINI_API_KEY;
-  if (!apiKey) return geminiModel();
-  return createGoogleGenerativeAI({ apiKey })(newsModelName());
+  const nome = tentativa >= 2 ? newsModelFallbackName() : newsModelName();
+  if (!apiKey) return geminiModel(nome);
+  return createGoogleGenerativeAI({ apiKey })(nome);
 }

@@ -98,9 +98,9 @@ export async function generateArticle(triaged: TriageResult): Promise<GeneratedA
 
   // Ver `lib/news/ritmo.ts`: 5 pedidos/minuto no nível gratuito, e as
   // repetições do AI SDK não passavam pela fila.
-  const { object } = await comRitmoETentativas(() =>
+  const { object } = await comRitmoETentativas((tentativa) =>
     generateObject({
-      model: newsModel(),
+      model: newsModel(tentativa),
       schema: articleSchema,
       system: WRITER_SYSTEM,
       maxRetries: 0,

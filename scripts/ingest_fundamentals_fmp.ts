@@ -106,7 +106,12 @@ async function main() {
   );
 
   const empresas = await prisma.company.findMany({
-    where: TICKERS ? { ticker: { in: TICKERS } } : { isActive: true },
+    // Os "^" são índices e séries macro (^GSPC, ^VIX, ^DGS10): vivem em
+    // `companies` para a pesquisa e a página macro, mas não têm demonstrações
+    // financeiras — a FMP responde 402 e apareciam como 26 falhas por dia.
+    where: TICKERS
+      ? { ticker: { in: TICKERS } }
+      : { isActive: true, ticker: { not: { startsWith: "^" } } },
     select: { id: true, ticker: true, sector: true },
     orderBy: { ticker: "asc" },
   });

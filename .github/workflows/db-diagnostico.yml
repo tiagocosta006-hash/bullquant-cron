@@ -62,6 +62,7 @@ jobs:
         run: |
           psql "$DB" -P pager=off -v t="$TICKER" <<'SQL'
             select f."periodType" as tipo, f."fiscalYear" as ano, f."fiscalQuarter" as tri,
+                   round(f."totalEquity"/1e9, 2) as capital_proprio_mm, f."returnOnEquity" as roe,
                    (select string_agg(k, ' | ' order by k) from jsonb_object_keys(f."revenueSegments"::jsonb) k) as segmentos
             from fundamentals f join companies c on c.id = f."companyId"
             where c.ticker = :'t'

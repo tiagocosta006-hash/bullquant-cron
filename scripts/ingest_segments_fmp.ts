@@ -27,6 +27,7 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 import { PrismaClient, PeriodType, Prisma } from "@prisma/client";
 import { fmpGet, emParalelo, FmpError, simboloFmp } from "../lib/fmp/cliente";
 import { taxaParaUsd } from "../lib/fmp/cambio";
+import { eFinanceira } from "../lib/fmp/mapear";
 
 const prisma = new PrismaClient();
 
@@ -61,13 +62,14 @@ async function main() {
       isActive: true,
       ticker: TICKERS ? { in: TICKERS } : { not: { startsWith: "^" } },
     },
-    select: { id: true, ticker: true },
+    select: { id: true, ticker: true, sector: true },
     orderBy: { ticker: "asc" },
   });
   console.log(`[segmentos] ${empresas.length} empresas${DRY_RUN ? " (dry-run)" : ""}`);
 
   let linhasEscritas = 0;
   let empresasComDados = 0;
+  let descartados = 0;
   const falhas: string[] = [];
 
   await emParalelo(empresas, async (empresa) => {
@@ -79,9 +81,10 @@ async function main() {
 
     const linhas = await prisma.fundamental.findMany({
       where: { companyId: empresa.id },
-      select: { id: true, periodType: true, fiscalYear: true, fiscalQuarter: true, periodEnd: true, fxRate: true, reportedCurrency: true },
+      select: { id: true, periodType: true, fiscalYear: true, fiscalQuarter: true, periodEnd: true, fxRate: true, reportedCurrency: true, revenue: true },
     });
     const porChave = new Map(linhas.map((l) => [chave(l.periodType, l.fiscalYear, l.fiscalQuarter), l]));
+    let falhou = false;
 
     for (const eixo of ["product", "geography"] as Eixo[]) {
       for (const periodo of ["annual", "quarter"] as const) {
@@ -94,6 +97,7 @@ async function main() {
         } catch (erro) {
           const msg = erro instanceof FmpError ? `${erro.status} ${erro.message}` : String(erro);
           falhas.push(`${empresa.ticker} ${eixo}/${periodo}: ${msg.slice(0, 80)}`);
+          falhou = true;
           continue;
         }
         if (!Array.isArray(resposta)) continue;
@@ -119,18 +123,38 @@ async function main() {
           for (const [nome, v] of Object.entries(r.data)) {
             if (typeof v === "number" && Number.isFinite(v)) segs[nome] = Math.round(v * taxa);
           }
-          if (Object.keys(segs).length > 0) porEixo[eixo].set(k, segs);
+          if (Object.keys(segs).length === 0) continue;
+
+          // Os segmentos têm de somar à receita da linha (±10%). A FMP tem
+          // trimestres incompletos — a Meta em 2021 Q4 só com "Family of
+          // Apps" — e barras que não somam à receita ao lado enganam mais do
+          // que um buraco. Financeiras ficam de fora da verificação: a nossa
+          // receita delas é líquida de juros (lib/fmp/mapear.ts) e os
+          // segmentos vêm brutos.
+          const receita = linha.revenue != null ? Number(linha.revenue) : null;
+          if (receita && receita > 0 && !eFinanceira(empresa.sector)) {
+            const soma = Object.values(segs).reduce((a, b) => a + b, 0);
+            if (Math.abs(soma / receita - 1) > 0.1) {
+              descartados++;
+              continue;
+            }
+          }
+          porEixo[eixo].set(k, segs);
         }
       }
     }
 
-    const chaves = new Set([...porEixo.product.keys(), ...porEixo.geography.keys()]);
-    if (chaves.size === 0) return;
-    empresasComDados++;
+    // Todas as linhas da empresa, não só as que têm segmentos: uma linha
+    // gravada numa execução anterior e agora descartada tem de voltar a NULL.
+    const chaves = new Set(porChave.keys());
+    const temDados = porEixo.product.size + porEixo.geography.size > 0;
+    if (temDados) empresasComDados++;
+    // Com uma resposta em falta, regravar tudo apagaria segmentos bons.
+    if (falhou) return;
     if (DRY_RUN) {
       const ultima = [...chaves].filter((k) => k.startsWith("ANNUAL")).sort().pop();
       if (ultima) console.log(`[segmentos] ${empresa.ticker} ${ultima}`, porEixo.product.get(ultima) ?? porEixo.geography.get(ultima));
-      linhasEscritas += chaves.size;
+      linhasEscritas += [...chaves].filter((k) => porEixo.product.has(k) || porEixo.geography.has(k)).length;
       return;
     }
 
@@ -149,7 +173,10 @@ async function main() {
         where: { id: porChave.get(k)!.id },
         data: {
           revenueSegments: product === null ? Prisma.DbNull : (product as Prisma.InputJsonValue),
-          revenueSegmentsByAxis: { product, geography } as Prisma.InputJsonValue,
+          revenueSegmentsByAxis:
+            product === null && geography === null
+              ? Prisma.DbNull
+              : ({ product, geography } as Prisma.InputJsonValue),
         },
       });
     });
@@ -157,7 +184,7 @@ async function main() {
     linhasEscritas += operacoes.length;
   });
 
-  console.log(`[segmentos] ${empresasComDados} empresas com segmentos, ${linhasEscritas} linhas escritas`);
+  console.log(`[segmentos] ${empresasComDados} empresas com segmentos, ${linhasEscritas} linhas escritas, ${descartados} períodos descartados (não somam à receita)`);
   if (falhas.length) {
     console.log(`[segmentos] ${falhas.length} falhas:`);
     for (const f of falhas.slice(0, 30)) console.log("  ", f);

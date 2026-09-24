@@ -204,6 +204,19 @@ model Fundamental {
   dividendsPaid          Decimal? @db.Decimal(20, 4)
   netChangeInCash        Decimal? @db.Decimal(20, 4)
 
+  // --- Proveniência ---
+  // A FMP responde sempre na moeda de reporte da empresa e não tem parâmetro
+  // para pedir noutra. Catorze empresas do universo reportam em EUR, GBP, SEK
+  // ou DKK; os valores acima estão SEMPRE em dólares, convertidos à taxa do
+  // fecho do período. Estes três campos são o recibo dessa conversão: sem
+  // eles, uma taxa errada é indistinguível de um valor verdadeiro.
+  /// Moeda em que a empresa reportou ("USD", "DKK"...). Os valores acima já não estão nela.
+  reportedCurrency String?
+  /// Taxa usada para converter em dólares, à data de `periodEnd`. 1 quando já era USD.
+  fxRate           Decimal? @db.Decimal(18, 8)
+  /// Origem dos dados. "fmp" desde a reconstrução de 2026-09.
+  source           String?
+
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   businessKpis Json?

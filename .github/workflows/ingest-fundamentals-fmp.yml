@@ -59,3 +59,15 @@ jobs:
           --anos=${{ github.event.inputs.anos || '10' }}
           ${{ github.event.inputs.tickers && format('--tickers={0}', github.event.inputs.tickers) || '' }}
           ${{ github.event.inputs.comparar == 'true' && '--comparar' || '' }}
+
+      # Depois dos statements: os segmentos gravam-se nas linhas que eles
+      # criam. ~2 100 chamadas a mais (4 por empresa).
+      - name: Run segments
+        if: ${{ github.event.inputs.comparar != 'true' }}
+        env:
+          DATABASE_URL: ${{ secrets.DIRECT_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+        run: >-
+          npx tsx scripts/ingest_segments_fmp.ts
+          ${{ github.event.inputs.tickers && format('--tickers={0}', github.event.inputs.tickers) || '' }}

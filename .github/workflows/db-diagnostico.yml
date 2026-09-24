@@ -60,9 +60,10 @@ jobs:
           DB: ${{ secrets.DIRECT_URL }}
           TICKER: ${{ github.event.inputs.ticker }}
         run: |
-          psql "$DB" -P pager=off -v t="$TICKER" -c "
-            select f.\"periodType\" as tipo, f.\"fiscalYear\" as ano, f.\"fiscalQuarter\" as tri,
-                   (select string_agg(k, ' | ' order by k) from jsonb_object_keys(f.\"revenueSegments\"::jsonb) k) as segmentos
-            from fundamentals f join companies c on c.id = f.\"companyId\"
+          psql "$DB" -P pager=off -v t="$TICKER" <<'SQL'
+            select f."periodType" as tipo, f."fiscalYear" as ano, f."fiscalQuarter" as tri,
+                   (select string_agg(k, ' | ' order by k) from jsonb_object_keys(f."revenueSegments"::jsonb) k) as segmentos
+            from fundamentals f join companies c on c.id = f."companyId"
             where c.ticker = :'t'
-            order by f.\"periodEnd\";"
+            order by f."periodEnd";
+          SQL

@@ -11,6 +11,9 @@
  *   --tickers=A,B    só estas empresas (por omissão: todas as ativas)
  *   --comparar       não escreve; mostra FMP vs o que está na base
  *   --dry-run        não escreve; mostra o que escreveria
+ *   --reconstruir    APAGA os fundamentais de cada empresa e reescreve-os
+ *                    a partir da FMP. É o modo de raiz: nada do que o motor
+ *                    antigo extraiu sobrevive.
  *   --anos=N         anos de histórico a pedir (por omissão 12)
  *   --so-anuais      salta os trimestres (backfill mais rápido)
  */
@@ -40,6 +43,7 @@ const args = process.argv.slice(2);
 const COMPARAR = args.includes("--comparar");
 const DRY_RUN = args.includes("--dry-run") || COMPARAR;
 const SO_ANUAIS = args.includes("--so-anuais");
+const RECONSTRUIR = args.includes("--reconstruir");
 const ANOS = Number(args.find((a) => a.startsWith("--anos="))?.split("=")[1] ?? 12);
 const TICKERS = args
   .find((a) => a.startsWith("--tickers="))
@@ -61,6 +65,9 @@ function dbAlvo(): string {
 }
 
 type Periodo = "annual" | "quarter";
+
+/** Uma linha já convertida em dólares e pronta a inserir. */
+type LinhaPronta = Record<string, unknown>;
 
 async function buscarEmpresa(ticker: string, periodo: Periodo, setor: string | null) {
   const limite = periodo === "annual" ? ANOS : ANOS * 4;
@@ -110,8 +117,14 @@ async function main() {
   let incoerentes = 0;
   const falhas: string[] = [];
   const semCambio: string[] = [];
+  const semDados: string[] = [];
 
   await emParalelo(empresas, async (empresa) => {
+    // Em reconstrução, junta-se tudo o que a FMP dá para esta empresa e só
+    // depois se troca — apagar primeiro deixaria uma janela com a empresa sem
+    // dados nenhuns se a chamada seguinte falhasse.
+    const novas: LinhaPronta[] = [];
+
     for (const periodo of periodos) {
       let registos;
       try {
@@ -156,6 +169,11 @@ async function main() {
         }
         if (DRY_RUN) continue;
 
+        if (RECONSTRUIR) {
+          novas.push(emDolares as LinhaPronta);
+          continue;
+        }
+
         const { periodType, fiscalYear, fiscalQuarter, ...resto } = emDolares;
 
         // `upsert` está fora de questão: a chave única inclui `fiscalQuarter`,
@@ -173,9 +191,33 @@ async function main() {
         escritas++;
       }
     }
+
+    // A troca é atómica por empresa: ou a empresa fica inteira com dados da
+    // FMP, ou fica como estava. Se a corrida parar a meio, as empresas já
+    // feitas estão consistentes e as outras intactas — repetir o comando
+    // acaba o trabalho.
+    if (RECONSTRUIR) {
+      if (novas.length === 0) {
+        semDados.push(empresa.ticker);
+        return;
+      }
+      await prisma.$transaction([
+        prisma.fundamental.deleteMany({ where: { companyId: empresa.id } }),
+        prisma.fundamental.createMany({
+          data: novas.map((l) => ({ ...l, companyId: empresa.id })),
+        }),
+      ]);
+      escritas += novas.length;
+    }
   });
 
   console.log(`\n[fmp] ${escritas} linhas escritas | ${incoerentes} incoerências NI/EPS`);
+  if (semDados.length) {
+    console.log(
+      `[fmp] ${semDados.length} empresas sem dados na FMP (mantidas como estavam): ` +
+        semDados.slice(0, 25).join(", "),
+    );
+  }
   if (semCambio.length) {
     console.log(`[fmp] ${semCambio.length} períodos sem câmbio disponível:`);
     for (const x of semCambio.slice(0, 10)) console.log(`  ${x}`);

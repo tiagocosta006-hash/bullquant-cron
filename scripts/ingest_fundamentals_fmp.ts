@@ -26,7 +26,7 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env.local"), override: true 
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 import { PrismaClient, PeriodType } from "@prisma/client";
-import { fmpGet, emParalelo, FmpError } from "../lib/fmp/cliente";
+import { fmpGet, emParalelo, FmpError, simboloFmp } from "../lib/fmp/cliente";
 import { construirLinha, chavePeriodo, coerenciaEps } from "../lib/fmp/mapear";
 import { taxaParaUsd, converterLinha } from "../lib/fmp/cambio";
 import type {
@@ -71,7 +71,7 @@ type LinhaPronta = Record<string, unknown>;
 
 async function buscarEmpresa(ticker: string, periodo: Periodo, setor: string | null) {
   const limite = periodo === "annual" ? ANOS : ANOS * 4;
-  const p = { symbol: ticker, period: periodo, limit: limite };
+  const p = { symbol: simboloFmp(ticker), period: periodo, limit: limite };
 
   const [inc, bal, cf, rat, km] = await Promise.all([
     fmpGet<FmpIncomeStatement[]>("income-statement", p),

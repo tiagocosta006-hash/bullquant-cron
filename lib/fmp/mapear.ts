@@ -175,12 +175,12 @@ export function construirLinha(
     netChangeInCash: cf?.netChangeInCash ?? null,
 
     // ---- Rácios e métricas ----
-    grossMargin: rat?.grossProfitMargin ?? null,
-    operatingMargin: rat?.operatingProfitMargin ?? null,
-    netMargin: rat?.netProfitMargin ?? null,
+    grossMargin: racio(rat?.grossProfitMargin),
+    operatingMargin: racio(rat?.operatingProfitMargin),
+    netMargin: racio(rat?.netProfitMargin),
     dividendPerShare: rat?.dividendPerShare ?? null,
-    returnOnEquity: km?.returnOnEquity ?? null,
-    roic: km?.returnOnInvestedCapital ?? null,
+    returnOnEquity: racio(km?.returnOnEquity),
+    roic: racio(km?.returnOnInvestedCapital),
   };
 }
 
@@ -211,6 +211,24 @@ export function eFinanceira(setor: string | null | undefined): boolean {
   if (!setor) return false;
   const s = setor.toLowerCase();
   return s.includes("financ") || s.includes("bank");
+}
+
+/**
+ * Um rácio que caiba no `Decimal(8,6)` do schema — ou nada.
+ *
+ * O limite são ±99,999999, isto é ±9 999,9% quando lido como percentagem. Não
+ * é apertado: só lá chega quem tem denominador quase nulo ou negativo. A
+ * McKesson, com capital próprio negativo por causa das recompras, tem um ROE
+ * fora dessa escala e fazia a inserção rebentar com `numeric field overflow` —
+ * e, por ser transação, levava atrás os outros 55 períodos da empresa.
+ *
+ * Devolve-se null em vez de cortar no limite: um ROE de 9 999% cortado seria um
+ * número errado apresentado como verdadeiro, e um ROE calculado sobre capital
+ * próprio negativo não significa nada de útil. "Sem valor" é a leitura honesta.
+ */
+function racio(v: number | null | undefined): number | null {
+  if (v == null || !Number.isFinite(v)) return null;
+  return Math.abs(v) < 100 ? v : null;
 }
 
 /** Soma que trata null como ausente, não como zero. */

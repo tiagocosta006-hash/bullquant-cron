@@ -42,6 +42,18 @@ const CONCORRENCIA = Number(process.env.FMP_CONCORRENCIA ?? 8);
  */
 const INTERVALO_MS = Number(process.env.FMP_INTERVALO_MS ?? 100);
 
+/**
+ * O símbolo como a FMP o espera.
+ *
+ * As classes de ações escrevem-se com hífen, não com ponto. Com `BRK.B` a FMP
+ * responde "Special Endpoint: this value is not available under your current
+ * subscription", que parece um problema de plano e não é — com `BRK-B` devolve
+ * os dados. Apanhou a Berkshire e a Brown-Forman na primeira reconstrução.
+ */
+export function simboloFmp(ticker: string): string {
+  return ticker.replace(/\./g, "-");
+}
+
 export class FmpError extends Error {
   constructor(
     message: string,

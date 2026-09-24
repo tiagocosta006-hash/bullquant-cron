@@ -24,7 +24,8 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 import { PrismaClient, PeriodType } from "@prisma/client";
 import { fmpGet, emParalelo, FmpError } from "../lib/fmp/cliente";
-import { construirLinha, chavePeriodo, coerenciaEps, moedaCompativel } from "../lib/fmp/mapear";
+import { construirLinha, chavePeriodo, coerenciaEps } from "../lib/fmp/mapear";
+import { taxaParaUsd, converterLinha } from "../lib/fmp/cambio";
 import type {
   FmpIncomeStatement,
   FmpBalanceSheet,
@@ -108,7 +109,7 @@ async function main() {
   let escritas = 0;
   let incoerentes = 0;
   const falhas: string[] = [];
-  const moedasIgnoradas = new Map<string, string>();
+  const semCambio: string[] = [];
 
   await emParalelo(empresas, async (empresa) => {
     for (const periodo of periodos) {
@@ -122,14 +123,20 @@ async function main() {
       }
 
       for (const { linha, coerencia, origem } of registos) {
-        // A base é em dólares; a FMP responde na moeda de reporte. Ver
-        // `moedaCompativel()`.
-        if (!moedaCompativel(origem.reportedCurrency)) {
-          if (!moedasIgnoradas.has(empresa.ticker)) {
-            moedasIgnoradas.set(empresa.ticker, origem.reportedCurrency ?? "?");
-          }
+        // A base é toda em dólares. A FMP responde na moeda de reporte e não
+        // tem parâmetro para pedir noutra — ver `lib/fmp/cambio.ts`.
+        const moeda = (origem.reportedCurrency ?? "USD").toUpperCase();
+        const taxa = await taxaParaUsd(moeda, linha.periodEnd as Date);
+        if (taxa === null) {
+          semCambio.push(`${empresa.ticker} ${origem.fiscalYear}${origem.period} (${moeda})`);
           continue;
         }
+        const emDolares = {
+          ...converterLinha(linha, taxa),
+          reportedCurrency: moeda,
+          fxRate: taxa,
+          source: "fmp",
+        };
 
         // A identidade netIncome ÷ shares = epsDiluted. Quando falha, o
         // numerador e o denominador são de universos diferentes — foi
@@ -144,12 +151,12 @@ async function main() {
         }
 
         if (COMPARAR) {
-          await compararComBase(empresa.id, empresa.ticker, linha);
+          await compararComBase(empresa.id, empresa.ticker, emDolares);
           continue;
         }
         if (DRY_RUN) continue;
 
-        const { periodType, fiscalYear, fiscalQuarter, ...resto } = linha;
+        const { periodType, fiscalYear, fiscalQuarter, ...resto } = emDolares;
 
         // `upsert` está fora de questão: a chave única inclui `fiscalQuarter`,
         // que é NULL nas anuais, e o Prisma recusa null num `where` único
@@ -169,11 +176,9 @@ async function main() {
   });
 
   console.log(`\n[fmp] ${escritas} linhas escritas | ${incoerentes} incoerências NI/EPS`);
-  if (moedasIgnoradas.size) {
-    console.log(
-      `[fmp] ${moedasIgnoradas.size} empresas ignoradas por reportarem noutra moeda: ` +
-        [...moedasIgnoradas].map(([t, m]) => `${t}(${m})`).join(", "),
-    );
+  if (semCambio.length) {
+    console.log(`[fmp] ${semCambio.length} períodos sem câmbio disponível:`);
+    for (const x of semCambio.slice(0, 10)) console.log(`  ${x}`);
   }
   if (falhas.length) {
     console.log(`[fmp] ${falhas.length} falhas:`);
@@ -188,8 +193,14 @@ function encontrar(
   fiscalYear: number,
   fiscalQuarter: number | null,
 ) {
+  // `select: { id: true }` e não a linha inteira: só se quer saber se existe
+  // e com que id. Uma linha de `fundamentals` são 586 bytes e uma
+  // reconstrução toca em ~28 000 — trazer tudo custava 16 MB de egress para
+  // deitar fora 99% do que vinha. Foi leitura desnecessária como esta que
+  // esgotou a quota do Supabase em Setembro.
   return prisma.fundamental.findFirst({
     where: { companyId, periodType, fiscalYear, fiscalQuarter },
+    select: { id: true },
   });
 }
 

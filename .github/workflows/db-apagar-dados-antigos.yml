@@ -1,0 +1,34 @@
+name: DB — apagar dados de mercado antigos
+
+# Os dados de mercado passaram a vir da FMP (lib/fmp/mercado.ts e
+# lib/fmp/calendario.ts, PRs #130 e #132) e o site já não lê estas tabelas.
+# Eram cópias de fontes antigas mantidas por scripts; apagá-las liberta espaço
+# no plano gratuito do Supabase. A tabela `prices` já foi apagada assim.
+#
+# Manual e com confirmação escrita, porque não se desfaz. A FMP continua a
+# ter estes dados.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmar:
+        description: 'Escrever APAGAR para confirmar'
+        required: true
+
+jobs:
+  apagar:
+    if: ${{ github.event.inputs.confirmar == 'APAGAR' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DB: ${{ secrets.DIRECT_URL }}
+      TABELAS: prices, earnings_events, corporate_events, market_events, insider_transactions
+    steps:
+      - name: Antes
+        run: |
+          psql "$DB" -P pager=off -c "select pg_size_pretty(pg_database_size(current_database())) as base;"
+          psql "$DB" -P pager=off -c "select relname as tabela, n_live_tup as linhas, pg_size_pretty(pg_total_relation_size(relid)) as tamanho from pg_stat_user_tables where relname in ('prices','earnings_events','corporate_events','market_events','insider_transactions');"
+      - name: Apagar
+        run: psql "$DB" -v ON_ERROR_STOP=1 -c "TRUNCATE TABLE $TABELAS;"
+      - name: Depois
+        run: psql "$DB" -P pager=off -c "select pg_size_pretty(pg_database_size(current_database())) as base;"

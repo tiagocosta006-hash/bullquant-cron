@@ -1,0 +1,40 @@
+name: DB Diagnóstico (egress)
+
+# Mostra que consultas estão a ler mais linhas da base, a partir do
+# pg_stat_statements. O egress do Supabase conta bytes que saem pela rede, e
+# linhas devolvidas são a melhor aproximação disponível.
+#
+# Existe porque a ligação direta à base a partir de uma máquina de
+# desenvolvimento pode ficar bloqueada pelo pooler (ban por tentativas
+# falhadas), e o CI continua a chegar lá. O repo é público: só se imprimem as
+# consultas normalizadas ($1, $2...), nunca valores.
+
+on:
+  workflow_dispatch:
+    inputs:
+      reset:
+        description: "Zerar o contador no fim (para medir uma janela limpa)"
+        type: boolean
+        default: false
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Top consultas por linhas devolvidas
+        env:
+          DB: ${{ secrets.DIRECT_URL }}
+        run: |
+          psql "$DB" -P pager=off -c "select stats_reset as contagem_desde, now() as agora from pg_stat_statements_info;"
+          psql "$DB" -P pager=off -c "
+            select calls, rows, round(rows::numeric/greatest(calls,1)) as linhas_por_call,
+                   left(regexp_replace(query, '\s+', ' ', 'g'), 150) as consulta
+            from pg_stat_statements
+            where query not ilike '%pg_stat%' and rows > 0
+            order by rows desc limit 25;"
+      - name: Zerar contador
+        if: ${{ github.event.inputs.reset == 'true' }}
+        env:
+          DB: ${{ secrets.DIRECT_URL }}
+        run: psql "$DB" -c "select pg_stat_statements_reset();"

@@ -710,7 +710,10 @@
       "na": "N/D",
       "naGeneric": "Sem dados disponíveis para esta empresa.",
       "naMargin": "Margem não reportada, típico de bancos e seguradoras, que não têm custo de produção (COGS).",
-      "naPrice": "Indisponível: depende do preço atual, que ainda não carregou."
+      "naPrice": "Indisponível: depende do preço atual, que ainda não carregou.",
+      "naForward": "Sem estimativas de analistas para esta empresa",
+      "naFewAnalysts": "Menos de 3 analistas: o consenso não é representativo",
+      "forwardHint": "Consenso de {n} analistas · lucro ajustado · próximos 12 meses"
     },
     "proGate": {
       "title": "Funcionalidade Pro",
@@ -796,6 +799,33 @@
       "cagrLabel": "CAGR",
       "disclaimer": "Fundamentais da SEC EDGAR. Não é conselho de investimento.",
       "error": "Não foi possível gerar a imagem. Tenta outra vez."
+    },
+    "analysts": {
+      "title": "Consenso dos analistas",
+      "subtitle": "{n} analistas a cobrir a empresa",
+      "targetTitle": "Preço-alvo (12 meses)",
+      "upside": "Potencial",
+      "low": "Mín.",
+      "median": "Mediana",
+      "high": "Máx.",
+      "currentPrice": "Preço atual",
+      "targetsLastYear": "{n} preços-alvo publicados no último ano",
+      "singleTarget": "Apenas um preço-alvo publicado — pouco representativo",
+      "ratingsTitle": "Recomendações",
+      "buy": "Comprar",
+      "hold": "Manter",
+      "sell": "Vender",
+      "history": "Evolução nos últimos 12 meses",
+      "consensus": {
+        "STRONG_BUY": "Compra forte",
+        "BUY": "Comprar",
+        "HOLD": "Manter",
+        "SELL": "Vender",
+        "STRONG_SELL": "Venda forte"
+      },
+      "disclaimer": "Consenso de analistas de terceiros (via Financial Modeling Prep). Não é uma recomendação da BullValue nem aconselhamento de investimento.",
+      "estimate": "Estimativa",
+      "estimateInfo": "Barras mais claras: consenso de analistas para os próximos anos fiscais (média das estimativas; o EPS é ajustado, não contabilístico)."
     }
   },
   "analista": {

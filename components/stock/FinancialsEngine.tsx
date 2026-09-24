@@ -6,6 +6,7 @@ import { DecisionChart } from "./DecisionChart"
 import { FinancialStatements } from "./FinancialStatements"
 import { GeographyPie } from "./GeographyPie"
 import { useTranslations } from "next-intl"
+import type { EstimativaAnual } from "@/lib/fmp/estimativas"
 
 type PeriodType = "QUARTERLY" | "TTM" | "ANNUAL"
 
@@ -71,8 +72,9 @@ type FundamentalRow = {
   netChangeInCash?: number | null
 }
 
-export function FinancialsEngine({ ticker, sector, currencySymbol = "$", preliminary = null }: { ticker: string, sector?: string | null, currencySymbol?: string, preliminary?: { fiscalYear: number; fiscalQuarter: number; revenue: number | null; epsDiluted: number | null } | null }) {
+export function FinancialsEngine({ ticker, sector, currencySymbol = "$", preliminary = null, estimativas = [] }: { ticker: string, sector?: string | null, currencySymbol?: string, preliminary?: { fiscalYear: number; fiscalQuarter: number; revenue: number | null; epsDiluted: number | null } | null, estimativas?: EstimativaAnual[] }) {
   const t = useTranslations("financials")
+  const tA = useTranslations("stock.analysts")
   const tFs = useTranslations("financialStatements")
   const isBank = sector === "Financials"
   const isReit = sector === "Real Estate"
@@ -332,13 +334,31 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
     }
   }, [preliminary, period, chartData])
 
+  // Anos futuros do consenso de analistas, só no modo anual e só depois do
+  // último ano real. Vão em chaves PRÓPRIAS (revenueEstimate/epsEstimate):
+  // estimativa nunca se mistura com real, nem no CAGR nem na tabela.
+  const linhasEstimadas = useMemo(() => {
+    if (period !== "ANNUAL" || estimativas.length === 0 || chartData.length === 0) return []
+    const ultimoReal = chartData[chartData.length - 1].fiscalYear ?? 0
+    return estimativas
+      .filter(e => e.fiscalYear > ultimoReal)
+      .map(e => ({
+        label: `${e.fiscalYear}E`,
+        fiscalYear: e.fiscalYear,
+        revenueEstimate: e.revenueAvg,
+        epsEstimate: e.epsAvg,
+      }))
+  }, [period, estimativas, chartData])
+  const temEstimativas = linhasEstimadas.length > 0
+  const corEstimativa = "color-mix(in srgb, var(--chart-1) 38%, transparent)"
+
   const revenueChartData = showPreliminary
     ? [...chartData, { ...showPreliminary, revenue: showPreliminary.revenue }]
-    : chartData
+    : [...chartData, ...linhasEstimadas]
 
   const epsChartData = showPreliminary
     ? [...chartData, { ...showPreliminary, epsDiluted: showPreliminary.epsDiluted }]
-    : chartData
+    : [...chartData, ...linhasEstimadas]
 
   // Aviso guiado pelos DADOS reais: se o histórico trimestral for escasso (típico
   // das europeias, que reportam semestral/anual), avisar em vez de mostrar um
@@ -437,9 +457,12 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
               title={t('charts.revenue')}
               data={revenueChartData}
               type="BAR"
-              config={{ isCurrency: true, dataKeys: [{ key: 'revenue', color: 'var(--chart-1)', type: 'bar' }] }}
+              config={{ isCurrency: true, dataKeys: [
+                { key: 'revenue', name: t('charts.revenue'), color: 'var(--chart-1)', type: 'bar', stackId: 'r' },
+                ...(temEstimativas ? [{ key: 'revenueEstimate', name: tA('estimate'), color: corEstimativa, type: 'bar' as const, stackId: 'r' }] : []),
+              ] }}
               cagr={calcCAGR('revenue')}
-              infoTooltip={showPreliminary ? t('preliminaryInfo') : undefined}
+              infoTooltip={showPreliminary ? t('preliminaryInfo') : temEstimativas ? tA('estimateInfo') : undefined}
             />
 
             {segmentKeys.length > 0 && (
@@ -466,9 +489,12 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
               title={t('charts.epsDiluted')}
               data={epsChartData}
               type="BAR"
-              config={{ dataKeys: [{ key: 'epsDiluted', color: 'var(--chart-1)', type: 'bar' }] }}
+              config={{ dataKeys: [
+                { key: 'epsDiluted', name: t('charts.epsDiluted'), color: 'var(--chart-1)', type: 'bar', stackId: 'e' },
+                ...(temEstimativas ? [{ key: 'epsEstimate', name: tA('estimate'), color: corEstimativa, type: 'bar' as const, stackId: 'e' }] : []),
+              ] }}
               cagr={calcCAGR('epsDiluted')}
-              infoTooltip={showPreliminary ? t('preliminaryInfo') : undefined}
+              infoTooltip={showPreliminary ? t('preliminaryInfo') : temEstimativas ? tA('estimateInfo') : undefined}
             />
 
             {!isBank && (

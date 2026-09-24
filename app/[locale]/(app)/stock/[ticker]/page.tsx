@@ -7,6 +7,8 @@ import { getTranslations } from 'next-intl/server'
 import { prisma } from '@/lib/prisma'
 import { cotacao } from '@/lib/fmp/mercado'
 import { resultadosDe } from '@/lib/fmp/calendario'
+import { analistas as carregarAnalistas } from '@/lib/fmp/estimativas'
+import { AnalystConsensus } from '@/components/stock/AnalystConsensus'
 import { getUser } from '@/lib/supabase/server'
 import { StockHeader } from '@/components/stock/StockHeader'
 import { StockSnapshot } from '@/components/stock/StockSnapshot'
@@ -171,6 +173,19 @@ export default async function StockPage({
       select: { ticker: true, name: true, logoUrl: true }
     })
   ])
+
+  // Consenso de analistas (FMP, cache de 12h). Depende do último anual para
+  // a moeda de reporte e para casar os anos fiscais; uma falha da FMP não
+  // pode deitar a página abaixo — fica tudo N/A.
+  const ultimoAnual = historicalAnnual[0] ?? null
+  const dadosAnalistas = company.exchange === 'MACRO' ? null : await carregarAnalistas(
+    company.ticker,
+    ultimoAnual?.reportedCurrency ?? 'USD',
+    ultimoAnual ? { fiscalYear: ultimoAnual.fiscalYear, periodEnd: ultimoAnual.periodEnd } : null,
+  ).catch((e) => {
+    console.error(`[analistas] ${company.ticker}:`, e)
+    return null
+  })
 
   // DEV_UNLOCK_PRO no .env.local abre o conteúdo gated em desenvolvimento;
   // em produção isDevUnlocked() é sempre false (ver lib/devAccess.ts).
@@ -353,8 +368,20 @@ export default async function StockPage({
                 fundamentals={JSON.parse(JSON.stringify(fundamentalsToPass))} 
                 currencySymbol={currencySymbol}
                 initialPrice={latestPrice ? latestPrice.price : null}
+                forward={dadosAnalistas?.ntm && dadosAnalistas.ltm
+                  ? { ntm: dadosAnalistas.ntm, ltm: dadosAnalistas.ltm, analistas: dadosAnalistas.analistasEps }
+                  : null}
               />
             </div>
+            {/* Preço-alvo e recomendações: conteúdo PRO (ou a demo pública). */}
+            {canViewFinancials && dadosAnalistas && (
+              <AnalystConsensus
+                alvo={dadosAnalistas.alvo}
+                recomendacoes={dadosAnalistas.recomendacoes}
+                preco={latestPrice ? latestPrice.price : null}
+                currencySymbol={currencySymbol}
+              />
+            )}
             <StockPriceChart ticker={company.ticker} currencySymbol={currencySymbol} />
             <CompanyProfile company={company} />
           </>
@@ -364,7 +391,7 @@ export default async function StockPage({
             <div className="relative min-h-[400px]">
               {!canViewFinancials && <ProGate isPro={isPro} isLoggedIn={isLoggedIn} ticker={company.ticker} />}
               <div className={!canViewFinancials ? "pointer-events-none select-none" : ""}>
-                <FinancialsEngine ticker={company.ticker} sector={company.sector} currencySymbol={currencySymbol} preliminary={preliminaryQuarter} />
+                <FinancialsEngine ticker={company.ticker} sector={company.sector} currencySymbol={currencySymbol} preliminary={preliminaryQuarter} estimativas={canViewFinancials ? dadosAnalistas?.anuais ?? [] : []} />
               </div>
             </div>
           )

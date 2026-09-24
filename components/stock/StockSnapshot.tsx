@@ -4,13 +4,19 @@ import { useEffect, useState, useMemo } from "react"
 import { useTranslations } from "next-intl"
 import { obterPrecoAoVivo } from "@/lib/precoAoVivo"
 import type { Fundamental } from "@prisma/client"
+import type { Totais12m } from "@/lib/fmp/estimativas"
 
 type StockSnapshotProps = {
   ticker: string
   fundamentals: Fundamental[] // 4 quarters or 1 annual
   currencySymbol?: string
   initialPrice?: number | null
+  /** Consenso de analistas (lib/fmp/estimativas.ts), em USD e base ajustada. */
+  forward?: { ntm: Totais12m; ltm: Totais12m; analistas: number } | null
 }
+
+/** Abaixo disto o "consenso" é a opinião de uma ou duas pessoas. */
+const MIN_ANALISTAS = 3
 
 function formatVal(value: number | null | undefined, isPercent = false, isCurrency = false, isRatio = false, currencySymbol = "$") {
   if (value === null || value === undefined || isNaN(Number(value))) return "---"
@@ -39,7 +45,8 @@ function Stat({
   naLabel,
   naReason,
   currencySymbol,
-  glossarySlug
+  glossarySlug,
+  hint
 }: {
   label: string
   value: number | null
@@ -51,6 +58,7 @@ function Stat({
   naReason: string
   currencySymbol?: string
   glossarySlug?: string
+  hint?: string
 }) {
   return (
     <div className="flex justify-between items-center">
@@ -71,13 +79,13 @@ function Stat({
           {naLabel}
         </span>
       ) : (
-        <span className="font-bold">{formatVal(value, percent, currency, ratio, currencySymbol)}</span>
+        <span className={hint ? "font-bold cursor-help" : "font-bold"} title={hint}>{formatVal(value, percent, currency, ratio, currencySymbol)}</span>
       )}
     </div>
   )
 }
 
-export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$", initialPrice = null }: StockSnapshotProps) {
+export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$", initialPrice = null, forward = null }: StockSnapshotProps) {
   const t = useTranslations("stock.snapshot")
   const [price, setPrice] = useState<number | null>(initialPrice)
   const [isLoading, setIsLoading] = useState(initialPrice === null)
@@ -163,6 +171,17 @@ export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$", init
       ? ttm.dividendPerShare / price
       : null
 
+  // Forward: capitalização ÷ totais estimados (nunca EPS — ver o cabeçalho de
+  // lib/fmp/estimativas.ts sobre ADRs). Crescimento = próximos 12 meses vs
+  // últimos 12 meses, ambos em base ajustada e da mesma fonte.
+  const fwd = forward && forward.analistas >= MIN_ANALISTAS ? forward : null
+  const peFwd = marketCap && fwd && fwd.ntm.netIncome > 0 ? marketCap / fwd.ntm.netIncome : null
+  const evEbitdaFwd = ev && fwd && fwd.ntm.ebitda > 0 ? ev / fwd.ntm.ebitda : null
+  const epsGrowthFwd = fwd && fwd.ltm.eps > 0 ? fwd.ntm.eps / fwd.ltm.eps - 1 : null
+  const revGrowthFwd = fwd && fwd.ltm.revenue > 0 ? fwd.ntm.revenue / fwd.ltm.revenue - 1 : null
+  // PEG só com crescimento positivo: com crescimento negativo o rácio inverte o sinal e não significa nada.
+  const pegFwd = peFwd !== null && epsGrowthFwd !== null && epsGrowthFwd > 0 ? peFwd / (epsGrowthFwd * 100) : null
+
   if (!ttm) return null
 
   const netDebt =
@@ -171,6 +190,8 @@ export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$", init
   const naGeneric = t("naGeneric")
   const naMargin = t("naMargin")
   const naLabel = t("na")
+  const naForward = forward && forward.analistas < MIN_ANALISTAS ? t("naFewAnalysts") : t("naForward")
+  const hintForward = fwd ? t("forwardHint", { n: fwd.analistas }) : undefined
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -179,8 +200,11 @@ export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$", init
         <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-wider">{t("valuation")}</h3>
         <Stat label="Market Cap" value={marketCap} currency loading={isLoading} naLabel={naLabel} naReason={naGeneric} currencySymbol={currencySymbol} glossarySlug="market-cap" />
         <Stat label="P/E (TTM)" value={pe} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} glossarySlug="pe-ratio" />
+        <Stat label="P/E (Fwd)" value={peFwd} ratio loading={isLoading} naLabel={naLabel} naReason={naForward} hint={hintForward} />
+        <Stat label="PEG (Fwd)" value={pegFwd} ratio loading={isLoading} naLabel={naLabel} naReason={naForward} hint={hintForward} />
         <Stat label="P/Sales" value={ps} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} glossarySlug="ps-ratio" />
         <Stat label="EV/EBITDA" value={evEbitda} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} glossarySlug="ev-ebitda" />
+        <Stat label="EV/EBITDA (Fwd)" value={evEbitdaFwd} ratio loading={isLoading} naLabel={naLabel} naReason={naForward} hint={hintForward} />
         <Stat label="P/Book" value={pb} ratio loading={isLoading} naLabel={naLabel} naReason={naGeneric} glossarySlug="pb-ratio" />
       </div>
 
@@ -198,6 +222,8 @@ export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$", init
         <Stat label="Gross Margin" value={ttm.grossMargin} percent naLabel={naLabel} naReason={naMargin} glossarySlug="gross-margin" />
         <Stat label="Oper. Margin" value={ttm.operatingMargin} percent naLabel={naLabel} naReason={naMargin} glossarySlug="operating-margin" />
         <Stat label="Net Margin" value={ttm.netMargin} percent naLabel={naLabel} naReason={naGeneric} glossarySlug="net-margin" />
+        <Stat label="EPS Growth (Fwd)" value={epsGrowthFwd} percent naLabel={naLabel} naReason={naForward} hint={hintForward} />
+        <Stat label="Rev. Growth (Fwd)" value={revGrowthFwd} percent naLabel={naLabel} naReason={naForward} hint={hintForward} />
       </div>
 
       {/* 4. Balance */}

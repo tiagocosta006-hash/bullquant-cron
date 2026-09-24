@@ -710,7 +710,10 @@
       "na": "N/A",
       "naGeneric": "No data available for this company.",
       "naMargin": "Margin not reported, common for banks and insurers, which have no cost of goods (COGS).",
-      "naPrice": "Unavailable: depends on the live price, which hasn't loaded yet."
+      "naPrice": "Unavailable: depends on the live price, which hasn't loaded yet.",
+      "naForward": "No analyst estimates for this company",
+      "naFewAnalysts": "Fewer than 3 analysts: the consensus is not representative",
+      "forwardHint": "Consensus of {n} analysts · adjusted earnings · next 12 months"
     },
     "earnings": {
       "title": "Latest Results",
@@ -796,6 +799,33 @@
         "earningsAhead": "Profits growing faster than price — multiple compression",
         "inLine": "Price tracking profit growth closely"
       }
+    },
+    "analysts": {
+      "title": "Analyst consensus",
+      "subtitle": "{n} analysts covering the company",
+      "targetTitle": "Price target (12 months)",
+      "upside": "Upside",
+      "low": "Low",
+      "median": "Median",
+      "high": "High",
+      "currentPrice": "Current price",
+      "targetsLastYear": "{n} price targets published in the last year",
+      "singleTarget": "Only one price target published — not representative",
+      "ratingsTitle": "Ratings",
+      "buy": "Buy",
+      "hold": "Hold",
+      "sell": "Sell",
+      "history": "Last 12 months",
+      "consensus": {
+        "STRONG_BUY": "Strong buy",
+        "BUY": "Buy",
+        "HOLD": "Hold",
+        "SELL": "Sell",
+        "STRONG_SELL": "Strong sell"
+      },
+      "disclaimer": "Third-party analyst consensus (via Financial Modeling Prep). Not a BullValue recommendation or investment advice.",
+      "estimate": "Estimate",
+      "estimateInfo": "Lighter bars: analyst consensus for the next fiscal years (mean estimate; EPS is adjusted, not GAAP)."
     }
   },
   "analista": {

@@ -52,11 +52,9 @@ O inventário da base a 2026-09-24:
 | Conteúdo editorial (notícias) | 4,4 MB | 1,5% |
 | Dados dos utilizadores | 3,3 MB | 1% |
 
-**Noventa e sete por cento da base é cópia de dados que a FMP devolve a
-pedido.** Manter essa cópia é o que produz metade dos problemas que tivemos:
-os 500 MB do plano gratuito do Supabase quase esgotados, o egress que obrigou
-a mudar de conta, dez cron jobs que podem partir em silêncio, e a janela de
-oito dias em que o terminal esteve sem notícias sem ninguém reparar.
+**Noventa e sete por cento da base são dados de mercado.** Continuam a ser
+guardados — ver a regra abaixo —, mas quem os produz muda por completo, e é
+daí que vem a diferença.
 
 ### A regra
 
@@ -128,21 +126,25 @@ quando deixou de refletir.
 
 ## 3. Riscos, e o que se faz a cada um
 
-**A FMP passa a ser dependência de runtime.** Se estiver em baixo, as páginas
-de empresa param. Mitigação: cache com `stale-while-revalidate` longo — uma
-página já visitada continua a servir do CDN durante horas. É o mesmo mecanismo
-que já protege o `/api/prices/[ticker]`.
+**Trocamos os nossos erros pelos da FMP.** Nenhum fornecedor é perfeito, e a
+própria FMP escreve no rodapé que podem ocorrer omissões. A diferença é que os
+erros dela são verificáveis contra a SEC por amostragem, e os nossos não eram
+detetáveis de todo. O job de verificação diária é o que transforma isso numa
+garantia em vez de uma esperança.
 
-**Latência.** Uma chamada à FMP são 300-800 ms. Numa página que hoje lê do
-Postgres em 20 ms, isso nota-se à primeira visita. Mitigação: a cache absorve
-as seguintes; e as páginas mais visitadas podem ser pré-aquecidas.
+**Dependência de um fornecedor.** Se a FMP fechar ou mudar de preço, é preciso
+migrar outra vez. Mitigação: o armazém é nosso e completo, portanto uma
+migração futura começa com dados, não do zero. Foi esta a razão de não ir a
+pedido.
 
-**Limite de pedidos.** 750/min no Premium. O tráfego atual são ~7 páginas por
-hora. Há quatro ordens de grandeza de folga.
+**Espaço.** A FMP oferece 40 anos; trazê-los todos leva a base para lá dos 500
+MB do plano gratuito. A disciplina dos 10 anos do `CLAUDE.md` §1 não é uma
+preferência, é o que mantém isto dentro do plano.
 
-**Perdemos o histórico curado.** Os 2 072 449 preços continuam no Postgres
-local (`/opt/homebrew/var/postgresql@17`) e no backup. Deixam de ser o caminho
-de serviço e passam a ser rede de segurança.
+**Convenções diferentes em financeiras.** Dívida e caixa de um banco não
+significam o mesmo que numa industrial. As regras estão em `lib/fmp/mapear.ts`
+e cada uma foi verificada contra o que a empresa reporta à SEC — não assumida
+pelo nome do campo.
 
 ---
 
@@ -157,14 +159,16 @@ não-financeiras a comparação dá zero diferenças.
 
 Falta: correr a comparação nas 559, publicar, desligar o motor XBRL.
 
-### Fase 2 — preços a pedido
+### Fase 2 — preços
 
-`/api/prices/[ticker]` deixa de ler a tabela `prices` e passa a chamar
-`historical-price-eod/full`, com a amostragem a acontecer já no servidor.
-Valida-se contra os 2 M de linhas que temos antes de trocar — sabemos a
-resposta certa antes de perguntar.
+O `ingest_prices.py` (Polygon, 559 chamadas sequenciais com 13s de pausa, duas
+horas) é substituído por `historical-price-eod/full`: 559 chamadas em ~45
+segundos, e uma só chamada `batch-quote` para a atualização diária de todas as
+empresas.
 
-Liberta 250 MB e apaga o cron de 2 horas da Polygon.
+Valida-se contra os 2 072 449 registos que já lá estão antes de trocar — é a
+única fase em que sabemos a resposta certa antes de perguntar. Os registos
+anteriores a 10 anos saem, para ficar nos 164 MB.
 
 ### Fase 3 — o resto dos dados de mercado
 

@@ -38,3 +38,15 @@ jobs:
         env:
           DB: ${{ secrets.DIRECT_URL }}
         run: psql "$DB" -c "select pg_stat_statements_reset();"
+      - name: Cobertura dos fundamentais (só contagens)
+        env:
+          DB: ${{ secrets.DIRECT_URL }}
+        run: |
+          psql "$DB" -P pager=off -c "
+            select count(*) as linhas,
+                   count(distinct \"companyId\") as empresas,
+                   count(*) filter (where source = 'fmp') as fmp,
+                   count(*) filter (where \"revenueSegments\" is not null) as com_segmentos,
+                   count(*) filter (where \"revenueSegmentsByAxis\" is not null) as com_segmentos_eixo,
+                   count(*) filter (where \"businessKpis\" is not null) as com_kpis
+            from fundamentals;"

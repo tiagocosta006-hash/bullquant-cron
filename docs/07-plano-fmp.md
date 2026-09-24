@@ -148,45 +148,109 @@ pelo nome do campo.
 
 ---
 
-## 4. Fases
+## 4. Reconstrução de raiz
 
-Cada fase é reversível sozinha e deixa a plataforma a funcionar.
+Não é uma migração campo a campo. **Nada do que o motor antigo extraiu
+sobrevive.** As tabelas de mercado esvaziam-se e voltam a encher a partir da
+FMP, e a comparação com o que lá estava deixa de ser critério de nada — era o
+que estava errado.
 
-### Fase 1 — fundamentais (feito, por publicar)
+Isto muda o que se verifica: em vez de "a FMP concorda com o que temos?",
+passa a ser "a FMP concorda com o que a empresa arquivou na SEC?".
 
-`lib/fmp/` e `scripts/ingest_fundamentals_fmp.ts`, com `--comparar`. Nas
-não-financeiras a comparação dá zero diferenças.
+### 4.1 Esquema — o que muda
 
-Falta: correr a comparação nas 559, publicar, desligar o motor XBRL.
+O modelo atual foi desenhado à volta do que o extractor de XBRL conseguia
+produzir. Três acrescentos tornam os dados auto-descritivos:
 
-### Fase 2 — preços
+| Campo | Porquê |
+|---|---|
+| `reportedCurrency` | Catorze empresas reportam em EUR, GBP, SEK ou DKK. Sem este campo não há como saber se um número está em dólares. |
+| `fxRate` | A taxa usada na conversão, à data de fecho do período. Torna a conversão auditável e reversível. |
+| `source` | `"fmp"`. Quando um dia houver outra fonte, distingue-se sem adivinhar. |
 
-O `ingest_prices.py` (Polygon, 559 chamadas sequenciais com 13s de pausa, duas
-horas) é substituído por `historical-price-eod/full`: 559 chamadas em ~45
-segundos, e uma só chamada `batch-quote` para a atualização diária de todas as
-empresas.
+Aditivos, portanto `prisma db push` — o `CLAUDE.md` §10 avisa que o histórico
+de migrations tem drift e que `migrate dev` quereria resetar a base.
 
-Valida-se contra os 2 072 449 registos que já lá estão antes de trocar — é a
-única fase em que sabemos a resposta certa antes de perguntar. Os registos
-anteriores a 10 anos saem, para ficar nos 164 MB.
+Saem os campos que só existiam porque o extractor os produzia e nada os lê.
 
-### Fase 3 — o resto dos dados de mercado
+### 4.2 Moeda
 
-Insiders, earnings, dividendos, splits, perfis. Todos têm endpoint direto e
-todos são per-company.
+A FMP responde na moeda de reporte: a Novo Nordisk vem com EPS de 23,03 em
+coroas dinamarquesas, não 3,15 em dólares. Escrever isso num campo em dólares
+é como a comparação apanhou o problema — pelo rácio constante de 0,14x em
+todos os anos, que é a própria taxa de câmbio.
 
-### Fase 4 — snapshot para o cruzado
+A FMP tem câmbios históricos diários (`historical-price-eod/light?symbol=EURUSD`).
+A regra:
 
-Um cron diário que grava 559 linhas de métricas-chave (market cap, P/E, ROIC,
-margens, crescimento) para o dashboard e o screener. Substitui as listas
-curadas à mão que o `CLAUDE.md` §10 admite serem temporárias — e desbloqueia
-o screening por métricas que está em TODO desde o início.
+1. Guarda-se o valor **convertido em dólares**, porque é o que a plataforma
+   compara e mostra;
+2. Guarda-se a **moeda original** e a **taxa usada**, à data de fecho do
+   período, para o número ser reconstituível;
+3. A conversão usa a taxa do fecho do período, não a de hoje — senão o
+   histórico muda de valor sempre que o câmbio se mexe.
 
-### Fase 5 — o que passa a ser possível
+São quatro moedas e uma chamada por moeda cobre dez anos de taxas.
 
-Estimativas de analistas e Forward P/E (hoje "N/A — disponível em breve"),
-price targets, segmentação de receita por produto e geografia, transcrições.
-Já estão pagos.
+### 4.3 O comando de reconstrução
+
+Um só, idempotente, seguro de repetir:
+
+```
+npx tsx scripts/rebuild_market_data.ts --anos=10
+```
+
+Esvazia as tabelas de mercado e enche-as. ~3 400 chamadas, ~6 minutos. É esta
+propriedade — reconstruir tudo num comando — que torna o armazém descartável
+em vez de precioso, e é a diferença de fundo face ao que existia.
+
+Não toca no que é nosso: utilizadores, carteiras, cenários DCF, notícias.
+
+### 4.4 Verificação
+
+Deixa de ser contra a base antiga e passa a ser contra a fonte primária.
+
+**Na escrita:** a identidade `netIncome ÷ ações diluídas = epsDiluted` corre
+sobre cada linha. É contabilidade, não heurística, e era ela que faltava
+quando a IBKR passou.
+
+**Diariamente:** uma amostra de empresas é comparada contra o que a SEC
+publica no `companyconcept`, e diverge → avisa. O que deixou a IBKR errada
+durante meses não foi falta de dados, foi não haver ninguém a comparar.
+
+### 4.5 Ordem
+
+Cada passo deixa a plataforma a funcionar e é reversível sozinho.
+
+1. **Esquema** — os três campos novos, `db push`.
+2. **Fundamentais** — esvaziar e encher. É a tabela onde estavam os erros.
+3. **Preços** — a `prices` volta a nascer com 10 anos (164 MB em vez de 251).
+   Apaga o cron de duas horas da Polygon.
+4. **Insiders, earnings, dividendos, splits, perfis** — endpoint direto para
+   cada um.
+5. **Snapshot cruzado** — 559 linhas de métricas para o dashboard e o
+   screener. Desbloqueia o screening por métricas que está em TODO desde o
+   início e substitui as listas curadas à mão.
+6. **Apagar o motor antigo** — `ingest_fundamentals.py` e os seus 3 044
+   linhas, mais seis scripts e onze workflows.
+7. **O que passa a existir** — estimativas de analistas, Forward P/E, price
+   targets, segmentação de receita. Já estão pagos.
+
+### 4.6 O que é eliminado
+
+```
+scripts/ingest_fundamentals.py        3 044 linhas
+scripts/ingest_prices.py                169
+scripts/fast_prices.py                  172
+scripts/backfill_history_nasdaq.py      231
+scripts/ingest_earnings.py              234
+scripts/ingest_insider.py               235
+                                      ─────
+                                      ~4 085 linhas
+
+.github/workflows/  onze ficheiros de ingestão → dois
+```
 
 ---
 
@@ -212,5 +276,12 @@ financeiras. A `cashAndShortTermInvestments` de um banco inclui a carteira de
 títulos. Cada mapeamento precisa de ser verificado contra o que a empresa
 reporta, não assumido pelo nome.
 
-**A comparação vem antes da escrita.** As três armadilhas acima foram todas
-apanhadas em `--comparar`, nenhuma chegou a produção.
+**Verifica-se contra a fonte primária, não contra o que lá estava.** As
+armadilhas acima foram todas apanhadas a correr sem escrever — a do câmbio,
+que teria mostrado a Novo Nordisk com um EPS de 23,03 em vez de 3,15, só
+apareceu porque o rácio era constante em todos os anos. Nenhuma chegou a
+produção. Mas o critério não é concordar com a base antiga, é concordar com o
+que a empresa arquivou.
+
+**A moeda de reporte não se assume.** Catorze empresas do universo respondem em
+EUR, GBP, SEK ou DKK. Nada no nome do campo o diz — só o `reportedCurrency`.

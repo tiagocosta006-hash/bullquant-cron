@@ -24,7 +24,7 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 import { PrismaClient, PeriodType } from "@prisma/client";
 import { fmpGet, emParalelo, FmpError } from "../lib/fmp/cliente";
-import { construirLinha, chavePeriodo, coerenciaEps } from "../lib/fmp/mapear";
+import { construirLinha, chavePeriodo, coerenciaEps, moedaCompativel } from "../lib/fmp/mapear";
 import type {
   FmpIncomeStatement,
   FmpBalanceSheet,
@@ -108,6 +108,7 @@ async function main() {
   let escritas = 0;
   let incoerentes = 0;
   const falhas: string[] = [];
+  const moedasIgnoradas = new Map<string, string>();
 
   await emParalelo(empresas, async (empresa) => {
     for (const periodo of periodos) {
@@ -121,6 +122,15 @@ async function main() {
       }
 
       for (const { linha, coerencia, origem } of registos) {
+        // A base é em dólares; a FMP responde na moeda de reporte. Ver
+        // `moedaCompativel()`.
+        if (!moedaCompativel(origem.reportedCurrency)) {
+          if (!moedasIgnoradas.has(empresa.ticker)) {
+            moedasIgnoradas.set(empresa.ticker, origem.reportedCurrency ?? "?");
+          }
+          continue;
+        }
+
         // A identidade netIncome ÷ shares = epsDiluted. Quando falha, o
         // numerador e o denominador são de universos diferentes — foi
         // exatamente isso que passou despercebido na IBKR.
@@ -159,6 +169,12 @@ async function main() {
   });
 
   console.log(`\n[fmp] ${escritas} linhas escritas | ${incoerentes} incoerências NI/EPS`);
+  if (moedasIgnoradas.size) {
+    console.log(
+      `[fmp] ${moedasIgnoradas.size} empresas ignoradas por reportarem noutra moeda: ` +
+        [...moedasIgnoradas].map(([t, m]) => `${t}(${m})`).join(", "),
+    );
+  }
   if (falhas.length) {
     console.log(`[fmp] ${falhas.length} falhas:`);
     for (const f of falhas.slice(0, 20)) console.log(`  ${f}`);

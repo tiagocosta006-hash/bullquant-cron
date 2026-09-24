@@ -68,6 +68,27 @@ export function coerenciaEps(inc: FmpIncomeStatement): {
   return { ok: desvio <= 2, esperado, desvio };
 }
 
+/**
+ * A demonstração vem na moeda em que a plataforma guarda (dólares)?
+ *
+ * A FMP devolve os valores na moeda de REPORTE da empresa, não em USD. A
+ * Ericsson vem em coroas suecas, a Novo Nordisk em coroas dinamarquesas, a
+ * ASML e mais nove em euros — catorze empresas do universo atual.
+ *
+ * Escrever isso nos campos da base, que são em dólares, mostraria a Novo
+ * Nordisk com um EPS de 23,03 em vez de 3,15. A comparação apanhou-o pelo
+ * rácio constante em todos os anos: 0,14x na NVO, 0,10x na ERIC — as próprias
+ * taxas de câmbio.
+ *
+ * Enquanto não houver conversão com câmbios históricos à data de cada período,
+ * estas empresas não se escrevem. Os valores que lá estão vieram convertidos
+ * do motor antigo e estão certos; substituí-los por coroas seria uma
+ * regressão, não uma migração.
+ */
+export function moedaCompativel(reportedCurrency: string | null | undefined): boolean {
+  return (reportedCurrency ?? "USD").toUpperCase() === "USD";
+}
+
 /** "FY" → ANNUAL; "Q1".."Q4" → QUARTERLY. */
 export function tipoDePeriodo(period: string): PeriodType {
   return period.toUpperCase().startsWith("Q") ? PeriodType.QUARTERLY : PeriodType.ANNUAL;

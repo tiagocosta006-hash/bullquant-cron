@@ -1,0 +1,61 @@
+name: Ingest Fundamentals (FMP)
+
+# Espelha os fundamentais das 559 empresas a partir da Financial Modeling Prep.
+# Substitui o ingest-fundamentals.yml, que extraía tags XBRL da SEC — ver
+# docs/07-plano-fmp.md para o porquê.
+#
+# Não é caro nem lento: ~3 400 chamadas, ~5 minutos, contra um teto de 750 por
+# minuto. Por isso corre por inteiro em vez de tentar ser incremental — um
+# espelho que se reconstrói todo não acumula deriva.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tickers:
+        description: "Só estas empresas (vazio = todas)"
+        required: false
+        default: ""
+      comparar:
+        description: "Não escrever; mostrar diferenças vs a base"
+        type: boolean
+        required: false
+        default: false
+      anos:
+        description: "Anos de histórico"
+        required: false
+        default: "10"
+  schedule:
+    # Diário às 4h UTC, depois de a SEC ter processado as filings do dia
+    # anterior e antes do movimento da manhã europeia.
+    - cron: "0 4 * * *"
+
+concurrency:
+  group: ingest-fundamentals-fmp
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ingest
+        env:
+          DATABASE_URL: ${{ secrets.DIRECT_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+        run: >-
+          npx tsx scripts/ingest_fundamentals_fmp.ts
+          --anos=${{ github.event.inputs.anos || '10' }}
+          ${{ github.event.inputs.tickers && format('--tickers={0}', github.event.inputs.tickers) || '' }}
+          ${{ github.event.inputs.comparar == 'true' && '--comparar' || '' }}

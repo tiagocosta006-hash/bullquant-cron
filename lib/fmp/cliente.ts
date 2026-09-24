@@ -32,8 +32,15 @@ const BASE = "https://financialmodelingprep.com/stable";
  */
 const CONCORRENCIA = Number(process.env.FMP_CONCORRENCIA ?? 8);
 
-/** Intervalo mínimo entre pedidos, para não passar os 750/min mesmo em rajada. */
-const INTERVALO_MS = Number(process.env.FMP_INTERVALO_MS ?? 80);
+/**
+ * Intervalo mínimo entre pedidos.
+ *
+ * 80 ms davam exatamente 750/min — o teto, sem folga nenhuma. Na primeira
+ * corrida às 559 empresas isso chegou para cinco delas apanharem 429. 100 ms
+ * dão 600/min, 20% abaixo do limite, e não se nota: a corrida completa passa
+ * de 5 para 6 minutos.
+ */
+const INTERVALO_MS = Number(process.env.FMP_INTERVALO_MS ?? 100);
 
 export class FmpError extends Error {
   constructor(
@@ -126,7 +133,13 @@ export async function fmpGet<T>(
     } catch (erro) {
       ultimoErro = erro;
       if (erro instanceof FmpError && [401, 402, 403, 200].includes(erro.status)) throw erro;
-      if (i < tentativas - 1) await dormir(500 * (i + 1));
+      if (i < tentativas - 1) {
+        // O 429 é por janela de um minuto: esperar meio segundo e voltar cai
+        // na mesma janela e falha outra vez. Recua-se o suficiente para a
+        // janela rodar.
+        const espera = erro instanceof FmpError && erro.status === 429 ? 20_000 : 500 * (i + 1);
+        await dormir(espera);
+      }
     } finally {
       libertar();
     }

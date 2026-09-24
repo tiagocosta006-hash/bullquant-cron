@@ -179,7 +179,14 @@ export function construirLinha(
     operatingMargin: racio(rat?.operatingProfitMargin),
     netMargin: racio(rat?.netProfitMargin),
     dividendPerShare: rat?.dividendPerShare ?? null,
-    returnOnEquity: racio(km?.returnOnEquity),
+    // Com capital próprio negativo (recompras acima do lucro acumulado — MSCI,
+    // McKesson, Home Depot em certos anos) o ROE sai negativo para empresas
+    // muito rentáveis: a MSCI dava −45%. A conta está certa e o número não
+    // significa nada; a convenção é N/A.
+    returnOnEquity:
+      bal?.totalStockholdersEquity != null && bal.totalStockholdersEquity <= 0
+        ? null
+        : racio(km?.returnOnEquity),
     roic: racio(km?.returnOnInvestedCapital),
   };
 }

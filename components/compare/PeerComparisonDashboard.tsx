@@ -275,7 +275,9 @@ export function PeerComparisonDashboard({ baseCompany, baseFundamentals, availab
       const cash = Number(latest.cash) || 0
       const ebitda = Number(latest.ebitda) || 0
       const roic = Number(latest.roic) || 0
-      const roe = Number(latest.returnOnEquity) || 0
+      // Capital próprio negativo → ROE sem significado (ver lib/fmp/mapear.ts).
+      const equity = latest.totalEquity != null ? Number(latest.totalEquity) : null
+      const roe = equity !== null && equity <= 0 ? 0 : Number(latest.returnOnEquity) || 0
 
       const currentPrice = prices[company.ticker]
       let pe = null

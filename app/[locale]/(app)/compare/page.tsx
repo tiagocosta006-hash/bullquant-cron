@@ -75,7 +75,8 @@ export default async function ComparePage({
         cash: true,
         ebitda: true,
         roic: true,
-        returnOnEquity: true
+        returnOnEquity: true,
+        totalEquity: true
       }
     })
   ])

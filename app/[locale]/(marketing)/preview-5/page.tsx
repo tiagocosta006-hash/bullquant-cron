@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { LiveDcf } from "@/components/marketing/heroes/LiveDcf";
 import { CTA, Peek } from "@/components/marketing/heroes/shared";
 import { prisma } from "@/lib/prisma";
+import { cotacao } from "@/lib/fmp/mercado";
 
 /** /preview-5 — "A pergunta": a DCF real a correr-se a si própria. */
 export default async function Preview5() {
@@ -18,11 +19,9 @@ export default async function Preview5() {
     orderBy: { fiscalYear: "desc" },
     select: { freeCashFlow: true, sharesOutstanding: true, totalDebt: true, cash: true },
   });
-  const price = await prisma.price.findFirst({
-    where: { ticker: "AAPL" },
-    orderBy: { date: "desc" },
-    select: { close: true },
-  });
+  // Da FMP, não da tabela `prices` — ver lib/fmp/mercado.ts.
+  const q = await cotacao("AAPL");
+  const price = q ? { close: q.price } : null;
 
   // Sem dados não se mostra: o argumento desta direção é que o cálculo é real.
   if (!f || !price) notFound();

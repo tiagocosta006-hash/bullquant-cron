@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { historico } from "@/lib/fmp/mercado"
 import { createClient } from "@/lib/supabase/server"
 
 type HistoryPoint = {
@@ -46,24 +47,14 @@ export async function GET(request: Request) {
     const cutoff = new Date()
     cutoff.setMonth(cutoff.getMonth() - months)
 
-    const prices = await prisma.price.findMany({
-      where: {
-        ticker: { in: tickers },
-        date: { gte: cutoff },
-      },
-      select: { ticker: true, date: true, close: true },
-      orderBy: { date: "asc" },
-    })
-
-    // Agrupa preços por ticker, mantendo-os ordenados por data para fazer
-    // "último preço conhecido até aqui" (forward-fill em fins de semana/feriados).
-    const pricesByTicker = new Map<string, { date: string; close: number }[]>()
-    for (const p of prices) {
-      const key = p.date.toISOString().slice(0, 10)
-      const list = pricesByTicker.get(p.ticker) || []
-      list.push({ date: key, close: Number(p.close) })
-      pricesByTicker.set(p.ticker, list)
-    }
+    // Da FMP, não da tabela `prices` (ver lib/fmp/mercado.ts). São no máximo
+    // umas dezenas de posições e cada histórico fica na cache do Next uma
+    // hora, portanto repetir a página não repete os pedidos.
+    const historicos = await Promise.all(tickers.map((t) => historico(t, cutoff)))
+    const pricesByTicker = new Map<string, { date: string; close: number }[]>(
+      tickers.map((t, i) => [t, historicos[i]])
+    )
+    const prices = historicos.flat()
 
     const quantityByTicker = new Map(
       portfolio.items.map(item => [item.company.ticker, Number(item.quantity)])
@@ -71,7 +62,7 @@ export async function GET(request: Request) {
 
     // União de todas as datas em que pelo menos um ticker tem preço.
     const allDates = Array.from(
-      new Set(prices.map(p => p.date.toISOString().slice(0, 10)))
+      new Set(prices.map(p => p.date))
     ).sort()
 
     if (allDates.length === 0) {

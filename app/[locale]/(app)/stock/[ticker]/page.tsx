@@ -5,6 +5,7 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { prisma } from '@/lib/prisma'
+import { cotacao } from '@/lib/fmp/mercado'
 import { getUser } from '@/lib/supabase/server'
 import { StockHeader } from '@/components/stock/StockHeader'
 import { StockSnapshot } from '@/components/stock/StockSnapshot'
@@ -147,11 +148,8 @@ export default async function StockPage({
       orderBy: { periodEnd: 'desc' },
     }),
 
-    // 7. Latest Price
-    prisma.price.findFirst({
-      where: { ticker: company.ticker },
-      orderBy: { date: 'desc' }
-    }),
+    // 7. Cotação atual — da FMP, não da tabela `prices` (ver lib/fmp/mercado.ts)
+    cotacao(company.ticker),
 
     prisma.earningsEvent.findFirst({
       where: { companyId: company.id, epsActual: { not: null } },
@@ -292,9 +290,9 @@ export default async function StockPage({
           currency: company.currency
         }}
         initialPriceData={latestPrice ? {
-          currentPrice: Number(latestPrice.close),
-          change: 0,
-          changePercent: 0,
+          currentPrice: latestPrice.price,
+          change: latestPrice.change ?? 0,
+          changePercent: latestPrice.changePercentage ?? 0,
         } : null}
         shareComponent={
           <ShareStockModal
@@ -336,7 +334,7 @@ export default async function StockPage({
                 ticker={company.ticker} 
                 fundamentals={JSON.parse(JSON.stringify(fundamentalsToPass))} 
                 currencySymbol={currencySymbol}
-                initialPrice={latestPrice ? Number(latestPrice.close) : null}
+                initialPrice={latestPrice ? latestPrice.price : null}
               />
             </div>
             <StockPriceChart ticker={company.ticker} currencySymbol={currencySymbol} />

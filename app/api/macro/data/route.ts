@@ -10,7 +10,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Missing tickers parameter" }, { status: 400 })
   }
 
-  const tickers = tickersParam.split(",").map((t) => t.trim()).filter(Boolean)
+  // Cada ticker são pedidos à FMP; um limite evita que um URL inventado os multiplique.
+  const tickers = tickersParam.split(",").map((t) => t.trim()).filter(Boolean).slice(0, 12)
 
   let desde: Date | undefined
   if (startDateParam) {

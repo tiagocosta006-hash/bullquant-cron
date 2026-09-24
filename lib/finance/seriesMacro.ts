@@ -1,76 +1,180 @@
-import { prisma } from "@/lib/prisma"
+import { amostrar, get, historico } from "@/lib/fmp/mercado"
 
 /**
- * Séries de preços reduzidas ao que um gráfico mostra — reduzidas NO SQL.
+ * Séries macro da página /macro, vindas da FMP.
  *
- * ── Porque é que isto existe ─────────────────────────────────────────────
+ * ── Porque é que isto mudou ───────────────────────────────────────────────
  *
- * A página macro e o /api/macro/data faziam ambos a mesma coisa:
+ * Estas séries viviam na tabela `prices` (copiadas do FRED) e eram lidas do
+ * Supabase. Essa tabela foi a origem do esgotamento do egress; os preços e as
+ * séries macro passam a vir da FMP e a ficar na Data Cache do Next. O Supabase
+ * não é tocado aqui.
  *
- *     findMany({ where: { ticker: { in: [...] } } })   // traz TUDO
- *     ...depois reduzir a 800 pontos em JavaScript
+ * ── Limites da FMP que moldam o código (medidos a 2026-09-24) ────────────
  *
- * Isso corrigia o que chegava ao browser e deixava a leitura da base
- * exactamente na mesma. O S&P 500 tem cotação diária desde 1927 — são 24.849
- * linhas só nele. A consulta inteira devolvia 136.257 linhas e 2,2 MB da base
- * DE CADA VEZ, para desenhar gráficos de 800 píxeis.
+ *   · `treasury-rates` e `economic-indicators` devolvem no máximo ~90 dias por
+ *     pedido, seja qual for o intervalo `from`/`to`. Dez anos são ~41 janelas.
+ *   · O PIB (`realGDP`) não responde a intervalos; responde a `to=D` com o
+ *     último trimestre até D. Por isso pede-se trimestre a trimestre.
  *
- * Medido no `pg_stat_statements` de produção: 7.329 chamadas desde 23 de
- * julho, 746 milhões de linhas, cerca de 16 GB. O plano gratuito do Supabase
- * são 5 GB de egress por mês — esta consulta sozinha gastava mais de 8 GB por
- * mês e foi ela que esgotou a quota e deixou a autenticação bloqueada.
+ * As janelas antigas nunca mudam: ficam em cache 30 dias. Só a janela de hoje
+ * revalida de 6 em 6 horas. Um arranque a frio são ~220 pedidos (Premium dá
+ * 750/min); depois disso são meia dúzia por dia.
  *
- * ── A correcção ──────────────────────────────────────────────────────────
- *
- * A redução passa para dentro do SQL: uma `row_number()` por série e só as
- * linhas cujo índice cai no passo de amostragem. O último ponto é sempre
- * preservado — é o valor de hoje, e perdê-lo mudava o número que a pessoa lê.
- *
- * Medido contra produção: 109.706 linhas e 1.873 kB passam a 8.540 linhas e
- * 150 kB. Treze vezes menos, com 780 a 795 pontos por série, que é o que um
- * gráfico de 800 px consegue desenhar.
+ * Os tickers mantêm os nomes antigos (^DGS10, ^CPI_YOY, …) para o cliente da
+ * página não mudar. Um ticker que não seja macro (ex: ^GSPC) cai no histórico
+ * de preços normal.
  */
 
 export type PontoSerie = { date: string; value: number }
 
 const ALVO_PONTOS_POR_DEFEITO = 800
+const DIA = 86_400_000
+const JANELA_DIAS = 90
+const REVALIDATE_FECHADA = 30 * 86_400
+const REVALIDATE_ABERTA = 6 * 3600
+
+const iso = (d: Date) => d.toISOString().slice(0, 10)
+
+/** Revalidação conforme a janela ainda pode receber dados novos ou não. */
+function revalidatePara(fim: Date): number {
+  return Date.now() - fim.getTime() > 10 * DIA ? REVALIDATE_FECHADA : REVALIDATE_ABERTA
+}
+
+/** Janelas [início, fim] de 90 dias, de `desde` até hoje. */
+function janelas(desde: Date): Array<[Date, Date]> {
+  const hoje = new Date()
+  const out: Array<[Date, Date]> = []
+  for (let ini = desde; ini <= hoje; ini = new Date(ini.getTime() + JANELA_DIAS * DIA)) {
+    const fim = new Date(Math.min(ini.getTime() + (JANELA_DIAS - 1) * DIA, hoje.getTime()))
+    out.push([ini, fim])
+  }
+  return out
+}
+
+/** Corre `fn` sobre `itens` com no máximo `n` pedidos em simultâneo. */
+async function emLotes<T, R>(itens: T[], n: number, fn: (x: T) => Promise<R>): Promise<R[]> {
+  const out: R[] = new Array(itens.length)
+  let i = 0
+  await Promise.all(
+    Array.from({ length: Math.min(n, itens.length) }, async () => {
+      while (i < itens.length) {
+        const k = i++
+        out[k] = await fn(itens[k])
+      }
+    }),
+  )
+  return out
+}
+
+/** Junta pontos de várias janelas, sem datas repetidas, por ordem. */
+function juntar(pontos: PontoSerie[]): PontoSerie[] {
+  const porData = new Map<string, number>()
+  for (const p of pontos) if (Number.isFinite(p.value)) porData.set(p.date, p.value)
+  return [...porData.entries()]
+    .sort(([a], [b]) => (a < b ? -1 : 1))
+    .map(([date, value]) => ({ date, value }))
+}
+
+// ─── Fontes ────────────────────────────────────────────────────────────────
+
+type LinhaTesouro = { date: string; month1?: number; year2?: number; year10?: number; year30?: number }
+
+async function tesouro(desde: Date): Promise<LinhaTesouro[]> {
+  const blocos = await emLotes(janelas(desde), 8, ([ini, fim]) =>
+    get<LinhaTesouro[]>("treasury-rates", { from: iso(ini), to: iso(fim) }, revalidatePara(fim)),
+  )
+  return blocos.flatMap((b) => (Array.isArray(b) ? b : []))
+}
+
+type LinhaIndicador = { date: string; value: number }
+
+async function indicador(nome: string, desde: Date): Promise<PontoSerie[]> {
+  const blocos = await emLotes(janelas(desde), 8, ([ini, fim]) =>
+    get<LinhaIndicador[]>("economic-indicators", { name: nome, from: iso(ini), to: iso(fim) }, revalidatePara(fim)),
+  )
+  return juntar(blocos.flatMap((b) => (Array.isArray(b) ? b : [])).map((l) => ({ date: l.date, value: l.value })))
+}
+
+/** PIB real trimestral: um pedido por trimestre (ver cabeçalho). */
+async function pibReal(desde: Date): Promise<PontoSerie[]> {
+  const trimestres: Date[] = []
+  const hoje = new Date()
+  let d = new Date(Date.UTC(desde.getUTCFullYear(), Math.floor(desde.getUTCMonth() / 3) * 3, 1))
+  while (d <= hoje) {
+    trimestres.push(d)
+    d = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 3, 1))
+  }
+  const linhas = await emLotes(trimestres, 8, (t) =>
+    get<LinhaIndicador[]>("economic-indicators", { name: "realGDP", to: iso(t) }, revalidatePara(t)),
+  )
+  return juntar(linhas.flatMap((b) => (Array.isArray(b) ? b : [])).map((l) => ({ date: l.date, value: l.value })))
+}
+
+/** Variação homóloga em %, comparando com o ponto de há `passos` períodos. */
+function homologa(serie: PontoSerie[], passos: number): PontoSerie[] {
+  const out: PontoSerie[] = []
+  for (let i = passos; i < serie.length; i++) {
+    const antes = serie[i - passos].value
+    if (antes) out.push({ date: serie[i].date, value: (serie[i].value / antes - 1) * 100 })
+  }
+  return out
+}
+
+// ─── API pública ───────────────────────────────────────────────────────────
+
+const TESOURO: Record<string, (l: LinhaTesouro) => number | undefined> = {
+  "^DGS1MO": (l) => l.month1,
+  "^DGS10": (l) => l.year10,
+  "^DGS30": (l) => l.year30,
+  "^T10Y2Y": (l) => (l.year10 != null && l.year2 != null ? l.year10 - l.year2 : undefined),
+}
 
 export async function carregarSeriesReduzidas(
   tickers: string[],
   opcoes: { desde?: Date; alvoPontos?: number } = {},
 ): Promise<Record<string, PontoSerie[]>> {
-  const { desde, alvoPontos = ALVO_PONTOS_POR_DEFEITO } = opcoes
-  if (tickers.length === 0) return {}
+  const { alvoPontos = ALVO_PONTOS_POR_DEFEITO } = opcoes
+  const desde = opcoes.desde ?? new Date(Date.now() - 10 * 365.25 * DIA)
+  // As homólogas precisam do ano anterior ao primeiro ponto mostrado.
+  const desdeHomologa = new Date(desde.getTime() - 400 * DIA)
 
-  const filtroData = desde ? " AND date >= $3::date" : ""
-  const params: unknown[] = desde ? [tickers, alvoPontos, desde] : [tickers, alvoPontos]
+  let tesouroCache: Promise<LinhaTesouro[]> | null = null
+  const obterTesouro = () => (tesouroCache ??= tesouro(desde))
 
-  const linhas = await prisma.$queryRawUnsafe<
-    Array<{ ticker: string; date: Date; close: unknown }>
-  >(
-    `SELECT s.ticker, s.date, s.close FROM (
-       SELECT ticker, date, close,
-              row_number() OVER (PARTITION BY ticker ORDER BY date) AS rn,
-              count(*)     OVER (PARTITION BY ticker)               AS total
-       FROM prices
-       WHERE ticker = ANY($1)${filtroData}
-     ) s
-     WHERE s.rn % GREATEST(1, CEIL(s.total::numeric / $2)::int) = 0
-        OR s.rn = s.total
-     ORDER BY s.ticker, s.date`,
-    ...params,
-  )
+  async function serie(ticker: string): Promise<PontoSerie[]> {
+    const campo = TESOURO[ticker]
+    if (campo) {
+      return juntar(
+        (await obterTesouro()).map((l) => ({ date: l.date, value: campo(l) ?? NaN })),
+      )
+    }
+    switch (ticker) {
+      case "^FEDFUNDS":
+        return indicador("federalFunds", desde)
+      case "^UNRATE":
+        return indicador("unemploymentRate", desde)
+      case "^CPI_YOY":
+        return homologa(await indicador("CPI", desdeHomologa), 12)
+      case "^GDP_YOY":
+        return homologa(await pibReal(desdeHomologa), 4)
+      default:
+        return (await historico(ticker, desde)).map((p) => ({ date: p.date, value: p.close }))
+    }
+  }
 
   // Todas as séries pedidas aparecem no resultado, mesmo vazias: o cliente
   // espera a chave e desenhar-lhe um gráfico vazio é melhor do que rebentar.
-  const series: Record<string, PontoSerie[]> = {}
-  for (const t of tickers) series[t] = []
-  for (const l of linhas) {
-    if (!series[l.ticker]) series[l.ticker] = []
-    series[l.ticker].push({
-      date: l.date.toISOString().slice(0, 10),
-      value: Number(l.close),
-    })
-  }
-  return series
+  const resultados = await Promise.all(
+    tickers.map(async (t) => {
+      try {
+        const s = (await serie(t)).filter((p) => p.date >= iso(desde))
+        return [t, amostrar(s, alvoPontos)] as const
+      } catch (e) {
+        console.error(`[macro] ${t}:`, e)
+        return [t, [] as PontoSerie[]] as const
+      }
+    }),
+  )
+  return Object.fromEntries(resultados)
 }

@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server"
 import { ImageResponse } from "next/og"
 import { prisma } from "@/lib/prisma"
+import { cotacao } from "@/lib/fmp/mercado"
 import { formatPrice, formatLargeNumber } from "@/lib/finance/format"
 import fs from "fs"
 import path from "path"
@@ -67,11 +68,9 @@ export async function GET(
       price = priceData.currentPrice
     } else {
       // Fallback to database if API fails
-      const latestPrice = await prisma.price.findFirst({
-        where: { ticker: upper },
-        orderBy: { date: "desc" },
-      })
-      price = latestPrice ? Number(latestPrice.close) : null
+      // Da FMP, não da tabela `prices` — ver lib/fmp/mercado.ts.
+      const q = await cotacao(upper)
+      price = q ? q.price : null
     }
 
     const currency = company.currency === "EUR" ? "€" : "$"

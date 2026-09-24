@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { historico, semanal } from "@/lib/fmp/mercado"
 import { exigirPro, CACHE_PRIVADO } from "@/lib/api/acessoPro"
 
 export async function GET(
@@ -22,20 +23,13 @@ export async function GET(
       return NextResponse.json({ error: "Company not found" }, { status: 404 })
     }
 
-    // Só `date` e `close`: é o que o cálculo usa, e sem `select` o Prisma
-    // trazia também open, high, low e volume — quatro colunas por linha que
-    // ninguém lê, em milhares de linhas por empresa.
-    //
-    // E uma por semana, não uma por dia. A variável a jusante já se chamava
-    // `weeklyPrices`, mas a amostragem nunca chegou a existir: puxavam-se as
-    // cotações diárias todas desde o início da série. Para uma linha de
-    // múltiplos históricos, o ponto semanal é indistinguível do diário.
-    const allPrices = await prisma.$queryRawUnsafe<Array<{ date: Date; close: number }>>(
-      `SELECT DISTINCT ON (date_trunc('week', date)) date, close
-       FROM prices WHERE ticker = $1
-       ORDER BY date_trunc('week', date), date DESC`,
-      ticker.toUpperCase(),
-    )
+    // Um ponto por semana: para uma linha de múltiplos históricos o ponto
+    // semanal é indistinguível do diário, e a variável a jusante já se chama
+    // `weeklyPrices`. Vem da FMP, não da tabela `prices` (ver lib/fmp/mercado.ts).
+    const allPrices = semanal(await historico(ticker)).map((p) => ({
+      date: new Date(p.date + "T00:00:00Z"),
+      close: p.close,
+    }))
 
     if (allPrices.length === 0) {
       return NextResponse.json({ error: "No prices found" }, { status: 404 })

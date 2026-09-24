@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { cotacoes } from "@/lib/fmp/mercado";
 import { Prisma } from "@prisma/client";
 
 export type ScreenerCompany = {
@@ -55,11 +56,11 @@ type RawRow = {
   logourl: string | null;
   sector: string | null;
   sharesoutstanding: Prisma.Decimal | null;
-  lastclose: Prisma.Decimal | null;
-  previousclose: Prisma.Decimal | null;
+  lastclose: Prisma.Decimal | number | null;
+  previousclose: Prisma.Decimal | number | null;
 };
 
-function toNumber(value: Prisma.Decimal | null): number | null {
+function toNumber(value: Prisma.Decimal | number | null): number | null {
   if (value === null) return null;
   const num = Number(value);
   return Number.isFinite(num) ? num : null;
@@ -85,36 +86,37 @@ function mapRawRow(r: RawRow): ScreenerCompany {
   };
 }
 
+type Ordem = "marketCap" | "gainers" | "losers";
+
 /**
- * Últimos 2 preços por ticker via LATERAL JOIN (top-N por grupo) em vez do
- * `include: { prices: { take: 2 } }` do Prisma — esse padrão traz TODAS as
- * linhas de `prices` para os tickers pedidos e só corta para 2 em memória no
- * Node, o que com ~530 empresas e ~620k linhas de preços custava 4-8s por
- * pedido. O LATERAL faz o corte dentro do Postgres, ~300-400ms.
+ * Empresas de uma categoria, com a cotação da FMP.
+ *
+ * Antes juntava a tabela `prices` num LATERAL para ir buscar os dois últimos
+ * fechos de cada empresa. Os preços deixaram de estar na base (ver
+ * lib/fmp/mercado.ts): a base dá as empresas e as ações em circulação, e o
+ * `batch-quote` da FMP dá as cotações de todas numa só chamada.
+ *
+ * A ordenação passou do SQL para aqui porque depende do preço, que já não
+ * está no SQL. São ~560 empresas — ordená-las em memória é instantâneo.
  */
 async function queryCompanies(
-  orderBy: Prisma.Sql,
+  ordem: Ordem,
   limit: number,
   offset: number,
   sector?: string,
   isEtf?: boolean,
 ): Promise<{ rows: RawRow[] }> {
   const sectorFilter = sector ? Prisma.sql`AND c.sector = ${sector}` : Prisma.empty;
-  const etfFilter = isEtf 
+  const etfFilter = isEtf
     ? Prisma.sql`AND c.exchange = 'MACRO' AND c.ticker NOT LIKE '^%'`
     // O `^` exclui índices (^GSPC, ^DJI, ^VIX): estão em `companies` para
-    // alimentar gráficos de contexto, não são empresas. Não têm ações em
-    // circulação nem fundamentais, por isso caíam no fim do Market Cap — mas
-    // nas Maiores Subidas/Descidas ordena-se por variação, e aí um índice
-    // entrava na grelha ao lado da Dell.
+    // alimentar gráficos de contexto, não são empresas.
     : Prisma.sql`AND (c.exchange IS NULL OR c.exchange != 'MACRO') AND c.ticker NOT LIKE '^%'`;
 
-  const rows = await prisma.$queryRaw<RawRow[]>`
+  const base = await prisma.$queryRaw<Omit<RawRow, "lastclose" | "previousclose">[]>`
     SELECT
       c.ticker, c.name, c."logoUrl" AS logourl, c.sector,
-      lf."sharesOutstanding" AS sharesoutstanding,
-      lp.last_close AS lastclose,
-      lp.previous_close AS previousclose
+      lf."sharesOutstanding" AS sharesoutstanding
     FROM companies c
     LEFT JOIN LATERAL (
       SELECT f."sharesOutstanding"
@@ -123,39 +125,38 @@ async function queryCompanies(
       ORDER BY f."periodEnd" DESC
       LIMIT 1
     ) lf ON true
-    LEFT JOIN LATERAL (
-      SELECT
-        (array_agg(p2.close ORDER BY p2.date DESC))[1] AS last_close,
-        (array_agg(p2.close ORDER BY p2.date DESC))[2] AS previous_close
-      FROM (
-        SELECT p.close, p.date
-        FROM prices p
-        WHERE p.ticker = c.ticker
-        ORDER BY p.date DESC
-        LIMIT 2
-      ) p2
-    ) lp ON true
     WHERE c."isActive" = true
     ${sectorFilter}
     ${etfFilter}
-    ORDER BY ${orderBy}
-    LIMIT ${limit} OFFSET ${offset}
   `;
 
-  return { rows };
-}
+  const quotes = await cotacoes(base.map((r) => r.ticker));
+  const rows: RawRow[] = base.map((r) => {
+    const q = quotes.get(r.ticker);
+    return { ...r, lastclose: q?.price ?? null, previousclose: q?.previousClose ?? null };
+  });
 
-const ORDER_BY_MARKET_CAP = Prisma.sql`(COALESCE(lf."sharesOutstanding", 0) * COALESCE(lp.last_close, 0)) DESC NULLS LAST`;
-const ORDER_BY_GAINERS = Prisma.sql`
-  CASE WHEN lp.previous_close IS NOT NULL AND lp.previous_close != 0
-    THEN (lp.last_close - lp.previous_close) / lp.previous_close
-    ELSE NULL END DESC NULLS LAST
-`;
-const ORDER_BY_LOSERS = Prisma.sql`
-  CASE WHEN lp.previous_close IS NOT NULL AND lp.previous_close != 0
-    THEN (lp.last_close - lp.previous_close) / lp.previous_close
-    ELSE NULL END ASC NULLS LAST
-`;
+  const variacao = (r: RawRow) => {
+    const last = toNumber(r.lastclose);
+    const prev = toNumber(r.previousclose);
+    return last !== null && prev ? (last - prev) / prev : null;
+  };
+  const marketCap = (r: RawRow) => (toNumber(r.sharesoutstanding) ?? 0) * (toNumber(r.lastclose) ?? 0);
+
+  // Nulos sempre no fim, como o NULLS LAST que estava no SQL.
+  const chave = (r: RawRow) =>
+    ordem === "marketCap" ? marketCap(r) : variacao(r);
+  rows.sort((a, b) => {
+    const ka = chave(a);
+    const kb = chave(b);
+    if (ka === null && kb === null) return 0;
+    if (ka === null) return 1;
+    if (kb === null) return -1;
+    return ordem === "losers" ? ka - kb : kb - ka;
+  });
+
+  return { rows: rows.slice(offset, offset + limit) };
+}
 
 /**
  * Estas listas mudam uma vez por dia, depois da ingestão — mas eram
@@ -193,12 +194,13 @@ async function carregarPaginaCategoria(
   sector?: string,
 ): Promise<ScreenerPage> {
   const isEtf = category === "etfs";
-  const orderBy = category === "gainers" ? ORDER_BY_GAINERS
-    : category === "losers" ? ORDER_BY_LOSERS
-    : ORDER_BY_MARKET_CAP; // marketCap, sp500 e etfs ordenam por Market Cap (sendo que ETFs não devem ter, vão ficar com ordem arbitrária, mas okay)
+  // marketCap, sp500 e etfs ordenam por Market Cap.
+  const ordem: Ordem = category === "gainers" ? "gainers"
+    : category === "losers" ? "losers"
+    : "marketCap";
 
   // Pede 1 a mais para saber se há próxima página, sem precisar de um COUNT(*) à parte.
-  const { rows } = await queryCompanies(orderBy, limit + 1, offset, sector, isEtf);
+  const { rows } = await queryCompanies(ordem, limit + 1, offset, sector, isEtf);
   const hasMore = rows.length > limit;
   const companies = rows.slice(0, limit).map(mapRawRow);
 

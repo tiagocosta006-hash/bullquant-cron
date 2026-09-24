@@ -60,30 +60,71 @@ oito dias em que o terminal esteve sem notícias sem ninguém reparar.
 
 ### A regra
 
-> **Não se armazena o que a FMP devolve numa chamada. Armazena-se o que é
-> nosso e o que precisa de ser consultado em conjunto.**
+> **A base continua a ser a fonte que a plataforma lê. O que muda é que deixa
+> de ser construída por um motor que interpreta, e passa a ser um espelho da
+> FMP que se reconstrói em cinco minutos.**
 
-Isto divide-se por *forma da consulta*, não por tipo de dado:
+A primeira versão deste plano propunha o contrário — ir à FMP a pedido e
+esvaziar a base. Estava errada, por três razões que só aparecem quando se
+pergunta como as outras plataformas fazem:
 
-| Consulta | Onde vive | Porquê |
+**Latência.** Uma chamada à FMP são 300-800 ms; uma leitura ao Postgres, 20 ms.
+
+**Independência.** Se a FMP cair, ou se um dia se mudar de fornecedor, a
+plataforma continua a servir.
+
+**Histórico próprio, que é a razão decisiva.** Se a FMP reformular um número
+que já foi mostrado a um cliente, queremos saber. Com a API a pedido, o valor
+antigo desaparece sem rasto e ninguém consegue reconstruir o que estava no ecrã
+naquele dia. Para quem apresenta posições a clientes, isto não é um detalhe
+técnico.
+
+A Macrotrends, a Stock Analysis, a Simply Wall St e a Qualtrim — a referência
+do `CLAUDE.md` — todas guardam.
+
+### O que muda então, se se continua a guardar
+
+O problema do armazém nunca foi ser um armazém. Foi ser construído por um motor
+que podia estar errado sem ninguém saber, e por isso ser **insubstituível**:
+reconstruí-lo era um projeto, portanto nunca se reconstruía, portanto os erros
+ficavam lá durante meses.
+
+Com a FMP o armazém passa a ser **descartável**. Reconstrói-se por inteiro em
+~3 400 chamadas e cinco minutos. Se alguma vez estiver errado, apaga-se e
+volta a encher-se. Deixa de ser precioso, e é isso que o torna confiável.
+
+Os cron jobs mudam de natureza na mesma medida: deixam de *extrair e
+interpretar* e passam a *espelhar*. Um espelho que falha não corrompe nada —
+só fica desatualizado, e nota-se.
+
+### Espaço, com a disciplina que já está decidida
+
+| Granularidade dos preços | Linhas | Espaço |
 |---|---|---|
-| Detalhe de **uma** empresa (fundamentais, preços, DCF) | FMP a pedido, com cache | Uma chamada traz 40 anos. Guardar 2 M de linhas para servir uma de cada vez é trabalho a mais. |
-| **Cruzada** entre empresas (screener, dashboard, comparar) | `company-screener` da FMP, ou snapshot noturno pequeno | Precisa dos dados lado a lado. O snapshot são 559 linhas × ~30 métricas, <1 MB. |
-| **Nossos** (utilizadores, carteiras, cenários DCF, notícias) | Postgres, como hoje | Não existem em lado nenhum senão aqui. |
+| Tudo (1927-2026) | 2 075 820 | 251 MB |
+| **Diário, últimos 10 anos** | 1 353 258 | **164 MB** |
+| Diário 10 anos + semanal antes | 1 498 111 | 181 MB |
 
-### O que isto faz aos números
+O `CLAUDE.md` §1 já decidiu 10 anos. Mantendo isso, a base fica em ~215 MB dos
+500 MB do plano gratuito. A FMP dá 40 anos — a tentação de os trazer todos é
+exatamente como se chega ao teto sem dar por isso.
 
-```
-base de dados      293 MB  →  ~10 MB
-cron jobs          13      →  2  (notícias e snapshot)
-código de ingestão ~4 100 linhas  →  ~400
-```
+### Chamadas à API
 
-O problema de armazenamento do Supabase desaparece. O de egress encolhe na
-mesma proporção. E a classe inteira de bugs "o cron partiu e os dados
-envelheceram" deixa de existir, porque não há dados a envelhecer.
+| | Chamadas |
+|---|---|
+| Reconstrução completa | ~3 400 (5 min a 750/min) |
+| Diário | ~50 |
+| Cotações de todas as empresas | 1 (`batch-quote`) |
 
----
+Sem risco de esgotar: o teto do Premium são 750 por minuto.
+
+### O alarme que faltava
+
+O que permitiu à IBKR ficar errada durante meses não foi a falta de dados —
+foi a falta de quem verificasse. Acrescenta-se um job diário que compara uma
+amostra da base contra a FMP e avisa quando divergem. O espelho tem de saber
+quando deixou de refletir.
 
 ## 3. Riscos, e o que se faz a cada um
 

@@ -199,7 +199,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Preconnect para acelerar o download dos logos da Finnhub */}
+        {/* Preconnect para acelerar o download dos logos (ainda servidos pela Finnhub) */}
         <link rel="preconnect" href="https://static2.finnhub.io" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://static2.finnhub.io" />
 

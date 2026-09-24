@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { deriveFcff, deriveEffectiveTaxRate, type FcfSourceRecord } from "@/lib/finance/fcf"
 import { exigirPro } from "@/lib/api/acessoPro"
 import { normalizarTicker } from "@/lib/ticker"
+import { cotacao, get, simbolo } from "@/lib/fmp/mercado"
 
 function num(val: unknown): number | null {
   if (val === null || val === undefined) return null
@@ -15,33 +16,18 @@ function num(val: unknown): number | null {
 }
 
 async function fetchCurrentPrice(ticker: string): Promise<number | null> {
-  const apiKey = process.env.FINNHUB_API_KEY
-  if (!apiKey) return null
   try {
-    const res = await fetch(
-      `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`,
-      { next: { revalidate: 60 } }
-    )
-    if (!res.ok) return null
-    const data = await res.json()
-    return typeof data.c === "number" && data.c > 0 ? data.c : null
+    const q = await cotacao(ticker)
+    return q && q.price > 0 ? q.price : null
   } catch {
     return null
   }
 }
 
 async function fetchBeta(ticker: string): Promise<number | null> {
-  const apiKey = process.env.FINNHUB_API_KEY
-  if (!apiKey) return null
   try {
-    const res = await fetch(
-      `https://finnhub.io/api/v1/stock/metric?symbol=${ticker}&metric=all&token=${apiKey}`,
-      { next: { revalidate: 3600 } } // cache 1 hora
-    )
-    if (!res.ok) return null
-    const data = await res.json()
-    // Beta pode estar em data.metric.beta ou data.metric.52WeekBeta
-    const beta = data.metric?.beta ?? data.metric?.["52WeekBeta"]
+    const perfil = await get<Array<{ beta?: number }>>("profile", { symbol: simbolo(ticker) }, 86_400)
+    const beta = perfil?.[0]?.beta
     return typeof beta === "number" && beta > 0 && beta < 10 ? beta : null
   } catch {
     return null
@@ -54,7 +40,7 @@ export async function GET(
 ) {
   try {
     const { ticker } = await params
-    // Validado antes de chegar à Finnhub (duas chamadas abaixo) — ver lib/ticker.ts.
+    // Validado antes de chegar à FMP (duas chamadas abaixo) — ver lib/ticker.ts.
     const upper = normalizarTicker(ticker)
     if (!upper) {
       return NextResponse.json({ error: "Ticker inválido" }, { status: 400 })

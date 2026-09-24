@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { prisma } from '@/lib/prisma'
 import { cotacao } from '@/lib/fmp/mercado'
+import { resultadosDe } from '@/lib/fmp/calendario'
 import { getUser } from '@/lib/supabase/server'
 import { StockHeader } from '@/components/stock/StockHeader'
 import { StockSnapshot } from '@/components/stock/StockSnapshot'
@@ -151,10 +152,8 @@ export default async function StockPage({
     // 7. Cotação atual — da FMP, não da tabela `prices` (ver lib/fmp/mercado.ts)
     cotacao(company.ticker),
 
-    prisma.earningsEvent.findFirst({
-      where: { companyId: company.id, epsActual: { not: null } },
-      orderBy: { date: 'desc' },
-    }),
+    // Último resultado já reportado — da FMP (lib/fmp/calendario.ts).
+    resultadosDe(company.ticker).then(rs => rs.find(r => r.epsActual != null) ?? null),
 
     // 8. Peers — mesma INDÚSTRIA (peers reais); fallback para o setor só quando
     // a industry não está preenchida. Ordem determinística por ticker.
@@ -205,7 +204,7 @@ export default async function StockPage({
     latestEarnings?.revenueActual != null &&
     latestQuarterly?.periodEnd &&
     latestQuarterly.fiscalQuarter != null &&
-    (latestEarnings.date.getTime() - latestQuarterly.periodEnd.getTime()) / 86_400_000 > 55
+    (new Date(latestEarnings.date + 'T00:00:00Z').getTime() - latestQuarterly.periodEnd.getTime()) / 86_400_000 > 55
   ) {
     const q = latestQuarterly.fiscalQuarter
     preliminaryQuarter = {
@@ -213,6 +212,25 @@ export default async function StockPage({
       fiscalQuarter: q === 4 ? 1 : q + 1,
       revenue: Number(latestEarnings.revenueActual),
       epsDiluted: latestEarnings.epsActual != null ? Number(latestEarnings.epsActual) : null,
+    }
+  }
+
+  // A FMP não diz a que trimestre fiscal pertence um anúncio. Descobre-se
+  // pelos nossos fundamentais: é o trimestre cujo fecho foi até ~100 dias
+  // antes. Sem esse trimestre na base (ainda não há 10-Q), é o seguinte ao
+  // último conhecido — a mesma regra do overlay preliminar acima.
+  let periodoResultados: { fiscalYear: number; fiscalQuarter: number } | null = null
+  if (latestEarnings) {
+    const dataAnuncio = new Date(latestEarnings.date + 'T00:00:00Z').getTime()
+    const trimestre = latestFundamentals.find(f =>
+      f.fiscalQuarter != null &&
+      f.periodEnd.getTime() < dataAnuncio &&
+      dataAnuncio - f.periodEnd.getTime() <= 100 * 86_400_000
+    )
+    if (trimestre?.fiscalQuarter != null) {
+      periodoResultados = { fiscalYear: trimestre.fiscalYear, fiscalQuarter: trimestre.fiscalQuarter }
+    } else if (preliminaryQuarter) {
+      periodoResultados = { fiscalYear: preliminaryQuarter.fiscalYear, fiscalQuarter: preliminaryQuarter.fiscalQuarter }
     }
   }
 
@@ -316,11 +334,11 @@ export default async function StockPage({
         hasPro={isPro}
         overview={
           <>
-            {latestEarnings && (
+            {latestEarnings && periodoResultados && (
               <LatestResults
-                fiscalYear={latestEarnings.fiscalYear}
-                fiscalQuarter={latestEarnings.fiscalQuarter}
-                date={latestEarnings.date.toISOString().slice(0, 10)}
+                fiscalYear={periodoResultados.fiscalYear}
+                fiscalQuarter={periodoResultados.fiscalQuarter}
+                date={latestEarnings.date}
                 epsEstimate={latestEarnings.epsEstimate !== null ? Number(latestEarnings.epsEstimate) : null}
                 epsActual={latestEarnings.epsActual !== null ? Number(latestEarnings.epsActual) : null}
                 revenueEstimate={latestEarnings.revenueEstimate !== null ? Number(latestEarnings.revenueEstimate) : null}

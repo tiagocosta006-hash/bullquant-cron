@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { createClient } from '@/lib/supabase/server'
 import { exigirPro, CACHE_PRIVADO } from '@/lib/api/acessoPro'
+import { empresasPorTicker, calendarioResultados } from '@/lib/fmp/calendario'
 
 /**
  * GET /api/earnings?from=YYYY-MM-DD&to=YYYY-MM-DD[&watchlist=1]
@@ -29,6 +30,9 @@ export async function GET(request: NextRequest) {
   if (isNaN(from.getTime()) || isNaN(to.getTime())) {
     return NextResponse.json({ error: 'Invalid date range' }, { status: 400 })
   }
+  if (to.getTime() - from.getTime() > 100 * 86_400_000 || to < from) {
+    return NextResponse.json({ error: 'Date range too large' }, { status: 400 })
+  }
 
   try {
     let companyIds: string[] | undefined
@@ -45,33 +49,31 @@ export async function GET(request: NextRequest) {
       companyIds = portfolio?.items.map(i => i.companyId) ?? []
     }
 
-    const events = await prisma.earningsEvent.findMany({
-      where: {
-        date: { gte: from, lte: to },
-        ...(companyIds ? { companyId: { in: companyIds } } : {}),
-      },
-      orderBy: [{ date: 'asc' }, { company: { ticker: 'asc' } }],
-      include: {
-        company: { select: { ticker: true, name: true, logoUrl: true, employees: true } },
-      },
-    })
+    const empresas = await empresasPorTicker()
+    const porId = new Map(Object.values(empresas).map(e => [e.id, e.ticker]))
+    const tickers = new Set(
+      companyIds ? companyIds.map(id => porId.get(id)).filter((t): t is string => !!t) : Object.keys(empresas)
+    )
+    const eventos = await calendarioResultados(from, to, tickers)
 
-    // Serializar Decimals → number
-    const data = events.map(e => ({
-      id: e.id,
-      date: e.date.toISOString().slice(0, 10),
-      hour: e.hour,
-      fiscalYear: e.fiscalYear,
-      fiscalQuarter: e.fiscalQuarter,
-      epsEstimate: e.epsEstimate !== null ? Number(e.epsEstimate) : null,
-      epsActual: e.epsActual !== null ? Number(e.epsActual) : null,
-      revenueEstimate: e.revenueEstimate !== null ? Number(e.revenueEstimate) : null,
-      revenueActual: e.revenueActual !== null ? Number(e.revenueActual) : null,
-      ticker: e.company.ticker,
-      name: e.company.name,
-      logoUrl: e.company.logoUrl,
-      employees: e.company.employees
-    }))
+    const data = eventos.map(e => {
+      const fecho = new Date(new Date(e.date + 'T00:00:00Z').getTime() - 45 * 86_400_000)
+      return {
+        id: `e|${e.ticker}|${e.date}`,
+        date: e.date,
+        hour: 'UNKNOWN',
+        fiscalYear: fecho.getUTCFullYear(),
+        fiscalQuarter: Math.floor(fecho.getUTCMonth() / 3) + 1,
+        epsEstimate: e.epsEstimate,
+        epsActual: e.epsActual,
+        revenueEstimate: e.revenueEstimate,
+        revenueActual: e.revenueActual,
+        ticker: e.ticker,
+        name: empresas[e.ticker]?.name ?? e.ticker,
+        logoUrl: empresas[e.ticker]?.logoUrl ?? null,
+        employees: empresas[e.ticker]?.employees ?? null,
+      }
+    })
 
     // O calendário geral é público e igual para todos; o ramo watchlist é
     // por-utilizador e NUNCA pode ir para a cache partilhada da CDN.

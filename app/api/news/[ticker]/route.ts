@@ -2,43 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 // Partilhado com o pipeline do Terminal de Notícias (lib/news/*).
 import { isRealImage } from "@/lib/news/normalize";
 import { normalizarTicker } from "@/lib/ticker";
-
-const FINNHUB_KEY = process.env.FINNHUB_API_KEY!;
+import { noticias } from "@/lib/fmp/mercado";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ ticker: string }> }
 ) {
   const bruto = await params;
-  // Validado antes de construir o URL da Finnhub: sem isto, cada ticker
-  // inventado era uma chave de cache nova e uma chamada nova, contornando o
-  // `revalidate: 900` que protege a quota. Ver lib/ticker.ts.
+  // Validado antes de chamar a FMP: sem isto, cada ticker inventado era uma
+  // chave de cache nova e uma chamada nova. Ver lib/ticker.ts.
   const ticker = normalizarTicker(bruto.ticker);
   if (!ticker) {
     return NextResponse.json({ error: "Ticker inválido" }, { status: 400 });
   }
 
-  // Fetch last 60 days for a fuller feed
-  const to = new Date();
-  const from = new Date();
-  from.setDate(from.getDate() - 60);
-
-  const fmt = (d: Date) => d.toISOString().split("T")[0];
-  const url = `https://finnhub.io/api/v1/company-news?symbol=${ticker}&from=${fmt(from)}&to=${fmt(to)}&token=${FINNHUB_KEY}`;
-
   try {
-    const res = await fetch(url, { next: { revalidate: 900 } }); // cache 15 min
-    if (!res.ok) throw new Error(`Finnhub error: ${res.status}`);
-
-    const raw: Array<{
-      id: number;
-      datetime: number;
-      headline: string;
-      summary: string;
-      source: string;
-      url: string;
-      image: string;
-    }> = await res.json();
+    // 60 dias para um feed mais cheio; cache de 15 min (lib/fmp/mercado.ts).
+    const raw = await noticias(ticker, 60);
 
     // Deduplicate by headline prefix
     const seen = new Set<string>();

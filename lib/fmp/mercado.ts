@@ -153,7 +153,7 @@ export async function cotacoes(tickers: string[]): Promise<Map<string, Cotacao>>
   const out = new Map<string, Cotacao>();
   if (tickers.length === 0) return out;
 
-  const porSimbolo = new Map(tickers.map((t) => [simbolo(t), t]));
+  const porSimbolo = new Map(tickers.map((t) => [simbolo(t), t.toUpperCase()]));
   // Em blocos, para o URL não ficar demasiado longo com centenas de tickers.
   const blocos: string[][] = [];
   const todos = [...porSimbolo.keys()];
@@ -185,4 +185,60 @@ export async function cotacoes(tickers: string[]): Promise<Map<string, Cotacao>>
 /** Atalho para um só ticker. */
 export async function cotacao(ticker: string): Promise<Cotacao | null> {
   return (await cotacoes([ticker])).get(ticker.toUpperCase()) ?? null;
+}
+
+// ─── Notícias por empresa ──────────────────────────────────────────────────
+
+export type NoticiaEmpresa = {
+  id: number;
+  /** Segundos Unix, como a Finnhub dava — o frontend já conta com isso. */
+  datetime: number;
+  headline: string;
+  summary: string;
+  source: string;
+  url: string;
+  image: string;
+};
+
+type LinhaNoticia = {
+  publishedDate: string;
+  publisher?: string;
+  site?: string;
+  title: string;
+  text?: string;
+  url: string;
+  image?: string;
+};
+
+/** Notícias de uma empresa nos últimos `dias`, mais recentes primeiro. */
+export async function noticias(ticker: string, dias: number): Promise<NoticiaEmpresa[]> {
+  const ate = new Date();
+  const de = new Date(ate.getTime() - dias * 86_400_000);
+  const linhas = await get<LinhaNoticia[]>(
+    "news/stock",
+    {
+      symbols: simbolo(ticker),
+      from: de.toISOString().slice(0, 10),
+      to: ate.toISOString().slice(0, 10),
+      limit: "100",
+    },
+    900,
+  );
+  if (!Array.isArray(linhas)) return [];
+  return linhas
+    .map((l) => {
+      const t = Date.parse(l.publishedDate.replace(" ", "T") + "Z");
+      return {
+        // Id estável a partir do URL, para as `key` do React.
+        id: [...l.url].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0) >>> 0,
+        datetime: Math.floor(t / 1000),
+        headline: l.title,
+        summary: l.text ?? "",
+        source: l.publisher || l.site || "",
+        url: l.url,
+        image: l.image ?? "",
+      };
+    })
+    .filter((n) => Number.isFinite(n.datetime))
+    .sort((a, b) => b.datetime - a.datetime);
 }

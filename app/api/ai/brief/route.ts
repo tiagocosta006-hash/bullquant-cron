@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { noticias } from '@/lib/fmp/mercado'
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { createClient } from '@/lib/supabase/server'
@@ -26,7 +27,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Company not found' }, { status: 404 })
     }
 
-    // Auth — este endpoint chama Gemini/Finnhub; exige utilizador autenticado
+    // Auth — este endpoint chama Gemini/FMP; exige utilizador autenticado
     // para não expor o custo a pedidos anónimos.
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -53,22 +54,9 @@ export async function GET(request: Request) {
       return NextResponse.json(rateLimitError, { status: 429 })
     }
 
-    // 2. Fetch Finnhub News (last 15 days)
-    const to = new Date()
-    const from = new Date()
-    from.setDate(from.getDate() - 15)
-    
-    const toStr = to.toISOString().split('T')[0]
-    const fromStr = from.toISOString().split('T')[0]
-    
-    const finnhubRes = await fetch(`https://finnhub.io/api/v1/company-news?symbol=${ticker.toUpperCase()}&from=${fromStr}&to=${toStr}&token=${process.env.FINNHUB_API_KEY}`)
-    
-    if (!finnhubRes.ok) {
-      return NextResponse.json({ error: 'Failed to fetch news from Finnhub' }, { status: 500 })
-    }
+    // 2. Notícias dos últimos 15 dias (FMP, lib/fmp/mercado.ts)
+    const rawNews = await noticias(company.ticker, 15)
 
-    const rawNews = await finnhubRes.json()
-    
     // Sort descending by datetime, take top 20
     let newsContext = ''
     if (Array.isArray(rawNews)) {

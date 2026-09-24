@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { insiders } from "@/lib/fmp/calendario";
+import { normalizarTicker } from "@/lib/ticker";
 import { exigirPro, CACHE_PRIVADO } from "@/lib/api/acessoPro"
 
 /**
  * GET /api/insider/[ticker]
  * Transações de insiders (SEC Form 4) de uma empresa, mais recentes primeiro,
- * + um resumo de compras/vendas na janela recente. Decimais → number antes do
- * browser. Degrada para lista vazia se a tabela ainda não estiver populada.
+ * + um resumo de compras/vendas na janela recente. Vêm da FMP
+ * (lib/fmp/calendario.ts); degrada para lista vazia se a FMP falhar.
  */
 const WINDOW_DAYS = 90;
 
@@ -14,43 +15,16 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ ticker: string }> },
 ) {
-  const { ticker } = await params;
+  // Validar antes de chamar a FMP: um ticker inventado seria um pedido novo.
+  const ticker = normalizarTicker((await params).ticker);
+  if (!ticker) return NextResponse.json({ error: "Ticker inválido" }, { status: 400 });
 
   // Vive no separador que a página protege com `canViewProTabs` (só PRO).
   const acesso = await exigirPro();
   if (!acesso.ok) return acesso.resposta;
 
   try {
-    const company = await prisma.company.findUnique({
-      where: { ticker: ticker.toUpperCase() },
-      select: { id: true },
-    });
-
-    if (!company) {
-      return NextResponse.json({ error: "Company not found" }, { status: 404 });
-    }
-
-    const rows = await prisma.insiderTransaction.findMany({
-      where: { companyId: company.id },
-      orderBy: { transactionDate: "desc" },
-      take: 100,
-    });
-
-    const transactions = rows.map((r) => ({
-      id: r.id,
-      insiderName: r.insiderName,
-      title: r.title,
-      type: r.type, // BUY | SELL | OTHER
-      transactionCode: r.transactionCode,
-      shares: Number(r.shares),
-      sharesChange: r.sharesChange !== null ? Number(r.sharesChange) : null,
-      price: r.price !== null ? Number(r.price) : null,
-      value: r.value !== null ? Number(r.value) : null,
-      sharesOwnedAfter:
-        r.sharesOwnedAfter !== null ? Number(r.sharesOwnedAfter) : null,
-      transactionDate: r.transactionDate.toISOString().slice(0, 10),
-      filedAt: r.filedAt ? r.filedAt.toISOString().slice(0, 10) : null,
-    }));
+    const transactions = await insiders(ticker);
 
     // Resumo da janela recente
     const cutoff = new Date();
@@ -74,7 +48,6 @@ export async function GET(
       { headers: { "Cache-Control": CACHE_PRIVADO } },
     );
   } catch (error) {
-    // Tabela ainda não migrada/populada → degrada graciosamente
     console.error("Error fetching insider transactions:", error);
     return NextResponse.json({ transactions: [], summary: null, unavailable: true });
   }

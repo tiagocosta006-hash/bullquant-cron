@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { createClient } from '@/lib/supabase/server'
 import { exigirPro, CACHE_PRIVADO } from '@/lib/api/acessoPro'
+import { empresasPorTicker, calendarioResultados, calendarioCorporativo, calendarioMacro } from '@/lib/fmp/calendario'
 
 type Kind = 'earnings' | 'corporate' | 'macro'
 const ALL_KINDS: Kind[] = ['earnings', 'corporate', 'macro']
@@ -38,6 +39,11 @@ export async function GET(request: NextRequest) {
   if (isNaN(from.getTime()) || isNaN(to.getTime())) {
     return NextResponse.json({ error: 'Invalid date range' }, { status: 400 })
   }
+  // Cada semana do intervalo são pedidos à FMP. A página pede um mês (com as
+  // pontas da grelha, ~6 semanas); mais de ~3 meses não tem uso legítimo.
+  if (to.getTime() - from.getTime() > 100 * 86_400_000 || to < from) {
+    return NextResponse.json({ error: 'Date range too large' }, { status: 400 })
+  }
 
   // A página /calendar é PRO (ProGate por cima), mas o ramo `scope=all` não
   // pedia nada a ninguém — e servia 12 KB do calendário de resultados em
@@ -71,76 +77,57 @@ export async function GET(request: NextRequest) {
       companyIds = portfolio?.items.map(i => i.companyId) ?? []
     }
 
-    const companyFilter = companyIds ? { companyId: { in: companyIds } } : {}
+    // Os eventos vêm da FMP (lib/fmp/calendario.ts); a base só diz que
+    // empresas existem e, nos ramos watchlist/portfolio, quais são do user.
+    const empresas = await empresasPorTicker()
+    const porId = new Map(Object.values(empresas).map(e => [e.id, e.ticker]))
+    const tickers = new Set(
+      companyIds ? companyIds.map(id => porId.get(id)).filter((t): t is string => !!t) : Object.keys(empresas)
+    )
+    const meta = (ticker: string) => {
+      const e = empresas[ticker]
+      return { ticker, name: e?.name ?? ticker, logoUrl: e?.logoUrl ?? null, employees: e?.employees ?? null }
+    }
 
     const [earnings, corporate, macro] = await Promise.all([
-      kinds.has('earnings')
-        ? prisma.earningsEvent.findMany({
-            where: { date: { gte: from, lte: to }, ...companyFilter },
-            orderBy: [{ date: 'asc' }, { company: { ticker: 'asc' } }],
-            include: { company: { select: { ticker: true, name: true, logoUrl: true, employees: true } } },
-          })
-        : [],
-      kinds.has('corporate')
-        ? prisma.corporateEvent.findMany({
-            where: { date: { gte: from, lte: to }, ...companyFilter },
-            orderBy: [{ date: 'asc' }, { company: { ticker: 'asc' } }],
-            include: { company: { select: { ticker: true, name: true, logoUrl: true, employees: true } } },
-          })
-        : [],
+      kinds.has('earnings') ? calendarioResultados(from, to, tickers) : [],
+      kinds.has('corporate') ? calendarioCorporativo(from, to, tickers) : [],
       // Macro é market-wide: nunca filtra por watchlist.
-      kinds.has('macro')
-        ? prisma.marketEvent.findMany({
-            where: { date: { gte: from, lte: to } },
-            orderBy: { date: 'asc' },
-          })
-        : [],
+      kinds.has('macro') ? calendarioMacro(from, to) : [],
     ])
 
     const data = [
-      ...earnings.map(e => ({
-        kind: 'earnings' as const,
-        id: e.id,
-        date: e.date.toISOString().slice(0, 10),
-        hour: e.hour,
-        fiscalYear: e.fiscalYear,
-        fiscalQuarter: e.fiscalQuarter,
-        epsEstimate: e.epsEstimate !== null ? Number(e.epsEstimate) : null,
-        epsActual: e.epsActual !== null ? Number(e.epsActual) : null,
-        revenueEstimate: e.revenueEstimate !== null ? Number(e.revenueEstimate) : null,
-        revenueActual: e.revenueActual !== null ? Number(e.revenueActual) : null,
-        ticker: e.company.ticker,
-        name: e.company.name,
-        logoUrl: e.company.logoUrl,
-        employees: e.company.employees,
-      })),
+      ...earnings.map(e => {
+        // A FMP não diz o trimestre fiscal: aproxima-se pelo trimestre de
+        // calendário que acabou antes do anúncio (os resultados saem 3-8
+        // semanas depois do fecho).
+        const fecho = new Date(new Date(e.date + 'T00:00:00Z').getTime() - 45 * 86_400_000)
+        return {
+          kind: 'earnings' as const,
+          id: `e|${e.ticker}|${e.date}`,
+          date: e.date,
+          hour: 'UNKNOWN' as const,
+          fiscalYear: fecho.getUTCFullYear(),
+          fiscalQuarter: Math.floor(fecho.getUTCMonth() / 3) + 1,
+          epsEstimate: e.epsEstimate,
+          epsActual: e.epsActual,
+          revenueEstimate: e.revenueEstimate,
+          revenueActual: e.revenueActual,
+          ...meta(e.ticker),
+        }
+      }),
       ...corporate.map(c => ({
         kind: 'corporate' as const,
-        id: c.id,
+        id: `c|${c.ticker}|${c.type}|${c.date}`,
         type: c.type,
-        date: c.date.toISOString().slice(0, 10),
-        payDate: c.payDate ? c.payDate.toISOString().slice(0, 10) : null,
-        amount: c.amount !== null ? Number(c.amount) : null,
+        date: c.date,
+        payDate: c.payDate,
+        amount: c.amount,
         splitRatio: c.splitRatio,
-        note: c.note,
-        ticker: c.company.ticker,
-        name: c.company.name,
-        logoUrl: c.company.logoUrl,
-        employees: c.company.employees,
+        note: null,
+        ...meta(c.ticker),
       })),
-      ...macro.map(m => ({
-        kind: 'macro' as const,
-        id: m.id,
-        type: m.type,
-        date: m.date.toISOString().slice(0, 10),
-        time: m.time,
-        title: m.title,
-        importance: m.importance,
-        country: m.country,
-        actual: m.actual,
-        estimate: m.estimate,
-        previous: m.previous,
-      })),
+      ...macro.map(m => ({ kind: 'macro' as const, ...m })),
     ].sort((a, b) => a.date.localeCompare(b.date))
 
     // O calendário geral é público e igual para todos; os ramos watchlist/portfolio

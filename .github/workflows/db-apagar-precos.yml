@@ -1,0 +1,34 @@
+name: DB — apagar a tabela de preços antiga
+
+# Os preços passaram a vir da FMP (lib/fmp/mercado.ts, PR #130) e o site já
+# não lê a tabela `prices`. Ela ocupa ~2 milhões de linhas copiadas de fontes
+# antigas; apagá-la liberta espaço no plano gratuito do Supabase (500 MB).
+#
+# Manual e com confirmação escrita, porque não se desfaz. Os dados não se
+# perdem de facto: a FMP devolve os mesmos 10 anos numa chamada.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmar:
+        description: 'Escrever APAGAR para confirmar'
+        required: true
+
+jobs:
+  apagar:
+    if: ${{ github.event.inputs.confirmar == 'APAGAR' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DB: ${{ secrets.DIRECT_URL }}
+    steps:
+      - name: Tamanho antes
+        run: |
+          psql "$DB" -P pager=off -c "select pg_size_pretty(pg_database_size(current_database())) as base, pg_size_pretty(pg_total_relation_size('prices')) as prices;"
+      - name: Apagar
+        run: psql "$DB" -v ON_ERROR_STOP=1 -c "TRUNCATE TABLE prices;"
+      - name: Tamanho depois
+        run: |
+          psql "$DB" -P pager=off -c "select pg_size_pretty(pg_database_size(current_database())) as base, (select count(*) from prices) as linhas_prices;"
+      - name: Zerar pg_stat_statements (medir o egress a partir daqui)
+        run: psql "$DB" -c "select pg_stat_statements_reset();"

@@ -948,6 +948,8 @@
     "charts": {
       "revenue": "Receitas (Revenue)",
       "revenueBySegment": "Receitas por Segmento",
+      "revenueByGeography": "Receitas por Geografia",
+      "otherRegions": "Outras regiões",
       "epsDiluted": "Lucro por Ação (EPS)",
       "freeCashFlow": "Free Cash Flow",
       "netIncome": "Lucro Líquido",

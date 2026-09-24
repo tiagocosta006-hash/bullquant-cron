@@ -948,6 +948,8 @@
     "charts": {
       "revenue": "Revenue",
       "revenueBySegment": "Revenue by Segment",
+      "revenueByGeography": "Revenue by Geography",
+      "otherRegions": "Other regions",
       "epsDiluted": "EPS Diluted",
       "freeCashFlow": "Free Cash Flow",
       "netIncome": "Net Income",

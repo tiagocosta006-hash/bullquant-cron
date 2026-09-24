@@ -12,10 +12,9 @@
  * trimestre e por ano, com o mesmo fiscalYear/period dos statements — por
  * isso casam com as linhas sem adivinhar datas.
  *
- * `revenueSegments` (o que os gráficos usam) fica com o eixo de produto, ou o
- * geográfico quando a empresa só reporta esse — escolhido por EMPRESA, nunca
- * por período, para um gráfico não misturar os dois. `revenueSegmentsByAxis` guarda
- * os dois. Valores em dólares, com a mesma taxa de câmbio da linha.
+ * `revenueSegments` (gráfico de barras) fica só com o eixo de produto;
+ * `revenueSegmentsByAxis` guarda os dois, e a geografia alimenta o gráfico
+ * circular da página de stock. Valores em dólares, com a mesma taxa de câmbio da linha.
  *
  * 4 pedidos por empresa (produto/geografia × anual/trimestral).
  */
@@ -135,23 +134,21 @@ async function main() {
       return;
     }
 
-    // UM eixo por empresa, nunca por período. A primeira versão escolhia
-    // produto-ou-geografia linha a linha, e na Meta os trimestres de 2016-17
-    // (sem produto na FMP) ficaram com regiões enquanto os seguintes tinham
-    // "Family of Apps" — o mesmo gráfico misturava os dois eixos. Os períodos
-    // sem o eixo escolhido ficam a NULL: um buraco é honesto, uma mistura não.
-    const eixoDaEmpresa: Eixo = porEixo.product.size > 0 ? "product" : "geography";
-
+    // `revenueSegments` (gráfico de barras "por segmento") é SÓ produto;
+    // a geografia tem o seu gráfico circular e lê de revenueSegmentsByAxis.
+    // A primeira versão escolhia produto-ou-geografia linha a linha, e na
+    // Meta os trimestres de 2016-17 (sem produto na FMP) ficaram com regiões
+    // enquanto os seguintes tinham "Family of Apps" — o mesmo gráfico
+    // misturava os dois eixos. Um buraco é honesto, uma mistura não.
     // `updateMany` e não `update`: devolve só a contagem, não relê a linha —
     // cada linha relida era egress do Supabase.
     const operacoes = [...chaves].map((k) => {
       const product = porEixo.product.get(k) ?? null;
       const geography = porEixo.geography.get(k) ?? null;
-      const principal = porEixo[eixoDaEmpresa].get(k) ?? null;
       return prisma.fundamental.updateMany({
         where: { id: porChave.get(k)!.id },
         data: {
-          revenueSegments: principal === null ? Prisma.DbNull : (principal as Prisma.InputJsonValue),
+          revenueSegments: product === null ? Prisma.DbNull : (product as Prisma.InputJsonValue),
           revenueSegmentsByAxis: { product, geography } as Prisma.InputJsonValue,
         },
       });

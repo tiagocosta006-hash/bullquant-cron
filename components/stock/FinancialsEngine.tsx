@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react"
 import { Info, BarChart3, FileSpreadsheet } from "lucide-react"
 import { DecisionChart } from "./DecisionChart"
 import { FinancialStatements } from "./FinancialStatements"
+import { GeographyPie } from "./GeographyPie"
 import { useTranslations } from "next-intl"
 
 type PeriodType = "QUARTERLY" | "TTM" | "ANNUAL"
@@ -39,6 +40,7 @@ type FundamentalRow = {
   roic?: number | null
   dividendPerShare?: number | null
   revenueSegments?: Record<string, number> | null
+  revenueSegmentsByAxis?: { product?: Record<string, number> | null; geography?: Record<string, number> | null } | null
   businessKpis?: Record<string, number> | null
   // Demonstrações Contabilísticas Expandidas
   depreciationAndAmortization?: number | null
@@ -287,6 +289,29 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
     return chartData.slice(primeiro, ultimo + 1)
   }, [chartData, segmentKeys])
 
+  // Geografia do período mais recente do modo escolhido, para o gráfico
+  // circular. Em TTM soma os últimos 4 trimestres — só se os 4 a tiverem,
+  // senão a soma misturava um ano incompleto com as percentagens.
+  const geografiaAtual = useMemo((): { geografia: Record<string, number>; periodo: string } | null => {
+    const geoDe = (r: FundamentalRow) => r.revenueSegmentsByAxis?.geography ?? null
+    if (period === "TTM") {
+      const trimestres = data.filter(d => d.periodType === "QUARTERLY")
+      const ultimos = trimestres.slice(-4)
+      if (ultimos.length < 4 || ultimos.some(q => !geoDe(q))) return null
+      const soma: Record<string, number> = {}
+      for (const q of ultimos) {
+        for (const [k, v] of Object.entries(geoDe(q)!)) soma[k] = (soma[k] ?? 0) + v
+      }
+      const ult = ultimos[3]
+      return { geografia: soma, periodo: `TTM Q${ult.fiscalQuarter} '${String(ult.fiscalYear).slice(2)}` }
+    }
+    for (let i = processedData.length - 1; i >= 0; i--) {
+      const g = geoDe(processedData[i])
+      if (g && Object.keys(g).length > 0) return { geografia: g, periodo: processedData[i].label ?? "" }
+    }
+    return null
+  }, [data, processedData, period])
+
   // Barra preliminar: revenue/EPS já reportados (earnings) mas ainda sem 10-Q.
   // Só no modo trimestral e só se o trimestre ainda não existir nos oficiais.
   const showPreliminary = useMemo(() => {
@@ -426,6 +451,14 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
                   isCurrency: true, 
                   dataKeys: segmentKeys.map((k, i) => ({ key: k, color: segmentColors[i % segmentColors.length], type: 'bar', stackId: 'a' })) 
                 }} 
+              />
+            )}
+
+            {geografiaAtual && (
+              <GeographyPie
+                geografia={geografiaAtual.geografia}
+                periodo={geografiaAtual.periodo}
+                currencySymbol={currencySymbol}
               />
             )}
             

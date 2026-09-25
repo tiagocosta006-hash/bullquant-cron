@@ -182,7 +182,16 @@ export function DecisionChart({ title, data, type, config, cagr, infoTooltip, em
                 tickLine={false}
                 tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }}
                 dy={15}
-                interval={displayData.length > 15 ? "preserveEnd" : 0}
+                // Com 10 anos reais + 3 estimados, "2016 … 2028E" não cabia no
+                // cartão e os rótulos sobrepunham-se. Anos passam a '16 … '28E
+                // (só no eixo; o tooltip mostra o ano inteiro) e, se mesmo
+                // assim faltar espaço, o recharts salta rótulos em vez de os
+                // encavalitar.
+                tickFormatter={(v: string) =>
+                  displayData.length > 8 && /^\d{4}E?$/.test(String(v)) ? `'${String(v).slice(2)}` : String(v)
+                }
+                interval={displayData.length > 15 ? "preserveEnd" : "preserveStartEnd"}
+                minTickGap={2}
                 height={40}
               />
               <YAxis

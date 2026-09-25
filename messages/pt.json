@@ -825,7 +825,7 @@
       },
       "disclaimer": "Consenso de analistas de terceiros (via Financial Modeling Prep). Não é uma recomendação da BullValue nem aconselhamento de investimento.",
       "estimate": "Estimativa",
-      "estimateInfo": "Barras mais claras: consenso de analistas para os próximos anos fiscais (média das estimativas; o EPS é ajustado, não contabilístico)."
+      "estimateInfo": "Barras mais claras: consenso de analistas para os próximos anos fiscais (média das estimativas). O ano corrente inclui os trimestres já reportados — um ganho extraordinário nesses trimestres entra na estimativa do ano. O EPS dos analistas é, em regra, ajustado."
     }
   },
   "analista": {

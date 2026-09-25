@@ -15,14 +15,14 @@ from f where revenue > 0 and "grossProfit" is not null and "costOfRevenue" is no
   and abs("grossProfit" - (revenue - "costOfRevenue")) > 0.01 * abs(revenue)
 order by abs("grossProfit" - (revenue - "costOfRevenue")) / abs(revenue) desc limit 8;
 
-\echo '== 2. Ativo = passivo + capital próprio (±2%)'
-select count(*) filter (where abs("totalAssets" - ("totalLiabilities" + "totalEquity")) > 0.02 * "totalAssets") as falham, count(*) as testadas
+\echo '== 2. Ativo = passivo + capital próprio + minoritários (±2%)'
+select count(*) filter (where abs("totalAssets" - ("totalLiabilities" + "totalEquity" + coalesce("minorityInterest", 0))) > 0.02 * "totalAssets") as falham, count(*) as testadas
 from f where "totalAssets" > 0 and "totalLiabilities" is not null and "totalEquity" is not null;
 select ticker, "periodType", "fiscalYear", "fiscalQuarter", round("totalAssets"/1e9,2) ativo, round("totalLiabilities"/1e9,2) passivo, round("totalEquity"/1e9,2) cp,
-       round(100*("totalAssets" - "totalLiabilities" - "totalEquity")/"totalAssets",1) as dif_pct
+       round(100*("totalAssets" - "totalLiabilities" - "totalEquity" - coalesce("minorityInterest", 0))/"totalAssets",1) as dif_pct
 from f where "totalAssets" > 0 and "totalLiabilities" is not null and "totalEquity" is not null
-  and abs("totalAssets" - ("totalLiabilities" + "totalEquity")) > 0.02 * "totalAssets"
-order by abs("totalAssets" - "totalLiabilities" - "totalEquity") / "totalAssets" desc limit 8;
+  and abs("totalAssets" - ("totalLiabilities" + "totalEquity" + coalesce("minorityInterest", 0))) > 0.02 * "totalAssets"
+order by abs("totalAssets" - "totalLiabilities" - "totalEquity" - coalesce("minorityInterest", 0)) / "totalAssets" desc limit 8;
 
 \echo '== 3. FCF = OCF − capex (±1%)'
 select count(*) filter (where abs("freeCashFlow" - ("operatingCashFlow" - capex)) > 0.01 * greatest(abs("operatingCashFlow"),1)) as falham, count(*) as testadas

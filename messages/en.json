@@ -825,7 +825,7 @@
       },
       "disclaimer": "Third-party analyst consensus (via Financial Modeling Prep). Not a BullValue recommendation or investment advice.",
       "estimate": "Estimate",
-      "estimateInfo": "Lighter bars: analyst consensus for the next fiscal years (mean estimate; EPS is adjusted, not GAAP)."
+      "estimateInfo": "Lighter bars: analyst consensus for the next fiscal years (mean estimate). The current year includes quarters already reported — a one-off gain in those quarters flows into the year's estimate. Analyst EPS is usually adjusted."
     }
   },
   "analista": {

@@ -72,6 +72,12 @@ function erro(msg: string) {
  * Só empresas ativas: a base local ainda guarda europeias inativas de uma
  * experiência antiga (L'Oréal, LVMH…) com dados pré-FMP que o site não mostra.
  */
+/**
+ * Logo público da FMP (PNG, sem chave). Cobre empresas que não têm logo na
+ * base (ex.: Novo Nordisk) e deixa o Claude pô-los nas apresentações.
+ */
+const logo = (ticker: string) => `https://images.financialmodelingprep.com/symbol/${ticker.toUpperCase().replace(/\./g, "-")}.png`
+
 async function empresa(ticker: string) {
   const c = await prisma.company.findUnique({ where: { ticker: ticker.trim().toUpperCase() } })
   return c && c.isActive ? c : null
@@ -164,6 +170,7 @@ async function calcularValuation(ticker: string) {
   return {
     ticker: c.ticker,
     nome: c.name,
+    logo: logo(c.ticker),
     baseDosFundamentais: base.periodo,
     preco: r2(preco),
     variacaoDiaPct: r2(q?.changePercentage ?? null),
@@ -234,7 +241,7 @@ server.registerTool(
       take: 15,
       orderBy: { ticker: "asc" },
     })
-    return resposta(rows)
+    return resposta(rows.map((r) => ({ ...r, logo: logo(r.ticker) })))
   }),
 )
 
@@ -250,7 +257,7 @@ server.registerTool(
     if (!c) return erro(`Empresa ${ticker} não está na base da BullValue.`)
     const q = await cotacao(c.ticker)
     return resposta({
-      ticker: c.ticker, nome: c.name, bolsa: c.exchange, setor: c.sector, industria: c.industry,
+      ticker: c.ticker, nome: c.name, logo: logo(c.ticker), bolsa: c.exchange, setor: c.sector, industria: c.industry,
       pais: c.country, website: c.website, trabalhadores: c.employees, descricao: c.description,
       preco: q?.price ?? null, variacaoDiaPct: q?.changePercentage ?? null, marketCapFmp: q?.marketCap ?? null,
     })
@@ -456,7 +463,7 @@ server.registerTool(
   },
   seguro(async ({ tickers }) => {
     const m = await cotacoes(tickers.map((t) => t.trim().toUpperCase()))
-    return resposta([...m.values()].map((q) => ({ ticker: q.ticker, preco: q.price, variacaoDiaPct: q.changePercentage, marketCap: q.marketCap })))
+    return resposta([...m.values()].map((q) => ({ ticker: q.ticker, logo: logo(q.ticker), preco: q.price, variacaoDiaPct: q.changePercentage, marketCap: q.marketCap })))
   }),
 )
 

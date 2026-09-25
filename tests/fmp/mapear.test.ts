@@ -49,6 +49,13 @@ describe("construirLinha — zeros da FMP e EPS incoerente", () => {
     expect(l.grossMargin).toBeNull()
   })
 
+  it("FCF é sempre OCF − capex, mesmo que a FMP diga outra coisa", () => {
+    const l = construirLinha(inc({}), undefined,
+      { operatingCashFlow: 500, capitalExpenditure: -120, freeCashFlow: 450 } as never, undefined, undefined)
+    expect(l.freeCashFlow).toBe(380)
+    expect(l.capex).toBe(120)
+  })
+
   it("um prejuízo real continua negativo (só o zero exato é tratado)", () => {
     const l = construirLinha(inc({ netIncome: -50, bottomLineNetIncome: -50, epsDiluted: -0.5 }), undefined, undefined, undefined, undefined)
     expect(l.netIncome).toBe(-50)

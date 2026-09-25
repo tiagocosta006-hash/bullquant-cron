@@ -200,7 +200,12 @@ export function construirLinha(
     // A FMP devolve o capex negativo (saída). A BD guarda-o positivo, como o
     // resto da plataforma sempre assumiu (FCF = OCF − capex).
     capex: cf?.capitalExpenditure != null ? Math.abs(cf.capitalExpenditure) : null,
-    freeCashFlow: cf?.freeCashFlow ?? null,
+    // FCF = OCF − capex, a fórmula da plataforma (CLAUDE.md §5). O
+    // `freeCashFlow` da FMP diverge dela em ~1% das linhas (238 de 25 864).
+    freeCashFlow:
+      semZero(cf?.operatingCashFlow) !== null && cf?.capitalExpenditure != null
+        ? cf.operatingCashFlow! - Math.abs(cf.capitalExpenditure)
+        : cf?.freeCashFlow ?? null,
     investingCashFlow: cf?.netCashProvidedByInvestingActivities ?? null,
     financingCashFlow: cf?.netCashProvidedByFinancingActivities ?? null,
     stockBasedCompensation: cf?.stockBasedCompensation ?? null,

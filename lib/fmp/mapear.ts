@@ -92,6 +92,38 @@ export interface LinhaFundamental {
  * `fundamentals`. As quatro respostas vêm por período e são casadas pela
  * chave (fiscalYear, period) a montante.
  */
+/**
+ * A FMP devolve 0 — não null — quando um campo falta no filing. O Costco
+ * FY2026 chegou com lucro 0, a Humana com custo das vendas 0, a Baker Hughes
+ * 2017 com passivo 0; a TotalEnergies com EPS 0 em 2016-18. No site isso era
+ * um zero indistinguível de um valor real. Nos TOTAIS onde zero exato é
+ * impossível numa empresa cotada, 0 passa a "sem dado".
+ */
+function semZero(v: number | null | undefined): number | null {
+  return v == null || v === 0 ? null : v;
+}
+
+/**
+ * EPS diluído, corrigido quando não bate com lucro ÷ ações por mais de 15%.
+ *
+ * A Cooper fez um split 4:1 em 2024 e a FMP ajustou as ações mas não o EPS
+ * antigo: 2016 aparecia com 5,59 para 1,40 de lucro por ação, e o gráfico
+ * mostrava uma queda falsa de 75% em 2021. Diferenças pequenas e legítimas
+ * (duas classes de ações na ERIE, minoritários nos REITs, ~5-11%) ficam como
+ * reportadas.
+ */
+function epsCoerente(inc: FmpIncomeStatement): number | null {
+  const ni = semZero(lucroAtribuivel(inc));
+  const shares = semZero(inc.weightedAverageShsOutDil);
+  const eps = semZero(inc.epsDiluted);
+  if (ni === null || shares === null) return eps;
+  const calculado = ni / shares;
+  if (eps === null || Math.abs(eps - calculado) > 0.15 * Math.abs(calculado)) {
+    return Math.round(calculado * 10000) / 10000;
+  }
+  return eps;
+}
+
 export function construirLinha(
   inc: FmpIncomeStatement,
   bal: FmpBalanceSheet | undefined,
@@ -111,40 +143,42 @@ export function construirLinha(
 
     // ---- Demonstração de resultados ----
     revenue: receita(inc, setor),
-    costOfRevenue: inc.costOfRevenue,
-    grossProfit: inc.grossProfit,
+    // Sem custo das vendas (seguradoras, bancos) a FMP põe os dois a 0 — e o
+    // "lucro bruto 0" que isso desenhava não existe.
+    costOfRevenue: inc.costOfRevenue === 0 && inc.grossProfit === 0 ? null : inc.costOfRevenue,
+    grossProfit: inc.costOfRevenue === 0 && inc.grossProfit === 0 ? null : inc.grossProfit,
     operatingExpenses: inc.operatingExpenses,
     researchAndDevelopment: inc.researchAndDevelopmentExpenses,
     sellingGeneralAndAdmin: inc.sellingGeneralAndAdministrativeExpenses,
-    ebitda: inc.ebitda,
-    operatingIncome: inc.operatingIncome,
+    ebitda: semZero(inc.ebitda),
+    operatingIncome: semZero(inc.operatingIncome),
     interestExpense: inc.interestExpense,
     taxExpense: inc.incomeTaxExpense,
-    netIncome: lucroAtribuivel(inc),
-    epsDiluted: inc.epsDiluted,
-    sharesOutstanding: inc.weightedAverageShsOutDil,
+    netIncome: semZero(lucroAtribuivel(inc)),
+    epsDiluted: epsCoerente(inc),
+    sharesOutstanding: semZero(inc.weightedAverageShsOutDil),
     depreciationAndAmortization: inc.depreciationAndAmortization,
-    incomeBeforeTax: inc.incomeBeforeTax,
+    incomeBeforeTax: semZero(inc.incomeBeforeTax),
     netInterestIncome: inc.netInterestIncome,
     otherNonOperatingIncome: inc.nonOperatingIncomeExcludingInterest,
 
     // ---- Balanço ----
     // Depende do setor — ver `caixa()`.
     cash: caixa(bal, setor),
-    totalCurrentAssets: bal?.totalCurrentAssets ?? null,
+    totalCurrentAssets: semZero(bal?.totalCurrentAssets),
     accountsReceivable: bal?.netReceivables ?? null,
     inventory: bal?.inventory ?? null,
     propertyPlantEquipment: bal?.propertyPlantEquipmentNet ?? null,
     goodwillAndIntangibles: bal?.goodwillAndIntangibleAssets ?? null,
-    totalAssets: bal?.totalAssets ?? null,
+    totalAssets: semZero(bal?.totalAssets),
     accountsPayable: bal?.accountPayables ?? null,
     shortTermDebt: bal?.shortTermDebt ?? null,
-    totalCurrentLiab: bal?.totalCurrentLiabilities ?? null,
+    totalCurrentLiab: semZero(bal?.totalCurrentLiabilities),
     longTermDebt: bal?.longTermDebt ?? null,
-    totalLiabilities: bal?.totalLiabilities ?? null,
+    totalLiabilities: semZero(bal?.totalLiabilities),
     retainedEarnings: bal?.retainedEarnings ?? null,
     // O capital do GRUPO, sem os minoritários — o ROE tem de usar este.
-    totalEquity: bal?.totalStockholdersEquity ?? null,
+    totalEquity: semZero(bal?.totalStockholdersEquity),
     minorityInterest: bal?.minorityInterest ?? null,
     // NÃO usamos o `totalDebt` da FMP: ela soma-lhe as locações financeiras.
     // Na Microsoft isso são 88,5 mM de leases de data centers em cima de 40,3 mM
@@ -162,7 +196,7 @@ export function construirLinha(
     totalDebt: somar(bal?.shortTermDebt, bal?.longTermDebt),
 
     // ---- Fluxos de caixa ----
-    operatingCashFlow: cf?.operatingCashFlow ?? null,
+    operatingCashFlow: semZero(cf?.operatingCashFlow),
     // A FMP devolve o capex negativo (saída). A BD guarda-o positivo, como o
     // resto da plataforma sempre assumiu (FCF = OCF − capex).
     capex: cf?.capitalExpenditure != null ? Math.abs(cf.capitalExpenditure) : null,
@@ -175,9 +209,11 @@ export function construirLinha(
     netChangeInCash: cf?.netChangeInCash ?? null,
 
     // ---- Rácios e métricas ----
-    grossMargin: racio(rat?.grossProfitMargin),
-    operatingMargin: racio(rat?.operatingProfitMargin),
-    netMargin: racio(rat?.netProfitMargin),
+    // A margem segue o numerador: se ele é "sem dado" (zero da FMP), a
+    // margem também — senão aparecia "margem bruta 0%" numa seguradora.
+    grossMargin: inc.costOfRevenue === 0 && inc.grossProfit === 0 ? null : racio(rat?.grossProfitMargin),
+    operatingMargin: semZero(inc.operatingIncome) === null ? null : racio(rat?.operatingProfitMargin),
+    netMargin: semZero(lucroAtribuivel(inc)) === null ? null : racio(rat?.netProfitMargin),
     dividendPerShare: rat?.dividendPerShare ?? null,
     // Com capital próprio negativo (recompras acima do lucro acumulado — MSCI,
     // McKesson, Home Depot em certos anos) o ROE sai negativo para empresas

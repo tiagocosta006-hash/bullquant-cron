@@ -1099,7 +1099,9 @@
       "dividendsPaid": "Dividends Paid",
       "financingCashFlowTotal": "Financing Cash Flow (FCFin)",
       "netChangeInCash": "Net Change in Cash",
-      "freeCashFlow": "Free Cash Flow (FCF)"
+      "freeCashFlow": "Free Cash Flow (FCF)",
+      "minorityInterest": "Minority Interest",
+      "fxAndOther": "FX Effect & Other"
     },
     "footer": {
       "sourceNote": "Official accounting data extracted from SEC EDGAR 10-K and 10-Q filings.",

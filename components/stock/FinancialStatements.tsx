@@ -63,6 +63,7 @@ export type FundamentalDataRow = {
   totalLiabilities?: number | null
   retainedEarnings?: number | null
   totalEquity?: number | null
+  minorityInterest?: number | null
   // Cash Flow
   operatingCashFlow?: number | null
   capex?: number | null
@@ -554,6 +555,10 @@ export function FinancialStatements({
         lines: [
           { key: "retainedEarnings", label: t("metrics.retainedEarnings"), indent: 1 },
           { key: "totalEquity", label: t("metrics.totalEquity"), isBold: true, isSubtotal: true },
+          // O capital próprio acima é o do GRUPO (é o que o ROE e o P/B usam).
+          // Sem esta linha, Ativo ≠ Passivo + Capital Próprio à vista em
+          // ~15% dos períodos — na KKR faltavam 48 mil M.
+          { key: "minorityInterest", label: t("metrics.minorityInterest"), indent: 1 },
         ],
       },
     ],
@@ -593,6 +598,19 @@ export function FinancialStatements({
         id: "summaryGroup",
         title: t("sections.cashSummaryFreeCashFlow"),
         lines: [
+          // O que separa a soma dos três fluxos da variação de caixa: efeito
+          // cambial sobretudo (em ~15% dos períodos), e operações
+          // descontinuadas. Mostrado como resto para o quadro fechar à vista.
+          {
+            key: "fxAndOther",
+            label: t("metrics.fxAndOther"),
+            indent: 1,
+            getValue: r => {
+              if (r.netChangeInCash == null || r.operatingCashFlow == null || r.investingCashFlow == null || r.financingCashFlow == null) return null
+              const resto = r.netChangeInCash - (r.operatingCashFlow + r.investingCashFlow + r.financingCashFlow)
+              return Math.abs(resto) < 1 ? 0 : resto
+            },
+          },
           { key: "netChangeInCash", label: t("metrics.netChangeInCash"), isSubtotal: true },
           { key: "freeCashFlow", label: t("metrics.freeCashFlow"), isBold: true, isSubtotal: true },
         ],

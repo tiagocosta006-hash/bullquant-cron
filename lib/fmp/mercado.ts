@@ -36,6 +36,23 @@ function chave(): string {
   return k;
 }
 
+/** A FMP recusou por limite de pedidos — distinto de "não há dados". */
+export class FmpLimite extends Error {
+  constructor(endpoint: string) {
+    super(`Limite de pedidos da FMP atingido (${endpoint}). Tenta daqui a um minuto.`);
+  }
+}
+
+/**
+ * No site, uma falha da FMP degrada para "sem dados" (a página abre na mesma).
+ * O servidor MCP liga o modo estrito: aí o Claude tem de saber que foi o
+ * limite de pedidos, e não concluir que a empresa não tem analistas.
+ */
+let modoEstrito = false;
+export function modoEstritoFmp(ligado: boolean) {
+  modoEstrito = ligado;
+}
+
 export async function get<T>(
   endpoint: string,
   params: Record<string, string>,
@@ -45,7 +62,15 @@ export async function get<T>(
   for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
   url.searchParams.set("apikey", chave());
 
-  const resp = await fetch(url, { next: { revalidate, tags: ["fmp"] } });
+  // 429 = limite por minuto da FMP (750 no Premium). Acontece quando a
+  // ingestão diária corre ao mesmo tempo: duas tentativas curtas chegam, e
+  // sem elas a página ficava sem preços como se a empresa não os tivesse.
+  let resp = await fetch(url, { next: { revalidate, tags: ["fmp"] } });
+  for (let tentativa = 1; resp.status === 429 && tentativa <= 2; tentativa++) {
+    await new Promise((r) => setTimeout(r, 1500 * tentativa));
+    resp = await fetch(url, { next: { revalidate, tags: ["fmp"] } });
+  }
+  if (resp.status === 429 && modoEstrito) throw new FmpLimite(endpoint);
   if (!resp.ok) {
     console.error(`[fmp] ${endpoint} → HTTP ${resp.status}`);
     return null;

@@ -10,7 +10,8 @@
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "mcp": "tsx scripts/mcp/bullvalue.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.2",
@@ -59,6 +60,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@tailwindcss/postcss": "^4",
     "@types/express": "^5.0.6",
     "@types/node": "^20",

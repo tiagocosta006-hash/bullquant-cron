@@ -157,7 +157,7 @@ export function construirLinha(
     netIncome: semZero(lucroAtribuivel(inc)),
     epsDiluted: epsCoerente(inc),
     sharesOutstanding: semZero(inc.weightedAverageShsOutDil),
-    depreciationAndAmortization: inc.depreciationAndAmortization,
+    depreciationAndAmortization: semZero(inc.depreciationAndAmortization),
     incomeBeforeTax: semZero(inc.incomeBeforeTax),
     netInterestIncome: inc.netInterestIncome,
     otherNonOperatingIncome: inc.nonOperatingIncomeExcludingInterest,
@@ -208,7 +208,8 @@ export function construirLinha(
         : cf?.freeCashFlow ?? null,
     investingCashFlow: cf?.netCashProvidedByInvestingActivities ?? null,
     financingCashFlow: cf?.netCashProvidedByFinancingActivities ?? null,
-    stockBasedCompensation: cf?.stockBasedCompensation ?? null,
+    // Zero exato de SBC numa cotada é um campo em falta, não um valor (Cooper 2016).
+    stockBasedCompensation: semZero(cf?.stockBasedCompensation),
     shareRepurchases: cf?.commonStockRepurchased != null ? Math.abs(cf.commonStockRepurchased) : null,
     dividendsPaid: cf?.commonDividendsPaid != null ? Math.abs(cf.commonDividendsPaid) : null,
     netChangeInCash: cf?.netChangeInCash ?? null,

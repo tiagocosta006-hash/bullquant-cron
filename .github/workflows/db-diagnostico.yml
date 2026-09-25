@@ -16,6 +16,10 @@ on:
         description: "Zerar o contador no fim (para medir uma janela limpa)"
         type: boolean
         default: false
+      identidades:
+        description: "Correr as verificações de identidades contabilísticas"
+        type: boolean
+        default: false
       ticker:
         description: "Mostrar os segmentos de receita desta empresa (opcional)"
         required: false
@@ -68,3 +72,10 @@ jobs:
             where c.ticker = :'t'
             order by f."periodEnd";
           SQL
+      - uses: actions/checkout@v4
+        if: ${{ github.event.inputs.identidades == 'true' }}
+      - name: Identidades contabilísticas
+        if: ${{ github.event.inputs.identidades == 'true' }}
+        env:
+          DB: ${{ secrets.DIRECT_URL }}
+        run: psql "$DB" -v ON_ERROR_STOP=1 -f scripts/sql/identidades.sql

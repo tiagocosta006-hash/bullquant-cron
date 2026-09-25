@@ -68,8 +68,13 @@ function erro(msg: string) {
   return { content: [{ type: "text" as const, text: msg }], isError: true }
 }
 
+/**
+ * Só empresas ativas: a base local ainda guarda europeias inativas de uma
+ * experiência antiga (L'Oréal, LVMH…) com dados pré-FMP que o site não mostra.
+ */
 async function empresa(ticker: string) {
-  return prisma.company.findUnique({ where: { ticker: ticker.trim().toUpperCase() } })
+  const c = await prisma.company.findUnique({ where: { ticker: ticker.trim().toUpperCase() } })
+  return c && c.isActive ? c : null
 }
 
 /** Campos de fluxo (somam-se em TTM) e de stock (usa-se o último). */

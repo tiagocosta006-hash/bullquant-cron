@@ -232,7 +232,7 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
             </div>
           </div>
 
-          {aba === "pressupostos" && <SeparadorPressupostos c={contexto} onDriverSerie={onDriverSerie} onAvaliacao={onAvaliacao} />}
+          {aba === "pressupostos" && <SeparadorPressupostos c={contexto} iniciais={iniciais} onDriverSerie={onDriverSerie} onAvaliacao={onAvaliacao} />}
           {aba === "historico" && <SeparadorHistorico c={contexto} />}
           {aba === "schedules" && <SeparadorSchedules c={contexto} />}
           {aba === "projecoes" && <SeparadorProjecoes c={contexto} />}

@@ -1717,11 +1717,12 @@
       "custosAjuda": "A margem bruta define o custo das vendas (usado nos dias de inventário e fornecedores). A margem EBIT define o resultado operacional.",
       "capexAjuda": "Investimento e amortizações em % da receita. Capex muito acima da D&A durante muito tempo significa que a empresa ainda está a crescer a sua base de ativos.",
       "fundoManeioAjuda": "Clientes, inventário e fornecedores projetados pelos dias. Um aumento do fundo de maneio consome caixa.",
-      "impostosAjuda": "Taxa efetiva aplicada ao EBIT (imposto operacional, como se a empresa não tivesse dívida)."
+      "impostosAjuda": "Taxa efetiva aplicada ao EBIT (imposto operacional, como se a empresa não tivesse dívida).",
+      "inputsNota": "Os drivers a azul vêm dos Assumptions (os inputs). Aqui só se calcula, ano a ano; para mudar um valor, vai aos Assumptions."
     },
     "pressupostos": {
       "operacionais": "Operating Assumptions",
-      "operacionaisAjuda": "Todos os pressupostos num sítio: edita qualquer ano diretamente. À esquerda, os últimos 5 anos reais para comparar.",
+      "operacionaisAjuda": "Os inputs do modelo, num só sítio (as \"células azuis\" do FMVA). Para cada driver: o valor do ano 1, o do último ano e o caminho entre os dois. \"By year\" abre a linha para afinares anos específicos. Os Schedules só calculam a partir daqui.",
       "driver": "Driver",
       "igualAno1": "= Y1",
       "media3": "3Y avg",
@@ -1749,7 +1750,23 @@
         "multiplo": "Exit Multiple",
         "media": "Average"
       },
-      "meioDoAno": "Mid-year convention"
+      "meioDoAno": "Mid-year convention",
+      "ultimoAno": "Last FY",
+      "media3Col": "3Y avg",
+      "ano1": "Year 1 ({ano})",
+      "anoFinal": "Final year ({ano})",
+      "caminho": "Path",
+      "caminhos": {
+        "constant": "Constant",
+        "linear": "Linear",
+        "custom": "Custom",
+        "consenso": "Consensus → fade"
+      },
+      "porAno": "By year",
+      "igualY1Ajuda": "Constante: igual ao ano 1. Clica para passar a Linear.",
+      "customAjuda": "Editado ano a ano. Escolhe Constant ou Linear para voltar a um caminho simples.",
+      "reporDriverAjuda": "Repor este driver (consenso e histórico)",
+      "consensoAjuda": "Anos 1 a 3 do consenso dos analistas, depois converge em linha reta até ao último ano."
     },
     "avaliacao": {
       "valorPorAcao": "Implied share price",

@@ -8,7 +8,7 @@ import {
   type AnoHistorico, type AnoProjetado, type Avaliacao, type Driver, type Mercado, type Pressupostos,
   type PressupostosAvaliacao, type RaciosAno,
 } from "@/lib/finance/modelo"
-import { TabelaModelo, useFormatos, type Formato, type LinhaTabela } from "./TabelaModelo"
+import { TabelaModelo, CelulaEditavel, useFormatos, type Formato, type LinhaTabela } from "./TabelaModelo"
 
 /** Quantos anos de histórico se mostram ao lado das projeções. */
 const ANOS_HIST_SCHEDULES = 5
@@ -88,10 +88,25 @@ function CampoAvaliacao({
   )
 }
 
+type Caminho = "linear" | "constant" | "custom"
+
+/** Que forma tem a série: constante, linha reta do ano 1 ao último, ou editada à mão. */
+function caminhoDe(v: number[]): Caminho {
+  const n = v.length
+  const tol = (x: number) => Math.abs(x) * 1e-9 + 1e-12
+  if (v.every((x) => Math.abs(x - v[0]) <= tol(v[0]))) return "constant"
+  const linear = v.every((x, i) => Math.abs(x - (v[0] + ((v[n - 1] - v[0]) * i) / (n - 1))) <= tol(x) + 1e-9)
+  return linear ? "linear" : "custom"
+}
+function linha(de: number, ate: number, n: number): number[] {
+  return Array.from({ length: n }, (_, i) => (n === 1 ? ate : de + ((ate - de) * i) / (n - 1)))
+}
+
 export function SeparadorPressupostos({
-  c, onDriverSerie, onAvaliacao,
+  c, iniciais, onDriverSerie, onAvaliacao,
 }: {
   c: ContextoSeparador
+  iniciais: Pressupostos | null
   onDriverSerie: (d: Driver, valores: number[]) => void
   onAvaliacao: (patch: Partial<PressupostosAvaliacao>) => void
 }) {
@@ -99,39 +114,103 @@ export function SeparadorPressupostos({
   const { fmt } = useFormatos()
   const p = c.pressupostos
   const a = p.avaliacao
-  const hist = ultimos(c.racios, ANOS_HIST_SCHEDULES)
+  const n = p.anos
+  const anos = anosProj(c)
+  const [aberto, setAberto] = React.useState<Driver | null>(null)
 
-  const linhas: LinhaTabela[] = DRIVERS.map((d) => ({
-    rotulo: t(`drivers.${d}`),
-    formato: FORMATO_DRIVER[d],
-    driver: d,
-    hist: hist.map((r) => r[d]),
-    proj: p.drivers[d],
-  }))
+  const grupos: Array<{ titulo: string; drivers: Driver[] }> = [
+    { titulo: t("seccoes.receita"), drivers: ["crescimentoReceita"] },
+    { titulo: t("seccoes.custos"), drivers: ["margemBruta", "margemEbit"] },
+    { titulo: t("seccoes.capexDa"), drivers: ["capexPctReceita", "daPctReceita"] },
+    { titulo: t("seccoes.fundoManeio"), drivers: ["dso", "dio", "dpo"] },
+    { titulo: t("seccoes.impostos"), drivers: ["taxaImposto"] },
+  ]
 
   return (
     <div className="space-y-6">
       <Cartao titulo={t("pressupostos.operacionais")}>
         <p className="text-sm text-muted-foreground">{t("pressupostos.operacionaisAjuda")}</p>
-        <TabelaModelo anosHist={hist.map((r) => r.fiscalYear)} anosProj={anosProj(c)} linhas={linhas} onEditar={c.onDriver} unidade={t("pressupostos.driver")} />
-        <div className="flex flex-wrap gap-2">
-          {DRIVERS.map((d) => {
-            const serie = p.drivers[d]
-            const med = resumo(c.racios, d, 3).media
-            return (
-              <div key={d} className="flex items-center gap-1 rounded-lg border border-border/50 px-2 py-1 text-xs">
-                <span className="mr-1 font-medium">{t(`drivers.${d}`)}</span>
-                <button type="button" className="rounded px-1.5 py-0.5 text-primary hover:bg-primary/10" onClick={() => onDriverSerie(d, serie.map(() => serie[0]))}>{t("pressupostos.igualAno1")}</button>
-                {med !== null && (
-                  <button type="button" className="rounded px-1.5 py-0.5 text-primary hover:bg-primary/10" title={fmt(med, FORMATO_DRIVER[d])} onClick={() => onDriverSerie(d, serie.map(() => med))}>{t("pressupostos.media3")}</button>
-                )}
-                <button type="button" className="rounded px-1.5 py-0.5 text-primary hover:bg-primary/10" onClick={() => {
-                  const n = serie.length
-                  onDriverSerie(d, serie.map((_, i) => (n === 1 ? serie[0] : serie[0] + ((serie[n - 1] - serie[0]) * i) / (n - 1))))
-                }}>{t("pressupostos.interpolar")}</button>
-              </div>
-            )
-          })}
+        <div className="overflow-x-auto rounded-xl border border-border/60">
+          <table className="w-full min-w-[820px] border-collapse text-sm">
+            <thead>
+              <tr className="border-b border-border/60 bg-muted/30 text-xs text-muted-foreground">
+                <th className="px-3 py-2 text-left font-medium">{t("pressupostos.driver")}</th>
+                <th className="px-3 py-2 text-right font-medium">{t("pressupostos.ultimoAno")}</th>
+                <th className="px-3 py-2 text-right font-medium">{t("pressupostos.media3Col")}</th>
+                <th className="border-l border-primary/10 bg-primary/5 px-3 py-2 text-right font-semibold text-primary">{t("pressupostos.ano1", { ano: anos[0] })}</th>
+                <th className="bg-primary/5 px-3 py-2 text-right font-semibold text-primary">{t("pressupostos.anoFinal", { ano: anos[n - 1] })}</th>
+                <th className="px-3 py-2 text-left font-medium">{t("pressupostos.caminho")}</th>
+                <th className="px-3 py-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {grupos.map((g) => (
+                <React.Fragment key={g.titulo}>
+                  <tr><td colSpan={7} className="px-3 pt-4 pb-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">{g.titulo}</td></tr>
+                  {g.drivers.map((d) => {
+                    const v = p.drivers[d]
+                    const cam = caminhoDe(v)
+                    const r = resumo(c.racios, d, 3)
+                    const formato = FORMATO_DRIVER[d]
+                    const mudarY1 = (x: number) => onDriverSerie(d, cam === "constant" ? v.map(() => x) : linha(x, v[n - 1], n))
+                    const mudarFinal = (x: number) => onDriverSerie(d, linha(v[0], x, n))
+                    const inicial = iniciais?.drivers[d]
+                    return (
+                      <React.Fragment key={d}>
+                        <tr className="border-b border-border/30">
+                          <td className="px-3 py-1.5 font-medium">{t(`drivers.${d}`)}</td>
+                          <td className="px-3 py-1.5 text-right tabular-nums text-muted-foreground">{fmt(r.ultimo, formato)}</td>
+                          <td className="px-3 py-1.5 text-right tabular-nums text-muted-foreground">{fmt(r.media, formato)}</td>
+                          <td className="border-l border-primary/10 px-2 py-1 text-right"><CelulaEditavel valor={v[0]} formato={formato} rotulo={`${t(`drivers.${d}`)} Y1`} onMudar={mudarY1} /></td>
+                          <td className="px-2 py-1 text-right">
+                            {cam === "constant"
+                              ? <button type="button" onClick={() => mudarFinal(v[0])} className="w-full rounded-md px-2 py-1 text-right text-sm tabular-nums text-muted-foreground hover:bg-muted/50" title={t("pressupostos.igualY1Ajuda")}>= Y1</button>
+                              : <CelulaEditavel valor={v[n - 1]} formato={formato} rotulo={`${t(`drivers.${d}`)} final`} onMudar={mudarFinal} />}
+                          </td>
+                          <td className="px-3 py-1.5">
+                            <div className="flex gap-1">
+                              {(["constant", "linear"] as const).map((k) => (
+                                <button key={k} type="button"
+                                  onClick={() => onDriverSerie(d, k === "constant" ? v.map(() => v[0]) : linha(v[0], v[n - 1], n))}
+                                  className={`rounded px-2 py-0.5 text-xs font-semibold ${cam === k ? "bg-primary text-primary-foreground" : "bg-muted/50 text-muted-foreground hover:text-foreground"}`}>
+                                  {t(`pressupostos.caminhos.${k}`)}
+                                </button>
+                              ))}
+                              {cam === "custom" && (inicial && inicial.length === v.length && inicial.every((x, i) => x === v[i])
+                                ? <span className="rounded bg-primary/15 px-2 py-0.5 text-xs font-semibold text-primary" title={t("pressupostos.consensoAjuda")}>{t("pressupostos.caminhos.consenso")}</span>
+                                : <span className="rounded bg-amber-500/15 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-400" title={t("pressupostos.customAjuda")}>{t("pressupostos.caminhos.custom")}</span>)}
+                            </div>
+                          </td>
+                          <td className="px-3 py-1.5 text-right whitespace-nowrap">
+                            <button type="button" onClick={() => setAberto(aberto === d ? null : d)} className="rounded px-2 py-0.5 text-xs text-primary hover:bg-primary/10">
+                              {aberto === d ? "▾" : "▸"} {t("pressupostos.porAno")}
+                            </button>
+                            {inicial && (
+                              <button type="button" onClick={() => onDriverSerie(d, [...inicial])} className="rounded px-2 py-0.5 text-xs text-muted-foreground hover:bg-muted/50" title={t("pressupostos.reporDriverAjuda")}>↺</button>
+                            )}
+                          </td>
+                        </tr>
+                        {aberto === d && (
+                          <tr className="border-b border-border/30 bg-muted/10">
+                            <td colSpan={7} className="px-3 py-3">
+                              <div className="flex flex-wrap gap-2">
+                                {v.map((x, i) => (
+                                  <label key={i} className="flex w-20 flex-col gap-1 text-xs text-muted-foreground">
+                                    <span className="text-center">{anos[i]}E</span>
+                                    <CelulaEditavel valor={x} formato={formato} rotulo={`${t(`drivers.${d}`)} ${anos[i]}`} onMudar={(val) => c.onDriver(d, i, val)} />
+                                  </label>
+                                ))}
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    )
+                  })}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
         </div>
       </Cartao>
 
@@ -290,10 +369,11 @@ export function SeparadorSchedules({ c }: { c: ContextoSeparador }) {
 
   return (
     <div className="space-y-6">
+      <p className="text-sm text-muted-foreground">{t("schedules.inputsNota")}</p>
       {blocos.map((b) => (
         <Cartao key={b.titulo} titulo={b.titulo}>
           <p className="text-sm text-muted-foreground">{b.ajuda}</p>
-          <TabelaModelo anosHist={anosH} anosProj={anosP} linhas={b.linhas} onEditar={c.onDriver} unidade={t("unidade")} />
+          <TabelaModelo anosHist={anosH} anosProj={anosP} linhas={b.linhas} unidade={t("unidade")} />
         </Cartao>
       ))}
     </div>

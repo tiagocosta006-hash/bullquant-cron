@@ -1717,11 +1717,12 @@
       "custosAjuda": "Gross margin sets cost of revenue (used for inventory and payable days). EBIT margin sets operating income.",
       "capexAjuda": "Investment and amortization as % of revenue. Capex well above D&A for a long time means the company is still growing its asset base.",
       "fundoManeioAjuda": "Receivables, inventory and payables projected by days. An increase in working capital consumes cash.",
-      "impostosAjuda": "Effective rate applied to EBIT (operating tax, as if the company had no debt)."
+      "impostosAjuda": "Effective rate applied to EBIT (operating tax, as if the company had no debt).",
+      "inputsNota": "Drivers in blue come from Assumptions (the inputs). Schedules only calculate, year by year; to change a value, go to Assumptions."
     },
     "pressupostos": {
       "operacionais": "Operating Assumptions",
-      "operacionaisAjuda": "All assumptions in one place: edit any year directly. On the left, the last 5 actual years for comparison.",
+      "operacionaisAjuda": "The model inputs, in one place (the FMVA \"blue cells\"). For each driver: the Year 1 value, the final-year value and the path between them. \"By year\" opens the row to fine-tune specific years. Schedules only calculate from here.",
       "driver": "Driver",
       "igualAno1": "= Y1",
       "media3": "3Y avg",
@@ -1749,7 +1750,23 @@
         "multiplo": "Exit Multiple",
         "media": "Average"
       },
-      "meioDoAno": "Mid-year convention"
+      "meioDoAno": "Mid-year convention",
+      "ultimoAno": "Last FY",
+      "media3Col": "3Y avg",
+      "ano1": "Year 1 ({ano})",
+      "anoFinal": "Final year ({ano})",
+      "caminho": "Path",
+      "caminhos": {
+        "constant": "Constant",
+        "linear": "Linear",
+        "custom": "Custom",
+        "consenso": "Consensus → fade"
+      },
+      "porAno": "By year",
+      "igualY1Ajuda": "Constant: same as Year 1. Click to switch to Linear.",
+      "customAjuda": "Edited year by year. Pick Constant or Linear to go back to a simple path.",
+      "reporDriverAjuda": "Reset this driver (consensus and history)",
+      "consensoAjuda": "Years 1 to 3 from analyst consensus, then a straight-line fade to the final year."
     },
     "avaliacao": {
       "valorPorAcao": "Implied share price",

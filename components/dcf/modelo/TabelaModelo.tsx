@@ -61,7 +61,7 @@ export function useFormatos() {
   }, [locale])
 }
 
-function CelulaEditavel({
+export function CelulaEditavel({
   valor, formato, onMudar, rotulo,
 }: { valor: number; formato: Formato; onMudar: (v: number) => void; rotulo: string }) {
   const { paraInput, ler } = useFormatos()
@@ -142,7 +142,9 @@ export function TabelaModelo({
                   <td key={`p${a}`} className={`border-l border-primary/10 px-2 py-1 text-right tabular-nums ${l.destaque ? "font-semibold text-foreground" : ""}`}>
                     {l.driver && onEditar && l.proj && l.proj[i] !== null && l.proj[i] !== undefined ? (
                       <CelulaEditavel valor={l.proj[i] as number} formato={l.formato} rotulo={`${l.rotulo} ${a}`} onMudar={(v) => onEditar(l.driver!, i, v)} />
-                    ) : l.proj ? fmt(l.proj[i] ?? null, l.formato) : ""}
+                    ) : l.proj ? (
+                      <span className={l.driver ? "font-medium text-primary" : ""}>{fmt(l.proj[i] ?? null, l.formato)}</span>
+                    ) : ""}
                   </td>
                 ))}
               </tr>

@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server"
 import { Calculator, Info } from "lucide-react"
 import { DcfCalculator } from "@/components/dcf/DcfCalculator"
 import { ModeloDcf } from "@/components/dcf/modelo/ModeloDcf"
+import { DcfSimples } from "@/components/dcf/simples/DcfSimples"
 import { Link } from "@/i18n/routing"
 import { PageHeader, InfoNote } from "@/components/layout/PageHeader"
 import { getUser } from "@/lib/supabase/server"
@@ -28,13 +29,14 @@ export default async function DcfPage({
   
   const isPro = dbUser?.plan === "PRO" || devUnlocked
   const isLoggedIn = !!user || devUnlocked
-  // Modelo completo (schedules → projeções → avaliação) por omissão; a
-  // calculadora rápida de duas fases continua disponível.
-  const modo = resolvedParams.modo === "rapida" ? "rapida" : "modelo"
+  // DCF simples (estilo Qualtrim) por omissão; o modelo avançado (FMVA) ao
+  // lado. A calculadora rápida antiga sai do menu mas continua por URL
+  // (?modo=rapida), porque os DCFs guardados abrem nela.
+  const modo = resolvedParams.modo === "modelo" ? "modelo" : resolvedParams.modo === "rapida" ? "rapida" : "simples"
   const tModo = await getTranslations("dcfModelo")
-  const hrefModo = (m: "modelo" | "rapida") => ({
+  const hrefModo = (m: "simples" | "modelo") => ({
     pathname: "/dcf",
-    query: { ...(m === "rapida" ? { modo: "rapida" } : {}), ...(defaultTicker ? { ticker: defaultTicker } : {}) },
+    query: { ...(m === "modelo" ? { modo: "modelo" } : {}), ...(defaultTicker ? { ticker: defaultTicker } : {}) },
   })
 
   return (
@@ -51,7 +53,7 @@ export default async function DcfPage({
         <ProGate isPro={isPro} isLoggedIn={isLoggedIn} />
       )}
       <div className="flex gap-1 rounded-xl border border-border/50 bg-muted/40 p-1 w-fit">
-        {(["modelo", "rapida"] as const).map((m) => (
+        {(["simples", "modelo"] as const).map((m) => (
           <Link key={m} href={hrefModo(m)}
             className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition-all ${modo === m ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
             {tModo(`modos.${m}`)}
@@ -59,9 +61,9 @@ export default async function DcfPage({
         ))}
       </div>
       <div className={!isPro ? "pointer-events-none select-none" : ""}>
-        {modo === "modelo"
-          ? <ModeloDcf defaultTicker={defaultTicker} locked={locked} />
-          : <DcfCalculator defaultTicker={defaultTicker} locked={locked} />}
+        {modo === "simples" && <DcfSimples defaultTicker={defaultTicker} locked={locked} />}
+        {modo === "modelo" && <ModeloDcf defaultTicker={defaultTicker} locked={locked} />}
+        {modo === "rapida" && <DcfCalculator defaultTicker={defaultTicker} locked={locked} />}
       </div>
     </div>
   )

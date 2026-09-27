@@ -1636,7 +1636,8 @@
   },
   "dcfModelo": {
     "modos": {
-      "modelo": "Full model",
+      "simples": "Simple DCF",
+      "modelo": "Advanced model (FMVA)",
       "rapida": "Quick calculator"
     },
     "pesquisa": "Search company (e.g. MSCI)...",
@@ -1795,6 +1796,51 @@
       "WACC_MENOR_QUE_G": "WACC must be above perpetual growth for the Gordon terminal value to make sense. Raise WACC, lower growth or use the exit multiple.",
       "SEM_ACOES": "No share count to compute value per share.",
       "SEM_DADOS": "Not enough data to project."
+    }
+  },
+  "dcfSimples": {
+    "t": {
+      "price": "Price",
+      "metric": "Metric",
+      "fcfPerShare": "FCF per share",
+      "eps": "EPS",
+      "pe": "P/E",
+      "pfcf": "P/FCF",
+      "years": "Years",
+      "starting": "Starting {m} (TTM)",
+      "desiredReturn": "Desired return",
+      "reset": "Reset",
+      "bear": "Bear",
+      "base": "Base",
+      "bull": "Bull",
+      "reference": "Reference",
+      "growth": "{m} growth",
+      "refCagr": "5Y CAGR {c5} · 10Y CAGR {c10}",
+      "refConsensusEps": "Consensus EPS growth {g}",
+      "refConsensusFcf": "Consensus EPS growth {g} · revenue {r}",
+      "exitMultiple": "Exit multiple ({x})",
+      "refMultiple": "Current {atual} · 10Y median {med}",
+      "refRange": "10Y range {min} to {max}",
+      "futureMetric": "Future {m} (Y{n})",
+      "futurePrice": "Future price (Y{n})",
+      "fairValue": "Fair value",
+      "upside": "Upside / downside",
+      "expectedCagr": "Expected CAGR",
+      "chartTitle": "{m}: history and scenarios",
+      "actual": "Actual"
+    },
+    "pesquisa": "Search company (e.g. MSCI)...",
+    "vazio": "Pick a company. The simple DCF projects FCF per share or EPS in three scenarios and tells you how much you can pay today to earn the return you want.",
+    "reporAjuda": "Go back to the initial scenarios (consensus and history).",
+    "porAno": "per year, for {n} years",
+    "anoSaida": "multiple the stock trades at in year {n}",
+    "fairValueAjuda": "the most you can pay today to earn {r} a year",
+    "cagrAjuda": "annual return if you buy at {p}",
+    "cagrCor": "Green if ≥ the desired return ({r}), red if below.",
+    "graficoAjuda": "Bars: actual values per year. Lines: the three scenarios from the TTM value.",
+    "erros": {
+      "carregar": "Could not load the data. Please try again.",
+      "negativo": "The last 12 months {metrica} is negative or zero: the method does not apply. Switch metric or enter a normalized starting value."
     }
   }
 }

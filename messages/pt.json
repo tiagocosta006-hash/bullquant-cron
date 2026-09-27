@@ -1636,7 +1636,8 @@
   },
   "dcfModelo": {
     "modos": {
-      "modelo": "Modelo completo",
+      "simples": "Simple DCF",
+      "modelo": "Advanced model (FMVA)",
       "rapida": "Calculadora rápida"
     },
     "pesquisa": "Pesquisar empresa (ex.: MSCI)...",
@@ -1795,6 +1796,51 @@
       "WACC_MENOR_QUE_G": "A WACC tem de ser maior do que o crescimento perpétuo para o valor terminal de Gordon fazer sentido. Aumenta a WACC, baixa o crescimento ou usa o múltiplo de saída.",
       "SEM_ACOES": "Sem número de ações para calcular o valor por ação.",
       "SEM_DADOS": "Sem dados suficientes para projetar."
+    }
+  },
+  "dcfSimples": {
+    "t": {
+      "price": "Price",
+      "metric": "Metric",
+      "fcfPerShare": "FCF per share",
+      "eps": "EPS",
+      "pe": "P/E",
+      "pfcf": "P/FCF",
+      "years": "Years",
+      "starting": "Starting {m} (TTM)",
+      "desiredReturn": "Desired return",
+      "reset": "Reset",
+      "bear": "Bear",
+      "base": "Base",
+      "bull": "Bull",
+      "reference": "Reference",
+      "growth": "{m} growth",
+      "refCagr": "5Y CAGR {c5} · 10Y CAGR {c10}",
+      "refConsensusEps": "Consensus EPS growth {g}",
+      "refConsensusFcf": "Consensus EPS growth {g} · revenue {r}",
+      "exitMultiple": "Exit multiple ({x})",
+      "refMultiple": "Current {atual} · 10Y median {med}",
+      "refRange": "10Y range {min} to {max}",
+      "futureMetric": "Future {m} (Y{n})",
+      "futurePrice": "Future price (Y{n})",
+      "fairValue": "Fair value",
+      "upside": "Upside / downside",
+      "expectedCagr": "Expected CAGR",
+      "chartTitle": "{m}: history and scenarios",
+      "actual": "Actual"
+    },
+    "pesquisa": "Pesquisar empresa (ex.: MSCI)...",
+    "vazio": "Escolhe uma empresa. O DCF simples projeta o FCF per share ou o EPS em três cenários e diz-te quanto podes pagar hoje para ganhar o retorno que queres.",
+    "reporAjuda": "Volta aos cenários iniciais (consenso e histórico).",
+    "porAno": "por ano, durante {n} anos",
+    "anoSaida": "a que múltiplo a ação negoceia no ano {n}",
+    "fairValueAjuda": "o máximo a pagar hoje para ganhar {r} ao ano",
+    "cagrAjuda": "retorno anual se comprares a {p}",
+    "cagrCor": "Verde se ≥ ao desired return ({r}), vermelho se abaixo.",
+    "graficoAjuda": "Barras: valores reais por ano. Linhas: os três cenários a partir do valor TTM.",
+    "erros": {
+      "carregar": "Não foi possível carregar os dados. Tenta novamente.",
+      "negativo": "O {metrica} dos últimos 12 meses é negativo ou zero: o método não se aplica. Muda a métrica ou escreve um valor inicial normalizado."
     }
   }
 }

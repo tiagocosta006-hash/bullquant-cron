@@ -27,6 +27,7 @@ import { useFormatos } from "./TabelaModelo"
 type Dados = {
   empresa: { ticker: string; nome: string; setor: string | null; industria: string | null; logoUrl: string | null; financeira: boolean }
   historico: AnoHistorico[]
+  multiplosHistoricos?: Array<{ fiscalYear: number; evEbitda: number | null }>
   estimativas: EstimativaModelo[]
   mercado: { preco: number | null; acoes: number | null; dividaTotal: number; caixa: number; interessesMinoritarios: number; dataBalanco: string | null }
   contexto: ContextoMercado & { dataRf: string | null }
@@ -157,7 +158,7 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
 
   const contexto: ContextoSeparador | null = calculo && pressupostos ? {
     historico: calculo.hist, racios: calculo.rs, pressupostos, iniciais, projecoes: calculo.projecoes,
-    avaliacao: calculo.avaliacao, mercado: calculo.mercado, estimativas: dados?.estimativas ?? [], fracaoAno1: calculo.f,
+    avaliacao: calculo.avaliacao, mercado: calculo.mercado, estimativas: dados?.estimativas ?? [], multiplosHistoricos: dados?.multiplosHistoricos ?? [], evEbitdaAtual: dados?.contexto.evEbitdaAtual ?? null, fracaoAno1: calculo.f,
     onDriver, onDriverSerie, onSegmentoSerie, onModoReceita, onAvaliacao,
   } : null
 

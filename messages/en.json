@@ -1836,6 +1836,14 @@
       "crescimentoSegmentos": "Segment growth (YoY)",
       "segmentosAjuda": "Revenue is the sum of the segments. Each segment starts from its 3-year CAGR, calibrated so that Year 1 total matches consensus, and fades to the final year. Compare the 'Revenue growth' row with consensus.",
       "semSegmentos": "This company has no verified segments in BullValue (or reports only one): the Revenue Build uses total growth."
+    },
+    "multiplo": {
+      "titulo": "EV/EBITDA history",
+      "resumo": "Current {atual} · 10Y median {mediana} · range {min} to {max}",
+      "saida": "Exit {x}",
+      "usarMediana": "Use median ({x})",
+      "usarAtual": "Use current ({x})",
+      "nota": "EV/EBITDA at each fiscal year end. An exit multiple well above the historical median assumes the market keeps paying more than it did in the past."
     }
   },
   "dcfSimples": {

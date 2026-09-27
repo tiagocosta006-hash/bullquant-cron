@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { exigirPro, CACHE_PRIVADO } from "@/lib/api/acessoPro"
 import { normalizarTicker } from "@/lib/ticker"
-import { cotacao, get, simbolo } from "@/lib/fmp/mercado"
+import { cotacao, get, simbolo, historico as historicoPrecos } from "@/lib/fmp/mercado"
 import { analistas } from "@/lib/fmp/estimativas"
 import { modeloFcffAplicavel } from "@/lib/finance/modelo/aplicabilidade"
 import type { AnoHistorico } from "@/lib/finance/modelo"
@@ -50,6 +50,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
         capex: true, accountsReceivable: true, inventory: true, accountsPayable: true, taxExpense: true,
         incomeBeforeTax: true, stockBasedCompensation: true, operatingCashFlow: true, freeCashFlow: true,
         reportedCurrency: true, revenueSegmentsByAxis: true,
+        sharesOutstanding: true, totalDebt: true, cash: true, minorityInterest: true,
       },
     }),
     prisma.fundamental.findMany({
@@ -82,7 +83,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
   // Dados de mercado: preço, beta (perfil FMP), taxa do Tesouro a 10 anos.
   const hoje = new Date()
   const ha15dias = new Date(hoje.getTime() - 15 * 86_400_000)
-  const [q, perfil, tesouro, a] = await Promise.all([
+  const inicioPrecos = new Date(anuais[0].periodEnd.getTime() - 10 * 86_400_000)
+  const [q, perfil, tesouro, a, serie] = await Promise.all([
     cotacao(company.ticker),
     get<Array<{ beta?: number }>>("profile", { symbol: simbolo(company.ticker) }, 86_400),
     get<Array<{ date: string; year10?: number }>>(
@@ -94,7 +96,25 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
       fiscalYear: ultimoAnual.fiscalYear,
       periodEnd: ultimoAnual.periodEnd,
     }).catch(() => null),
+    historicoPrecos(company.ticker, inicioPrecos).catch(() => []),
   ])
+
+  // EV/EBITDA no fim de cada ano fiscal, para o analista ver a que múltiplos
+  // a empresa negociou antes de escolher o de saída. EV = preço no fecho do
+  // ano × ações diluídas + dívida − caixa + minoritários.
+  const precoEm = (d: Date): number | null => {
+    const alvo = d.toISOString().slice(0, 10)
+    let r: number | null = null
+    for (const x of serie) { if (x.date > alvo) break; r = x.close }
+    return r
+  }
+  const multiplosHistoricos = anuais.map((f) => {
+    const preco = precoEm(f.periodEnd)
+    const acoes = n(f.sharesOutstanding)
+    const ebitda = n(f.ebitda)
+    const ev = preco && acoes ? preco * acoes + (n(f.totalDebt) ?? 0) - (n(f.cash) ?? 0) + (n(f.minorityInterest) ?? 0) : null
+    return { fiscalYear: f.fiscalYear, evEbitda: ev !== null && ebitda && ebitda > 0 ? ev / ebitda : null }
+  })
   const ultimaTaxa = Array.isArray(tesouro)
     ? [...tesouro].sort((x, y) => (x.date < y.date ? 1 : -1)).find((t) => typeof t.year10 === "number")
     : undefined
@@ -123,6 +143,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
         financeira: !modeloFcffAplicavel(company.sector, company.industry, company.ticker),
       },
       historico,
+      multiplosHistoricos,
       estimativas: (a?.anuais ?? []).map((e) => ({
         fiscalYear: e.fiscalYear, revenueAvg: e.revenueAvg, ebitAvg: e.ebitAvg, analistas: e.analistas,
       })),

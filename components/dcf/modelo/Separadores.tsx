@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { AlertTriangle } from "lucide-react"
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from "recharts"
 import {
   resumo,
   type AnoHistorico, type AnoProjetado, type Avaliacao, type Driver, type EstimativaModelo, type Mercado, type Pressupostos,
@@ -29,6 +30,9 @@ export type ContextoSeparador = {
   avaliacao: Avaliacao
   mercado: Mercado
   estimativas: EstimativaModelo[]
+  /** EV/EBITDA no fim de cada ano fiscal real, e o atual (TTM). */
+  multiplosHistoricos: Array<{ fiscalYear: number; evEbitda: number | null }>
+  evEbitdaAtual: number | null
   fracaoAno1: number
   onDriver: (d: Driver, ano: number, v: number) => void
   onDriverSerie: (d: Driver, valores: number[]) => void
@@ -490,6 +494,54 @@ export function SeparadorProjecoes({ c }: { c: ContextoSeparador }) {
 }
 
 
+/**
+ * EV/EBITDA histórico, ao lado do exit multiple: a que múltiplos a empresa
+ * negociou nos últimos 10 anos, para escolher o de saída com contexto.
+ */
+function HistoricoMultiplo({ c }: { c: ContextoSeparador }) {
+  const t = useTranslations("dcfModelo")
+  const { fmt } = useFormatos()
+  const a = c.pressupostos.avaliacao
+  const dados = c.multiplosHistoricos.filter((x) => x.evEbitda !== null && x.evEbitda > 0 && x.evEbitda < 200)
+  if (dados.length === 0) return null
+  const vals = dados.map((x) => x.evEbitda as number).sort((x, y) => x - y)
+  const m = Math.floor(vals.length / 2)
+  const mediana = vals.length % 2 ? vals[m] : (vals[m - 1] + vals[m]) / 2
+  const grafico = [
+    ...dados.map((x) => ({ ano: String(x.fiscalYear), v: x.evEbitda as number, atual: false })),
+    ...(c.evEbitdaAtual ? [{ ano: "TTM", v: c.evEbitdaAtual, atual: true }] : []),
+  ]
+  const usar = (v: number) => c.onAvaliacao({ multiploSaida: Math.round(v * 10) / 10 })
+  return (
+    <div className="rounded-xl border border-border/60 p-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-3">
+        <p className="text-sm font-semibold">{t("multiplo.titulo")}</p>
+        <p className="text-xs text-muted-foreground">
+          {t("multiplo.resumo", { atual: fmt(c.evEbitdaAtual, "x"), mediana: fmt(mediana, "x"), min: fmt(vals[0], "x"), max: fmt(vals[vals.length - 1], "x") })}
+        </p>
+      </div>
+      <div className="mt-2 h-40">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={grafico} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+            <XAxis dataKey="ano" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} width={36} tickFormatter={(v: number) => `${Math.round(v)}x`} />
+            <Tooltip formatter={(v) => [fmt(Number(v), "x"), "EV/EBITDA"]} contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 12, fontSize: 12 }} />
+            <ReferenceLine y={a.multiploSaida} stroke="var(--primary)" strokeDasharray="4 4" label={{ value: t("multiplo.saida", { x: fmt(a.multiploSaida, "x") }), position: "insideTopRight", fill: "var(--primary)", fontSize: 11 }} />
+            <Bar dataKey="v" radius={[4, 4, 0, 0]}>
+              {grafico.map((x) => <Cell key={x.ano} fill={x.atual ? "var(--primary)" : "var(--muted-foreground)"} fillOpacity={x.atual ? 0.9 : 0.35} />)}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+      <div className="mt-2 flex flex-wrap gap-2 text-xs">
+        <button type="button" onClick={() => usar(mediana)} className="rounded-md border border-border/60 px-2.5 py-1 text-primary hover:bg-primary/10">{t("multiplo.usarMediana", { x: fmt(mediana, "x") })}</button>
+        {c.evEbitdaAtual && <button type="button" onClick={() => usar(c.evEbitdaAtual!)} className="rounded-md border border-border/60 px-2.5 py-1 text-primary hover:bg-primary/10">{t("multiplo.usarAtual", { x: fmt(c.evEbitdaAtual, "x") })}</button>}
+        <span className="self-center text-muted-foreground">{t("multiplo.nota")}</span>
+      </div>
+    </div>
+  )
+}
+
 function AssumptionsAvaliacao({ c }: { c: ContextoSeparador }) {
   const t = useTranslations("dcfModelo")
   const a = c.pressupostos.avaliacao
@@ -523,6 +575,7 @@ function AssumptionsAvaliacao({ c }: { c: ContextoSeparador }) {
           <span className="text-[11px] leading-snug text-muted-foreground/80">{t("pressupostos.waccManualAjuda")}</span>
         </label>
       </div>
+      <HistoricoMultiplo c={c} />
       <div className="flex flex-wrap items-center gap-6 pt-2">
         <div className="flex items-center gap-2 text-sm">
           <span className="text-muted-foreground">{t("pressupostos.metodo")}</span>

@@ -1836,6 +1836,14 @@
       "crescimentoSegmentos": "Segment growth (YoY)",
       "segmentosAjuda": "A receita é a soma dos segmentos. Cada segmento parte do seu CAGR de 3 anos, calibrado para que o total do ano 1 bata com o consenso, e converge até ao último ano. Compara a linha 'Revenue growth' com o consenso.",
       "semSegmentos": "Esta empresa não tem segmentos verificados na BullValue (ou reporta um só): o Revenue Build usa o crescimento total."
+    },
+    "multiplo": {
+      "titulo": "EV/EBITDA history",
+      "resumo": "Current {atual} · 10Y median {mediana} · range {min} to {max}",
+      "saida": "Exit {x}",
+      "usarMediana": "Use median ({x})",
+      "usarAtual": "Use current ({x})",
+      "nota": "EV/EBITDA no fecho de cada ano fiscal. Um múltiplo de saída muito acima da mediana histórica pressupõe que o mercado vai continuar a pagar mais do que pagou no passado."
     }
   },
   "dcfSimples": {

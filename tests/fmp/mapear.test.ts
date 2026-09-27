@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { construirLinha } from "@/lib/fmp/mapear"
+import { construirLinha, tipoFinanceira } from "@/lib/fmp/mapear"
 import type { FmpIncomeStatement } from "@/lib/fmp/tipos"
 
 // Linha de resultados mínima; cada teste muda só o que interessa.
@@ -60,5 +60,34 @@ describe("construirLinha — zeros da FMP e EPS incoerente", () => {
     const l = construirLinha(inc({ netIncome: -50, bottomLineNetIncome: -50, epsDiluted: -0.5 }), undefined, undefined, undefined, undefined)
     expect(l.netIncome).toBe(-50)
     expect(l.epsDiluted).toBe(-0.5)
+  })
+})
+
+describe("tipoFinanceira e receita — só bancos descontam juros", () => {
+  it("classifica pela indústria, não pelo setor", () => {
+    expect(tipoFinanceira("Financials", "Diversified Banks", "JPM")).toBe("banco")
+    expect(tipoFinanceira("Financials", "Investment Banking & Brokerage", "GS")).toBe("banco")
+    expect(tipoFinanceira("Financials", "Consumer Finance", "AXP")).toBe("banco")
+    expect(tipoFinanceira("Financials", "Asset Management & Custody Banks", "BNY")).toBe("banco")
+    expect(tipoFinanceira("Financials", null, "HSBC")).toBe("banco")
+    expect(tipoFinanceira("Financials", "Property & Casualty Insurance", "PGR")).toBe("seguradora")
+    expect(tipoFinanceira("Financials", "Multi-Sector Holdings", "BRK.B")).toBe("seguradora")
+    expect(tipoFinanceira("Financials", "Financial Exchanges & Data", "MSCI")).toBeNull()
+    expect(tipoFinanceira("Financials", "Transaction & Payment Processing Services", "V")).toBeNull()
+    expect(tipoFinanceira("Financials", "Insurance Brokers", "AON")).toBeNull()
+    expect(tipoFinanceira("Financials", "Asset Management & Custody Banks", "BLK")).toBeNull()
+    expect(tipoFinanceira("Information Technology", "Software", "MSFT")).toBeNull()
+  })
+
+  it("MSCI 2025: receita da FMP tal como vem (3,134 mM), sem tirar os juros da dívida", () => {
+    const l = construirLinha(inc({ revenue: 3134e6, interestExpense: 210e6 }), undefined, undefined, undefined, undefined,
+      "Financials", "Financial Exchanges & Data", "MSCI")
+    expect(l.revenue).toBe(3134e6)
+  })
+
+  it("banco: receita líquida de juros pagos", () => {
+    const l = construirLinha(inc({ revenue: 279.745e9, interestExpense: 97.898e9 }), undefined, undefined, undefined, undefined,
+      "Financials", "Diversified Banks", "JPM")
+    expect(l.revenue).toBeCloseTo(181.847e9, -3)
   })
 })

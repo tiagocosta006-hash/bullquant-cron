@@ -4,7 +4,7 @@ import { deriveFcff, deriveEffectiveTaxRate, type FcfSourceRecord } from "@/lib/
 import { exigirPro } from "@/lib/api/acessoPro"
 import { normalizarTicker } from "@/lib/ticker"
 import { cotacao, get, simbolo } from "@/lib/fmp/mercado"
-import { eFinanceira } from "@/lib/fmp/mapear"
+import { tipoFinanceira } from "@/lib/fmp/mapear"
 
 function num(val: unknown): number | null {
   if (val === null || val === undefined) return null
@@ -159,7 +159,8 @@ export async function GET(
     // depósitos e o dinheiro dos clientes, e o "FCF" não mede nada (a IBKR
     // dava $1 331 por ação contra $90). O padrão para financeiras é descontar
     // o lucro líquido, e a dívida faz parte da operação — não se subtrai.
-    const financeira = eFinanceira(company.sector)
+    // Só bancos e seguradoras: a Visa ou a MSCI avaliam-se pelo FCF.
+    const financeira = tipoFinanceira(company.sector, company.industry, company.ticker) !== null
     let netDebtFinal = netDebt
     if (financeira) {
       const lucro = normalizar(annuals.map((f) => num(f.netIncome)))

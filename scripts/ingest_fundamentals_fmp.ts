@@ -69,7 +69,7 @@ type Periodo = "annual" | "quarter";
 /** Uma linha já convertida em dólares e pronta a inserir. */
 type LinhaPronta = Record<string, unknown>;
 
-async function buscarEmpresa(ticker: string, periodo: Periodo, setor: string | null) {
+async function buscarEmpresa(ticker: string, periodo: Periodo, setor: string | null, industria: string | null) {
   const limite = periodo === "annual" ? ANOS : ANOS * 4;
   const p = { symbol: simboloFmp(ticker), period: periodo, limit: limite };
 
@@ -92,7 +92,7 @@ async function buscarEmpresa(ticker: string, periodo: Periodo, setor: string | n
   return inc.map((i) => {
     const k = chavePeriodo(i);
     return {
-      linha: construirLinha(i, mBal.get(k), mCf.get(k), mRat.get(k), mKm.get(k), setor),
+      linha: construirLinha(i, mBal.get(k), mCf.get(k), mRat.get(k), mKm.get(k), setor, industria, ticker),
       coerencia: coerenciaEps(i),
       origem: i,
     };
@@ -112,7 +112,7 @@ async function main() {
     where: TICKERS
       ? { ticker: { in: TICKERS } }
       : { isActive: true, ticker: { not: { startsWith: "^" } } },
-    select: { id: true, ticker: true, sector: true },
+    select: { id: true, ticker: true, sector: true, industry: true },
     orderBy: { ticker: "asc" },
   });
   console.log(`[fmp] ${empresas.length} empresas`);
@@ -133,7 +133,7 @@ async function main() {
     for (const periodo of periodos) {
       let registos;
       try {
-        registos = await buscarEmpresa(empresa.ticker, periodo, empresa.sector);
+        registos = await buscarEmpresa(empresa.ticker, periodo, empresa.sector, empresa.industry);
       } catch (erro) {
         const msg = erro instanceof FmpError ? `${erro.status} ${erro.message}` : String(erro);
         falhas.push(`${empresa.ticker} (${periodo}): ${msg.slice(0, 90)}`);

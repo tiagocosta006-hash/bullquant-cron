@@ -27,7 +27,7 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 import { PrismaClient, PeriodType, Prisma } from "@prisma/client";
 import { fmpGet, emParalelo, FmpError, simboloFmp } from "../lib/fmp/cliente";
 import { taxaParaUsd } from "../lib/fmp/cambio";
-import { eFinanceira } from "../lib/fmp/mapear";
+import { tipoFinanceira } from "../lib/fmp/mapear";
 
 const prisma = new PrismaClient();
 
@@ -62,7 +62,7 @@ async function main() {
       isActive: true,
       ticker: TICKERS ? { in: TICKERS } : { not: { startsWith: "^" } },
     },
-    select: { id: true, ticker: true, sector: true },
+    select: { id: true, ticker: true, sector: true, industry: true },
     orderBy: { ticker: "asc" },
   });
   console.log(`[segmentos] ${empresas.length} empresas${DRY_RUN ? " (dry-run)" : ""}`);
@@ -132,7 +132,7 @@ async function main() {
           // receita delas é líquida de juros (lib/fmp/mapear.ts) e os
           // segmentos vêm brutos.
           const receita = linha.revenue != null ? Number(linha.revenue) : null;
-          if (receita && receita > 0 && !eFinanceira(empresa.sector)) {
+          if (receita && receita > 0 && tipoFinanceira(empresa.sector, empresa.industry, empresa.ticker) !== "banco") {
             const soma = Object.values(segs).reduce((a, b) => a + b, 0);
             if (Math.abs(soma / receita - 1) > 0.1) {
               descartados++;

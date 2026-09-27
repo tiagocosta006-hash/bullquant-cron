@@ -131,6 +131,8 @@ export function construirLinha(
   rat: FmpRatios | undefined,
   km: FmpKeyMetrics | undefined,
   setor?: string | null,
+  industria: string | null = null,
+  ticker = "",
 ): LinhaFundamental {
   const periodType = tipoDePeriodo(inc.period);
 
@@ -142,7 +144,7 @@ export function construirLinha(
     filedAt: inc.filingDate ? new Date(inc.filingDate) : null,
 
     // ---- Demonstração de resultados ----
-    revenue: receita(inc, setor),
+    revenue: receita(inc, setor, industria, ticker),
     // Sem custo das vendas (seguradoras, bancos) a FMP põe os dois a 0 — e o
     // "lucro bruto 0" que isso desenhava não existe.
     costOfRevenue: inc.costOfRevenue === 0 && inc.grossProfit === 0 ? null : inc.costOfRevenue,
@@ -164,7 +166,7 @@ export function construirLinha(
 
     // ---- Balanço ----
     // Depende do setor — ver `caixa()`.
-    cash: caixa(bal, setor),
+    cash: caixa(bal, setor, industria, ticker),
     totalCurrentAssets: semZero(bal?.totalCurrentAssets),
     accountsReceivable: bal?.netReceivables ?? null,
     inventory: bal?.inventory ?? null,
@@ -249,9 +251,11 @@ export function construirLinha(
  * Mostrar 643 mM de caixa a um cliente ao lado de um banco que declara 290 mM
  * não é uma convenção diferente — é um número inventado por soma.
  */
-function caixa(bal: FmpBalanceSheet | undefined, setor: string | null | undefined): number | null {
+function caixa(bal: FmpBalanceSheet | undefined, setor: string | null | undefined, industria: string | null = null, ticker = ""): number | null {
   if (!bal) return null;
-  if (eFinanceira(setor)) return bal.cashAndCashEquivalents ?? null;
+  // Bancos e seguradoras: as aplicações financeiras são o negócio (carteira de
+  // crédito, reservas técnicas), não caixa disponível.
+  if (tipoFinanceira(setor, industria, ticker) !== null) return bal.cashAndCashEquivalents ?? null;
   return bal.cashAndShortTermInvestments ?? bal.cashAndCashEquivalents ?? null;
 }
 
@@ -260,6 +264,41 @@ export function eFinanceira(setor: string | null | undefined): boolean {
   if (!setor) return false;
   const s = setor.toLowerCase();
   return s.includes("financ") || s.includes("bank");
+}
+
+/** Bancos de custódia vêm misturados com gestoras em "Asset Management & Custody Banks". */
+const CUSTODIA = new Set(["BNY", "STT", "NTRS"]);
+
+/**
+ * Que tipo de financeira é esta empresa — pela INDÚSTRIA, não pelo setor.
+ *
+ *   "banco"       bancos, bancos de custódia, corretoras/banca de
+ *                 investimento, crédito ao consumo: a receita "bruta" inclui
+ *                 juros cobrados e compara-se LÍQUIDA de juros pagos.
+ *   "seguradora"  seguradoras, resseguradoras, holdings com seguradora
+ *                 (Berkshire): receita normal, mas as aplicações são reservas.
+ *   null          o resto — incluindo o resto do setor financeiro (MSCI,
+ *                 Visa, S&P Global, bolsas, corretores de seguros, gestoras),
+ *                 que se trata como qualquer empresa.
+ *
+ * "Setor financeiro" chegava para errar: a regra dos bancos era aplicada à
+ * MSCI e tirava-lhe os juros da dívida à receita (2025: 2,925 mM em vez de
+ * 3,134 mM), o que dava +20% de crescimento esperado em 2026 em vez de +12%.
+ */
+export function tipoFinanceira(
+  setor: string | null | undefined,
+  industria: string | null | undefined,
+  ticker = "",
+): "banco" | "seguradora" | null {
+  if (CUSTODIA.has(ticker.toUpperCase())) return "banco";
+  if (!eFinanceira(setor)) return null;
+  // Financeiras sem indústria na base (HSBC, UBS, Barclays) são bancos.
+  if (!industria) return "banco";
+  const i = industria.toLowerCase();
+  if (i.includes("insurance brokers") || i.includes("asset management")) return null;
+  if (i.includes("insurance") || i.includes("reinsurance") || i.includes("multi-sector holdings")) return "seguradora";
+  if (i.includes("bank") || i.includes("brokerage") || i.includes("investment banking") || i.includes("consumer finance") || i.includes("thrift") || i.includes("mortgage")) return "banco";
+  return null;
 }
 
 /**
@@ -323,10 +362,10 @@ function somar(...xs: Array<number | null | undefined>): number | null {
  * Fora das financeiras não se toca: o juro pago é despesa de financiamento,
  * não uma dedução ao topo da demonstração.
  */
-export function receita(inc: FmpIncomeStatement, setor: string | null | undefined): number | null {
+export function receita(inc: FmpIncomeStatement, setor: string | null | undefined, industria: string | null = null, ticker = ""): number | null {
   const bruta = inc.revenue;
   if (bruta == null) return null;
-  if (!eFinanceira(setor)) return bruta;
+  if (tipoFinanceira(setor, industria, ticker) !== "banco") return bruta;
   const juros = inc.interestExpense;
   return juros != null ? bruta - juros : bruta;
 }

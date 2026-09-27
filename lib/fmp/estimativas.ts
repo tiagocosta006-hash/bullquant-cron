@@ -36,6 +36,7 @@ type LinhaEstimativa = {
   revenueHigh: number
   revenueAvg: number
   ebitdaAvg: number
+  ebitAvg: number
   netIncomeAvg: number
   epsAvg: number
   epsHigh: number
@@ -54,6 +55,9 @@ export type EstimativaAnual = {
   epsAvg: number
   epsLow: number
   epsHigh: number
+  /** EBIT e EBITDA médios estimados (base dos analistas, normalmente ajustada). */
+  ebitAvg: number | null
+  ebitdaAvg: number | null
   analistas: number
 }
 
@@ -167,6 +171,8 @@ export async function analistas(
         epsAvg: l.epsAvg * taxa,
         epsLow: l.epsLow * taxa,
         epsHigh: l.epsHigh * taxa,
+        ebitAvg: typeof l.ebitAvg === "number" ? l.ebitAvg * taxa : null,
+        ebitdaAvg: typeof l.ebitdaAvg === "number" ? l.ebitdaAvg * taxa : null,
         analistas: l.numAnalystsEps,
       }))
 

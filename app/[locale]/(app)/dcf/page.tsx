@@ -1,6 +1,8 @@
 import { getTranslations } from "next-intl/server"
 import { Calculator, Info } from "lucide-react"
 import { DcfCalculator } from "@/components/dcf/DcfCalculator"
+import { ModeloDcf } from "@/components/dcf/modelo/ModeloDcf"
+import { Link } from "@/i18n/routing"
 import { PageHeader, InfoNote } from "@/components/layout/PageHeader"
 import { getUser } from "@/lib/supabase/server"
 import { prisma } from "@/lib/prisma"
@@ -10,7 +12,7 @@ import { ProGate } from "@/components/ui/ProGate"
 export default async function DcfPage({
   searchParams,
 }: {
-  searchParams: Promise<{ ticker?: string }>
+  searchParams: Promise<{ ticker?: string; modo?: string }>
 }) {
   const t = await getTranslations("dcf")
   const resolvedParams = await searchParams
@@ -26,6 +28,14 @@ export default async function DcfPage({
   
   const isPro = dbUser?.plan === "PRO" || devUnlocked
   const isLoggedIn = !!user || devUnlocked
+  // Modelo completo (schedules → projeções → avaliação) por omissão; a
+  // calculadora rápida de duas fases continua disponível.
+  const modo = resolvedParams.modo === "rapida" ? "rapida" : "modelo"
+  const tModo = await getTranslations("dcfModelo")
+  const hrefModo = (m: "modelo" | "rapida") => ({
+    pathname: "/dcf",
+    query: { ...(m === "rapida" ? { modo: "rapida" } : {}), ...(defaultTicker ? { ticker: defaultTicker } : {}) },
+  })
 
   return (
     <div className="space-y-6 relative min-h-[70vh]">
@@ -40,8 +50,18 @@ export default async function DcfPage({
       {!isPro && (
         <ProGate isPro={isPro} isLoggedIn={isLoggedIn} />
       )}
+      <div className="flex gap-1 rounded-xl border border-border/50 bg-muted/40 p-1 w-fit">
+        {(["modelo", "rapida"] as const).map((m) => (
+          <Link key={m} href={hrefModo(m)}
+            className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition-all ${modo === m ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+            {tModo(`modos.${m}`)}
+          </Link>
+        ))}
+      </div>
       <div className={!isPro ? "pointer-events-none select-none" : ""}>
-        <DcfCalculator defaultTicker={defaultTicker} locked={locked} />
+        {modo === "modelo"
+          ? <ModeloDcf defaultTicker={defaultTicker} locked={locked} />
+          : <DcfCalculator defaultTicker={defaultTicker} locked={locked} />}
       </div>
     </div>
   )

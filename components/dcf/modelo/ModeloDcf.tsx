@@ -1,0 +1,252 @@
+"use client"
+
+import * as React from "react"
+import { useTranslations } from "next-intl"
+import { Search, Loader2, RotateCcw, AlertTriangle } from "lucide-react"
+import { useDebounce } from "@/hooks/useDebounce"
+import {
+  racios, projetar, avaliar, fracaoAno1, anosAteFimAno1, pressupostosIniciais, mudarHorizonte,
+  type AnoHistorico, type Driver, type EstimativaModelo, type ContextoMercado, type Pressupostos,
+  type PressupostosAvaliacao, type Mercado,
+} from "@/lib/finance/modelo"
+import {
+  SeparadorPressupostos, SeparadorHistorico, SeparadorSchedules, SeparadorProjecoes, SeparadorAvaliacao,
+  type ContextoSeparador,
+} from "./Separadores"
+import { useFormatos } from "./TabelaModelo"
+
+/**
+ * Modelo DCF completo, organizado como um modelo FMVA:
+ * Pressupostos → Histórico → Schedules → Projeções → Avaliação.
+ *
+ * Os cálculos correm no cliente (lib/finance/modelo); o servidor só entrega
+ * os dados (/api/dcf/modelo/[ticker]). Os pressupostos que o analista muda
+ * ficam guardados neste browser, por empresa, até se reporem.
+ */
+
+type Dados = {
+  empresa: { ticker: string; nome: string; setor: string | null; industria: string | null; logoUrl: string | null; financeira: boolean }
+  historico: AnoHistorico[]
+  estimativas: EstimativaModelo[]
+  mercado: { preco: number | null; acoes: number | null; dividaTotal: number; caixa: number; interessesMinoritarios: number; dataBalanco: string | null }
+  contexto: ContextoMercado & { dataRf: string | null }
+}
+
+type SearchResult = { ticker: string; name: string }
+
+const SEPARADORES = ["pressupostos", "historico", "schedules", "projecoes", "avaliacao"] as const
+type Separador = (typeof SEPARADORES)[number]
+
+const chaveRascunho = (ticker: string) => `bv-dcf-modelo:v1:${ticker}`
+
+function lerRascunho(ticker: string): Pressupostos | null {
+  try {
+    const s = localStorage.getItem(chaveRascunho(ticker))
+    return s ? (JSON.parse(s) as Pressupostos) : null
+  } catch {
+    return null
+  }
+}
+function gravarRascunho(ticker: string, p: Pressupostos | null) {
+  try {
+    if (p) localStorage.setItem(chaveRascunho(ticker), JSON.stringify(p))
+    else localStorage.removeItem(chaveRascunho(ticker))
+  } catch { /* modo privado: o rascunho só não fica guardado */ }
+}
+
+export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: string; locked?: boolean }) {
+  const t = useTranslations("dcfModelo")
+  const { fmt } = useFormatos()
+  const [dados, setDados] = React.useState<Dados | null>(null)
+  const [pressupostos, setPressupostos] = React.useState<Pressupostos | null>(null)
+  const [iniciais, setIniciais] = React.useState<Pressupostos | null>(null)
+  const [aba, setAba] = React.useState<Separador>("pressupostos")
+  const [carregando, setCarregando] = React.useState(false)
+  const [erro, setErro] = React.useState<string | null>(null)
+  const [comRascunho, setComRascunho] = React.useState(false)
+
+  // Pesquisa
+  const [query, setQuery] = React.useState("")
+  const [resultados, setResultados] = React.useState<SearchResult[]>([])
+  const debounced = useDebounce(query, 300)
+  React.useEffect(() => {
+    if (locked || debounced.length < 2) { setResultados([]); return }
+    let vivo = true
+    fetch(`/api/search?q=${encodeURIComponent(debounced)}`)
+      .then((r) => r.json())
+      .then((d) => { if (vivo) setResultados(Array.isArray(d) ? d.slice(0, 8) : []) })
+      .catch(() => vivo && setResultados([]))
+    return () => { vivo = false }
+  }, [debounced, locked])
+
+  const carregar = React.useCallback(async (ticker: string) => {
+    setQuery(""); setResultados([]); setErro(null); setCarregando(true)
+    try {
+      const r = await fetch(`/api/dcf/modelo/${encodeURIComponent(ticker)}`)
+      if (!r.ok) { setErro(r.status === 404 ? t("erros.naoEncontrada") : t("erros.carregar")); setDados(null); return }
+      const d = (await r.json()) as Dados
+      setDados(d)
+      const ini = pressupostosIniciais(d.historico, racios(d.historico), d.estimativas, d.contexto)
+      setIniciais(ini)
+      const rasc = lerRascunho(d.empresa.ticker)
+      setPressupostos(rasc ?? ini)
+      setComRascunho(!!rasc)
+      setAba("pressupostos")
+    } catch {
+      setErro(t("erros.carregar"))
+    } finally {
+      setCarregando(false)
+    }
+  }, [t])
+
+  React.useEffect(() => { if (defaultTicker) carregar(defaultTicker) }, [defaultTicker, carregar])
+
+  const atualizar = (fn: (p: Pressupostos) => Pressupostos) => {
+    setPressupostos((p) => {
+      if (!p || !dados) return p
+      const novo = fn(p)
+      gravarRascunho(dados.empresa.ticker, novo)
+      setComRascunho(true)
+      return novo
+    })
+  }
+  const onDriver = (d: Driver, i: number, v: number) =>
+    atualizar((p) => ({ ...p, drivers: { ...p.drivers, [d]: p.drivers[d].map((x, j) => (j === i ? v : x)) } }))
+  const onDriverSerie = (d: Driver, valores: number[]) =>
+    atualizar((p) => ({ ...p, drivers: { ...p.drivers, [d]: valores } }))
+  const onAvaliacao = (patch: Partial<PressupostosAvaliacao>) =>
+    atualizar((p) => ({ ...p, avaliacao: { ...p.avaliacao, ...patch } }))
+  const repor = () => {
+    if (!dados || !iniciais) return
+    gravarRascunho(dados.empresa.ticker, null)
+    setPressupostos(iniciais)
+    setComRascunho(false)
+  }
+
+  const calculo = React.useMemo(() => {
+    if (!dados || !pressupostos || dados.historico.length === 0) return null
+    const hist = dados.historico
+    const rs = racios(hist)
+    const base = hist[hist.length - 1]
+    const mercado: Mercado = {
+      preco: dados.mercado.preco ?? 0,
+      acoes: dados.mercado.acoes ?? 0,
+      dividaTotal: dados.mercado.dividaTotal,
+      caixa: dados.mercado.caixa,
+      interessesMinoritarios: dados.mercado.interessesMinoritarios,
+    }
+    // Os fluxos até à data do balanço já estão na caixa e na dívida da ponte:
+    // conta-se só o resto do ano 1. O desconto conta a partir de hoje.
+    const dataBalanco = dados.mercado.dataBalanco ? new Date(dados.mercado.dataBalanco + "T00:00:00Z") : new Date()
+    const f = fracaoAno1(base.periodEnd, dataBalanco)
+    const d0 = anosAteFimAno1(base.periodEnd)
+    const proj = projetar(base, pressupostos)
+    const { projecoes, avaliacao } = avaliar(proj, pressupostos.avaliacao, mercado, f, d0)
+    return { hist, rs, mercado, f, projecoes, avaliacao }
+  }, [dados, pressupostos])
+
+  const contexto: ContextoSeparador | null = calculo && pressupostos ? {
+    historico: calculo.hist, racios: calculo.rs, pressupostos, projecoes: calculo.projecoes,
+    avaliacao: calculo.avaliacao, mercado: calculo.mercado, fracaoAno1: calculo.f, onDriver,
+  } : null
+
+  return (
+    <div className="space-y-6">
+      {/* Cabeçalho: pesquisa + empresa + resultado */}
+      <div className="glass rounded-xl p-5 space-y-4">
+        <div className="flex flex-wrap items-center gap-4">
+          {!locked && (
+            <div className="relative w-full max-w-sm">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={t("pesquisa")}
+                className="w-full rounded-lg border border-border bg-background py-2 pl-9 pr-3 text-sm outline-none focus:border-primary"
+              />
+              {resultados.length > 0 && (
+                <div className="absolute z-30 mt-1 w-full overflow-hidden rounded-lg border border-border bg-popover shadow-xl">
+                  {resultados.map((r) => (
+                    <button key={r.ticker} type="button" onClick={() => carregar(r.ticker)}
+                      className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-muted/60">
+                      <span className="w-14 font-semibold text-primary">{r.ticker}</span>
+                      <span className="truncate text-muted-foreground">{r.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          {carregando && <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />}
+          {dados && (
+            <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className="text-lg font-bold tracking-tight">{dados.empresa.nome} <span className="text-primary">{dados.empresa.ticker}</span></p>
+                <p className="text-xs text-muted-foreground">{[dados.empresa.setor, dados.empresa.industria].filter(Boolean).join(" · ")}</p>
+              </div>
+              {calculo?.avaliacao.valido && (
+                <div className="flex items-center gap-6 text-sm">
+                  <div><p className="text-xs text-muted-foreground">{t("avaliacao.valorPorAcao")}</p><p className="text-xl font-bold text-primary tabular-nums">${fmt(calculo.avaliacao.valorPorAcao, "anos")}</p></div>
+                  <div><p className="text-xs text-muted-foreground">{t("avaliacao.preco")}</p><p className="text-xl font-bold tabular-nums">${fmt(calculo.avaliacao.preco, "anos")}</p></div>
+                  <div><p className="text-xs text-muted-foreground">{t("avaliacao.potencial")}</p><p className={`text-xl font-bold tabular-nums ${calculo.avaliacao.potencial >= 0 ? "text-bull" : "text-bear"}`}>{calculo.avaliacao.potencial >= 0 ? "+" : ""}{fmt(calculo.avaliacao.potencial, "pct")}</p></div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        {erro && <p className="flex items-center gap-2 text-sm text-bear"><AlertTriangle className="h-4 w-4" />{erro}</p>}
+        {!dados && !carregando && !erro && <p className="text-sm text-muted-foreground">{t("vazio")}</p>}
+      </div>
+
+      {dados?.empresa.financeira && (
+        <div className="glass flex items-start gap-3 rounded-xl p-5 text-sm">
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
+          <p>{t("erros.financeira")}</p>
+        </div>
+      )}
+
+      {contexto && pressupostos && !dados?.empresa.financeira && (
+        <>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap gap-1 rounded-xl border border-border/50 bg-muted/40 p-1">
+              {SEPARADORES.map((s, i) => (
+                <button key={s} type="button" onClick={() => setAba(s)}
+                  className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all ${aba === s ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+                  <span className="mr-1.5 text-primary/70">{i + 1}</span>{t(`tabs.${s}`)}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-3 text-xs">
+              <label className="flex items-center gap-2">
+                <span className="text-muted-foreground">{t("horizonte")}</span>
+                <select value={pressupostos.anos} onChange={(e) => atualizar((p) => mudarHorizonte(p, Number(e.target.value)))}
+                  className="rounded-md border border-border bg-background px-2 py-1">
+                  {[5, 7, 10].map((n) => <option key={n} value={n}>{t("anos", { n })}</option>)}
+                </select>
+              </label>
+              {comRascunho && (
+                <button type="button" onClick={repor} className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-muted-foreground hover:text-foreground" title={t("reporAjuda")}>
+                  <RotateCcw className="h-3.5 w-3.5" />{t("repor")}
+                </button>
+              )}
+            </div>
+          </div>
+
+          {aba === "pressupostos" && <SeparadorPressupostos c={contexto} onDriverSerie={onDriverSerie} onAvaliacao={onAvaliacao} />}
+          {aba === "historico" && <SeparadorHistorico c={contexto} />}
+          {aba === "schedules" && <SeparadorSchedules c={contexto} />}
+          {aba === "projecoes" && <SeparadorProjecoes c={contexto} />}
+          {aba === "avaliacao" && <SeparadorAvaliacao c={contexto} />}
+
+          <p className="text-xs text-muted-foreground">
+            {t("fontes", {
+              balanco: dados?.mercado.dataBalanco ?? "N/A",
+              rf: dados?.contexto.dataRf ?? "N/A",
+              n: dados?.estimativas.length ?? 0,
+            })}
+          </p>
+        </>
+      )}
+    </div>
+  )
+}

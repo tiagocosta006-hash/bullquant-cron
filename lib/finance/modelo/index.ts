@@ -1,0 +1,6 @@
+export * from "./tipos"
+export { racios, resumo, baseCustos } from "./historico"
+export { projetar } from "./projecao"
+export { avaliar, calcularWacc, fracaoAno1, anosAteFimAno1 } from "./avaliacao"
+export { pressupostosIniciais, mudarHorizonte, interpolar, RF_POR_OMISSAO, ERP_POR_OMISSAO, G_POR_OMISSAO } from "./pressupostos"
+export type { EstimativaModelo, ContextoMercado } from "./pressupostos"

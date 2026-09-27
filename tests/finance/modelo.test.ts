@@ -1,0 +1,178 @@
+import { describe, it, expect } from "vitest"
+import { modeloFcffAplicavel } from "@/lib/finance/modelo/aplicabilidade"
+import {
+  projetar, avaliar, racios, resumo, fracaoAno1, pressupostosIniciais, mudarHorizonte, interpolar,
+  type AnoHistorico, type Pressupostos,
+} from "@/lib/finance/modelo"
+
+// Último ano real: receita 1000, custo das vendas 600, clientes 100,
+// inventário 50, fornecedores 80 → fundo de maneio 70.
+const base: AnoHistorico = {
+  fiscalYear: 2025, periodEnd: "2025-12-31", revenue: 1000, costOfRevenue: 600, grossProfit: 400,
+  operatingExpenses: 200, operatingIncome: 200, ebitda: 250, depreciationAndAmortization: 50, capex: 60,
+  accountsReceivable: 100, inventory: 50, accountsPayable: 80, taxExpense: 50, incomeBeforeTax: 200,
+  stockBasedCompensation: null, operatingCashFlow: 230, freeCashFlow: 170,
+}
+
+const p: Pressupostos = {
+  anos: 2,
+  drivers: {
+    crescimentoReceita: [0.1, 0.1], margemBruta: [0.4, 0.4], margemEbit: [0.2, 0.2],
+    daPctReceita: [0.05, 0.05], capexPctReceita: [0.06, 0.06],
+    dso: [36.5, 36.5], dio: [(50 / 600) * 365, (50 / 600) * 365], dpo: [(80 / 600) * 365, (80 / 600) * 365],
+    taxaImposto: [0.25, 0.25],
+  },
+  avaliacao: {
+    rf: 0.04, erp: 0.05, beta: 1, custoDivida: 0.05, taxaImpostoWacc: 0.25, waccManual: 0.1,
+    g: 0.02, multiploSaida: 10, metodoTerminal: "gordon", meioDoAno: false,
+  },
+}
+const mercado = { preco: 15, acoes: 100, dividaTotal: 200, caixa: 50, interessesMinoritarios: 10 }
+
+describe("modelo DCF — projeções (schedules → FCFF)", () => {
+  const proj = projetar(base, p)
+
+  it("ano 1: receita 1100, EBIT 220, NOPAT 165, Δ fundo de maneio 7, FCFF 147", () => {
+    const a = proj[0]
+    expect(a.fiscalYear).toBe(2026)
+    expect(a.receita).toBeCloseTo(1100, 6)
+    expect(a.cogs).toBeCloseTo(660, 6)
+    expect(a.ebit).toBeCloseTo(220, 6)
+    expect(a.ebitda).toBeCloseTo(275, 6)
+    expect(a.nopat).toBeCloseTo(165, 6)
+    // clientes 110 + inventário 55 − fornecedores 88 = 77; 77 − 70 = 7
+    expect(a.fundoManeio).toBeCloseTo(77, 6)
+    expect(a.variacaoFundoManeio).toBeCloseTo(7, 6)
+    expect(a.fcff).toBeCloseTo(147, 6)
+  })
+
+  it("ano 2: FCFF 161,7", () => {
+    expect(proj[1].receita).toBeCloseTo(1210, 6)
+    expect(proj[1].fcff).toBeCloseTo(161.7, 6)
+  })
+
+  it("EBIT negativo não gera imposto negativo", () => {
+    const perda = projetar(base, { ...p, drivers: { ...p.drivers, margemEbit: [-0.1, -0.1] } })
+    expect(perda[0].impostosOperacionais).toBe(0)
+    expect(perda[0].nopat).toBeCloseTo(-110, 6)
+  })
+})
+
+describe("modelo DCF — avaliação", () => {
+  const proj = projetar(base, p)
+
+  it("sem meio do ano nem período parcial: EV 1971,13 e 18,11 por ação", () => {
+    const { avaliacao: a } = avaliar(proj, p.avaliacao, mercado, 1)
+    // VP: 147/1,1 + 161,7/1,21 = 267,27; TV = 161,7 × 1,02 / 0,08 = 2061,68; VP(TV) = 1703,86
+    expect(a.somaVpFcff).toBeCloseTo(267.2727, 3)
+    expect(a.terminalGordon).toBeCloseTo(2061.675, 3)
+    expect(a.enterpriseValue).toBeCloseTo(1971.13, 1)
+    // EV − dívida 200 + caixa 50 − minoritários 10 = 1811,13 → ÷ 100 ações
+    expect(a.valorPorAcao).toBeCloseTo(18.1113, 3)
+    expect(a.potencial).toBeCloseTo(18.1113 / 15 - 1, 4)
+  })
+
+  it("período parcial e meio do ano: só um quarto do ano 1 conta, descontado a 0,125 anos", () => {
+    const { projecoes } = avaliar(proj, { ...p.avaliacao, meioDoAno: true }, mercado, 0.25)
+    expect(projecoes[0].fracao).toBe(0.25)
+    expect(projecoes[0].periodoDesconto).toBeCloseTo(0.125, 9)
+    expect(projecoes[1].periodoDesconto).toBeCloseTo(0.75, 9)
+    expect(projecoes[0].valorPresente).toBeCloseTo((147 * 0.25) / Math.pow(1.1, 0.125), 6)
+  })
+
+  it("verificações cruzadas: o múltiplo implícito no Gordon devolve o mesmo g", () => {
+    const { avaliacao: a } = avaliar(proj, p.avaliacao, mercado, 1)
+    const multiplo = a.multiploImplicitoNoGordon!
+    const { avaliacao: b } = avaliar(proj, { ...p.avaliacao, multiploSaida: multiplo }, mercado, 1)
+    expect(b.gImplicitoNoMultiplo!).toBeCloseTo(0.02, 9)
+  })
+
+  it("WACC ≤ g com Gordon é inválido; com múltiplo de saída continua válido", () => {
+    const mau = { ...p.avaliacao, waccManual: 0.02 }
+    expect(avaliar(proj, mau, mercado, 1).avaliacao.erro).toBe("WACC_MENOR_QUE_G")
+    expect(avaliar(proj, { ...mau, metodoTerminal: "multiplo" }, mercado, 1).avaliacao.valido).toBe(true)
+  })
+
+  it("WACC por CAPM com pesos de mercado", () => {
+    const { avaliacao: a } = avaliar(proj, { ...p.avaliacao, waccManual: null }, mercado, 1)
+    // Re = 4% + 1 × 5% = 9%; Rd = 5% × 0,75 = 3,75%; E = 1500, D = 200
+    expect(a.wacc.wacc).toBeCloseTo((1500 / 1700) * 0.09 + (200 / 1700) * 0.0375, 9)
+  })
+})
+
+describe("modelo DCF — histórico e pressupostos iniciais", () => {
+  const hist: AnoHistorico[] = [
+    { ...base, fiscalYear: 2023, revenue: 800, costOfRevenue: 480, grossProfit: 320, operatingIncome: 150, capex: 48 },
+    { ...base, fiscalYear: 2024, revenue: 900, costOfRevenue: 540, grossProfit: 360, operatingIncome: 175, capex: 54 },
+    base,
+  ]
+  const rs = racios(hist)
+
+  it("rácios: crescimento, margens, dias", () => {
+    expect(rs[0].crescimentoReceita).toBeNull()
+    expect(rs[1].crescimentoReceita).toBeCloseTo(0.125, 9)
+    expect(rs[2].margemEbit).toBeCloseTo(0.2, 9)
+    expect(rs[2].dso).toBeCloseTo(36.5, 9)
+    expect(resumo(rs, "margemBruta", 3).media).toBeCloseTo(0.4, 9)
+  })
+
+  it("com consenso: anos 1-2 seguem o consenso, depois desce até g + 1,5 pp", () => {
+    const ini = pressupostosIniciais(hist, rs, [
+      { fiscalYear: 2026, revenueAvg: 1150, ebitAvg: 253, analistas: 10 },
+      { fiscalYear: 2027, revenueAvg: 1265, ebitAvg: 290.95, analistas: 8 },
+    ], { rf: 0.045, beta: 1.2, custoDivida: 0.05, evEbitdaAtual: 14 }, 5)
+    expect(ini.drivers.crescimentoReceita[0]).toBeCloseTo(0.15, 9)
+    expect(ini.drivers.crescimentoReceita[1]).toBeCloseTo(0.1, 9)
+    expect(ini.drivers.crescimentoReceita[4]).toBeCloseTo(0.04, 9)
+    expect(ini.drivers.margemEbit[0]).toBeCloseTo(0.22, 9)
+    expect(ini.drivers.margemEbit[4]).toBeCloseTo(0.23, 9)
+    expect(ini.avaliacao.rf).toBe(0.045)
+    expect(ini.avaliacao.beta).toBeCloseTo(0.67 * 1.2 + 0.33, 2)
+    expect(ini.avaliacao.multiploSaida).toBe(14)
+  })
+
+  it("horizonte e interpolação preservam o que já foi escrito", () => {
+    const ini = pressupostosIniciais(hist, rs, [], { rf: null, beta: null, custoDivida: null, evEbitdaAtual: null }, 5)
+    expect(pressupostosIniciais(hist, rs, [], { rf: null, beta: null, custoDivida: null, evEbitdaAtual: null }).anos).toBe(10)
+    const dez = mudarHorizonte(ini, 10)
+    expect(dez.drivers.margemEbit).toHaveLength(10)
+    expect(dez.drivers.margemEbit[0]).toBe(ini.drivers.margemEbit[0])
+    expect(interpolar([0.2, 0.2, 0.2, 0.2], 1, 0.26)).toEqual([0.2, 0.2, 0.23, 0.26])
+  })
+
+  it("margem do consenso limitada ao histórico ± 5 pp", () => {
+    const ini = pressupostosIniciais(hist, rs, [{ fiscalYear: 2026, revenueAvg: 1100, ebitAvg: 440, analistas: 5 }],
+      { rf: null, beta: null, custoDivida: null, evEbitdaAtual: null })
+    // histórico: 18,75%, 19,4%, 20% → máximo 20% + 5 pp = 25%, não 40%
+    expect(ini.drivers.margemEbit[0]).toBeCloseTo(0.25, 9)
+  })
+
+  it("desconto a partir de hoje quando o balanço é anterior (d0 ≠ f)", () => {
+    const proj = projetar(base, p)
+    const { projecoes } = avaliar(proj, { ...p.avaliacao, meioDoAno: false }, mercado, 0.5, 0.25)
+    expect(projecoes[0].fracao).toBe(0.5)
+    expect(projecoes[0].periodoDesconto).toBeCloseTo(0.25, 9)
+    expect(projecoes[1].periodoDesconto).toBeCloseTo(1.25, 9)
+  })
+
+  it("fração do ano 1: último ano fechado há 9 meses → falta 1/4", () => {
+    const f = fracaoAno1("2025-12-31", new Date("2026-10-01T00:00:00Z"))
+    expect(f).toBeGreaterThan(0.24)
+    expect(f).toBeLessThan(0.26)
+  })
+})
+
+describe("modelo DCF — a que empresas se aplica", () => {
+  it("financeiras de balanço ficam de fora; negócios leves do setor entram", () => {
+    expect(modeloFcffAplicavel("Financials", "Diversified Banks", "JPM")).toBe(false)
+    expect(modeloFcffAplicavel("Financials", "Property & Casualty Insurance", "PGR")).toBe(false)
+    expect(modeloFcffAplicavel("Financials", "Investment Banking & Brokerage", "IBKR")).toBe(false)
+    expect(modeloFcffAplicavel("Financials", "Asset Management & Custody Banks", "BNY")).toBe(false)
+    expect(modeloFcffAplicavel("Financials", null, "HSBC")).toBe(false)
+    expect(modeloFcffAplicavel("Financials", "Financial Exchanges & Data", "MSCI")).toBe(true)
+    expect(modeloFcffAplicavel("Financials", "Transaction & Payment Processing Services", "V")).toBe(true)
+    expect(modeloFcffAplicavel("Financials", "Insurance Brokers", "AON")).toBe(true)
+    expect(modeloFcffAplicavel("Financials", "Asset Management & Custody Banks", "BLK")).toBe(true)
+    expect(modeloFcffAplicavel("Information Technology", "Software", "MSFT")).toBe(true)
+  })
+})

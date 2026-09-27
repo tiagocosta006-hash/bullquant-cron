@@ -1,10 +1,10 @@
 import { getTranslations } from "next-intl/server"
-import { Calculator, Info } from "lucide-react"
+import { Calculator } from "lucide-react"
 import { DcfCalculator } from "@/components/dcf/DcfCalculator"
 import { ModeloDcf } from "@/components/dcf/modelo/ModeloDcf"
 import { DcfSimples } from "@/components/dcf/simples/DcfSimples"
-import { Link } from "@/i18n/routing"
-import { PageHeader, InfoNote } from "@/components/layout/PageHeader"
+import { EspacoDcf } from "@/components/dcf/EspacoDcf"
+import { PageHeader } from "@/components/layout/PageHeader"
 import { getUser } from "@/lib/supabase/server"
 import { prisma } from "@/lib/prisma"
 import { isDevUnlocked } from "@/lib/devAccess"
@@ -35,8 +35,8 @@ export default async function DcfPage({
   const modo = resolvedParams.modo === "modelo" ? "modelo" : resolvedParams.modo === "rapida" ? "rapida" : "simples"
   const tModo = await getTranslations("dcfModelo")
   const hrefModo = (m: "simples" | "modelo") => ({
-    pathname: "/dcf",
-    query: { ...(m === "modelo" ? { modo: "modelo" } : {}), ...(defaultTicker ? { ticker: defaultTicker } : {}) },
+    pathname: "/dcf" as const,
+    query: { ...(m === "modelo" ? { modo: "modelo" } : {}), ...(defaultTicker ? { ticker: defaultTicker } : {}) } as Record<string, string>,
   })
 
   return (
@@ -47,24 +47,28 @@ export default async function DcfPage({
         subtitle={t("subtitle")}
       />
 
-      <InfoNote icon={<Info className="h-5 w-5" />}>{t("educationalWarning")}</InfoNote>
-
       {!isPro && (
         <ProGate isPro={isPro} isLoggedIn={isLoggedIn} />
       )}
-      <div className="flex gap-1 rounded-xl border border-border/50 bg-muted/40 p-1 w-fit">
-        {(["simples", "modelo"] as const).map((m) => (
-          <Link key={m} href={hrefModo(m)}
-            className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition-all ${modo === m ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
-            {tModo(`modos.${m}`)}
-          </Link>
-        ))}
-      </div>
-      <div className={!isPro ? "pointer-events-none select-none" : ""}>
-        {modo === "simples" && <DcfSimples defaultTicker={defaultTicker} locked={locked} />}
-        {modo === "modelo" && <ModeloDcf defaultTicker={defaultTicker} locked={locked} />}
-        {modo === "rapida" && <DcfCalculator defaultTicker={defaultTicker} locked={locked} />}
-      </div>
+      {/* O aviso educativo é obrigatório (CLAUDE.md §10.5): sai da caixa do
+          topo para uma linha discreta no fim, a pedido do Costa. */}
+      <EspacoDcf
+        modo={modo}
+        hrefs={{ simples: hrefModo("simples"), modelo: hrefModo("modelo") }}
+        rotulos={{
+          modos: { simples: tModo("modos.simples"), modelo: tModo("modos.modelo") },
+          entrar: tModo("ecraInteiro.entrar"),
+          sair: tModo("ecraInteiro.sair"),
+          titulo: tModo("ecraInteiro.titulo"),
+        }}
+        aviso={t("educationalWarning")}
+      >
+        <div className={!isPro ? "pointer-events-none select-none" : ""}>
+          {modo === "simples" && <DcfSimples defaultTicker={defaultTicker} locked={locked} />}
+          {modo === "modelo" && <ModeloDcf defaultTicker={defaultTicker} locked={locked} />}
+          {modo === "rapida" && <DcfCalculator defaultTicker={defaultTicker} locked={locked} />}
+        </div>
+      </EspacoDcf>
     </div>
   )
 }

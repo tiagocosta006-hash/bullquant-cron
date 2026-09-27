@@ -1813,6 +1813,11 @@
       "WACC_MENOR_QUE_G": "A WACC tem de ser maior do que o crescimento perpétuo para o valor terminal de Gordon fazer sentido. Aumenta a WACC, baixa o crescimento ou usa o múltiplo de saída.",
       "SEM_ACOES": "Sem número de ações para calcular o valor por ação.",
       "SEM_DADOS": "Sem dados suficientes para projetar."
+    },
+    "ecraInteiro": {
+      "entrar": "Fullscreen",
+      "sair": "Sair",
+      "titulo": "BullValue DCF"
     }
   },
   "dcfSimples": {

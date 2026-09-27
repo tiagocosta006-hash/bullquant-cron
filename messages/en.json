@@ -1813,6 +1813,11 @@
       "WACC_MENOR_QUE_G": "WACC must be above perpetual growth for the Gordon terminal value to make sense. Raise WACC, lower growth or use the exit multiple.",
       "SEM_ACOES": "No share count to compute value per share.",
       "SEM_DADOS": "Not enough data to project."
+    },
+    "ecraInteiro": {
+      "entrar": "Fullscreen",
+      "sair": "Exit",
+      "titulo": "BullValue DCF"
     }
   },
   "dcfSimples": {

@@ -88,7 +88,7 @@ export function DcfSimples({ defaultTicker, locked = false }: { defaultTicker?: 
   React.useEffect(() => {
     if (locked || debounced.length < 2) { setResultados([]); return }
     let vivo = true
-    fetch(`/api/search?q=${encodeURIComponent(debounced)}`).then((r) => r.json())
+    fetch(`/api/search?empresas=1&q=${encodeURIComponent(debounced)}`).then((r) => r.json())
       .then((d) => vivo && setResultados(Array.isArray(d) ? d.slice(0, 8) : [])).catch(() => vivo && setResultados([]))
     return () => { vivo = false }
   }, [debounced, locked])
@@ -173,7 +173,8 @@ export function DcfSimples({ defaultTicker, locked = false }: { defaultTicker?: 
 
   return (
     <div className="space-y-6">
-      <div className="glass rounded-xl p-5 space-y-4">
+      {/* overflow-visible: o .glass corta o conteúdo, e cortava a lista da pesquisa. */}
+      <div className="glass relative z-30 overflow-visible rounded-xl p-5 space-y-4">
         <div className="flex flex-wrap items-center gap-4">
           {!locked && (
             <div className="relative w-full max-w-sm">
@@ -181,7 +182,7 @@ export function DcfSimples({ defaultTicker, locked = false }: { defaultTicker?: 
               <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("pesquisa")}
                 className="w-full rounded-lg border border-border bg-background py-2 pl-9 pr-3 text-sm outline-none focus:border-primary" />
               {resultados.length > 0 && (
-                <div className="absolute z-30 mt-1 w-full overflow-hidden rounded-lg border border-border bg-popover shadow-xl">
+                <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-lg border border-border bg-[#FBFAF7] shadow-2xl dark:bg-[#1A1917]">
                   {resultados.map((r) => (
                     <button key={r.ticker} type="button" onClick={() => carregar(r.ticker)} className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-muted/60">
                       <span className="w-14 font-semibold text-primary">{r.ticker}</span><span className="truncate text-muted-foreground">{r.name}</span>
@@ -206,7 +207,7 @@ export function DcfSimples({ defaultTicker, locked = false }: { defaultTicker?: 
           )}
         </div>
         {erro && <p className="flex items-center gap-2 text-sm text-bear"><AlertTriangle className="h-4 w-4" />{erro}</p>}
-        {!dados && !carregando && !erro && <p className="text-sm text-muted-foreground">{t("vazio")}</p>}
+        {!dados && !carregando && !erro && resultados.length === 0 && <p className="text-sm text-muted-foreground">{t("vazio")}</p>}
       </div>
 
       {dados && estado && calc && (

@@ -27,6 +27,8 @@ export type AnoHistorico = {
   stockBasedCompensation: number | null
   operatingCashFlow: number | null
   freeCashFlow: number | null
+  /** Receita por segmento (produto) e geografia, já verificada contra a receita (±10%). */
+  segmentos?: { product?: Record<string, number> | null; geography?: Record<string, number> | null } | null
 }
 
 /** Os pressupostos que se projetam ano a ano. */
@@ -69,9 +71,22 @@ export type PressupostosAvaliacao = {
   meioDoAno: boolean
 }
 
+/** Um segmento no Revenue Build: receita do último ano e crescimento por ano. */
+export type SegmentoProjetado = { nome: string; base: number; crescimento: number[] }
+
+export type ReceitaSegmentos = {
+  eixo: "product" | "geography"
+  segmentos: SegmentoProjetado[]
+  /** Receita − soma dos segmentos no último ano (reconciliação, cresce com o total dos segmentos). */
+  outros: number
+}
+
 export type Pressupostos = {
   /** Anos projetados (5 a 10). */
   anos: number
+  /** Revenue Build: crescimento total (driver) ou soma dos segmentos. */
+  modoReceita?: "total" | "segmentos"
+  receitaSegmentos?: ReceitaSegmentos | null
   /** Um valor por ano projetado, para cada driver. */
   drivers: Record<Driver, number[]>
   avaliacao: PressupostosAvaliacao
@@ -90,6 +105,8 @@ export type Mercado = {
 export type AnoProjetado = {
   fiscalYear: number
   receita: number
+  /** Só no modo por segmento: receita projetada de cada segmento. */
+  segmentos?: Record<string, number>
   cogs: number
   lucroBruto: number
   ebit: number

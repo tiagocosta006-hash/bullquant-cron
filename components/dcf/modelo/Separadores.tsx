@@ -4,11 +4,18 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 import { AlertTriangle } from "lucide-react"
 import {
-  DRIVERS, resumo,
-  type AnoHistorico, type AnoProjetado, type Avaliacao, type Driver, type Mercado, type Pressupostos,
+  resumo,
+  type AnoHistorico, type AnoProjetado, type Avaliacao, type Driver, type EstimativaModelo, type Mercado, type Pressupostos,
   type PressupostosAvaliacao, type RaciosAno,
 } from "@/lib/finance/modelo"
 import { TabelaModelo, CelulaEditavel, useFormatos, type Formato, type LinhaTabela } from "./TabelaModelo"
+
+/**
+ * Os separadores do modelo avançado, à FMVA: Historicals → Schedules →
+ * Projections → Valuation. Cada schedule tem os SEUS assumptions no topo
+ * (os inputs) e o cálculo por baixo; os pressupostos de avaliação vivem na
+ * Valuation, onde são usados.
+ */
 
 /** Quantos anos de histórico se mostram ao lado das projeções. */
 const ANOS_HIST_SCHEDULES = 5
@@ -17,11 +24,17 @@ export type ContextoSeparador = {
   historico: AnoHistorico[]
   racios: RaciosAno[]
   pressupostos: Pressupostos
+  iniciais: Pressupostos | null
   projecoes: AnoProjetado[]
   avaliacao: Avaliacao
   mercado: Mercado
+  estimativas: EstimativaModelo[]
   fracaoAno1: number
   onDriver: (d: Driver, ano: number, v: number) => void
+  onDriverSerie: (d: Driver, valores: number[]) => void
+  onSegmentoSerie: (nome: string, valores: number[]) => void
+  onModoReceita: (modo: "total" | "segmentos") => void
+  onAvaliacao: (patch: Partial<PressupostosAvaliacao>) => void
 }
 
 const FORMATO_DRIVER: Record<Driver, Formato> = {
@@ -47,8 +60,6 @@ function anosProj(c: ContextoSeparador) {
 function ultimos<T>(arr: T[], n: number) {
   return arr.slice(-n)
 }
-
-// ─── 1. Pressupostos ───────────────────────────────────────────────────────
 
 function CampoAvaliacao({
   a, k, formato, rotulo, ajuda, onAvaliacao,
@@ -88,6 +99,8 @@ function CampoAvaliacao({
   )
 }
 
+// ─── Assumptions de um schedule ────────────────────────────────────────────
+
 type Caminho = "linear" | "constant" | "custom"
 
 /** Que forma tem a série: constante, linha reta do ano 1 ao último, ou editada à mão. */
@@ -102,167 +115,118 @@ function linha(de: number, ate: number, n: number): number[] {
   return Array.from({ length: n }, (_, i) => (n === 1 ? ate : de + ((ate - de) * i) / (n - 1)))
 }
 
-export function SeparadorPressupostos({
-  c, iniciais, onDriverSerie, onAvaliacao,
-}: {
-  c: ContextoSeparador
-  iniciais: Pressupostos | null
-  onDriverSerie: (d: Driver, valores: number[]) => void
-  onAvaliacao: (patch: Partial<PressupostosAvaliacao>) => void
-}) {
+export type LinhaInput = {
+  chave: string
+  rotulo: string
+  formato: Formato
+  valores: number[]
+  iniciais?: number[] | null
+  /** Valores de referência (histórico), um por coluna de referência. */
+  refs: (number | null)[]
+  refsFormato?: Formato
+  onSerie: (v: number[]) => void
+}
+
+/**
+ * A tabela de assumptions de um schedule: por linha, as referências
+ * históricas, o Year 1, o Final year e o caminho entre os dois. "By year"
+ * abre a linha para afinar anos específicos.
+ */
+function TabelaAssumptions({ linhas, cabecalhosRefs, anos }: { linhas: LinhaInput[]; cabecalhosRefs: string[]; anos: number[] }) {
   const t = useTranslations("dcfModelo")
   const { fmt } = useFormatos()
-  const p = c.pressupostos
-  const a = p.avaliacao
-  const n = p.anos
-  const anos = anosProj(c)
-  const [aberto, setAberto] = React.useState<Driver | null>(null)
-
-  const grupos: Array<{ titulo: string; drivers: Driver[] }> = [
-    { titulo: t("seccoes.receita"), drivers: ["crescimentoReceita"] },
-    { titulo: t("seccoes.custos"), drivers: ["margemBruta", "margemEbit"] },
-    { titulo: t("seccoes.capexDa"), drivers: ["capexPctReceita", "daPctReceita"] },
-    { titulo: t("seccoes.fundoManeio"), drivers: ["dso", "dio", "dpo"] },
-    { titulo: t("seccoes.impostos"), drivers: ["taxaImposto"] },
-  ]
-
+  const [aberto, setAberto] = React.useState<string | null>(null)
+  const n = anos.length
+  const colunas = 5 + cabecalhosRefs.length
   return (
-    <div className="space-y-6">
-      <Cartao titulo={t("pressupostos.operacionais")}>
-        <p className="text-sm text-muted-foreground">{t("pressupostos.operacionaisAjuda")}</p>
-        <div className="overflow-x-auto rounded-xl border border-border/60">
-          <table className="w-full min-w-[820px] border-collapse text-sm">
-            <thead>
-              <tr className="border-b border-border/60 bg-muted/30 text-xs text-muted-foreground">
-                <th className="px-3 py-2 text-left font-medium">{t("pressupostos.driver")}</th>
-                <th className="px-3 py-2 text-right font-medium">{t("pressupostos.ultimoAno")}</th>
-                <th className="px-3 py-2 text-right font-medium">{t("pressupostos.media3Col")}</th>
-                <th className="border-l border-primary/10 bg-primary/5 px-3 py-2 text-right font-semibold text-primary">{t("pressupostos.ano1", { ano: anos[0] })}</th>
-                <th className="bg-primary/5 px-3 py-2 text-right font-semibold text-primary">{t("pressupostos.anoFinal", { ano: anos[n - 1] })}</th>
-                <th className="px-3 py-2 text-left font-medium">{t("pressupostos.caminho")}</th>
-                <th className="px-3 py-2"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {grupos.map((g) => (
-                <React.Fragment key={g.titulo}>
-                  <tr><td colSpan={7} className="px-3 pt-4 pb-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">{g.titulo}</td></tr>
-                  {g.drivers.map((d) => {
-                    const v = p.drivers[d]
-                    const cam = caminhoDe(v)
-                    const r = resumo(c.racios, d, 3)
-                    const formato = FORMATO_DRIVER[d]
-                    const mudarY1 = (x: number) => onDriverSerie(d, cam === "constant" ? v.map(() => x) : linha(x, v[n - 1], n))
-                    const mudarFinal = (x: number) => onDriverSerie(d, linha(v[0], x, n))
-                    const inicial = iniciais?.drivers[d]
-                    return (
-                      <React.Fragment key={d}>
-                        <tr className="border-b border-border/30">
-                          <td className="px-3 py-1.5 font-medium">{t(`drivers.${d}`)}</td>
-                          <td className="px-3 py-1.5 text-right tabular-nums text-muted-foreground">{fmt(r.ultimo, formato)}</td>
-                          <td className="px-3 py-1.5 text-right tabular-nums text-muted-foreground">{fmt(r.media, formato)}</td>
-                          <td className="border-l border-primary/10 px-2 py-1 text-right"><CelulaEditavel valor={v[0]} formato={formato} rotulo={`${t(`drivers.${d}`)} Y1`} onMudar={mudarY1} /></td>
-                          <td className="px-2 py-1 text-right">
-                            {cam === "constant"
-                              ? <button type="button" onClick={() => mudarFinal(v[0])} className="w-full rounded-md px-2 py-1 text-right text-sm tabular-nums text-muted-foreground hover:bg-muted/50" title={t("pressupostos.igualY1Ajuda")}>= Y1</button>
-                              : <CelulaEditavel valor={v[n - 1]} formato={formato} rotulo={`${t(`drivers.${d}`)} final`} onMudar={mudarFinal} />}
-                          </td>
-                          <td className="px-3 py-1.5">
-                            <div className="flex gap-1">
-                              {(["constant", "linear"] as const).map((k) => (
-                                <button key={k} type="button"
-                                  onClick={() => onDriverSerie(d, k === "constant" ? v.map(() => v[0]) : linha(v[0], v[n - 1], n))}
-                                  className={`rounded px-2 py-0.5 text-xs font-semibold ${cam === k ? "bg-primary text-primary-foreground" : "bg-muted/50 text-muted-foreground hover:text-foreground"}`}>
-                                  {t(`pressupostos.caminhos.${k}`)}
-                                </button>
-                              ))}
-                              {cam === "custom" && (inicial && inicial.length === v.length && inicial.every((x, i) => x === v[i])
-                                ? <span className="rounded bg-primary/15 px-2 py-0.5 text-xs font-semibold text-primary" title={t("pressupostos.consensoAjuda")}>{t("pressupostos.caminhos.consenso")}</span>
-                                : <span className="rounded bg-amber-500/15 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-400" title={t("pressupostos.customAjuda")}>{t("pressupostos.caminhos.custom")}</span>)}
-                            </div>
-                          </td>
-                          <td className="px-3 py-1.5 text-right whitespace-nowrap">
-                            <button type="button" onClick={() => setAberto(aberto === d ? null : d)} className="rounded px-2 py-0.5 text-xs text-primary hover:bg-primary/10">
-                              {aberto === d ? "▾" : "▸"} {t("pressupostos.porAno")}
-                            </button>
-                            {inicial && (
-                              <button type="button" onClick={() => onDriverSerie(d, [...inicial])} className="rounded px-2 py-0.5 text-xs text-muted-foreground hover:bg-muted/50" title={t("pressupostos.reporDriverAjuda")}>↺</button>
-                            )}
-                          </td>
-                        </tr>
-                        {aberto === d && (
-                          <tr className="border-b border-border/30 bg-muted/10">
-                            <td colSpan={7} className="px-3 py-3">
-                              <div className="flex flex-wrap gap-2">
-                                {v.map((x, i) => (
-                                  <label key={i} className="flex w-20 flex-col gap-1 text-xs text-muted-foreground">
-                                    <span className="text-center">{anos[i]}E</span>
-                                    <CelulaEditavel valor={x} formato={formato} rotulo={`${t(`drivers.${d}`)} ${anos[i]}`} onMudar={(val) => c.onDriver(d, i, val)} />
-                                  </label>
-                                ))}
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </React.Fragment>
-                    )
-                  })}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Cartao>
-
-      <Cartao titulo={t("pressupostos.avaliacao")}>
-        <div className="grid grid-cols-2 gap-5 md:grid-cols-4">
-          <CampoAvaliacao a={a} onAvaliacao={onAvaliacao} k="rf" formato="pct" rotulo={t("pressupostos.rf")} ajuda={t("pressupostos.rfAjuda")} />
-          <CampoAvaliacao a={a} onAvaliacao={onAvaliacao} k="erp" formato="pct" rotulo={t("pressupostos.erp")} ajuda={t("pressupostos.erpAjuda")} />
-          <CampoAvaliacao a={a} onAvaliacao={onAvaliacao} k="beta" formato="anos" rotulo={t("pressupostos.beta")} ajuda={t("pressupostos.betaAjuda")} />
-          <CampoAvaliacao a={a} onAvaliacao={onAvaliacao} k="custoDivida" formato="pct" rotulo={t("pressupostos.custoDivida")} ajuda={t("pressupostos.custoDividaAjuda")} />
-          <CampoAvaliacao a={a} onAvaliacao={onAvaliacao} k="taxaImpostoWacc" formato="pct" rotulo={t("pressupostos.taxaImpostoWacc")} />
-          <CampoAvaliacao a={a} onAvaliacao={onAvaliacao} k="g" formato="pct" rotulo={t("pressupostos.g")} ajuda={t("pressupostos.gAjuda")} />
-          <CampoAvaliacao a={a} onAvaliacao={onAvaliacao} k="multiploSaida" formato="x" rotulo={t("pressupostos.multiplo")} ajuda={t("pressupostos.multiploAjuda")} />
-          <label className="flex flex-col gap-1">
-            <span className="text-xs font-medium text-muted-foreground">{t("pressupostos.waccManual")}</span>
-            <div className="flex items-center gap-2">
-              <input
-                defaultValue={a.waccManual !== null ? String(Math.round(a.waccManual * 1000) / 10).replace(".", ",") : ""}
-                key={a.waccManual ?? "auto"}
-                placeholder={t("pressupostos.waccAuto")}
-                inputMode="decimal"
-                onBlur={(e) => {
-                  const s = e.target.value.replace(",", ".").replace("%", "").trim()
-                  onAvaliacao({ waccManual: s === "" ? null : Number.isFinite(Number(s)) ? Number(s) / 100 : a.waccManual })
-                }}
-                className="w-28 rounded-md border border-primary/30 bg-primary/5 px-2 py-1.5 text-right text-sm font-medium tabular-nums text-primary outline-none focus:border-primary placeholder:text-muted-foreground/60"
-              />
-              <span className="text-xs text-muted-foreground">%</span>
-            </div>
-            <span className="text-[11px] leading-snug text-muted-foreground/80">{t("pressupostos.waccManualAjuda")}</span>
-          </label>
-        </div>
-        <div className="flex flex-wrap items-center gap-6 pt-2">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground">{t("pressupostos.metodo")}</span>
-            {(["gordon", "multiplo", "media"] as const).map((m) => (
-              <button key={m} type="button" onClick={() => onAvaliacao({ metodoTerminal: m })}
-                className={`rounded-md px-3 py-1 text-xs font-semibold ${a.metodoTerminal === m ? "bg-primary text-primary-foreground" : "bg-muted/50 text-muted-foreground hover:text-foreground"}`}>
-                {t(`pressupostos.metodos.${m}`)}
-              </button>
-            ))}
-          </div>
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={a.meioDoAno} onChange={(e) => onAvaliacao({ meioDoAno: e.target.checked })} className="h-4 w-4 accent-[var(--primary)]" />
-            <span>{t("pressupostos.meioDoAno")}</span>
-          </label>
-        </div>
-      </Cartao>
+    <div className="overflow-x-auto rounded-xl border border-primary/20 bg-primary/[0.03]">
+      <table className="w-full min-w-[760px] border-collapse text-sm">
+        <thead>
+          <tr className="border-b border-border/60 text-xs text-muted-foreground">
+            <th className="px-3 py-2 text-left font-semibold uppercase tracking-wider text-primary">{t("schedules.assumptions")}</th>
+            {cabecalhosRefs.map((h) => <th key={h} className="px-3 py-2 text-right font-medium">{h}</th>)}
+            <th className="px-3 py-2 text-right font-semibold text-primary">{t("pressupostos.ano1", { ano: anos[0] })}</th>
+            <th className="px-3 py-2 text-right font-semibold text-primary">{t("pressupostos.anoFinal", { ano: anos[n - 1] })}</th>
+            <th className="px-3 py-2 text-left font-medium">{t("pressupostos.caminho")}</th>
+            <th className="px-3 py-2"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {linhas.map((l) => {
+            const v = l.valores
+            const cam = caminhoDe(v)
+            const eIniciais = l.iniciais && l.iniciais.length === v.length && l.iniciais.every((x, i) => x === v[i])
+            const mudarY1 = (x: number) => l.onSerie(cam === "constant" ? v.map(() => x) : linha(x, v[n - 1], n))
+            const mudarFinal = (x: number) => l.onSerie(linha(v[0], x, n))
+            return (
+              <React.Fragment key={l.chave}>
+                <tr className="border-b border-border/30">
+                  <td className="px-3 py-1.5 font-medium">{l.rotulo}</td>
+                  {l.refs.map((r, i) => <td key={i} className="px-3 py-1.5 text-right tabular-nums text-muted-foreground">{fmt(r, l.refsFormato ?? l.formato)}</td>)}
+                  <td className="px-2 py-1 text-right"><CelulaEditavel valor={v[0]} formato={l.formato} rotulo={`${l.rotulo} Y1`} onMudar={mudarY1} /></td>
+                  <td className="px-2 py-1 text-right">
+                    {cam === "constant"
+                      ? <button type="button" onClick={() => mudarFinal(v[0])} className="w-full rounded-md px-2 py-1 text-right text-sm tabular-nums text-muted-foreground hover:bg-muted/50" title={t("pressupostos.igualY1Ajuda")}>= Y1</button>
+                      : <CelulaEditavel valor={v[n - 1]} formato={l.formato} rotulo={`${l.rotulo} final`} onMudar={mudarFinal} />}
+                  </td>
+                  <td className="px-3 py-1.5">
+                    <div className="flex flex-wrap gap-1">
+                      {(["constant", "linear"] as const).map((k) => (
+                        <button key={k} type="button"
+                          onClick={() => l.onSerie(k === "constant" ? v.map(() => v[0]) : linha(v[0], v[n - 1], n))}
+                          className={`rounded px-2 py-0.5 text-xs font-semibold ${cam === k ? "bg-primary text-primary-foreground" : "bg-muted/50 text-muted-foreground hover:text-foreground"}`}>
+                          {t(`pressupostos.caminhos.${k}`)}
+                        </button>
+                      ))}
+                      {cam === "custom" && (eIniciais
+                        ? <span className="rounded bg-primary/15 px-2 py-0.5 text-xs font-semibold text-primary" title={t("pressupostos.consensoAjuda")}>{t("pressupostos.caminhos.consenso")}</span>
+                        : <span className="rounded bg-amber-500/15 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-400" title={t("pressupostos.customAjuda")}>{t("pressupostos.caminhos.custom")}</span>)}
+                    </div>
+                  </td>
+                  <td className="px-3 py-1.5 text-right whitespace-nowrap">
+                    <button type="button" onClick={() => setAberto(aberto === l.chave ? null : l.chave)} className="rounded px-2 py-0.5 text-xs text-primary hover:bg-primary/10">
+                      {aberto === l.chave ? "▾" : "▸"} {t("pressupostos.porAno")}
+                    </button>
+                    {l.iniciais && (
+                      <button type="button" onClick={() => l.onSerie([...l.iniciais!])} className="rounded px-2 py-0.5 text-xs text-muted-foreground hover:bg-muted/50" title={t("pressupostos.reporDriverAjuda")}>↺</button>
+                    )}
+                  </td>
+                </tr>
+                {aberto === l.chave && (
+                  <tr className="border-b border-border/30 bg-muted/10">
+                    <td colSpan={colunas} className="px-3 py-3">
+                      <div className="flex flex-wrap gap-2">
+                        {v.map((x, i) => (
+                          <label key={i} className="flex w-20 flex-col gap-1 text-xs text-muted-foreground">
+                            <span className="text-center">{anos[i]}E</span>
+                            <CelulaEditavel valor={x} formato={l.formato} rotulo={`${l.rotulo} ${anos[i]}`} onMudar={(val) => l.onSerie(v.map((y, j) => (j === i ? val : y)))} />
+                          </label>
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            )
+          })}
+        </tbody>
+      </table>
     </div>
   )
 }
 
-// ─── 2. Histórico ──────────────────────────────────────────────────────────
+/** Linhas de assumptions para drivers "normais" (com Last FY e 3Y avg). */
+function linhasDrivers(c: ContextoSeparador, drivers: Driver[], rotulo: (d: Driver) => string): LinhaInput[] {
+  return drivers.map((d) => {
+    const r = resumo(c.racios, d, 3)
+    return {
+      chave: d, rotulo: rotulo(d), formato: FORMATO_DRIVER[d], valores: c.pressupostos.drivers[d],
+      iniciais: c.iniciais?.drivers[d] ?? null, refs: [r.ultimo, r.media], onSerie: (v) => c.onDriverSerie(d, v),
+    }
+  })
+}
+
+// ─── 1. Historicals ──────────────────────────────────────────────────────────
 
 export function SeparadorHistorico({ c }: { c: ContextoSeparador }) {
   const t = useTranslations("dcfModelo")
@@ -304,7 +268,119 @@ export function SeparadorHistorico({ c }: { c: ContextoSeparador }) {
   )
 }
 
-// ─── 3. Schedules ──────────────────────────────────────────────────────────
+// ─── 2. Schedules ──────────────────────────────────────────────────────────
+
+/** CAGR entre dois valores positivos. */
+function cagrEntre(ini: number | null | undefined, fim: number | null | undefined, anos: number): number | null {
+  return ini && fim && ini > 0 && fim > 0 && anos > 0 ? Math.pow(fim / ini, 1 / anos) - 1 : null
+}
+
+function RevenueBuild({ c }: { c: ContextoSeparador }) {
+  const t = useTranslations("dcfModelo")
+  const p = c.pressupostos
+  const rs = p.receitaSegmentos ?? null
+  const modo = rs ? p.modoReceita ?? "total" : "total"
+  const h = ultimos(c.historico, 6)
+  const r = ultimos(c.racios, 6)
+  const anosH = h.map((a) => a.fiscalYear)
+  const anosP = anosProj(c)
+  const pr = c.projecoes
+  const ult = c.historico[c.historico.length - 1]
+
+  // Crescimento implícito no consenso, para os anos projetados que o têm.
+  const consenso = anosP.map((fy, i) => {
+    const e = c.estimativas.find((x) => x.fiscalYear === fy)
+    const antes = i === 0 ? { revenueAvg: ult.revenue ?? 0 } : c.estimativas.find((x) => x.fiscalYear === fy - 1)
+    return e && antes && antes.revenueAvg > 0 ? e.revenueAvg / antes.revenueAvg - 1 : null
+  })
+  const crescimentoProj = pr.map((x, i) => (i === 0 ? (ult.revenue ? x.receita / ult.revenue - 1 : null) : x.receita / pr[i - 1].receita - 1))
+
+  const eixo = rs?.eixo
+  const segHist = (nome: string) => h.map((a) => (eixo ? a.segmentos?.[eixo]?.[nome] ?? null : null))
+  const nomes = rs?.segmentos.map((s) => s.nome) ?? []
+
+  const seletor = rs ? (
+    <div className="flex gap-1 rounded-lg bg-muted/50 p-1">
+      {(["total", "segmentos"] as const).map((m) => (
+        <button key={m} type="button" onClick={() => c.onModoReceita(m)}
+          className={`rounded-md px-3 py-1 text-xs font-semibold ${modo === m ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+          {m === "total" ? t("receita.modoTotal") : t(`receita.modoSegmentos.${rs.eixo}`)}
+        </button>
+      ))}
+    </div>
+  ) : null
+
+  // Receita por segmento: histórico sempre visível (é o que diz o que cresce);
+  // projeção só no modo por segmento.
+  const tabelaSegmentos: LinhaTabela[] = rs ? [
+    ...nomes.map((nome) => ({
+      rotulo: nome, formato: "m" as const, hist: segHist(nome),
+      proj: modo === "segmentos" ? pr.map((x) => x.segmentos?.[nome] ?? null) : undefined,
+    })),
+    {
+      rotulo: t("receita.outros"), formato: "m" as const, nota: t("receita.outrosNota"),
+      hist: h.map((a) => {
+        const m = eixo ? a.segmentos?.[eixo] : null
+        return m && a.revenue !== null ? a.revenue - Object.values(m).reduce((s, v) => s + v, 0) : null
+      }),
+      proj: modo === "segmentos" ? pr.map((x) => (x.segmentos ? x.receita - Object.values(x.segmentos).reduce((s, v) => s + v, 0) : null)) : undefined,
+    },
+    { rotulo: t("linhas.receita"), formato: "m" as const, hist: h.map((a) => a.revenue), proj: pr.map((x) => x.receita), subtotal: true, destaque: true },
+    { rotulo: t("drivers.crescimentoReceita"), formato: "pct" as const, hist: r.map((x) => x.crescimentoReceita), proj: crescimentoProj },
+    { rotulo: t("receita.consenso"), formato: "pct" as const, proj: consenso },
+  ] : []
+
+  const crescimentoSeg: LinhaTabela[] = rs ? nomes.map((nome) => {
+    const s = segHist(nome)
+    return {
+      rotulo: nome, formato: "pct" as const,
+      hist: s.map((v, i) => (i > 0 && v !== null && s[i - 1] ? v / (s[i - 1] as number) - 1 : null)),
+      proj: modo === "segmentos" ? rs.segmentos.find((x) => x.nome === nome)!.crescimento : undefined,
+      driver: modo === "segmentos" ? ("crescimentoReceita" as Driver) : undefined,
+    }
+  }) : []
+
+  const inputsSegmentos: LinhaInput[] = rs && modo === "segmentos" ? rs.segmentos.map((s) => {
+    const serie = c.historico.map((a) => (eixo ? a.segmentos?.[eixo]?.[s.nome] ?? null : null))
+    const fim = serie[serie.length - 1]
+    const somaUlt = eixo && ult.segmentos?.[eixo] ? Object.values(ult.segmentos[eixo]!).reduce((a, b) => a + b, 0) : 0
+    const ini = c.iniciais?.receitaSegmentos?.segmentos.find((x) => x.nome === s.nome)?.crescimento ?? null
+    return {
+      chave: `seg:${s.nome}`, rotulo: s.nome, formato: "pct" as const, valores: s.crescimento, iniciais: ini,
+      refs: [cagrEntre(serie[serie.length - 4], fim, 3), cagrEntre(serie[serie.length - 6], fim, 5), somaUlt > 0 && fim ? fim / somaUlt : null],
+      onSerie: (v: number[]) => c.onSegmentoSerie(s.nome, v),
+    }
+  }) : []
+
+  return (
+    <Cartao titulo={t("seccoes.receita")} acao={seletor}>
+      <p className="text-sm text-muted-foreground">{modo === "segmentos" ? t("receita.segmentosAjuda") : t("schedules.receitaAjuda")}</p>
+      {modo === "total" ? (
+        <TabelaAssumptions anos={anosP} cabecalhosRefs={[t("pressupostos.ultimoAno"), t("pressupostos.media3Col")]}
+          linhas={linhasDrivers(c, ["crescimentoReceita"], (d) => t(`drivers.${d}`))} />
+      ) : (
+        <TabelaAssumptions anos={anosP} cabecalhosRefs={[t("receita.cagr3"), t("receita.cagr5"), t("receita.mix")]} linhas={inputsSegmentos} />
+      )}
+      {rs ? (
+        <>
+          <p className="pt-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">{t("receita.receitaSegmentos")}</p>
+          <TabelaModelo anosHist={anosH} anosProj={modo === "segmentos" ? anosP : anosP} linhas={tabelaSegmentos} unidade={t("unidade")} />
+          <p className="pt-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">{t("receita.crescimentoSegmentos")}</p>
+          <TabelaModelo anosHist={anosH} anosProj={modo === "segmentos" ? anosP : []} linhas={crescimentoSeg} unidade="YoY" />
+        </>
+      ) : (
+        <>
+          <TabelaModelo anosHist={anosH} anosProj={anosP} unidade={t("unidade")} linhas={[
+            { rotulo: t("drivers.crescimentoReceita"), formato: "pct", driver: "crescimentoReceita", hist: r.map((x) => x.crescimentoReceita), proj: p.drivers.crescimentoReceita },
+            { rotulo: t("linhas.receita"), formato: "m", hist: h.map((a) => a.revenue), proj: pr.map((x) => x.receita), destaque: true },
+            { rotulo: t("receita.consenso"), formato: "pct", proj: consenso },
+          ]} />
+          <p className="text-xs text-muted-foreground">{t("receita.semSegmentos")}</p>
+        </>
+      )}
+    </Cartao>
+  )
+}
 
 export function SeparadorSchedules({ c }: { c: ContextoSeparador }) {
   const t = useTranslations("dcfModelo")
@@ -316,17 +392,12 @@ export function SeparadorSchedules({ c }: { c: ContextoSeparador }) {
   const anosP = anosProj(c)
   const col = <K extends keyof AnoHistorico>(k: K) => h.map((a) => a[k] as number | null)
   const nwcHist = h.map((a) => (a.accountsReceivable ?? 0) + (a.inventory ?? 0) - (a.accountsPayable ?? 0))
+  const refs = [t("pressupostos.ultimoAno"), t("pressupostos.media3Col")]
+  const rot = (x: Driver) => t(`drivers.${x}`)
 
-  const blocos: Array<{ titulo: string; ajuda: string; linhas: LinhaTabela[] }> = [
+  const blocos: Array<{ titulo: string; ajuda: string; drivers: Driver[]; linhas: LinhaTabela[] }> = [
     {
-      titulo: t("seccoes.receita"), ajuda: t("schedules.receitaAjuda"),
-      linhas: [
-        { rotulo: t("drivers.crescimentoReceita"), formato: "pct", driver: "crescimentoReceita", hist: r.map((x) => x.crescimentoReceita), proj: d.crescimentoReceita },
-        { rotulo: t("linhas.receita"), formato: "m", hist: col("revenue"), proj: pr.map((p) => p.receita), destaque: true },
-      ],
-    },
-    {
-      titulo: t("seccoes.custos"), ajuda: t("schedules.custosAjuda"),
+      titulo: t("seccoes.custos"), ajuda: t("schedules.custosAjuda"), drivers: ["margemBruta", "margemEbit"],
       linhas: [
         { rotulo: t("drivers.margemBruta"), formato: "pct", driver: "margemBruta", hist: r.map((x) => x.margemBruta), proj: d.margemBruta },
         { rotulo: t("linhas.custoVendas"), formato: "m", hist: col("costOfRevenue"), proj: pr.map((p) => p.cogs) },
@@ -336,7 +407,7 @@ export function SeparadorSchedules({ c }: { c: ContextoSeparador }) {
       ],
     },
     {
-      titulo: t("seccoes.capexDa"), ajuda: t("schedules.capexAjuda"),
+      titulo: t("seccoes.capexDa"), ajuda: t("schedules.capexAjuda"), drivers: ["capexPctReceita", "daPctReceita"],
       linhas: [
         { rotulo: t("drivers.capexPctReceita"), formato: "pct", driver: "capexPctReceita", hist: r.map((x) => x.capexPctReceita), proj: d.capexPctReceita },
         { rotulo: t("linhas.capex"), formato: "m", hist: col("capex"), proj: pr.map((p) => p.capex) },
@@ -346,7 +417,7 @@ export function SeparadorSchedules({ c }: { c: ContextoSeparador }) {
       ],
     },
     {
-      titulo: t("seccoes.fundoManeio"), ajuda: t("schedules.fundoManeioAjuda"),
+      titulo: t("seccoes.fundoManeio"), ajuda: t("schedules.fundoManeioAjuda"), drivers: ["dso", "dio", "dpo"],
       linhas: [
         { rotulo: t("drivers.dso"), formato: "dias", driver: "dso", hist: r.map((x) => x.dso), proj: d.dso },
         { rotulo: t("linhas.clientes"), formato: "m", hist: col("accountsReceivable"), proj: pr.map((p) => p.clientes) },
@@ -359,7 +430,7 @@ export function SeparadorSchedules({ c }: { c: ContextoSeparador }) {
       ],
     },
     {
-      titulo: t("seccoes.impostos"), ajuda: t("schedules.impostosAjuda"),
+      titulo: t("seccoes.impostos"), ajuda: t("schedules.impostosAjuda"), drivers: ["taxaImposto"],
       linhas: [
         { rotulo: t("drivers.taxaImposto"), formato: "pct", driver: "taxaImposto", hist: r.map((x) => x.taxaImposto), proj: d.taxaImposto },
         { rotulo: t("linhas.impostosOperacionais"), formato: "m", proj: pr.map((p) => p.impostosOperacionais) },
@@ -369,10 +440,11 @@ export function SeparadorSchedules({ c }: { c: ContextoSeparador }) {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-muted-foreground">{t("schedules.inputsNota")}</p>
+      <RevenueBuild c={c} />
       {blocos.map((b) => (
         <Cartao key={b.titulo} titulo={b.titulo}>
           <p className="text-sm text-muted-foreground">{b.ajuda}</p>
+          <TabelaAssumptions anos={anosP} cabecalhosRefs={refs} linhas={linhasDrivers(c, b.drivers, rot)} />
           <TabelaModelo anosHist={anosH} anosProj={anosP} linhas={b.linhas} unidade={t("unidade")} />
         </Cartao>
       ))}
@@ -380,7 +452,7 @@ export function SeparadorSchedules({ c }: { c: ContextoSeparador }) {
   )
 }
 
-// ─── 4. Projeções ──────────────────────────────────────────────────────────
+// ─── 3. Projections ──────────────────────────────────────────────────────────
 
 export function SeparadorProjecoes({ c }: { c: ContextoSeparador }) {
   const t = useTranslations("dcfModelo")
@@ -417,9 +489,63 @@ export function SeparadorProjecoes({ c }: { c: ContextoSeparador }) {
   )
 }
 
-// ─── 5. Avaliação ──────────────────────────────────────────────────────────
+
+function AssumptionsAvaliacao({ c }: { c: ContextoSeparador }) {
+  const t = useTranslations("dcfModelo")
+  const a = c.pressupostos.avaliacao
+  const onAvaliacao = c.onAvaliacao
+  return (
+    <Cartao titulo={t("pressupostos.avaliacao")}>
+      <div className="grid grid-cols-2 gap-5 md:grid-cols-4">
+        <CampoAvaliacao a={a} onAvaliacao={onAvaliacao} k="rf" formato="pct" rotulo={t("pressupostos.rf")} ajuda={t("pressupostos.rfAjuda")} />
+        <CampoAvaliacao a={a} onAvaliacao={onAvaliacao} k="erp" formato="pct" rotulo={t("pressupostos.erp")} ajuda={t("pressupostos.erpAjuda")} />
+        <CampoAvaliacao a={a} onAvaliacao={onAvaliacao} k="beta" formato="anos" rotulo={t("pressupostos.beta")} ajuda={t("pressupostos.betaAjuda")} />
+        <CampoAvaliacao a={a} onAvaliacao={onAvaliacao} k="custoDivida" formato="pct" rotulo={t("pressupostos.custoDivida")} ajuda={t("pressupostos.custoDividaAjuda")} />
+        <CampoAvaliacao a={a} onAvaliacao={onAvaliacao} k="taxaImpostoWacc" formato="pct" rotulo={t("pressupostos.taxaImpostoWacc")} />
+        <CampoAvaliacao a={a} onAvaliacao={onAvaliacao} k="g" formato="pct" rotulo={t("pressupostos.g")} ajuda={t("pressupostos.gAjuda")} />
+        <CampoAvaliacao a={a} onAvaliacao={onAvaliacao} k="multiploSaida" formato="x" rotulo={t("pressupostos.multiplo")} ajuda={t("pressupostos.multiploAjuda")} />
+        <label className="flex flex-col gap-1">
+          <span className="text-xs font-medium text-muted-foreground">{t("pressupostos.waccManual")}</span>
+          <div className="flex items-center gap-2">
+            <input
+              defaultValue={a.waccManual !== null ? String(Math.round(a.waccManual * 1000) / 10).replace(".", ",") : ""}
+              key={a.waccManual ?? "auto"}
+              placeholder={t("pressupostos.waccAuto")}
+              inputMode="decimal"
+              onBlur={(e) => {
+                const s = e.target.value.replace(",", ".").replace("%", "").trim()
+                onAvaliacao({ waccManual: s === "" ? null : Number.isFinite(Number(s)) ? Number(s) / 100 : a.waccManual })
+              }}
+              className="w-28 rounded-md border border-primary/30 bg-primary/5 px-2 py-1.5 text-right text-sm font-medium tabular-nums text-primary outline-none focus:border-primary placeholder:text-muted-foreground/60"
+            />
+            <span className="text-xs text-muted-foreground">%</span>
+          </div>
+          <span className="text-[11px] leading-snug text-muted-foreground/80">{t("pressupostos.waccManualAjuda")}</span>
+        </label>
+      </div>
+      <div className="flex flex-wrap items-center gap-6 pt-2">
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-muted-foreground">{t("pressupostos.metodo")}</span>
+          {(["gordon", "multiplo", "media"] as const).map((m) => (
+            <button key={m} type="button" onClick={() => onAvaliacao({ metodoTerminal: m })}
+              className={`rounded-md px-3 py-1 text-xs font-semibold ${a.metodoTerminal === m ? "bg-primary text-primary-foreground" : "bg-muted/50 text-muted-foreground hover:text-foreground"}`}>
+              {t(`pressupostos.metodos.${m}`)}
+            </button>
+          ))}
+        </div>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={a.meioDoAno} onChange={(e) => onAvaliacao({ meioDoAno: e.target.checked })} className="h-4 w-4 accent-[var(--primary)]" />
+          <span>{t("pressupostos.meioDoAno")}</span>
+        </label>
+      </div>
+    </Cartao>
+  )
+}
+
+// ─── 4. Valuation ──────────────────────────────────────────────────────────
 
 export function SeparadorAvaliacao({ c }: { c: ContextoSeparador }) {
+  const assumptions = <AssumptionsAvaliacao c={c} />
   const t = useTranslations("dcfModelo")
   const { fmt } = useFormatos()
   const v = c.avaliacao
@@ -429,9 +555,12 @@ export function SeparadorAvaliacao({ c }: { c: ContextoSeparador }) {
 
   if (!v.valido) {
     return (
-      <div className="glass flex items-start gap-3 rounded-xl p-5 text-sm">
-        <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
-        <p>{t(`erros.${v.erro ?? "SEM_DADOS"}`)}</p>
+      <div className="space-y-6">
+        {assumptions}
+        <div className="glass flex items-start gap-3 rounded-xl p-5 text-sm">
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
+          <p>{t(`erros.${v.erro ?? "SEM_DADOS"}`)}</p>
+        </div>
       </div>
     )
   }
@@ -453,6 +582,7 @@ export function SeparadorAvaliacao({ c }: { c: ContextoSeparador }) {
   const cor = v.potencial >= 0 ? "text-bull" : "text-bear"
   return (
     <div className="space-y-6">
+      {assumptions}
       <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {[
           { r: t("avaliacao.valorPorAcao"), v: `$${fmt(v.valorPorAcao, "anos")}`, c: "text-primary" },

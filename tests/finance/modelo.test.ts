@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import { modeloFcffAplicavel } from "@/lib/finance/modelo/aplicabilidade"
 import {
-  projetar, avaliar, racios, resumo, fracaoAno1, pressupostosIniciais, mudarHorizonte, interpolar,
+  projetar, avaliar, racios, resumo, fracaoAno1, pressupostosIniciais, segmentosIniciais, mudarHorizonte, interpolar,
   type AnoHistorico, type Pressupostos,
 } from "@/lib/finance/modelo"
 
@@ -174,5 +174,45 @@ describe("modelo DCF — a que empresas se aplica", () => {
     expect(modeloFcffAplicavel("Financials", "Insurance Brokers", "AON")).toBe(true)
     expect(modeloFcffAplicavel("Financials", "Asset Management & Custody Banks", "BLK")).toBe(true)
     expect(modeloFcffAplicavel("Information Technology", "Software", "MSFT")).toBe(true)
+  })
+})
+
+describe("modelo DCF — Revenue Build por segmento", () => {
+  // Dois segmentos: A cresceu 20%/ano (100 → 172,8 em 3 anos), B 0% (200 → 200).
+  const h = (fy: number, a: number, b: number): AnoHistorico => ({
+    ...base, fiscalYear: fy, revenue: a + b + 10, segmentos: { product: { A: a, B: b } },
+  })
+  const hist = [h(2022, 100, 200), h(2023, 120, 200), h(2024, 144, 200), h(2025, 172.8, 200)]
+
+  it("calibrado ao crescimento total do ano 1 e converge para o destino", () => {
+    const rs = segmentosIniciais(hist, [0.1, 0.07, 0.04])!
+    expect(rs.eixo).toBe("product")
+    expect(rs.outros).toBeCloseTo(10, 9)
+    const [A, B] = rs.segmentos
+    // média ponderada dos CAGR: (172,8×20% + 200×0%)/372,8 = 9,27%; ajuste = 10% − 9,27%
+    const media = (172.8 * 0.2) / 372.8
+    expect(A.crescimento[0]).toBeCloseTo(0.2 + (0.1 - media), 9)
+    expect(B.crescimento[0]).toBeCloseTo(0 + (0.1 - media), 9)
+    expect(A.crescimento[2]).toBeCloseTo(0.04, 9)
+    // soma ponderada dos crescimentos do ano 1 = crescimento total
+    expect((172.8 * A.crescimento[0] + 200 * B.crescimento[0]) / 372.8).toBeCloseTo(0.1, 9)
+  })
+
+  it("no modo por segmento a receita é a soma dos segmentos mais a reconciliação", () => {
+    const rs = segmentosIniciais(hist, [0.1, 0.1])!
+    const ult = hist[hist.length - 1]
+    const pp = { ...p, anos: 2, modoReceita: "segmentos" as const, receitaSegmentos: rs }
+    const proj = projetar(ult, pp)
+    const a1 = 172.8 * (1 + rs.segmentos[0].crescimento[0])
+    const b1 = 200 * (1 + rs.segmentos[1].crescimento[0])
+    expect(proj[0].segmentos!.A).toBeCloseTo(a1, 9)
+    expect(proj[0].receita).toBeCloseTo(a1 + b1 + 10 * ((a1 + b1) / 372.8), 9)
+    // calibrado: o total cresce ~10% como no modo total
+    expect(proj[0].receita / ult.revenue! - 1).toBeCloseTo(0.1, 6)
+  })
+
+  it("sem segmentos (ou só um) não há Revenue Build por segmento", () => {
+    expect(segmentosIniciais([{ ...base, segmentos: { product: { Único: 1000 } } }], [0.1])).toBeNull()
+    expect(segmentosIniciais([base], [0.1])).toBeNull()
   })
 })

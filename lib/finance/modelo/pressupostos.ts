@@ -1,5 +1,5 @@
 import { resumo } from "./historico"
-import type { AnoHistorico, Driver, Pressupostos, PressupostosAvaliacao, RaciosAno } from "./tipos"
+import type { AnoHistorico, Driver, Pressupostos, PressupostosAvaliacao, RaciosAno, ReceitaSegmentos } from "./tipos"
 
 /**
  * Pressupostos com que um modelo abre — um ponto de partida defensável, que
@@ -118,6 +118,8 @@ export function pressupostosIniciais(
 
   return {
     anos,
+    modoReceita: "total",
+    receitaSegmentos: segmentosIniciais(hist, crescimento),
     drivers: {
       crescimentoReceita: crescimento,
       margemBruta: constante(lim(med3("margemBruta", 1), -1, 1)),
@@ -142,7 +144,11 @@ export function mudarHorizonte(p: Pressupostos, anos: number): Pressupostos {
       return [k, out]
     }),
   ) as Pressupostos["drivers"]
-  return { ...p, anos, drivers }
+  const estender = (v: number[]) => { const o = v.slice(0, anos); while (o.length < anos) o.push(o[o.length - 1] ?? 0); return o }
+  const receitaSegmentos = p.receitaSegmentos
+    ? { ...p.receitaSegmentos, segmentos: p.receitaSegmentos.segmentos.map((s) => ({ ...s, crescimento: estender(s.crescimento) })) }
+    : p.receitaSegmentos
+  return { ...p, anos, drivers, receitaSegmentos }
 }
 
 /** Preenche um driver em linha reta do ano `de` ao último, até `valorFinal`. */
@@ -153,4 +159,58 @@ export function interpolar(valores: number[], de: number, valorFinal: number): n
   const l = linha(out[de], valorFinal, n)
   for (let i = 0; i < n; i++) out[de + i] = l[i]
   return out
+}
+
+/**
+ * Segmentos para o Revenue Build, a partir do histórico.
+ *
+ * Usa o eixo de produto se o último ano tiver pelo menos 2 segmentos, senão
+ * o geográfico. Os segmentos são os do ÚLTIMO ano: as empresas reorganizam-
+ * se (a Microsoft trocou "Office" por "Microsoft 365") e projetar nomes que já
+ * não existem não faz sentido.
+ *
+ * Crescimento por omissão: o CAGR de 3 anos de cada segmento (ou o último ano,
+ * se só houver 2), CALIBRADO ao crescimento total do ano 1 — soma-se a cada
+ * segmento a diferença entre o crescimento total e a média ponderada dos
+ * segmentos. Assim, mudar para o modo por segmento não altera o valor até o
+ * analista mexer. Depois converge em linha reta para o mesmo destino da
+ * receita total.
+ */
+export function segmentosIniciais(hist: AnoHistorico[], crescimentoTotal: number[]): ReceitaSegmentos | null {
+  const ult = hist[hist.length - 1]
+  const escolher = (eixo: "product" | "geography") => {
+    const m = ult?.segmentos?.[eixo]
+    return m && Object.keys(m).length >= 2 ? m : null
+  }
+  const eixo: "product" | "geography" | null = escolher("product") ? "product" : escolher("geography") ? "geography" : null
+  if (!eixo || !ult.revenue) return null
+  const atual = escolher(eixo)!
+  const n = crescimentoTotal.length
+  const nomes = Object.keys(atual).filter((k) => atual[k] > 0)
+  if (nomes.length < 2) return null
+
+  const cagrDe = (nome: string): number | null => {
+    const serie = hist.map((a) => a.segmentos?.[eixo]?.[nome] ?? null)
+    const fim = serie[serie.length - 1]
+    for (const anos of [3, 2, 1]) {
+      const ini = serie[serie.length - 1 - anos]
+      if (ini && ini > 0 && fim && fim > 0) return Math.pow(fim / ini, 1 / anos) - 1
+    }
+    return null
+  }
+  const soma = nomes.reduce((s, k) => s + atual[k], 0)
+  const cagrs = nomes.map((k) => cagrDe(k) ?? crescimentoTotal[0])
+  const media = nomes.reduce((s, k, i) => s + (atual[k] / soma) * cagrs[i], 0)
+  const ajuste = crescimentoTotal[0] - media
+  const destino = crescimentoTotal[n - 1]
+
+  return {
+    eixo,
+    outros: ult.revenue - soma,
+    segmentos: nomes.map((k, i) => ({
+      nome: k,
+      base: atual[k],
+      crescimento: linha(lim(cagrs[i] + ajuste, -0.3, 0.6), destino, n),
+    })),
+  }
 }

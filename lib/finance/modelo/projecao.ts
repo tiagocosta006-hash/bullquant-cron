@@ -27,9 +27,25 @@ export function projetar(base: AnoHistorico, p: Pressupostos): AnoProjetado[] {
   // a projeção tem de usar a mesma base.
   const semCogs = !(base.costOfRevenue && base.costOfRevenue > 0) && custosBase === base.revenue
 
+  // Revenue Build por segmento: cada segmento cresce ao seu ritmo e a receita
+  // é a soma; a reconciliação ("outros") mantém o peso face aos segmentos.
+  const rs = p.modoReceita === "segmentos" && p.receitaSegmentos && p.receitaSegmentos.segmentos.length > 0 ? p.receitaSegmentos : null
+  const segAtual = rs ? rs.segmentos.map((s) => s.base) : []
+  const somaBase = segAtual.reduce((a, b) => a + b, 0)
+
   const out: AnoProjetado[] = []
   for (let i = 0; i < p.anos; i++) {
-    const receita = receitaAnt * (1 + d.crescimentoReceita[i])
+    let receita = receitaAnt * (1 + d.crescimentoReceita[i])
+    let segmentos: Record<string, number> | undefined
+    if (rs) {
+      segmentos = {}
+      for (let k = 0; k < rs.segmentos.length; k++) {
+        segAtual[k] = segAtual[k] * (1 + (rs.segmentos[k].crescimento[i] ?? 0))
+        segmentos[rs.segmentos[k].nome] = segAtual[k]
+      }
+      const soma = segAtual.reduce((a, b) => a + b, 0)
+      receita = soma + (somaBase > 0 ? rs.outros * (soma / somaBase) : 0)
+    }
     const cogs = receita * (1 - d.margemBruta[i])
     const baseDias = semCogs ? receita : cogs
     const ebit = receita * d.margemEbit[i]
@@ -45,6 +61,7 @@ export function projetar(base: AnoHistorico, p: Pressupostos): AnoProjetado[] {
     out.push({
       fiscalYear: base.fiscalYear + i + 1,
       receita,
+      segmentos,
       cogs,
       lucroBruto: receita - cogs,
       ebit,

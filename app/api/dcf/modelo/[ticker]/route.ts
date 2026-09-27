@@ -49,7 +49,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
         operatingExpenses: true, operatingIncome: true, ebitda: true, depreciationAndAmortization: true,
         capex: true, accountsReceivable: true, inventory: true, accountsPayable: true, taxExpense: true,
         incomeBeforeTax: true, stockBasedCompensation: true, operatingCashFlow: true, freeCashFlow: true,
-        reportedCurrency: true,
+        reportedCurrency: true, revenueSegmentsByAxis: true,
       },
     }),
     prisma.fundamental.findMany({
@@ -74,6 +74,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
     taxExpense: n(a.taxExpense), incomeBeforeTax: n(a.incomeBeforeTax),
     stockBasedCompensation: n(a.stockBasedCompensation), operatingCashFlow: n(a.operatingCashFlow),
     freeCashFlow: n(a.freeCashFlow),
+    segmentos: (a.revenueSegmentsByAxis ?? null) as AnoHistorico["segmentos"],
   }))
   const ultimoAnual = anuais[anuais.length - 1]
   const recente = trimestres[0]

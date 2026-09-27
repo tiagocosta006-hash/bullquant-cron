@@ -1718,7 +1718,8 @@
       "capexAjuda": "Investimento e amortizações em % da receita. Capex muito acima da D&A durante muito tempo significa que a empresa ainda está a crescer a sua base de ativos.",
       "fundoManeioAjuda": "Clientes, inventário e fornecedores projetados pelos dias. Um aumento do fundo de maneio consome caixa.",
       "impostosAjuda": "Taxa efetiva aplicada ao EBIT (imposto operacional, como se a empresa não tivesse dívida).",
-      "inputsNota": "Os drivers a azul vêm dos Assumptions (os inputs). Aqui só se calcula, ano a ano; para mudar um valor, vai aos Assumptions."
+      "inputsNota": "Os drivers a azul vêm dos Assumptions (os inputs). Aqui só se calcula, ano a ano; para mudar um valor, vai aos Assumptions.",
+      "assumptions": "Assumptions"
     },
     "pressupostos": {
       "operacionais": "Operating Assumptions",
@@ -1818,6 +1819,23 @@
       "entrar": "Fullscreen",
       "sair": "Sair",
       "titulo": "BullValue DCF"
+    },
+    "receita": {
+      "modoTotal": "Total growth",
+      "modoSegmentos": {
+        "product": "Segment build",
+        "geography": "Geographic build"
+      },
+      "cagr3": "3Y CAGR",
+      "cagr5": "5Y CAGR",
+      "mix": "Mix",
+      "outros": "Other / reconciliation",
+      "outrosNota": "Receita que não está atribuída a nenhum segmento (eliminações, receita não alocada). Na projeção mantém o peso face aos segmentos.",
+      "consenso": "Consensus revenue growth",
+      "receitaSegmentos": "Revenue by segment",
+      "crescimentoSegmentos": "Segment growth (YoY)",
+      "segmentosAjuda": "A receita é a soma dos segmentos. Cada segmento parte do seu CAGR de 3 anos, calibrado para que o total do ano 1 bata com o consenso, e converge até ao último ano. Compara a linha 'Revenue growth' com o consenso.",
+      "semSegmentos": "Esta empresa não tem segmentos verificados na BullValue (ou reporta um só): o Revenue Build usa o crescimento total."
     }
   },
   "dcfSimples": {

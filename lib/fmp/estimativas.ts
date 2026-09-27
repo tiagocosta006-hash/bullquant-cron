@@ -159,8 +159,14 @@ export async function analistas(
     const hojeIso = new Date().toISOString().slice(0, 10)
     const i1 = ord.findIndex((l) => l.date > hojeIso)
 
+    // Anos ainda não REPORTADOS, não anos por acabar: o ano fiscal da Apple
+    // acaba a 26 de setembro e os resultados só saem no fim de outubro — nesse
+    // intervalo o ano já acabou mas continua a ser estimativa, e é o ano 1 de
+    // qualquer projeção. Filtrar por "depois de hoje" tirava-o, e o modelo
+    // abria sem consenso.
+    const fimReportado = ultimoAnual ? ultimoAnual.periodEnd.toISOString().slice(0, 10) : hojeIso
     anuais = ord
-      .filter((l) => l.date > hojeIso)
+      .filter((l) => l.date > fimReportado && anoFiscal(l.date, ultimoAnual) > (ultimoAnual?.fiscalYear ?? 0))
       .slice(0, 3)
       .map((l) => ({
         fiscalYear: anoFiscal(l.date, ultimoAnual),

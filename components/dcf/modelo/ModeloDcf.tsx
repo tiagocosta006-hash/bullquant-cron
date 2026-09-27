@@ -10,7 +10,7 @@ import {
   type PressupostosAvaliacao, type Mercado,
 } from "@/lib/finance/modelo"
 import {
-  SeparadorPressupostos, SeparadorHistorico, SeparadorSchedules, SeparadorProjecoes, SeparadorAvaliacao,
+  SeparadorHistorico, SeparadorSchedules, SeparadorProjecoes, SeparadorAvaliacao,
   type ContextoSeparador,
 } from "./Separadores"
 import { useFormatos } from "./TabelaModelo"
@@ -34,7 +34,7 @@ type Dados = {
 
 type SearchResult = { ticker: string; name: string }
 
-const SEPARADORES = ["pressupostos", "historico", "schedules", "projecoes", "avaliacao"] as const
+const SEPARADORES = ["historico", "schedules", "projecoes", "avaliacao"] as const
 type Separador = (typeof SEPARADORES)[number]
 
 const chaveRascunho = (ticker: string) => `bv-dcf-modelo:v1:${ticker}`
@@ -60,7 +60,7 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
   const [dados, setDados] = React.useState<Dados | null>(null)
   const [pressupostos, setPressupostos] = React.useState<Pressupostos | null>(null)
   const [iniciais, setIniciais] = React.useState<Pressupostos | null>(null)
-  const [aba, setAba] = React.useState<Separador>("pressupostos")
+  const [aba, setAba] = React.useState<Separador>("schedules")
   const [carregando, setCarregando] = React.useState(false)
   const [erro, setErro] = React.useState<string | null>(null)
   const [comRascunho, setComRascunho] = React.useState(false)
@@ -89,9 +89,14 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
       const ini = pressupostosIniciais(d.historico, racios(d.historico), d.estimativas, d.contexto)
       setIniciais(ini)
       const rasc = lerRascunho(d.empresa.ticker)
-      setPressupostos(rasc ?? ini)
+      // Rascunhos de antes do Revenue Build por segmento não têm segmentos:
+      // recebem os iniciais, no horizonte do rascunho.
+      const junto = rasc
+        ? { ...rasc, receitaSegmentos: rasc.receitaSegmentos ?? mudarHorizonte(ini, rasc.anos).receitaSegmentos, modoReceita: rasc.modoReceita ?? "total" }
+        : ini
+      setPressupostos(junto)
       setComRascunho(!!rasc)
-      setAba("pressupostos")
+      setAba("schedules")
     } catch {
       setErro(t("erros.carregar"))
     } finally {
@@ -114,6 +119,11 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
     atualizar((p) => ({ ...p, drivers: { ...p.drivers, [d]: p.drivers[d].map((x, j) => (j === i ? v : x)) } }))
   const onDriverSerie = (d: Driver, valores: number[]) =>
     atualizar((p) => ({ ...p, drivers: { ...p.drivers, [d]: valores } }))
+  const onSegmentoSerie = (nome: string, valores: number[]) =>
+    atualizar((p) => p.receitaSegmentos
+      ? { ...p, receitaSegmentos: { ...p.receitaSegmentos, segmentos: p.receitaSegmentos.segmentos.map((s) => (s.nome === nome ? { ...s, crescimento: valores } : s)) } }
+      : p)
+  const onModoReceita = (modoReceita: "total" | "segmentos") => atualizar((p) => ({ ...p, modoReceita }))
   const onAvaliacao = (patch: Partial<PressupostosAvaliacao>) =>
     atualizar((p) => ({ ...p, avaliacao: { ...p.avaliacao, ...patch } }))
   const repor = () => {
@@ -146,8 +156,9 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
   }, [dados, pressupostos])
 
   const contexto: ContextoSeparador | null = calculo && pressupostos ? {
-    historico: calculo.hist, racios: calculo.rs, pressupostos, projecoes: calculo.projecoes,
-    avaliacao: calculo.avaliacao, mercado: calculo.mercado, fracaoAno1: calculo.f, onDriver,
+    historico: calculo.hist, racios: calculo.rs, pressupostos, iniciais, projecoes: calculo.projecoes,
+    avaliacao: calculo.avaliacao, mercado: calculo.mercado, estimativas: dados?.estimativas ?? [], fracaoAno1: calculo.f,
+    onDriver, onDriverSerie, onSegmentoSerie, onModoReceita, onAvaliacao,
   } : null
 
   return (
@@ -232,8 +243,6 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
               )}
             </div>
           </div>
-
-          {aba === "pressupostos" && <SeparadorPressupostos c={contexto} iniciais={iniciais} onDriverSerie={onDriverSerie} onAvaliacao={onAvaliacao} />}
           {aba === "historico" && <SeparadorHistorico c={contexto} />}
           {aba === "schedules" && <SeparadorSchedules c={contexto} />}
           {aba === "projecoes" && <SeparadorProjecoes c={contexto} />}

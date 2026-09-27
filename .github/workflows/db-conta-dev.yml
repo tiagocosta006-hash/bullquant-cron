@@ -1,0 +1,27 @@
+name: DB — conta de desenvolvimento (PRO)
+
+# Confirma o email e dá o plano PRO à conta de desenvolvimento usada para
+# testar o site em produção como um utilizador PRO. Fixo a ESTE email de
+# propósito: não é um atalho para dar PRO a outras contas. A password nunca
+# passa por aqui (a conta foi registada pelo formulário normal do site).
+
+on:
+  workflow_dispatch:
+
+jobs:
+  conta:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DB: ${{ secrets.DIRECT_URL }}
+    steps:
+      - name: Confirmar email e dar PRO
+        run: |
+          psql "$DB" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+            update auth.users set email_confirmed_at = coalesce(email_confirmed_at, now())
+              where email = 'dev@thebullvalue.com';
+            update public.users set plan = 'PRO' where email = 'dev@thebullvalue.com';
+            select u.email, u.plan, (a.email_confirmed_at is not null) as email_confirmado
+              from public.users u join auth.users a on a.id::text = u.id
+              where u.email = 'dev@thebullvalue.com';
+          SQL

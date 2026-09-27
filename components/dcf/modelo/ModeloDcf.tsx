@@ -157,7 +157,7 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
   }, [dados, pressupostos])
 
   const contexto: ContextoSeparador | null = calculo && pressupostos ? {
-    historico: calculo.hist, racios: calculo.rs, pressupostos, iniciais, projecoes: calculo.projecoes,
+    ticker: dados?.empresa.ticker ?? "", historico: calculo.hist, racios: calculo.rs, pressupostos, iniciais, projecoes: calculo.projecoes,
     avaliacao: calculo.avaliacao, mercado: calculo.mercado, estimativas: dados?.estimativas ?? [], multiplosHistoricos: dados?.multiplosHistoricos ?? [], evEbitdaAtual: dados?.contexto.evEbitdaAtual ?? null, fracaoAno1: calculo.f,
     onDriver, onDriverSerie, onSegmentoSerie, onModoReceita, onAvaliacao,
   } : null

@@ -755,7 +755,9 @@
       "tooltipPe": "P/E Ratio",
       "tooltipPs": "P/Sales",
       "tooltipFcf": "FCF Yield",
-      "avgLabel": "Avg"
+      "avgLabel": "Avg",
+      "medianLabel": "Median",
+      "tabEv": "EV/EBITDA"
     },
     "demoBadge": {
       "label": "Pro",
@@ -1843,7 +1845,7 @@
       "saida": "Exit {x}",
       "usarMediana": "Use median ({x})",
       "usarAtual": "Use current ({x})",
-      "nota": "EV/EBITDA at each fiscal year end. An exit multiple well above the historical median assumes the market keeps paying more than it did in the past."
+      "nota": "Weekly line, using the trailing 12-month EBITDA known at each date. An exit multiple well above the median assumes the market keeps paying more than it did in the past."
     }
   },
   "dcfSimples": {

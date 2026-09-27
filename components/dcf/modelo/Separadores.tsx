@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { AlertTriangle } from "lucide-react"
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from "recharts"
+import { GraficoMultiplo, estatisticas, type PontoMultiplo } from "@/components/stock/GraficoMultiplo"
 import {
   resumo,
   type AnoHistorico, type AnoProjetado, type Avaliacao, type Driver, type EstimativaModelo, type Mercado, type Pressupostos,
@@ -22,6 +22,7 @@ import { TabelaModelo, CelulaEditavel, useFormatos, type Formato, type LinhaTabe
 const ANOS_HIST_SCHEDULES = 5
 
 export type ContextoSeparador = {
+  ticker: string
   historico: AnoHistorico[]
   racios: RaciosAno[]
   pressupostos: Pressupostos
@@ -495,46 +496,60 @@ export function SeparadorProjecoes({ c }: { c: ContextoSeparador }) {
 
 
 /**
- * EV/EBITDA histórico, ao lado do exit multiple: a que múltiplos a empresa
- * negociou nos últimos 10 anos, para escolher o de saída com contexto.
+ * EV/EBITDA histórico ao lado do exit multiple: a mesma linha semanal do
+ * gráfico de múltiplos da página da empresa (/api/valuation), com média,
+ * mediana e o múltiplo de saída escolhido. Sem acesso à série semanal (demo
+ * anónima), cai nos valores de fim de ano fiscal.
  */
 function HistoricoMultiplo({ c }: { c: ContextoSeparador }) {
   const t = useTranslations("dcfModelo")
+  const tV = useTranslations("stock.valuationChart")
   const { fmt } = useFormatos()
   const a = c.pressupostos.avaliacao
-  const dados = c.multiplosHistoricos.filter((x) => x.evEbitda !== null && x.evEbitda > 0 && x.evEbitda < 200)
-  if (dados.length === 0) return null
-  const vals = dados.map((x) => x.evEbitda as number).sort((x, y) => x - y)
-  const m = Math.floor(vals.length / 2)
-  const mediana = vals.length % 2 ? vals[m] : (vals[m - 1] + vals[m]) / 2
-  const grafico = [
-    ...dados.map((x) => ({ ano: String(x.fiscalYear), v: x.evEbitda as number, atual: false })),
-    ...(c.evEbitdaAtual ? [{ ano: "TTM", v: c.evEbitdaAtual, atual: true }] : []),
-  ]
+  const [semanal, setSemanal] = React.useState<PontoMultiplo[] | null>(null)
+  React.useEffect(() => {
+    let vivo = true
+    fetch(`/api/valuation/${encodeURIComponent(c.ticker)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: Array<{ date: string; price: number; evEbitda?: number }> | null) => {
+        if (vivo && Array.isArray(d)) setSemanal(d.map((x) => ({ date: x.date, price: x.price, v: x.evEbitda })))
+      })
+      .catch(() => undefined)
+    return () => { vivo = false }
+  }, [c.ticker])
+
+  const anual: PontoMultiplo[] = c.multiplosHistoricos
+    .filter((x) => x.evEbitda !== null)
+    .map((x) => ({ date: `${x.fiscalYear}-12-31`, v: x.evEbitda }))
+  const pontos = (semanal && semanal.some((x) => typeof x.v === "number") ? semanal : anual).filter(
+    (x) => typeof x.v !== "number" || (x.v > 0 && x.v < 200),
+  )
+  if (pontos.length === 0) return null
+  const { mediana } = estatisticas(pontos)
+  const vals = pontos.map((x) => x.v).filter((x): x is number => typeof x === "number")
   const usar = (v: number) => c.onAvaliacao({ multiploSaida: Math.round(v * 10) / 10 })
+
   return (
     <div className="rounded-xl border border-border/60 p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <p className="text-sm font-semibold">{t("multiplo.titulo")}</p>
         <p className="text-xs text-muted-foreground">
-          {t("multiplo.resumo", { atual: fmt(c.evEbitdaAtual, "x"), mediana: fmt(mediana, "x"), min: fmt(vals[0], "x"), max: fmt(vals[vals.length - 1], "x") })}
+          {t("multiplo.resumo", { atual: fmt(c.evEbitdaAtual, "x"), mediana: fmt(mediana ?? null, "x"), min: fmt(Math.min(...vals), "x"), max: fmt(Math.max(...vals), "x") })}
         </p>
       </div>
-      <div className="mt-2 h-40">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={grafico} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-            <XAxis dataKey="ano" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} width={36} tickFormatter={(v: number) => `${Math.round(v)}x`} />
-            <Tooltip formatter={(v) => [fmt(Number(v), "x"), "EV/EBITDA"]} contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 12, fontSize: 12 }} />
-            <ReferenceLine y={a.multiploSaida} stroke="var(--primary)" strokeDasharray="4 4" label={{ value: t("multiplo.saida", { x: fmt(a.multiploSaida, "x") }), position: "insideTopRight", fill: "var(--primary)", fontSize: 11 }} />
-            <Bar dataKey="v" radius={[4, 4, 0, 0]}>
-              {grafico.map((x) => <Cell key={x.ano} fill={x.atual ? "var(--primary)" : "var(--muted-foreground)"} fillOpacity={x.atual ? 0.9 : 0.35} />)}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+      <div className="mt-2">
+        <GraficoMultiplo
+          pontos={pontos}
+          formato="x"
+          cor="#8b5cf6"
+          nome="EV/EBITDA"
+          altura={260}
+          rotulos={{ media: tV("avgLabel"), mediana: tV("medianLabel"), preco: tV("tooltipPrice") }}
+          linhaExtra={{ y: a.multiploSaida, rotulo: t("multiplo.saida", { x: fmt(a.multiploSaida, "x") }), cor: "var(--primary)" }}
+        />
       </div>
       <div className="mt-2 flex flex-wrap gap-2 text-xs">
-        <button type="button" onClick={() => usar(mediana)} className="rounded-md border border-border/60 px-2.5 py-1 text-primary hover:bg-primary/10">{t("multiplo.usarMediana", { x: fmt(mediana, "x") })}</button>
+        {mediana !== undefined && <button type="button" onClick={() => usar(mediana)} className="rounded-md border border-border/60 px-2.5 py-1 text-primary hover:bg-primary/10">{t("multiplo.usarMediana", { x: fmt(mediana, "x") })}</button>}
         {c.evEbitdaAtual && <button type="button" onClick={() => usar(c.evEbitdaAtual!)} className="rounded-md border border-border/60 px-2.5 py-1 text-primary hover:bg-primary/10">{t("multiplo.usarAtual", { x: fmt(c.evEbitdaAtual, "x") })}</button>}
         <span className="self-center text-muted-foreground">{t("multiplo.nota")}</span>
       </div>

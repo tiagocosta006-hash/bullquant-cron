@@ -51,6 +51,10 @@ export async function GET(
         freeCashFlow: true,
         operatingCashFlow: true,
         capex: true,
+        ebitda: true,
+        totalDebt: true,
+        cash: true,
+        minorityInterest: true,
       }
     })
 
@@ -119,6 +123,8 @@ export async function GET(
       let ttmRev = 0;
       let ttmFcf: number | null = 0;
       let ttmNi = 0;
+      let ttmEbitda = 0;
+      let hasAllEbitda = true;
 
       let hasAllEps = true;
       let hasAllRev = true;
@@ -157,6 +163,9 @@ export async function GET(
         const ni = q.netIncome?.toNumber();
         if (ni !== undefined && ni !== null) ttmNi += ni; else hasAllNi = false;
 
+        const eb = q.ebitda?.toNumber();
+        if (eb !== undefined && eb !== null) ttmEbitda += eb; else hasAllEbitda = false;
+
         let fcf = q.freeCashFlow?.toNumber();
         if (fcf === undefined || fcf === null) {
           const ocf = q.operatingCashFlow?.toNumber();
@@ -170,7 +179,8 @@ export async function GET(
         ttmEps: hasAllEps ? ttmEps : null,
         ttmRev: hasAllRev ? ttmRev : null,
         ttmFcf: hasAllFcf ? ttmFcf : null,
-        ttmNi: hasAllNi ? ttmNi : null
+        ttmNi: hasAllNi ? ttmNi : null,
+        ttmEbitda: hasAllEbitda ? ttmEbitda : null,
       }
     }
 
@@ -185,6 +195,9 @@ export async function GET(
       let ttmFcf: number | null = null
       let ttmNi: number | null = null
       let shares: number | null = null
+      let ttmEbitda: number | null = null
+      // Balanço do período mais recente já público nessa data: a ponte do EV.
+      let dividaLiquida: number | null = null
       let foundTtm = false;
 
       const validQ = quarters.filter(f => f.availableAt <= priceTime)
@@ -207,6 +220,8 @@ export async function GET(
               ttmFcf = ttm.ttmFcf
               ttmNi = ttm.ttmNi
               shares = latest4[0].sharesOutstanding?.toNumber() || null
+              ttmEbitda = ttm.ttmEbitda
+              dividaLiquida = (latest4[0].totalDebt?.toNumber() ?? 0) - (latest4[0].cash?.toNumber() ?? 0) + (latest4[0].minorityInterest?.toNumber() ?? 0)
               foundTtm = true
             }
           }
@@ -237,6 +252,8 @@ export async function GET(
           }
           ttmFcf = fcf !== undefined ? fcf : null
           shares = latest.sharesOutstanding ? latest.sharesOutstanding.toNumber() : null
+          ttmEbitda = latest.ebitda ? latest.ebitda.toNumber() : null
+          dividaLiquida = (latest.totalDebt?.toNumber() ?? 0) - (latest.cash?.toNumber() ?? 0) + (latest.minorityInterest?.toNumber() ?? 0)
         }
       }
 
@@ -248,6 +265,7 @@ export async function GET(
         pe?: number
         ps?: number
         fcfYield?: number
+        evEbitda?: number
       } = {
         date: p.date.toISOString().split('T')[0],
         price: priceVal
@@ -275,9 +293,13 @@ export async function GET(
         if (ttmFcf !== null) {
           obj.fcfYield = ttmFcf / marketCap
         }
+        // EV/EBITDA: capitalização + dívida − caixa + minoritários, ÷ EBITDA TTM.
+        if (ttmEbitda !== null && ttmEbitda > 0 && dividaLiquida !== null) {
+          obj.evEbitda = (marketCap + dividaLiquida) / ttmEbitda
+        }
       }
 
-      if (obj.pe !== undefined || obj.ps !== undefined || obj.fcfYield !== undefined
+      if (obj.pe !== undefined || obj.ps !== undefined || obj.fcfYield !== undefined || obj.evEbitda !== undefined
           || obj.netIncome !== undefined || obj.epsTtm !== undefined) {
         results.push(obj)
       }
@@ -316,6 +338,7 @@ export async function GET(
           pe: n(r.pe, 2),
           ps: n(r.ps, 2),
           fcfYield: n(r.fcfYield, 5),
+          evEbitda: n(r.evEbitda, 2),
         }
       })
 

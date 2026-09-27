@@ -735,7 +735,9 @@
       "tooltipPe": "P/E Ratio",
       "tooltipPs": "P/Sales",
       "tooltipFcf": "FCF Yield",
-      "avgLabel": "Média"
+      "avgLabel": "Média",
+      "medianLabel": "Mediana",
+      "tabEv": "EV/EBITDA"
     },
     "priceVsEarnings": {
       "title": "Preço vs Lucros",
@@ -1843,7 +1845,7 @@
       "saida": "Exit {x}",
       "usarMediana": "Use median ({x})",
       "usarAtual": "Use current ({x})",
-      "nota": "EV/EBITDA no fecho de cada ano fiscal. Um múltiplo de saída muito acima da mediana histórica pressupõe que o mercado vai continuar a pagar mais do que pagou no passado."
+      "nota": "Linha semanal, com o EBITDA dos últimos 12 meses conhecidos em cada data. Um múltiplo de saída muito acima da mediana pressupõe que o mercado vai continuar a pagar mais do que pagou no passado."
     }
   },
   "dcfSimples": {

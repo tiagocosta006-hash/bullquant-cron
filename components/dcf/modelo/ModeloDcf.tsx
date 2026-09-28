@@ -10,9 +10,10 @@ import {
   type PressupostosAvaliacao, type Mercado,
 } from "@/lib/finance/modelo"
 import {
-  SeparadorHistorico, SeparadorSchedules, SeparadorProjecoes, SeparadorAvaliacao,
+  SeparadorHistorico, SeparadorProjecoes, SeparadorAvaliacao,
   type ContextoSeparador,
 } from "./Separadores"
+import { SeparadorSchedules } from "./Schedules"
 import { useFormatos } from "./TabelaModelo"
 
 /**

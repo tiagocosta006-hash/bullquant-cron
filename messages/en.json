@@ -1721,7 +1721,8 @@
       "fundoManeioAjuda": "Receivables, inventory and payables projected by days. An increase in working capital consumes cash.",
       "impostosAjuda": "Effective rate applied to EBIT (operating tax, as if the company had no debt).",
       "inputsNota": "Drivers in blue come from Assumptions (the inputs). Schedules only calculate, year by year; to change a value, go to Assumptions.",
-      "assumptions": "Assumptions"
+      "assumptions": "Assumptions",
+      "inputsNotaNova": "Blue rows are the inputs: click one to open the panel with historical data, analyst consensus and the controls."
     },
     "pressupostos": {
       "operacionais": "Operating Assumptions",
@@ -1837,7 +1838,8 @@
       "receitaSegmentos": "Revenue by segment",
       "crescimentoSegmentos": "Segment growth (YoY)",
       "segmentosAjuda": "Revenue is the sum of the segments. Each segment starts from its 3-year CAGR, calibrated so that Year 1 total matches consensus, and fades to the final year. Compare the 'Revenue growth' row with consensus.",
-      "semSegmentos": "This company has no verified segments in BullValue (or reports only one): the Revenue Build uses total growth."
+      "semSegmentos": "This company has no verified segments in BullValue (or reports only one): the Revenue Build uses total growth.",
+      "segmento": "Segment"
     },
     "multiplo": {
       "titulo": "EV/EBITDA history",
@@ -1846,6 +1848,36 @@
       "usarMediana": "Use median ({x})",
       "usarAtual": "Use current ({x})",
       "nota": "Weekly line, using the trailing 12-month EBITDA known at each date. An exit multiple well above the median assumes the market keeps paying more than it did in the past."
+    },
+    "painel": {
+      "titulo": "Assumption",
+      "fechar": "Close",
+      "historicoProjecao": "History and projection",
+      "real": "Actual",
+      "tuaProjecao": "Your projection",
+      "consenso": "Analyst consensus",
+      "consensoEbit": "Consensus EBIT margin",
+      "media3": "3Y avg",
+      "media5": "5Y avg",
+      "mediana10": "10Y median",
+      "min": "Min",
+      "max": "Max",
+      "segmentos": "Growth by segment",
+      "ultimoYoY": "Last YoY",
+      "margemEbitdaConsenso": "Consensus EBITDA margin",
+      "ebitAjustado": "Consensus EBIT may include non-operating gains; the suggested margin is capped to the historical range ±5 pp.",
+      "capexDa": "Capex ÷ D&A",
+      "nwc": "Working capital as % of revenue",
+      "taxaLegal": "US reference: 21% federal, about 25% including state taxes. The effective rate can be lower due to tax credits and foreign profits.",
+      "mixHistorico": "Share of revenue",
+      "analistas": "Analysts"
+    },
+    "resumos": {
+      "receita": "Y1 {g} ({ano}E) · projection CAGR {cagr} · 5Y historical {hist}",
+      "custos": "EBIT margin {de} → {ate} · last FY {hist}",
+      "capex": "Capex {capex} · D&A {da} of revenue (Y1)",
+      "wc": "DSO {dso} · DIO {dio} · DPO {dpo}",
+      "tax": "Tax rate {t}"
     }
   },
   "dcfSimples": {

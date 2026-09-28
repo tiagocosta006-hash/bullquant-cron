@@ -145,7 +145,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
       historico,
       multiplosHistoricos,
       estimativas: (a?.anuais ?? []).map((e) => ({
-        fiscalYear: e.fiscalYear, revenueAvg: e.revenueAvg, ebitAvg: e.ebitAvg, analistas: e.analistas,
+        fiscalYear: e.fiscalYear, revenueAvg: e.revenueAvg, revenueLow: e.revenueLow, revenueHigh: e.revenueHigh,
+        ebitAvg: e.ebitAvg, ebitdaAvg: e.ebitdaAvg, epsAvg: e.epsAvg, analistas: e.analistas,
       })),
       mercado: {
         preco,

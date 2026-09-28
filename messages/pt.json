@@ -1721,7 +1721,8 @@
       "fundoManeioAjuda": "Clientes, inventário e fornecedores projetados pelos dias. Um aumento do fundo de maneio consome caixa.",
       "impostosAjuda": "Taxa efetiva aplicada ao EBIT (imposto operacional, como se a empresa não tivesse dívida).",
       "inputsNota": "Os drivers a azul vêm dos Assumptions (os inputs). Aqui só se calcula, ano a ano; para mudar um valor, vai aos Assumptions.",
-      "assumptions": "Assumptions"
+      "assumptions": "Assumptions",
+      "inputsNotaNova": "As linhas a azul são os inputs: clica numa para abrir o painel com os dados históricos, o consenso dos analistas e os controlos."
     },
     "pressupostos": {
       "operacionais": "Operating Assumptions",
@@ -1837,7 +1838,8 @@
       "receitaSegmentos": "Revenue by segment",
       "crescimentoSegmentos": "Segment growth (YoY)",
       "segmentosAjuda": "A receita é a soma dos segmentos. Cada segmento parte do seu CAGR de 3 anos, calibrado para que o total do ano 1 bata com o consenso, e converge até ao último ano. Compara a linha 'Revenue growth' com o consenso.",
-      "semSegmentos": "Esta empresa não tem segmentos verificados na BullValue (ou reporta um só): o Revenue Build usa o crescimento total."
+      "semSegmentos": "Esta empresa não tem segmentos verificados na BullValue (ou reporta um só): o Revenue Build usa o crescimento total.",
+      "segmento": "Segment"
     },
     "multiplo": {
       "titulo": "EV/EBITDA history",
@@ -1846,6 +1848,36 @@
       "usarMediana": "Use median ({x})",
       "usarAtual": "Use current ({x})",
       "nota": "Linha semanal, com o EBITDA dos últimos 12 meses conhecidos em cada data. Um múltiplo de saída muito acima da mediana pressupõe que o mercado vai continuar a pagar mais do que pagou no passado."
+    },
+    "painel": {
+      "titulo": "Assumption",
+      "fechar": "Fechar",
+      "historicoProjecao": "Histórico e projeção",
+      "real": "Actual",
+      "tuaProjecao": "Your projection",
+      "consenso": "Analyst consensus",
+      "consensoEbit": "Consensus EBIT margin",
+      "media3": "3Y avg",
+      "media5": "5Y avg",
+      "mediana10": "10Y median",
+      "min": "Min",
+      "max": "Max",
+      "segmentos": "Crescimento por segmento",
+      "ultimoYoY": "Last YoY",
+      "margemEbitdaConsenso": "Consensus EBITDA margin",
+      "ebitAjustado": "O EBIT do consenso pode incluir ganhos não operacionais; a margem sugerida está limitada ao intervalo histórico ±5 pp.",
+      "capexDa": "Capex ÷ D&A",
+      "nwc": "Working capital em % da receita",
+      "taxaLegal": "Referência EUA: 21% federal, cerca de 25% com impostos estaduais. A taxa efetiva pode ficar abaixo por créditos fiscais e lucros no estrangeiro.",
+      "mixHistorico": "Peso na receita",
+      "analistas": "Analistas"
+    },
+    "resumos": {
+      "receita": "Y1 {g} ({ano}E) · projection CAGR {cagr} · 5Y historical {hist}",
+      "custos": "EBIT margin {de} → {ate} · last FY {hist}",
+      "capex": "Capex {capex} · D&A {da} of revenue (Y1)",
+      "wc": "DSO {dso} · DIO {dio} · DPO {dpo}",
+      "tax": "Tax rate {t}"
     }
   },
   "dcfSimples": {

@@ -5,21 +5,17 @@ import { useTranslations } from "next-intl"
 import { AlertTriangle } from "lucide-react"
 import { GraficoMultiplo, estatisticas, type PontoMultiplo } from "@/components/stock/GraficoMultiplo"
 import {
-  resumo,
   type AnoHistorico, type AnoProjetado, type Avaliacao, type Driver, type EstimativaModelo, type Mercado, type Pressupostos,
   type PressupostosAvaliacao, type RaciosAno,
 } from "@/lib/finance/modelo"
-import { TabelaModelo, CelulaEditavel, useFormatos, type Formato, type LinhaTabela } from "./TabelaModelo"
+import { TabelaModelo, useFormatos, type Formato, type LinhaTabela } from "./TabelaModelo"
 
 /**
  * Os separadores do modelo avançado, à FMVA: Historicals → Schedules →
- * Projections → Valuation. Cada schedule tem os SEUS assumptions no topo
- * (os inputs) e o cálculo por baixo; os pressupostos de avaliação vivem na
+ * Projections → Valuation. Os Schedules (inputs com painel de dados) vivem em
+ * Schedules.tsx; os pressupostos de avaliação vivem na
  * Valuation, onde são usados.
  */
-
-/** Quantos anos de histórico se mostram ao lado das projeções. */
-const ANOS_HIST_SCHEDULES = 5
 
 export type ContextoSeparador = {
   ticker: string
@@ -40,11 +36,6 @@ export type ContextoSeparador = {
   onSegmentoSerie: (nome: string, valores: number[]) => void
   onModoReceita: (modo: "total" | "segmentos") => void
   onAvaliacao: (patch: Partial<PressupostosAvaliacao>) => void
-}
-
-const FORMATO_DRIVER: Record<Driver, Formato> = {
-  crescimentoReceita: "pct", margemBruta: "pct", margemEbit: "pct", daPctReceita: "pct",
-  capexPctReceita: "pct", dso: "dias", dio: "dias", dpo: "dias", taxaImposto: "pct",
 }
 
 function Cartao({ titulo, children, acao }: { titulo: string; children: React.ReactNode; acao?: React.ReactNode }) {
@@ -104,134 +95,6 @@ function CampoAvaliacao({
   )
 }
 
-// ─── Assumptions de um schedule ────────────────────────────────────────────
-
-type Caminho = "linear" | "constant" | "custom"
-
-/** Que forma tem a série: constante, linha reta do ano 1 ao último, ou editada à mão. */
-function caminhoDe(v: number[]): Caminho {
-  const n = v.length
-  const tol = (x: number) => Math.abs(x) * 1e-9 + 1e-12
-  if (v.every((x) => Math.abs(x - v[0]) <= tol(v[0]))) return "constant"
-  const linear = v.every((x, i) => Math.abs(x - (v[0] + ((v[n - 1] - v[0]) * i) / (n - 1))) <= tol(x) + 1e-9)
-  return linear ? "linear" : "custom"
-}
-function linha(de: number, ate: number, n: number): number[] {
-  return Array.from({ length: n }, (_, i) => (n === 1 ? ate : de + ((ate - de) * i) / (n - 1)))
-}
-
-export type LinhaInput = {
-  chave: string
-  rotulo: string
-  formato: Formato
-  valores: number[]
-  iniciais?: number[] | null
-  /** Valores de referência (histórico), um por coluna de referência. */
-  refs: (number | null)[]
-  refsFormato?: Formato
-  onSerie: (v: number[]) => void
-}
-
-/**
- * A tabela de assumptions de um schedule: por linha, as referências
- * históricas, o Year 1, o Final year e o caminho entre os dois. "By year"
- * abre a linha para afinar anos específicos.
- */
-function TabelaAssumptions({ linhas, cabecalhosRefs, anos }: { linhas: LinhaInput[]; cabecalhosRefs: string[]; anos: number[] }) {
-  const t = useTranslations("dcfModelo")
-  const { fmt } = useFormatos()
-  const [aberto, setAberto] = React.useState<string | null>(null)
-  const n = anos.length
-  const colunas = 5 + cabecalhosRefs.length
-  return (
-    <div className="overflow-x-auto rounded-xl border border-primary/20 bg-primary/[0.03]">
-      <table className="w-full min-w-[760px] border-collapse text-sm">
-        <thead>
-          <tr className="border-b border-border/60 text-xs text-muted-foreground">
-            <th className="px-3 py-2 text-left font-semibold uppercase tracking-wider text-primary">{t("schedules.assumptions")}</th>
-            {cabecalhosRefs.map((h) => <th key={h} className="px-3 py-2 text-right font-medium">{h}</th>)}
-            <th className="px-3 py-2 text-right font-semibold text-primary">{t("pressupostos.ano1", { ano: anos[0] })}</th>
-            <th className="px-3 py-2 text-right font-semibold text-primary">{t("pressupostos.anoFinal", { ano: anos[n - 1] })}</th>
-            <th className="px-3 py-2 text-left font-medium">{t("pressupostos.caminho")}</th>
-            <th className="px-3 py-2"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {linhas.map((l) => {
-            const v = l.valores
-            const cam = caminhoDe(v)
-            const eIniciais = l.iniciais && l.iniciais.length === v.length && l.iniciais.every((x, i) => x === v[i])
-            const mudarY1 = (x: number) => l.onSerie(cam === "constant" ? v.map(() => x) : linha(x, v[n - 1], n))
-            const mudarFinal = (x: number) => l.onSerie(linha(v[0], x, n))
-            return (
-              <React.Fragment key={l.chave}>
-                <tr className="border-b border-border/30">
-                  <td className="px-3 py-1.5 font-medium">{l.rotulo}</td>
-                  {l.refs.map((r, i) => <td key={i} className="px-3 py-1.5 text-right tabular-nums text-muted-foreground">{fmt(r, l.refsFormato ?? l.formato)}</td>)}
-                  <td className="px-2 py-1 text-right"><CelulaEditavel valor={v[0]} formato={l.formato} rotulo={`${l.rotulo} Y1`} onMudar={mudarY1} /></td>
-                  <td className="px-2 py-1 text-right">
-                    {cam === "constant"
-                      ? <button type="button" onClick={() => mudarFinal(v[0])} className="w-full rounded-md px-2 py-1 text-right text-sm tabular-nums text-muted-foreground hover:bg-muted/50" title={t("pressupostos.igualY1Ajuda")}>= Y1</button>
-                      : <CelulaEditavel valor={v[n - 1]} formato={l.formato} rotulo={`${l.rotulo} final`} onMudar={mudarFinal} />}
-                  </td>
-                  <td className="px-3 py-1.5">
-                    <div className="flex flex-wrap gap-1">
-                      {(["constant", "linear"] as const).map((k) => (
-                        <button key={k} type="button"
-                          onClick={() => l.onSerie(k === "constant" ? v.map(() => v[0]) : linha(v[0], v[n - 1], n))}
-                          className={`rounded px-2 py-0.5 text-xs font-semibold ${cam === k ? "bg-primary text-primary-foreground" : "bg-muted/50 text-muted-foreground hover:text-foreground"}`}>
-                          {t(`pressupostos.caminhos.${k}`)}
-                        </button>
-                      ))}
-                      {cam === "custom" && (eIniciais
-                        ? <span className="rounded bg-primary/15 px-2 py-0.5 text-xs font-semibold text-primary" title={t("pressupostos.consensoAjuda")}>{t("pressupostos.caminhos.consenso")}</span>
-                        : <span className="rounded bg-amber-500/15 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-400" title={t("pressupostos.customAjuda")}>{t("pressupostos.caminhos.custom")}</span>)}
-                    </div>
-                  </td>
-                  <td className="px-3 py-1.5 text-right whitespace-nowrap">
-                    <button type="button" onClick={() => setAberto(aberto === l.chave ? null : l.chave)} className="rounded px-2 py-0.5 text-xs text-primary hover:bg-primary/10">
-                      {aberto === l.chave ? "▾" : "▸"} {t("pressupostos.porAno")}
-                    </button>
-                    {l.iniciais && (
-                      <button type="button" onClick={() => l.onSerie([...l.iniciais!])} className="rounded px-2 py-0.5 text-xs text-muted-foreground hover:bg-muted/50" title={t("pressupostos.reporDriverAjuda")}>↺</button>
-                    )}
-                  </td>
-                </tr>
-                {aberto === l.chave && (
-                  <tr className="border-b border-border/30 bg-muted/10">
-                    <td colSpan={colunas} className="px-3 py-3">
-                      <div className="flex flex-wrap gap-2">
-                        {v.map((x, i) => (
-                          <label key={i} className="flex w-20 flex-col gap-1 text-xs text-muted-foreground">
-                            <span className="text-center">{anos[i]}E</span>
-                            <CelulaEditavel valor={x} formato={l.formato} rotulo={`${l.rotulo} ${anos[i]}`} onMudar={(val) => l.onSerie(v.map((y, j) => (j === i ? val : y)))} />
-                          </label>
-                        ))}
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </React.Fragment>
-            )
-          })}
-        </tbody>
-      </table>
-    </div>
-  )
-}
-
-/** Linhas de assumptions para drivers "normais" (com Last FY e 3Y avg). */
-function linhasDrivers(c: ContextoSeparador, drivers: Driver[], rotulo: (d: Driver) => string): LinhaInput[] {
-  return drivers.map((d) => {
-    const r = resumo(c.racios, d, 3)
-    return {
-      chave: d, rotulo: rotulo(d), formato: FORMATO_DRIVER[d], valores: c.pressupostos.drivers[d],
-      iniciais: c.iniciais?.drivers[d] ?? null, refs: [r.ultimo, r.media], onSerie: (v) => c.onDriverSerie(d, v),
-    }
-  })
-}
-
-// ─── 1. Historicals ──────────────────────────────────────────────────────────
 
 export function SeparadorHistorico({ c }: { c: ContextoSeparador }) {
   const t = useTranslations("dcfModelo")
@@ -276,189 +139,6 @@ export function SeparadorHistorico({ c }: { c: ContextoSeparador }) {
 // ─── 2. Schedules ──────────────────────────────────────────────────────────
 
 /** CAGR entre dois valores positivos. */
-function cagrEntre(ini: number | null | undefined, fim: number | null | undefined, anos: number): number | null {
-  return ini && fim && ini > 0 && fim > 0 && anos > 0 ? Math.pow(fim / ini, 1 / anos) - 1 : null
-}
-
-function RevenueBuild({ c }: { c: ContextoSeparador }) {
-  const t = useTranslations("dcfModelo")
-  const p = c.pressupostos
-  const rs = p.receitaSegmentos ?? null
-  const modo = rs ? p.modoReceita ?? "total" : "total"
-  const h = ultimos(c.historico, 6)
-  const r = ultimos(c.racios, 6)
-  const anosH = h.map((a) => a.fiscalYear)
-  const anosP = anosProj(c)
-  const pr = c.projecoes
-  const ult = c.historico[c.historico.length - 1]
-
-  // Crescimento implícito no consenso, para os anos projetados que o têm.
-  const consenso = anosP.map((fy, i) => {
-    const e = c.estimativas.find((x) => x.fiscalYear === fy)
-    const antes = i === 0 ? { revenueAvg: ult.revenue ?? 0 } : c.estimativas.find((x) => x.fiscalYear === fy - 1)
-    return e && antes && antes.revenueAvg > 0 ? e.revenueAvg / antes.revenueAvg - 1 : null
-  })
-  const crescimentoProj = pr.map((x, i) => (i === 0 ? (ult.revenue ? x.receita / ult.revenue - 1 : null) : x.receita / pr[i - 1].receita - 1))
-
-  const eixo = rs?.eixo
-  const segHist = (nome: string) => h.map((a) => (eixo ? a.segmentos?.[eixo]?.[nome] ?? null : null))
-  const nomes = rs?.segmentos.map((s) => s.nome) ?? []
-
-  const seletor = rs ? (
-    <div className="flex gap-1 rounded-lg bg-muted/50 p-1">
-      {(["total", "segmentos"] as const).map((m) => (
-        <button key={m} type="button" onClick={() => c.onModoReceita(m)}
-          className={`rounded-md px-3 py-1 text-xs font-semibold ${modo === m ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
-          {m === "total" ? t("receita.modoTotal") : t(`receita.modoSegmentos.${rs.eixo}`)}
-        </button>
-      ))}
-    </div>
-  ) : null
-
-  // Receita por segmento: histórico sempre visível (é o que diz o que cresce);
-  // projeção só no modo por segmento.
-  const tabelaSegmentos: LinhaTabela[] = rs ? [
-    ...nomes.map((nome) => ({
-      rotulo: nome, formato: "m" as const, hist: segHist(nome),
-      proj: modo === "segmentos" ? pr.map((x) => x.segmentos?.[nome] ?? null) : undefined,
-    })),
-    {
-      rotulo: t("receita.outros"), formato: "m" as const, nota: t("receita.outrosNota"),
-      hist: h.map((a) => {
-        const m = eixo ? a.segmentos?.[eixo] : null
-        return m && a.revenue !== null ? a.revenue - Object.values(m).reduce((s, v) => s + v, 0) : null
-      }),
-      proj: modo === "segmentos" ? pr.map((x) => (x.segmentos ? x.receita - Object.values(x.segmentos).reduce((s, v) => s + v, 0) : null)) : undefined,
-    },
-    { rotulo: t("linhas.receita"), formato: "m" as const, hist: h.map((a) => a.revenue), proj: pr.map((x) => x.receita), subtotal: true, destaque: true },
-    { rotulo: t("drivers.crescimentoReceita"), formato: "pct" as const, hist: r.map((x) => x.crescimentoReceita), proj: crescimentoProj },
-    { rotulo: t("receita.consenso"), formato: "pct" as const, proj: consenso },
-  ] : []
-
-  const crescimentoSeg: LinhaTabela[] = rs ? nomes.map((nome) => {
-    const s = segHist(nome)
-    return {
-      rotulo: nome, formato: "pct" as const,
-      hist: s.map((v, i) => (i > 0 && v !== null && s[i - 1] ? v / (s[i - 1] as number) - 1 : null)),
-      proj: modo === "segmentos" ? rs.segmentos.find((x) => x.nome === nome)!.crescimento : undefined,
-      driver: modo === "segmentos" ? ("crescimentoReceita" as Driver) : undefined,
-    }
-  }) : []
-
-  const inputsSegmentos: LinhaInput[] = rs && modo === "segmentos" ? rs.segmentos.map((s) => {
-    const serie = c.historico.map((a) => (eixo ? a.segmentos?.[eixo]?.[s.nome] ?? null : null))
-    const fim = serie[serie.length - 1]
-    const somaUlt = eixo && ult.segmentos?.[eixo] ? Object.values(ult.segmentos[eixo]!).reduce((a, b) => a + b, 0) : 0
-    const ini = c.iniciais?.receitaSegmentos?.segmentos.find((x) => x.nome === s.nome)?.crescimento ?? null
-    return {
-      chave: `seg:${s.nome}`, rotulo: s.nome, formato: "pct" as const, valores: s.crescimento, iniciais: ini,
-      refs: [cagrEntre(serie[serie.length - 4], fim, 3), cagrEntre(serie[serie.length - 6], fim, 5), somaUlt > 0 && fim ? fim / somaUlt : null],
-      onSerie: (v: number[]) => c.onSegmentoSerie(s.nome, v),
-    }
-  }) : []
-
-  return (
-    <Cartao titulo={t("seccoes.receita")} acao={seletor}>
-      <p className="text-sm text-muted-foreground">{modo === "segmentos" ? t("receita.segmentosAjuda") : t("schedules.receitaAjuda")}</p>
-      {modo === "total" ? (
-        <TabelaAssumptions anos={anosP} cabecalhosRefs={[t("pressupostos.ultimoAno"), t("pressupostos.media3Col")]}
-          linhas={linhasDrivers(c, ["crescimentoReceita"], (d) => t(`drivers.${d}`))} />
-      ) : (
-        <TabelaAssumptions anos={anosP} cabecalhosRefs={[t("receita.cagr3"), t("receita.cagr5"), t("receita.mix")]} linhas={inputsSegmentos} />
-      )}
-      {rs ? (
-        <>
-          <p className="pt-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">{t("receita.receitaSegmentos")}</p>
-          <TabelaModelo anosHist={anosH} anosProj={modo === "segmentos" ? anosP : anosP} linhas={tabelaSegmentos} unidade={t("unidade")} />
-          <p className="pt-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">{t("receita.crescimentoSegmentos")}</p>
-          <TabelaModelo anosHist={anosH} anosProj={modo === "segmentos" ? anosP : []} linhas={crescimentoSeg} unidade="YoY" />
-        </>
-      ) : (
-        <>
-          <TabelaModelo anosHist={anosH} anosProj={anosP} unidade={t("unidade")} linhas={[
-            { rotulo: t("drivers.crescimentoReceita"), formato: "pct", driver: "crescimentoReceita", hist: r.map((x) => x.crescimentoReceita), proj: p.drivers.crescimentoReceita },
-            { rotulo: t("linhas.receita"), formato: "m", hist: h.map((a) => a.revenue), proj: pr.map((x) => x.receita), destaque: true },
-            { rotulo: t("receita.consenso"), formato: "pct", proj: consenso },
-          ]} />
-          <p className="text-xs text-muted-foreground">{t("receita.semSegmentos")}</p>
-        </>
-      )}
-    </Cartao>
-  )
-}
-
-export function SeparadorSchedules({ c }: { c: ContextoSeparador }) {
-  const t = useTranslations("dcfModelo")
-  const h = ultimos(c.historico, ANOS_HIST_SCHEDULES)
-  const r = ultimos(c.racios, ANOS_HIST_SCHEDULES)
-  const pr = c.projecoes
-  const d = c.pressupostos.drivers
-  const anosH = h.map((a) => a.fiscalYear)
-  const anosP = anosProj(c)
-  const col = <K extends keyof AnoHistorico>(k: K) => h.map((a) => a[k] as number | null)
-  const nwcHist = h.map((a) => (a.accountsReceivable ?? 0) + (a.inventory ?? 0) - (a.accountsPayable ?? 0))
-  const refs = [t("pressupostos.ultimoAno"), t("pressupostos.media3Col")]
-  const rot = (x: Driver) => t(`drivers.${x}`)
-
-  const blocos: Array<{ titulo: string; ajuda: string; drivers: Driver[]; linhas: LinhaTabela[] }> = [
-    {
-      titulo: t("seccoes.custos"), ajuda: t("schedules.custosAjuda"), drivers: ["margemBruta", "margemEbit"],
-      linhas: [
-        { rotulo: t("drivers.margemBruta"), formato: "pct", driver: "margemBruta", hist: r.map((x) => x.margemBruta), proj: d.margemBruta },
-        { rotulo: t("linhas.custoVendas"), formato: "m", hist: col("costOfRevenue"), proj: pr.map((p) => p.cogs) },
-        { rotulo: t("linhas.lucroBruto"), formato: "m", hist: col("grossProfit"), proj: pr.map((p) => p.lucroBruto) },
-        { rotulo: t("drivers.margemEbit"), formato: "pct", driver: "margemEbit", hist: r.map((x) => x.margemEbit), proj: d.margemEbit },
-        { rotulo: t("linhas.ebit"), formato: "m", hist: col("operatingIncome"), proj: pr.map((p) => p.ebit), destaque: true },
-      ],
-    },
-    {
-      titulo: t("seccoes.capexDa"), ajuda: t("schedules.capexAjuda"), drivers: ["capexPctReceita", "daPctReceita"],
-      linhas: [
-        { rotulo: t("drivers.capexPctReceita"), formato: "pct", driver: "capexPctReceita", hist: r.map((x) => x.capexPctReceita), proj: d.capexPctReceita },
-        { rotulo: t("linhas.capex"), formato: "m", hist: col("capex"), proj: pr.map((p) => p.capex) },
-        { rotulo: t("drivers.daPctReceita"), formato: "pct", driver: "daPctReceita", hist: r.map((x) => x.daPctReceita), proj: d.daPctReceita },
-        { rotulo: t("linhas.da"), formato: "m", hist: col("depreciationAndAmortization"), proj: pr.map((p) => p.da) },
-        { rotulo: t("linhas.capexLiquido"), formato: "m", hist: h.map((a) => (a.capex !== null && a.depreciationAndAmortization !== null ? a.capex - a.depreciationAndAmortization : null)), proj: pr.map((p) => p.capex - p.da), nota: t("linhas.capexLiquidoNota") },
-      ],
-    },
-    {
-      titulo: t("seccoes.fundoManeio"), ajuda: t("schedules.fundoManeioAjuda"), drivers: ["dso", "dio", "dpo"],
-      linhas: [
-        { rotulo: t("drivers.dso"), formato: "dias", driver: "dso", hist: r.map((x) => x.dso), proj: d.dso },
-        { rotulo: t("linhas.clientes"), formato: "m", hist: col("accountsReceivable"), proj: pr.map((p) => p.clientes) },
-        { rotulo: t("drivers.dio"), formato: "dias", driver: "dio", hist: r.map((x) => x.dio), proj: d.dio },
-        { rotulo: t("linhas.inventario"), formato: "m", hist: col("inventory"), proj: pr.map((p) => p.inventario) },
-        { rotulo: t("drivers.dpo"), formato: "dias", driver: "dpo", hist: r.map((x) => x.dpo), proj: d.dpo },
-        { rotulo: t("linhas.fornecedores"), formato: "m", hist: col("accountsPayable"), proj: pr.map((p) => p.fornecedores) },
-        { rotulo: t("linhas.fundoManeio"), formato: "m", hist: nwcHist, proj: pr.map((p) => p.fundoManeio), subtotal: true },
-        { rotulo: t("linhas.varFundoManeio"), formato: "m", hist: nwcHist.map((v, i) => (i === 0 ? null : v - nwcHist[i - 1])), proj: pr.map((p) => p.variacaoFundoManeio), destaque: true },
-      ],
-    },
-    {
-      titulo: t("seccoes.impostos"), ajuda: t("schedules.impostosAjuda"), drivers: ["taxaImposto"],
-      linhas: [
-        { rotulo: t("drivers.taxaImposto"), formato: "pct", driver: "taxaImposto", hist: r.map((x) => x.taxaImposto), proj: d.taxaImposto },
-        { rotulo: t("linhas.impostosOperacionais"), formato: "m", proj: pr.map((p) => p.impostosOperacionais) },
-      ],
-    },
-  ]
-
-  return (
-    <div className="space-y-6">
-      <RevenueBuild c={c} />
-      {blocos.map((b) => (
-        <Cartao key={b.titulo} titulo={b.titulo}>
-          <p className="text-sm text-muted-foreground">{b.ajuda}</p>
-          <TabelaAssumptions anos={anosP} cabecalhosRefs={refs} linhas={linhasDrivers(c, b.drivers, rot)} />
-          <TabelaModelo anosHist={anosH} anosProj={anosP} linhas={b.linhas} unidade={t("unidade")} />
-        </Cartao>
-      ))}
-    </div>
-  )
-}
-
-// ─── 3. Projections ──────────────────────────────────────────────────────────
-
 export function SeparadorProjecoes({ c }: { c: ContextoSeparador }) {
   const t = useTranslations("dcfModelo")
   const pr = c.projecoes

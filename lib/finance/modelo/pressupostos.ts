@@ -23,7 +23,16 @@ import type { AnoHistorico, Driver, Pressupostos, PressupostosAvaliacao, RaciosA
  *               betas tendem para 1 ao longo do tempo (Nvidia 2,2 → 1,8).
  */
 
-export type EstimativaModelo = { fiscalYear: number; revenueAvg: number; ebitAvg: number | null; analistas: number }
+export type EstimativaModelo = {
+  fiscalYear: number
+  revenueAvg: number
+  ebitAvg: number | null
+  analistas: number
+  revenueLow?: number
+  revenueHigh?: number
+  ebitdaAvg?: number | null
+  epsAvg?: number
+}
 
 export type ContextoMercado = {
   rf: number | null

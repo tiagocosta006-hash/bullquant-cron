@@ -5,7 +5,7 @@ import { createPortal } from "react-dom"
 import { useTranslations } from "next-intl"
 import { ChevronDown, ChevronRight, Info, X, Pencil } from "lucide-react"
 import { ComposedChart, Bar, Line, Scatter, ErrorBar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts"
-import type { Driver } from "@/lib/finance/modelo"
+import { NOMES_CENARIOS, type Driver, type NomeCenario, type Pressupostos } from "@/lib/finance/modelo"
 import { CelulaEditavel, useFormatos, type Formato } from "./TabelaModelo"
 import type { ContextoSeparador } from "./Separadores"
 
@@ -20,6 +20,8 @@ import type { ContextoSeparador } from "./Separadores"
  */
 
 const ANOS_HIST = 5
+
+const COR_LINHA_CENARIO: Record<NomeCenario, string> = { bear: "var(--bear)", base: "var(--primary)", bull: "var(--bull)" }
 
 const FORMATO_DRIVER: Record<Driver, Formato> = {
   crescimentoReceita: "pct", margemBruta: "pct", margemEbit: "pct", daPctReceita: "pct",
@@ -203,6 +205,12 @@ function PainelAssumption({ c, alvo, onFechar }: { c: ContextoSeparador; alvo: A
     const serie = hist.map((a) => (rs ? a.segmentos?.[rs.eixo]?.[alvo.nome] ?? null : null))
     histValores = serie.map((v, i) => (i > 0 && v !== null && serie[i - 1] ? v / (serie[i - 1] as number) - 1 : null))
   }
+  // Os outros cenários, para comparar enquanto se edita este.
+  const serieDe = (q: Pressupostos): number[] | null =>
+    alvo.tipo === "driver" ? q.drivers[alvo.d] : q.receitaSegmentos?.segmentos.find((s) => s.nome === alvo.nome)?.crescimento ?? null
+  const outros = NOMES_CENARIOS.filter((x) => x !== c.cenario)
+    .map((nome) => ({ nome, serie: serieDe(c.conjunto.cenarios[nome]) }))
+    .filter((x): x is { nome: NomeCenario; serie: number[] } => !!x.serie)
   const st = estat(histValores)
   const cons = consensoPorAno(c)
   const consDriver = alvo.tipo === "driver" && (alvo.d === "crescimentoReceita" || alvo.d === "margemEbit")
@@ -218,6 +226,7 @@ function PainelAssumption({ c, alvo, onFechar }: { c: ContextoSeparador; alvo: A
       return {
         ano: `${a}E`,
         proj: valores[i] * escala,
+        ...Object.fromEntries(outros.map((o) => [o.nome, o.serie[i] !== undefined ? o.serie[i] * escala : null])),
         cons: v !== null ? v * escala : null,
         consErro: v !== null && cd?.low != null && cd?.high != null ? [(v - cd.low) * escala, (cd.high - v) * escala] : undefined,
       }
@@ -342,7 +351,11 @@ function PainelAssumption({ c, alvo, onFechar }: { c: ContextoSeparador; alvo: A
                 <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} width={40} tickFormatter={(v: number) => (formato === "pct" ? `${Math.round(v)}%` : `${Math.round(v)}`)} />
                 <Tooltip formatter={(v, nome) => [typeof v === "number" ? (formato === "pct" ? `${v.toFixed(1)}%` : v.toFixed(0)) : String(v), String(nome)]} contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 10, fontSize: 11 }} />
                 <Bar dataKey="hist" name={t("painel.real")} fill="var(--muted-foreground)" fillOpacity={0.4} radius={[3, 3, 0, 0]} />
-                <Line dataKey="proj" name={t("painel.tuaProjecao")} stroke="var(--primary)" strokeWidth={2} dot={{ r: 2 }} connectNulls={false} />
+                {outros.map((o) => (
+                  <Line key={o.nome} dataKey={o.nome} name={t(`cenario.nomes.${o.nome}`)} stroke={COR_LINHA_CENARIO[o.nome]}
+                    strokeWidth={1.25} strokeDasharray="4 3" dot={false} connectNulls={false} />
+                ))}
+                <Line dataKey="proj" name={`${t(`cenario.nomes.${c.cenario}`)} (${t("painel.tuaProjecao")})`} stroke={COR_LINHA_CENARIO[c.cenario]} strokeWidth={2} dot={{ r: 2 }} connectNulls={false} />
                 {consDriver && (
                   <Scatter dataKey="cons" name={t("painel.consenso")} fill="#2F6FAE">
                     <ErrorBar dataKey="consErro" width={4} stroke="#2F6FAE" direction="y" />

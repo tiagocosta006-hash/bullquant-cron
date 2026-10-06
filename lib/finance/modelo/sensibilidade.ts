@@ -115,34 +115,6 @@ export function grelhaCrescimentoMargem(c: ContextoSensibilidade, passoCrescimen
 
 export type NomeCenario = "bear" | "base" | "bull"
 
-export type Cenario = { nome: NomeCenario; probabilidade: number; ajuste: Ajuste }
-
-/** Cenários por omissão: o Bear e o Bull mexem no crescimento, na margem, na WACC e no múltiplo de saída. */
-export const CENARIOS_POR_OMISSAO: Cenario[] = [
-  { nome: "bear", probabilidade: 0.25, ajuste: { crescimento: -0.03, margemEbit: -0.03, wacc: 0.01, multiplo: -2 } },
-  { nome: "base", probabilidade: 0.5, ajuste: {} },
-  { nome: "bull", probabilidade: 0.25, ajuste: { crescimento: 0.03, margemEbit: 0.03, wacc: -0.01, multiplo: 2 } },
-]
-
-export type ResultadoCenarios = {
-  cenarios: Array<Cenario & { valor: number | null }>
-  /** Valor esperado, com as probabilidades normalizadas aos cenários válidos. null se nenhum for válido. */
-  valorEsperado: number | null
-  /** Soma das probabilidades escritas (o analista vê se não dá 100%). */
-  somaProbabilidades: number
-}
-
-export function calcularCenarios(c: ContextoSensibilidade, cenarios: Cenario[] = CENARIOS_POR_OMISSAO): ResultadoCenarios {
-  const com = cenarios.map((x) => ({ ...x, valor: valorComAjuste(c, x.ajuste) }))
-  const validos = com.filter((x) => x.valor !== null && x.probabilidade > 0)
-  const pesoTotal = validos.reduce((s, x) => s + x.probabilidade, 0)
-  return {
-    cenarios: com,
-    valorEsperado: pesoTotal > 0 ? validos.reduce((s, x) => s + (x.valor as number) * x.probabilidade, 0) / pesoTotal : null,
-    somaProbabilidades: cenarios.reduce((s, x) => s + x.probabilidade, 0),
-  }
-}
-
 export type BarraFootball = { chave: string; min: number; max: number; ponto: number | null }
 
 /** Menor e maior valor válido de uma grelha. */

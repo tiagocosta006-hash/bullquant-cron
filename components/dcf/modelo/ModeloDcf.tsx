@@ -6,7 +6,8 @@ import { Search, Loader2, RotateCcw, AlertTriangle } from "lucide-react"
 import { useDebounce } from "@/hooks/useDebounce"
 import {
   racios, projetar, avaliar, fracaoAno1, anosAteFimAno1, pressupostosIniciais, mudarHorizonte,
-  type AnoHistorico, type Driver, type EstimativaModelo, type ContextoMercado, type Pressupostos,
+  cenariosIniciais, derivarCenario, mudarHorizonteCenarios, NOMES_CENARIOS, PROBABILIDADES_POR_OMISSAO,
+  type ConjuntoCenarios, type NomeCenario, type AnoHistorico, type Driver, type EstimativaModelo, type ContextoMercado, type Pressupostos,
   type PressupostosAvaliacao, type Mercado,
 } from "@/lib/finance/modelo"
 import {
@@ -40,29 +41,53 @@ type SearchResult = { ticker: string; name: string }
 const SEPARADORES = ["historico", "schedules", "projecoes", "avaliacao", "sensibilidade"] as const
 type Separador = (typeof SEPARADORES)[number]
 
-const chaveRascunho = (ticker: string) => `bv-dcf-modelo:v1:${ticker}`
+// v2: os três cenários. v1 (um só conjunto de pressupostos) passa a ser o Base.
+const chaveRascunho = (ticker: string) => `bv-dcf-modelo:v2:${ticker}`
+const chaveV1 = (ticker: string) => `bv-dcf-modelo:v1:${ticker}`
+const chaveProbV1 = (ticker: string) => `bv-dcf-cenarios:v1:${ticker}`
 
-function lerRascunho(ticker: string): Pressupostos | null {
+function lerRascunho(ticker: string): ConjuntoCenarios | null {
   try {
-    const s = localStorage.getItem(chaveRascunho(ticker))
-    return s ? (JSON.parse(s) as Pressupostos) : null
+    const v2 = localStorage.getItem(chaveRascunho(ticker))
+    if (v2) return JSON.parse(v2) as ConjuntoCenarios
+    const v1 = localStorage.getItem(chaveV1(ticker))
+    if (!v1) return null
+    const conjunto = cenariosIniciais(JSON.parse(v1) as Pressupostos)
+    const prob = JSON.parse(localStorage.getItem(chaveProbV1(ticker)) ?? "null") as Record<NomeCenario, number> | null
+    return prob ? { ...conjunto, probabilidades: { ...PROBABILIDADES_POR_OMISSAO, ...prob } } : conjunto
   } catch {
     return null
   }
 }
-function gravarRascunho(ticker: string, p: Pressupostos | null) {
+function gravarRascunho(ticker: string, c: ConjuntoCenarios | null) {
   try {
-    if (p) localStorage.setItem(chaveRascunho(ticker), JSON.stringify(p))
+    if (c) localStorage.setItem(chaveRascunho(ticker), JSON.stringify(c))
     else localStorage.removeItem(chaveRascunho(ticker))
+    localStorage.removeItem(chaveV1(ticker))
+    localStorage.removeItem(chaveProbV1(ticker))
   } catch { /* modo privado: o rascunho só não fica guardado */ }
+}
+
+/** Rascunhos de antes do Revenue Build por segmento não têm segmentos: recebem os iniciais. */
+function completar(p: Pressupostos, ini: Pressupostos): Pressupostos {
+  return { ...p, receitaSegmentos: p.receitaSegmentos ?? mudarHorizonte(ini, p.anos).receitaSegmentos, modoReceita: p.modoReceita ?? "total" }
+}
+
+const COR_CENARIO: Record<NomeCenario, string> = {
+  bear: "bg-bear text-white",
+  base: "bg-primary text-primary-foreground",
+  bull: "bg-bull text-white",
 }
 
 export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: string; locked?: boolean }) {
   const t = useTranslations("dcfModelo")
   const { fmt } = useFormatos()
   const [dados, setDados] = React.useState<Dados | null>(null)
-  const [pressupostos, setPressupostos] = React.useState<Pressupostos | null>(null)
-  const [iniciais, setIniciais] = React.useState<Pressupostos | null>(null)
+  const [conjunto, setConjunto] = React.useState<ConjuntoCenarios | null>(null)
+  const [iniciaisConjunto, setIniciaisConjunto] = React.useState<ConjuntoCenarios | null>(null)
+  const cenario: NomeCenario = conjunto?.ativo ?? "base"
+  const pressupostos = conjunto?.cenarios[cenario] ?? null
+  const iniciais = iniciaisConjunto?.cenarios[cenario] ?? null
   const [aba, setAba] = React.useState<Separador>("schedules")
   const [carregando, setCarregando] = React.useState(false)
   const [erro, setErro] = React.useState<string | null>(null)
@@ -90,14 +115,19 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
       const d = (await r.json()) as Dados
       setDados(d)
       const ini = pressupostosIniciais(d.historico, racios(d.historico), d.estimativas, d.contexto)
-      setIniciais(ini)
+      setIniciaisConjunto(cenariosIniciais(ini))
       const rasc = lerRascunho(d.empresa.ticker)
-      // Rascunhos de antes do Revenue Build por segmento não têm segmentos:
-      // recebem os iniciais, no horizonte do rascunho.
-      const junto = rasc
-        ? { ...rasc, receitaSegmentos: rasc.receitaSegmentos ?? mudarHorizonte(ini, rasc.anos).receitaSegmentos, modoReceita: rasc.modoReceita ?? "total" }
-        : ini
-      setPressupostos(junto)
+      const junto: ConjuntoCenarios = rasc
+        ? {
+            ...rasc,
+            cenarios: {
+              bear: completar(rasc.cenarios.bear, ini),
+              base: completar(rasc.cenarios.base, ini),
+              bull: completar(rasc.cenarios.bull, ini),
+            },
+          }
+        : cenariosIniciais(ini)
+      setConjunto(junto)
       setComRascunho(!!rasc)
       setAba("schedules")
     } catch {
@@ -109,15 +139,29 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
 
   React.useEffect(() => { if (defaultTicker) carregar(defaultTicker) }, [defaultTicker, carregar])
 
-  const atualizar = (fn: (p: Pressupostos) => Pressupostos) => {
-    setPressupostos((p) => {
-      if (!p || !dados) return p
-      const novo = fn(p)
+  const atualizarConjunto = (fn: (c: ConjuntoCenarios) => ConjuntoCenarios) => {
+    setConjunto((c) => {
+      if (!c || !dados) return c
+      const novo = fn(c)
       gravarRascunho(dados.empresa.ticker, novo)
       setComRascunho(true)
       return novo
     })
   }
+  // Os Schedules e a Valuation editam o cenário ativo.
+  const atualizar = (fn: (p: Pressupostos) => Pressupostos) =>
+    atualizarConjunto((c) => ({ ...c, cenarios: { ...c.cenarios, [c.ativo]: fn(c.cenarios[c.ativo]) } }))
+  const mudarCenario = (ativo: NomeCenario) => setConjunto((c) => {
+    if (!c || !dados) return c
+    const novo = { ...c, ativo }
+    gravarRascunho(dados.empresa.ticker, novo)
+    return novo
+  })
+  const onProbabilidade = (nome: NomeCenario, v: number) =>
+    atualizarConjunto((c) => ({ ...c, probabilidades: { ...c.probabilidades, [nome]: v } }))
+  /** Recomeça o Bear ou o Bull a partir do Base atual. */
+  const derivarDoBase = (nome: NomeCenario) =>
+    atualizarConjunto((c) => ({ ...c, cenarios: { ...c.cenarios, [nome]: derivarCenario(c.cenarios.base, nome) } }))
   const onDriver = (d: Driver, i: number, v: number) =>
     atualizar((p) => ({ ...p, drivers: { ...p.drivers, [d]: p.drivers[d].map((x, j) => (j === i ? v : x)) } }))
   const onDriverSerie = (d: Driver, valores: number[]) =>
@@ -130,9 +174,9 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
   const onAvaliacao = (patch: Partial<PressupostosAvaliacao>) =>
     atualizar((p) => ({ ...p, avaliacao: { ...p.avaliacao, ...patch } }))
   const repor = () => {
-    if (!dados || !iniciais) return
+    if (!dados || !iniciaisConjunto) return
     gravarRascunho(dados.empresa.ticker, null)
-    setPressupostos(iniciais)
+    setConjunto(iniciaisConjunto)
     setComRascunho(false)
   }
 
@@ -162,6 +206,7 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
     ticker: dados?.empresa.ticker ?? "", historico: calculo.hist, racios: calculo.rs, pressupostos, iniciais, projecoes: calculo.projecoes,
     avaliacao: calculo.avaliacao, mercado: calculo.mercado, estimativas: dados?.estimativas ?? [], multiplosHistoricos: dados?.multiplosHistoricos ?? [], evEbitdaAtual: dados?.contexto.evEbitdaAtual ?? null, fracaoAno1: calculo.f, anosAteFimAno1: calculo.d0,
     onDriver, onDriverSerie, onSegmentoSerie, onModoReceita, onAvaliacao,
+    cenario, conjunto: conjunto!, onProbabilidade, derivarDoBase,
   } : null
 
   return (
@@ -201,7 +246,7 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
               </div>
               {calculo?.avaliacao.valido && (
                 <div className="flex items-center gap-6 text-sm">
-                  <div><p className="text-xs text-muted-foreground">{t("avaliacao.valorPorAcao")}</p><p className="text-xl font-bold text-primary tabular-nums">${fmt(calculo.avaliacao.valorPorAcao, "anos")}</p></div>
+                  <div><p className="text-xs text-muted-foreground">{t("avaliacao.valorPorAcao")}{cenario !== "base" && <span className={`ml-1.5 rounded px-1 py-px text-[10px] font-semibold ${COR_CENARIO[cenario]}`}>{t(`cenario.nomes.${cenario}`)}</span>}</p><p className="text-xl font-bold text-primary tabular-nums">${fmt(calculo.avaliacao.valorPorAcao, "anos")}</p></div>
                   <div><p className="text-xs text-muted-foreground">{t("avaliacao.preco")}</p><p className="text-xl font-bold tabular-nums">${fmt(calculo.avaliacao.preco, "anos")}</p></div>
                   <div><p className="text-xs text-muted-foreground">{t("avaliacao.potencial")}</p><p className={`text-xl font-bold tabular-nums ${calculo.avaliacao.potencial >= 0 ? "text-bull" : "text-bear"}`}>{calculo.avaliacao.potencial >= 0 ? "+" : ""}{fmt(calculo.avaliacao.potencial, "pct")}</p></div>
                 </div>
@@ -231,10 +276,21 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
                 </button>
               ))}
             </div>
-            <div className="flex items-center gap-3 text-xs">
+            <div className="flex flex-wrap items-center gap-3 text-xs">
+              <div className="flex items-center gap-2" title={t("cenario.ajuda")}>
+                <span className="text-muted-foreground">{t("cenario.rotulo")}</span>
+                <div className="flex gap-0.5 rounded-lg border border-border/50 bg-muted/40 p-0.5">
+                  {NOMES_CENARIOS.map((n) => (
+                    <button key={n} type="button" onClick={() => mudarCenario(n)}
+                      className={`rounded-md px-2.5 py-1 font-semibold transition-all ${cenario === n ? COR_CENARIO[n] : "text-muted-foreground hover:text-foreground"}`}>
+                      {t(`cenario.nomes.${n}`)}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <label className="flex items-center gap-2">
                 <span className="text-muted-foreground">{t("horizonte")}</span>
-                <select value={pressupostos.anos} onChange={(e) => atualizar((p) => mudarHorizonte(p, Number(e.target.value)))}
+                <select value={pressupostos.anos} onChange={(e) => atualizarConjunto((c) => mudarHorizonteCenarios(c, Number(e.target.value)))}
                   className="rounded-md border border-border bg-background px-2 py-1">
                   {[5, 7, 10].map((n) => <option key={n} value={n}>{t("anos", { n })}</option>)}
                 </select>

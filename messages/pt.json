@@ -1897,21 +1897,24 @@
       },
       "cenarios": {
         "titulo": "Scenarios",
-        "ajuda": "Bear e Bull deslocam crescimento, margem EBIT, WACC e múltiplo de saída ao mesmo tempo. As probabilidades são tuas; o valor esperado é a média ponderada.",
+        "ajuda": "Cada cenário é o modelo completo com os seus assumptions: escolhe-o no seletor Scenario e edita-o nos Schedules e na Valuation. O valor esperado é a média ponderada pelas tuas probabilidades.",
         "cenario": "Scenario",
-        "ajustes": "Adjustments (growth · EBIT margin · WACC · exit multiple)",
         "valor": "Value per share",
         "potencial": "Upside / downside",
         "probabilidade": "Probability",
         "esperado": "Probability-weighted value",
-        "semAjustes": "Teu modelo",
-        "resumoAjustes": "{cresc} · {margem} · {wacc} · {mult}",
         "somaAviso": "As probabilidades somam {soma}, não 100%: o valor esperado usa-as proporcionalmente.",
         "nomes": {
           "bear": "Bear",
           "base": "Base",
           "bull": "Bull"
-        }
+        },
+        "cagr": "Revenue CAGR",
+        "margem": "EBIT margin",
+        "terminal": "Terminal value",
+        "aEditar": "a editar",
+        "derivar": "From Base",
+        "derivarAjuda": "Recomeça este cenário a partir do Base atual (±3 pp crescimento e margem, ±2x múltiplo, ±0,5 pp g). Perde as alterações deste cenário."
       },
       "football": {
         "titulo": "Football field",
@@ -1929,7 +1932,17 @@
         "ajuda": "Valor por ação ao mudar a WACC e o múltiplo EV/EBITDA de saída. O centro é o teu modelo; verde acima do preço atual, vermelho abaixo.",
         "multiplo": "Exit multiple"
       },
-      "pontoBarra": "Valor central de cada análise"
+      "pontoBarra": "Valor central de cada análise",
+      "doCenario": "Sensibilidade do cenário {cenario} (o selecionado)"
+    },
+    "cenario": {
+      "rotulo": "Scenario",
+      "ajuda": "Cada cenário tem os seus próprios assumptions. Os Schedules e a Valuation editam o cenário selecionado.",
+      "nomes": {
+        "bear": "Bear",
+        "base": "Base",
+        "bull": "Bull"
+      }
     }
   },
   "dcfSimples": {

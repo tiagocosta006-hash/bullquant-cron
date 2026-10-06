@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import { modeloFcffAplicavel } from "@/lib/finance/modelo/aplicabilidade"
 import {
-  projetar, avaliar, grelhaWaccG, grelhaWaccMultiplo, grelhaCrescimentoMargem, valorComAjuste, aplicarAjuste, calcularCenarios, racios, resumo, fracaoAno1, pressupostosIniciais, segmentosIniciais, mudarHorizonte, interpolar,
+  projetar, avaliar, grelhaWaccG, grelhaWaccMultiplo, grelhaCrescimentoMargem, valorComAjuste, aplicarAjuste, cenariosIniciais, mudarHorizonteCenarios, valorEsperado, racios, resumo, fracaoAno1, pressupostosIniciais, segmentosIniciais, mudarHorizonte, interpolar,
   type AnoHistorico, type Pressupostos,
 } from "@/lib/finance/modelo"
 
@@ -246,24 +246,7 @@ describe("modelo DCF — sensibilidade e cenários", () => {
     expect(valorComAjuste(ctx, { margemEbit: 0.02 })!).toBeGreaterThan(18.1113)
   })
 
-  it("cenários: o valor esperado é a média ponderada e o base coincide com o modelo", () => {
-    const r = calcularCenarios(ctx)
-    const [bear, base_, bull] = r.cenarios
-    expect(base_.valor).toBeCloseTo(18.1113, 3)
-    expect(bear.valor!).toBeLessThan(base_.valor!)
-    expect(bull.valor!).toBeGreaterThan(base_.valor!)
-    expect(r.valorEsperado).toBeCloseTo(0.25 * bear.valor! + 0.5 * base_.valor! + 0.25 * bull.valor!, 6)
-    expect(r.somaProbabilidades).toBeCloseTo(1, 6)
-  })
 
-  it("probabilidades que não somam 100% são normalizadas no valor esperado", () => {
-    const r = calcularCenarios(ctx, [
-      { nome: "base", probabilidade: 0.3, ajuste: {} },
-      { nome: "bull", probabilidade: 0.3, ajuste: { crescimento: 0.03 } },
-    ])
-    expect(r.somaProbabilidades).toBeCloseTo(0.6, 6)
-    expect(r.valorEsperado).toBeCloseTo((r.cenarios[0].valor! + r.cenarios[1].valor!) / 2, 6)
-  })
 
   it("WACC × exit multiple: o centro é o modelo com exit multiple, e mais múltiplo vale mais", () => {
     const pm = { ...p, avaliacao: { ...p.avaliacao, metodoTerminal: "multiplo" as const } }
@@ -276,5 +259,52 @@ describe("modelo DCF — sensibilidade e cenários", () => {
     expect(g.valores[3][2]!).toBeLessThan(g.valores[2][2]!)
     // Com exit multiple, o g não mexe no valor: era por isso que a WACC × g não servia.
     expect(valorComAjuste(cm, { g: 0.04 })).toBeCloseTo(centro, 6)
+  })
+})
+
+describe("modelo DCF — cenários Bear/Base/Bull (conjuntos completos)", () => {
+  const ctx = { base, pressupostos: p, mercado, f: 1, d0: 1 }
+
+  it("o Base é o modelo do analista; o Bear e o Bull partem dele com ±3 pp, ±2x e ±0,5 pp no g", () => {
+    const c = cenariosIniciais(p)
+    expect(c.ativo).toBe("base")
+    expect(c.cenarios.base).toBe(p)
+    expect(c.cenarios.bear.drivers.crescimentoReceita[0]).toBeCloseTo(p.drivers.crescimentoReceita[0] - 0.03, 9)
+    expect(c.cenarios.bull.drivers.margemEbit[0]).toBeCloseTo(p.drivers.margemEbit[0] + 0.03, 9)
+    expect(c.cenarios.bear.avaliacao.multiploSaida).toBeCloseTo(p.avaliacao.multiploSaida - 2, 9)
+    expect(c.cenarios.bull.avaliacao.g).toBeCloseTo(p.avaliacao.g + 0.005, 9)
+    // A WACC não muda: continua calculada (não passa a manual).
+    expect(c.cenarios.bear.avaliacao.waccManual).toBe(p.avaliacao.waccManual)
+  })
+
+  it("cada cenário vale o modelo inteiro com os seus pressupostos: Bear < Base < Bull", () => {
+    const c = cenariosIniciais(p)
+    const v = (q: typeof p) => valorComAjuste({ ...ctx, pressupostos: q })!
+    expect(v(c.cenarios.base)).toBeCloseTo(18.1113, 3)
+    expect(v(c.cenarios.bear)).toBeLessThan(v(c.cenarios.base))
+    expect(v(c.cenarios.bull)).toBeGreaterThan(v(c.cenarios.base))
+  })
+
+  it("um cenário editado é independente dos outros", () => {
+    const c = cenariosIniciais(p)
+    const bear = { ...c.cenarios.bear, drivers: { ...c.cenarios.bear.drivers, margemEbit: c.cenarios.bear.drivers.margemEbit.map(() => 0.05) } }
+    const c2 = { ...c, cenarios: { ...c.cenarios, bear } }
+    expect(c2.cenarios.base.drivers.margemEbit[0]).toBe(p.drivers.margemEbit[0])
+    expect(c2.cenarios.bear.drivers.margemEbit[0]).toBe(0.05)
+  })
+
+  it("o horizonte muda nos três cenários", () => {
+    const c = mudarHorizonteCenarios(cenariosIniciais(p), 7)
+    for (const n of ["bear", "base", "bull"] as const) {
+      expect(c.cenarios[n].anos).toBe(7)
+      expect(c.cenarios[n].drivers.crescimentoReceita).toHaveLength(7)
+    }
+  })
+
+  it("valor esperado: média ponderada, normalizada se as probabilidades não somam 100%", () => {
+    expect(valorEsperado({ bear: 10, base: 20, bull: 40 }, { bear: 0.25, base: 0.5, bull: 0.25 })).toBeCloseTo(22.5, 9)
+    expect(valorEsperado({ bear: 10, base: 20, bull: 40 }, { bear: 0, base: 0.3, bull: 0.3 })).toBeCloseTo(30, 9)
+    expect(valorEsperado({ bear: null, base: 20, bull: 40 }, { bear: 0.5, base: 0.25, bull: 0.25 })).toBeCloseTo(30, 9)
+    expect(valorEsperado({ bear: null, base: null, bull: null }, { bear: 1, base: 1, bull: 1 })).toBeNull()
   })
 })

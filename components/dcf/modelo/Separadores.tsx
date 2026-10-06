@@ -6,7 +6,7 @@ import { AlertTriangle } from "lucide-react"
 import { GraficoMultiplo, estatisticas, type PontoMultiplo } from "@/components/stock/GraficoMultiplo"
 import {
   type AnoHistorico, type AnoProjetado, type Avaliacao, type Driver, type EstimativaModelo, type Mercado, type Pressupostos,
-  type PressupostosAvaliacao, type RaciosAno,
+  type PressupostosAvaliacao, type RaciosAno, type ConjuntoCenarios, type NomeCenario,
 } from "@/lib/finance/modelo"
 import { TabelaModelo, useFormatos, type Formato, type LinhaTabela } from "./TabelaModelo"
 
@@ -38,6 +38,12 @@ export type ContextoSeparador = {
   onSegmentoSerie: (nome: string, valores: number[]) => void
   onModoReceita: (modo: "total" | "segmentos") => void
   onAvaliacao: (patch: Partial<PressupostosAvaliacao>) => void
+  /** Cenário que os Schedules e a Valuation estão a editar. */
+  cenario: NomeCenario
+  /** Os três conjuntos de pressupostos e as probabilidades. */
+  conjunto: ConjuntoCenarios
+  onProbabilidade: (nome: NomeCenario, v: number) => void
+  derivarDoBase: (nome: NomeCenario) => void
 }
 
 function Cartao({ titulo, children, acao }: { titulo: string; children: React.ReactNode; acao?: React.ReactNode }) {

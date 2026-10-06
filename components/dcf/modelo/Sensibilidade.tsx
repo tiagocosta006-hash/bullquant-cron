@@ -4,8 +4,8 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 import { Info } from "lucide-react"
 import {
-  grelhaWaccG, grelhaWaccMultiplo, grelhaCrescimentoMargem, calcularCenarios, intervaloGrelha,
-  CENARIOS_POR_OMISSAO, type Cenario, type Grelha, type ContextoSensibilidade, type BarraFootball,
+  grelhaWaccG, grelhaWaccMultiplo, grelhaCrescimentoMargem, intervaloGrelha, projetar, avaliar, valorEsperado,
+  NOMES_CENARIOS, type Grelha, type ContextoSensibilidade, type BarraFootball, type NomeCenario,
 } from "@/lib/finance/modelo"
 import type { ContextoSeparador } from "./Separadores"
 import { useFormatos } from "./TabelaModelo"
@@ -127,29 +127,16 @@ function FootballField({ barras, preco, valor }: { barras: BarraFootball[]; prec
 
 export function SeparadorSensibilidade({ c }: { c: ContextoSeparador }) {
   const t = useTranslations("dcfModelo.sensibilidade")
+  const tc = useTranslations("dcfModelo.cenario")
   const { fmt, ler, paraInput } = useFormatos()
-  // As probabilidades são do analista: guardam-se por empresa, como o rascunho do modelo.
-  const chave = `bv-dcf-cenarios:v1:${c.ticker}`
-  const [cenarios, setCenariosEstado] = React.useState<Cenario[]>(() => {
-    try {
-      const guardadas = JSON.parse(localStorage.getItem(chave) ?? "null") as Record<string, number> | null
-      if (guardadas) return CENARIOS_POR_OMISSAO.map((x) => ({ ...x, probabilidade: guardadas[x.nome] ?? x.probabilidade }))
-    } catch {}
-    return CENARIOS_POR_OMISSAO
-  })
-  const setCenarios = (f: (xs: Cenario[]) => Cenario[]) => setCenariosEstado((xs) => {
-    const novos = f(xs)
-    try { localStorage.setItem(chave, JSON.stringify(Object.fromEntries(novos.map((x) => [x.nome, x.probabilidade])))) } catch {}
-    return novos
-  })
 
   const ctx: ContextoSensibilidade | null = React.useMemo(() => {
     const base = c.historico[c.historico.length - 1]
     if (!base) return null
-    // `d0` volta a ser calculado como no modelo: ver ModeloDcf. Aqui chega via contexto.
     return { base, pressupostos: c.pressupostos, mercado: c.mercado, f: c.fracaoAno1, d0: c.anosAteFimAno1 }
   }, [c.historico, c.pressupostos, c.mercado, c.fracaoAno1, c.anosAteFimAno1])
 
+  // As tabelas de sensibilidade são do cenário ativo.
   const calculo = React.useMemo(() => {
     if (!ctx) return null
     // A tabela da WACC acompanha o método do valor terminal: com o exit multiple
@@ -158,17 +145,40 @@ export function SeparadorSensibilidade({ c }: { c: ContextoSeparador }) {
     const waccG = metodo !== "multiplo" ? grelhaWaccG(ctx) : null
     const waccMultiplo = metodo !== "gordon" ? grelhaWaccMultiplo(ctx) : null
     const crescMargem = grelhaCrescimentoMargem(ctx)
-    const cen = calcularCenarios(ctx, cenarios)
-    return { waccG, waccMultiplo, crescMargem, cen }
-  }, [ctx, cenarios])
+    return { waccG, waccMultiplo, crescMargem }
+  }, [ctx])
 
-  if (!ctx || !calculo || !c.avaliacao.valido) return <p className="text-sm text-muted-foreground">{t("semModelo")}</p>
+  // Cada cenário corre o modelo inteiro com os SEUS pressupostos.
+  const cenarios = React.useMemo(() => {
+    if (!ctx) return null
+    const receitaBase = ctx.base.revenue ?? 0
+    const linhas = NOMES_CENARIOS.map((nome) => {
+      const p = c.conjunto.cenarios[nome]
+      const proj = projetar(ctx.base, p)
+      const { avaliacao } = avaliar(proj, p.avaliacao, ctx.mercado, ctx.f, ctx.d0)
+      const ult = proj[proj.length - 1]
+      return {
+        nome,
+        valor: avaliacao.valido ? avaliacao.valorPorAcao : null,
+        cagr: receitaBase > 0 && ult ? Math.pow(ult.receita / receitaBase, 1 / proj.length) - 1 : null,
+        margemIni: p.drivers.margemEbit[0], margemFim: p.drivers.margemEbit[p.drivers.margemEbit.length - 1],
+        wacc: avaliacao.wacc.wacc,
+        metodo: p.avaliacao.metodoTerminal, g: p.avaliacao.g, multiplo: p.avaliacao.multiploSaida,
+      }
+    })
+    const valores = Object.fromEntries(linhas.map((x) => [x.nome, x.valor])) as Record<NomeCenario, number | null>
+    return { linhas, esperado: valorEsperado(valores, c.conjunto.probabilidades) }
+  }, [ctx, c.conjunto])
+
+  if (!ctx || !calculo || !cenarios || !c.avaliacao.valido) return <p className="text-sm text-muted-foreground">{t("semModelo")}</p>
 
   const a = c.pressupostos.avaliacao
   const preco = c.mercado.preco
-  const { waccG, waccMultiplo, crescMargem, cen } = calculo
+  const { waccG, waccMultiplo, crescMargem } = calculo
   const pct = (v: number) => fmt(v, "pct")
   const pp = (v: number) => `${v >= 0 ? "+" : ""}${fmt(v * 100, "anos")} pp`
+  const somaProb = NOMES_CENARIOS.reduce((s, n) => s + c.conjunto.probabilidades[n], 0)
+  const somaOk = Math.abs(somaProb - 1) < 0.0005
 
   const barras: BarraFootball[] = []
   const r1 = waccG && intervaloGrelha(waccG)
@@ -177,18 +187,77 @@ export function SeparadorSensibilidade({ c }: { c: ContextoSeparador }) {
   if (r1m) barras.push({ chave: "waccMultiplo", ...r1m, ponto: c.avaliacao.valorPorAcao })
   const r2 = intervaloGrelha(crescMargem)
   if (r2) barras.push({ chave: "crescMargem", ...r2, ponto: c.avaliacao.valorPorAcao })
-  const vs = cen.cenarios.map((x) => x.valor).filter((x): x is number => x !== null)
-  if (vs.length >= 2) barras.push({ chave: "cenarios", min: Math.min(...vs), max: Math.max(...vs), ponto: cen.valorEsperado })
+  const vs = cenarios.linhas.map((x) => x.valor).filter((x): x is number => x !== null)
+  if (vs.length >= 2) barras.push({ chave: "cenarios", min: Math.min(...vs), max: Math.max(...vs), ponto: cenarios.esperado })
 
-  const mudarProb = (nome: Cenario["nome"], texto: string) => {
+  const mudarProb = (nome: NomeCenario, texto: string) => {
     const v = ler(texto, "pct")
     if (v === null || v < 0 || v > 1) return
-    setCenarios((xs) => xs.map((x) => (x.nome === nome ? { ...x, probabilidade: v } : x)))
+    c.onProbabilidade(nome, v)
   }
-  const somaOk = Math.abs(cen.somaProbabilidades - 1) < 0.0005
+  const potencial = (v: number | null) => (v === null || preco <= 0 ? "N/A" : `${v >= preco ? "+" : ""}${pct(v / preco - 1)}`)
+  const corPot = (v: number | null) => (v !== null && v >= preco ? "text-bull" : "text-bear")
 
   return (
     <div className="glass space-y-6 rounded-xl px-5 py-4">
+      <Cartao titulo={t("cenarios.titulo")} ajuda={t("cenarios.ajuda")}>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[720px] text-xs tabular-nums">
+            <thead>
+              <tr className="text-muted-foreground">
+                <th className="py-1 text-left font-medium">{t("cenarios.cenario")}</th>
+                <th className="py-1 text-right font-medium">{t("cenarios.cagr")}</th>
+                <th className="py-1 text-right font-medium">{t("cenarios.margem")}</th>
+                <th className="py-1 text-right font-medium">WACC</th>
+                <th className="py-1 text-right font-medium">{t("cenarios.terminal")}</th>
+                <th className="py-1 text-right font-medium">{t("cenarios.valor")}</th>
+                <th className="py-1 text-right font-medium">{t("cenarios.potencial")}</th>
+                <th className="py-1 text-right font-medium">{t("cenarios.probabilidade")}</th>
+                <th className="py-1"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {cenarios.linhas.map((x) => (
+                <tr key={x.nome} className={`border-t border-border/50 ${x.nome === c.cenario ? "bg-primary/5" : ""}`}>
+                  <td className="py-1.5 font-semibold">{tc(`nomes.${x.nome}`)}{x.nome === c.cenario && <span className="ml-1.5 text-[10px] font-normal text-primary">{t("cenarios.aEditar")}</span>}</td>
+                  <td className="py-1.5 text-right">{x.cagr === null ? "N/A" : pct(x.cagr)}</td>
+                  <td className="py-1.5 text-right">{pct(x.margemIni)} → {pct(x.margemFim)}</td>
+                  <td className="py-1.5 text-right">{pct(x.wacc)}</td>
+                  <td className="py-1.5 text-right">
+                    {x.metodo === "gordon" ? `g ${pct(x.g)}` : x.metodo === "multiplo" ? fmt(x.multiplo, "x") : `g ${pct(x.g)} · ${fmt(x.multiplo, "x")}`}
+                  </td>
+                  <td className="py-1.5 text-right font-semibold">{x.valor === null ? "N/A" : `$${fmt(x.valor, "anos")}`}</td>
+                  <td className={`py-1.5 text-right ${corPot(x.valor)}`}>{potencial(x.valor)}</td>
+                  <td className="py-1.5 text-right">
+                    <input key={c.conjunto.probabilidades[x.nome]} defaultValue={paraInput(c.conjunto.probabilidades[x.nome], "pct")} inputMode="decimal"
+                      aria-label={`${tc(`nomes.${x.nome}`)} ${t("cenarios.probabilidade")}`}
+                      onBlur={(e) => mudarProb(x.nome, e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLInputElement).blur()}
+                      className="w-14 rounded border border-primary/30 bg-primary/5 px-2 py-0.5 text-right font-medium text-primary outline-none focus:border-primary" />
+                    <span className="ml-1 text-muted-foreground">%</span>
+                  </td>
+                  <td className="py-1.5 pl-3 text-right whitespace-nowrap">
+                    {x.nome !== "base" && (
+                      <button type="button" onClick={() => c.derivarDoBase(x.nome)} title={t("cenarios.derivarAjuda")}
+                        className="rounded px-1.5 py-0.5 text-muted-foreground hover:bg-muted/60 hover:text-foreground">↺ {t("cenarios.derivar")}</button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              <tr className="border-t border-border/60 font-semibold">
+                <td className="py-1.5" colSpan={5}>{t("cenarios.esperado")}</td>
+                <td className="py-1.5 text-right text-primary">{cenarios.esperado === null ? "N/A" : `$${fmt(cenarios.esperado, "anos")}`}</td>
+                <td className={`py-1.5 text-right ${corPot(cenarios.esperado)}`}>{potencial(cenarios.esperado)}</td>
+                <td className={`py-1.5 text-right ${somaOk ? "" : "text-amber-500"}`}>{pct(somaProb)}</td>
+                <td />
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        {!somaOk && <p className="text-xs text-amber-500">{t("cenarios.somaAviso", { soma: pct(somaProb) })}</p>}
+      </Cartao>
+
+      <p className="border-t border-border/60 pt-4 text-xs text-muted-foreground">{t("doCenario", { cenario: tc(`nomes.${c.cenario}`) })}</p>
       <div className="grid gap-6 xl:grid-cols-2">
       {waccG && (
         <Cartao titulo={t("waccG.titulo")} ajuda={t("waccG.ajuda")}>
@@ -208,55 +277,6 @@ export function SeparadorSensibilidade({ c }: { c: ContextoSeparador }) {
           base={{ linha: 0, coluna: 0 }} formatoLinha={pp} formatoColuna={pp} />
       </Cartao>
       </div>
-
-      <Cartao titulo={t("cenarios.titulo")} ajuda={t("cenarios.ajuda")}>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[520px] text-xs tabular-nums">
-            <thead>
-              <tr className="text-left text-xs text-muted-foreground">
-                <th className="py-1 font-medium">{t("cenarios.cenario")}</th>
-                <th className="py-1 text-right font-medium">{t("cenarios.ajustes")}</th>
-                <th className="py-1 text-right font-medium">{t("cenarios.valor")}</th>
-                <th className="py-1 text-right font-medium">{t("cenarios.potencial")}</th>
-                <th className="py-1 text-right font-medium">{t("cenarios.probabilidade")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cen.cenarios.map((x) => (
-                <tr key={x.nome} className="border-t border-border/50">
-                  <td className="py-1.5 font-semibold">{t(`cenarios.nomes.${x.nome}`)}</td>
-                  <td className="py-1.5 text-right text-xs text-muted-foreground">
-                    {x.nome === "base" ? t("cenarios.semAjustes") : t("cenarios.resumoAjustes", {
-                      cresc: pp(x.ajuste.crescimento ?? 0), margem: pp(x.ajuste.margemEbit ?? 0), wacc: pp(x.ajuste.wacc ?? 0),
-                      mult: `${(x.ajuste.multiplo ?? 0) >= 0 ? "+" : ""}${fmt(x.ajuste.multiplo ?? 0, "x")}`,
-                    })}
-                  </td>
-                  <td className="py-1.5 text-right font-semibold">{x.valor === null ? "N/A" : `$${fmt(x.valor, "anos")}`}</td>
-                  <td className={`py-2 text-right ${x.valor !== null && x.valor >= preco ? "text-bull" : "text-bear"}`}>
-                    {x.valor === null || preco <= 0 ? "N/A" : `${x.valor >= preco ? "+" : ""}${pct(x.valor / preco - 1)}`}
-                  </td>
-                  <td className="py-1.5 text-right">
-                    <input key={x.probabilidade} defaultValue={paraInput(x.probabilidade, "pct")} inputMode="decimal"
-                      onBlur={(e) => mudarProb(x.nome, e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLInputElement).blur()}
-                      className="w-14 rounded border border-primary/30 bg-primary/5 px-2 py-0.5 text-right font-medium text-primary outline-none focus:border-primary" />
-                    <span className="ml-1 text-xs text-muted-foreground">%</span>
-                  </td>
-                </tr>
-              ))}
-              <tr className="border-t border-border/60 font-semibold">
-                <td className="py-1.5" colSpan={2}>{t("cenarios.esperado")}</td>
-                <td className="py-1.5 text-right text-primary">{cen.valorEsperado === null ? "N/A" : `$${fmt(cen.valorEsperado, "anos")}`}</td>
-                <td className={`py-2 text-right ${cen.valorEsperado !== null && cen.valorEsperado >= preco ? "text-bull" : "text-bear"}`}>
-                  {cen.valorEsperado === null || preco <= 0 ? "N/A" : `${cen.valorEsperado >= preco ? "+" : ""}${pct(cen.valorEsperado / preco - 1)}`}
-                </td>
-                <td className={`py-2 text-right ${somaOk ? "" : "text-amber-500"}`}>{pct(cen.somaProbabilidades)}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        {!somaOk && <p className="text-xs text-amber-500">{t("cenarios.somaAviso", { soma: pct(cen.somaProbabilidades) })}</p>}
-      </Cartao>
 
       <Cartao titulo={t("football.titulo")} ajuda={t("football.ajuda")}>
         <FootballField barras={barras} preco={preco} valor={c.avaliacao.valorPorAcao} />

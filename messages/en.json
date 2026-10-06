@@ -1655,7 +1655,8 @@
       "historico": "Historicals",
       "schedules": "Schedules",
       "projecoes": "Projections",
-      "avaliacao": "Valuation"
+      "avaliacao": "Valuation",
+      "sensibilidade": "Sensitivity"
     },
     "drivers": {
       "crescimentoReceita": "Revenue growth",
@@ -1878,6 +1879,57 @@
       "capex": "Capex {capex} · D&A {da} of revenue (Y1)",
       "wc": "DSO {dso} · DIO {dio} · DPO {dpo}",
       "tax": "Tax rate {t}"
+    },
+    "sensibilidade": {
+      "semModelo": "There is no sensitivity without a valid model: fix the Valuation tab first.",
+      "preco": "Price",
+      "modelo": "Model",
+      "waccG": {
+        "titulo": "WACC × Terminal growth",
+        "ajuda": "Value per share when WACC and terminal growth change. The centre is your model; green is above the current price, red below. Empty cells: WACC does not exceed growth.",
+        "g": "Terminal growth"
+      },
+      "crescMargem": {
+        "titulo": "Revenue growth × EBIT margin",
+        "ajuda": "Value per share when percentage points are added to revenue growth and EBIT margin in every projected year. The centre is your model.",
+        "crescimento": "Revenue growth",
+        "margem": "EBIT margin"
+      },
+      "cenarios": {
+        "titulo": "Scenarios",
+        "ajuda": "Bear and Bull shift growth, EBIT margin, WACC and exit multiple together. The probabilities are yours; the expected value is the weighted average.",
+        "cenario": "Scenario",
+        "ajustes": "Adjustments (growth · EBIT margin · WACC · exit multiple)",
+        "valor": "Value per share",
+        "potencial": "Upside / downside",
+        "probabilidade": "Probability",
+        "esperado": "Probability-weighted value",
+        "semAjustes": "Your model",
+        "resumoAjustes": "{cresc} · {margem} · {wacc} · {mult}",
+        "somaAviso": "The probabilities add up to {soma}, not 100%: the expected value uses them proportionally.",
+        "nomes": {
+          "bear": "Bear",
+          "base": "Base",
+          "bull": "Bull"
+        }
+      },
+      "football": {
+        "titulo": "Football field",
+        "ajuda": "The value-per-share range of each analysis, against the current price and your model's value."
+      },
+      "barras": {
+        "waccG": "WACC × growth",
+        "crescMargem": "Growth × margin",
+        "cenarios": "Bear – Bull",
+        "multiplo": "Exit multiple ±2x",
+        "waccMultiplo": "WACC × Exit multiple"
+      },
+      "waccMultiplo": {
+        "titulo": "WACC × Exit multiple",
+        "ajuda": "Value per share as WACC and the exit EV/EBITDA multiple change. The centre is your model; green above the current price, red below.",
+        "multiplo": "Exit multiple"
+      },
+      "pontoBarra": "Central value of each analysis"
     }
   },
   "dcfSimples": {

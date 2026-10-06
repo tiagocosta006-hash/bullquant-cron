@@ -31,6 +31,8 @@ export type ContextoSeparador = {
   multiplosHistoricos: Array<{ fiscalYear: number; evEbitda: number | null }>
   evEbitdaAtual: number | null
   fracaoAno1: number
+  /** Anos de hoje até ao fim do ano 1 (para re-correr o modelo na sensibilidade). */
+  anosAteFimAno1: number
   onDriver: (d: Driver, ano: number, v: number) => void
   onDriverSerie: (d: Driver, valores: number[]) => void
   onSegmentoSerie: (nome: string, valores: number[]) => void

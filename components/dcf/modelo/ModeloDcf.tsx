@@ -14,6 +14,7 @@ import {
   type ContextoSeparador,
 } from "./Separadores"
 import { SeparadorSchedules } from "./Schedules"
+import { SeparadorSensibilidade } from "./Sensibilidade"
 import { useFormatos } from "./TabelaModelo"
 
 /**
@@ -36,7 +37,7 @@ type Dados = {
 
 type SearchResult = { ticker: string; name: string }
 
-const SEPARADORES = ["historico", "schedules", "projecoes", "avaliacao"] as const
+const SEPARADORES = ["historico", "schedules", "projecoes", "avaliacao", "sensibilidade"] as const
 type Separador = (typeof SEPARADORES)[number]
 
 const chaveRascunho = (ticker: string) => `bv-dcf-modelo:v1:${ticker}`
@@ -154,12 +155,12 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
     const d0 = anosAteFimAno1(base.periodEnd)
     const proj = projetar(base, pressupostos)
     const { projecoes, avaliacao } = avaliar(proj, pressupostos.avaliacao, mercado, f, d0)
-    return { hist, rs, mercado, f, projecoes, avaliacao }
+    return { hist, rs, mercado, f, d0, projecoes, avaliacao }
   }, [dados, pressupostos])
 
   const contexto: ContextoSeparador | null = calculo && pressupostos ? {
     ticker: dados?.empresa.ticker ?? "", historico: calculo.hist, racios: calculo.rs, pressupostos, iniciais, projecoes: calculo.projecoes,
-    avaliacao: calculo.avaliacao, mercado: calculo.mercado, estimativas: dados?.estimativas ?? [], multiplosHistoricos: dados?.multiplosHistoricos ?? [], evEbitdaAtual: dados?.contexto.evEbitdaAtual ?? null, fracaoAno1: calculo.f,
+    avaliacao: calculo.avaliacao, mercado: calculo.mercado, estimativas: dados?.estimativas ?? [], multiplosHistoricos: dados?.multiplosHistoricos ?? [], evEbitdaAtual: dados?.contexto.evEbitdaAtual ?? null, fracaoAno1: calculo.f, anosAteFimAno1: calculo.d0,
     onDriver, onDriverSerie, onSegmentoSerie, onModoReceita, onAvaliacao,
   } : null
 
@@ -249,6 +250,7 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
           {aba === "schedules" && <SeparadorSchedules c={contexto} />}
           {aba === "projecoes" && <SeparadorProjecoes c={contexto} />}
           {aba === "avaliacao" && <SeparadorAvaliacao c={contexto} />}
+          {aba === "sensibilidade" && <SeparadorSensibilidade key={contexto.ticker} c={contexto} />}
 
           <p className="text-xs text-muted-foreground">
             {t("fontes", {

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import { modeloFcffAplicavel } from "@/lib/finance/modelo/aplicabilidade"
 import {
-  projetar, avaliar, racios, resumo, fracaoAno1, pressupostosIniciais, segmentosIniciais, mudarHorizonte, interpolar,
+  projetar, avaliar, grelhaWaccG, grelhaWaccMultiplo, grelhaCrescimentoMargem, valorComAjuste, aplicarAjuste, calcularCenarios, racios, resumo, fracaoAno1, pressupostosIniciais, segmentosIniciais, mudarHorizonte, interpolar,
   type AnoHistorico, type Pressupostos,
 } from "@/lib/finance/modelo"
 
@@ -214,5 +214,67 @@ describe("modelo DCF — Revenue Build por segmento", () => {
   it("sem segmentos (ou só um) não há Revenue Build por segmento", () => {
     expect(segmentosIniciais([{ ...base, segmentos: { product: { Único: 1000 } } }], [0.1])).toBeNull()
     expect(segmentosIniciais([base], [0.1])).toBeNull()
+  })
+})
+
+describe("modelo DCF — sensibilidade e cenários", () => {
+  const ctx = { base, pressupostos: p, mercado, f: 1, d0: 1 }
+
+  it("o centro das grelhas é o valor do modelo (18,11)", () => {
+    const g = grelhaWaccG(ctx)
+    expect(g.valores[2][2]).toBeCloseTo(18.1113, 3)
+    expect(grelhaCrescimentoMargem(ctx).valores[2][2]).toBeCloseTo(18.1113, 3)
+  })
+
+  it("WACC 11%, g 2%: 15,91 por ação (à mão: EV 1751,07 − dívida líquida 160)", () => {
+    expect(valorComAjuste(ctx, { wacc: 0.01 })).toBeCloseTo(15.911, 2)
+  })
+
+  it("mais WACC vale menos, mais g vale mais", () => {
+    const g = grelhaWaccG(ctx)
+    expect(g.valores[3][2]!).toBeLessThan(g.valores[2][2]!)
+    expect(g.valores[2][3]!).toBeGreaterThan(g.valores[2][2]!)
+  })
+
+  it("WACC ≤ g dá célula vazia (null), não um valor absurdo", () => {
+    expect(valorComAjuste(ctx, { wacc: -0.09, g: 0.02 })).toBeNull()
+  })
+
+  it("margem EBIT +2 pp em todos os anos: ano 1 passa de 220 para 242 de EBIT", () => {
+    const aj = aplicarAjuste(p, { margemEbit: 0.02 }, 0.1)
+    expect(projetar(base, aj)[0].ebit).toBeCloseTo(242, 6)
+    expect(valorComAjuste(ctx, { margemEbit: 0.02 })!).toBeGreaterThan(18.1113)
+  })
+
+  it("cenários: o valor esperado é a média ponderada e o base coincide com o modelo", () => {
+    const r = calcularCenarios(ctx)
+    const [bear, base_, bull] = r.cenarios
+    expect(base_.valor).toBeCloseTo(18.1113, 3)
+    expect(bear.valor!).toBeLessThan(base_.valor!)
+    expect(bull.valor!).toBeGreaterThan(base_.valor!)
+    expect(r.valorEsperado).toBeCloseTo(0.25 * bear.valor! + 0.5 * base_.valor! + 0.25 * bull.valor!, 6)
+    expect(r.somaProbabilidades).toBeCloseTo(1, 6)
+  })
+
+  it("probabilidades que não somam 100% são normalizadas no valor esperado", () => {
+    const r = calcularCenarios(ctx, [
+      { nome: "base", probabilidade: 0.3, ajuste: {} },
+      { nome: "bull", probabilidade: 0.3, ajuste: { crescimento: 0.03 } },
+    ])
+    expect(r.somaProbabilidades).toBeCloseTo(0.6, 6)
+    expect(r.valorEsperado).toBeCloseTo((r.cenarios[0].valor! + r.cenarios[1].valor!) / 2, 6)
+  })
+
+  it("WACC × exit multiple: o centro é o modelo com exit multiple, e mais múltiplo vale mais", () => {
+    const pm = { ...p, avaliacao: { ...p.avaliacao, metodoTerminal: "multiplo" as const } }
+    const cm = { ...ctx, pressupostos: pm }
+    const proj = projetar(base, pm)
+    const centro = avaliar(proj, pm.avaliacao, mercado, 1, 1).avaliacao.valorPorAcao
+    const g = grelhaWaccMultiplo(cm)
+    expect(g.valores[2][2]).toBeCloseTo(centro, 6)
+    expect(g.valores[2][3]!).toBeGreaterThan(g.valores[2][2]!)
+    expect(g.valores[3][2]!).toBeLessThan(g.valores[2][2]!)
+    // Com exit multiple, o g não mexe no valor: era por isso que a WACC × g não servia.
+    expect(valorComAjuste(cm, { g: 0.04 })).toBeCloseTo(centro, 6)
   })
 })

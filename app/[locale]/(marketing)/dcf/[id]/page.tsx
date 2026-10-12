@@ -117,6 +117,7 @@ export default async function PublicDcfPage({
       {/* Results Card */}
       <div className="w-full mb-12">
         <DcfResults result={result} currency={currency} mode={inputs.mode} />
+        <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{t("sharedNotice")}</p>
       </div>
 
       {/* Assumptions Grid */}

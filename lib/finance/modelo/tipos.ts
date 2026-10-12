@@ -22,6 +22,8 @@ export type AnoHistorico = {
   accountsReceivable: number | null
   inventory: number | null
   accountsPayable: number | null
+  /** Receita diferida (corrente): cobrada adiantado, ainda não reconhecida. Reduz o fundo de maneio. */
+  deferredRevenue?: number | null
   taxExpense: number | null
   incomeBeforeTax: number | null
   stockBasedCompensation: number | null
@@ -41,6 +43,7 @@ export const DRIVERS = [
   "dso",
   "dio",
   "dpo",
+  "diasReceitaDiferida",
   "taxaImposto",
 ] as const
 export type Driver = (typeof DRIVERS)[number]
@@ -118,6 +121,7 @@ export type AnoProjetado = {
   clientes: number
   inventario: number
   fornecedores: number
+  receitaDiferida: number
   fundoManeio: number
   variacaoFundoManeio: number
   fcff: number

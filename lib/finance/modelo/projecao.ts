@@ -10,7 +10,7 @@ import type { AnoHistorico, AnoProjetado, Pressupostos } from "./tipos"
  *   D&A, capex   = receita × %
  *   EBITDA       = EBIT + D&A
  *   NOPAT        = EBIT × (1 − taxa de imposto)
- *   fundo maneio = clientes + inventário − fornecedores, cada um pelos dias
+ *   fundo maneio = clientes + inventário − fornecedores − receita diferida, cada um pelos dias
  *   FCFF         = NOPAT + D&A − capex − Δ fundo de maneio
  *
  * O desconto (fracao, periodoDesconto, fator, VP) fica a zero aqui e é
@@ -22,7 +22,10 @@ export function projetar(base: AnoHistorico, p: Pressupostos): AnoProjetado[] {
   let receitaAnt = base.revenue ?? 0
   // O fundo de maneio de partida é o real do último ano — assim o primeiro
   // Δ mede a mudança face ao balanço que existe, não face a zero.
-  let fmAnt = (base.accountsReceivable ?? 0) + (base.inventory ?? 0) - (base.accountsPayable ?? 0)
+  let fmAnt = (base.accountsReceivable ?? 0) + (base.inventory ?? 0) - (base.accountsPayable ?? 0) - (base.deferredRevenue ?? 0)
+  // Rascunhos anteriores à receita diferida não têm este driver: mantém-se o
+  // rácio do último ano, para o Δ do fundo de maneio não saltar no ano 1.
+  const diasDiferidaBase = base.deferredRevenue && base.revenue ? (base.deferredRevenue / base.revenue) * 365 : 0
   // Sem custo das vendas no histórico, DIO/DPO foram medidos sobre a receita;
   // a projeção tem de usar a mesma base.
   const semCogs = !(base.costOfRevenue && base.costOfRevenue > 0) && custosBase === base.revenue
@@ -54,7 +57,8 @@ export function projetar(base: AnoHistorico, p: Pressupostos): AnoProjetado[] {
     const clientes = (receita * d.dso[i]) / 365
     const inventario = (baseDias * d.dio[i]) / 365
     const fornecedores = (baseDias * d.dpo[i]) / 365
-    const fundoManeio = clientes + inventario - fornecedores
+    const receitaDiferida = (receita * (d.diasReceitaDiferida?.[i] ?? diasDiferidaBase)) / 365
+    const fundoManeio = clientes + inventario - fornecedores - receitaDiferida
     const variacaoFundoManeio = fundoManeio - fmAnt
     const impostosOperacionais = ebit > 0 ? ebit * d.taxaImposto[i] : 0
     const nopat = ebit - impostosOperacionais
@@ -73,6 +77,7 @@ export function projetar(base: AnoHistorico, p: Pressupostos): AnoProjetado[] {
       clientes,
       inventario,
       fornecedores,
+      receitaDiferida,
       fundoManeio,
       variacaoFundoManeio,
       fcff: nopat + da - capex - variacaoFundoManeio,

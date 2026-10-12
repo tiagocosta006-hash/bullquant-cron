@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import { modeloFcffAplicavel } from "@/lib/finance/modelo/aplicabilidade"
 import {
-  projetar, avaliar, grelhaWaccG, grelhaWaccMultiplo, grelhaCrescimentoMargem, valorComAjuste, aplicarAjuste, cenariosIniciais, mudarHorizonteCenarios, valorEsperado, racios, resumo, fracaoAno1, pressupostosIniciais, segmentosIniciais, mudarHorizonte, interpolar,
+  medianaPares, projetar, avaliar, grelhaWaccG, grelhaWaccMultiplo, grelhaCrescimentoMargem, valorComAjuste, aplicarAjuste, cenariosIniciais, mudarHorizonteCenarios, valorEsperado, racios, resumo, fracaoAno1, pressupostosIniciais, segmentosIniciais, mudarHorizonte, interpolar,
   type AnoHistorico, type Pressupostos,
 } from "@/lib/finance/modelo"
 
@@ -19,7 +19,7 @@ const p: Pressupostos = {
   drivers: {
     crescimentoReceita: [0.1, 0.1], margemBruta: [0.4, 0.4], margemEbit: [0.2, 0.2],
     daPctReceita: [0.05, 0.05], capexPctReceita: [0.06, 0.06],
-    dso: [36.5, 36.5], dio: [(50 / 600) * 365, (50 / 600) * 365], dpo: [(80 / 600) * 365, (80 / 600) * 365],
+    dso: [36.5, 36.5], diasReceitaDiferida: [0, 0], dio: [(50 / 600) * 365, (50 / 600) * 365], dpo: [(80 / 600) * 365, (80 / 600) * 365],
     taxaImposto: [0.25, 0.25],
   },
   avaliacao: {
@@ -306,5 +306,61 @@ describe("modelo DCF — cenários Bear/Base/Bull (conjuntos completos)", () => 
     expect(valorEsperado({ bear: 10, base: 20, bull: 40 }, { bear: 0, base: 0.3, bull: 0.3 })).toBeCloseTo(30, 9)
     expect(valorEsperado({ bear: null, base: 20, bull: 40 }, { bear: 0.5, base: 0.25, bull: 0.25 })).toBeCloseTo(30, 9)
     expect(valorEsperado({ bear: null, base: null, bull: null }, { bear: 1, base: 1, bull: 1 })).toBeNull()
+  })
+})
+
+describe("modelo DCF — receita diferida no fundo de maneio", () => {
+  // Receita diferida 100 sobre receita 1000 (36,5 dias): fundo de maneio de partida 70 − 100 = −30.
+  const comDiferida: AnoHistorico = { ...base, deferredRevenue: 100 }
+  const pd: Pressupostos = { ...p, drivers: { ...p.drivers, diasReceitaDiferida: [36.5, 36.5] } }
+
+  it("os dias de receita diferida entram nos rácios históricos", () => {
+    expect(racios([comDiferida])[0].diasReceitaDiferida).toBeCloseTo(36.5, 6)
+    expect(racios([base])[0].diasReceitaDiferida).toBeNull()
+  })
+
+  it("ano 1: receita diferida 110, fundo de maneio −33, Δ −3, FCFF 157 (e não 147)", () => {
+    const a = projetar(comDiferida, pd)[0]
+    expect(a.receitaDiferida).toBeCloseTo(110, 6)
+    expect(a.fundoManeio).toBeCloseTo(-33, 6)
+    expect(a.variacaoFundoManeio).toBeCloseTo(-3, 6)
+    // NOPAT 165 + D&A 55 − capex 66 − (−3)
+    expect(a.fcff).toBeCloseTo(157, 6)
+  })
+
+  it("sem o driver (rascunho antigo) mantém o rácio do último ano: o Δ não salta no ano 1", () => {
+    const antigo = { ...p, drivers: { ...p.drivers } } as Pressupostos
+    delete (antigo.drivers as Partial<Pressupostos["drivers"]>).diasReceitaDiferida
+    expect(projetar(comDiferida, antigo)[0].fcff).toBeCloseTo(157, 6)
+  })
+
+  it("sem receita diferida no histórico nada muda face ao modelo anterior", () => {
+    expect(projetar(base, p)[0].fcff).toBeCloseTo(147, 6)
+  })
+})
+
+describe("modelo DCF — mediana dos pares", () => {
+  const par = (receita: number, ebit: number): AnoHistorico[] => [
+    { ...base, fiscalYear: 2024, revenue: receita / 1.1, operatingIncome: ebit / 1.1 },
+    { ...base, fiscalYear: 2025, revenue: receita, operatingIncome: ebit },
+  ]
+  it("mediana da margem EBIT e do crescimento no último ano de cada par", () => {
+    // margens 10%, 20%, 30% → mediana 20%; crescimento 10% em todos
+    const r = medianaPares([par(1000, 100), par(1000, 200), par(1000, 300)])!
+    expect(r.n).toBe(3)
+    expect(r.mediana.margemEbit).toBeCloseTo(0.2, 6)
+    expect(r.mediana.crescimentoReceita).toBeCloseTo(0.1, 6)
+  })
+  it("mediana de número par de pares é a média dos dois do meio", () => {
+    const r = medianaPares([par(1000, 100), par(1000, 200), par(1000, 300), par(1000, 400)])!
+    expect(r.mediana.margemEbit).toBeCloseTo(0.25, 6)
+  })
+  it("com menos de 3 pares não há mediana; pares sem 2 anos não contam", () => {
+    expect(medianaPares([par(1000, 100), par(1000, 200)])).toBeNull()
+    expect(medianaPares([par(1000, 100), par(1000, 200), [par(1000, 300)[1]]])).toBeNull()
+  })
+  it("um driver sem dado em 3 pares fica de fora (sem receita diferida nos pares)", () => {
+    const r = medianaPares([par(1000, 100), par(1000, 200), par(1000, 300)])!
+    expect(r.mediana.diasReceitaDiferida).toBeUndefined()
   })
 })

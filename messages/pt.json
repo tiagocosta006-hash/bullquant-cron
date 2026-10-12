@@ -825,7 +825,7 @@
         "SELL": "Vender",
         "STRONG_SELL": "Venda forte"
       },
-      "disclaimer": "Consenso de analistas de terceiros (via Financial Modeling Prep). Não é uma recomendação da BullValue nem aconselhamento de investimento.",
+      "disclaimer": "Recomendações e preços-alvo de analistas de terceiros, agregados de um fornecedor de dados. Não são produzidos nem subscritos pela BullValue, podem estar desatualizados e não constituem recomendação da BullValue nem aconselhamento de investimento.",
       "estimate": "Estimativa",
       "estimateInfo": "Barras mais claras: consenso de analistas para os próximos anos fiscais (média das estimativas). O ano corrente inclui os trimestres já reportados — um ganho extraordinário nesses trimestres entra na estimativa do ano. O EPS dos analistas é, em regra, ajustado."
     }
@@ -883,7 +883,8 @@
         "Quais são os 3 maiores riscos?",
         "Como evoluiu a margem operacional?",
         "O que impulsiona a receita?"
-      ]
+      ],
+      "aiNotice": "Estás a falar com um sistema de IA, não com uma pessoa. As respostas são gerais e informativas, podem estar erradas e não são aconselhamento. Não partilhes dados pessoais nem financeiros sensíveis."
     },
     "demo": {
       "badge": "Demo",
@@ -896,7 +897,8 @@
         "A analisar o 10-K oficial da SEC...",
         "A calcular o fosso competitivo (moat)..."
       ]
-    }
+    },
+    "aiLabel": "Texto gerado por inteligência artificial (Google Gemini) a partir de dados financeiros e do relatório da empresa. Pode conter erros, omissões ou interpretações incorretas: confirma sempre na fonte indicada. Não tem em conta a tua situação pessoal e não é aconselhamento nem recomendação de investimento."
   },
   "dcf": {
     "title": "Calculadora DCF",
@@ -968,7 +970,9 @@
       "cta": "Criar conta grátis",
       "saveTitle": "Guarda os teus cenários DCF",
       "saveDesc": "Cria uma conta grátis para guardares e revisitares as tuas análises DCF."
-    }
+    },
+    "resultNote": "Resultado do modelo com os pressupostos indicados. Não é uma previsão, um preço-alvo nem uma recomendação, e é muito sensível à taxa de desconto e ao crescimento terminal. Não tem em conta a tua situação pessoal.",
+    "sharedNotice": "Análise elaborada por um utilizador com os pressupostos dele. Não foi criada, revista nem subscrita pela BullValue e não é recomendação de investimento."
   },
   "financials": {
     "engineTitle": "Motor de Decisão & Financeiras",
@@ -1230,10 +1234,11 @@
     "refund": "Política de Reembolso",
     "pricing": "Preços",
     "about": "Sobre Nós",
-    "directory": "Diretório de Ações"
+    "directory": "Diretório de Ações",
+    "legalNotice": "A BullValue é uma ferramenta de análise e de educação financeira. Não presta serviços de investimento e nada neste sítio é aconselhamento, recomendação personalizada ou convite a comprar, vender ou deter instrumentos financeiros. Investir envolve risco, incluindo a perda total do capital. A rendibilidade passada não garante rendibilidade futura. Os dados de terceiros podem conter erros ou atrasos."
   },
   "cookieConsent": {
-    "text": "Utilizamos cookies exclusivamente para compreender como utiliza o BullValue e melhorar a sua experiência. Aceita a sua utilização?",
+    "text": "Usamos cookies essenciais para o sítio funcionar. Com o teu consentimento, usamos também cookies de estatística (Google Analytics) e de marketing (Meta Pixel). Podes recusar sem perder acesso.",
     "accept": "Aceitar Tudo",
     "decline": "Recusar"
   },
@@ -1656,7 +1661,8 @@
       "schedules": "Schedules",
       "projecoes": "Projections",
       "avaliacao": "Valuation",
-      "sensibilidade": "Sensitivity"
+      "sensibilidade": "Sensitivity",
+      "resumo": "Summary"
     },
     "drivers": {
       "crescimentoReceita": "Revenue growth",
@@ -1667,7 +1673,8 @@
       "dso": "DSO (days)",
       "dio": "DIO (days)",
       "dpo": "DPO (days)",
-      "taxaImposto": "Tax rate"
+      "taxaImposto": "Tax rate",
+      "diasReceitaDiferida": "Deferred revenue (days)"
     },
     "seccoes": {
       "receita": "Revenue Build",
@@ -1711,7 +1718,8 @@
       "fracaoNota": "No ano 1 só conta a parte do ano fiscal ainda por decorrer",
       "periodo": "Discount period (years)",
       "fator": "Discount factor",
-      "vp": "PV of FCFF"
+      "vp": "PV of FCFF",
+      "receitaDiferida": "Deferred revenue"
     },
     "historicoAjuda": "Os últimos 10 anos reais, já corrigidos pela BullValue, com os rácios que servem de âncora aos pressupostos.",
     "projecoesAjuda": "A demonstração de resultados projetada e a construção do FCFF: NOPAT + D&A − capex − aumento do fundo de maneio. Valores negativos entre parênteses.",
@@ -1719,7 +1727,7 @@
       "receitaAjuda": "Receita projetada a partir do crescimento de cada ano. Os primeiros anos vêm do consenso dos analistas.",
       "custosAjuda": "A margem bruta define o custo das vendas (usado nos dias de inventário e fornecedores). A margem EBIT define o resultado operacional.",
       "capexAjuda": "Investimento e amortizações em % da receita. Capex muito acima da D&A durante muito tempo significa que a empresa ainda está a crescer a sua base de ativos.",
-      "fundoManeioAjuda": "Clientes, inventário e fornecedores projetados pelos dias. Um aumento do fundo de maneio consome caixa.",
+      "fundoManeioAjuda": "Clientes, inventário, fornecedores e receita diferida projetados pelos dias. A receita diferida (cobrada adiantado) reduz o fundo de maneio, o que importa nas empresas de subscrição. Um aumento do fundo de maneio consome caixa.",
       "impostosAjuda": "Taxa efetiva aplicada ao EBIT (imposto operacional, como se a empresa não tivesse dívida).",
       "inputsNota": "Os drivers a azul vêm dos Assumptions (os inputs). Aqui só se calcula, ano a ano; para mudar um valor, vai aos Assumptions.",
       "assumptions": "Assumptions",
@@ -1814,7 +1822,6 @@
     "erros": {
       "carregar": "Não foi possível carregar os dados. Tenta novamente.",
       "naoEncontrada": "Empresa sem histórico suficiente para o modelo.",
-      "financeira": "Bancos, seguradoras e outras financeiras não se avaliam por FCFF: o balanço é o próprio negócio. Usa a calculadora rápida (que usa o lucro) enquanto o modelo próprio para financeiras não está pronto.",
       "WACC_MENOR_QUE_G": "A WACC tem de ser maior do que o crescimento perpétuo para o valor terminal de Gordon fazer sentido. Aumenta a WACC, baixa o crescimento ou usa o múltiplo de saída.",
       "SEM_ACOES": "Sem número de ações para calcular o valor por ação.",
       "SEM_DADOS": "Sem dados suficientes para projetar."
@@ -1871,13 +1878,15 @@
       "nwc": "Working capital em % da receita",
       "taxaLegal": "Referência EUA: 21% federal, cerca de 25% com impostos estaduais. A taxa efetiva pode ficar abaixo por créditos fiscais e lucros no estrangeiro.",
       "mixHistorico": "Peso na receita",
-      "analistas": "Analistas"
+      "analistas": "Analistas",
+      "pares": "Peer median ({n})",
+      "paresNota": "Mediana das empresas da mesma indústria na BullValue, no último ano fiscal de cada uma."
     },
     "resumos": {
       "receita": "Y1 {g} ({ano}E) · projection CAGR {cagr} · 5Y historical {hist}",
       "custos": "EBIT margin {de} → {ate} · last FY {hist}",
       "capex": "Capex {capex} · D&A {da} of revenue (Y1)",
-      "wc": "DSO {dso} · DIO {dio} · DPO {dpo}",
+      "wc": "DSO {dso} · DIO {dio} · DPO {dpo} · Deferred revenue {ddr}",
       "tax": "Tax rate {t}"
     },
     "sensibilidade": {
@@ -1942,6 +1951,96 @@
         "bear": "Bear",
         "base": "Base",
         "bull": "Bull"
+      }
+    },
+    "macro": {
+      "titulo": "Crescimento da economia",
+      "linha": "Inflação (CPI) {cpi} + PIB real {pib} ≈ PIB nominal {nominal}. Taxa sem risco a 10 anos {rf}. O teu crescimento perpétuo: {g}.",
+      "gAcima": "O crescimento perpétuo está acima do PIB nominal atual dos EUA: nenhuma empresa cresce mais do que a economia para sempre.",
+      "nota": "Variação homóloga dos EUA até {data}. Uma âncora, não uma regra: o crescimento de longo prazo costuma ficar entre a inflação e o PIB nominal."
+    },
+    "resumo": {
+      "titulo": "Resumo do modelo",
+      "ajuda": "O resultado do cenário {cenario}, os três cenários e os pressupostos que mais pesam. O PDF e o Excel têm este mesmo conteúdo.",
+      "cenarioAtivo": "Cenário ativo",
+      "tese": "Tese do analista",
+      "teseAjuda": "O teu raciocínio, em texto livre. Fica guardado neste browser com o resto do rascunho e acompanha o PDF e o Excel.",
+      "tesePlaceholder": "Porque é que estes pressupostos? O que te faria mudar de ideias?",
+      "exportarPdf": "Exportar PDF",
+      "exportarExcel": "Exportar Excel",
+      "erroExportar": "Não foi possível exportar. Tenta outra vez.",
+      "tituloPdf": "Resumo de modelo DCF"
+    },
+    "legal": {
+      "aviso": "Ferramenta educativa e de apoio à análise. Os valores resultam de pressupostos definidos pelo utilizador (ou pré-preenchidos com dados históricos e estimativas de analistas) e são estimativas que podem estar erradas; não constituem recomendação de investimento, consultoria para investimento nem convite à compra ou venda de valores mobiliários. Investir envolve risco de perda parcial ou total do capital; rendibilidades passadas não garantem rendibilidades futuras. Decide por ti e, se precisares, consulta um consultor devidamente autorizado.",
+      "rodapePdf": "BullValue — ferramenta educativa, não é recomendação de investimento"
+    },
+    "versoes": {
+      "titulo": "Versões guardadas",
+      "ajuda": "Guarda o modelo na tua conta, com a tese, e volta a ele mais tarde. Cada gravação é uma versão nova; nunca se reescreve uma anterior.",
+      "nomePlaceholder": "Nome da versão (opcional): ex. após resultados do Q2",
+      "guardar": "Guardar versão",
+      "guardada": "Guardada como v{n}.",
+      "erroGuardar": "Não foi possível guardar. Tenta outra vez.",
+      "vazio": "Ainda não guardaste nenhuma versão desta empresa.",
+      "abrir": "Abrir",
+      "apagar": "Apagar",
+      "valia": "valia {valor} (preço {preco})",
+      "confirmarCarregar": "Abrir a v{n} substitui o rascunho atual deste browser. Continuar?",
+      "confirmarApagar": "Apagar a v{n}? Não se pode desfazer.",
+      "carregada": "v{n} aberta.",
+      "erroCarregar": "Não foi possível abrir esta versão."
+    },
+    "financeira": {
+      "intro": "Bancos, seguradoras e corretoras avaliam-se pelo retorno em excesso: quanto o capital próprio rende acima do que custa (ROE − Ke). Valor do capital = capital próprio atual + valor presente dos excessos futuros. Não há dívida na ponte: já é capital próprio.",
+      "semDados": "Sem capital próprio ou histórico suficiente para este modelo.",
+      "ke": "Custo do capital próprio (Ke) = taxa sem risco + beta × prémio de risco = {ke}",
+      "pressupostos": {
+        "titulo": "Assumptions",
+        "ajuda": "O ROE desce (ou sobe) em linha reta do ano 1 ao último; o terminal usa o ROE final. Os valores de partida vêm da mediana dos últimos 3 anos.",
+        "roeInicial": "ROE (year 1)",
+        "roeInicialAjuda": "Lucro sobre o capital próprio do início do ano.",
+        "roeFinal": "ROE (final year)",
+        "roeFinalAjuda": "Por omissão, metade do excesso sobre o Ke mantém-se: a vantagem desgasta-se, não desaparece.",
+        "payout": "Payout (dividends + buybacks)",
+        "payoutAjuda": "Parte do lucro distribuída. O resto fica no capital e faz crescer o balanço.",
+        "gAjuda": "Por omissão, não passa do que o ROE final e o payout financiam."
+      },
+      "linhas": {
+        "lucro": "Net income",
+        "roe": "ROE",
+        "distribuicoes": "Dividends + buybacks",
+        "payout": "Payout",
+        "capital": "Shareholders' equity",
+        "custoCapital": "Equity charge (Ke × opening equity)",
+        "excesso": "Residual income",
+        "vp": "PV of residual income"
+      },
+      "projecao": "Historical and projection",
+      "projecaoAjuda": "O ano 1 são os 12 meses seguintes ao balanço de {data}; os fluxos descontam-se no fim de cada ano. O capital próprio é o do grupo, com preferenciais.",
+      "ponte": {
+        "titulo": "Equity value",
+        "capitalAtual": "Book value of equity",
+        "somaVp": "Sum of PV of residual income",
+        "vpTerminal": "PV of terminal value",
+        "valorCapital": "Equity value",
+        "pb": "Implied P/B",
+        "pe": "Implied P/E (year 1)",
+        "pbAtual": "Current P/B (market)",
+        "pesoTerminal": "Terminal value as % of equity value"
+      },
+      "sensibilidade": {
+        "titulo": "Ke × ROE sensitivity",
+        "ajuda": "Valor por ação ao mudar o custo do capital próprio e o ROE final. O centro é o teu modelo."
+      },
+      "avisos": {
+        "gInsustentavel": "O crescimento perpétuo de {g} está acima do que o ROE final e o payout financiam ({s}): o balanço não cresce tanto sem novo capital.",
+        "roeAlto": "Um ROE acima de 30% é raro e dura pouco: verifica se não está inflacionado por recompras ou por um ano excecional."
+      },
+      "erros": {
+        "KE_MENOR_QUE_G": "O custo do capital próprio tem de ser maior do que o crescimento perpétuo. Baixa o crescimento ou sobe o beta.",
+        "SEM_ACOES": "Sem número de ações para calcular o valor por ação.",
+        "SEM_DADOS": "Sem dados suficientes para projetar."
       }
     }
   },

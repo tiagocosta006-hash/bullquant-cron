@@ -147,6 +147,8 @@ export function DcfResults({ result, currency = "$", mode = "FCFF", ticker, name
           </div>
         )}
 
+        <p className="text-[11px] leading-relaxed text-muted-foreground/80">{t("resultNote")}</p>
+
         {/* Detalhe do cálculo */}
         <div className="border-t border-border pt-4 space-y-3">
           <DetailRow label={t("enterpriseValue")} value={formatLargeNumber(result.enterpriseValue, currency)} />

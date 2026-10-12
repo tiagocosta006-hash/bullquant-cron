@@ -4,8 +4,9 @@ import { exigirPro, CACHE_PRIVADO } from "@/lib/api/acessoPro"
 import { normalizarTicker } from "@/lib/ticker"
 import { cotacao, get, simbolo, historico as historicoPrecos } from "@/lib/fmp/mercado"
 import { analistas } from "@/lib/fmp/estimativas"
+import { carregarSeriesReduzidas } from "@/lib/finance/seriesMacro"
 import { modeloFcffAplicavel } from "@/lib/finance/modelo/aplicabilidade"
-import type { AnoHistorico } from "@/lib/finance/modelo"
+import { medianaPares, type AnoHistorico } from "@/lib/finance/modelo"
 
 /**
  * GET /api/dcf/modelo/[ticker]
@@ -26,6 +27,39 @@ const n = (v: unknown): number | null => {
   return null
 }
 
+/** Mediana dos pares da mesma indústria (na nossa base), no último ano fiscal de cada um. */
+async function paresDaIndustria(companyId: string, industry: string, fim: Date) {
+  try {
+    const desde = new Date(fim.getTime() - 3 * 365 * 86_400_000)
+    const linhas = await prisma.fundamental.findMany({
+      where: { periodType: "ANNUAL", periodEnd: { gte: desde }, company: { industry, isActive: true, id: { not: companyId } } },
+      orderBy: { periodEnd: "asc" },
+      select: {
+        companyId: true, fiscalYear: true, periodEnd: true, revenue: true, costOfRevenue: true, grossProfit: true,
+        operatingExpenses: true, operatingIncome: true, ebitda: true, depreciationAndAmortization: true, capex: true,
+        accountsReceivable: true, inventory: true, accountsPayable: true, taxExpense: true, incomeBeforeTax: true,
+      },
+    })
+    const porEmpresa = new Map<string, AnoHistorico[]>()
+    for (const a of linhas) {
+      const h = porEmpresa.get(a.companyId) ?? []
+      h.push({
+        fiscalYear: a.fiscalYear, periodEnd: a.periodEnd.toISOString().slice(0, 10),
+        revenue: n(a.revenue), costOfRevenue: n(a.costOfRevenue), grossProfit: n(a.grossProfit),
+        operatingExpenses: n(a.operatingExpenses), operatingIncome: n(a.operatingIncome), ebitda: n(a.ebitda),
+        depreciationAndAmortization: n(a.depreciationAndAmortization), capex: n(a.capex),
+        accountsReceivable: n(a.accountsReceivable), inventory: n(a.inventory), accountsPayable: n(a.accountsPayable),
+        taxExpense: n(a.taxExpense), incomeBeforeTax: n(a.incomeBeforeTax),
+        stockBasedCompensation: null, operatingCashFlow: null, freeCashFlow: null,
+      })
+      porEmpresa.set(a.companyId, h)
+    }
+    return medianaPares([...porEmpresa.values()])
+  } catch {
+    return null
+  }
+}
+
 export async function GET(_req: Request, { params }: { params: Promise<{ ticker: string }> }) {
   const ticker = normalizarTicker((await params).ticker)
   if (!ticker) return NextResponse.json({ error: "Ticker inválido" }, { status: 400 })
@@ -39,7 +73,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
   })
   if (!company || !company.isActive) return NextResponse.json({ error: "Company not found" }, { status: 404 })
 
-  const [anuais, trimestres] = await Promise.all([
+  const [anuais, trimestres, balancos, macro] = await Promise.all([
     prisma.fundamental.findMany({
       where: { companyId: company.id, periodType: "ANNUAL" },
       orderBy: { periodEnd: "desc" },
@@ -51,6 +85,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
         incomeBeforeTax: true, stockBasedCompensation: true, operatingCashFlow: true, freeCashFlow: true,
         reportedCurrency: true, revenueSegmentsByAxis: true,
         sharesOutstanding: true, totalDebt: true, cash: true, minorityInterest: true,
+        netIncome: true, totalEquity: true, dividendsPaid: true, shareRepurchases: true,
       },
     }),
     prisma.fundamental.findMany({
@@ -59,10 +94,29 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
       take: 4,
       select: {
         periodEnd: true, totalDebt: true, cash: true, minorityInterest: true, sharesOutstanding: true,
-        ebitda: true, interestExpense: true,
+        ebitda: true, interestExpense: true, totalEquity: true,
       },
     }),
+    // A receita diferida não está na nossa base: vem do balanço anual da FMP.
+    get<Array<{ date: string; deferredRevenue?: number | null }>>(
+      "balance-sheet-statement",
+      { symbol: simbolo(company.ticker), period: "annual", limit: "12" },
+      86_400,
+    ).catch(() => null),
+    // Inflação e PIB real (variação homóloga, em cache) para o terminal growth.
+    carregarSeriesReduzidas(["^CPI_YOY", "^GDP_YOY"], { desde: new Date(Date.now() - 2 * 365 * 86_400_000), alvoPontos: 60 }).catch(() => null),
   ])
+  const ultimoMacro = (t: string) => {
+    const s = macro?.[t]
+    const p = s && s.length ? s[s.length - 1] : null
+    return p ? { valor: p.value / 100, data: p.date } : null
+  }
+  const receitaDiferidaEm = (d: Date): number | null => {
+    if (!Array.isArray(balancos)) return null
+    const alvo = d.getTime()
+    const b = balancos.find((x) => Math.abs(new Date(x.date + "T00:00:00Z").getTime() - alvo) <= 10 * 86_400_000)
+    return typeof b?.deferredRevenue === "number" ? b.deferredRevenue : null
+  }
   if (anuais.length < 2) return NextResponse.json({ error: "Histórico insuficiente" }, { status: 404 })
 
   const historico: AnoHistorico[] = anuais.reverse().map((a) => ({
@@ -72,13 +126,29 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
     operatingExpenses: n(a.operatingExpenses), operatingIncome: n(a.operatingIncome), ebitda: n(a.ebitda),
     depreciationAndAmortization: n(a.depreciationAndAmortization), capex: n(a.capex),
     accountsReceivable: n(a.accountsReceivable), inventory: n(a.inventory), accountsPayable: n(a.accountsPayable),
+    deferredRevenue: receitaDiferidaEm(a.periodEnd),
     taxExpense: n(a.taxExpense), incomeBeforeTax: n(a.incomeBeforeTax),
     stockBasedCompensation: n(a.stockBasedCompensation), operatingCashFlow: n(a.operatingCashFlow),
     freeCashFlow: n(a.freeCashFlow),
     segmentos: (a.revenueSegmentsByAxis ?? null) as AnoHistorico["segmentos"],
   }))
   const ultimoAnual = anuais[anuais.length - 1]
+  const pares = company.industry ? await paresDaIndustria(company.id, company.industry, ultimoAnual.periodEnd) : null
   const recente = trimestres[0]
+  const financeira = !modeloFcffAplicavel(company.sector, company.industry, company.ticker)
+  // Bancos, seguradoras e corretoras: o FCFF não mede nada; o modelo é o do
+  // retorno em excesso, que precisa do lucro, do capital próprio e das distribuições.
+  const financas = financeira
+    ? {
+        historico: anuais.map((a) => ({
+          fiscalYear: a.fiscalYear, periodEnd: a.periodEnd.toISOString().slice(0, 10),
+          netIncome: n(a.netIncome), totalEquity: n(a.totalEquity),
+          dividendos: n(a.dividendsPaid) === null ? null : Math.abs(n(a.dividendsPaid) as number),
+          recompras: n(a.shareRepurchases) === null ? null : Math.abs(n(a.shareRepurchases) as number),
+        })),
+        capitalProprio: n(recente?.totalEquity) ?? n(ultimoAnual.totalEquity),
+      }
+    : null
 
   // Dados de mercado: preço, beta (perfil FMP), taxa do Tesouro a 10 anos.
   const hoje = new Date()
@@ -140,9 +210,11 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
         logoUrl: company.logoUrl,
         // Bancos, seguradoras, corretoras: FCFF não mede nada (o balanço é
         // o negócio). A MSCI ou a Visa, apesar do setor, entram no modelo.
-        financeira: !modeloFcffAplicavel(company.sector, company.industry, company.ticker),
+        financeira,
       },
       historico,
+      financas,
+      pares: pares && company.industry ? { industria: company.industry, ...pares } : null,
       multiplosHistoricos,
       estimativas: (a?.anuais ?? []).map((e) => ({
         fiscalYear: e.fiscalYear, revenueAvg: e.revenueAvg, revenueLow: e.revenueLow, revenueHigh: e.revenueHigh,
@@ -159,6 +231,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
       contexto: {
         rf: ultimaTaxa?.year10 != null ? ultimaTaxa.year10 / 100 : null,
         dataRf: ultimaTaxa?.date ?? null,
+        cpiYoy: ultimoMacro("^CPI_YOY")?.valor ?? null,
+        pibRealYoy: ultimoMacro("^GDP_YOY")?.valor ?? null,
+        dataMacro: ultimoMacro("^CPI_YOY")?.data ?? null,
         beta: typeof perfil?.[0]?.beta === "number" ? perfil[0].beta : null,
         custoDivida: jurosTtm !== null && divida > 0 ? Math.abs(jurosTtm) / divida : null,
         evEbitdaAtual: ev !== null && ebitdaTtm && ebitdaTtm > 0 ? ev / ebitdaTtm : null,

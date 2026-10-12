@@ -11,6 +11,7 @@ import type { AnoHistorico, Driver, RaciosAno } from "./tipos"
  *   DSO (dias de clientes)  = clientes / receita × 365
  *   DIO (dias de inventário)= inventário / custo das vendas × 365
  *   DPO (dias de fornec.)   = fornecedores / custo das vendas × 365
+ *   dias de receita diferida= receita diferida / receita × 365
  *   taxa de imposto efetiva = impostos / resultado antes de impostos
  *
  * Sem custo das vendas (algumas empresas de serviços), DIO e DPO usam a
@@ -39,6 +40,7 @@ export function racios(hist: AnoHistorico[]): RaciosAno[] {
       dso: a.accountsReceivable !== null && a.revenue ? (a.accountsReceivable / a.revenue) * 365 : null,
       dio: a.inventory !== null && custos ? (a.inventory / custos) * 365 : null,
       dpo: a.accountsPayable !== null && custos ? (a.accountsPayable / custos) * 365 : null,
+      diasReceitaDiferida: a.deferredRevenue != null && a.revenue ? (a.deferredRevenue / a.revenue) * 365 : null,
       // Taxas fora de [0, 60%] são anos com créditos fiscais ou prejuízos —
       // não servem de âncora.
       taxaImposto: t !== null && t >= 0 && t <= 0.6 ? t : null,

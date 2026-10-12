@@ -825,7 +825,7 @@
         "SELL": "Sell",
         "STRONG_SELL": "Strong sell"
       },
-      "disclaimer": "Third-party analyst consensus (via Financial Modeling Prep). Not a BullValue recommendation or investment advice.",
+      "disclaimer": "Third-party analyst ratings and price targets, aggregated from a data provider. Not produced or endorsed by BullValue, may be out of date, and are not a BullValue recommendation or investment advice.",
       "estimate": "Estimate",
       "estimateInfo": "Lighter bars: analyst consensus for the next fiscal years (mean estimate). The current year includes quarters already reported — a one-off gain in those quarters flows into the year's estimate. Analyst EPS is usually adjusted."
     }
@@ -882,7 +882,8 @@
       "upgradeCta": "Upgrade to Pro",
       "guestTitle": "Chat exclusive to Pro accounts",
       "guestDesc": "Create a free account and upgrade to Pro to chat with the AI Analyst about this company.",
-      "guestCta": "Create free account"
+      "guestCta": "Create free account",
+      "aiNotice": "You are talking to an AI system, not a person. Answers are general and informational, may be wrong and are not advice. Do not share personal or sensitive financial data."
     },
     "registerCta": "Create free account",
     "demo": {
@@ -896,7 +897,8 @@
         "Analyzing the official SEC 10-K...",
         "Calculating the competitive moat..."
       ]
-    }
+    },
+    "aiLabel": "AI-generated text (Google Gemini) based on financial data and the company's filings. It may contain errors, omissions or misinterpretations: always check the cited source. It does not consider your personal circumstances and is not investment advice or a recommendation."
   },
   "dcf": {
     "title": "DCF Calculator",
@@ -968,7 +970,9 @@
       "cta": "Create free account",
       "saveTitle": "Save your DCF scenarios",
       "saveDesc": "Create a free account to save and revisit your DCF analyses."
-    }
+    },
+    "resultNote": "Model output based on the assumptions shown. It is not a forecast, a price target or a recommendation, and it is highly sensitive to the discount rate and terminal growth. It does not consider your personal circumstances.",
+    "sharedNotice": "Analysis created by a user using their own assumptions. Not created, reviewed or endorsed by BullValue and not an investment recommendation."
   },
   "financials": {
     "engineTitle": "Financials & Decision Engine",
@@ -1230,10 +1234,11 @@
     "refund": "Refund Policy",
     "pricing": "Pricing",
     "about": "About Us",
-    "directory": "Stock Directory"
+    "directory": "Stock Directory",
+    "legalNotice": "BullValue is a financial analysis and education tool. It does not provide investment services and nothing on this site is advice, a personal recommendation or an invitation to buy, sell or hold any financial instrument. Investing involves risk, including the total loss of capital. Past performance is not a reliable indicator of future results. Third-party data may contain errors or delays."
   },
   "cookieConsent": {
-    "text": "We use cookies exclusively to understand how you use BullValue and improve your experience. Do you accept their use?",
+    "text": "We use essential cookies for the site to work. With your consent we also use analytics (Google Analytics) and marketing (Meta Pixel) cookies. You can refuse without losing access.",
     "accept": "Accept All",
     "decline": "Decline"
   },
@@ -1656,7 +1661,8 @@
       "schedules": "Schedules",
       "projecoes": "Projections",
       "avaliacao": "Valuation",
-      "sensibilidade": "Sensitivity"
+      "sensibilidade": "Sensitivity",
+      "resumo": "Summary"
     },
     "drivers": {
       "crescimentoReceita": "Revenue growth",
@@ -1667,7 +1673,8 @@
       "dso": "DSO (days)",
       "dio": "DIO (days)",
       "dpo": "DPO (days)",
-      "taxaImposto": "Tax rate"
+      "taxaImposto": "Tax rate",
+      "diasReceitaDiferida": "Deferred revenue (days)"
     },
     "seccoes": {
       "receita": "Revenue Build",
@@ -1711,7 +1718,8 @@
       "fracaoNota": "In year 1 only the part of the fiscal year still ahead counts",
       "periodo": "Discount period (years)",
       "fator": "Discount factor",
-      "vp": "PV of FCFF"
+      "vp": "PV of FCFF",
+      "receitaDiferida": "Deferred revenue"
     },
     "historicoAjuda": "The last 10 actual years, as corrected by BullValue, with the ratios that anchor the assumptions.",
     "projecoesAjuda": "Projected income statement and the FCFF build: NOPAT + D&A − capex − increase in working capital. Negative values in parentheses.",
@@ -1719,7 +1727,7 @@
       "receitaAjuda": "Revenue projected from each year's growth. The first years come from analyst consensus.",
       "custosAjuda": "Gross margin sets cost of revenue (used for inventory and payable days). EBIT margin sets operating income.",
       "capexAjuda": "Investment and amortization as % of revenue. Capex well above D&A for a long time means the company is still growing its asset base.",
-      "fundoManeioAjuda": "Receivables, inventory and payables projected by days. An increase in working capital consumes cash.",
+      "fundoManeioAjuda": "Receivables, inventory, payables and deferred revenue projected by days. Deferred revenue (billed in advance) reduces working capital, which matters for subscription businesses. An increase in working capital consumes cash.",
       "impostosAjuda": "Effective rate applied to EBIT (operating tax, as if the company had no debt).",
       "inputsNota": "Drivers in blue come from Assumptions (the inputs). Schedules only calculate, year by year; to change a value, go to Assumptions.",
       "assumptions": "Assumptions",
@@ -1814,7 +1822,6 @@
     "erros": {
       "carregar": "Could not load the data. Please try again.",
       "naoEncontrada": "Not enough history for the model.",
-      "financeira": "Banks, insurers and other financials are not valued on FCFF: the balance sheet is the business. Use the quick calculator (earnings-based) until the financials model is ready.",
       "WACC_MENOR_QUE_G": "WACC must be above perpetual growth for the Gordon terminal value to make sense. Raise WACC, lower growth or use the exit multiple.",
       "SEM_ACOES": "No share count to compute value per share.",
       "SEM_DADOS": "Not enough data to project."
@@ -1871,13 +1878,15 @@
       "nwc": "Working capital as % of revenue",
       "taxaLegal": "US reference: 21% federal, about 25% including state taxes. The effective rate can be lower due to tax credits and foreign profits.",
       "mixHistorico": "Share of revenue",
-      "analistas": "Analysts"
+      "analistas": "Analysts",
+      "pares": "Peer median ({n})",
+      "paresNota": "Median of the companies in the same industry on BullValue, in each one's latest fiscal year."
     },
     "resumos": {
       "receita": "Y1 {g} ({ano}E) · projection CAGR {cagr} · 5Y historical {hist}",
       "custos": "EBIT margin {de} → {ate} · last FY {hist}",
       "capex": "Capex {capex} · D&A {da} of revenue (Y1)",
-      "wc": "DSO {dso} · DIO {dio} · DPO {dpo}",
+      "wc": "DSO {dso} · DIO {dio} · DPO {dpo} · Deferred revenue {ddr}",
       "tax": "Tax rate {t}"
     },
     "sensibilidade": {
@@ -1942,6 +1951,96 @@
         "bear": "Bear",
         "base": "Base",
         "bull": "Bull"
+      }
+    },
+    "macro": {
+      "titulo": "Economic growth",
+      "linha": "Inflation (CPI) {cpi} + real GDP {pib} ≈ nominal GDP {nominal}. 10-year risk-free rate {rf}. Your terminal growth: {g}.",
+      "gAcima": "Terminal growth is above current US nominal GDP: no company outgrows the economy forever.",
+      "nota": "US year-over-year change up to {data}. An anchor, not a rule: long-run growth tends to sit between inflation and nominal GDP."
+    },
+    "resumo": {
+      "titulo": "Model summary",
+      "ajuda": "The result of the {cenario} scenario, the three scenarios and the assumptions that matter most. The PDF and the Excel file carry the same content.",
+      "cenarioAtivo": "Active scenario",
+      "tese": "Analyst thesis",
+      "teseAjuda": "Your reasoning, in free text. It is saved in this browser with the rest of the draft and goes into the PDF and the Excel file.",
+      "tesePlaceholder": "Why these assumptions? What would change your mind?",
+      "exportarPdf": "Export PDF",
+      "exportarExcel": "Export Excel",
+      "erroExportar": "Could not export. Please try again.",
+      "tituloPdf": "DCF model summary"
+    },
+    "legal": {
+      "aviso": "Educational and analysis-support tool. Values result from assumptions set by the user (or pre-filled with historical data and analyst estimates) and are estimates that may be wrong; they are not investment recommendations, investment advice or an invitation to buy or sell securities. Investing involves risk of partial or total loss of capital; past performance does not guarantee future results. Decide for yourself and, if you need to, consult a duly authorised adviser.",
+      "rodapePdf": "BullValue — educational tool, not an investment recommendation"
+    },
+    "versoes": {
+      "titulo": "Saved versions",
+      "ajuda": "Save the model to your account, with the thesis, and come back to it later. Every save is a new version; an earlier one is never overwritten.",
+      "nomePlaceholder": "Version name (optional): e.g. after Q2 results",
+      "guardar": "Save version",
+      "guardada": "Saved as v{n}.",
+      "erroGuardar": "Could not save. Please try again.",
+      "vazio": "You haven't saved any version of this company yet.",
+      "abrir": "Open",
+      "apagar": "Delete",
+      "valia": "valued at {valor} (price {preco})",
+      "confirmarCarregar": "Opening v{n} replaces this browser's current draft. Continue?",
+      "confirmarApagar": "Delete v{n}? This cannot be undone.",
+      "carregada": "v{n} opened.",
+      "erroCarregar": "Could not open this version."
+    },
+    "financeira": {
+      "intro": "Banks, insurers and brokers are valued by residual income: how much equity earns above what it costs (ROE − Ke). Equity value = current book equity + present value of future excess returns. There is no debt bridge: it is already equity value.",
+      "semDados": "Not enough equity or history for this model.",
+      "ke": "Cost of equity (Ke) = risk-free rate + beta × equity risk premium = {ke}",
+      "pressupostos": {
+        "titulo": "Assumptions",
+        "ajuda": "ROE moves in a straight line from year 1 to the last year; the terminal value uses the final ROE. Starting values are the 3-year median.",
+        "roeInicial": "ROE (year 1)",
+        "roeInicialAjuda": "Net income over opening shareholders' equity.",
+        "roeFinal": "ROE (final year)",
+        "roeFinalAjuda": "By default, half of the excess over Ke persists: the edge fades, it does not vanish.",
+        "payout": "Payout (dividends + buybacks)",
+        "payoutAjuda": "Share of earnings distributed. The rest stays in equity and grows the balance sheet.",
+        "gAjuda": "By default, no higher than what the final ROE and the payout can fund."
+      },
+      "linhas": {
+        "lucro": "Net income",
+        "roe": "ROE",
+        "distribuicoes": "Dividends + buybacks",
+        "payout": "Payout",
+        "capital": "Shareholders' equity",
+        "custoCapital": "Equity charge (Ke × opening equity)",
+        "excesso": "Residual income",
+        "vp": "PV of residual income"
+      },
+      "projecao": "Historical and projection",
+      "projecaoAjuda": "Year 1 is the 12 months after the {data} balance sheet; flows are discounted at the end of each year. Equity is the group's, including preferred shares.",
+      "ponte": {
+        "titulo": "Equity value",
+        "capitalAtual": "Book value of equity",
+        "somaVp": "Sum of PV of residual income",
+        "vpTerminal": "PV of terminal value",
+        "valorCapital": "Equity value",
+        "pb": "Implied P/B",
+        "pe": "Implied P/E (year 1)",
+        "pbAtual": "Current P/B (market)",
+        "pesoTerminal": "Terminal value as % of equity value"
+      },
+      "sensibilidade": {
+        "titulo": "Ke × ROE sensitivity",
+        "ajuda": "Value per share when the cost of equity and the final ROE change. The centre is your model."
+      },
+      "avisos": {
+        "gInsustentavel": "Terminal growth of {g} is above what the final ROE and payout fund ({s}): the balance sheet cannot grow that fast without new capital.",
+        "roeAlto": "An ROE above 30% is rare and short-lived: check it is not inflated by buybacks or an exceptional year."
+      },
+      "erros": {
+        "KE_MENOR_QUE_G": "The cost of equity must exceed terminal growth. Lower growth or raise beta.",
+        "SEM_ACOES": "No share count to compute the value per share.",
+        "SEM_DADOS": "Not enough data to project."
       }
     }
   },

@@ -138,6 +138,7 @@ export function pressupostosIniciais(
       dso: constante(lim(med3("dso", 45), 0, 365)),
       dio: constante(lim(med3("dio", 0), 0, 365)),
       dpo: constante(lim(med3("dpo", 30), 0, 365)),
+      diasReceitaDiferida: constante(lim(med3("diasReceitaDiferida", 0), 0, 365)),
       taxaImposto: constante(taxa),
     },
     avaliacao,

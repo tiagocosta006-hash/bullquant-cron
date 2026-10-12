@@ -606,6 +606,7 @@ export function StockAnalyst({
           </a>
         )}
       </div>
+      <p {...demoReveal("text-xs leading-relaxed text-muted-foreground")}>{t("aiLabel")}</p>
 
       {/* Herói da tese */}
       <LiquidGlass {...demoReveal("relative overflow-hidden rounded-3xl p-6 md:p-8")}>
@@ -1067,6 +1068,7 @@ function AnalystChat({
         <Sparkles className="h-4 w-4 text-primary" />
         <h3 className="text-sm font-semibold">{t("chat.title")}</h3>
       </div>
+      <p className="shrink-0 border-b border-border/40 px-4 py-2 text-[11px] leading-snug text-muted-foreground">{t("chat.aiNotice")}</p>
 
       <div className="flex flex-1 min-h-0 flex-col p-4">
         {messages.length > 0 && (

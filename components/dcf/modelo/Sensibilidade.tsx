@@ -4,7 +4,7 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 import { Info } from "lucide-react"
 import {
-  grelhaWaccG, grelhaWaccMultiplo, grelhaCrescimentoMargem, intervaloGrelha, projetar, avaliar, valorEsperado,
+  grelhaWaccG, grelhaWaccMultiplo, grelhaCrescimentoMargem, intervaloGrelha, correrCenarios,
   NOMES_CENARIOS, type Grelha, type ContextoSensibilidade, type BarraFootball, type NomeCenario,
 } from "@/lib/finance/modelo"
 import type { ContextoSeparador } from "./Separadores"
@@ -151,23 +151,7 @@ export function SeparadorSensibilidade({ c }: { c: ContextoSeparador }) {
   // Cada cenário corre o modelo inteiro com os SEUS pressupostos.
   const cenarios = React.useMemo(() => {
     if (!ctx) return null
-    const receitaBase = ctx.base.revenue ?? 0
-    const linhas = NOMES_CENARIOS.map((nome) => {
-      const p = c.conjunto.cenarios[nome]
-      const proj = projetar(ctx.base, p)
-      const { avaliacao } = avaliar(proj, p.avaliacao, ctx.mercado, ctx.f, ctx.d0)
-      const ult = proj[proj.length - 1]
-      return {
-        nome,
-        valor: avaliacao.valido ? avaliacao.valorPorAcao : null,
-        cagr: receitaBase > 0 && ult ? Math.pow(ult.receita / receitaBase, 1 / proj.length) - 1 : null,
-        margemIni: p.drivers.margemEbit[0], margemFim: p.drivers.margemEbit[p.drivers.margemEbit.length - 1],
-        wacc: avaliacao.wacc.wacc,
-        metodo: p.avaliacao.metodoTerminal, g: p.avaliacao.g, multiplo: p.avaliacao.multiploSaida,
-      }
-    })
-    const valores = Object.fromEntries(linhas.map((x) => [x.nome, x.valor])) as Record<NomeCenario, number | null>
-    return { linhas, esperado: valorEsperado(valores, c.conjunto.probabilidades) }
+    return correrCenarios(ctx.base, c.conjunto, ctx.mercado, ctx.f, ctx.d0)
   }, [ctx, c.conjunto])
 
   if (!ctx || !calculo || !cenarios || !c.avaliacao.valido) return <p className="text-sm text-muted-foreground">{t("semModelo")}</p>

@@ -140,7 +140,11 @@ export default async function NewsArticlePage({
           </p>
         </section>
 
-        <ArticleFooter sources={article.sources} className="mt-8" />
+        <p className="mt-8 rounded-lg border border-border/50 bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground">
+          Resumo elaborado com apoio de inteligência artificial a partir das fontes indicadas. Pode conter erros ou omissões: confirma sempre na fonte. Não é aconselhamento nem recomendação de investimento.
+        </p>
+
+        <ArticleFooter sources={article.sources} className="mt-4" />
       </article>
     </div>
   );

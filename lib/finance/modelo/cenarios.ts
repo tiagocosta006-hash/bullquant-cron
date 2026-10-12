@@ -18,6 +18,8 @@ export type ConjuntoCenarios = {
   cenarios: Record<NomeCenario, Pressupostos>
   /** Probabilidades escritas pelo analista (decimal). */
   probabilidades: Record<NomeCenario, number>
+  /** A tese do analista (texto livre), que acompanha o resumo e as exportações. */
+  tese?: string
 }
 
 export const PROBABILIDADES_POR_OMISSAO: Record<NomeCenario, number> = { bear: 0.25, base: 0.5, bull: 0.25 }

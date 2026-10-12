@@ -7,7 +7,7 @@ import { useDebounce } from "@/hooks/useDebounce"
 import {
   racios, projetar, avaliar, fracaoAno1, anosAteFimAno1, pressupostosIniciais, mudarHorizonte,
   cenariosIniciais, derivarCenario, mudarHorizonteCenarios, NOMES_CENARIOS, PROBABILIDADES_POR_OMISSAO,
-  type ConjuntoCenarios, type NomeCenario, type AnoHistorico, type Driver, type EstimativaModelo, type ContextoMercado, type Pressupostos,
+  type ConjuntoCenarios, type NomeCenario, type AnoHistorico, type AnoFin, type Driver, type EstimativaModelo, type ContextoMercado, type Pressupostos,
   type PressupostosAvaliacao, type Mercado,
 } from "@/lib/finance/modelo"
 import {
@@ -16,6 +16,8 @@ import {
 } from "./Separadores"
 import { SeparadorSchedules } from "./Schedules"
 import { SeparadorSensibilidade } from "./Sensibilidade"
+import { SeparadorResumo } from "./Resumo"
+import { ModeloFinanceira } from "./ModeloFinanceira"
 import { useFormatos } from "./TabelaModelo"
 
 /**
@@ -30,15 +32,17 @@ import { useFormatos } from "./TabelaModelo"
 type Dados = {
   empresa: { ticker: string; nome: string; setor: string | null; industria: string | null; logoUrl: string | null; financeira: boolean }
   historico: AnoHistorico[]
+  financas?: { historico: AnoFin[]; capitalProprio: number | null } | null
+  pares?: { industria: string; n: number; mediana: Partial<Record<Driver, number>> } | null
   multiplosHistoricos?: Array<{ fiscalYear: number; evEbitda: number | null }>
   estimativas: EstimativaModelo[]
   mercado: { preco: number | null; acoes: number | null; dividaTotal: number; caixa: number; interessesMinoritarios: number; dataBalanco: string | null }
-  contexto: ContextoMercado & { dataRf: string | null }
+  contexto: ContextoMercado & { dataRf: string | null; cpiYoy?: number | null; pibRealYoy?: number | null; dataMacro?: string | null }
 }
 
 type SearchResult = { ticker: string; name: string }
 
-const SEPARADORES = ["historico", "schedules", "projecoes", "avaliacao", "sensibilidade"] as const
+const SEPARADORES = ["historico", "schedules", "projecoes", "avaliacao", "sensibilidade", "resumo"] as const
 type Separador = (typeof SEPARADORES)[number]
 
 // v2: os três cenários. v1 (um só conjunto de pressupostos) passa a ser o Base.
@@ -70,7 +74,13 @@ function gravarRascunho(ticker: string, c: ConjuntoCenarios | null) {
 
 /** Rascunhos de antes do Revenue Build por segmento não têm segmentos: recebem os iniciais. */
 function completar(p: Pressupostos, ini: Pressupostos): Pressupostos {
-  return { ...p, receitaSegmentos: p.receitaSegmentos ?? mudarHorizonte(ini, p.anos).receitaSegmentos, modoReceita: p.modoReceita ?? "total" }
+  return {
+    ...p,
+    receitaSegmentos: p.receitaSegmentos ?? mudarHorizonte(ini, p.anos).receitaSegmentos,
+    modoReceita: p.modoReceita ?? "total",
+    // Rascunhos anteriores à receita diferida: recebem a dos pressupostos iniciais.
+    drivers: p.drivers.diasReceitaDiferida ? p.drivers : { ...p.drivers, diasReceitaDiferida: mudarHorizonte(ini, p.anos).drivers.diasReceitaDiferida },
+  }
 }
 
 const COR_CENARIO: Record<NomeCenario, string> = {
@@ -92,6 +102,8 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
   const [carregando, setCarregando] = React.useState(false)
   const [erro, setErro] = React.useState<string | null>(null)
   const [comRascunho, setComRascunho] = React.useState(false)
+  // Sobe ao abrir uma versão guardada: o Summary recomeça com a tese dessa versão.
+  const [aberturas, setAberturas] = React.useState(0)
 
   // Pesquisa
   const [query, setQuery] = React.useState("")
@@ -159,6 +171,17 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
   })
   const onProbabilidade = (nome: NomeCenario, v: number) =>
     atualizarConjunto((c) => ({ ...c, probabilidades: { ...c.probabilidades, [nome]: v } }))
+  const onCarregarConjunto = (novo: ConjuntoCenarios) => {
+    if (!dados || !iniciaisConjunto) return
+    setAberturas((n) => n + 1)
+    // O mesmo tratamento dos rascunhos: versões antigas ganham o que lhes falta.
+    const ini = iniciaisConjunto.cenarios.base
+    atualizarConjunto(() => ({
+      ...novo,
+      cenarios: { bear: completar(novo.cenarios.bear, ini), base: completar(novo.cenarios.base, ini), bull: completar(novo.cenarios.bull, ini) },
+    }))
+  }
+  const onTese = (tese: string) => atualizarConjunto((c) => ({ ...c, tese }))
   /** Recomeça o Bear ou o Bull a partir do Base atual. */
   const derivarDoBase = (nome: NomeCenario) =>
     atualizarConjunto((c) => ({ ...c, cenarios: { ...c.cenarios, [nome]: derivarCenario(c.cenarios.base, nome) } }))
@@ -204,9 +227,10 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
 
   const contexto: ContextoSeparador | null = calculo && pressupostos ? {
     ticker: dados?.empresa.ticker ?? "", historico: calculo.hist, racios: calculo.rs, pressupostos, iniciais, projecoes: calculo.projecoes,
-    avaliacao: calculo.avaliacao, mercado: calculo.mercado, estimativas: dados?.estimativas ?? [], multiplosHistoricos: dados?.multiplosHistoricos ?? [], evEbitdaAtual: dados?.contexto.evEbitdaAtual ?? null, fracaoAno1: calculo.f, anosAteFimAno1: calculo.d0,
+    avaliacao: calculo.avaliacao, mercado: calculo.mercado, estimativas: dados?.estimativas ?? [], multiplosHistoricos: dados?.multiplosHistoricos ?? [], evEbitdaAtual: dados?.contexto.evEbitdaAtual ?? null, pares: dados?.pares ?? null, macro: { cpi: dados?.contexto.cpiYoy ?? null, pib: dados?.contexto.pibRealYoy ?? null, data: dados?.contexto.dataMacro ?? null }, fracaoAno1: calculo.f, anosAteFimAno1: calculo.d0,
     onDriver, onDriverSerie, onSegmentoSerie, onModoReceita, onAvaliacao,
-    cenario, conjunto: conjunto!, onProbabilidade, derivarDoBase,
+    cenario, conjunto: conjunto!, onProbabilidade, derivarDoBase, onTese, onCarregarConjunto,
+    empresa: { nome: dados?.empresa.nome ?? "", setor: dados?.empresa.setor ?? null, industria: dados?.empresa.industria ?? null },
   } : null
 
   return (
@@ -244,7 +268,7 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
                 <p className="text-lg font-bold tracking-tight">{dados.empresa.nome} <span className="text-primary">{dados.empresa.ticker}</span></p>
                 <p className="text-xs text-muted-foreground">{[dados.empresa.setor, dados.empresa.industria].filter(Boolean).join(" · ")}</p>
               </div>
-              {calculo?.avaliacao.valido && (
+              {calculo?.avaliacao.valido && !dados.empresa.financeira && (
                 <div className="flex items-center gap-6 text-sm">
                   <div><p className="text-xs text-muted-foreground">{t("avaliacao.valorPorAcao")}{cenario !== "base" && <span className={`ml-1.5 rounded px-1 py-px text-[10px] font-semibold ${COR_CENARIO[cenario]}`}>{t(`cenario.nomes.${cenario}`)}</span>}</p><p className="text-xl font-bold text-primary tabular-nums">${fmt(calculo.avaliacao.valorPorAcao, "anos")}</p></div>
                   <div><p className="text-xs text-muted-foreground">{t("avaliacao.preco")}</p><p className="text-xl font-bold tabular-nums">${fmt(calculo.avaliacao.preco, "anos")}</p></div>
@@ -258,11 +282,15 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
         {!dados && !carregando && !erro && resultados.length === 0 && <p className="text-sm text-muted-foreground">{t("vazio")}</p>}
       </div>
 
-      {dados?.empresa.financeira && (
-        <div className="glass flex items-start gap-3 rounded-xl p-5 text-sm">
-          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
-          <p>{t("erros.financeira")}</p>
-        </div>
+      {dados?.empresa.financeira && dados.financas && (
+        <ModeloFinanceira
+          key={dados.empresa.ticker}
+          d={{
+            ticker: dados.empresa.ticker, nome: dados.empresa.nome, historico: dados.financas.historico,
+            capitalProprio: dados.financas.capitalProprio, preco: dados.mercado.preco, acoes: dados.mercado.acoes,
+            rf: dados.contexto.rf ?? null, beta: dados.contexto.beta ?? null, dataBalanco: dados.mercado.dataBalanco,
+          }}
+        />
       )}
 
       {contexto && pressupostos && !dados?.empresa.financeira && (
@@ -307,6 +335,7 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
           {aba === "projecoes" && <SeparadorProjecoes c={contexto} />}
           {aba === "avaliacao" && <SeparadorAvaliacao c={contexto} />}
           {aba === "sensibilidade" && <SeparadorSensibilidade key={contexto.ticker} c={contexto} />}
+          {aba === "resumo" && <SeparadorResumo key={`${contexto.ticker}-${aberturas}`} c={contexto} />}
 
           <p className="text-xs text-muted-foreground">
             {t("fontes", {

@@ -20,6 +20,7 @@ model User {
   brokerConnections BrokerConnection[]
   brokerCashFlows   BrokerCashFlow[]
   dcfAnalyses       DcfAnalysis[]
+  dcfModelos        DcfModelo[]
   portfolio         Portfolio?
   watchlistItems    WatchlistItem[]
   watchlists        Watchlist[]
@@ -116,6 +117,7 @@ model Company {
   companyBrief           CompanyBrief?
   corporateEvents        CorporateEvent[]
   dcfAnalyses            DcfAnalysis[]
+  dcfModelos             DcfModelo[]
   earnings               EarningsEvent[]
   fundamentals           Fundamental[]
   insiderTxns            InsiderTransaction[]
@@ -399,6 +401,32 @@ model DcfAnalysis {
 
   @@index([userId, companyId, createdAt])
   @@map("dcf_analyses")
+}
+
+/// Modelo DCF avançado (FMVA) guardado pelo analista. Cada gravação é uma nova
+/// versão do modelo daquele utilizador para aquela empresa (1, 2, 3…); nunca se
+/// reescreve uma versão. `conjunto` é o ConjuntoCenarios completo (três
+/// cenários, probabilidades e tese), validado em lib/finance/modelo/validar.ts.
+model DcfModelo {
+  id            String   @id @default(cuid())
+  userId        String
+  companyId     String
+  versao        Int
+  titulo        String?
+  tese          String?  @db.Text
+  cenarioAtivo  String
+  conjunto      Json
+  /// O que o modelo valia no momento de guardar, para comparar versões sem as abrir.
+  valorPorAcao  Decimal? @db.Decimal(20, 4)
+  valorEsperado Decimal? @db.Decimal(20, 4)
+  precoAoGuardar Decimal? @db.Decimal(20, 4)
+  createdAt     DateTime @default(now())
+  company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, companyId, versao])
+  @@index([userId, companyId, createdAt])
+  @@map("dcf_modelos")
 }
 
 model EarningsEvent {

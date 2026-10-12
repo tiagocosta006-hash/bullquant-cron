@@ -25,7 +25,7 @@ const COR_LINHA_CENARIO: Record<NomeCenario, string> = { bear: "var(--bear)", ba
 
 const FORMATO_DRIVER: Record<Driver, Formato> = {
   crescimentoReceita: "pct", margemBruta: "pct", margemEbit: "pct", daPctReceita: "pct",
-  capexPctReceita: "pct", dso: "dias", dio: "dias", dpo: "dias", taxaImposto: "pct",
+  capexPctReceita: "pct", dso: "dias", dio: "dias", dpo: "dias", diasReceitaDiferida: "dias", taxaImposto: "pct",
 }
 
 export type Alvo = { tipo: "driver"; d: Driver } | { tipo: "segmento"; nome: string }
@@ -277,8 +277,8 @@ function PainelAssumption({ c, alvo, onFechar }: { c: ContextoSeparador; alvo: A
     const ratio = hist.map((a) => (a.capex && a.depreciationAndAmortization ? a.capex / a.depreciationAndAmortization : null))
     extras.push(<p key="cd" className="text-xs text-muted-foreground">{t("painel.capexDa")}: {ultimos(hist, 6).map((a, i) => `${a.fiscalYear} ${fmt(ultimos(ratio, 6)[i], "x")}`).join(" · ")}</p>)
   }
-  if (alvo.tipo === "driver" && ["dso", "dio", "dpo"].includes(alvo.d)) {
-    const nwc = hist.map((a) => (a.revenue ? ((a.accountsReceivable ?? 0) + (a.inventory ?? 0) - (a.accountsPayable ?? 0)) / a.revenue : null))
+  if (alvo.tipo === "driver" && ["dso", "dio", "dpo", "diasReceitaDiferida"].includes(alvo.d)) {
+    const nwc = hist.map((a) => (a.revenue ? ((a.accountsReceivable ?? 0) + (a.inventory ?? 0) - (a.accountsPayable ?? 0) - (a.deferredRevenue ?? 0)) / a.revenue : null))
     extras.push(<p key="nwc" className="text-xs text-muted-foreground">{t("painel.nwc")}: {ultimos(hist, 6).map((a, i) => `${a.fiscalYear} ${fmt(ultimos(nwc, 6)[i], "pct")}`).join(" · ")}</p>)
   }
   if (alvo.tipo === "driver" && alvo.d === "taxaImposto") {
@@ -375,6 +375,9 @@ function PainelAssumption({ c, alvo, onFechar }: { c: ContextoSeparador; alvo: A
             <Stat rotulo={t("painel.mediana10")} valor={fmt(st.mediana, formato)} />
             <Stat rotulo={t("painel.min")} valor={fmt(st.min, formato)} />
             <Stat rotulo={t("painel.max")} valor={fmt(st.max, formato)} />
+            {alvo.tipo === "driver" && c.pares?.mediana[alvo.d] !== undefined && (
+              <Stat rotulo={t("painel.pares", { n: c.pares.n })} valor={fmt(c.pares.mediana[alvo.d] ?? null, formato)} />
+            )}
           </div>
         )}
 
@@ -473,7 +476,7 @@ export function SeparadorSchedules({ c }: { c: ContextoSeparador }) {
   const drv = (x: Driver): Alvo => ({ tipo: "driver", d: x })
   const toggle = (k: string) => setFechadas((s) => { const n = new Set(s); if (n.has(k)) n.delete(k); else n.add(k); return n })
   const crescProj = pr.map((x, i) => (i === 0 ? (ult.revenue ? x.receita / ult.revenue - 1 : null) : x.receita / pr[i - 1].receita - 1))
-  const nwcHist = h.map((a) => (a.accountsReceivable ?? 0) + (a.inventory ?? 0) - (a.accountsPayable ?? 0))
+  const nwcHist = h.map((a) => (a.accountsReceivable ?? 0) + (a.inventory ?? 0) - (a.accountsPayable ?? 0) - (a.deferredRevenue ?? 0))
   const cagrProj = ult.revenue && pr.length ? Math.pow(pr[pr.length - 1].receita / ult.revenue, 1 / pr.length) - 1 : null
   const hist5 = c.historico.length >= 6 ? cagr(c.historico[c.historico.length - 6].revenue, ult.revenue, 5) : null
 
@@ -542,11 +545,12 @@ export function SeparadorSchedules({ c }: { c: ContextoSeparador }) {
     },
     {
       k: "wc", titulo: t("seccoes.fundoManeio"), ajuda: t("schedules.fundoManeioAjuda"),
-      resumo: t("resumos.wc", { dso: fmt(d.dso[0], "dias"), dio: fmt(d.dio[0], "dias"), dpo: fmt(d.dpo[0], "dias") }),
+      resumo: t("resumos.wc", { dso: fmt(d.dso[0], "dias"), dio: fmt(d.dio[0], "dias"), dpo: fmt(d.dpo[0], "dias"), ddr: fmt(d.diasReceitaDiferida?.[0] ?? null, "dias") }),
       linhas: [
         { rotulo: t("drivers.dso"), formato: "dias", alvo: drv("dso"), hist: r.map((x) => x.dso), proj: d.dso },
         { rotulo: t("drivers.dio"), formato: "dias", alvo: drv("dio"), hist: r.map((x) => x.dio), proj: d.dio },
         { rotulo: t("drivers.dpo"), formato: "dias", alvo: drv("dpo"), hist: r.map((x) => x.dpo), proj: d.dpo },
+        { rotulo: t("drivers.diasReceitaDiferida"), formato: "dias", alvo: drv("diasReceitaDiferida"), hist: r.map((x) => x.diasReceitaDiferida), proj: d.diasReceitaDiferida ?? [] },
         { rotulo: t("linhas.fundoManeio"), formato: "m", hist: nwcHist, proj: pr.map((x) => x.fundoManeio) },
         { rotulo: t("linhas.varFundoManeio"), formato: "m", hist: nwcHist.map((v, i) => (i === 0 ? null : v - nwcHist[i - 1])), proj: pr.map((x) => x.variacaoFundoManeio), subtotal: true },
       ],

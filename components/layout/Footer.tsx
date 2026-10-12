@@ -33,6 +33,7 @@ export async function Footer() {
           </Link>
         </div>
       </div>
+      <p className="container mx-auto mt-6 px-4 text-xs leading-relaxed text-muted-foreground/80">{t('legalNotice')}</p>
     </footer>
   );
 }

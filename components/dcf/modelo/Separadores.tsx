@@ -30,9 +30,18 @@ export type ContextoSeparador = {
   /** EV/EBITDA no fim de cada ano fiscal real, e o atual (TTM). */
   multiplosHistoricos: Array<{ fiscalYear: number; evEbitda: number | null }>
   evEbitdaAtual: number | null
+  /** Mediana da indústria por driver (null se houver menos de 3 pares). */
+  pares: { industria: string; n: number; mediana: Partial<Record<Driver, number>> } | null
+  /** Inflação (CPI) e PIB real dos EUA, variação homóloga em decimal, para ancorar o terminal growth. */
+  macro: { cpi: number | null; pib: number | null; data: string | null }
   fracaoAno1: number
   /** Anos de hoje até ao fim do ano 1 (para re-correr o modelo na sensibilidade). */
   anosAteFimAno1: number
+  /** Dados da empresa para o resumo e as exportações. */
+  empresa: { nome: string; setor: string | null; industria: string | null }
+  onTese: (tese: string) => void
+  /** Substitui o rascunho atual por uma versão guardada. */
+  onCarregarConjunto: (c: ConjuntoCenarios) => void
   onDriver: (d: Driver, ano: number, v: number) => void
   onDriverSerie: (d: Driver, valores: number[]) => void
   onSegmentoSerie: (nome: string, valores: number[]) => void
@@ -132,6 +141,8 @@ export function SeparadorHistorico({ c }: { c: ContextoSeparador }) {
     { rotulo: t("drivers.dio"), formato: "dias", hist: r.map((x) => x.dio) },
     { rotulo: t("linhas.fornecedores"), formato: "m", hist: col("accountsPayable") },
     { rotulo: t("drivers.dpo"), formato: "dias", hist: r.map((x) => x.dpo) },
+    { rotulo: t("linhas.receitaDiferida"), formato: "m", hist: col("deferredRevenue") },
+    { rotulo: t("drivers.diasReceitaDiferida"), formato: "dias", hist: r.map((x) => x.diasReceitaDiferida) },
     { rotulo: t("seccoes.cashFlow"), formato: "m", seccao: true },
     { rotulo: t("linhas.ocf"), formato: "m", hist: col("operatingCashFlow") },
     { rotulo: t("linhas.fcfHist"), formato: "m", hist: col("freeCashFlow"), destaque: true },
@@ -245,6 +256,29 @@ function HistoricoMultiplo({ c }: { c: ContextoSeparador }) {
   )
 }
 
+/**
+ * O crescimento perpétuo não pode passar o da economia: aqui ficam a inflação,
+ * o PIB real e o seu total (PIB nominal aproximado), ao lado da taxa sem risco.
+ */
+function ContextoCrescimento({ c }: { c: ContextoSeparador }) {
+  const t = useTranslations("dcfModelo")
+  const { fmt } = useFormatos()
+  const { cpi, pib, data } = c.macro
+  if (cpi === null && pib === null) return null
+  const nominal = cpi !== null && pib !== null ? cpi + pib : null
+  const a = c.pressupostos.avaliacao
+  return (
+    <div className="rounded-xl border border-border/60 p-4 text-sm">
+      <p className="font-semibold">{t("macro.titulo")}</p>
+      <p className="mt-1 text-muted-foreground">
+        {t("macro.linha", { cpi: fmt(cpi, "pct"), pib: fmt(pib, "pct"), nominal: fmt(nominal, "pct"), rf: fmt(a.rf, "pct"), g: fmt(a.g, "pct") })}
+      </p>
+      {nominal !== null && a.g > nominal && <p className="mt-1 text-xs text-amber-500">{t("macro.gAcima")}</p>}
+      <p className="mt-1 text-[11px] text-muted-foreground/80">{t("macro.nota", { data: data ?? "N/A" })}</p>
+    </div>
+  )
+}
+
 function AssumptionsAvaliacao({ c }: { c: ContextoSeparador }) {
   const t = useTranslations("dcfModelo")
   const a = c.pressupostos.avaliacao
@@ -278,6 +312,7 @@ function AssumptionsAvaliacao({ c }: { c: ContextoSeparador }) {
           <span className="text-[11px] leading-snug text-muted-foreground/80">{t("pressupostos.waccManualAjuda")}</span>
         </label>
       </div>
+      <ContextoCrescimento c={c} />
       <HistoricoMultiplo c={c} />
       <div className="flex flex-wrap items-center gap-6 pt-2">
         <div className="flex items-center gap-2 text-sm">

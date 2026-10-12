@@ -6,3 +6,8 @@ export { pressupostosIniciais, segmentosIniciais, mudarHorizonte, interpolar, RF
 export type { EstimativaModelo, ContextoMercado } from "./pressupostos"
 export * from "./sensibilidade"
 export * from "./cenarios"
+export { medianaPares, MINIMO_PARES } from "./pares"
+export type { MedianaPares } from "./pares"
+export { correrCenarios } from "./resumo"
+export type { LinhaCenario } from "./resumo"
+export * from "./financeiras"

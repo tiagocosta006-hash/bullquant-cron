@@ -6,6 +6,7 @@ import { PaddleRetain } from "@/components/providers/PaddleRetain";
 import { getUser } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { isPulseAdmin } from "@/lib/pulse/server";
+import { getTranslations } from "next-intl/server";
 
 /**
  * Terminal — navegação ÚNICA: pill Liquid Glass flutuante no topo
@@ -22,6 +23,7 @@ export default async function AppLayout({
   // se individualmente; guardar dados protege-se sempre na API (401). Por isso
   // o layout lida com user === null de forma graciosa (TopNav mostra "Entrar").
   const user = await getUser();
+  const tFooter = await getTranslations("footer");
 
   let userName: string | null = null;
   let userEmail: string | null = null;
@@ -59,6 +61,7 @@ export default async function AppLayout({
       />
       <main className="mx-auto w-full max-w-7xl px-4 pb-28 pt-24 md:px-6 md:pb-12">
         {children}
+        <p className="mt-12 border-t border-border/40 pt-4 text-xs leading-relaxed text-muted-foreground/80">{tFooter("legalNotice")}</p>
       </main>
       <MobileDock />
     </div>

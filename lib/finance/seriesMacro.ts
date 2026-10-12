@@ -111,12 +111,25 @@ async function pibReal(desde: Date): Promise<PontoSerie[]> {
   return juntar(linhas.flatMap((b) => (Array.isArray(b) ? b : [])).map((l) => ({ date: l.date, value: l.value })))
 }
 
-/** Variação homóloga em %, comparando com o ponto de há `passos` períodos. */
-function homologa(serie: PontoSerie[], passos: number): PontoSerie[] {
+/**
+ * Variação homóloga em %, comparando cada ponto com o de há um ano (±20 dias).
+ *
+ * Por data e não por posição: a FMP não tem o CPI de outubro de 2025 (não foi
+ * publicado), e recuar 12 pontos a partir daí comparava com 13 meses antes
+ * (agosto de 2026 contra julho de 2025: 3,71% em vez de 3,35%).
+ */
+export function homologa(serie: PontoSerie[]): PontoSerie[] {
   const out: PontoSerie[] = []
-  for (let i = passos; i < serie.length; i++) {
-    const antes = serie[i - passos].value
-    if (antes) out.push({ date: serie[i].date, value: (serie[i].value / antes - 1) * 100 })
+  const tempo = (d: string) => new Date(d + "T00:00:00Z").getTime()
+  const pontos = serie.map((p) => ({ ...p, t: tempo(p.date) }))
+  for (const p of pontos) {
+    const d = new Date(p.t)
+    const alvo = Date.UTC(d.getUTCFullYear() - 1, d.getUTCMonth(), d.getUTCDate())
+    let melhor: (typeof pontos)[number] | null = null
+    for (const q of pontos) {
+      if (Math.abs(q.t - alvo) <= 20 * DIA && (!melhor || Math.abs(q.t - alvo) < Math.abs(melhor.t - alvo))) melhor = q
+    }
+    if (melhor && melhor.value) out.push({ date: p.date, value: (p.value / melhor.value - 1) * 100 })
   }
   return out
 }
@@ -155,9 +168,9 @@ export async function carregarSeriesReduzidas(
       case "^UNRATE":
         return indicador("unemploymentRate", desde)
       case "^CPI_YOY":
-        return homologa(await indicador("CPI", desdeHomologa), 12)
+        return homologa(await indicador("CPI", desdeHomologa))
       case "^GDP_YOY":
-        return homologa(await pibReal(desdeHomologa), 4)
+        return homologa(await pibReal(desdeHomologa))
       default:
         return (await historico(ticker, desde)).map((p) => ({ date: p.date, value: p.close }))
     }

@@ -72,11 +72,13 @@ type FundamentalRow = {
   netChangeInCash?: number | null
 }
 
-export function FinancialsEngine({ ticker, sector, currencySymbol = "$", preliminary = null, estimativas = [] }: { ticker: string, sector?: string | null, currencySymbol?: string, preliminary?: { fiscalYear: number; fiscalQuarter: number; revenue: number | null; epsDiluted: number | null } | null, estimativas?: EstimativaAnual[] }) {
+export function FinancialsEngine({ ticker, sector, banco, currencySymbol = "$", preliminary = null, estimativas = [] }: { ticker: string, sector?: string | null, banco?: boolean, currencySymbol?: string, preliminary?: { fiscalYear: number; fiscalQuarter: number; revenue: number | null; epsDiluted: number | null } | null, estimativas?: EstimativaAnual[] }) {
   const t = useTranslations("financials")
   const tA = useTranslations("stock.analysts")
   const tFs = useTranslations("financialStatements")
-  const isBank = sector === "Financials"
+  // `banco` vem do servidor (tipoFinanceira: setor + indústria). Só sector === "Financials"
+  // tratava a MSCI, a Visa ou a S&P Global como bancos e escondia-lhes o FCF e o EBITDA.
+  const isBank = banco ?? sector === "Financials"
   const isReit = sector === "Real Estate"
   const [data, setData] = useState<FundamentalRow[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -147,6 +149,9 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
         const capex = sumWindow(last4, "capex")
         const freeCashFlow = operatingCashFlow === null ? null : operatingCashFlow - (capex ?? 0)
         const epsDiluted = sumWindow(last4, "epsDiluted")
+        const stockBasedCompensation = sumWindow(last4, "stockBasedCompensation")
+        const shareRepurchases = sumWindow(last4, "shareRepurchases")
+        const dividendsPaid = sumWindow(last4, "dividendsPaid")
         const opEx = sumWindow(last4, "operatingExpenses")
         const rAndD = sumWindow(last4, "researchAndDevelopment")
         const sga = sumWindow(last4, "sellingGeneralAndAdmin")
@@ -186,6 +191,7 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
         ttmData.push({
           label: `TTM Q${current.fiscalQuarter} '${String(current.fiscalYear).slice(2)}`,
           revenue, netIncome, ebitda, operatingCashFlow, capex, freeCashFlow, epsDiluted,
+          stockBasedCompensation, shareRepurchases, dividendsPaid,
           operatingExpenses: opEx, researchAndDevelopment: rAndD, sellingGeneralAndAdmin: sga,
           cash, totalDebt, sharesOutstanding, grossMargin, operatingMargin, profitMargin,
           roic, returnOnEquity, dividendPerShare, revenueSegments: segments,
@@ -548,6 +554,30 @@ export function FinancialsEngine({ ticker, sector, currencySymbol = "$", prelimi
                   { key: 'capex', name: 'CapEx', color: 'var(--chart-1)', type: 'bar', stackId: 'a' }
                 ] 
               }} 
+            />
+
+            <DecisionChart currencySymbol={currencySymbol} periodLabel={periodLabel}
+              title={t('charts.shareholderReturn')}
+              data={chartData}
+              type="BAR"
+              config={{
+                isCurrency: true,
+                dataKeys: [
+                  { key: 'shareRepurchases', name: t('charts.buybacks'), color: 'var(--chart-1)', type: 'bar', stackId: 'r' },
+                  { key: 'dividendsPaid', name: t('charts.dividendsPaid'), color: 'var(--chart-4)', type: 'bar', stackId: 'r' },
+                ],
+              }}
+              infoTooltip={t('charts.shareholderReturnInfo')}
+              emptyMessage={t('charts.noShareholderReturn')}
+            />
+
+            <DecisionChart currencySymbol={currencySymbol} periodLabel={periodLabel}
+              title={t('charts.stockBasedCompensation')}
+              data={chartData}
+              type="BAR"
+              config={{ isCurrency: true, dataKeys: [{ key: 'stockBasedCompensation', color: 'var(--chart-5)', type: 'bar' }], inverseColors: true }}
+              cagr={calcCAGR('stockBasedCompensation')}
+              infoTooltip={t('charts.stockBasedCompensationInfo')}
             />
 
             <DecisionChart currencySymbol={currencySymbol} periodLabel={periodLabel} 

@@ -999,7 +999,14 @@
       "operatingMargin": "Operating Margin",
       "profitMargin": "Profit Margin",
       "noDividends": "This company does not pay dividends.",
-      "returnOnEquity": "Return on Equity"
+      "returnOnEquity": "Return on Equity",
+      "shareholderReturn": "Buybacks + dividends",
+      "buybacks": "Buybacks",
+      "dividendsPaid": "Dividends paid",
+      "shareholderReturnInfo": "Cash spent on share repurchases (gross, before shares issued) plus dividends paid, in each period.",
+      "noShareholderReturn": "This company has made no buybacks and paid no dividends.",
+      "stockBasedCompensation": "SBC",
+      "stockBasedCompensationInfo": "Cost of shares granted to employees. Already included in operating income; buybacks that only offset it do not reduce the share count."
     },
     "ratios": {
       "roic": "ROIC",
@@ -1107,7 +1114,8 @@
       "netChangeInCash": "Net Change in Cash",
       "freeCashFlow": "Free Cash Flow (FCF)",
       "minorityInterest": "Minority Interest",
-      "fxAndOther": "FX Effect & Other"
+      "fxAndOther": "FX Effect & Other",
+      "freeCashFlowFmp": "FCF as calculated by FMP (for comparison)"
     },
     "footer": {
       "sourceNote": "Official accounting data extracted from SEC EDGAR 10-K and 10-Q filings.",

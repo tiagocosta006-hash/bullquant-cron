@@ -208,6 +208,8 @@ export function construirLinha(
       semZero(cf?.operatingCashFlow) !== null && cf?.capitalExpenditure != null
         ? cf.operatingCashFlow! - Math.abs(cf.capitalExpenditure)
         : cf?.freeCashFlow ?? null,
+    // O FCF da própria FMP, sem o recalcular: serve para comparar com o nosso.
+    freeCashFlowFmp: semZero(cf?.freeCashFlow),
     investingCashFlow: cf?.netCashProvidedByInvestingActivities ?? null,
     financingCashFlow: cf?.netCashProvidedByFinancingActivities ?? null,
     // Zero exato de SBC numa cotada é um campo em falta, não um valor (Cooper 2016).

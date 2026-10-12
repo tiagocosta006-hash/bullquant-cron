@@ -88,7 +88,7 @@ const FLUXOS = [
   "revenue", "costOfRevenue", "grossProfit", "operatingExpenses", "researchAndDevelopment",
   "sellingGeneralAndAdmin", "ebitda", "operatingIncome", "interestExpense", "taxExpense", "netIncome",
   "epsDiluted", "incomeBeforeTax", "depreciationAndAmortization", "operatingCashFlow", "capex",
-  "freeCashFlow", "investingCashFlow", "financingCashFlow", "stockBasedCompensation",
+  "freeCashFlow", "freeCashFlowFmp", "investingCashFlow", "financingCashFlow", "stockBasedCompensation",
   "shareRepurchases", "dividendsPaid", "netChangeInCash", "dividendPerShare",
 ] as const
 const STOCKS = [

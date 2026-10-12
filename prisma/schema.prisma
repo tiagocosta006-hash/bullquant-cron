@@ -162,6 +162,9 @@ model Fundamental {
   operatingCashFlow      Decimal?   @db.Decimal(20, 4)
   capex                  Decimal?   @db.Decimal(20, 4)
   freeCashFlow           Decimal?   @db.Decimal(20, 4)
+  /// FCF tal como a FMP o calcula (campo `freeCashFlow` do cash-flow-statement). Guardado ao lado do nosso
+  /// (OCF − capex) para se poder comparar: divergem em ~1% das linhas.
+  freeCashFlowFmp        Decimal?   @db.Decimal(20, 4)
   totalAssets            Decimal?   @db.Decimal(20, 4)
   totalCurrentLiab       Decimal?   @db.Decimal(20, 4)
   longTermDebt           Decimal?   @db.Decimal(20, 4)

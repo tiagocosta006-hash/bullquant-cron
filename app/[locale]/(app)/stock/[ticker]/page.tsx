@@ -1,3 +1,4 @@
+import { tipoFinanceira } from "@/lib/fmp/mapear";
 import { cache } from 'react'
 import dynamic from 'next/dynamic'
 import { eTickerDemo } from '@/lib/api/acessoPro'
@@ -391,7 +392,7 @@ export default async function StockPage({
             <div className="relative min-h-[400px]">
               {!canViewFinancials && <ProGate isPro={isPro} isLoggedIn={isLoggedIn} ticker={company.ticker} />}
               <div className={!canViewFinancials ? "pointer-events-none select-none" : ""}>
-                <FinancialsEngine ticker={company.ticker} sector={company.sector} currencySymbol={currencySymbol} preliminary={preliminaryQuarter} estimativas={canViewFinancials ? dadosAnalistas?.anuais ?? [] : []} />
+                <FinancialsEngine ticker={company.ticker} sector={company.sector} banco={tipoFinanceira(company.sector, company.industry, company.ticker) !== null} currencySymbol={currencySymbol} preliminary={preliminaryQuarter} estimativas={canViewFinancials ? dadosAnalistas?.anuais ?? [] : []} />
               </div>
             </div>
           )

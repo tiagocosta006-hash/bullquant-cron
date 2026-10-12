@@ -999,7 +999,14 @@
       "operatingMargin": "Margem Operacional",
       "profitMargin": "Margem Líquida",
       "noDividends": "Esta empresa não distribui dividendos.",
-      "returnOnEquity": "Retorno s/ Capital Próprio (ROE)"
+      "returnOnEquity": "Retorno s/ Capital Próprio (ROE)",
+      "shareholderReturn": "Recompras + dividendos",
+      "buybacks": "Recompras",
+      "dividendsPaid": "Dividendos pagos",
+      "shareholderReturnInfo": "Dinheiro gasto em recompras de ações (valor bruto, sem descontar as ações emitidas) mais os dividendos pagos, em cada período.",
+      "noShareholderReturn": "Esta empresa não fez recompras nem pagou dividendos.",
+      "stockBasedCompensation": "SBC",
+      "stockBasedCompensationInfo": "Custo das ações dadas a funcionários. Já está incluído no resultado operacional; as recompras que só o compensam não reduzem o número de ações."
     },
     "ratios": {
       "roic": "ROIC",
@@ -1107,7 +1114,8 @@
       "netChangeInCash": "Variação Líquida de Caixa",
       "freeCashFlow": "Free Cash Flow (FCF)",
       "minorityInterest": "Interesses Minoritários",
-      "fxAndOther": "Efeito Cambial e Outros"
+      "fxAndOther": "Efeito Cambial e Outros",
+      "freeCashFlowFmp": "FCF segundo a FMP (para comparar)"
     },
     "footer": {
       "sourceNote": "Dados contabilísticos oficiais extraídos de relatórios 10-K e 10-Q da SEC EDGAR.",

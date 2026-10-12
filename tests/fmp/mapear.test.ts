@@ -56,6 +56,26 @@ describe("construirLinha — zeros da FMP e EPS incoerente", () => {
     expect(l.capex).toBe(120)
   })
 
+  it("guarda também o FCF da FMP tal como vem, ao lado do nosso", () => {
+    const l = construirLinha(inc({}), undefined,
+      { operatingCashFlow: 500, capitalExpenditure: -120, freeCashFlow: 450 } as never, undefined, undefined)
+    expect(l.freeCashFlow).toBe(380)
+    expect(l.freeCashFlowFmp).toBe(450)
+  })
+
+  it("FCF da FMP igual a zero é falta de dado, não valor", () => {
+    const l = construirLinha(inc({}), undefined,
+      { operatingCashFlow: 500, capitalExpenditure: -120, freeCashFlow: 0 } as never, undefined, undefined)
+    expect(l.freeCashFlowFmp).toBeNull()
+  })
+
+  it("SBC e recompras vêm do cash-flow da FMP (recompra em valor absoluto)", () => {
+    const l = construirLinha(inc({}), undefined,
+      { operatingCashFlow: 500, capitalExpenditure: -120, stockBasedCompensation: 40, commonStockRepurchased: -90 } as never, undefined, undefined)
+    expect(l.stockBasedCompensation).toBe(40)
+    expect(l.shareRepurchases).toBe(90)
+  })
+
   it("um prejuízo real continua negativo (só o zero exato é tratado)", () => {
     const l = construirLinha(inc({ netIncome: -50, bottomLineNetIncome: -50, epsDiluted: -0.5 }), undefined, undefined, undefined, undefined)
     expect(l.netIncome).toBe(-50)

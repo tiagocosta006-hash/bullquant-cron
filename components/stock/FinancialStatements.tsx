@@ -68,6 +68,7 @@ export type FundamentalDataRow = {
   operatingCashFlow?: number | null
   capex?: number | null
   freeCashFlow?: number | null
+  freeCashFlowFmp?: number | null
   investingCashFlow?: number | null
   financingCashFlow?: number | null
   stockBasedCompensation?: number | null
@@ -353,7 +354,7 @@ export function FinancialStatements({
         "researchAndDevelopment", "sellingGeneralAndAdmin", "operatingIncome",
         "depreciationAndAmortization", "ebitda", "interestExpense", "netInterestIncome",
         "otherNonOperatingIncome", "incomeBeforeTax", "taxExpense", "netIncome",
-        "operatingCashFlow", "capex", "freeCashFlow", "investingCashFlow",
+        "operatingCashFlow", "capex", "freeCashFlow", "freeCashFlowFmp", "investingCashFlow",
         "financingCashFlow", "stockBasedCompensation", "shareRepurchases",
         "dividendsPaid", "netChangeInCash", "dividendPerShare", "epsDiluted",
       ]
@@ -613,6 +614,7 @@ export function FinancialStatements({
           },
           { key: "netChangeInCash", label: t("metrics.netChangeInCash"), isSubtotal: true },
           { key: "freeCashFlow", label: t("metrics.freeCashFlow"), isBold: true, isSubtotal: true },
+          { key: "freeCashFlowFmp", label: t("metrics.freeCashFlowFmp"), indent: 1 },
         ],
       },
     ],

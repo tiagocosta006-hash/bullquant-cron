@@ -1,0 +1,4 @@
+{
+  "_nota": "Empresas onde a FMP deixa o software capitalizado fora do capex em pelo menos um ano (auditoria SEC de 2026-10-12). O script corre só estas por omissão; --todas volta a procurar nas restantes.",
+  "tickers": ["BR", "CHRW", "COIN", "CRWD", "DASH", "DDOG", "FICO", "FIS", "HAS", "ICE", "JKHY", "MA", "MSCI", "NTRS", "PODD", "TTD", "TYL", "WTW"]
+}

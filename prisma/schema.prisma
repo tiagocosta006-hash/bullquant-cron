@@ -165,6 +165,9 @@ model Fundamental {
   /// FCF tal como a FMP o calcula (campo `freeCashFlow` do cash-flow-statement). Guardado ao lado do nosso
   /// (OCF − capex) para se poder comparar: divergem em ~1% das linhas.
   freeCashFlowFmp        Decimal?   @db.Decimal(20, 4)
+  /// Software capitalizado que a FMP deixou fora do `capex` e que scripts/ingest_capex_software.ts (SEC) somou.
+  /// Null = nada somado. A ingestão da FMP repõe-no a null em cada escrita, e o script volta a aplicá-lo.
+  capitalizedSoftware    Decimal?   @db.Decimal(20, 4)
   totalAssets            Decimal?   @db.Decimal(20, 4)
   totalCurrentLiab       Decimal?   @db.Decimal(20, 4)
   longTermDebt           Decimal?   @db.Decimal(20, 4)

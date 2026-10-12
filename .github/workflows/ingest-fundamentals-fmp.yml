@@ -71,3 +71,14 @@ jobs:
         run: >-
           npx tsx scripts/ingest_segments_fmp.ts
           ${{ github.event.inputs.tickers && format('--tickers={0}', github.event.inputs.tickers) || '' }}
+
+      # Depois da FMP e dos segmentos: soma o software capitalizado ao capex onde a FMP o deixou fora
+      # (MSCI, Mastercard, FIS…; ver lib/sec/capexSoftware.ts). Só 18 empresas, segundos.
+      - name: Run capex software (SEC)
+        if: ${{ github.event.inputs.comparar != 'true' }}
+        env:
+          DATABASE_URL: ${{ secrets.DIRECT_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: >-
+          npx tsx scripts/ingest_capex_software.ts
+          ${{ github.event.inputs.tickers && format('--tickers={0}', github.event.inputs.tickers) || '' }}

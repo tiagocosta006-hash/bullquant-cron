@@ -210,6 +210,8 @@ export function construirLinha(
         : cf?.freeCashFlow ?? null,
     // O FCF da própria FMP, sem o recalcular: serve para comparar com o nosso.
     freeCashFlowFmp: semZero(cf?.freeCashFlow),
+    // Reposto a null em cada escrita: o `capex` volta a ser o da FMP e o script da SEC volta a somar o software.
+    capitalizedSoftware: null,
     investingCashFlow: cf?.netCashProvidedByInvestingActivities ?? null,
     financingCashFlow: cf?.netCashProvidedByFinancingActivities ?? null,
     // Zero exato de SBC numa cotada é um campo em falta, não um valor (Cooper 2016).

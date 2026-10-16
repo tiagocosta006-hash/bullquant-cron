@@ -1,3 +1,4 @@
+import { exigirPro } from "@/lib/api/acessoPro"
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { createClient } from "@/lib/supabase/server"
@@ -6,6 +7,8 @@ import { fetchTrading212Positions, Trading212ApiError } from "@/lib/broker/tradi
 
 /** Devolve se o utilizador já tem uma ligação Trading212 (nunca as credenciais). */
 export async function GET() {
+  const acessoPro = await exigirPro()
+  if (!acessoPro.ok) return acessoPro.resposta
   const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
@@ -21,6 +24,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const acessoPro = await exigirPro()
+  if (!acessoPro.ok) return acessoPro.resposta
   try {
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -68,6 +73,8 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE() {
+  const acessoPro = await exigirPro()
+  if (!acessoPro.ok) return acessoPro.resposta
   const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {

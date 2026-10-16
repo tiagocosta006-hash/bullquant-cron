@@ -38,7 +38,7 @@ export function ProGate({ isPro, isLoggedIn = true, ticker }: ProGateProps) {
             <p className="text-muted-foreground max-w-md mb-8 font-medium">
               {ticker ? tGate("guestDesc", { ticker }) : tGate("guestDescGeneric")}
             </p>
-            <Link href="/register">
+            <Link href="/pricing">
               <Button size="lg" className="font-semibold shadow-lg shadow-primary/20 px-8">
                 {tGate("guestCta")}
               </Button>

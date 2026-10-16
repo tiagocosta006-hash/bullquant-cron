@@ -10,6 +10,7 @@ import { PulseTracker } from "@/components/pulse/PulseTracker";
 import { BRAND } from "@/lib/brand";
 import { PaddleProvider } from "@/components/providers/PaddleProvider";
 import { CookieConsent } from "@/components/layout/CookieConsent";
+import { lerPrefs } from "@/lib/legal/cookiePrefs";
 import dynamic from "next/dynamic";
 
 /* Painel de design, só em dev.
@@ -104,7 +105,7 @@ export async function generateMetadata({
       template: `%s · ${BRAND.name}`,
     },
     description:
-      "Análise fundamental de ações com 10 anos de dados, DCF integrada e Analista IA. Em português, gratuito. Uma plataforma Bullocracy.",
+      "Análise fundamental de ações com 10 anos de dados, DCF integrada e Analista IA. Em português. Uma plataforma Bullocracy.",
     keywords: [
       "BullValue",
       "análise fundamental de ações",
@@ -253,10 +254,7 @@ export default async function RootLayout({
           <PaddleProvider>
             <main className="flex-1 flex flex-col">{children}</main>
           </PaddleProvider>
-          <CookieConsent
-            initialConsent={cookieStore.get("cookie_consent")?.value === "true"}
-            showInitialBanner={cookieStore.get("cookie_consent") === undefined}
-          />
+          <CookieConsent initialPrefs={lerPrefs(cookieStore.get("cookie_prefs")?.value)} />
           <PulseTracker />
           {/* Painel de design ao vivo — ver a definição no topo do ficheiro. */}
           <TweakPanel />

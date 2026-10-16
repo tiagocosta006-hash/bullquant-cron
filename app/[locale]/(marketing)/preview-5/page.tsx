@@ -50,7 +50,7 @@ export default async function Preview5() {
         </p>
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <CTA>Criar conta grátis</CTA>
+          <CTA>Subscrever PRO</CTA>
           <Peek />
         </div>
       </div>

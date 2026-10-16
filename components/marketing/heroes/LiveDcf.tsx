@@ -108,17 +108,17 @@ export function LiveDcf({
       </div>
 
       <div className="flex flex-col justify-center border-t border-border pt-6 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
-        <p className="text-sm text-muted-foreground">Valor justo por ação</p>
+        <p className="text-sm text-muted-foreground">Valor do cenário por ação</p>
         <p className="nums mt-1 text-5xl font-extrabold tabular-nums sm:text-6xl">
           ${r.fairValue.toFixed(2)}
         </p>
         <p className="mt-3 text-sm text-muted-foreground">
-          Preço actual <span className="nums tabular-nums">${currentPrice.toFixed(2)}</span>
+          Preço atual <span className="nums tabular-nums">${currentPrice.toFixed(2)}</span>
         </p>
         <p
-          className={`nums mt-4 text-xl font-bold tabular-nums ${under ? "text-bull" : "text-bear"}`}
+          className="nums mt-4 text-xl font-bold tabular-nums"
         >
-          {under ? "Subavaliada" : "Sobreavaliada"} {(r.marginOfSafety * 100).toFixed(1)}%
+          {under ? "Preço abaixo do valor do cenário" : "Preço acima do valor do cenário"} · {(r.marginOfSafety * 100).toFixed(1)}%
         </p>
         <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
           {ticker} · calculado com o mesmo motor da calculadora do BullValue, a partir dos

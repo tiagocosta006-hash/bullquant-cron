@@ -68,7 +68,7 @@ export function SavedValuations({ analyses, ticker, currency = "$" }: SavedValua
                     {formattedTime}
                   </p>
                 </div>
-                <div className={`px-2 py-1 rounded-md text-xs font-bold shrink-0 ${isUndervalued ? 'bg-bull/10 text-bull' : 'bg-bear/10 text-bear'}`}>
+                <div className={`px-2 py-1 rounded-md text-xs font-bold shrink-0 bg-muted text-foreground`}>
                   {isUndervalued ? "+" : ""}{mos.toFixed(1)}% {t("mos")}
                 </div>
               </div>

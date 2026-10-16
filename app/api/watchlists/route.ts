@@ -1,3 +1,4 @@
+import { exigirPro } from "@/lib/api/acessoPro"
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { createClient } from "@/lib/supabase/server"
@@ -15,6 +16,8 @@ const createSchema = z.object({
 
 // GET — lista as watchlists nomeadas do utilizador (com contagem de empresas)
 export async function GET() {
+  const acessoPro = await exigirPro()
+  if (!acessoPro.ok) return acessoPro.resposta
   try {
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -45,6 +48,8 @@ export async function GET() {
 
 // POST { name } — cria uma nova watchlist nomeada
 export async function POST(request: Request) {
+  const acessoPro = await exigirPro()
+  if (!acessoPro.ok) return acessoPro.resposta
   try {
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()

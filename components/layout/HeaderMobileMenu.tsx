@@ -90,7 +90,7 @@ export function HeaderMobileMenu({
                   {labels.login}
                 </Link>
                 <Link
-                  href="/register"
+                  href="/pricing"
                   data-track="header_register"
                   className="flex items-center gap-3 rounded-xl px-3 py-3 text-[15px] font-semibold text-primary transition-colors hover:bg-primary/10"
                 >

@@ -45,7 +45,7 @@ export default async function Preview4() {
         </div>
 
         <div className="mt-14 flex flex-col gap-3 sm:flex-row">
-          <CTA>Criar conta grátis</CTA>
+          <CTA>Subscrever PRO</CTA>
           <Peek />
         </div>
       </div>

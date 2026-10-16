@@ -29,8 +29,8 @@ export async function generateMetadata({
   }
 
   const ticker = analysis.company.ticker
-  const title = `Análise DCF: ${ticker} | ${BRAND.name}`
-  const description = `Vê a análise fundamental e de Discounted Cash Flow da ${ticker} gerada na ${BRAND.name}.`
+  const title = `Cenário DCF: ${ticker} | ${BRAND.name}`
+  const description = `Cenário de DCF da ${ticker} criado por um utilizador da ${BRAND.name}, com os pressupostos dele. Não é recomendação de investimento.`
 
   // Use the OpenGraph dynamic image endpoint that we will create next
   const ogUrl = new URL(`${BRAND.siteUrl}/api/og/dcf/${id}`)
@@ -38,6 +38,8 @@ export async function generateMetadata({
   return {
     title,
     description,
+    // Conteúdo de um utilizador: não se indexa nos motores de pesquisa.
+    robots: { index: false, follow: false },
     openGraph: {
       title,
       description,
@@ -93,7 +95,6 @@ export default async function PublicDcfPage({
 
   const result = runDcf(inputs)
   const currency = analysis.company.currency === "EUR" ? "€" : "$"
-  const userName = analysis.user.name ?? "um investidor"
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12 md:py-20 flex flex-col items-center">
@@ -107,7 +108,7 @@ export default async function PublicDcfPage({
           </h1>
         </div>
         <p className="text-muted-foreground">
-          {analysis.label ? `"${analysis.label}"` : `Análise criada por ${userName}`}
+          {analysis.label ? `"${analysis.label}"` : "Cenário criado por um utilizador"}
         </p>
         <div className="pt-2">
           <DownloadDcfImageButton id={id} ticker={analysis.company.ticker} />
@@ -117,7 +118,10 @@ export default async function PublicDcfPage({
       {/* Results Card */}
       <div className="w-full mb-12">
         <DcfResults result={result} currency={currency} mode={inputs.mode} />
-        <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{t("sharedNotice")}</p>
+        <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+          {t("sharedNotice")}{" "}
+          <a href={`mailto:suporte@thebullvalue.com?subject=${encodeURIComponent(`Denúncia de conteúdo: DCF ${id}`)}`} className="underline underline-offset-4">{t("reportContent")}</a>
+        </p>
       </div>
 
       {/* Assumptions Grid */}
@@ -141,10 +145,10 @@ export default async function PublicDcfPage({
           O BullValue permite-te aceder a 10 anos de dados financeiros da SEC e calcular modelos DCF em segundos.
         </p>
         <Link
-          href="/register"
+          href="/pricing"
           className={cn(buttonVariants({ size: "lg" }), "mt-4 font-semibold px-8")}
         >
-          Experimentar Gratuitamente <ArrowRight className="ml-2 h-4 w-4" />
+          Subscrever PRO <ArrowRight className="ml-2 h-4 w-4" />
         </Link>
       </div>
 

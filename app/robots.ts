@@ -3,7 +3,7 @@ import { BRAND } from '@/lib/brand'
 import { routing } from '@/i18n/routing'
 
 export default function robots(): MetadataRoute.Robots {
-  const allowBase = ['/', '/stock/', '/explore', '/directory', '/calendar', '/pricing', '/terms', '/privacy', '/refund', '/glossary', '/about', '/dcf/']
+  const allowBase = ['/', '/stock/', '/explore', '/directory', '/calendar', '/pricing', '/terms', '/privacy', '/refund', '/cookies', '/legal', '/withdrawal', '/glossary', '/about', '/dcf/']
   const disallowBase = [
     '/api/',
     '/auth/',
@@ -19,6 +19,7 @@ export default function robots(): MetadataRoute.Robots {
     '/watchlist',
     '/compare',
     '/transcripts',
+    '/preview',
   ]
 
   const allow = Array.from(new Set(allowBase.flatMap(path => [

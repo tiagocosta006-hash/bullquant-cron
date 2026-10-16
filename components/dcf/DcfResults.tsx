@@ -69,7 +69,7 @@ export function DcfResults({ result, currency = "$", mode = "FCFF", ticker, name
   const { fairValue, currentPrice, marginOfSafety } = result
   const hasPrice = Number.isFinite(currentPrice) && currentPrice > 0
 
-  // Margem de segurança positiva = subavaliada (verde); negativa = sobreavaliada.
+  // Diferença positiva = preço abaixo do valor do cenário. Sem cores de veredicto: é uma diferença, não um sinal.
   const undervalued = marginOfSafety > 0
   // barra: 0% no centro, clamp a ±50% para a largura visual
   const barPct = Math.min(50, Math.abs(marginOfSafety) * 100)
@@ -98,7 +98,7 @@ export function DcfResults({ result, currency = "$", mode = "FCFF", ticker, name
           </Button>
         </div>
 
-        {/* Fair Value vs Preço Atual */}
+        {/* Valor do cenário vs preço atual */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
             <p className="text-xs uppercase tracking-wide text-muted-foreground">{t("fairValue")}</p>
@@ -122,9 +122,7 @@ export function DcfResults({ result, currency = "$", mode = "FCFF", ticker, name
               <span
                 className={cn(
                   "px-2.5 py-1 rounded-full text-sm font-bold tabular-nums",
-                  undervalued
-                    ? "bg-bull/15 text-bull"
-                    : "bg-bear/15 text-bear"
+                  "bg-muted text-foreground"
                 )}
               >
                 {undervalued ? "+" : ""}
@@ -136,7 +134,7 @@ export function DcfResults({ result, currency = "$", mode = "FCFF", ticker, name
               <div
                 className={cn(
                   "absolute top-0 bottom-0",
-                  undervalued ? "bg-bull left-1/2" : "bg-bear right-1/2"
+                  undervalued ? "bg-primary/60 left-1/2" : "bg-primary/60 right-1/2"
                 )}
                 style={{ width: `${barPct}%` }}
               />

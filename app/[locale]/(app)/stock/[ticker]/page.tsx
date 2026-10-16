@@ -58,8 +58,8 @@ export async function generateMetadata({
     }
   }
 
-  const title = `${company.name} (${company.ticker}): Cotação, Análise Fundamental e Valor Justo DCF | ${BRAND.name}`
-  const description = `Consulte a cotação da ${company.name} (${company.ticker}), demonstrações financeiras de 10 anos, modelo de valor justo DCF e análise de IA do setor ${company.sector || 'financeiro'}.`
+  const title = `${company.name} (${company.ticker}): Cotação, Análise Fundamental e Calculadora DCF | ${BRAND.name}`
+  const description = `Consulte a cotação da ${company.name} (${company.ticker}), demonstrações financeiras de 10 anos, calculadora DCF e análise de IA do setor ${company.sector || 'financeiro'}.`
 
   const ogImageUrl = `${BRAND.siteUrl}/api/og/stock/${company.ticker}`
 

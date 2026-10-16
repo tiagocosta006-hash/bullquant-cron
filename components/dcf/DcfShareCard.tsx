@@ -31,7 +31,7 @@ export const DcfShareCard = forwardRef<HTMLDivElement, DcfShareCardProps>(
     const { fairValue, currentPrice, marginOfSafety } = result
     const hasPrice = Number.isFinite(currentPrice) && currentPrice > 0
     const undervalued = marginOfSafety > 0
-    const marginColor = undervalued ? "#16a34a" : "#dc2626"
+    const marginColor = "#57544d"
 
     const dateString = new Intl.DateTimeFormat('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date())
 
@@ -126,7 +126,7 @@ export const DcfShareCard = forwardRef<HTMLDivElement, DcfShareCardProps>(
             )}
 
             <div className="flex flex-col">
-              <div className="flex text-[20px] font-[800] text-[#e4aa33] uppercase mb-3 tracking-[0.05em]">Fair Value (DCF)</div>
+              <div className="flex text-[20px] font-[800] text-[#e4aa33] uppercase mb-3 tracking-[0.05em]">Valor do cenário (DCF)</div>
               <div className="flex text-[64px] font-[800] text-[#1a1a17] tracking-[-0.02em]">
                 {formatPrice(fairValue, currency)}
               </div>
@@ -155,8 +155,11 @@ export const DcfShareCard = forwardRef<HTMLDivElement, DcfShareCardProps>(
             )}
           </div>
           
-          <div className="flex text-[18px] font-[400] text-[#8b877d] uppercase tracking-[0.05em]">
-            {dateString}
+          <div className="flex flex-col items-end">
+            <div className="flex text-[18px] font-[400] text-[#8b877d] uppercase tracking-[0.05em]">
+              {dateString}
+            </div>
+            <div className="flex text-[14px] font-[400] text-[#8b877d] mt-2">Cenário de um utilizador, com os pressupostos dele · não é recomendação de investimento</div>
           </div>
         </div>
 

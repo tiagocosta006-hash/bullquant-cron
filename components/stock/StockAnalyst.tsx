@@ -414,7 +414,7 @@ export function StockAnalyst({
               <h3 className="text-2xl font-bold tracking-tight">{t("needsAuthTitle")}</h3>
               <p className="text-muted-foreground">{t("needsAuthDesc")}</p>
             </div>
-            <a href="/register">
+            <a href="/pricing">
               <Button size="lg" className="gap-2">
                 <Lock className="h-4 w-4" />
                 {t("registerCta")}

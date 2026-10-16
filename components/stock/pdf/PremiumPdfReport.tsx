@@ -151,8 +151,9 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   footerText: {
-    fontSize: 9,
+    fontSize: 7,
     color: '#a1a1aa',
+    maxWidth: '85%',
   },
 });
 
@@ -295,7 +296,7 @@ export const PremiumPdfReport = ({ company, fundamentals, aiInsight }: PremiumPd
 
         {/* Footer */}
         <View style={styles.footer} fixed>
-          <Text style={styles.footerText}>BullValue Analytics — Confidential & Proprietary</Text>
+          <Text style={styles.footerText}>BullValue — ferramenta educativa e de análise. Não é aconselhamento nem recomendação de investimento. Dados de terceiros podem conter erros ou atrasos.</Text>
           <Text style={styles.footerText} render={({ pageNumber, totalPages }) => (
             `Page ${pageNumber} of ${totalPages}`
           )} />

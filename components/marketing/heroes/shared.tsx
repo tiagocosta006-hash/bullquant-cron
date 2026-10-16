@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
  */
 export const CTA = ({ children }: { children: React.ReactNode }) => (
   <Link
-    href="/register"
+    href="/pricing"
     className={cn(buttonVariants({ size: "lg" }), "pressable min-h-13 px-8 text-base font-semibold")}
   >
     {children}

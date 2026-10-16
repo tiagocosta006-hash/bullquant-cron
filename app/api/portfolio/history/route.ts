@@ -1,3 +1,4 @@
+import { exigirPro } from "@/lib/api/acessoPro"
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { historico } from "@/lib/fmp/mercado"
@@ -16,6 +17,8 @@ type HistoryPoint = {
  * snapshots diários reais (não existem no schema atual).
  */
 export async function GET(request: Request) {
+  const acessoPro = await exigirPro()
+  if (!acessoPro.ok) return acessoPro.resposta
   try {
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()

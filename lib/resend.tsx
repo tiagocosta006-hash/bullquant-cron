@@ -294,3 +294,50 @@ export const sendPasswordResetEmail = async (email: string, resetLink: string) =
     return { data: null, error: { message: err?.message || 'Falha de rede ao contactar Resend' } };
   }
 };
+
+const escapeHtml = (s: string) =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+/**
+ * Retratação (livre resolução): confirmação ao consumidor, em suporte duradouro (e-mail),
+ * e aviso à equipa para executar o reembolso na Whop. DL 24/2014; Dir. (UE) 2023/2673.
+ * Só devolve sucesso se os DOIS e-mails forem aceites: a confirmação é a prova de que o pedido chegou.
+ */
+export const sendWithdrawalEmails = async (
+  opts: { name: string; email: string; locale: 'pt' | 'en'; supportEmail: string; whenIso: string },
+) => {
+  if (!resend) return { ok: false as const, error: 'RESEND_API_KEY não configurada' };
+  const { name, email, locale, supportEmail, whenIso } = opts;
+  const n = escapeHtml(name);
+  const e = escapeHtml(email);
+  const quando = new Date(whenIso).toLocaleString(locale === 'pt' ? 'pt-PT' : 'en-GB', { timeZone: 'Europe/Lisbon' });
+  const pt = locale === 'pt';
+  try {
+    const paraUtilizador = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [email],
+      replyTo: supportEmail,
+      subject: pt ? 'Confirmação: resolução do contrato recebida — BullValue' : 'Confirmation: withdrawal from contract received — BullValue',
+      text: pt
+        ? `Olá ${name},\n\nRecebemos em ${quando} a sua declaração de resolução do contrato de subscrição PRO da BullValue (e-mail ${email}).\n\nO acesso PRO termina e devolvemos o que lhe seja devido, sem demora injustificada e no máximo em 14 dias, pelo mesmo meio de pagamento (através da Whop). Se tiver pedido o início imediato do serviço, será retido apenas o valor proporcional ao serviço já prestado.\n\nPara qualquer questão responda a este e-mail ou escreva para ${supportEmail}.`
+        : `Hello ${name},\n\nWe received on ${quando} your declaration of withdrawal from the BullValue PRO subscription contract (e-mail ${email}).\n\nPRO access ends and we refund what is due to you without undue delay and at the latest within 14 days, by the same means of payment (through Whop). If you asked for the service to start immediately, only the proportionate amount for the service already provided is retained.\n\nFor any question reply to this e-mail or write to ${supportEmail}.`,
+      html: getEmailTemplate(pt
+        ? `<h2>Resolução do contrato recebida</h2><p>Olá ${n},</p><p>Recebemos em <strong>${escapeHtml(quando)}</strong> a sua declaração de resolução do contrato de subscrição PRO da BullValue (e-mail <strong>${e}</strong>).</p><p>O acesso PRO termina e devolvemos o que lhe seja devido, sem demora injustificada e no máximo em 14 dias, pelo mesmo meio de pagamento (através da Whop). Se pediu o início imediato do serviço, é retido apenas o valor proporcional ao serviço já prestado.</p><p>Para qualquer questão responda a este e-mail ou escreva para ${escapeHtml(supportEmail)}.</p>`
+        : `<h2>Withdrawal received</h2><p>Hello ${n},</p><p>We received on <strong>${escapeHtml(quando)}</strong> your declaration of withdrawal from the BullValue PRO subscription contract (e-mail <strong>${e}</strong>).</p><p>PRO access ends and we refund what is due to you without undue delay and at the latest within 14 days, by the same means of payment (through Whop). If you asked for the service to start immediately, only the proportionate amount for the service already provided is retained.</p><p>For any question reply to this e-mail or write to ${escapeHtml(supportEmail)}.</p>`),
+    });
+    if (paraUtilizador.error) return { ok: false as const, error: paraUtilizador.error.message };
+
+    const paraEquipa = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [supportEmail],
+      replyTo: email,
+      subject: `[RETRATAÇÃO] ${email} — executar reembolso na Whop`,
+      text: `Pedido de resolução (livre resolução) recebido em ${quando}.\nNome: ${name}\nE-mail da subscrição: ${email}\nIdioma: ${locale}\n\nAção: retirar o acesso PRO, calcular o valor proporcional (se houve início imediato) e reembolsar na Whop em ≤ 14 dias.`,
+    });
+    if (paraEquipa.error) return { ok: false as const, error: paraEquipa.error.message };
+    return { ok: true as const };
+  } catch (err: any) {
+    console.error('[Resend] Exceção na retratação:', err);
+    return { ok: false as const, error: err?.message || 'Falha de rede ao contactar Resend' };
+  }
+};

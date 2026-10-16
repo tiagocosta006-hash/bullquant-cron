@@ -370,7 +370,7 @@ export function SeparadorAvaliacao({ c }: { c: ContextoSeparador }) {
   if (v.gImplicitoNoMultiplo !== null && Math.abs(v.gImplicitoNoMultiplo - a.g) > 0.02)
     avisos.push(t("avisos.divergencia", { g: fmt(v.gImplicitoNoMultiplo, "pct"), mult: fmt(v.multiploImplicitoNoGordon, "x") }))
 
-  const cor = v.potencial >= 0 ? "text-bull" : "text-bear"
+  const cor = ""  // sem cores de veredicto
   return (
     <div className="space-y-6">
       {assumptions}

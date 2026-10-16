@@ -40,15 +40,12 @@ describe("créditos prometidos vs orçamento real do Gemini", () => {
   it("a página de preços anuncia os números que o código impõe", () => {
     const numeros = (texto: string) => (texto.match(/\d+/g) ?? []).map(Number);
 
-    expect(numeros(pt.marketing.pricing.free.f4)).toContain(PLAN_DAILY_CREDITS.FREE);
     expect(numeros(pt.marketing.pricing.pro.f2)).toContain(PLAN_DAILY_CREDITS.PRO);
-    expect(numeros(en.marketing.pricing.free.f4)).toContain(PLAN_DAILY_CREDITS.FREE);
     expect(numeros(en.marketing.pricing.pro.f2)).toContain(PLAN_DAILY_CREDITS.PRO);
   });
 
   it("a FAQ anuncia os mesmos números que a tabela de preços", () => {
     for (const faq of [pt.marketing.faq.a1, en.marketing.faq.a1]) {
-      expect(faq).toContain(String(PLAN_DAILY_CREDITS.FREE));
       expect(faq).toContain(String(PLAN_DAILY_CREDITS.PRO));
     }
   });

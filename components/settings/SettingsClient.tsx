@@ -394,6 +394,9 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
                       {t('profile.logoutBtn')}
                     </Button>
                   </form>
+                  <a href="/api/account/export" download className="inline-flex h-9 items-center justify-center rounded-md border border-border px-4 text-sm font-medium hover:bg-muted/60">
+                    {t('profile.exportData')}
+                  </a>
                   <Dialog>
                     <DialogTrigger render={<Button variant="destructive" />}>
                       {t('profile.deleteAccountBtn')}
@@ -526,7 +529,7 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
                   <p className="font-semibold text-primary mb-1">Plano PRO Activo</p>
                   <p className="text-sm text-muted-foreground">
                     {user.viaWhop
-                      ? 'Tens acesso completo a todas as funcionalidades PRO através da comunidade. A subscrição é gerida no Whop — é lá que alteras o pagamento ou cancelas.'
+                      ? t('subscription.managedOnWhop')
                       : 'Tens acesso completo a todas as funcionalidades PRO. Para gerir a tua subscrição (cancelar, actualizar dados de pagamento), utiliza o portal de faturação abaixo.'}
                   </p>
                 </div>
@@ -553,67 +556,32 @@ export function SettingsClient({ user, locale, aiUsedToday, aiDailyLimit, betaEn
                 )}
               </div>
             ) : (
-              /* ── Estado FREE — mostrar comparação de planos ── */
+              /* ── Sem subscrição ativa: um só plano, pago na Whop ── */
               <div className="space-y-6">
                 <p className="text-sm text-muted-foreground">{t('subscription.desc')}</p>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {/* Gratuito */}
-                  <div className="rounded-xl border border-border bg-muted/20 p-5 flex flex-col">
-                    <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">{tPricing('free.name')}</p>
-                    <div className="flex items-end gap-1 mb-1">
-                      <span className="text-3xl font-extrabold">{tPricing('free.price')}</span>
-                      <span className="mb-0.5 text-sm text-muted-foreground">/ {tPricing('free.period')}</span>
-                    </div>
-                    <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-                      {(tPricing.raw('features.free') as string[]).slice(0, 5).map(f => (
-                        <li key={f} className="flex items-center gap-2">
-                          <Check className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                          {f}
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="mt-auto pt-5">
-                      <div className="w-full rounded-lg border border-border bg-muted/30 py-2 text-center text-sm font-medium text-muted-foreground">
-                        Plano atual
-                      </div>
-                    </div>
+                <div className="relative flex max-w-md flex-col rounded-xl border border-primary/40 bg-gradient-to-br from-primary/8 to-card/60 p-5 shadow-[0_0_30px_-8px_hsl(var(--primary)/0.2)]">
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-primary">{tPricing('pro.name')}</p>
+                  <div className="mb-1 flex items-end gap-1">
+                    <span className="text-3xl font-extrabold">{tPricing('pro.price')}</span>
+                    <span className="mb-0.5 text-sm text-muted-foreground">/ {tPricing('pro.period')}</span>
                   </div>
-
-                  {/* PRO */}
-                  <div className="relative rounded-xl border border-primary/40 bg-gradient-to-br from-primary/8 to-card/60 p-5 flex flex-col shadow-[0_0_30px_-8px_hsl(var(--primary)/0.2)]">
-                    <div className="absolute -top-3 left-4">
-                      <div className="flex items-center gap-1 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold text-primary-foreground">
-                        <Star className="h-2.5 w-2.5 fill-current" />
-                        {tPricing('pro.badge')}
-                      </div>
-                    </div>
-                    <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">{tPricing('pro.name')}</p>
-                    <div className="flex items-end gap-1 mb-1">
-                      <span className="text-3xl font-extrabold">{proPrice}</span>
-                      <span className="mb-0.5 text-sm text-muted-foreground">/ {tPricing('pro.period')}</span>
-                    </div>
-                    <ul className="mt-4 space-y-2 text-sm">
-                      {(tPricing.raw('features.pro') as string[]).slice(1, 6).map(f => (
-                        <li key={f} className="flex items-center gap-2">
-                          <Check className="h-3.5 w-3.5 shrink-0 text-primary" />
-                          {f}
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="mt-auto pt-5">
-                      <a
-                        href="/pricing"
-                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_4px_20px_-4px_hsl(var(--primary)/0.5)] transition-opacity hover:opacity-90"
-                      >
-                        {t('subscription.upgradeBtn')}
-                      </a>
-                    </div>
-                  </div>
+                  <ul className="mt-4 space-y-2 text-sm">
+                    {(tPricing.raw('features.pro') as string[]).slice(0, 6).map(f => (
+                      <li key={f} className="flex items-center gap-2">
+                        <Check className="h-3.5 w-3.5 shrink-0 text-primary" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <a
+                    href="/pricing"
+                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_4px_20px_-4px_hsl(var(--primary)/0.5)] transition-opacity hover:opacity-90"
+                  >
+                    {t('subscription.upgradeBtn')}
+                  </a>
                 </div>
-
-                <p className="text-center text-xs text-muted-foreground/60">
-                  Pagamentos seguros via Paddle · Cancela a qualquer momento
+                <p className="text-xs text-muted-foreground/70">
+                  {t('subscription.paidOnWhop')}
                 </p>
               </div>
             )}

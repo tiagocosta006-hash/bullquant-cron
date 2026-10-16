@@ -44,6 +44,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...createSitemapEntries('/terms', { lastModified: now, changeFrequency: 'yearly', priority: 0.3 }),
     ...createSitemapEntries('/privacy', { lastModified: now, changeFrequency: 'yearly', priority: 0.3 }),
     ...createSitemapEntries('/refund', { lastModified: now, changeFrequency: 'yearly', priority: 0.3 }),
+    ...createSitemapEntries('/cookies', { lastModified: now, changeFrequency: 'yearly', priority: 0.2 }),
+    ...createSitemapEntries('/legal', { lastModified: now, changeFrequency: 'yearly', priority: 0.3 }),
   ]
 
   // Category pages

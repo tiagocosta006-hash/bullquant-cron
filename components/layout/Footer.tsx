@@ -1,6 +1,7 @@
 import { Link } from '@/i18n/routing';
 import { getTranslations } from 'next-intl/server';
 import { BRAND } from '@/lib/brand';
+import { LegalFooterLinks } from '@/components/legal/LegalFooterLinks';
 
 export async function Footer() {
   const t = await getTranslations('footer');
@@ -22,18 +23,12 @@ export async function Footer() {
           <Link href="/pricing" className="hover:text-foreground transition-colors">
             {t('pricing')}
           </Link>
-          <Link href="/terms" className="hover:text-foreground transition-colors">
-            {t('terms')}
-          </Link>
-          <Link href="/privacy" className="hover:text-foreground transition-colors">
-            {t('privacy')}
-          </Link>
-          <Link href="/refund" className="hover:text-foreground transition-colors">
-            {t('refund')}
-          </Link>
         </div>
       </div>
-      <p className="container mx-auto mt-6 px-4 text-xs leading-relaxed text-muted-foreground/80">{t('legalNotice')}</p>
+      <div className="container mx-auto mt-6 space-y-3 px-4">
+        <LegalFooterLinks />
+        <p className="text-xs leading-relaxed text-muted-foreground/80">{t('legalNotice')}</p>
+      </div>
     </footer>
   );
 }

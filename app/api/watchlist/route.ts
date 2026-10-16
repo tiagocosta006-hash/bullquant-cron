@@ -1,3 +1,4 @@
+import { exigirPro } from "@/lib/api/acessoPro"
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { createClient } from "@/lib/supabase/server"
@@ -9,6 +10,8 @@ const tickerSchema = z.object({
 
 // GET — lista de observação do utilizador (com dados da empresa + último anual)
 export async function GET() {
+  const acessoPro = await exigirPro()
+  if (!acessoPro.ok) return acessoPro.resposta
   try {
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -53,6 +56,8 @@ export async function GET() {
 
 // POST { ticker } — seguir uma empresa (idempotente)
 export async function POST(request: Request) {
+  const acessoPro = await exigirPro()
+  if (!acessoPro.ok) return acessoPro.resposta
   try {
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -99,6 +104,8 @@ export async function POST(request: Request) {
 
 // DELETE { ticker } — deixar de seguir
 export async function DELETE(request: Request) {
+  const acessoPro = await exigirPro()
+  if (!acessoPro.ok) return acessoPro.resposta
   try {
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()

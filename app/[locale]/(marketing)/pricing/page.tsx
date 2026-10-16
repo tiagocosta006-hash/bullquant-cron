@@ -16,11 +16,12 @@ import { cn } from "@/lib/utils";
 import { PricingCards } from "./PricingCards";
 
 import { BRAND } from "@/lib/brand";
+import { LEGAL } from "@/lib/legal/config";
 
 export const metadata = {
   title: `Preços | ${BRAND.name}`,
   description:
-    `Plano gratuito para sempre ou PRO a €10/mês. Análise fundamental completa do S&P 500, DCF integrada e Analista IA em português com ${BRAND.name}.`,
+    `Subscrição PRO a €10/mês. Análise fundamental completa do S&P 500, DCF integrada e Analista IA em português com ${BRAND.name}.`,
 
 };
 
@@ -33,7 +34,6 @@ export default async function PricingPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  const freeFeatures = t.raw("features.free") as string[];
   const proFeatures = t.raw("features.pro") as string[];
   const faqItems = t.raw("faq.items") as { q: string; a: string }[];
 
@@ -68,13 +68,6 @@ export default async function PricingPage() {
         "offers": [
           {
             "@type": "Offer",
-            "name": "Plano Gratuito",
-            "price": "0",
-            "priceCurrency": "EUR",
-            "availability": "https://schema.org/InStock",
-          },
-          {
-            "@type": "Offer",
             "name": "Plano PRO",
             "price": "10",
             "priceCurrency": "EUR",
@@ -82,7 +75,7 @@ export default async function PricingPage() {
             "billingIncrement": "P1M",
           },
         ],
-        "description": `Análise fundamental de ações com 10 anos de dados da SEC, calculadora DCF integrada e Analista IA. Em português, gratuito.`,
+        "description": `Análise fundamental de ações com 10 anos de dados da SEC, calculadora DCF integrada e Analista IA. Em português.`,
       },
     ],
   };
@@ -113,7 +106,7 @@ export default async function PricingPage() {
       <section className="mx-auto max-w-5xl px-6 pb-6 md:px-8">
         {/* Sem props: o cartão deixou de ter checkout, logo já não precisa de
             saber quem está autenticado. Ver o comentário em PricingCards. */}
-        <PricingCards />
+        <PricingCards supportEmail={LEGAL.email} />
 
         {/* Trust badge */}
         <Reveal className="mt-6 flex justify-center">
@@ -151,7 +144,7 @@ export default async function PricingPage() {
               {tm("features.fundamentals.title").replace("10 anos de fundamentais", "O que tens acesso")}
             </h2>
             <p className="mt-2 text-muted-foreground">
-              Ferramentas sérias para investidores sérios — em português e de graça.
+              Ferramentas sérias para investidores sérios — em português.
             </p>
           </div>
           <div className="grid gap-5 sm:grid-cols-3">
@@ -180,7 +173,7 @@ export default async function PricingPage() {
             <p className="max-w-[48ch] text-muted-foreground">{tm("ctaSubtitle")}</p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
-                href="/register"
+                href="/pricing"
                 id="pricing-bottom-cta"
                 className={cn(buttonVariants({ size: "lg" }), "h-13 px-8 text-base font-semibold")}
               >

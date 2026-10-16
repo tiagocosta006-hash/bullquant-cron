@@ -28,7 +28,7 @@ const args = process.argv.slice(2);
 const DRY = args.includes("--dry-run");
 const TODAS = args.includes("--todas");
 const TICKERS = args.find((a) => a.startsWith("--tickers="))?.split("=")[1]?.split(",").map((t) => t.trim().toUpperCase()).filter(Boolean);
-const UA = { "User-Agent": "BullValue Analyst (tiago@bullquant.com)" };
+const UA = { "User-Agent": "BullValue Analyst (suporte@thebullvalue.com)" };
 const n = (v: unknown): number | null => (v === null || v === undefined ? null : Number(v));
 
 async function factsDaSec(cik: string): Promise<unknown | null> {

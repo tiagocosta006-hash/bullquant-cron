@@ -65,7 +65,7 @@ export function SearchBar({ isLoggedIn = true }: SearchBarProps) {
     if (query.trim()) {
       setIsOpen(false)
       if (!isLoggedIn) {
-        router.push('/register')
+        router.push('/pricing')
         return
       }
       router.push(`/stock/${query.trim().toUpperCase()}`)
@@ -77,7 +77,7 @@ export function SearchBar({ isLoggedIn = true }: SearchBarProps) {
     setQuery("")
     setIsOpen(false)
     if (!isLoggedIn) {
-      router.push('/register')
+      router.push('/pricing')
       return
     }
     router.push(`/stock/${company.ticker}`)

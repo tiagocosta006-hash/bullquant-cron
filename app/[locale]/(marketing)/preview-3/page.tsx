@@ -63,10 +63,10 @@ export default async function Preview3() {
           </h1>
           <p className="mt-8 max-w-[46ch] text-lg leading-relaxed text-muted-foreground">
             Sem folhas de cálculo e sem procurar o relatório. Os fundamentais das 500 empresas do
-            S&amp;P 500, retirados dos filings da SEC — em português e de graça.
+            S&amp;P 500, retirados dos filings da SEC — em português.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <CTA>Criar conta grátis</CTA>
+            <CTA>Subscrever PRO</CTA>
             <Peek />
           </div>
         </div>

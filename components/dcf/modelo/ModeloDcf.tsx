@@ -272,7 +272,7 @@ export function ModeloDcf({ defaultTicker, locked = false }: { defaultTicker?: s
                 <div className="flex items-center gap-6 text-sm">
                   <div><p className="text-xs text-muted-foreground">{t("avaliacao.valorPorAcao")}{cenario !== "base" && <span className={`ml-1.5 rounded px-1 py-px text-[10px] font-semibold ${COR_CENARIO[cenario]}`}>{t(`cenario.nomes.${cenario}`)}</span>}</p><p className="text-xl font-bold text-primary tabular-nums">${fmt(calculo.avaliacao.valorPorAcao, "anos")}</p></div>
                   <div><p className="text-xs text-muted-foreground">{t("avaliacao.preco")}</p><p className="text-xl font-bold tabular-nums">${fmt(calculo.avaliacao.preco, "anos")}</p></div>
-                  <div><p className="text-xs text-muted-foreground">{t("avaliacao.potencial")}</p><p className={`text-xl font-bold tabular-nums ${calculo.avaliacao.potencial >= 0 ? "text-bull" : "text-bear"}`}>{calculo.avaliacao.potencial >= 0 ? "+" : ""}{fmt(calculo.avaliacao.potencial, "pct")}</p></div>
+                  <div><p className="text-xs text-muted-foreground">{t("avaliacao.potencial")}</p><p className="text-xl font-bold tabular-nums">{calculo.avaliacao.potencial >= 0 ? "+" : ""}{fmt(calculo.avaliacao.potencial, "pct")}</p></div>
                 </div>
               )}
             </div>

@@ -14,7 +14,7 @@ const REPORT_FILING_CHARS = 140_000;
 export const reportSchema = z.object({
   executiveSummary: z
     .string()
-    .describe("2-3 frases (pt-PT): a tese e como a empresa ganha dinheiro."),
+    .describe("2-3 frases (pt-PT): resumo do negócio e como a empresa ganha dinheiro, sem juízo de investimento."),
   businessModel: z
     .string()
     .describe("1 parágrafo (pt-PT): modelo de negócio e principais fontes de receita."),
@@ -63,7 +63,8 @@ REGRAS DE ZERO ALUCINAÇÃO (tolerância zero):
 2. QUALITATIVO (moat, riscos, modelo de negócio, KPIs): baseia-te APENAS no texto do relatório anual (10-K/20-F) fornecido. Para cada afirmação factual chave, fornece a citação EXATA ("quote") do texto que a prova.
 3. KPIs OPERACIONAIS: extrai só métricas NÃO-GAAP específicas do negócio (ex: entregas, utilizadores ativos, same-store sales, GWh, subscritores). NUNCA extraias métricas GAAP genéricas (Net Income, EBITDA, Gross Margin, CapEx) como KPIs.
 4. CITAÇÕES: quando o número está numa tabela, cita a FRASE natural adjacente, não a linha de tabela.
-5. Se não encontrares algo, deixa null ou array vazio — nunca inventes para preencher.`;
+5. Se não encontrares algo, deixa null ou array vazio — nunca inventes para preencher.
+6. NÃO emitas recomendações nem opiniões de compra/venda/manter, preços-alvo ou "valor justo". Descreve o negócio, a vantagem competitiva, os riscos e os factos reportados no filing; as conclusões de investimento são do leitor.`;
 
 export type GeneratedReport = {
   report: AnalystReportData;

@@ -1,0 +1,37 @@
+name: Purge Pulse (retenção 180 dias)
+
+# A Política de Privacidade diz que os eventos do Pulse se conservam 180 dias.
+# Este workflow é o que cumpre essa promessa: se mudares o prazo, muda aqui e na política.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Só contar, não apagar"
+        type: boolean
+        required: false
+        default: false
+  schedule:
+    - cron: "45 4 * * *" # diário 4h45 UTC
+
+concurrency:
+  group: purge-pulse
+  cancel-in-progress: false
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install dependencies
+        run: npm ci
+      - name: Purge
+        env:
+          DATABASE_URL: ${{ secrets.DIRECT_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: npx tsx scripts/purge_pulse.ts --dias=180 ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}

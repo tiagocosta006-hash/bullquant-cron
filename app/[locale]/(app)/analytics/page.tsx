@@ -1,3 +1,4 @@
+import { exigirPlanoProNaPagina } from "@/lib/api/planoPro"
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
@@ -16,6 +17,7 @@ export const dynamic = "force-dynamic";
 type DailyRow = { day: Date; pageviews: bigint; visitors: bigint };
 
 export default async function AnalyticsPage() {
+  await exigirPlanoProNaPagina()
   const user = await getUser();
   if (!user || !isPulseAdmin(user.email)) notFound();
 

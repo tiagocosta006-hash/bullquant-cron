@@ -43,7 +43,7 @@ export function SeparadorResumo({ c }: { c: ContextoSeparador }) {
   if (!v.valido || !cen) return <p className="text-sm text-muted-foreground">{t("sensibilidade.semModelo")}</p>
 
   const pot = (x: number | null) => (x === null || m.preco <= 0 ? "N/A" : `${x >= m.preco ? "+" : ""}${fmt(x / m.preco - 1, "pct")}`)
-  const cor = (x: number | null) => (x !== null && x >= m.preco ? "text-bull" : "text-bear")
+  const cor = (_x: number | null) => ""  // sem cores de veredicto: é uma diferença face ao preço, não um sinal
   const avisos: string[] = []
   if (v.pesoTerminal > 0.75) avisos.push(t("avisos.pesoTerminal", { pct: fmt(v.pesoTerminal, "pct") }))
   if (a.g > a.rf) avisos.push(t("avisos.gAcimaRf"))

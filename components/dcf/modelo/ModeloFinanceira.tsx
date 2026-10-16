@@ -131,7 +131,7 @@ export function ModeloFinanceira({ d }: { d: DadosFinanceira }) {
     if (v.pesoTerminal > 0.75) avisos.push(t("avisos.pesoTerminal", { pct: fmt(v.pesoTerminal, "pct") }))
     if (p.roeInicial > 0.3 || p.roeFinal > 0.3) avisos.push(tf("avisos.roeAlto"))
   }
-  const cor = v.potencial >= 0 ? "text-bull" : "text-bear"
+  const cor = ""  // sem cores de veredicto
   const meio = 2
 
   if (!(capital0 > 0) || d.historico.length < 2) {

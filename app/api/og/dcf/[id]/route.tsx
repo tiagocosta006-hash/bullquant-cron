@@ -36,7 +36,7 @@ export async function GET(
     const calculatedFairValue = Number(fairValue)
     
     const isUndervalued = marginOfSafety && Number(marginOfSafety) > 0
-    const marginColor = isUndervalued ? "#16a34a" : "#dc2626"
+    const marginColor = "#57544d"
 
     const dateString = new Intl.DateTimeFormat('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date())
 
@@ -155,7 +155,7 @@ export async function GET(
               )}
 
               <div style={{ display: "flex", flexDirection: "column" }}>
-                <div style={{ fontSize: 20, fontWeight: 800, color: "#e4aa33", textTransform: "uppercase", marginBottom: 12, display: "flex", letterSpacing: "0.05em" }}>Fair Value (DCF)</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: "#e4aa33", textTransform: "uppercase", marginBottom: 12, display: "flex", letterSpacing: "0.05em" }}>Valor do cenário (DCF)</div>
                 <div style={{ fontSize: 64, fontWeight: 800, color: "#1a1a17", display: "flex", letterSpacing: "-0.02em" }}>
                   {formatPrice(calculatedFairValue, currency)}
                 </div>
@@ -180,9 +180,10 @@ export async function GET(
               </div>
             </div>
             
-            {/* Date Stamp */}
-            <div style={{ fontSize: 18, fontWeight: 400, color: "#8b877d", display: "flex", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-              {dateString}
+            {/* Date Stamp + aviso */}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+              <div style={{ fontSize: 18, fontWeight: 400, color: "#8b877d", display: "flex", textTransform: "uppercase", letterSpacing: "0.05em" }}>{dateString}</div>
+              <div style={{ fontSize: 14, fontWeight: 400, color: "#8b877d", display: "flex", marginTop: 8 }}>Cenário de um utilizador, com os pressupostos dele · não é recomendação de investimento</div>
             </div>
           </div>
 

@@ -34,7 +34,7 @@ export default async function Preview1() {
         </h1>
 
         <div className="mt-10 flex flex-col gap-3 pb-12 sm:flex-row">
-          <CTA>Criar conta grátis</CTA>
+          <CTA>Subscrever PRO</CTA>
           <Peek />
         </div>
       </div>

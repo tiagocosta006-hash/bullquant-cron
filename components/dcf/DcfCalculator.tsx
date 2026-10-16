@@ -344,7 +344,7 @@ export function DcfCalculator({
               onMouseDown={(e) => {
                 if (!locked) return
                 e.preventDefault()
-                window.location.href = "/register"
+                window.location.href = "/pricing"
               }}
               onChange={(e) => {
                 if (locked) return
@@ -362,7 +362,7 @@ export function DcfCalculator({
           {locked && (
             <p className="mt-2 text-xs text-muted-foreground">
               {tLocked("hint")}{" "}
-              <a href="/register" className="font-semibold text-primary hover:underline">
+              <a href="/pricing" className="font-semibold text-primary hover:underline">
                 {tLocked("cta")}
               </a>
             </p>
@@ -547,7 +547,7 @@ export function DcfCalculator({
             <Lock className="mx-auto mb-2 h-5 w-5 text-primary" />
             <p className="text-sm font-semibold text-foreground">{tLocked("saveTitle")}</p>
             <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">{tLocked("saveDesc")}</p>
-            <a href="/register">
+            <a href="/pricing">
               <Button size="sm" className="mt-3">
                 {tLocked("cta")}
               </Button>

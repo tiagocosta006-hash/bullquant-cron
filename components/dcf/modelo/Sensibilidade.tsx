@@ -180,7 +180,7 @@ export function SeparadorSensibilidade({ c }: { c: ContextoSeparador }) {
     c.onProbabilidade(nome, v)
   }
   const potencial = (v: number | null) => (v === null || preco <= 0 ? "N/A" : `${v >= preco ? "+" : ""}${pct(v / preco - 1)}`)
-  const corPot = (v: number | null) => (v !== null && v >= preco ? "text-bull" : "text-bear")
+  const corPot = (_v: number | null) => ""  // sem cores de veredicto
 
   return (
     <div className="glass space-y-6 rounded-xl px-5 py-4">

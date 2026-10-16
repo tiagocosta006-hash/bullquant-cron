@@ -151,7 +151,8 @@ export default async function LandingPage({
         "url": BRAND.siteUrl,
         "offers": {
           "@type": "Offer",
-          "price": "0",
+          "price": "10",
+          "billingIncrement": "P1M",
           "priceCurrency": "EUR"
         }
       },
@@ -179,7 +180,7 @@ export default async function LandingPage({
     {
       key: "dashboard",
       icon: LayoutDashboard,
-      href: "/register",
+      href: "/pricing",
       mock: (
         <DashboardReplica
           tabs={["sp500", "gainers", "marketCap"].map((k) => tDashboard(`tabs.${k}`))}
@@ -197,7 +198,7 @@ export default async function LandingPage({
     {
       key: "portfolio",
       icon: Briefcase,
-      href: "/register",
+      href: "/pricing",
       mock: (
         <PortfolioReplica
           labels={{
@@ -219,7 +220,7 @@ export default async function LandingPage({
     {
       key: "calendar",
       icon: CalendarDays,
-      href: "/register",
+      href: "/pricing",
       mock: (
         <CalendarReplica
           labels={{
@@ -237,7 +238,7 @@ export default async function LandingPage({
     {
       key: "explore",
       icon: SearchCode,
-      href: "/register",
+      href: "/pricing",
       mock: (
         <ExploreReplica
           heading={tExplore("sectorsTitle")}
@@ -295,7 +296,7 @@ export default async function LandingPage({
 
           <div className="hero-in mt-10 flex flex-col gap-3 sm:flex-row" style={heroDelay(0.28)}>
             <Link
-              href="/register"
+              href="/pricing"
               data-track="hero_register"
               className={cn(
                 buttonVariants({ size: "lg" }),
@@ -569,7 +570,7 @@ export default async function LandingPage({
               { value: 10, suffix: "", label: t("numbers.years") },
               { value: 500, suffix: "", label: t("numbers.companies") },
               { value: 40, suffix: "", label: t("numbers.quarters") },
-              { value: 0, suffix: " €", label: t("numbers.free") },
+              { value: 10, suffix: " €", label: t("numbers.free") },
             /* Sem Parallax: os counters lado a lado tinham amplitudes
                diferentes (20 vs 36), por isso derivavam uns em relação aos
                outros — o olho lê isso como desalinhamento, não como
@@ -608,44 +609,7 @@ export default async function LandingPage({
             </p>
           </Reveal>
 
-          <div className="mt-14 grid gap-5 md:grid-cols-2">
-            <Reveal>
-              <div className="h-full">
-                <LiquidGlass className="card-lift flex h-full flex-col rounded-3xl border-border p-7 shadow-[inset_0_1px_0_rgb(255_255_255/0.28),0_2px_10px_rgb(40_30_10/0.10)]">
-                  <div className="text-sm font-semibold text-muted-foreground">
-                    {t("pricing.free.name")}
-                  </div>
-                  <div className="mt-3 flex items-baseline gap-2">
-                    {/* O dourado saiu daqui e foi para o Pro: é o acento da
-                        marca e estava a destacar o plano que NÃO se quer
-                        vender. Grátis fica em tinta normal. */}
-                    <span className="nums text-5xl font-extrabold tracking-tight">
-                      {t("pricing.free.price")}
-                    </span>
-                    <span className="text-sm text-muted-foreground">{t("pricing.free.period")}</span>
-                  </div>
-                  <ul className="mt-6 flex-1 space-y-3">
-                    {(["f1", "f2", "f3", "f4", "f5"] as const).map((k) => (
-                      <li key={k} className="flex items-start gap-2.5 text-[15px] leading-relaxed">
-                        <Check className="mt-1 h-4 w-4 shrink-0 text-primary" strokeWidth={2.5} />
-                        {t(`pricing.free.${k}`)}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    href="/register"
-                    data-track="pricing_free"
-                    className={cn(
-                      buttonVariants({ size: "lg" }),
-                      "pressable mt-8 min-h-12 w-full text-base font-semibold",
-                    )}
-                  >
-                    {t("pricing.free.cta")}
-                  </Link>
-                </LiquidGlass>
-              </div>
-            </Reveal>
-
+          <div className="mx-auto mt-14 max-w-xl">
             <Reveal style={{ transitionDelay: "90ms" }}>
               <div className="h-full">
                 <LiquidGlass className="card-lift flex h-full flex-col rounded-3xl border-primary/40 p-7 shadow-[inset_0_1px_0_rgb(255_255_255/0.28),0_2px_10px_rgb(40_30_10/0.10)]">
@@ -681,7 +645,7 @@ export default async function LandingPage({
                     href="/pricing"
                     data-track="pricing_pro"
                     className={cn(
-                      buttonVariants({ size: "lg", variant: "outline" }),
+                      buttonVariants({ size: "lg" }),
                       "pressable mt-8 min-h-12 w-full text-base font-semibold",
                     )}
                   >
@@ -795,7 +759,7 @@ export default async function LandingPage({
           {/* título+subtítulo clicáveis: um único link em bloco (um só tab
               stop; heading dentro de link é HTML válido), hover subtil */}
           <Link
-            href="/register"
+            href="/pricing"
             data-track="footer_text_register"
             className="group mt-8 flex flex-col items-center"
           >
@@ -816,7 +780,7 @@ export default async function LandingPage({
           >
             <GrowCta>
               <Link
-                href="/register"
+                href="/pricing"
                 data-track="footer_register"
                 className={cn(
                   buttonVariants({ size: "lg" }),

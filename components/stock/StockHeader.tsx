@@ -88,7 +88,7 @@ export function StockHeader({ company, shareComponent, initialPriceData = null }
     // Anónimo: "Seguir" é o momento de maior intenção no header — manda
     // direto para a criação de conta em vez de ficar em no-op silencioso.
     if (isFollowing === null) {
-      router.push('/register')
+      router.push('/pricing')
       return
     }
 

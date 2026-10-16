@@ -12,7 +12,7 @@
     "titleAccent": "value investors.",
     "subtitle": "10 anos de fundamentais, uma calculadora DCF que se autopreenche, um Analista IA especializado, um novo método de encontrar e perceber empresas. Análise da equipa de gestão. E muito mais num só terminal.",
     "boot": "A ler os números",
-    "primaryCta": "Criar conta grátis",
+    "primaryCta": "Subscrever PRO",
     "secondaryCta": "Espreitar sem conta: AAPL",
     "peekCta": "Espreitar sem conta",
     "trust": "",
@@ -28,7 +28,7 @@
       },
       "ai": {
         "title": "Analista IA",
-        "desc": "Lê o 10-K oficial e devolve tese de investimento, moat e KPIs com citações à fonte. Podes perguntar-lhe o que quiseres. Nunca é conselho de investimento."
+        "desc": "Lê o 10-K oficial e devolve um resumo do negócio, moat e KPIs com citações à fonte. Podes perguntar-lhe o que quiseres. Nunca é conselho de investimento."
       }
     },
     "stats": {
@@ -36,11 +36,11 @@
       "yearsLabel": "de fundamentais por empresa",
       "companies": "500",
       "companiesLabel": "empresas do S&P 500",
-      "price": "0 €",
-      "priceLabel": "no plano gratuito"
+      "price": "10 €",
+      "priceLabel": "por mês"
     },
     "ctaTitle": "Começa a ver o valor que os outros não veem.",
-    "ctaSubtitle": "Cria a tua conta gratuita e analisa qualquer empresa do S&P 500 em segundos.",
+    "ctaSubtitle": "Subscreve o PRO e analisa qualquer empresa do S&P 500 em segundos.",
     "ticker": {
       "label": "Últimos fechos disponíveis · S&P 500",
       "labelLive": "Preços em direto · S&P 500"
@@ -49,7 +49,7 @@
       "caption": "Dez anos de fundamentais, DCF e Analista IA, num só terminal, sem folhas de cálculo.",
       "alt": "Demonstração do terminal BullValue",
       "caption2": "Preço em direto, watchlist e calendário de resultados, tudo a um clique de distância.",
-      "caption3": "Grátis, em português, pronto em menos de um minuto.",
+      "caption3": "Em português, pronto em menos de um minuto.",
       "updated": "Atualizado às {time}",
       "finRows": {
         "gross": "Bruta",
@@ -90,17 +90,17 @@
         "titleAccent": "realmente?",
         "desc": "A calculadora DCF autopreenche-se com os dados da empresa e recalcula em tempo real enquanto ajustas a WACC e o crescimento a curto e longo prazo.",
         "b1": "Autopreenchida com os fundamentais reais da empresa",
-        "b2": "Margem de segurança clara, acima ou abaixo do preço",
+        "b2": "Diferença clara, acima ou abaixo do preço",
         "b3": "Partilha os teus cenários, guarda-os e consulta-os mais tarde",
         "growth": "Crescimento anual (anos 1–5)",
         "wacc": "WACC",
         "terminal": "Crescimento terminal",
         "price": "Preço atual",
-        "fairValue": "Fair Value",
+        "fairValue": "Valor do cenário",
         "perShare": "por ação",
-        "margin": "Margem de segurança",
-        "undervalued": "Subavaliada",
-        "overvalued": "Sobreavaliada",
+        "margin": "Diferença face ao preço",
+        "undervalued": "Preço abaixo",
+        "overvalued": "Preço acima",
         "disclaimer": "Exemplo ilustrativo com uma empresa fictícia. Uma DCF depende das tuas premissas, não é conselho de investimento."
       },
       "ai": {
@@ -113,7 +113,7 @@
         "b3": "Pergunta o que quiseres, o Analista responde com contexto",
         "cardTitle": "Analista IA · Empresa exemplo",
         "chipLabel": "IA",
-        "thesisLabel": "Tese de investimento",
+        "thesisLabel": "Resumo do negócio",
         "thesis": "Líder de mercado com receitas recorrentes, margens em expansão e capital devolvido aos acionistas. Um compounder clássico a preço razoável.",
         "moatLabel": "Moat",
         "moatValue": "Moat largo",
@@ -170,42 +170,31 @@
       "years": "anos de fundamentais",
       "companies": "empresas",
       "quarters": "trimestres de dados",
-      "free": "no plano gratuito"
+      "free": "por mês no PRO"
     },
     "pricing": {
       "eyebrow": "Planos",
-      "title": "Começa grátis. A sério.",
-      "subtitle": "Sem cartão de crédito para começar. O plano gratuito é para sempre; o Pro desbloqueia os extras quando quiseres.",
-      "free": {
-        "name": "Grátis",
-        "price": "0 €",
-        "period": "para sempre",
-        "f1": "Apenas MAG 7 com fundamentais completos",
-        "f2": "10 anos de fundamentais visuais da MAG 7",
-        "f3": "Calculadora DCF com autopreenchimento e cenários guardados",
-        "f4": "3 créditos de IA por dia",
-        "f5": "Watchlist, calendário de resultados e insider trading",
-        "cta": "Criar conta grátis"
-      },
+      "title": "Um plano, todas as ferramentas.",
+      "subtitle": "Uma subscrição mensal com acesso a todas as empresas do S&P 500 e a todas as ferramentas. Pagas na Whop e cancelas quando quiseres.",
       "pro": {
         "name": "Pro",
-        "badge": "Mais popular",
+        "badge": "Acesso completo",
         "price": "10 €",
         "period": "por mês",
-        "f1": "Tudo o que está no plano grátis",
-        "f2": "8 créditos de IA por dia",
-        "f3": "Chat com o Analista IA sobre qualquer empresa",
+        "f1": "Fundamentais completos de todo o S&P 500",
+        "f2": "8 créditos de IA por dia, com chat do Analista IA sobre qualquer empresa",
+        "f3": "Calculadora DCF e modelo avançado com cenários, exportação e análises guardadas",
         "f4": "Múltiplos de avaliação históricos (P/E, P/S, EV/EBITDA)",
-        "f5": "Comunidade privada e apoio prioritário",
-        "cta": "Ver o que inclui o PRO",
-        "note": "7 dias grátis · exclusivo da comunidade"
+        "f5": "Explorar, comparador de empresas e calendário de resultados",
+        "cta": "Subscrever PRO",
+        "note": "Pagamento na Whop · cancelas quando quiseres"
       }
     },
     "about": {
       "eyebrow": "Bullocracy",
       "title": "Feito em Portugal, por investidores.",
       "p1": "A BullValue nasceu de uma frustração simples: não existia nenhuma plataforma séria de análise fundamental em português. Ferramentas ou eram caras, ou eram em inglês, ou eram ruído disfarçado de análise.",
-      "p2": "Somos a Bullocracy, uma equipa pequena que acredita que a literacia financeira portuguesa merece melhor do que dicas de rede social. Por isso o essencial é gratuito: dados da SEC, DCF a sério e zero conselhos de compra.",
+      "p2": "Somos a Bullocracy, uma equipa pequena que acredita que a literacia financeira portuguesa merece melhor do que dicas de rede social. Por isso o foco é o essencial: dados da SEC, DCF a sério e zero conselhos de compra.",
       "team": {
         "role1": "Co-Founder & Web Analyst",
         "role2": "Co-Founder & Product Owner",
@@ -214,18 +203,18 @@
     },
     "faq": {
       "title": "Perguntas frequentes",
-      "q1": "Qual é a diferença entre o plano Grátis e o Pro?",
-      "a1": "O plano Grátis inclui o acesso aos fundamentais completos das empresas MAG 7, à calculadora DCF (com cenários guardados), ao Analista IA com 3 créditos de IA por dia, às listas temáticas, à watchlist sem limite, ao calendário de resultados e ao insider trading. O plano Pro desbloqueia o acesso a todo o S&P 500 (500 empresas), além de incluir 8 créditos de IA por dia, o chat com o Analista IA sobre qualquer empresa, os múltiplos de avaliação históricos, a comunidade privada e o apoio prioritário. Cada ação gasta créditos consoante o trabalho que dá: um resumo de empresa ou um perfil de gestão custam 1 crédito, uma análise completa do Analista custa 3 e cada mensagem no chat custa 4. Tudo o que já foi gerado fica em cache e pode ser consultado à vontade — os créditos só contam quando há uma análise nova a ser escrita.",
+      "q1": "O que inclui a subscrição PRO?",
+      "a1": "O PRO dá acesso aos fundamentais completos de todo o S&P 500 (500 empresas), à calculadora DCF e ao modelo avançado (cenários, exportação para PDF e Excel, versões guardadas), ao Analista IA com 8 créditos de IA por dia e chat sobre qualquer empresa, aos múltiplos de avaliação históricos, às listas temáticas, ao Explorar, ao comparador, ao calendário de resultados e ao insider trading. Cada ação de IA gasta créditos consoante o trabalho que dá: um resumo de empresa ou um perfil de gestão custam 1 crédito, uma análise completa do Analista custa 3 e cada mensagem no chat custa 4. Tudo o que já foi gerado fica em cache e pode ser consultado à vontade.",
       "q2": "Isto é aconselhamento financeiro?",
       "a2": "Não. A BullValue é uma ferramenta de análise e educação. Nenhum valor, métrica ou insight constitui recomendação de compra ou venda. As decisões são sempre tuas.",
       "q3": "Que empresas estão disponíveis?",
       "a3": "As 500 empresas do S&P 500. A cobertura de empresas europeias (incluindo a Euronext Lisboa) está no roadmap.",
       "q4": "Com que frequência os dados são atualizados?",
       "a4": "Os preços das ações e os relatórios financeiros são atualizados diariamente, com as métricas essenciais e os gráficos a serem processados pouco tempo após a publicação oficial por parte das empresas.",
-      "q5": "Como se ganha acesso ao Pro?",
-      "a5": "Sim. O Pro é obtido através da comunidade privada na Whop e inclui 7 dias grátis — cancelas lá quando quiseres, sem penalização. Depois entras no thebullvalue.com com o mesmo email da subscrição."
+      "q5": "Como subscrevo?",
+      "a5": "Em Preços carregas em Subscrever PRO e pagas na Whop. Depois crias a conta em thebullvalue.com com o mesmo e-mail da compra (ou entras, se já tens conta) e o acesso PRO é ativado automaticamente. Cancelas na Whop quando quiseres."
     },
-    "floatingNote": "0 € · sem cartão",
+    "floatingNote": "10 € por mês · cancelas quando quiseres",
     "mission": {
       "badge": "A Missão",
       "title": "Democratizar o acesso a dados financeiros.",
@@ -308,7 +297,7 @@
       "dashboard": "Visão geral, atalhos e exploração de empresas",
       "portfolio": "As tuas posições reais e o seu desempenho ao vivo",
       "calendar": "Próximos relatórios de ganhos das empresas americanas",
-      "dcf": "Avalia o preço justo de qualquer ação usando fluxos de caixa",
+      "dcf": "Calcula o valor de um cenário para qualquer ação, a partir de fluxos de caixa e dos teus pressupostos",
       "transcripts": "Lê as reuniões com investidores na íntegra",
       "explore": "Encontra e explora empresas organizadas por tipo de negócio",
       "watchlist": "As empresas que estás só a observar, sem posição"
@@ -332,13 +321,13 @@
     "submitButton": "Entrar",
     "submitLoading": "A entrar...",
     "noAccount": "Não tens conta?",
-    "registerLink": "Regista-te grátis",
+    "registerLink": "Já subscreveste? Cria a conta",
     "devLoginButton": "Entrar como dev (local)",
     "devLoginLoading": "A entrar..."
   },
   "register": {
     "title": "Criar Conta",
-    "subtitle": "Junta-te a milhares de investidores no BullValue.",
+    "subtitle": "Cria a conta com o mesmo e-mail da subscrição PRO para ativar o acesso.",
     "nameLabel": "Nome",
     "namePlaceholder": "O teu nome",
     "emailLabel": "Email",
@@ -351,7 +340,7 @@
     "confirmPasswordLabel": "Confirmar Password",
     "passwordMismatch": "As passwords não coincidem.",
     "emailInUse": "Este email já está registado.",
-    "consentText": "Declaro que tenho mais de 16 anos e concordo com os <terms>Termos</terms> e a <privacy>Política de Privacidade</privacy>."
+    "consentText": "Declaro que tenho 18 anos ou mais e concordo com os <terms>Termos</terms> e a <privacy>Política de Privacidade</privacy>."
   },
   "forgotPassword": {
     "title": "Recuperar Password",
@@ -383,12 +372,12 @@
     "dcf": "DCF",
     "calendar": "Calendário",
     "theme": "Alternar tema",
-    "startFree": "Começar grátis",
+    "startFree": "Subscrever PRO",
     "about": "Quem somos",
     "menuTitle": "Menu",
     "openMenu": "Abrir menu",
     "peek": "Espreitar sem conta",
-    "createAccount": "Criar conta"
+    "createAccount": "Subscrever PRO"
   },
   "search": {
     "placeholder": "Pesquisar ticker (ex: AAPL)...",
@@ -400,7 +389,7 @@
   "settings": {
     "title": "Configurações",
     "subtitle": "Gere o teu perfil, preferências e subscrição num só lugar.",
-    "planFree": "Plano Gratuito",
+    "planFree": "Sem subscrição",
     "saveSuccess": "Perfil atualizado com sucesso!",
     "tabs": {
       "profile": "Perfil",
@@ -423,7 +412,7 @@
       "changePasswordBtn": "Alterar Password",
       "passwordSuccess": "Password atualizada com sucesso!",
       "deleteAccountTitle": "Apagar Conta Definitivamente",
-      "deleteAccountDesc": "Esta ação é irreversível. Todos os teus dados, portfólios e avaliações serão apagados para sempre.",
+      "deleteAccountDesc": "Esta ação é irreversível. Todos os teus dados, portfólios e avaliações serão apagados para sempre. Atenção: apagar a conta não cancela a subscrição na Whop — cancela-a primeiro lá, para não continuares a ser cobrado.",
       "deleteAccountBtn": "Apagar Conta",
       "deleteAccountConfirmLabel": "Escreve APAGAR para confirmar",
       "deleteAccountCancel": "Cancelar",
@@ -431,7 +420,8 @@
       "changeEmailTitle": "Alterar Email",
       "newEmail": "Novo Email",
       "confirmEmailChangeBtn": "Confirmar Alteração",
-      "emailChangeSuccess": "Foi enviado um email de confirmação para o novo e o antigo endereço. Verifica as caixas de correio."
+      "emailChangeSuccess": "Foi enviado um email de confirmação para o novo e o antigo endereço. Verifica as caixas de correio.",
+      "exportData": "Exportar os meus dados (JSON)"
     },
     "preferences": {
       "title": "Preferências de Utilização",
@@ -444,33 +434,11 @@
     },
     "subscription": {
       "title": "O Teu Plano Atual",
-      "desc": "Estás atualmente no plano gratuito. Tens acesso ilimitado a cotações, mas o número de análises de IA e DCF diárias é limitado.",
-      "premiumSoonTitle": "Acesso Premium em Breve",
-      "premiumSoonDesc": "Estamos a preparar funcionalidades avançadas de inteligência artificial exclusivas para subscritores PRO.",
-      "upgradeBtn": "Fazer Upgrade para PRO",
+      "desc": "Ainda não tens uma subscrição PRO ativa. Subscreve para aceder a todas as funcionalidades da plataforma.",
+      "upgradeBtn": "Subscrever PRO",
       "aiUsageLabel": "Análises de IA hoje",
-      "compare": {
-        "title": "Free vs PRO",
-        "free": "Free",
-        "pro": "PRO",
-        "priceLabel": "Preço",
-        "priceFree": "0 €",
-        "pricePro": "10 €/mês",
-        "priceNote": "Preço provisório — o valor final será anunciado no lançamento.",
-        "quotesLabel": "Cotações e 10 anos de fundamentais",
-        "aiLabel": "Análises de IA",
-        "aiFree": "{limit}/dia",
-        "aiPro": "Ilimitadas",
-        "kpisLabel": "KPIs de negócio (IA profunda)",
-        "pdfLabel": "Relatórios PDF PRO"
-      },
-      "beta": {
-        "title": "Modo beta",
-        "desc": "Durante a beta podes alternar entre Free e PRO sem pagamento, para testares todas as funcionalidades.",
-        "toPro": "Ativar PRO (beta)",
-        "toFree": "Voltar ao plano Free",
-        "error": "Não foi possível alterar o plano. Tenta novamente."
-      }
+      "paidOnWhop": "Pagamento e faturação na Whop · cancelas quando quiseres · 14 dias de livre resolução.",
+      "managedOnWhop": "Tens acesso completo às funcionalidades PRO. A subscrição é gerida na Whop: é lá que alteras o pagamento ou cancelas. Para resolver o contrato nos primeiros 14 dias usa a página Retratação."
     }
   },
   "portfolio": {
@@ -494,7 +462,7 @@
       "title": "BullValue",
       "description": "Pesquisa pelo ticker de uma empresa na barra superior para começar ou regista-te para acederes à tua Watchlist.",
       "testExample": "Testar Exemplo",
-      "createAccount": "Criar Conta Grátis"
+      "createAccount": "Subscrever PRO"
     },
     "card": {
       "currentPrice": "Preço Atual",
@@ -656,8 +624,8 @@
       "openCalculator": "Abrir Calculadora",
       "noAnalyses": "Ainda não guardaste nenhuma avaliação DCF para esta empresa.",
       "savedAt": "Guardado a",
-      "fairValue": "Preço Justo",
-      "mos": "Margem de Segurança",
+      "fairValue": "Valor do cenário",
+      "mos": "face ao preço",
       "growth": "Crescimento (1-5a)",
       "termGrowth": "Cresc. Terminal"
     },
@@ -721,9 +689,9 @@
       "descGeneric": "Esta funcionalidade é exclusiva para contas Pro. Desbloqueia o teu potencial de análise.",
       "upgradeCta": "Passar a Pro",
       "guestTitle": "Cria uma conta para aceder",
-      "guestDesc": "Regista-te grátis para desbloquear os gráficos de valuation histórico da {ticker} e ver se negoceia com prémio ou desconto face às médias.",
-      "guestDescGeneric": "Regista-te grátis e passa a Pro para acederes a ferramentas exclusivas de investimento.",
-      "guestCta": "Criar conta grátis"
+      "guestDesc": "Subscreve o PRO para desbloqueares os gráficos de valuation histórico da {ticker} e veres se negoceia com prémio ou desconto face às médias.",
+      "guestDescGeneric": "Subscreve o PRO para acederes a todas as ferramentas de análise.",
+      "guestCta": "Subscrever PRO"
     },
     "valuationChart": {
       "title": "Valuation Histórico",
@@ -805,7 +773,7 @@
     "analysts": {
       "title": "Consenso dos analistas",
       "subtitle": "{n} analistas a cobrir a empresa",
-      "targetTitle": "Preço-alvo (12 meses)",
+      "targetTitle": "Preço-alvo de terceiros (12 meses)",
       "upside": "Potencial",
       "low": "Mín.",
       "median": "Mediana",
@@ -813,17 +781,17 @@
       "currentPrice": "Preço atual",
       "targetsLastYear": "{n} preços-alvo publicados no último ano",
       "singleTarget": "Apenas um preço-alvo publicado — pouco representativo",
-      "ratingsTitle": "Recomendações",
-      "buy": "Comprar",
-      "hold": "Manter",
-      "sell": "Vender",
+      "ratingsTitle": "Recomendações de terceiros",
+      "buy": "Positiva",
+      "hold": "Neutra",
+      "sell": "Negativa",
       "history": "Evolução nos últimos 12 meses",
       "consensus": {
-        "STRONG_BUY": "Compra forte",
-        "BUY": "Comprar",
-        "HOLD": "Manter",
-        "SELL": "Vender",
-        "STRONG_SELL": "Venda forte"
+        "STRONG_BUY": "Muito positivo",
+        "BUY": "Positivo",
+        "HOLD": "Neutro",
+        "SELL": "Negativo",
+        "STRONG_SELL": "Muito negativo"
       },
       "disclaimer": "Recomendações e preços-alvo de analistas de terceiros, agregados de um fornecedor de dados. Não são produzidos nem subscritos pela BullValue, podem estar desatualizados e não constituem recomendação da BullValue nem aconselhamento de investimento.",
       "estimate": "Estimativa",
@@ -833,7 +801,7 @@
   "analista": {
     "title": "Analista IA",
     "badge": "IA · com fontes",
-    "thesisLabel": "Tese de investimento",
+    "thesisLabel": "Resumo do negócio",
     "moatLabel": "Moat",
     "source": "Fonte: {label}",
     "generateTitle": "Análise de {ticker} pelo Analista IA",
@@ -847,7 +815,7 @@
     "needsAuthTitle": "Sessão expirada",
     "needsAuthDesc": "A tua sessão expirou. Inicia sessão outra vez para gerar a análise.",
     "login": "Iniciar sessão",
-    "registerCta": "Criar conta grátis",
+    "registerCta": "Subscrever PRO",
     "viewSource": "Ver citação na fonte",
     "sourceTitle": "Fonte da citação",
     "sourceDesc": "Abaixo está a citação exata de onde a IA tirou:",
@@ -875,8 +843,8 @@
       "proDesc": "Passa a Pro para conversar com o Analista IA e fazer perguntas de seguimento sobre a empresa e o 10-K.",
       "upgradeCta": "Passar a Pro",
       "guestTitle": "Chat exclusivo para contas Pro",
-      "guestDesc": "Cria uma conta grátis e passa a Pro para conversar com o Analista IA sobre esta empresa.",
-      "guestCta": "Criar conta grátis",
+      "guestDesc": "Subscreve o PRO para conversares com o Analista IA sobre esta empresa.",
+      "guestCta": "Subscrever PRO",
       "error": "Ocorreu um erro. Tenta novamente.",
       "suggestions": [
         "Explica-me o negócio em 30 segundos",
@@ -938,11 +906,11 @@
     "terminalGrowth": "Crescimento Perpétuo",
     "terminalGrowthHint": "Crescimento a longo prazo após o ano 10 (tipicamente ≤ inflação).",
     "reverseDcf": "Calcular Crescimento Implícito (Reverse DCF)",
-    "fairValue": "Valor Justo",
+    "fairValue": "Valor do cenário",
     "currentPrice": "Preço Atual",
-    "marginOfSafety": "Margem de Segurança",
-    "undervalued": "Potencialmente subavaliada face ao valor justo estimado.",
-    "overvalued": "Potencialmente sobreavaliada face ao valor justo estimado.",
+    "marginOfSafety": "Diferença face ao preço",
+    "undervalued": "Preço abaixo do valor do cenário.",
+    "overvalued": "Preço acima do valor do cenário.",
     "enterpriseValue": "Enterprise Value",
     "equityValue": "Valor do Capital Próprio",
     "terminalValuePv": "Valor Terminal (VP)",
@@ -964,15 +932,16 @@
     "exportImage": "Partilhar imagem",
     "demoLocked": {
       "badge": "Demo",
-      "tooltip": "Na demo só podes analisar a Apple (AAPL). Cria uma conta grátis para analisares qualquer empresa.",
+      "tooltip": "Na demo só podes analisar a Apple (AAPL). Subscreve o PRO para analisares qualquer empresa.",
       "placeholder": "Só Apple (AAPL) na demo",
       "hint": "Estás a ver a demo, trancada à Apple.",
-      "cta": "Criar conta grátis",
+      "cta": "Subscrever PRO",
       "saveTitle": "Guarda os teus cenários DCF",
-      "saveDesc": "Cria uma conta grátis para guardares e revisitares as tuas análises DCF."
+      "saveDesc": "Subscreve o PRO para guardares e revisitares as tuas análises DCF."
     },
     "resultNote": "Resultado do modelo com os pressupostos indicados. Não é uma previsão, um preço-alvo nem uma recomendação, e é muito sensível à taxa de desconto e ao crescimento terminal. Não tem em conta a tua situação pessoal.",
-    "sharedNotice": "Análise elaborada por um utilizador com os pressupostos dele. Não foi criada, revista nem subscrita pela BullValue e não é recomendação de investimento."
+    "sharedNotice": "Análise elaborada por um utilizador com os pressupostos dele. Não foi criada, revista nem subscrita pela BullValue e não é recomendação de investimento.",
+    "reportContent": "Denunciar este conteúdo"
   },
   "financials": {
     "engineTitle": "Motor de Decisão & Financeiras",
@@ -1208,9 +1177,9 @@
     "filters": {
       "title": "Critérios",
       "guruStrategies": "Grandes Investidores",
-      "moatCompounders": "Warren Buffett",
+      "moatCompounders": "Compounders (moat)",
       "moatTooltip": "Filtro de Fosso Competitivo: Margem Bruta > 40% e ROIC > 15%.",
-      "magicFormula": "Joel Greenblatt (Teste)",
+      "magicFormula": "Fórmula mágica (teste)",
       "magicTooltip": "Filtro de Eficiência: ROIC elevado ignorando as margens absolutas.",
       "sector": "Setor",
       "sectorPlaceholder": "Todos os Setores",
@@ -1243,55 +1212,53 @@
     "pricing": "Preços",
     "about": "Sobre Nós",
     "directory": "Diretório de Ações",
-    "legalNotice": "A BullValue é uma ferramenta de análise e de educação financeira. Não presta serviços de investimento e nada neste sítio é aconselhamento, recomendação personalizada ou convite a comprar, vender ou deter instrumentos financeiros. Investir envolve risco, incluindo a perda total do capital. A rendibilidade passada não garante rendibilidade futura. Os dados de terceiros podem conter erros ou atrasos."
+    "legalNotice": "A BullValue é uma ferramenta de análise e de educação financeira. Não presta serviços de investimento e nada neste sítio é aconselhamento, recomendação personalizada ou convite a comprar, vender ou deter instrumentos financeiros. Investir envolve risco, incluindo a perda total do capital. A rendibilidade passada não garante rendibilidade futura. Os dados de terceiros podem conter erros ou atrasos.",
+    "cookies": "Cookies",
+    "cookieSettings": "Definições de cookies",
+    "withdrawal": "Retratação",
+    "legal": "Aviso legal",
+    "complaintsBook": "Livro de Reclamações",
+    "legalNav": "Documentos legais"
   },
   "cookieConsent": {
-    "text": "Usamos cookies essenciais para o sítio funcionar. Com o teu consentimento, usamos também cookies de estatística (Google Analytics) e de marketing (Meta Pixel). Podes recusar sem perder acesso.",
-    "accept": "Aceitar Tudo",
-    "decline": "Recusar"
+    "titulo": "Preferências de cookies",
+    "text": "Usamos cookies essenciais para o sítio funcionar. Com o seu consentimento, usamos também cookies de estatística (Google Analytics) e de marketing (Meta Pixel). Pode recusar sem perder acesso e mudar de ideias quando quiser, nas Definições de cookies no rodapé.",
+    "politica": "Política de Cookies",
+    "essenciais": "Essenciais",
+    "essenciaisDesc": "Sessão, idioma e esta escolha. Sempre ativos.",
+    "estatistica": "Estatística",
+    "estatisticaDesc": "Google Analytics: como o sítio é usado, para o melhorar.",
+    "marketing": "Marketing",
+    "marketingDesc": "Meta Pixel: medir campanhas e anúncios noutras plataformas.",
+    "personalizar": "Personalizar",
+    "guardarEscolha": "Guardar a minha escolha",
+    "accept": "Aceitar tudo",
+    "decline": "Recusar não essenciais"
   },
   "pricing": {
     "badge": "Simples e transparente",
     "title": "Investe com mais confiança.",
-    "subtitle": "Começa gratuitamente. Nesta fase o plano PRO é exclusivo da comunidade privada e inclui 7 dias grátis.",
-    "monthly": "Mês",
-    "free": {
-      "name": "Gratuito",
-      "price": "€0",
-      "period": "para sempre",
-      "description": "Tudo o que precisas para começar a analisar empresas.",
-      "cta": "Criar conta grátis"
-    },
+    "subtitle": "Uma subscrição mensal com acesso a todas as empresas do S&P 500 e a todas as ferramentas. Pagas na Whop e cancelas quando quiseres.",
     "pro": {
       "name": "PRO",
       "price": "€10",
       "period": "por mês",
-      "description": "Para o investidor sério que quer ir mais fundo na análise.",
-      "cta": "Ver o que inclui o PRO",
-      "badge": "Mais popular",
-      "accessNote": "Nesta fase o PRO é exclusivo da comunidade privada e inclui 7 dias grátis. Quem já é membro entra com o mesmo email da subscrição.",
-      "note": "7 dias grátis · exclusivo da comunidade",
-      "communityLink": "Ver a comunidade"
+      "description": "Para quem quer ir mais fundo na análise de empresas.",
+      "cta": "Subscrever PRO",
+      "badge": "Acesso completo",
+      "accessNote": "Depois de pagar na Whop, cria a conta em thebullvalue.com com o mesmo e-mail da compra (ou entra, se já tens conta): o acesso PRO é ativado automaticamente.",
+      "note": "Pagamento na Whop · cancelas quando quiseres"
     },
     "features": {
       "title": "O que está incluído",
-      "free": [
-        "Gestão de Portfólio",
-        "WatchList Pessoal",
-        "Fundamentais MAG 7",
-        "Notícias do Mercado",
-        "Calculadora de Juro Composto",
-        "Dados Macro (Briefing)"
-      ],
       "pro": [
-        "Tudo do plano Gratuito",
-        "Fundamentais de todas as empresas",
+        "Fundamentais de todo o S&P 500",
         "Analista IA & Perfil da Empresa",
-        "Calculadora DCF (Valuation)",
-        "Ferramenta Explorar & Screener",
+        "Calculadora DCF e modelo avançado (cenários, PDF e Excel)",
+        "Explorar & Screener",
         "Comparador de Empresas",
         "Calendário de Resultados",
-        "Apoio prioritário 24/7 por email"
+        "Apoio por e-mail"
       ]
     },
     "faq": {
@@ -1299,27 +1266,42 @@
       "items": [
         {
           "q": "Posso cancelar a qualquer momento?",
-          "a": "Sim, sem qualquer penalização. Cancelas na Whop e o acesso PRO mantém-se até ao fim do período pago, revertendo depois para o plano gratuito."
+          "a": "Sim, sem penalização. Cancelas na Whop e o acesso PRO mantém-se até ao fim do período pago; depois a conta deixa de ter acesso às funcionalidades PRO."
         },
         {
-          "q": "Existe um período experimental?",
-          "a": "Sim. O plano PRO da comunidade inclui 7 dias grátis. Cancelas na Whop antes de terminarem e não pagas nada."
+          "q": "Posso desistir depois de subscrever?",
+          "a": "Sim. Tens 14 dias para resolver o contrato sem indicar motivo (livre resolução). Se pediste o início imediato do serviço, pagas apenas o valor proporcional ao que usaste. Faz o pedido na página Retratação."
         },
         {
           "q": "Quem processa os pagamentos?",
-          "a": "A Whop, que aloja a comunidade privada e trata da subscrição, da faturação e dos impostos. Nós nunca vemos nem guardamos dados de pagamento."
+          "a": "A Whop, que trata do pagamento, da faturação e dos impostos aplicáveis. Nós nunca vemos nem guardamos dados de cartão."
         },
         {
           "q": "A subscrição renova automaticamente?",
-          "a": "Sim, segue as condições da tua subscrição na Whop — é lá que a gere e a cancela, a qualquer momento."
+          "a": "Sim: renova todos os meses até cancelares. Geres e cancelas na tua conta Whop, a qualquer momento."
         },
         {
           "q": "Os meus dados financeiros estão seguros?",
           "a": "Nunca guardamos dados de cartão. Toda a informação de pagamento é gerida pela Whop; o thebullvalue.com só recebe a confirmação de que a tua subscrição está ativa."
+        },
+        {
+          "q": "Isto é aconselhamento financeiro?",
+          "a": "Não. A BullValue é uma ferramenta de análise e de educação financeira: não presta serviços de investimento nem faz recomendações personalizadas. As decisões são sempre tuas."
         }
       ]
     },
-    "trust": "7 dias grátis · Cancela quando quiseres · Subscrição gerida na Whop"
+    "trust": "Cancela quando quiseres · Pago e gerido na Whop · Livre resolução em 14 dias",
+    "consent": {
+      "terms": "Li e aceito os <terms>Termos de Serviço</terms> e a <privacy>Política de Privacidade</privacy> e tenho 18 anos ou mais.",
+      "immediate": "Peço expressamente o início imediato do serviço e sei que, se resolver o contrato nos 14 dias de livre resolução, pagarei o valor proporcional ao serviço já prestado.",
+      "billing": "10 € por mês. Renova automaticamente todos os meses até cancelares, a qualquer momento, na tua conta Whop. Os impostos aplicáveis são calculados e mostrados no pagamento, antes de confirmares.",
+      "checkout": "Subscrever PRO na Whop",
+      "missing": "Marca as duas caixas para continuar.",
+      "unavailable": "A subscrição está temporariamente indisponível. Escreve-nos para {email}.",
+      "haveAccount": "Já subscreveste?",
+      "createAccount": "Cria a tua conta com o mesmo e-mail",
+      "withdrawalLink": "Direito de livre resolução (14 dias)"
+    }
   },
   "explore": {
     "title": "Explorar Negócios",
@@ -1790,10 +1772,10 @@
       "consensoAjuda": "Anos 1 a 3 do consenso dos analistas, depois converge em linha reta até ao último ano."
     },
     "avaliacao": {
-      "valorPorAcao": "Implied share price",
+      "valorPorAcao": "Scenario value per share",
       "preco": "Current share price",
-      "potencial": "Upside / downside",
-      "margemSeguranca": "Margin of safety",
+      "potencial": "Value vs price",
+      "margemSeguranca": "Gap to price",
       "wacc": "WACC",
       "waccManualUsada": "WACC (manual)",
       "custoCapital": "Cost of equity",
@@ -2077,7 +2059,7 @@
       "refRange": "10Y range {min} to {max}",
       "futureMetric": "Future {m} (Y{n})",
       "futurePrice": "Future price (Y{n})",
-      "fairValue": "Fair value",
+      "fairValue": "Scenario value",
       "upside": "Upside / downside",
       "expectedCagr": "Expected CAGR",
       "chartTitle": "{m}: history and scenarios",

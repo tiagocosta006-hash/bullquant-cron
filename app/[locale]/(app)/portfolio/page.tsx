@@ -222,7 +222,7 @@ export default function Home() {
             {t('landing.testExample')}
           </Link>
           <Link
-            href="/register"
+            href="/pricing"
             className="w-full sm:w-auto px-6 py-3 rounded-xl bg-primary text-primary-foreground hover:opacity-90 font-semibold transition-opacity"
           >
             {t('landing.createAccount')}

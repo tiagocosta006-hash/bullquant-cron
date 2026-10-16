@@ -131,7 +131,7 @@ export async function updateSession(request: NextRequest) {
   // NODE_ENV: num build de produção é sempre false.
   if (!user && isGuestOnlyRoute && !isDevUnlocked()) {
     const url = request.nextUrl.clone()
-    url.pathname = '/register'
+    url.pathname = '/pricing'
     return NextResponse.redirect(url)
   }
 

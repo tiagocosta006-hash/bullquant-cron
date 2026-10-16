@@ -7,6 +7,7 @@ import { getUser } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { isPulseAdmin } from "@/lib/pulse/server";
 import { getTranslations } from "next-intl/server";
+import { LegalFooterLinks } from "@/components/legal/LegalFooterLinks";
 
 /**
  * Terminal — navegação ÚNICA: pill Liquid Glass flutuante no topo
@@ -61,7 +62,10 @@ export default async function AppLayout({
       />
       <main className="mx-auto w-full max-w-7xl px-4 pb-28 pt-24 md:px-6 md:pb-12">
         {children}
-        <p className="mt-12 border-t border-border/40 pt-4 text-xs leading-relaxed text-muted-foreground/80">{tFooter("legalNotice")}</p>
+        <div className="mt-12 space-y-3 border-t border-border/40 pt-4">
+          <LegalFooterLinks compacto />
+          <p className="text-xs leading-relaxed text-muted-foreground/80">{tFooter("legalNotice")}</p>
+        </div>
       </main>
       <MobileDock />
     </div>

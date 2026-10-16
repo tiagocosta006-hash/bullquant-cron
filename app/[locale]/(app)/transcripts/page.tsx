@@ -1,9 +1,11 @@
+import { exigirPlanoProNaPagina } from "@/lib/api/planoPro"
 import { getTranslations } from "next-intl/server";
 import { MessageSquareText } from "lucide-react";
 import { TranscriptsPlaceholder } from "@/components/stock/TranscriptsPlaceholder";
 import { PageHeader } from "@/components/layout/PageHeader";
 
 export default async function TranscriptsPage() {
+  await exigirPlanoProNaPagina()
   const t = await getTranslations("transcripts");
 
   return (

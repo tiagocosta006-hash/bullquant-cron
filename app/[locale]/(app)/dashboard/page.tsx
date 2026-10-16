@@ -1,3 +1,4 @@
+import { exigirPlanoProNaPagina } from "@/lib/api/planoPro"
 import { redirect } from 'next/navigation';
 import { getUser } from "@/lib/supabase/server";
 import { isDevUnlocked } from "@/lib/devAccess";
@@ -20,6 +21,7 @@ export default async function DashboardPage({
 }: {
   searchParams: Promise<{ tab?: string; sector?: string }>;
 }) {
+  await exigirPlanoProNaPagina()
   const user = await getUser();
 
   // DEV_UNLOCK_PRO desbloqueia esta página em dev sem login real (ver

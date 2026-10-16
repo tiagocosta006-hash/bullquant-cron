@@ -121,7 +121,7 @@ export async function Header() {
                   {t('login')}
                 </Link>
                 <Link
-                  href="/register"
+                  href="/pricing"
                   data-track="header_register"
                   className={cn(
                     buttonVariants(),

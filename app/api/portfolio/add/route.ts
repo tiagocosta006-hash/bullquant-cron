@@ -1,3 +1,4 @@
+import { exigirPro } from "@/lib/api/acessoPro"
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { createClient } from "@/lib/supabase/server"
@@ -19,6 +20,8 @@ const addPortfolioSchema = z.object({
 })
 
 export async function POST(request: Request) {
+  const acessoPro = await exigirPro()
+  if (!acessoPro.ok) return acessoPro.resposta
   try {
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()

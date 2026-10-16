@@ -229,7 +229,7 @@ export function SavedAnalyses({ ticker, currency, current, canSave, onLoad }: Sa
                   <p className="text-xs text-muted-foreground tabular-nums mt-1">
                     {t("saved.fairValueShort")} {formatPrice(a.fairValue, currency)}
                     {a.marginOfSafety != null && (
-                      <span className={cn("ml-2 font-medium", under ? "text-bull" : "text-bear")}>
+                      <span className="ml-2 font-medium">
                         {under ? "+" : ""}
                         {formatPercent(a.marginOfSafety)}
                       </span>

@@ -1,3 +1,4 @@
+import { exigirPro } from "@/lib/api/acessoPro"
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { createClient } from "@/lib/supabase/server"
@@ -18,6 +19,8 @@ import { fetchTrading212Transactions, Trading212ApiError } from "@/lib/broker/tr
  * apanhar páginas sobrepostas não duplica nada.
  */
 export async function POST() {
+  const acessoPro = await exigirPro()
+  if (!acessoPro.ok) return acessoPro.resposta
   const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {

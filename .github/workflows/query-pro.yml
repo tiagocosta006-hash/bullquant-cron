@@ -1,0 +1,47 @@
+name: Query PRO Users
+
+on:
+  workflow_dispatch:
+
+jobs:
+  query:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DB: ${{ secrets.DIRECT_URL }}
+    steps:
+      - name: Query PRO Users
+        run: |
+          echo "=== DATABASE HOST INFO ==="
+          psql "$DB" -v ON_ERROR_STOP=1 -P pager=off -c "SELECT current_database(), inet_server_addr(), version();"
+
+          echo "=== TOTAL USERS ==="
+          psql "$DB" -v ON_ERROR_STOP=1 -P pager=off -c "SELECT count(*) AS total_public_users FROM public.users;"
+          psql "$DB" -v ON_ERROR_STOP=1 -P pager=off -c "SELECT count(*) AS total_auth_users FROM auth.users;"
+
+          echo "=== PRO USERS IN PUBLIC.USERS ==="
+          psql "$DB" -v ON_ERROR_STOP=1 -P pager=off -c "
+            SELECT id, email, name, plan, \"whopStatus\", \"whopMembershipId\", \"paddleStatus\", \"createdAt\", \"updatedAt\"
+            FROM public.users
+            WHERE plan = 'PRO' OR \"whopStatus\" IS NOT NULL OR \"paddleStatus\" IS NOT NULL
+            ORDER BY \"createdAt\" DESC;
+          "
+
+          echo "=== ALL USERS IN PUBLIC.USERS ==="
+          psql "$DB" -v ON_ERROR_STOP=1 -P pager=off -c "
+            SELECT id, email, name, plan, \"whopStatus\", \"createdAt\"
+            FROM public.users
+            ORDER BY \"createdAt\" DESC;
+          "
+
+          echo "=== ALL USERS IN AUTH.USERS ==="
+          psql "$DB" -v ON_ERROR_STOP=1 -P pager=off -c "
+            SELECT id, email, email_confirmed_at, created_at, last_sign_in_at
+            FROM auth.users
+            ORDER BY created_at DESC;
+          "
+
+          echo "=== WHOP PENDING MEMBERSHIPS ==="
+          psql "$DB" -v ON_ERROR_STOP=1 -P pager=off -c "
+            SELECT * FROM public.whop_pending_memberships;
+          " || echo "whop_pending_memberships not found or empty"

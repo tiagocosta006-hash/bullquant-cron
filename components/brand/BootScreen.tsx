@@ -16,11 +16,10 @@ import { BullMarkAnimated } from "@/components/brand/BullMarkAnimated";
  *    o script falhar, a cortina sobe na mesma. Uma cortina dependente de JS é
  *    uma forma de partir o site inteiro.
  *
- * 3. APARECE EM TODOS OS REFRESHES (decisão do Alex). Por isso a coreografia é
- *    curta — ~1,15s do início ao fim — para não custar retenção. Se um dia
- *    quiseres voltar a limitá-la à primeira visita da sessão, o gancho já
- *    existe: o `html[data-booted]` em globals.css continua a funcionar, basta
- *    repor o script inline no <head> do layout raiz.
+ * 3. SÓ NA PRIMEIRA PÁGINA DE CADA SESSÃO (27/10/2026). Antes aparecia em
+ *    todos os refreshes; numa landing de vendas eram ~1,2 s em branco antes
+ *    do vídeo do produto, a cada visita. O script inline no <head> do layout
+ *    raiz põe `html[data-booted]` a partir da 2.ª página e o CSS esconde-a.
  *
  * 4. Sem texto. O logo a construir-se já diz o que é preciso.
  */

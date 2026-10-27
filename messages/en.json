@@ -12,7 +12,7 @@
     "titleAccent": "others miss.",
     "subtitle": "10 years of fundamentals, a DCF calculator that autofills, and an AI Analyst, free. Serious analysis for long-term investors.",
     "boot": "Reading the numbers",
-    "primaryCta": "Subscribe to PRO",
+    "primaryCta": "Get started",
     "secondaryCta": "Peek without an account: AAPL",
     "trust": "S&P 500 coverage · SEC EDGAR data · Cancel anytime",
     "signature": "Built by three Portuguese.",
@@ -431,13 +431,13 @@
     "dcf": "DCF",
     "calendar": "Calendar",
     "theme": "Toggle theme",
-    "startFree": "Subscribe to PRO",
+    "startFree": "Get started",
     "about": "About Us",
     "menuTitle": "Menu",
     "openMenu": "Open menu",
     "peek": "Peek without an account",
-    "createAccount": "Subscribe to PRO",
-    "createAccountShort": "Subscribe"
+    "createAccount": "Get started",
+    "createAccountShort": "Start"
   },
   "search": {
     "placeholder": "Search ticker (e.g., AAPL)...",

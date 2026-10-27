@@ -12,7 +12,7 @@
     "titleAccent": "value investors.",
     "subtitle": "10 anos de fundamentais, uma calculadora DCF que se autopreenche, um Analista IA especializado, um novo método de encontrar e perceber empresas. Análise da equipa de gestão. E muito mais num só terminal.",
     "boot": "A ler os números",
-    "primaryCta": "Subscrever PRO",
+    "primaryCta": "Começar agora",
     "secondaryCta": "Espreitar sem conta: AAPL",
     "peekCta": "Espreitar sem conta",
     "trust": "",
@@ -431,13 +431,13 @@
     "dcf": "DCF",
     "calendar": "Calendário",
     "theme": "Alternar tema",
-    "startFree": "Subscrever PRO",
+    "startFree": "Começar agora",
     "about": "Quem somos",
     "menuTitle": "Menu",
     "openMenu": "Abrir menu",
     "peek": "Espreitar sem conta",
-    "createAccount": "Subscrever PRO",
-    "createAccountShort": "Subscrever"
+    "createAccount": "Começar agora",
+    "createAccountShort": "Começar"
   },
   "search": {
     "placeholder": "Pesquisar ticker (ex: AAPL)...",

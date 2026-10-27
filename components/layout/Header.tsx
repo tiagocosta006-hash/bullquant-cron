@@ -24,7 +24,15 @@ export async function Header() {
         {/* Logo: sem bolha, só uma hairline dourada por baixo — destaca-se
             do vidro das restantes */}
         <div className="relative flex h-14 shrink-0 items-center px-1">
-          <Logo href="/" size="md" />
+          {/* Abaixo de 400px (iPhone mini/SE, Androids de 360px) o logo com
+              nome + menu + tema + CTA não cabem numa linha e o CTA ficava
+              cortado à direita; aí fica só o touro. */}
+          <div className="max-[400px]:hidden">
+            <Logo href="/" size="md" />
+          </div>
+          <div className="hidden max-[400px]:block">
+            <Logo href="/" size="md" iconOnly />
+          </div>
           <span className="gold-rule absolute inset-x-0 -bottom-0.5 h-px" aria-hidden />
         </div>
 
@@ -60,9 +68,9 @@ export async function Header() {
         </nav>
 
         {/* Bolha da direita: menu mobile, tema, auth */}
-        <div className="relative ml-auto flex h-12 shrink-0 items-center px-2.5 sm:px-4">
+        <div className="relative ml-auto flex h-12 shrink-0 items-center px-1.5 sm:px-4">
           <div className="glass glass-frost absolute inset-0 rounded-full" aria-hidden />
-          <div className="relative z-10 flex items-center space-x-2">
+          <div className="relative z-10 flex items-center space-x-1 sm:space-x-2">
             <HeaderMobileMenu
               isLoggedIn={!!user}
               labels={{

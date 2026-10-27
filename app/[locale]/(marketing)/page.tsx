@@ -31,8 +31,8 @@ import { LEGAL } from "@/lib/legal/config";
  */
 
 
-/* Equipa mostrada na secção "Feito em Portugal" — mesmas fotos da página
-   /about (public/team/). Sem foto → iniciais, como lá. */
+/* Equipa na faixa de prova — mesmas fotos da página /about (public/team/).
+   Sem foto → iniciais, como lá. */
 // image é opcional de propósito: com todos os membros a ter foto, o `as const`
 // tornava `image` sempre truthy e o TS estreitava o ramo do fallback de iniciais
 // para `never` (erro de build). Tipar `image?` mantém o fallback válido para
@@ -73,18 +73,22 @@ const heroWords = (text: string, offset: number, cls?: string) =>
  * tratamento nenhum. Um `if (locale === "pt")` daria o mesmo resultado hoje e
  * partia-se no dia em que a copy PT mudasse.
  */
-const BRAND_SPLIT = 8; // "The Bull" | "Value"
+// O título usa a marca sem o artigo ("BullValue: …"), e BRAND.name é
+// "The BullValue" — comparar com o nome inteiro nunca dava match e o
+// tratamento não chegava a aparecer.
+const MARCA_TITULO = BRAND.name.replace(/^The /, ""); // "BullValue"
+const BRAND_SPLIT = MARCA_TITULO.length - BRAND.nameParts[1].length; // "Bull" | "Value"
 
 function heroLead(text: string) {
-  if (!text.startsWith(BRAND.name)) return heroWords(text, 0);
-  const resto = text.slice(BRAND.name.length); // ex.: ": a plataforma para os"
+  if (!text.startsWith(MARCA_TITULO)) return heroWords(text, 0);
+  const resto = text.slice(MARCA_TITULO.length); // ex.: ": a plataforma para os"
   const [cauda, ...palavras] = resto.split(" "); // cauda = ":" colado à marca
   return (
     <>
       <span aria-hidden className="hero-clip">
         <span className="hero-word text-[1.18em]" style={{ "--w": 0 } as React.CSSProperties}>
-          {BRAND.name.slice(0, BRAND_SPLIT)}
-          <span className="text-primary">{BRAND.name.slice(BRAND_SPLIT)}</span>
+          {MARCA_TITULO.slice(0, BRAND_SPLIT)}
+          <span className="text-primary">{MARCA_TITULO.slice(BRAND_SPLIT)}</span>
           {cauda}
         </span>
       </span>
@@ -96,9 +100,6 @@ function heroLead(text: string) {
 export default async function LandingPage({
   searchParams,
 }: {
-  // `dashboardTile` era um andaime de comparação (?dashboardTile=a|b|c) para o
-  // tile do Dashboard no bento. O Alex escolheu o C, que está agora fixo no
-  // componente — daí o parâmetro ter saído.
   searchParams: Promise<{ preview?: string }>;
 }) {
   const [user, { preview }] = await Promise.all([getUser(), searchParams]);
@@ -142,12 +143,6 @@ export default async function LandingPage({
     ]
   };
 
-  // Bento "Tudo num terminal" — 4 réplicas FIÉIS (não mocks genéricos) de
-  // Dashboard, Portfólio, Calendário e Explorar. Cada uma copia literalmente
-  // as class strings dos componentes reais (ver comentários em
-  // components/marketing/replicas/*.tsx). Sem fetch — números hardcoded,
-  // labels via chaves i18n reais das próprias páginas (evita duplicar copy
-  // nos 9 locales).
   return (
     <div className="relative flex-1 overflow-x-clip">
       <script
@@ -173,7 +168,7 @@ export default async function LandingPage({
           <p className="hero-in mt-4 max-w-[56ch] text-[15px] leading-relaxed text-muted-foreground sm:mt-5 sm:text-lg" style={heroDelay(0.18)}>
             {t("hero2.subtitle")}
           </p>
-          <div className="hero-in mt-6 flex flex-row flex-wrap items-center justify-center gap-2.5 sm:mt-7 sm:gap-3" style={heroDelay(0.28)}>
+          <div data-hero-cta className="hero-in mt-6 flex flex-row flex-wrap items-center justify-center gap-2.5 sm:mt-7 sm:gap-3" style={heroDelay(0.28)}>
             <Link
               href="/register"
               data-track="hero_register"
@@ -263,7 +258,7 @@ export default async function LandingPage({
       </section>
 
       {/* ── 4 · Planos ──────────────────────────────────────────────── */}
-      <section id="planos" data-backdrop="rings" className="relative isolate">
+      <section id="planos" data-backdrop="rings" data-hide-floating className="relative isolate">
         <div className="relative mx-auto max-w-5xl px-6 py-16 md:px-8 md:py-24">
           <Reveal className="mx-auto mb-12 max-w-3xl text-center">
             <h2 className="text-balance text-3xl font-extrabold tracking-[-0.03em] sm:text-5xl">{t("pricing.title")}</h2>
@@ -295,7 +290,7 @@ export default async function LandingPage({
       </section>
 
       {/* ── 6 · CTA final ───────────────────────────────────────────── */}
-      <section data-backdrop="closing" className="relative isolate px-6 py-24 md:px-8 md:py-32">
+      <section data-backdrop="closing" data-hide-floating className="relative isolate px-6 py-24 md:px-8 md:py-32">
         <Reveal data-reveal="zoom" className="flex flex-col items-center text-center">
           <BrandMark className="h-14 w-14 rounded-2xl shadow-lg" />
           <h2 className="mt-8 max-w-[18ch] text-balance text-4xl font-extrabold leading-[1.04] tracking-[-0.035em] sm:text-6xl">

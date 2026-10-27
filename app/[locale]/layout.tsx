@@ -247,7 +247,14 @@ export default async function RootLayout({
           }}
         />
 
-        
+        {/* Cortina de entrada (BootScreen) só na 1.ª página vista em cada
+            sessão: nos refreshes e nas visitas seguintes o hero aparece logo.
+            Tem de correr antes da 1.ª pintura, daí ser inline no <head>. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var k="bv_booted";if(sessionStorage.getItem(k))document.documentElement.setAttribute("data-booted","");else sessionStorage.setItem(k,"1")}catch(e){}})();`,
+          }}
+        />
       </head>
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground">
         <NextIntlClientProvider messages={messages}>

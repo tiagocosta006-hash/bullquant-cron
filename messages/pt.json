@@ -284,6 +284,227 @@
       "a": "Versão A — a atual, com as correções",
       "b": "Versão B — redesenhada",
       "c": "Versão C — vídeos e prints mostrados de outra forma"
+    },
+    "landingB": {
+      "hero": {
+        "pill": "Análise fundamental das 500 empresas do S&P 500",
+        "titleLead": "Percebe",
+        "titleAccent": "quanto vale",
+        "titleTail": "uma ação antes de a comprares.",
+        "subtitle": "10 anos de números da SEC em gráficos, uma DCF que já abre preenchida e um analista IA que lê o relatório anual por ti. Num só sítio, explicado em português.",
+        "peek": "Ver a Apple sem conta",
+        "note": "Desde {preco} € por mês · cancelas quando quiseres · 14 dias de livre resolução"
+      },
+      "reel": {
+        "end": {
+          "title": "Isto foi a Microsoft.",
+          "lead": "A Apple abre aqui mesmo, sem conta. As outras 499 vêm com o PRO.",
+          "appleAria": "Abrir a página da Apple, sem conta"
+        }
+      },
+      "proof": {
+        "aria": "A BullValue em números",
+        "language": "Explicado em português",
+        "teamAria": "Conhecer a equipa: feito por três portugueses"
+      },
+      "jobs": {
+        "title": "Três perguntas que respondes",
+        "titleAccent": "antes de comprar.",
+        "subtitle": "Ecrãs reais da plataforma, com a Microsoft como exemplo.",
+        "seeFull": "Ver ecrã inteiro",
+        "seeFullAria": "Ver ecrã inteiro: {label}",
+        "items": {
+          "fund": {
+            "label": "Fundamentais",
+            "title": "O negócio está mesmo a crescer?",
+            "body": "Abre qualquer empresa e vês <b>10 anos</b> de receitas, margens, free cash flow e lucro por ação em gráficos, com os segmentos, a geografia e as estimativas dos analistas. Os números vêm dos relatórios <b>10-K e 10-Q entregues à SEC</b>, sem folhas de Excel.",
+            "alt": "Separador Fundamentais da Microsoft: receitas a 10 anos com CAGR de +14,7%, segmentos e geografia"
+          },
+          "dcf": {
+            "label": "Calculadora DCF",
+            "title": "Está cara ou barata?",
+            "body": "Compara os múltiplos de hoje com a <b>média de 10 anos</b> e abre uma <b>DCF já preenchida</b> com três cenários: Bear, Base e Bull. No exemplo da imagem, o cenário Base dá 511 $ por ação, com a Microsoft a 532 $. A conta é tua: os pressupostos estão à vista e mudas o que quiseres.",
+            "alt": "Calculadora DCF da Microsoft com três cenários: 286,62 $, 511,07 $ e 856,59 $ por ação, com a ação a 532,60 $"
+          },
+          "ai": {
+            "label": "Analista IA",
+            "title": "O que faz esta empresa, afinal?",
+            "body": "O Analista IA lê o relatório anual (10-K) e faz-te um dossier em português, <b>com citações à fonte</b>. Depois podes fazer-lhe perguntas: tens <b>8 créditos de IA por dia</b>.",
+            "alt": "Analista IA com o resumo do negócio da Microsoft e a indicação Fonte: 10-K"
+          }
+        },
+        "more": {
+          "title": "E ainda, no mesmo PRO:",
+          "items": {
+            "fmva": {
+              "title": "Modelo avançado",
+              "body": "revenue build por segmento, sensibilidade e exportação para PDF e Excel"
+            },
+            "cal": {
+              "title": "Calendário",
+              "body": "resultados e dividendos, filtrados pela tua watchlist"
+            },
+            "compare": {
+              "title": "Comparador",
+              "body": "empresas lado a lado"
+            },
+            "explore": {
+              "title": "Explorar",
+              "body": "descobrir empresas por setor e tipo de negócio"
+            },
+            "insider": {
+              "title": "Insider trading",
+              "body": "o que os gestores compram e vendem"
+            },
+            "glossary": {
+              "title": "Glossário",
+              "body": "cada métrica explicada em português"
+            }
+          }
+        }
+      },
+      "fit": {
+        "title": "É para ti?",
+        "yesTitle": "É para ti se",
+        "y1": "Estás a começar e queres perceber o que compras: os números vêm em gráficos e o Glossário explica cada métrica.",
+        "y2": "Investes a longo prazo e queres saber se uma empresa está cara antes de comprar.",
+        "y3": "Já fazes modelos e queres o histórico e o consenso prontos, sem copiar números à mão.",
+        "y4": "Preferes ler e perguntar em português.",
+        "noTitle": "Não é para ti se",
+        "n1": "Procuras dicas ou sinais de compra. A BullValue é uma ferramenta de análise, não aconselhamento: as decisões são tuas.",
+        "n2": "Fazes day trading: aqui há fundamentais, não gráficos ao minuto.",
+        "n3": "Só investes em empresas europeias: por agora cobrimos o S&P 500. A Europa, incluindo a Euronext Lisboa, está no roadmap."
+      },
+      "pricing": {
+        "titleLead": "{preco} € por mês.",
+        "titleAccent": "Uns {cents} cêntimos por dia.",
+        "subtitle": "O PRO custa {preco} € por mês e dá-te a plataforma inteira. Com a comunidade TCValue Group, {comunidade} €. Preço final com IVA, sem fidelização: renova todos os meses até cancelares.",
+        "factsLabel": "Condições da subscrição",
+        "facts": {
+          "cancel": "Cancelas na Whop quando quiseres. O PRO fica ativo até ao fim do mês pago.",
+          "withdrawal": "14 dias de livre resolução: se desistires, pagas só a parte proporcional ao tempo usado.",
+          "vat": "Preço final, com IVA incluído. Pagamento seguro na Whop."
+        },
+        "peekTitle": "Ainda a decidir?",
+        "peekBody": "Abre a página da Apple sem conta: vês o resumo e os 10 anos de fundamentais tal como no PRO. O Analista IA, o Valuation e a página da empresa ficam para o PRO."
+      },
+      "faq": {
+        "title": "Antes de subscreveres",
+        "free": {
+          "q": "Há plano grátis ou período experimental?",
+          "a": "Não. Em vez disso, a página da Apple abre sem conta: vês o resumo e os 10 anos de fundamentais tal como no PRO. E se subscreveres e mudares de ideias nos primeiros 14 dias, pagas só a parte proporcional ao tempo usado."
+        },
+        "lang": {
+          "q": "Está tudo em português? E os dados?",
+          "a": "A plataforma está em português: menus, explicações, glossário e o Analista IA, que lê os relatórios da SEC (em inglês) e te responde em português, com as citações da fonte. Os nomes das empresas e dos segmentos ficam como a empresa os reporta, e alguns termos técnicos (FCF, EBITDA, P/E) ficam no original, com explicação no Glossário. Na calculadora DCF e no modelo avançado, os nomes dos campos ainda estão em inglês."
+        },
+        "plans": {
+          "q": "Qual é a diferença entre os dois planos?",
+          "a": "As ferramentas são as mesmas. O PRO ({preco} €/mês) dá-te a plataforma inteira. O PRO + Comunidade ({comunidade} €/mês) junta o acesso à comunidade TCValue Group no Discord: dossiers de negócio de empresas cotadas, notas de mercado semanais e canais fechados com dúvidas respondidas pelo Tiago."
+        }
+      },
+      "final": {
+        "titleLead": "Da próxima vez que pensares em comprar uma ação,",
+        "titleAccent": "vê primeiro quanto vale.",
+        "team": "Feito em Portugal pela Bullocracy",
+        "teamLink": "Conhecer a equipa"
+      }
+    },
+    "landingC": {
+      "reel": {
+        "chaptersLabel": "Capítulos do vídeo",
+        "chapterAria": "Capítulo {n} de {total}: {label}",
+        "pause": "Pausar vídeo",
+        "play": "Reproduzir vídeo",
+        "openPage": "Abrir esta página",
+        "openPageAria": "Abrir a página pública da Microsoft, sem conta",
+        "startPlay": "Ver a plataforma a funcionar",
+        "videoSize": "Vídeo · {mb} MB",
+        "replay": "Rever",
+        "chapters": {
+          "resumo": {
+            "label": "Resumo",
+            "caption": "O resumo da Microsoft: preço, últimos resultados e os principais múltiplos num só ecrã."
+          },
+          "fund": {
+            "label": "Fundamentais",
+            "caption": "10 anos de receitas, lucros e FCF. As barras mais claras são as estimativas dos analistas."
+          },
+          "ai": {
+            "label": "Analista IA",
+            "caption": "O Analista IA lê o 10-K e explica o negócio em português, com a fonte indicada."
+          },
+          "val": {
+            "label": "Valuation",
+            "caption": "O P/E histórico contra a média, e se o preço subiu mais depressa do que os lucros."
+          },
+          "dcf": {
+            "label": "DCF simples",
+            "caption": "A calculadora DCF abre já preenchida: Bear, Base e Bull, e o valor por ação em cada cenário."
+          },
+          "fmva": {
+            "label": "Modelo FMVA",
+            "caption": "O modelo completo: receita por segmento, consenso dos analistas, sensibilidade e cenários."
+          }
+        },
+        "end": {
+          "title": "Isto foi a Microsoft.",
+          "lead": "Abre outra empresa do S&P 500, sem conta:",
+          "tickerAria": "Abrir a página da {ticker}, sem conta"
+        }
+      },
+      "gallery": {
+        "marksTitle": "O que estás a ver",
+        "seeFull": "Ver ecrã inteiro",
+        "counter": "{n} de {total}",
+        "carouselLabel": "Ecrãs da plataforma",
+        "carouselRole": "carrossel",
+        "slideRole": "ecrã",
+        "slideAria": "{n} de {total}: {label}",
+        "dotAria": "Ir para o ecrã {n}: {label}",
+        "swipeHint": "Desliza",
+        "marks": {
+          "fund": {
+            "m1": "O crescimento anual composto (CAGR) de cada métrica",
+            "m2": "Barras claras: as estimativas dos analistas",
+            "m3": "A receita por segmento, ano a ano"
+          },
+          "val": {
+            "m1": "Média e mediana do período: 33,7x e 33,8x",
+            "m2": "O tracejado marca a média, para comparares com cada momento",
+            "m3": "Em 2018, o P/E passou os 50x"
+          },
+          "dcf": {
+            "m1": "Os pressupostos de cada cenário vêm preenchidos; mudas o que quiseres",
+            "m2": "O valor de cada cenário: o máximo a pagar hoje para ganhar o retorno pedido",
+            "m3": "O retorno que pedes: aqui, 10% ao ano"
+          },
+          "fmva": {
+            "m1": "Pontos azuis: o consenso dos analistas",
+            "m2": "Barras douradas: a receita que projetas, ano a ano",
+            "m3": "A receita de cada segmento, linha a linha"
+          },
+          "ai": {
+            "m1": "A fonte do dossier: o relatório 10-K",
+            "m2": "O resumo do negócio, em português",
+            "m3": "O aviso de que o texto é gerado por IA, sempre à vista"
+          },
+          "cal": {
+            "m1": "Dividendos com o valor por ação",
+            "m2": "Indicadores macro no mesmo calendário, como o emprego nos EUA",
+            "m3": "Filtra pela tua watchlist ou pelo teu portefólio"
+          }
+        }
+      },
+      "lightbox": {
+        "title": "{label}: ecrã inteiro",
+        "close": "Fechar",
+        "prev": "Ecrã anterior",
+        "next": "Ecrã seguinte",
+        "fit": "Ajustar ao ecrã",
+        "actual": "Ver a 100%",
+        "hintTouch": "Arrasta para ver o ecrã todo · junta dois dedos para aproximar"
+      }
     }
   },
   "insider": {

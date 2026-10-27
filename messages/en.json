@@ -284,6 +284,227 @@
       "a": "Version A — current, with fixes",
       "b": "Version B — redesigned",
       "c": "Version C — videos and screenshots shown differently"
+    },
+    "landingB": {
+      "hero": {
+        "pill": "Fundamental analysis for all 500 S&P 500 companies",
+        "titleLead": "Know",
+        "titleAccent": "what a stock is worth",
+        "titleTail": "before you buy it.",
+        "subtitle": "10 years of SEC numbers in charts, a DCF that opens pre-filled and an AI analyst that reads the annual report for you. All in one place.",
+        "peek": "See Apple without an account",
+        "note": "From €{preco} a month · cancel anytime · 14-day right of withdrawal"
+      },
+      "reel": {
+        "end": {
+          "title": "That was Microsoft.",
+          "lead": "Apple opens right here, no account needed. The other 499 come with PRO.",
+          "appleAria": "Open Apple's page, no account needed"
+        }
+      },
+      "proof": {
+        "aria": "BullValue in numbers",
+        "language": "Explained in Portuguese",
+        "teamAria": "Meet the team: made by three Portuguese founders"
+      },
+      "jobs": {
+        "title": "Three questions you answer",
+        "titleAccent": "before you buy.",
+        "subtitle": "Real platform screens, with Microsoft as the example.",
+        "seeFull": "See full screen",
+        "seeFullAria": "See full screen: {label}",
+        "items": {
+          "fund": {
+            "label": "Fundamentals",
+            "title": "Is the business really growing?",
+            "body": "Open any company and see <b>10 years</b> of revenue, margins, free cash flow and earnings per share in charts, with segments, geography and analyst estimates. The numbers come from the <b>10-K and 10-Q filings with the SEC</b>, no spreadsheets needed.",
+            "alt": "Microsoft's Fundamentals tab: 10-year revenue with a +14.7% CAGR, segments and geography"
+          },
+          "dcf": {
+            "label": "DCF calculator",
+            "title": "Is it expensive or cheap?",
+            "body": "Compare today's multiples with the <b>10-year average</b> and open a <b>pre-filled DCF</b> with three scenarios: Bear, Base and Bull. In the example shown, the Base scenario gives $511 per share, with Microsoft at $532. The maths is yours: the assumptions are in plain sight and you change whatever you like.",
+            "alt": "Microsoft DCF calculator with three scenarios: $286.62, $511.07 and $856.59 per share, with the stock at $532.60"
+          },
+          "ai": {
+            "label": "AI Analyst",
+            "title": "What does this company actually do?",
+            "body": "The AI Analyst reads the annual report (10-K) and writes you a dossier <b>with source citations</b>. Then you can ask it questions: you get <b>8 AI credits a day</b>.",
+            "alt": "AI Analyst with Microsoft's business summary and the label Source: 10-K"
+          }
+        },
+        "more": {
+          "title": "Also in PRO:",
+          "items": {
+            "fmva": {
+              "title": "Advanced model",
+              "body": "revenue build by segment, sensitivity, PDF and Excel export"
+            },
+            "cal": {
+              "title": "Calendar",
+              "body": "earnings and dividends, filtered by your watchlist"
+            },
+            "compare": {
+              "title": "Comparison",
+              "body": "companies side by side"
+            },
+            "explore": {
+              "title": "Explore",
+              "body": "find companies by sector and type of business"
+            },
+            "insider": {
+              "title": "Insider trading",
+              "body": "what executives buy and sell"
+            },
+            "glossary": {
+              "title": "Glossary",
+              "body": "every metric explained in plain language"
+            }
+          }
+        }
+      },
+      "fit": {
+        "title": "Is it for you?",
+        "yesTitle": "It's for you if",
+        "y1": "You're starting out and want to understand what you buy: the numbers come as charts and the Glossary explains every metric.",
+        "y2": "You invest for the long term and want to know if a company is expensive before you buy.",
+        "y3": "You already build models and want the history and consensus ready, without copying numbers by hand.",
+        "y4": "You'd rather read and ask in Portuguese.",
+        "noTitle": "It's not for you if",
+        "n1": "You want stock tips or buy signals. BullValue is an analysis tool, not advice: the decisions are yours.",
+        "n2": "You day trade: this is fundamentals, not minute-by-minute charts.",
+        "n3": "You only invest in European companies: for now we cover the S&P 500. Europe, including Euronext Lisbon, is on the roadmap."
+      },
+      "pricing": {
+        "titleLead": "€{preco} a month.",
+        "titleAccent": "About {cents} cents a day.",
+        "subtitle": "PRO costs €{preco} a month and gives you the whole platform. With the TCValue Group community, €{comunidade}. Final price with VAT, no lock-in: it renews monthly until you cancel.",
+        "factsLabel": "Subscription terms",
+        "facts": {
+          "cancel": "Cancel on Whop whenever you want. PRO stays active until the end of the paid month.",
+          "withdrawal": "14-day right of withdrawal: if you change your mind, you only pay for the time used.",
+          "vat": "Final price, VAT included. Secure payment on Whop."
+        },
+        "peekTitle": "Still deciding?",
+        "peekBody": "Open Apple's page without an account: you see the summary and 10 years of fundamentals just like in PRO. The AI Analyst, Valuation and company profile are PRO-only."
+      },
+      "faq": {
+        "title": "Before you subscribe",
+        "free": {
+          "q": "Is there a free plan or trial?",
+          "a": "No. Instead, Apple's page opens without an account: you see the summary and 10 years of fundamentals just like in PRO. And if you subscribe and change your mind within 14 days, you only pay for the time used."
+        },
+        "lang": {
+          "q": "Is it all in Portuguese? And the data?",
+          "a": "The platform is in Portuguese: menus, explanations, the glossary and the AI Analyst, which reads the SEC filings (in English) and answers in Portuguese, with source citations. Company and segment names stay as the company reports them, and some technical terms (FCF, EBITDA, P/E) stay in the original, explained in the Glossary. In the DCF calculator and the advanced model, field names are still in English."
+        },
+        "plans": {
+          "q": "What's the difference between the two plans?",
+          "a": "The tools are the same. PRO (€{preco}/month) gives you the whole platform. PRO + Community (€{comunidade}/month) adds access to the TCValue Group community on Discord: business dossiers on listed companies, weekly market notes and private channels where Tiago answers questions."
+        }
+      },
+      "final": {
+        "titleLead": "Next time you think about buying a stock,",
+        "titleAccent": "check what it's worth first.",
+        "team": "Made in Portugal by Bullocracy",
+        "teamLink": "Meet the team"
+      }
+    },
+    "landingC": {
+      "reel": {
+        "chaptersLabel": "Video chapters",
+        "chapterAria": "Chapter {n} of {total}: {label}",
+        "pause": "Pause video",
+        "play": "Play video",
+        "openPage": "Open this page",
+        "openPageAria": "Open Microsoft's public page, no account needed",
+        "startPlay": "Watch the platform in action",
+        "videoSize": "Video · {mb} MB",
+        "replay": "Watch again",
+        "chapters": {
+          "resumo": {
+            "label": "Summary",
+            "caption": "Microsoft's summary: price, latest results and the key multiples on one screen."
+          },
+          "fund": {
+            "label": "Fundamentals",
+            "caption": "10 years of revenue, earnings and FCF. The lighter bars are analyst estimates."
+          },
+          "ai": {
+            "label": "AI Analyst",
+            "caption": "The AI Analyst reads the 10-K and explains the business, citing the source."
+          },
+          "val": {
+            "label": "Valuation",
+            "caption": "Historical P/E against its average, and whether the price outran earnings."
+          },
+          "dcf": {
+            "label": "Simple DCF",
+            "caption": "The DCF calculator opens pre-filled: Bear, Base and Bull, with the per-share value in each scenario."
+          },
+          "fmva": {
+            "label": "FMVA model",
+            "caption": "The full model: revenue by segment, analyst consensus, sensitivity and scenarios."
+          }
+        },
+        "end": {
+          "title": "That was Microsoft.",
+          "lead": "Open another S&P 500 company, no account needed:",
+          "tickerAria": "Open {ticker}'s page, no account needed"
+        }
+      },
+      "gallery": {
+        "marksTitle": "What you're looking at",
+        "seeFull": "See full screen",
+        "counter": "{n} of {total}",
+        "carouselLabel": "Platform screens",
+        "carouselRole": "carousel",
+        "slideRole": "screen",
+        "slideAria": "{n} of {total}: {label}",
+        "dotAria": "Go to screen {n}: {label}",
+        "swipeHint": "Swipe",
+        "marks": {
+          "fund": {
+            "m1": "Each metric's compound annual growth (CAGR)",
+            "m2": "Lighter bars: analyst estimates",
+            "m3": "Revenue by segment, year by year"
+          },
+          "val": {
+            "m1": "Average and median for the period: 33.7x and 33.8x",
+            "m2": "The dashed line marks the average, to compare with any moment",
+            "m3": "In 2018, the P/E went above 50x"
+          },
+          "dcf": {
+            "m1": "Each scenario's assumptions come pre-filled; change whatever you like",
+            "m2": "Each scenario's value: the most to pay today to earn your required return",
+            "m3": "Your required return: here, 10% a year"
+          },
+          "fmva": {
+            "m1": "Blue dots: analyst consensus",
+            "m2": "Gold bars: the revenue you project, year by year",
+            "m3": "Revenue for each segment, line by line"
+          },
+          "ai": {
+            "m1": "The dossier's source: the 10-K filing",
+            "m2": "A plain-language business summary",
+            "m3": "The AI-generated text notice, always shown"
+          },
+          "cal": {
+            "m1": "Dividends with the per-share amount",
+            "m2": "Macro releases on the same calendar, like US jobs",
+            "m3": "Filter by your watchlist or your portfolio"
+          }
+        }
+      },
+      "lightbox": {
+        "title": "{label}: full screen",
+        "close": "Close",
+        "prev": "Previous screen",
+        "next": "Next screen",
+        "fit": "Fit to screen",
+        "actual": "View at 100%",
+        "hintTouch": "Drag to see the whole screen · pinch to zoom in"
+      }
     }
   },
   "insider": {

@@ -18,6 +18,8 @@ export function MediaFrame({
   alt,
   aspect = "16 / 10",
   className,
+  address,
+  addressAction,
   children,
 }: {
   media?: MediaSource | null;
@@ -25,6 +27,10 @@ export function MediaFrame({
   /** aspect-ratio CSS reservado quando há vídeo/imagem (evita CLS) */
   aspect?: string;
   className?: string;
+  /** substitui o domínio na barra de endereço (ex.: thebullvalue.com/stock/MSFT) */
+  address?: React.ReactNode;
+  /** ação à direita da barra de endereço (ex.: "Abrir esta página") */
+  addressAction?: React.ReactNode;
   children?: React.ReactNode;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -62,9 +68,9 @@ export function MediaFrame({
           <i className="h-2.5 w-2.5 rounded-full bg-foreground/12" />
         </span>
         <span className="mx-auto rounded-full border border-border/60 bg-card/50 px-4 py-1 text-[11px] text-muted-foreground">
-          {BRAND.domain}
+          {address ?? BRAND.domain}
         </span>
-        <span className="w-10" aria-hidden />
+        {addressAction ?? <span className="w-10" aria-hidden />}
       </div>
 
       {/* Com MEDIA, esta div é a moldura que recorta o vídeo/imagem e precisa

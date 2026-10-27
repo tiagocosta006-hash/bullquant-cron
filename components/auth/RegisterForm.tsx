@@ -149,38 +149,21 @@ export function RegisterForm({
         </div>
       )}
 
-      <div className="flex items-start gap-2 pt-2">
-        <input 
-          type="checkbox" 
-          id="terms" 
-          name="terms" 
-          required 
-          className="mt-1 cursor-pointer rounded border-border"
-        />
-        <label htmlFor="terms" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
+      {/* Sem caixas: o próprio botão é a aceitação dos Termos e o pedido expresso
+          de início imediato (DL 24/2014, art. 15.º), porque a frase que o diz
+          está colada a ele e é lida antes do clique. O registo do pedido (data e
+          versão dos Termos) segue na metadata do checkout. */}
+      <input type="hidden" name="terms" value="on" />
+      <input type="hidden" name="imediato" value="on" />
+
+      <div className="space-y-3 pt-1">
+        <p className="text-center text-xs leading-relaxed text-muted-foreground">
           {t.rich("consentText", {
             terms: (chunks) => <Link href="/terms" className="text-foreground hover:underline font-medium" target="_blank">{chunks}</Link>,
-            privacy: (chunks) => <Link href="/privacy" className="text-foreground hover:underline font-medium" target="_blank">{chunks}</Link>
-          })}
-        </label>
-      </div>
-
-      <div className="flex items-start gap-2">
-        <input
-          type="checkbox"
-          id="imediato"
-          name="imediato"
-          required
-          className="mt-1 cursor-pointer rounded border-border"
-        />
-        <label htmlFor="imediato" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
-          {t.rich("immediateText", {
+            privacy: (chunks) => <Link href="/privacy" className="text-foreground hover:underline font-medium" target="_blank">{chunks}</Link>,
             withdrawal: (chunks) => <Link href="/refund" className="text-foreground hover:underline font-medium" target="_blank">{chunks}</Link>
           })}
-        </label>
-      </div>
-
-      <div>
+        </p>
         <SubmitButton
           label={t("submitButton")}
           loadingLabel={t("submitLoading")}

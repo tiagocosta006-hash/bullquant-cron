@@ -16,12 +16,12 @@ export type EstadoConta = "anonimo" | "semPro" | "pro";
  *
  * O que cada cartão pede depende de quem está a ver:
  *   - sem conta: o botão leva ao registo com o plano escolhido; o registo
- *     exige os Termos, os 18 anos e o pedido de início imediato, e segue
+ *     pede os Termos, os 18 anos e o início imediato (no botão), e segue
  *     sozinho para o checkout;
- *   - com conta sem PRO: os Termos já foram aceites no registo; falta o pedido
- *     expresso de início imediato (DL 24/2014 art. 15.º), UMA caixa para os
- *     dois cartões, e cada botão submete o formulário (POST /api/checkout)
- *     com o seu plano;
+ *   - com conta sem PRO: os Termos já foram aceites no registo; cada botão
+ *     submete o formulário (POST /api/checkout) com o seu plano, e é ele o
+ *     pedido expresso de início imediato (DL 24/2014 art. 15.º) — sem caixa,
+ *     com a frase que o diz colada ao botão, lida antes do clique;
  *   - com PRO: o plano que a conta já tem aparece como atual; do PRO só para a
  *     comunidade ainda se pode subir.
  * As condições de renovação aparecem ANTES do botão (informação pré-contratual).
@@ -41,15 +41,8 @@ export function PricingCards({
   const t = useTranslations("pricing");
   const locale = useLocale();
 
-  const [imediato, setImediato] = React.useState(false);
-  const [tentou, setTentou] = React.useState(erro === "consentimento");
   const [aEnviar, setAEnviar] = React.useState(false);
   const comFormulario = estado === "semPro" || (estado === "pro" && planoAtual === "pro");
-
-  const submeter = (e: React.FormEvent) => {
-    if (!imediato) { e.preventDefault(); setTentou(true); return; }
-    setAEnviar(true);
-  };
 
   const cartao = (id: PlanoId) => {
     const destaque = id === "comunidade";
@@ -78,23 +71,25 @@ export function PricingCards({
       );
     } else {
       acao = (
-        <button
-          type="submit"
-          name="plano"
-          value={id}
-          form="form-checkout"
-          data-track={`pricing_${id}`}
-          aria-disabled={!imediato}
-          disabled={aEnviar}
-          className={cn(
-            buttonVariants({ size: "lg", variant: destaque ? "default" : "outline" }),
-            "w-full font-semibold",
-            !imediato && "cursor-not-allowed opacity-60",
-          )}
-        >
-          {id === "pro" ? t("consent.startPro") : t("consent.startComunidade")}
-          <ArrowRight className="ml-2 h-4 w-4" />
-        </button>
+        <>
+          <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
+            {t.rich("consent.immediate", {
+              withdrawal: (chunks) => <Link href="/refund" target="_blank" className="font-medium text-foreground underline-offset-4 hover:underline">{chunks}</Link>,
+            })}
+          </p>
+          <button
+            type="submit"
+            name="plano"
+            value={id}
+            form="form-checkout"
+            data-track={`pricing_${id}`}
+            disabled={aEnviar}
+            className={cn(buttonVariants({ size: "lg", variant: destaque ? "default" : "outline" }), "w-full font-semibold")}
+          >
+            {id === "pro" ? t("consent.startPro") : t("consent.startComunidade")}
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </button>
+        </>
       );
     }
 
@@ -148,21 +143,15 @@ export function PricingCards({
       <div className="grid gap-8 md:grid-cols-2 md:gap-5">{PLANO_IDS.map(cartao)}</div>
 
       {comFormulario && (
-        // Um formulário para os dois cartões: a caixa do início imediato vale para
-        // o plano cujo botão for carregado (os botões levam form="form-checkout").
-        <form id="form-checkout" method="post" action="/api/checkout" onSubmit={submeter} className="mx-auto mt-6 max-w-2xl space-y-3">
+        // Um formulário para os dois cartões: os botões levam form="form-checkout"
+        // e o plano no seu value.
+        <form id="form-checkout" method="post" action="/api/checkout" onSubmit={() => setAEnviar(true)} className="mx-auto mt-6 max-w-2xl space-y-3">
           <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="imediato" value="on" />
           {estado === "pro" && planoAtual === "pro" && (
             <p className="rounded-xl border border-primary/25 bg-primary/5 px-4 py-3 text-sm text-muted-foreground">{t("consent.upgradeNote")}</p>
           )}
-          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-border/60 bg-background/60 px-4 py-3 text-sm leading-relaxed">
-            <input type="checkbox" name="imediato" checked={imediato} onChange={(e) => setImediato(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-[var(--primary)]" />
-            <span>
-              {t("consent.immediate")}{" "}
-              <Link href="/refund" target="_blank" className="whitespace-nowrap font-medium underline underline-offset-4">{t("consent.withdrawalLink")}</Link>
-            </span>
-          </label>
-          {tentou && !imediato && <p role="alert" className="text-center text-sm font-medium text-destructive">{t("consent.missing")}</p>}
+          {erro === "consentimento" && <p role="alert" className="text-center text-sm font-medium text-destructive">{t("consent.missing")}</p>}
         </form>
       )}
 

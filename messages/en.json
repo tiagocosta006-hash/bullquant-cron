@@ -177,7 +177,7 @@
     "pricing": {
       "eyebrow": "Plans",
       "title": "Two plans, every tool.",
-      "subtitle": "The whole platform from €7 a month, or with the TCValue Group community for €9.97. Cancel whenever you want.",
+      "subtitle": "The whole platform from €7 a month, or with the TCValue Group community for €9.97, with the first {dias} days free. Cancel whenever you want.",
       "pro": {
         "name": "Pro",
         "badge": "Full access",
@@ -214,7 +214,7 @@
       "q4": "How often is the data updated?",
       "a4": "Stock prices and financial filings are updated daily, with essential metrics and charts processed shortly after the companies' official releases.",
       "q5": "How do I subscribe?",
-      "a5": "You create your account at thebullvalue.com and go straight to Whop's secure checkout, already linked to your account. After paying, confirm your e-mail and sign in with PRO active. Cancel on Whop whenever you want."
+      "a5": "You create your account at thebullvalue.com and go straight to Whop's secure checkout, already linked to your account. On the community plan the first {dias} days are free and you only pay if you don't cancel before then. After confirming your e-mail, you sign in with PRO active. Cancel on Whop whenever you want."
     },
     "floatingNote": "From €7 per month · cancel anytime",
     "mission": {
@@ -265,7 +265,7 @@
     "hero2": {
       "subtitle": "10 years of fundamentals, a DCF calculator and an AI analyst for every S&P 500 company. All in one place.",
       "cta": "Get started",
-      "priceNote": "From €{preco} per month · cancel anytime",
+      "priceNote": "From €{preco} per month · {dias} days free on the community plan",
       "tabCompany": "Analyse a company",
       "tabDcf": "DCF calculator",
       "altCompany": "Video: Microsoft's page on BullValue, from the summary to fundamentals, the AI analyst and valuation",
@@ -398,7 +398,8 @@
     "planNote": "Cancel anytime. Payment happens in Whop's secure checkout.",
     "consentMissing": "We couldn't record your request. Please try again.",
     "planPrice": "€{preco} per month, taxes included",
-    "choosePlan": "Choose your plan"
+    "choosePlan": "Choose your plan",
+    "planPriceTrial": "{dias} days free, then €{preco} per month, taxes included"
   },
   "forgotPassword": {
     "title": "Reset Password",
@@ -1351,9 +1352,10 @@
       "goDashboard": "Go to the dashboard",
       "error": "We couldn't open the payment. Try again in a minute or write to {email}.",
       "startPro": "Start with PRO",
-      "startComunidade": "Join with the community",
+      "startComunidade": "Try {dias} days free",
       "active": "Your current plan",
-      "upgradeNote": "You already have BullValue PRO. After joining the community, cancel PRO in your Whop account so you don't pay for both."
+      "upgradeNote": "You already have BullValue PRO. After joining the community, cancel PRO in your Whop account so you don't pay for both.",
+      "billingTrial": "The first {dias} days are free: cancel before then and you pay nothing. After that, €{preco} per month, taxes included, renewing automatically until you cancel in your Whop account."
     },
     "plans": {
       "pro": {
@@ -1379,7 +1381,8 @@
           "Weekly market notes",
           "Private channels, with questions answered by Tiago",
           "Exclusive events and content"
-        ]
+        ],
+        "trial": "{dias} days free"
       }
     },
     "features": {

@@ -135,7 +135,7 @@ export default async function LandingPage({
           "name": t(`faq.q${n}`),
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": t(`faq.a${n}`)
+            "text": t(`faq.a${n}`, { dias: PLANOS.comunidade.diasGratis ?? 0 })
           }
         }))
       }
@@ -191,7 +191,7 @@ export default async function LandingPage({
             </Link>
           </div>
           <p className="hero-in mt-3 text-xs text-muted-foreground" style={heroDelay(0.34)}>
-            {t("hero2.priceNote", { preco: precoTexto(PLANOS.pro.preco) })}
+            {t("hero2.priceNote", { preco: precoTexto(PLANOS.pro.preco), dias: PLANOS.comunidade.diasGratis ?? 0 })}
           </p>
         </div>
 
@@ -267,7 +267,7 @@ export default async function LandingPage({
         <div className="relative mx-auto max-w-5xl px-6 py-16 md:px-8 md:py-24">
           <Reveal className="mx-auto mb-12 max-w-3xl text-center">
             <h2 className="text-balance text-3xl font-extrabold tracking-[-0.03em] sm:text-5xl">{t("pricing.title")}</h2>
-            <p className="mx-auto mt-4 max-w-[62ch] text-lg leading-relaxed text-muted-foreground">{t("pricing.subtitle")}</p>
+            <p className="mx-auto mt-4 max-w-[62ch] text-lg leading-relaxed text-muted-foreground">{t("pricing.subtitle", { dias: PLANOS.comunidade.diasGratis ?? 0 })}</p>
           </Reveal>
           {/* Quem vê a landing não tem sessão (com sessão redireciona), daí "anonimo". */}
           <PricingCards supportEmail={LEGAL.email} estado="anonimo" />
@@ -287,7 +287,7 @@ export default async function LandingPage({
                   {t(`faq.q${n}`)}
                   <ChevronDown className="faq-chevron h-4 w-4 shrink-0 text-muted-foreground" />
                 </summary>
-                <p className="max-w-[68ch] px-5 pb-5 text-[15px] leading-relaxed text-muted-foreground">{t(`faq.a${n}`)}</p>
+                <p className="max-w-[68ch] px-5 pb-5 text-[15px] leading-relaxed text-muted-foreground">{t(`faq.a${n}`, { dias: PLANOS.comunidade.diasGratis ?? 0 })}</p>
               </details>
             ))}
           </div>
@@ -319,7 +319,7 @@ export default async function LandingPage({
               {t("peekCta")}
             </Link>
           </div>
-          <p className="mt-5 text-xs text-muted-foreground/80">{t("hero2.priceNote", { preco: precoTexto(PLANOS.pro.preco) })}</p>
+          <p className="mt-5 text-xs text-muted-foreground/80">{t("hero2.priceNote", { preco: precoTexto(PLANOS.pro.preco), dias: PLANOS.comunidade.diasGratis ?? 0 })}</p>
         </Reveal>
       </section>
     </div>

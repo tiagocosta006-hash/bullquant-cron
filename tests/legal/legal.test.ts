@@ -6,6 +6,7 @@ import { PRIVACIDADE } from "@/lib/legal/privacidade"
 import { REEMBOLSO } from "@/lib/legal/reembolso"
 import { COOKIES } from "@/lib/legal/cookies"
 import { AVISO_LEGAL } from "@/lib/legal/avisoLegal"
+import { PLANOS } from "@/lib/planos"
 import { VERSOES, LEGAL, lacunasIdentificacao } from "@/lib/legal/config"
 import { lerPrefs } from "@/lib/legal/cookiePrefs"
 import { POST as retratacao } from "@/app/api/withdrawal/route"
@@ -73,7 +74,12 @@ describe("linguagem do produto (sem plano gratuito, sem veredictos)", () => {
       const ns = ["pricing", "marketing", "header", "login", "register"] as const
       for (const n of ns) {
         for (const [c, v] of textos((msgs as Record<string, unknown>)[n])) {
-          expect(v, `${loc}.${n}.${c}`).not.toMatch(/gr[aá]tis|gratuit|free plan|free account|sign up for free|start free|7 dias|7 days|sem cart[aã]o|no credit card/i)
+          // Os dias grátis do plano com comunidade só podem vir de lib/planos.ts
+          // ({dias}, igual ao trial da Whop): tira-se a frase que os usa e o
+          // resto continua sem promessas de acesso grátis.
+          const semTrial = v.replace(/[^.·]*\{dias\}[^.·]*/g, "")
+          expect(semTrial, `${loc}.${n}.${c}`).not.toMatch(/gr[aá]tis|gratuit|free plan|free account|sign up for free|start free|7 dias|7 days|sem cart[aã]o|no credit card/i)
+          if (v.includes("{dias}")) expect(PLANOS.comunidade.diasGratis, `${loc}.${n}.${c} usa {dias}`).toBeGreaterThan(0)
         }
       }
     })

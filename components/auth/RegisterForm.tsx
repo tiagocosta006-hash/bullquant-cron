@@ -73,12 +73,20 @@ export function RegisterForm({
                   <span className="block text-xs text-muted-foreground">{tPlanos(`${id}.description`)}</span>
                 </span>
               </span>
-              <span className="whitespace-nowrap text-sm font-bold">{precoTexto(PLANOS[id].preco, locale)} €</span>
+              <span className="text-right">
+                <span className="block whitespace-nowrap text-sm font-bold">{precoTexto(PLANOS[id].preco, locale)} €</span>
+                {PLANOS[id].diasGratis && (
+                  <span className="block whitespace-nowrap text-xs font-semibold text-primary">{tPlanos(`${id}.trial`, { dias: PLANOS[id].diasGratis })}</span>
+                )}
+              </span>
             </label>
           ))}
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          {t("planPrice", { preco: precoTexto(PLANOS[plano].preco, locale) })} · {t("planNote")}
+          {PLANOS[plano].diasGratis
+            ? t("planPriceTrial", { preco: precoTexto(PLANOS[plano].preco, locale), dias: PLANOS[plano].diasGratis })
+            : t("planPrice", { preco: precoTexto(PLANOS[plano].preco, locale) })}{" "}
+          · {t("planNote")}
         </p>
       </fieldset>
 

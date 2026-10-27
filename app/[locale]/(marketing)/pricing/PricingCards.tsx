@@ -47,6 +47,7 @@ export function PricingCards({
   const cartao = (id: PlanoId) => {
     const destaque = id === "comunidade";
     const preco = precoTexto(PLANOS[id].preco, locale);
+    const dias = PLANOS[id].diasGratis;
     const features = t.raw(`plans.${id}.features`) as string[];
     const atual = estado === "pro" && (planoAtual === id || (planoAtual !== "pro" && planoAtual !== "comunidade" && id === "pro"));
     const jaIncluido = estado === "pro" && planoAtual === "comunidade" && id === "pro";
@@ -65,7 +66,7 @@ export function PricingCards({
           data-track={`pricing_${id}`}
           className={cn(buttonVariants({ size: "lg", variant: destaque ? "default" : "outline" }), "w-full font-semibold")}
         >
-          {id === "pro" ? t("consent.startPro") : t("consent.startComunidade")}
+          {id === "pro" ? t("consent.startPro") : t("consent.startComunidade", { dias: dias ?? 0 })}
           <ArrowRight className="ml-2 h-4 w-4" />
         </Link>
       );
@@ -86,7 +87,7 @@ export function PricingCards({
             disabled={aEnviar}
             className={cn(buttonVariants({ size: "lg", variant: destaque ? "default" : "outline" }), "w-full font-semibold")}
           >
-            {id === "pro" ? t("consent.startPro") : t("consent.startComunidade")}
+            {id === "pro" ? t("consent.startPro") : t("consent.startComunidade", { dias: dias ?? 0 })}
             <ArrowRight className="ml-2 h-4 w-4" />
           </button>
         </>
@@ -119,6 +120,11 @@ export function PricingCards({
           <span className="nums text-5xl font-extrabold tracking-tight">{preco} €</span>
           <span className="mb-1.5 text-muted-foreground">/ {t("pro.period")}</span>
         </div>
+        {dias && (
+          <p className="mt-3 inline-flex w-fit items-center rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+            {t(`plans.${id}.trial`, { dias })}
+          </p>
+        )}
         <p className="mt-2 text-sm text-muted-foreground">{t(`plans.${id}.description`)}</p>
 
         <ul className="mb-7 mt-6 flex flex-1 flex-col gap-3">
@@ -132,7 +138,7 @@ export function PricingCards({
           ))}
         </ul>
 
-        <p className="mb-4 text-xs leading-relaxed text-muted-foreground">{t("consent.billing", { preco })}</p>
+        <p className="mb-4 text-xs leading-relaxed text-muted-foreground">{dias ? t("consent.billingTrial", { preco, dias }) : t("consent.billing", { preco })}</p>
         {acao}
       </div>
     );

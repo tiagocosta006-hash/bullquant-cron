@@ -278,6 +278,12 @@
       "proofYears": "anos de dados da SEC",
       "proofLanguage": "Tudo em português",
       "proofTeam": "Feito por três portugueses"
+    },
+    "variants": {
+      "label": "Versões da landing",
+      "a": "Versão A — a atual, com as correções",
+      "b": "Versão B — redesenhada",
+      "c": "Versão C — vídeos e prints mostrados de outra forma"
     }
   },
   "insider": {

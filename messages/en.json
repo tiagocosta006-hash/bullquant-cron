@@ -278,6 +278,12 @@
       "proofYears": "years of SEC data",
       "proofLanguage": "Built for Portuguese investors",
       "proofTeam": "Made by three Portuguese founders"
+    },
+    "variants": {
+      "label": "Landing versions",
+      "a": "Version A — current, with fixes",
+      "b": "Version B — redesigned",
+      "c": "Version C — videos and screenshots shown differently"
     }
   },
   "insider": {

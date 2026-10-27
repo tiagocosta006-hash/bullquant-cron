@@ -1,55 +1,35 @@
 import { redirect } from 'next/navigation';
 import { Link } from '@/i18n/routing';
 
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import { ArrowRight, Briefcase, CalendarDays, Check, ChevronDown, LayoutDashboard, SearchCode } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { BrandMark } from "@/components/brand/BrandMark";
-import { LiquidGlass } from "@/components/fx/LiquidGlass";
 import { Reveal } from "@/components/fx/Reveal";
 import { HeroHorizon } from "@/components/marketing/HeroHorizon";
-import { HeroStage } from "@/components/marketing/HeroStage";
-import { AiInsightCard } from "@/components/marketing/AiInsightCard";
-import { ChartScrollDraw } from "@/components/marketing/ChartScrollDraw";
-import { Counter } from "@/components/marketing/Counter";
-import { DcfScrollDemo } from "@/components/marketing/DcfScrollDemo";
-import { FeatureStory } from "@/components/marketing/FeatureStory";
+import { HeroVideo } from "@/components/marketing/HeroVideo";
 import { GrowCta } from "@/components/marketing/GrowCta";
-import { ManifestoText } from "@/components/marketing/ManifestoText";
-import { DashboardReplica } from "@/components/marketing/replicas/DashboardReplica";
-import { PortfolioReplica } from "@/components/marketing/replicas/PortfolioReplica";
-import { CalendarReplica } from "@/components/marketing/replicas/CalendarReplica";
-import { ExploreReplica } from "@/components/marketing/replicas/ExploreReplica";
-import { TickerWall } from "@/components/marketing/TickerWall";
 import { LANDING_MEDIA } from "@/components/marketing/media";
-import { MediaFrame } from "@/components/marketing/MediaFrame";
-import { ScrollShowcase } from "@/components/marketing/ScrollShowcase";
-import { TerminalMock } from "@/components/marketing/TerminalMock";
-import { TeamMemberModal } from "@/components/marketing/TeamMemberModal";
 import { TeamSignature } from "@/components/marketing/TeamSignature";
-import { TickerMarquee } from "@/components/marketing/TickerMarquee";
 import { PlatformInside } from "@/components/marketing/PlatformInside";
 import { BRAND } from "@/lib/brand";
-import { getTickerItems, GLOBAL_ETFS } from "@/lib/marketing/ticker";
 import { getUser } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
-import { PLANOS, PLANO_IDS } from "@/lib/planos";
+import { PLANOS, PLANO_IDS, precoTexto } from "@/lib/planos";
 import { PricingCards } from "./pricing/PricingCards";
 import { LEGAL } from "@/lib/legal/config";
 
 
 /**
- * Landing v2 — scroll-cinematográfica: hero de tipografia gigante com
- * ticker vivo (dados EOD do Postgres), showcase que se "abre" com o
- * scroll, manifesto palavra-a-palavra, três stories (gráfico que se
- * desenha · DCF real scriptada · Analista IA), bento, counters e CTA final.
- * Pinned sections são CSS sticky (nunca pin do GSAP — ver
- * lib/marketing/gsap.ts); todo o texto via i18n; media real entra pelos
- * slots de components/marketing/media.ts.
+ * Landing v3 — direta ao ponto (27/10/2026, "temos de fazer vendas"; modelo:
+ * a Qualtrim, ~4 ecrãs). Ordem: título curto + CTA com o preço → VÍDEO REAL da
+ * plataforma logo no primeiro ecrã → faixa de prova → a plataforma por dentro
+ * (prints reais) → os dois planos → FAQ → CTA final. A v2 (scroll
+ * cinematográfico, manifesto, stories animadas, bento, contadores, equipa em
+ * grande) tinha ~19 ecrãs; os componentes continuam em components/marketing/.
+ * Todo o texto via i18n (marketing.*).
  */
 
-const SITE_URL = "https://thebullvalue.com";
 
 /* Equipa mostrada na secção "Feito em Portugal" — mesmas fotos da página
    /about (public/team/). Sem foto → iniciais, como lá. */
@@ -129,19 +109,7 @@ export default async function LandingPage({
     redirect("/dashboard");
   }
 
-  const [t, tStockTabs, tDashboard, tPortfolio, tCalendar, tExplore, tAboutTeam, ticker] =
-    await Promise.all([
-      getTranslations("marketing"),
-      getTranslations("stock.tabs"),
-      getTranslations("dashboard"),
-      getTranslations("portfolio"),
-      getTranslations("calendar"),
-      getTranslations("explore"),
-      // bios e redes da equipa — as MESMAS de /about (about.team.members[]),
-      // não uma cópia: uma segunda fonte divergia ao primeiro update
-      getTranslations("about.team"),
-      getTickerItems(),
-    ]);
+  const t = await getTranslations("marketing");
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -180,81 +148,6 @@ export default async function LandingPage({
   // components/marketing/replicas/*.tsx). Sem fetch — números hardcoded,
   // labels via chaves i18n reais das próprias páginas (evita duplicar copy
   // nos 9 locales).
-  const bentoCards = [
-    {
-      key: "dashboard",
-      icon: LayoutDashboard,
-      href: "/pricing",
-      mock: (
-        <DashboardReplica
-          tabs={["sp500", "gainers", "marketCap"].map((k) => tDashboard(`tabs.${k}`))}
-          marketCapLabel={tDashboard("marketCap")}
-          logos={Object.fromEntries(
-            ["AAPL", "MSFT", "NVDA", "GOOGL", "AMZN", "META", "TSLA", "NFLX", "V"].map((tk) => [
-              tk,
-              ticker.items.find((i) => i.ticker === tk)?.logoUrl ?? null,
-            ]),
-          )}
-          variant="C"
-        />
-      ),
-    },
-    {
-      key: "portfolio",
-      icon: Briefcase,
-      href: "/pricing",
-      mock: (
-        <PortfolioReplica
-          labels={{
-            marketValue: tPortfolio("summary.marketValue"),
-            totalPnl: tPortfolio("summary.totalPnl"),
-            positions: tPortfolio("positions"),
-            upToday: tPortfolio("upToday"),
-            allocationTitle: tPortfolio("allocation.title"),
-            valueTabs: {
-              "1m": tPortfolio("valueChart.tabs.1m"),
-              "6m": tPortfolio("valueChart.tabs.6m"),
-              "1y": tPortfolio("valueChart.tabs.1y"),
-              max: tPortfolio("valueChart.tabs.max"),
-            },
-          }}
-        />
-      ),
-    },
-    {
-      key: "calendar",
-      icon: CalendarDays,
-      href: "/pricing",
-      mock: (
-        <CalendarReplica
-          labels={{
-            day: t("bento.replicas.calDay"),
-            week: t("bento.replicas.calWeek"),
-            month: t("bento.replicas.calMonth"),
-            scopeAll: tCalendar("scopeAll"),
-            scopeWatchlist: tCalendar("scopeWatchlist"),
-            scopePortfolio: tCalendar("scopePortfolio"),
-            others: t("bento.replicas.calOthers"),
-          }}
-        />
-      ),
-    },
-    {
-      key: "explore",
-      icon: SearchCode,
-      href: "/pricing",
-      mock: (
-        <ExploreReplica
-          heading={tExplore("sectorsTitle")}
-          // resolvido no servidor (contagens fixas ilustrativas, mesma ordem
-          // dos 4 setores em ExploreReplica.tsx) — Server Components não
-          // podem passar funções como prop a Client Components.
-          companiesLabels={[68, 52, 61, 47].map((count) => tExplore("companiesCount", { count }))}
-        />
-      ),
-    },
-  ] as const;
-
   return (
     <div className="relative flex-1 overflow-x-clip">
       <script
@@ -262,267 +155,98 @@ export default async function LandingPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* ── 1 · Hero (com horizonte dourado, aurora e saída em dolly) ── */}
-      <section
-        data-backdrop="paper"
-        className="relative isolate flex min-h-[calc(100svh-4rem)] flex-col px-6 pt-20 md:min-h-[calc(74svh-4rem)] md:px-8"
-      >
+      {/* ── 1 · Topo: o que é, o preço e o produto a ser usado ─────── */}
+      <section data-backdrop="paper" className="relative isolate px-5 pt-10 md:px-8 md:pt-20">
         <div className="hero-aurora" aria-hidden />
-        {/* Imagem de fundo do hero — inerte sem data-v-hero (painel Tweak).
-            Ver "IMAGEM DE FUNDO DO HERO" em app/design-variants.css. */}
-        <div className="hero-art" aria-hidden />
         <HeroHorizon />
-        {/* `relative`: é este o contexto de posicionamento da assinatura da
-            equipa (canto inferior direito). Ancorá-la à <section> punha-a em
-            cima da fita de tickers, que é filha da section mas não do stage. */}
-        <HeroStage className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center">
-          <h1
-            className="max-w-[15ch] text-balance text-5xl font-extrabold leading-[0.95] tracking-[-0.04em] sm:text-7xl md:text-8xl xl:text-[7.5rem]"
-          >
-            {/* Texto real invisível para leitores de ecrã e SEO (Googlebot valoriza texto no H1 e não em atributos) */}
+        <div className="relative mx-auto flex max-w-5xl flex-col items-center text-center">
+          <h1 className="max-w-[22ch] text-balance text-[2.1rem] font-extrabold leading-[1.02] tracking-[-0.035em] sm:text-6xl md:text-7xl">
+            {/* Texto real para leitores de ecrã e SEO; o visível é animado palavra a palavra */}
             <span className="sr-only">{t("titleLead")} {t("titleAccent")}</span>
-            
-            {/* O texto fragmentado para a animação visual, escondido dos motores de busca/screen readers para não duplicar */}
             {heroLead(t("titleLead"))}
-              {heroWords(
-                t("titleAccent"),
-                t("titleLead").split(" ").length,
-                "font-heading font-bold italic text-primary gold-sheen-text",
-              )}
+            {heroWords(
+              t("titleAccent"),
+              t("titleLead").split(" ").length,
+              "font-heading font-bold italic text-primary gold-sheen-text",
+            )}
           </h1>
-
-          <p
-            className="hero-in mt-8 max-w-[52ch] text-lg leading-relaxed text-muted-foreground sm:text-xl"
-            style={heroDelay(0.18)}
-          >
-            {t("subtitle")}
+          <p className="hero-in mt-4 max-w-[56ch] text-[15px] leading-relaxed text-muted-foreground sm:mt-5 sm:text-lg" style={heroDelay(0.18)}>
+            {t("hero2.subtitle")}
           </p>
-
-          <div className="hero-in mt-10 flex flex-col gap-3 sm:flex-row" style={heroDelay(0.28)}>
+          <div className="hero-in mt-6 flex flex-row flex-wrap items-center justify-center gap-2.5 sm:mt-7 sm:gap-3" style={heroDelay(0.28)}>
             <Link
               href="/register"
               data-track="hero_register"
-              className={cn(
-                buttonVariants({ size: "lg" }),
-                // cta-glow (pulso 7s) saiu: com o cta-sheen na mesma node eram
-                // dois loops sobrepostos no mesmo botão.
-                "pressable cta-sheen min-h-13 px-8 text-base font-semibold",
-              )}
+              className={cn(buttonVariants({ size: "lg" }), "pressable cta-sheen min-h-12 px-6 text-base font-semibold sm:px-8")}
             >
-              {t("primaryCta")}
+              {t("hero2.cta")}
+              <ArrowRight className="ml-1.5 h-4 w-4" />
             </Link>
             <Link
               href="/stock/AAPL"
               data-track="hero_demo"
-              className={cn(
-                buttonVariants({ size: "lg", variant: "outline" }),
-                "pressable min-h-13 px-8 text-base",
-              )}
+              className={cn(buttonVariants({ size: "lg", variant: "outline" }), "pressable min-h-12 px-5 text-base sm:px-7")}
             >
-              {t("secondaryCta")} <ArrowRight className="ml-1.5 h-4 w-4" />
+              {t("peekCta")}
             </Link>
           </div>
-
-          {/* Assinatura da equipa — as caras em pequeno, no canto inferior
-              direito, à MESMA ALTURA dos botões. O payoff está na secção 9c,
-              com as mesmas três em retrato 4:5 grande.
-
-              `lg:bottom-[26px]` e não `lg:bottom-0`: colada ao fundo, a
-              pílula caía na mesma linha do "Cobertura S&P 500 · …". Com ela
-              fora do fluxo, o fundo da linha dos botões fica a 24px do fundo
-              do stage; +2px alinha os CENTROS (botões 52px, pílula 48px).
-
-              Só a partir de lg: em ecrã estreito não há canto vazio nenhum e
-              a pílula cairia por cima da linha de confiança — abaixo disso
-              volta ao fluxo normal, debaixo dos botões. */}
-          <div
-            className="hero-in mt-8 flex flex-wrap items-center gap-x-3 gap-y-2 lg:absolute lg:bottom-[26px] lg:right-0 lg:mt-0 lg:justify-end"
-            style={heroDelay(0.42)}
-          >
-            <TeamSignature
-              faces={TEAM}
-              label={t("signature")}
-              className="inline-flex items-center gap-3 rounded-full border border-border/60 bg-card/50 py-1.5 pl-1.5 pr-4"
-            />
-          </div>
-
-          <p className="hero-in mt-6 max-w-[70ch] text-xs text-muted-foreground/80" style={heroDelay(0.48)}>
-            {t("trust")}
+          <p className="hero-in mt-3 text-xs text-muted-foreground" style={heroDelay(0.34)}>
+            {t("hero2.priceNote", { preco: precoTexto(PLANOS.pro.preco) })}
           </p>
-        </HeroStage>
-
-        {/* fita de terminal full-bleed (fora do HeroStage — plano próprio) */}
-        <div
-          className="hero-in flex flex-col -mx-6 border-y border-border/50 bg-card/40 md:-mx-8"
-          style={heroDelay(0.5)}
-        >
-          {/* legenda acompanha a fonte real dos dados — nunca prometer
-              "em direto" quando são fechos da BD (e vice-versa) */}
-          <TickerMarquee
-            items={ticker.items.filter(i => GLOBAL_ETFS.includes(i.ticker))}
-            label={ticker.live ? t("ticker.labelLive") : t("ticker.label")}
-          />
-          <div className="h-px w-full bg-border/50" />
-          <TickerMarquee
-            items={ticker.items.filter(i => !GLOBAL_ETFS.includes(i.ticker))}
-            label={ticker.live ? t("ticker.labelLive") : t("ticker.label")}
-          />
         </div>
-      </section>
 
-      {/* ── 2 · Showcase cinematográfico (scrub + sticky) ───────── */}
-      <section data-backdrop="stage" className="relative isolate">
-        <ScrollShowcase
-          peek
-          captions={[t("showcase.caption"), t("showcase.caption2"), t("showcase.caption3")]}
-        >
-          <MediaFrame media={LANDING_MEDIA.showcaseTerminal} alt={t("showcase.alt")}>
-            {/* updatedLabel: hora FIXA de propósito — é um mock. Uma hora real
-                dava mismatch de hidratação (servidor ≠ cliente) e prometia
-                dados ao vivo que este quadro não tem. */}
-            <TerminalMock
-              updatedLabel={t("showcase.updated", { time: "16:32" })}
-              tabs={{
-                overview: tStockTabs("overview"),
-                financials: tStockTabs("financials"),
-                analista: tStockTabs("analista"),
-              }}
-              fin={{
-                revenueTitle: t("stories.fundamentals.cardRevenueTitle"),
-                segmentsTitle: t("showcase.finSegmentsTitle"),
-                fcfTitle: t("stories.fundamentals.cardFcfTitle"),
-                cagrLabel: t("stories.fundamentals.cagrLabel"),
-                moreCharts: t("showcase.moreCharts", { count: 8 }),
-              }}
-              analystMock={{
-                thesisLabel: t("stories.ai.thesisLabel"),
-                thesis: t("stories.ai.thesis"),
-                moatLabel: t("stories.ai.moatLabel"),
-                moatValue: t("stories.ai.moatValue"),
-                chatUser: t("showcase.chat.user"),
-                chatAnswer: t("showcase.chat.answer"),
-                chatCite: t("showcase.chat.cite"),
-              }}
-            />
-          </MediaFrame>
-        </ScrollShowcase>
-      </section>
-
-      {/* ── 3 · Manifesto (palavra a palavra, parede de tickers) ── */}
-      <section data-backdrop="sunken" className="relative isolate">
-        <ManifestoText
-          lines={[t("manifesto.l1"), t("manifesto.l2"), t("manifesto.l3")]}
-          accentLine={2}
-          backdrop={<TickerWall items={ticker.items} />}
-        />
-      </section>
-
-      {/* ── 4 · Story 1: fundamentais (gráfico desenha-se) ──────── */}
-      <section data-backdrop="grid" className="relative isolate">
-        <div className="relative mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
-          <FeatureStory
-            index="01"
-            eyebrow={t("stories.fundamentals.eyebrow")}
-            title={t("stories.fundamentals.title")}
-            titleAccent={t("stories.fundamentals.titleAccent")}
-            desc={t("stories.fundamentals.desc")}
-            bullets={[
-              t("stories.fundamentals.b1"),
-              t("stories.fundamentals.b2"),
-              t("stories.fundamentals.b3"),
+        <div className="hero-in relative mx-auto mt-7 max-w-6xl md:mt-12" style={heroDelay(0.4)}>
+          <HeroVideo
+            items={[
+              {
+                key: "empresa",
+                label: t("hero2.tabCompany"),
+                video: LANDING_MEDIA.showcaseTerminal?.video ?? "",
+                poster: LANDING_MEDIA.showcaseTerminal?.poster ?? "",
+                alt: t("hero2.altCompany"),
+              },
+              {
+                key: "dcf",
+                label: t("hero2.tabDcf"),
+                video: LANDING_MEDIA.featureTour?.video ?? "",
+                poster: LANDING_MEDIA.featureTour?.poster ?? "",
+                alt: t("hero2.altDcf"),
+              },
             ]}
-          >
-            <ChartScrollDraw
-              ariaLabel={t("stories.fundamentals.chartAria")}
-              legendRevenue={t("stories.fundamentals.legendRevenue")}
-              legendFcf={t("stories.fundamentals.legendFcf")}
-              cardRevenueTitle={t("stories.fundamentals.cardRevenueTitle")}
-              cardFcfTitle={t("stories.fundamentals.cardFcfTitle")}
-              cagrLabel={t("stories.fundamentals.cagrLabel")}
-            />
-          </FeatureStory>
+            mobile={{ video: "/media/showcase-mobile.mp4", poster: "/media/showcase-mobile.jpg", alt: t("hero2.altCompany") }}
+          />
         </div>
       </section>
 
-      {/* ── 5 · Story 2: DCF (o motor real, scriptado) ──────────── */}
-      <section data-backdrop="rings" className="relative isolate">
-        <div className="relative mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
-          <FeatureStory
-            reverse
-            index="02"
-            eyebrow={t("stories.dcf.eyebrow")}
-            title={t("stories.dcf.title")}
-            titleAccent={t("stories.dcf.titleAccent")}
-            desc={t("stories.dcf.desc")}
-            bullets={[t("stories.dcf.b1"), t("stories.dcf.b2"), t("stories.dcf.b3")]}
-          >
-            <DcfScrollDemo
-              labels={{
-                growth: t("stories.dcf.growth"),
-                wacc: t("stories.dcf.wacc"),
-                terminal: t("stories.dcf.terminal"),
-                price: t("stories.dcf.price"),
-                fairValue: t("stories.dcf.fairValue"),
-                perShare: t("stories.dcf.perShare"),
-                margin: t("stories.dcf.margin"),
-                undervalued: t("stories.dcf.undervalued"),
-                overvalued: t("stories.dcf.overvalued"),
-                disclaimer: t("stories.dcf.disclaimer"),
-              }}
-            />
-          </FeatureStory>
+      {/* ── 2 · Prova, numa linha ───────────────────────────────────── */}
+      <section className="relative isolate px-6 py-12 md:px-8 md:py-16">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-x-10 gap-y-5 text-center">
+          <div>
+            <div className="nums text-3xl font-extrabold tracking-tight">500</div>
+            <div className="text-sm text-muted-foreground">{t("hero2.proofCompanies")}</div>
+          </div>
+          <div>
+            <div className="nums text-3xl font-extrabold tracking-tight">10</div>
+            <div className="text-sm text-muted-foreground">{t("hero2.proofYears")}</div>
+          </div>
+          <div className="text-sm font-semibold">{t("hero2.proofLanguage")}</div>
+          <TeamSignature
+            faces={TEAM}
+            label={t("hero2.proofTeam")}
+            className="inline-flex items-center gap-3 rounded-full border border-border/60 bg-card/50 py-1.5 pl-1.5 pr-4"
+          />
         </div>
       </section>
 
-      {/* ── 6 · Story 3: AI Insights (brief escreve-se) ─────────── */}
-      <section data-backdrop="dots" className="relative isolate">
-        <div className="relative mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
-          <FeatureStory
-            index="03"
-            eyebrow={t("stories.ai.eyebrow")}
-            title={t("stories.ai.title")}
-            titleAccent={t("stories.ai.titleAccent")}
-            desc={t("stories.ai.desc")}
-            bullets={[t("stories.ai.b1"), t("stories.ai.b2"), t("stories.ai.b3")]}
-          >
-            <AiInsightCard
-              title={t("stories.ai.cardTitle")}
-              chipLabel={t("stories.ai.chipLabel")}
-              thesisLabel={t("stories.ai.thesisLabel")}
-              thesis={t("stories.ai.thesis")}
-              moatLabel={t("stories.ai.moatLabel")}
-              moatValue={t("stories.ai.moatValue")}
-              kpis={[
-                {
-                  label: t("stories.ai.kpi1Label"),
-                  value: t("stories.ai.kpi1Value"),
-                  insight: t("stories.ai.kpi1Insight"),
-                },
-                {
-                  label: t("stories.ai.kpi2Label"),
-                  value: t("stories.ai.kpi2Value"),
-                  insight: t("stories.ai.kpi2Insight"),
-                },
-              ]}
-              chatUser={t("stories.ai.chatUser")}
-              chatAnswer={t("stories.ai.chatAnswer")}
-              chatCite={t("stories.ai.chatCite")}
-              disclaimer={t("stories.ai.disclaimer")}
-            />
-          </FeatureStory>
-        </div>
-      </section>
-
-      {/* ── 6b · A plataforma por dentro (prints reais, por separador) ── */}
+      {/* ── 3 · A plataforma por dentro (prints reais) ──────────────── */}
       <section data-backdrop="grid" className="relative isolate">
-        <div className="relative mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
+        <div className="relative mx-auto max-w-6xl px-6 py-16 md:px-8 md:py-24">
           <Reveal className="mx-auto mb-10 max-w-3xl text-center">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary">{t("inside.eyebrow")}</p>
-            <h2 className="text-balance text-4xl font-extrabold tracking-[-0.03em] sm:text-5xl">
+            <h2 className="text-balance text-3xl font-extrabold tracking-[-0.03em] sm:text-5xl">
               {t("inside.title")}{" "}
               <span className="font-heading font-bold italic text-primary">{t("inside.titleAccent")}</span>
             </h2>
-            <p className="mx-auto mt-5 max-w-[56ch] text-lg leading-relaxed text-muted-foreground">{t("inside.subtitle")}</p>
+            <p className="mx-auto mt-4 max-w-[56ch] text-lg leading-relaxed text-muted-foreground">{t("inside.subtitle")}</p>
           </Reveal>
           <Reveal>
             <PlatformInside
@@ -538,262 +262,64 @@ export default async function LandingPage({
         </div>
       </section>
 
-      {/* ── 7 · Feature tour (vídeo real: calculadora DCF → modelo FMVA) ── */}
-      {LANDING_MEDIA.featureTour ? (
-        <section className="mx-auto max-w-6xl px-6 pb-28 md:px-8 md:pb-40">
-          <Reveal className="mx-auto mb-10 max-w-3xl text-center">
-            <h2 className="text-balance text-4xl font-extrabold tracking-[-0.03em] sm:text-5xl">
-              {t("tour.title")}{" "}
-              <span className="font-heading font-bold italic text-primary">{t("tour.titleAccent")}</span>
-            </h2>
-            <p className="mx-auto mt-5 max-w-[56ch] text-lg leading-relaxed text-muted-foreground">{t("tour.subtitle")}</p>
+      {/* ── 4 · Planos ──────────────────────────────────────────────── */}
+      <section id="planos" data-backdrop="rings" className="relative isolate">
+        <div className="relative mx-auto max-w-5xl px-6 py-16 md:px-8 md:py-24">
+          <Reveal className="mx-auto mb-12 max-w-3xl text-center">
+            <h2 className="text-balance text-3xl font-extrabold tracking-[-0.03em] sm:text-5xl">{t("pricing.title")}</h2>
+            <p className="mx-auto mt-4 max-w-[62ch] text-lg leading-relaxed text-muted-foreground">{t("pricing.subtitle")}</p>
           </Reveal>
-          <Reveal>
-            <MediaFrame media={LANDING_MEDIA.featureTour} alt={t("tour.alt")} aspect="16 / 9" />
-          </Reveal>
-        </section>
-      ) : null}
-
-      {/* ── 8 · Bento: tudo num terminal ────────────────────────── */}
-      <section
-        data-backdrop="paper-grid"
-        className={cn(
-          "relative isolate",
-          // sem feature tour, o salto story 3 → bento precisa de mais ar
-          LANDING_MEDIA.featureTour ? "" : "pt-4 md:pt-8",
-        )}
-      >
-        <div className="relative mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
-        <Reveal data-reveal="zoom" className="mx-auto max-w-3xl text-center">
-          <h2 className="text-balance text-4xl font-extrabold tracking-[-0.03em] sm:text-5xl md:text-6xl">
-            {t("bento.title")}
-          </h2>
-          <p className="mx-auto mt-5 max-w-[62ch] text-lg leading-relaxed text-muted-foreground">{t("bento.subtitle")}</p>
-        </Reveal>
-
-        <div data-bento-grid className="mt-14 grid gap-5 md:grid-cols-2">
-          {bentoCards.map(({ key, icon: Icon, href, mock }, i) => (
-            <Reveal key={key} style={{ transitionDelay: `${i * 70}ms` }}>
-              <div className="h-full">
-              <Link
-                href={href}
-                data-track={`bento_${key}`}
-                className="block h-full rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-              >
-                <LiquidGlass className="group card-lift h-full rounded-3xl p-6">
-                  <div data-icon-tile className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary transition-transform duration-[var(--dur-base)] ease-[var(--spring)] group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100">
-                    <Icon className="h-5 w-5" strokeWidth={2} />
-                  </div>
-                  <h3 className="text-base font-semibold">{t(`bento.${key}.title`)}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                    {t(`bento.${key}.desc`)}
-                  </p>
-                  {mock}
-                </LiquidGlass>
-              </Link>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+          {/* Quem vê a landing não tem sessão (com sessão redireciona), daí "anonimo". */}
+          <PricingCards supportEmail={LEGAL.email} estado="anonimo" />
         </div>
       </section>
 
-      {/* ── 9 · Números (counters, banda dourada) ───────────────── */}
-      <section data-backdrop="gold" className="relative isolate">
-        <div className="relative mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
-          <Reveal className="grid gap-12 text-center sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              { value: 10, suffix: "", label: t("numbers.years") },
-              { value: 500, suffix: "", label: t("numbers.companies") },
-              { value: 40, suffix: "", label: t("numbers.quarters") },
-              { value: PLANOS.pro.preco, suffix: " €", label: t("numbers.free") },
-            /* Sem Parallax: os counters lado a lado tinham amplitudes
-               diferentes (20 vs 36), por isso derivavam uns em relação aos
-               outros — o olho lê isso como desalinhamento, não como
-               profundidade. */
-            ].map(({ value, suffix, label }) => (
-              <div key={label}>
-                <Counter
-                  value={value}
-                  suffix={suffix}
-                  className={cn(
-                    "text-5xl font-extrabold tracking-tight text-primary sm:text-7xl",
-                    // o brilho do "0 €" vive agora só no cartão de preços — aqui
-                    // era o 2º "0 €" a brilhar na mesma página.
-                  )}
-                />
-                <div className="mt-3 text-sm font-medium text-muted-foreground">{label}</div>
-              </div>
-            ))}
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ── slot: pricing (feat/pricing-page injeta aqui) ───────── */}
-      {/* ── 9b · Planos ─────────────────────────────────────────── */}
-      <section data-backdrop="rings" className="relative isolate">
-        <div className="relative mx-auto max-w-5xl px-6 py-24 md:px-8 md:py-32">
-          <Reveal data-reveal="zoom" className="mx-auto max-w-3xl text-center">
-            <div data-kicker className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-              {t("pricing.eyebrow")}
-            </div>
-            <h2 className="mt-6 text-balance text-4xl font-extrabold tracking-[-0.03em] sm:text-5xl md:text-6xl">
-              {t("pricing.title")}
-            </h2>
-            <p className="mx-auto mt-5 max-w-[62ch] text-lg leading-relaxed text-muted-foreground">
-              {t("pricing.subtitle")}
-            </p>
-          </Reveal>
-
-          {/* Os mesmos cartões da página de preços (lib/planos.ts é a fonte do preço).
-              Quem vê a landing não tem sessão (com sessão redireciona), daí "anonimo". */}
-          <div className="mt-14">
-            <PricingCards supportEmail={LEGAL.email} estado="anonimo" />
-          </div>
-        </div>
-      </section>
-
-      {/* ── 9c · About / Bullocracy ─────────────────────────────── */}
-      <section data-backdrop="sunken" className="relative isolate">
-        <div className="relative mx-auto max-w-3xl px-6 py-24 text-center md:px-8 md:py-32">
-          <Reveal data-reveal="zoom">
-            <BrandMark className="mx-auto h-14 w-14 rounded-2xl shadow-lg" />
-            <div data-kicker className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-              {t("about.eyebrow")}
-            </div>
-            <h2 className="mt-4 text-balance text-4xl font-extrabold tracking-[-0.03em] sm:text-5xl">
-              {t("about.title")}
-            </h2>
-            <span className="gold-rule mx-auto mt-8 block h-px w-24" aria-hidden />
-            <p className="mx-auto mt-8 max-w-[62ch] text-lg leading-relaxed text-muted-foreground">{t("about.p1")}</p>
-            <p className="mx-auto mt-5 max-w-[62ch] text-lg leading-relaxed text-muted-foreground">{t("about.p2")}</p>
-
-          </Reveal>
-        </div>
-
-        {/* As caras da equipa, GRANDES — o mesmo cartão da página /about
-            (TeamMemberModal, retrato 4:5 + modal com bio e redes), não uma
-            segunda versão em miniatura.
-            Eram avatares redondos de 80px numa lista: à escala da landing
-            liam-se como ícones decorativos, e a seguir a dois parágrafos
-            sobre "quem somos" isso é o contrário do que a secção promete.
-            Fica FORA do `max-w-3xl` do texto de propósito — os três retratos
-            precisam de largura de sobra. */}
-        <div className="relative mx-auto max-w-5xl px-6 pb-24 md:px-8 md:pb-32">
-          <div className="grid gap-6 sm:grid-cols-3">
-            {TEAM.map((member, index) => (
-              <Reveal key={member.name} style={{ transitionDelay: `${index * 70}ms` }}>
-                <TeamMemberModal
-                  member={{
-                    name: member.name,
-                    /* `members.N.role` e NÃO `marketing.about.team.roleN`:
-                       existem duas cópias dos papéis nos messages, e a que
-                       /about usa é esta. Puxar da outra deixava o papel vazio
-                       no cartão (o fallback do i18n devolve string vazia em
-                       vez do caminho da chave). */
-                    role: tAboutTeam(`members.${index}.role`),
-                    bio: tAboutTeam(`members.${index}.bio`),
-                    initials: member.initials,
-                    image: member.image,
-                    socials: {
-                      linkedin: tAboutTeam.has(`members.${index}.socials.linkedin`)
-                        ? tAboutTeam(`members.${index}.socials.linkedin`)
-                        : "#",
-                      instagram: tAboutTeam.has(`members.${index}.socials.instagram`)
-                        ? tAboutTeam(`members.${index}.socials.instagram`)
-                        : "#",
-                      email: tAboutTeam.has(`members.${index}.socials.email`)
-                        ? tAboutTeam(`members.${index}.socials.email`)
-                        : "#",
-                    },
-                  }}
-                />
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 9d · FAQ ────────────────────────────────────────────── */}
+      {/* ── 5 · FAQ ─────────────────────────────────────────────────── */}
       <section data-backdrop="paper-grid" className="relative isolate">
-        <div className="relative mx-auto max-w-2xl px-6 py-24 md:px-8 md:py-28">
+        <div className="relative mx-auto max-w-2xl px-6 py-16 md:px-8 md:py-24">
           <Reveal>
-            <h2 className="text-center text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">
-              {t("faq.title")}
-            </h2>
+            <h2 className="text-center text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">{t("faq.title")}</h2>
           </Reveal>
           <div className="mt-10 space-y-3">
-            {([1, 2, 3, 4, 5] as const).map((n, i) => (
-              <Reveal key={n} style={{ transitionDelay: `${i * 50}ms` }}>
-                <details className="faq-item glass rounded-2xl">
-                  <summary className="flex cursor-pointer select-none items-center justify-between gap-4 px-5 py-4 text-[15px] font-semibold">
-                    {t(`faq.q${n}`)}
-                    <ChevronDown className="faq-chevron h-4 w-4 shrink-0 text-muted-foreground" />
-                  </summary>
-                  <p className="max-w-[68ch] px-5 pb-5 text-[15px] leading-relaxed text-muted-foreground">
-                    {t(`faq.a${n}`)}
-                  </p>
-                </details>
-              </Reveal>
+            {([1, 2, 3, 4, 5] as const).map((n) => (
+              <details key={n} className="faq-item glass rounded-2xl">
+                <summary className="flex cursor-pointer select-none items-center justify-between gap-4 px-5 py-4 text-[15px] font-semibold">
+                  {t(`faq.q${n}`)}
+                  <ChevronDown className="faq-chevron h-4 w-4 shrink-0 text-muted-foreground" />
+                </summary>
+                <p className="max-w-[68ch] px-5 pb-5 text-[15px] leading-relaxed text-muted-foreground">{t(`faq.a${n}`)}</p>
+              </details>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── 10 · CTA final ──────────────────────────────────────── */}
-      <section
-        data-backdrop="closing"
-        className="relative isolate flex min-h-[90vh] items-center justify-center px-6 pb-16 md:px-8"
-      >
+      {/* ── 6 · CTA final ───────────────────────────────────────────── */}
+      <section data-backdrop="closing" className="relative isolate px-6 py-24 md:px-8 md:py-32">
         <Reveal data-reveal="zoom" className="flex flex-col items-center text-center">
-          <BrandMark className="breathe h-16 w-16 rounded-2xl shadow-lg" />
-          <span className="gold-rule mt-8 h-px w-28" aria-hidden />
-          {/* título+subtítulo clicáveis: um único link em bloco (um só tab
-              stop; heading dentro de link é HTML válido), hover subtil */}
-          <Link
-            href="/register"
-            data-track="footer_text_register"
-            className="group mt-8 flex flex-col items-center"
-          >
-            <h2 className="max-w-[18ch] text-balance text-5xl font-extrabold leading-[1.02] tracking-[-0.035em] transition-opacity duration-[var(--dur-fast)] group-hover:opacity-90 sm:text-6xl md:text-7xl">
-              {t("ctaTitle")}
-            </h2>
-            <p className="mt-6 max-w-[48ch] text-lg leading-relaxed text-muted-foreground transition-colors duration-[var(--dur-fast)] group-hover:text-foreground">
-              {t("ctaSubtitle")}
-            </p>
-          </Link>
-          {/* data-final-cta vai na LINHA (não no botão primário): o pill
-              flutuante espelha esta composição de 2 botões, por isso o morph
-              tem de medir a linha toda — medir só o primário fazia o pill (mais
-              largo) tentar encaixar numa caixa mais estreita e aterrar torto. */}
-          <div
-            data-final-cta
-            className="mt-10 flex flex-col items-center gap-4 sm:flex-row"
-          >
+          <BrandMark className="h-14 w-14 rounded-2xl shadow-lg" />
+          <h2 className="mt-8 max-w-[18ch] text-balance text-4xl font-extrabold leading-[1.04] tracking-[-0.035em] sm:text-6xl">
+            {t("ctaTitle")}
+          </h2>
+          <div data-final-cta className="mt-9 flex flex-col items-center gap-4 sm:flex-row">
             <GrowCta>
               <Link
                 href="/register"
                 data-track="footer_register"
-                className={cn(
-                  buttonVariants({ size: "lg" }),
-                  "pressable cta-sheen min-h-16 px-14 text-lg font-semibold",
-                )}
+                className={cn(buttonVariants({ size: "lg" }), "pressable cta-sheen min-h-14 px-12 text-lg font-semibold")}
               >
-                {t("primaryCta")}
+                {t("hero2.cta")}
               </Link>
             </GrowCta>
             <Link
               href="/stock/AAPL"
               data-track="footer_peek"
-              className={cn(
-                buttonVariants({ size: "lg", variant: "outline" }),
-                "pressable min-h-16 px-10 text-lg",
-              )}
+              className={cn(buttonVariants({ size: "lg", variant: "outline" }), "pressable min-h-14 px-9 text-lg")}
             >
               {t("peekCta")}
             </Link>
           </div>
-          <p className="mt-6 text-xs text-muted-foreground/80">{t("trust")}</p>
+          <p className="mt-5 text-xs text-muted-foreground/80">{t("hero2.priceNote", { preco: precoTexto(PLANOS.pro.preco) })}</p>
         </Reveal>
       </section>
     </div>

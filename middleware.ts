@@ -93,6 +93,6 @@ export async function middleware(request: NextRequest) {
 export const config = {
   // Ignorar caminhos internos do Next.js, ficheiros estáticos, imagens e scripts
   matcher: [
-    '/((?!_next/static|_next/image|brand/|team/|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|html|js|css|woff|woff2|json|xml)$).*)',
+    '/((?!_next/static|_next/image|brand/|team/|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|html|js|css|woff|woff2|json|xml|mp4|webm|mp3)$).*)',
   ],
 }

@@ -261,6 +261,19 @@
           "alt": "Calendário de resultados de outubro"
         }
       }
+    },
+    "hero2": {
+      "subtitle": "10 anos de fundamentais, calculadora DCF e um analista IA para cada empresa do S&P 500. Em português, num só sítio.",
+      "cta": "Começar agora",
+      "priceNote": "Desde {preco} € por mês · cancelas quando quiseres",
+      "tabCompany": "Analisar uma empresa",
+      "tabDcf": "Calculadora DCF",
+      "altCompany": "Vídeo: a página da Microsoft na BullValue, do resumo aos fundamentais, ao analista IA e ao valuation",
+      "altDcf": "Vídeo: a calculadora DCF da BullValue e o modelo completo ao estilo FMVA",
+      "proofCompanies": "empresas do S&P 500",
+      "proofYears": "anos de dados da SEC",
+      "proofLanguage": "Tudo em português",
+      "proofTeam": "Feito por três portugueses"
     }
   },
   "insider": {

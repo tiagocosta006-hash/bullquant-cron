@@ -261,6 +261,19 @@
           "alt": "October earnings calendar"
         }
       }
+    },
+    "hero2": {
+      "subtitle": "10 years of fundamentals, a DCF calculator and an AI analyst for every S&P 500 company. All in one place.",
+      "cta": "Get started",
+      "priceNote": "From €{preco} per month · cancel anytime",
+      "tabCompany": "Analyse a company",
+      "tabDcf": "DCF calculator",
+      "altCompany": "Video: Microsoft's page on BullValue, from the summary to fundamentals, the AI analyst and valuation",
+      "altDcf": "Video: BullValue's DCF calculator and the full FMVA-style model",
+      "proofCompanies": "S&P 500 companies",
+      "proofYears": "years of SEC data",
+      "proofLanguage": "Built for Portuguese investors",
+      "proofTeam": "Made by three Portuguese founders"
     }
   },
   "insider": {

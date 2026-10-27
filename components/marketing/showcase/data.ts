@@ -95,3 +95,32 @@ export const MOBILE_CHAPTERS: { key: ChapterKey; start: number; end: number; see
   { key: "ai", start: 14.8, end: 22.3, seekTo: 18.5 },
   { key: "val", start: 22.3, end: 99, seekTo: 24.4 },
 ];
+
+type Translate = (key: string, values?: Record<string, string | number>) => string;
+
+/**
+ * Item da galeria/lightbox com as marcas já traduzidas. `tc` é o tradutor de
+ * marketing.landingC; `text` traz o rótulo, a legenda e o alt de cada versão.
+ */
+export function buildGalleryItem(
+  k: ShotKey,
+  pos: { index: number; total: number },
+  text: { label: string; caption: string; alt: string },
+  tc: Translate,
+) {
+  const withText = (marks: MarkPos[]) => marks.map((m) => ({ ...m, text: tc(`gallery.marks.${k}.m${m.n}`) }));
+  const vars = { n: pos.index + 1, total: pos.total, label: text.label };
+  return {
+    key: k,
+    ...text,
+    ...shotPaths(k),
+    marksWide: withText(shotMarks(k, "wide")),
+    marksSquare: withText(shotMarks(k, "square")),
+    marksFull: withText(shotMarks(k, "full")),
+    fade: shotFade(k),
+    focus: { wide: shotFocus(k, "wide"), square: shotFocus(k, "square") },
+    slideAria: tc("gallery.slideAria", vars),
+    dotAria: tc("gallery.dotAria", vars),
+    counter: tc("gallery.counter", vars),
+  };
+}

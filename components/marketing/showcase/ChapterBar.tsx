@@ -19,6 +19,7 @@ export function ChapterBar({
   variant,
   label,
   fillRefs,
+  trackPrefix = "hero_reel",
 }: {
   chapters: BarChapter[];
   groups?: { label: string; from: number; to: number }[];
@@ -27,6 +28,7 @@ export function ChapterBar({
   variant: "ruler" | "compact";
   label: string;
   fillRefs: MutableRefObject<(HTMLSpanElement | null)[]>;
+  trackPrefix?: string;
 }) {
   const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -49,7 +51,7 @@ export function ChapterBar({
 
   return (
     <div role="group" aria-label={label}>
-      {ruler && groups && (
+      {ruler && groups && groups.length > 0 && (
         <div className="mb-1 grid gap-2" style={{ gridTemplateColumns: cols }} aria-hidden>
           {groups.map((g) => (
             <span
@@ -77,7 +79,7 @@ export function ChapterBar({
             tabIndex={i === active ? 0 : -1}
             aria-label={c.aria}
             aria-current={i === active ? "step" : undefined}
-            data-track={`hero_reel_chapter_${c.key}`}
+            data-track={`${trackPrefix}_chapter_${c.key}`}
             onClick={() => onSelect(i)}
             onKeyDown={(e) => onKey(e, i)}
             className={cn(

@@ -39,11 +39,14 @@ export function ShowcaseReel({
   mobile,
   labels,
   endCard,
+  trackPrefix = "hero_reel",
 }: {
   desktop: { sources: ReelSource[]; chapters: ReelChapter[]; groups: { label: string; from: number; to: number }[] };
   mobile: { sources: ReelSource[]; chapters: ReelChapter[] };
   labels: Labels;
   endCard: ReactNode;
+  /** prefixo dos data-track (a versão B usa "b_reel" para se medir à parte) */
+  trackPrefix?: string;
 }) {
   const wide = useMediaQuery("(min-width: 768px)", null);
   const branch = wide === null ? null : wide ? "desktop" : "mobile";
@@ -51,7 +54,7 @@ export function ShowcaseReel({
   return (
     <>
       <div className="md:hidden">
-        <Player variant="compact" enabled={branch === "mobile"} sources={mobile.sources} chapters={mobile.chapters} labels={labels} endCard={endCard} />
+        <Player variant="compact" enabled={branch === "mobile"} sources={mobile.sources} chapters={mobile.chapters} labels={labels} endCard={endCard} trackPrefix={trackPrefix} />
       </div>
       <div className="hidden md:block">
         <Player
@@ -62,6 +65,7 @@ export function ShowcaseReel({
           groups={desktop.groups}
           labels={labels}
           endCard={endCard}
+          trackPrefix={trackPrefix}
         />
       </div>
     </>
@@ -76,6 +80,7 @@ function Player({
   groups,
   labels,
   endCard,
+  trackPrefix,
 }: {
   variant: "ruler" | "compact";
   enabled: boolean;
@@ -84,6 +89,7 @@ function Player({
   groups?: { label: string; from: number; to: number }[];
   labels: Labels;
   endCard: ReactNode;
+  trackPrefix: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -295,7 +301,7 @@ function Player({
       {needsButton && (
         <button
           type="button"
-          data-track="hero_reel_start"
+          data-track={`${trackPrefix}_start`}
           onClick={(e) => {
             e.stopPropagation();
             setInteracted(true);
@@ -316,7 +322,7 @@ function Player({
         <button
           type="button"
           aria-label={playing ? labels.pause : labels.play}
-          data-track="hero_reel_pause"
+          data-track={`${trackPrefix}_pause`}
           onClick={(e) => {
             e.stopPropagation();
             togglePause();
@@ -333,7 +339,7 @@ function Player({
       {ended && (
         <div className="glass-frost absolute inset-x-3 bottom-3 animate-in fade-in-0 rounded-2xl p-5 text-center duration-200 motion-reduce:animate-none md:inset-0 md:m-auto md:h-fit md:max-w-md md:p-6">
           {endCard}
-          <Button variant="ghost" size="sm" data-track="hero_reel_replay" onClick={replay} className="mt-2">
+          <Button variant="ghost" size="sm" data-track={`${trackPrefix}_replay`} onClick={replay} className="mt-2">
             <RotateCcw className="mr-1.5 h-4 w-4" aria-hidden />
             {labels.replay}
           </Button>
@@ -351,6 +357,7 @@ function Player({
       variant={variant}
       label={labels.chapters}
       fillRefs={fillRefs}
+      trackPrefix={trackPrefix}
     />
   );
 
@@ -387,7 +394,7 @@ function Player({
           src.openHref ? (
             <Link
               href={src.openHref}
-              data-track="hero_reel_open_msft"
+              data-track={`${trackPrefix}_open_page`}
               aria-label={labels.openPageAria}
               className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-card/60 px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground hover:text-foreground"
             >

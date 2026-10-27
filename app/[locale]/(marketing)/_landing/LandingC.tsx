@@ -16,11 +16,7 @@ import {
   MOBILE_CHAPTERS,
   REEL_MEDIA,
   SHOT_KEYS,
-  shotFade,
-  shotFocus,
-  shotMarks,
-  shotPaths,
-  type MarkPos,
+  buildGalleryItem,
 } from "@/components/marketing/showcase/data";
 import { cn } from "@/lib/utils";
 import { PLANOS, precoTexto } from "@/lib/planos";
@@ -68,26 +64,14 @@ export async function LandingC() {
     };
   };
 
-  const galleryItems = SHOT_KEYS.map((k, i) => {
-    const label = t(`inside.items.${k}.label`);
-    const withText = (marks: MarkPos[]) => marks.map((m) => ({ ...m, text: tc(`gallery.marks.${k}.m${m.n}`) }));
-    const vars = { n: i + 1, total: SHOT_KEYS.length, label };
-    return {
-      key: k,
-      label,
-      caption: t(`inside.items.${k}.caption`),
-      alt: t(`inside.items.${k}.alt`),
-      ...shotPaths(k),
-      marksWide: withText(shotMarks(k, "wide")),
-      marksSquare: withText(shotMarks(k, "square")),
-      marksFull: withText(shotMarks(k, "full")),
-      fade: shotFade(k),
-      focus: { wide: shotFocus(k, "wide"), square: shotFocus(k, "square") },
-      slideAria: tc("gallery.slideAria", vars),
-      dotAria: tc("gallery.dotAria", vars),
-      counter: tc("gallery.counter", vars),
-    };
-  });
+  const galleryItems = SHOT_KEYS.map((k, i) =>
+    buildGalleryItem(
+      k,
+      { index: i, total: SHOT_KEYS.length },
+      { label: t(`inside.items.${k}.label`), caption: t(`inside.items.${k}.caption`), alt: t(`inside.items.${k}.alt`) },
+      tc,
+    ),
+  );
 
   return (
     <div className="relative flex-1 overflow-x-clip">
@@ -140,7 +124,6 @@ export async function LandingC() {
                   ...REEL_MEDIA.terminal,
                   alt: t("hero2.altCompany"),
                   address: "thebullvalue.com/stock/MSFT",
-                  openHref: "/stock/MSFT",
                   sizeLabel: sizeLabel(REEL_MEDIA.terminal.mb),
                 },
                 {
@@ -175,7 +158,7 @@ export async function LandingC() {
               <ReelEndCard
                 title={tc("reel.end.title")}
                 lead={tc("reel.end.lead")}
-                tickers={["AAPL", "NVDA", "KO"].map((ticker) => ({ ticker, aria: tc("reel.end.tickerAria", { ticker }) }))}
+                tickers={[{ ticker: "AAPL", aria: tc("reel.end.tickerAria", { ticker: "AAPL" }) }]}
                 cta={t("hero2.cta")}
               />
             }

@@ -5,7 +5,8 @@ import { cn } from "@/lib/utils";
 
 /**
  * Cartão final do vídeo do hero (versão C): no momento de maior intenção,
- * em vez de voltar a correr, oferece outra empresa sem conta ou o registo.
+ * em vez de voltar a correr, oferece a Apple (a única página que abre sem
+ * conta: o middleware manda as outras para /pricing) ou o registo.
  * Renderizado no servidor e passado ao leitor como slot.
  */
 export function ReelEndCard({
@@ -13,11 +14,14 @@ export function ReelEndCard({
   lead,
   tickers,
   cta,
+  track = "hero_reel_end",
 }: {
   title: string;
   lead: string;
   tickers: { ticker: string; aria: string }[];
   cta: string;
+  /** prefixo dos data-track */
+  track?: string;
 }) {
   return (
     <div>
@@ -31,7 +35,7 @@ export function ReelEndCard({
             key={ticker}
             href={`/stock/${ticker}`}
             aria-label={aria}
-            data-track={`hero_reel_end_${ticker}`}
+            data-track={`${track}_${ticker}`}
             className="nums inline-flex min-h-11 items-center rounded-full border border-border/70 bg-card/70 px-3.5 font-mono text-sm font-semibold hover:border-primary/60"
           >
             {ticker}
@@ -40,7 +44,7 @@ export function ReelEndCard({
       </div>
       <Link
         href="/register"
-        data-track="hero_reel_end_register"
+        data-track={`${track}_register`}
         className={cn(buttonVariants({ size: "lg" }), "pressable cta-sheen mt-4 min-h-12 w-full px-6 font-semibold md:w-auto")}
       >
         {cta}

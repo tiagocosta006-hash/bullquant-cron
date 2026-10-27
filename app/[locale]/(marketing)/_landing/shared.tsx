@@ -129,3 +129,6 @@ export function FaqList({ items, className = "mt-10 space-y-3" }: { items: FaqIt
     </div>
   );
 }
+
+/** Preço mensal em cêntimos por dia (média do ano), para "uns X cêntimos por dia". */
+export const centimosPorDia = (preco: number) => Math.round(((preco * 12) / 365) * 100);

@@ -206,7 +206,7 @@
     "faq": {
       "title": "Frequently asked questions",
       "q1": "What does the PRO subscription include?",
-      "a1": "PRO gives access to full fundamentals for the whole S&P 500 (500 companies), the DCF calculator and the advanced model (scenarios, PDF and Excel export, saved versions), the AI Analyst with 8 AI credits a day and chat about any company, historical valuation multiples, thematic lists, Explore, the comparison tool, the earnings calendar and insider trading. Each AI action spends credits depending on the work involved: a company summary and a management profile each cost 1 credit, a full Analyst report costs 3 and each chat message costs 4. Everything already generated is cached and can be viewed freely.",
+      "a1": "Everything the platform has: full fundamentals for all 500 S&P 500 companies, the DCF calculator and advanced model (scenarios, PDF and Excel export, saved versions), the AI Analyst with 8 credits a day, historical multiples, Explore, the comparison tool, the earnings calendar and insider trading.",
       "q2": "Is this financial advice?",
       "a2": "No. BullValue is an analysis and education tool. No value, metric or insight is a recommendation to buy or sell. Decisions are always yours.",
       "q3": "Which companies are available?",
@@ -214,7 +214,11 @@
       "q4": "How often is the data updated?",
       "a4": "Stock prices and financial filings are updated daily, with essential metrics and charts processed shortly after the companies' official releases.",
       "q5": "How do I subscribe?",
-      "a5": "You create your account at thebullvalue.com and go straight to Whop's secure checkout, already linked to your account. After paying, confirm your e-mail and sign in with PRO active. Cancel on Whop whenever you want."
+      "a5": "You create your account at thebullvalue.com and go straight to Whop's secure checkout, already linked to your account. After paying, confirm your e-mail and sign in with PRO active. Cancel on Whop whenever you want.",
+      "q6": "Is it for beginners?",
+      "a6": "Yes. Every company opens with the numbers already charted and the DCF already filled in, so there's nothing to build by hand, and the Glossary explains every metric. If you already build models, the advanced model goes down to a segment-level revenue build.",
+      "q7": "What if I change my mind?",
+      "a7": "Cancel on Whop whenever you like and PRO stays active until the end of the paid month. You also have a 14-day withdrawal right: cancel within that window and you only pay for the time you used."
     },
     "floatingNote": "From €7 per month · cancel anytime",
     "mission": {

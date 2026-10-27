@@ -43,6 +43,9 @@ const TEAM: { name: string; roleKey: string; image?: string; initials: string }[
   { name: "Alexandre Machado", roleKey: "role3", image: "/team/alex.jpeg", initials: "AM" },
 ];
 
+/* Ordem das perguntas do FAQ (marketing.faq.qN/aN), também no JSON-LD. */
+const FAQ_IDS = [1, 6, 7, 2, 5, 3, 4] as const;
+
 const heroDelay = (s: number) => ({ "--hero-delay": `${s}s` }) as React.CSSProperties;
 
 /* Headline palavra a palavra: cada palavra sobe de trás de uma clip-line
@@ -131,7 +134,7 @@ export default async function LandingPage({
       },
       {
         "@type": "FAQPage",
-        "mainEntity": ([1, 2, 3, 4, 5] as const).map((n) => ({
+        "mainEntity": FAQ_IDS.map((n) => ({
           "@type": "Question",
           "name": t(`faq.q${n}`),
           "acceptedAnswer": {
@@ -276,7 +279,7 @@ export default async function LandingPage({
             <h2 className="text-center text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">{t("faq.title")}</h2>
           </Reveal>
           <div className="mt-10 space-y-3">
-            {([1, 2, 3, 4, 5] as const).map((n) => (
+            {FAQ_IDS.map((n) => (
               <details key={n} className="faq-item glass rounded-2xl">
                 <summary className="flex cursor-pointer select-none items-center justify-between gap-4 px-5 py-4 text-[15px] font-semibold">
                   {t(`faq.q${n}`)}

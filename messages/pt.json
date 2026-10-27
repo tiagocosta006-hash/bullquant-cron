@@ -207,7 +207,7 @@
     "faq": {
       "title": "Perguntas frequentes",
       "q1": "O que inclui a subscrição PRO?",
-      "a1": "O PRO dá acesso aos fundamentais completos de todo o S&P 500 (500 empresas), à calculadora DCF e ao modelo avançado (cenários, exportação para PDF e Excel, versões guardadas), ao Analista IA com 8 créditos de IA por dia e chat sobre qualquer empresa, aos múltiplos de avaliação históricos, às listas temáticas, ao Explorar, ao comparador, ao calendário de resultados e ao insider trading. Cada ação de IA gasta créditos consoante o trabalho que dá: um resumo de empresa ou um perfil de gestão custam 1 crédito, uma análise completa do Analista custa 3 e cada mensagem no chat custa 4. Tudo o que já foi gerado fica em cache e pode ser consultado à vontade.",
+      "a1": "Tudo o que a plataforma tem: fundamentais completos das 500 empresas do S&P 500, calculadora DCF e modelo avançado (cenários, exportação para PDF e Excel, versões guardadas), Analista IA com 8 créditos por dia, múltiplos históricos, Explorar, comparador, calendário de resultados e insider trading.",
       "q2": "Isto é aconselhamento financeiro?",
       "a2": "Não. A BullValue é uma ferramenta de análise e educação. Nenhum valor, métrica ou insight constitui recomendação de compra ou venda. As decisões são sempre tuas.",
       "q3": "Que empresas estão disponíveis?",
@@ -215,7 +215,11 @@
       "q4": "Com que frequência os dados são atualizados?",
       "a4": "Os preços das ações e os relatórios financeiros são atualizados diariamente, com as métricas essenciais e os gráficos a serem processados pouco tempo após a publicação oficial por parte das empresas.",
       "q5": "Como subscrevo?",
-      "a5": "Crias a conta em thebullvalue.com e segues logo para o pagamento seguro na Whop, já ligado à tua conta. Depois de pagares, confirmas o email e entras com o PRO ativo. Cancelas na Whop quando quiseres."
+      "a5": "Crias a conta em thebullvalue.com e segues logo para o pagamento seguro na Whop, já ligado à tua conta. Depois de pagares, confirmas o email e entras com o PRO ativo. Cancelas na Whop quando quiseres.",
+      "q6": "Serve para quem está a começar?",
+      "a6": "Sim. Cada empresa abre já com os números em gráficos e a DCF já preenchida, por isso não precisas de montar nada à mão, e o Glossário explica cada métrica em português. Se já fazes modelos, o modelo avançado vai até ao revenue build por segmento.",
+      "q7": "E se mudar de ideias?",
+      "a7": "Cancelas na Whop quando quiseres e o PRO fica ativo até ao fim do mês pago. Tens ainda 14 dias de livre resolução: se desistires nesse prazo, pagas só a parte proporcional ao tempo usado."
     },
     "floatingNote": "Desde 7 € por mês · cancelas quando quiseres",
     "mission": {

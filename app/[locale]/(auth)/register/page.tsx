@@ -1,10 +1,11 @@
 import { getTranslations } from 'next-intl/server'
 import { RegisterForm } from '@/components/auth/RegisterForm'
+import { lerPlano } from '@/lib/planos'
 
 export default async function RegisterPage({
   searchParams,
 }: {
-  searchParams: Promise<{ message?: string; error?: string; email?: string; name?: string }>
+  searchParams: Promise<{ message?: string; error?: string; email?: string; name?: string; plano?: string }>
 }) {
   const resolvedParams = await searchParams
   const t = await getTranslations('register')
@@ -32,6 +33,7 @@ export default async function RegisterPage({
           message={resolvedParams.message}
           defaultEmail={resolvedParams.email}
           defaultName={resolvedParams.name}
+          defaultPlano={lerPlano(resolvedParams.plano)}
         />
       </div>
     </div>

@@ -21,20 +21,30 @@ import { LEGAL } from "@/lib/legal/config";
 export const metadata = {
   title: `Preços | ${BRAND.name}`,
   description:
-    `Subscrição PRO a €10/mês. Análise fundamental completa do S&P 500, DCF integrada e Analista IA em português com ${BRAND.name}.`,
+    `BullValue PRO a 7 €/mês, ou com a comunidade por 9,97 €/mês. Análise fundamental completa do S&P 500, DCF integrada e Analista IA em português com ${BRAND.name}.`,
 
 };
 
 import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
+import type { EstadoConta } from "./PricingCards";
+import { PLANOS, PLANO_IDS, type PlanoId } from "@/lib/planos";
 
-export default async function PricingPage() {
+export default async function PricingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ erro?: string }>;
+}) {
+  const { erro } = await searchParams;
   const t = await getTranslations("pricing");
   const tm = await getTranslations("marketing");
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const conta = user ? await prisma.user.findUnique({ where: { id: user.id }, select: { plan: true, whopProductId: true } }).catch(() => null) : null;
+  const estado: EstadoConta = !user ? "anonimo" : conta?.plan === "PRO" ? "pro" : "semPro";
+  const planoAtual: PlanoId | null = estado !== "pro" ? null : conta?.whopProductId === PLANOS.comunidade.whopProduto ? "comunidade" : "pro";
 
-  const proFeatures = t.raw("features.pro") as string[];
   const faqItems = t.raw("faq.items") as { q: string; a: string }[];
 
   const platformFeatures = [
@@ -65,16 +75,14 @@ export default async function PricingPage() {
         "applicationCategory": "FinanceApplication",
         "operatingSystem": "Web",
         "url": BRAND.siteUrl,
-        "offers": [
-          {
-            "@type": "Offer",
-            "name": "Plano PRO",
-            "price": "10",
-            "priceCurrency": "EUR",
-            "availability": "https://schema.org/InStock",
-            "billingIncrement": "P1M",
-          },
-        ],
+        "offers": PLANO_IDS.map((id) => ({
+          "@type": "Offer",
+          "name": id === "pro" ? "BullValue PRO" : "BullValue PRO + Comunidade",
+          "price": String(PLANOS[id].preco),
+          "priceCurrency": "EUR",
+          "availability": "https://schema.org/InStock",
+          "billingIncrement": "P1M",
+        })),
         "description": `Análise fundamental de ações com 10 anos de dados da SEC, calculadora DCF integrada e Analista IA. Em português.`,
       },
     ],
@@ -104,9 +112,7 @@ export default async function PricingPage() {
 
       {/* ── Cards de Preço ───────────────────────────────────── */}
       <section className="mx-auto max-w-5xl px-6 pb-6 md:px-8">
-        {/* Sem props: o cartão deixou de ter checkout, logo já não precisa de
-            saber quem está autenticado. Ver o comentário em PricingCards. */}
-        <PricingCards supportEmail={LEGAL.email} />
+        <PricingCards supportEmail={LEGAL.email} estado={estado} planoAtual={planoAtual} erro={erro} />
 
         {/* Trust badge */}
         <Reveal className="mt-6 flex justify-center">

@@ -69,6 +69,6 @@ export async function OpenInboxButtons({ email }: { email: string }) {
 
 function buttonClasses(primary: boolean) {
   return primary
-    ? "inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
-    : "inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-md border border-border bg-background px-4 text-sm font-semibold text-foreground transition-colors hover:bg-muted/60"
+    ? "inline-flex h-11 sm:flex-1 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+    : "inline-flex h-10 sm:flex-1 items-center justify-center gap-2 rounded-md border border-border bg-background px-4 text-sm font-semibold text-foreground transition-colors hover:bg-muted/60"
 }

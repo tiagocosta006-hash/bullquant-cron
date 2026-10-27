@@ -8,7 +8,7 @@ export async function GET(request: Request) {
   const code = searchParams.get('code')
   // Sanitise: only allow same-origin relative paths (no "//evil.com" exploits)
   const rawNext = searchParams.get('next') ?? '/'
-  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/'
+  let next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/'
   // welcome=1 marca uma confirmação de registo → boas-vindas só após confirmar.
   const isWelcome = searchParams.get('welcome') === '1'
 
@@ -62,6 +62,20 @@ export async function GET(request: Request) {
         }
       } catch (err) {
         console.error('Erro ao sincronizar novo email com o Prisma:', err)
+      }
+    }
+
+    // Confirmou o email mas não chegou a pagar (fechou o checkout da Whop):
+    // o dashboard estaria todo trancado — vai para os preços, onde ativa o PRO
+    // num clique. Quem pagou já é PRO (o webhook chega antes do clique no email).
+    if (next === '/dashboard') {
+      try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        const conta = user ? await prisma.user.findUnique({ where: { id: user.id }, select: { plan: true } }) : null
+        if (conta && conta.plan !== 'PRO') next = '/pricing'
+      } catch (err) {
+        console.error('Falha a ler o plano no callback:', err)
       }
     }
 

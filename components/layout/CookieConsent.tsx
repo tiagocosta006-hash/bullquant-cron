@@ -78,9 +78,9 @@ export function CookieConsent({ initialPrefs = null }: { initialPrefs?: PrefsCoo
       {producao && prefs?.marketing && <MetaPixel />}
 
       {aberto && (
-        <div role="dialog" aria-label={t("titulo")} className="fixed bottom-0 z-50 w-full border-t bg-background p-4 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
-          <div className="mx-auto flex max-w-5xl flex-col gap-4">
-            <p className="max-w-[80ch] text-sm text-muted-foreground">
+        <div role="dialog" aria-label={t("titulo")} className="fixed bottom-0 z-50 w-full border-t bg-background px-4 py-3 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] sm:p-4">
+          <div className="mx-auto flex max-w-5xl flex-col gap-2.5 sm:gap-4">
+            <p className="max-w-[80ch] text-xs leading-relaxed text-muted-foreground sm:text-sm">
               {t("text")}{" "}
               <Link href="/cookies" className="font-medium text-foreground underline underline-offset-4">{t("politica")}</Link>
             </p>

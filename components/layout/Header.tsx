@@ -130,7 +130,9 @@ export async function Header() {
                     "pressable h-11 rounded-full font-semibold md:h-8",
                   )}
                 >
-                  {t('createAccount')}
+                  {/* Em telemóvel o rótulo inteiro não cabia ao lado do menu e do tema e ficava cortado. */}
+                  <span className="sm:hidden">{t('createAccountShort')}</span>
+                  <span className="hidden sm:inline">{t('createAccount')}</span>
                 </Link>
               </div>
             )}

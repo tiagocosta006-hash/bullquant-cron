@@ -39,14 +39,15 @@ export const LEGAL = {
   ral: { nome: env(process.env.NEXT_PUBLIC_ADR_NAME), url: env(process.env.NEXT_PUBLIC_ADR_URL) },
   /** Subscrição: paga e gerida na Whop. */
   whopUrl: env(process.env.NEXT_PUBLIC_WHOP_URL),
-  preco: { valor: "10", moeda: "EUR", simbolo: "€" },
+  /** @deprecated os preços vivem em lib/planos.ts (dois planos). */
+  preco: { valor: "7", moeda: "EUR", simbolo: "€" },
   /** Prazo de livre resolução (DL 24/2014). */
   diasResolucao: 14,
 } as const
 
 /** Datas FIXAS (não `new Date()`): a data de uma versão jurídica tem de ficar parada. */
 export const VERSOES = {
-  termos: "2026-10-16",
+  termos: "2026-10-27",
   privacidade: "2026-10-16",
   reembolso: "2026-10-16",
   cookies: "2026-10-16",

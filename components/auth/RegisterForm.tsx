@@ -2,7 +2,9 @@
 
 import * as React from "react"
 import { Link } from '@/i18n/routing';
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
+import { PLANOS, PLANO_IDS, precoTexto, type PlanoId } from "@/lib/planos"
+import { cn } from "@/lib/utils"
 import { signup } from "@/app/[locale]/(auth)/actions"
 import { SubmitButton } from "@/components/auth/SubmitButton"
 import { Input } from "@/components/ui/input"
@@ -18,13 +20,18 @@ export function RegisterForm({
   message,
   defaultEmail,
   defaultName,
+  defaultPlano = "pro",
 }: {
   error?: string
   message?: string
   defaultEmail?: string
   defaultName?: string
+  defaultPlano?: PlanoId
 }) {
   const t = useTranslations("register")
+  const tPlanos = useTranslations("pricing.plans")
+  const locale = useLocale()
+  const [plano, setPlano] = React.useState<PlanoId>(defaultPlano)
   const [password, setPassword] = React.useState("")
   const [confirmPassword, setConfirmPassword] = React.useState("")
   const [confirmTouched, setConfirmTouched] = React.useState(false)
@@ -41,10 +48,40 @@ export function RegisterForm({
       ? t("passwordMismatch")
       : error === "emailInUse"
         ? t("emailInUse")
-        : error
+        : error === "consentMissing"
+          ? t("consentMissing")
+          : error
 
   return (
     <form className="space-y-6" action={signup}>
+      {/* O que se está a subscrever, ANTES dos dados: quem chega pela landing ainda não viu os preços. */}
+      <fieldset>
+        <legend className="mb-2 block text-sm font-medium leading-6 text-foreground">{t("choosePlan")}</legend>
+        <div className="grid gap-2">
+          {PLANO_IDS.map((id) => (
+            <label
+              key={id}
+              className={cn(
+                "flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-4 py-3 transition-colors",
+                plano === id ? "border-primary bg-primary/5" : "border-border hover:border-primary/40",
+              )}
+            >
+              <span className="flex items-center gap-3">
+                <input type="radio" name="plano" value={id} checked={plano === id} onChange={() => setPlano(id)} className="accent-[var(--primary)]" />
+                <span>
+                  <span className="block text-sm font-semibold">{tPlanos(`${id}.name`)}</span>
+                  <span className="block text-xs text-muted-foreground">{tPlanos(`${id}.description`)}</span>
+                </span>
+              </span>
+              <span className="whitespace-nowrap text-sm font-bold">{precoTexto(PLANOS[id].preco, locale)} €</span>
+            </label>
+          ))}
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          {t("planPrice", { preco: precoTexto(PLANOS[plano].preco, locale) })} · {t("planNote")}
+        </p>
+      </fieldset>
+
       <div>
         <label htmlFor="name" className="block text-sm font-medium leading-6 text-foreground mb-2">
           {t("nameLabel")}
@@ -124,6 +161,21 @@ export function RegisterForm({
           {t.rich("consentText", {
             terms: (chunks) => <Link href="/terms" className="text-foreground hover:underline font-medium" target="_blank">{chunks}</Link>,
             privacy: (chunks) => <Link href="/privacy" className="text-foreground hover:underline font-medium" target="_blank">{chunks}</Link>
+          })}
+        </label>
+      </div>
+
+      <div className="flex items-start gap-2">
+        <input
+          type="checkbox"
+          id="imediato"
+          name="imediato"
+          required
+          className="mt-1 cursor-pointer rounded border-border"
+        />
+        <label htmlFor="imediato" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
+          {t.rich("immediateText", {
+            withdrawal: (chunks) => <Link href="/refund" className="text-foreground hover:underline font-medium" target="_blank">{chunks}</Link>
           })}
         </label>
       </div>

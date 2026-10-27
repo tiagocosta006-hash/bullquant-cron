@@ -13,8 +13,8 @@ export interface MediaSource {
 export const LANDING_MEDIA: Record<"showcaseTerminal" | "featureTour", MediaSource | null> = {
   /** Vídeo principal do showcase (16:10) — ex.:
    *  { video: "/media/showcase-terminal.mp4", poster: "/media/showcase-terminal.jpg" } */
-  showcaseTerminal: null,
+  showcaseTerminal: { video: "/media/showcase-terminal.mp4", poster: "/media/showcase-terminal.jpg" },
   /** Tour largo (16:9) entre as stories e o bento — a secção só aparece
    *  quando este slot deixar de ser null. */
-  featureTour: null,
+  featureTour: { video: "/media/feature-tour.mp4", poster: "/media/feature-tour.jpg" },
 };

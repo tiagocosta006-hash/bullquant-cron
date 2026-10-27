@@ -196,7 +196,7 @@ export function FloatingCta({
             {note}
           </span>
           <Link
-            href="/pricing"
+            href="/register"
             data-track="floating_register"
             className={cn(buttonVariants(), "pressable h-11 rounded-full px-5 font-semibold md:h-8")}
           >

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { prisma } from "@/lib/prisma";
+import { whopTemSubscricaoValida } from "@/lib/whop";
 
 /**
  * Webhook do Whop — a fonte de verdade do acesso pago.
@@ -131,6 +132,8 @@ type WhopEvent = {
     user_id?: string;
     plan_id?: string;
     product_id?: string;
+    // Copiada do checkout criado no site (lib/whop.ts → criarCheckoutWhop).
+    metadata?: { bv_user_id?: string; [k: string]: unknown } | null;
   };
 };
 
@@ -200,16 +203,18 @@ export async function POST(request: Request) {
   }
 
   // Filtrar por produto: uma membership de outro produto do mesmo Whop não
-  // deve abrir esta plataforma. Sem WHOP_PRODUCT_ID definido, aceita tudo —
-  // aceitável enquanto houver um produto só, mas convém definir.
-  const produtoEsperado = process.env.WHOP_PRODUCT_ID;
+  // deve abrir esta plataforma. WHOP_PRODUCT_ID aceita vários, separados por
+  // vírgulas (o "BullValue PRO" e a comunidade, que inclui o PRO). Sem nenhum
+  // definido, aceita tudo.
+  const produtosEsperados = (process.env.WHOP_PRODUCT_ID ?? "").split(",").map((p) => p.trim()).filter(Boolean);
   const produto = d.product?.id ?? d.product_id ?? d.plan?.id ?? d.plan_id;
-  if (produtoEsperado && produto && produto !== produtoEsperado) {
+  if (produtosEsperados.length > 0 && produto && !produtosEsperados.includes(produto)) {
     return NextResponse.json({ ignorado: "outro produto" }, { status: 200 });
   }
 
   const email = (d.user?.email ?? "").toLowerCase().trim();
   const whopUserId = d.user?.id ?? d.user_id ?? null;
+  const contaDoCheckout = typeof d.metadata?.bv_user_id === "string" ? d.metadata.bv_user_id : null;
 
   /**
    * Diagnóstico devolvido em TODAS as respostas de sucesso.
@@ -226,9 +231,13 @@ export async function POST(request: Request) {
    * Não leva o endereço, só se ele veio: a resposta é para diagnosticar a
    * configuração, não para transportar dados de quem paga.
    */
-  const diagnostico = { tipo, temEmail: Boolean(email), temWhopUserId: Boolean(whopUserId) };
+  // O tipo do evento diz o que aconteceu a ESTA membership; o acesso decide-se
+  // por TODAS as da pessoa, perguntando à Whop o estado atual (ver
+  // whopTemSubscricaoValida). Só se a pergunta falhar é que vale o tipo.
+  const atual = whopUserId ? await whopTemSubscricaoValida(whopUserId, produtosEsperados) : null;
+  const temAcesso = atual ?? daAcesso;
+  const diagnostico = { tipo, temEmail: Boolean(email), temWhopUserId: Boolean(whopUserId), temConta: Boolean(contaDoCheckout), estadoAtual: atual };
   const estado = d.status ?? (daAcesso ? "active" : "canceled");
-  const temAcesso = daAcesso;
 
   // ── Porque é que aqui NÃO se devolve erro ─────────────────────────────────
   //
@@ -261,7 +270,7 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!email && !whopUserId && !d.id) {
+  if (!email && !whopUserId && !d.id && !contaDoCheckout) {
     console.error("[whop] evento sem email, sem user_id e sem membership id:", tipo);
     return NextResponse.json({ ignorado: "sem identificação", ...diagnostico }, { status: 200 });
   }
@@ -270,7 +279,11 @@ export async function POST(request: Request) {
     // Procura-se primeiro pelo id do Whop (estável) e só depois pelo email,
     // que a pessoa pode mudar. Na primeira compra só há email, e é aí que a
     // ligação entre as duas contas fica registada.
+    // Primeiro pela conta que criou o checkout (o caminho normal desde que o
+    // checkout nasce no site); depois pelo utilizador da Whop e pelo email,
+    // para quem paga pela loja da Whop (a comunidade inclui o PRO).
     const utilizador =
+      (contaDoCheckout ? await prisma.user.findUnique({ where: { id: contaDoCheckout } }) : null) ??
       (whopUserId ? await prisma.user.findUnique({ where: { whopUserId } }) : null) ??
       (email ? await prisma.user.findUnique({ where: { email } }) : null);
 
@@ -301,11 +314,11 @@ export async function POST(request: Request) {
           whopUserId,
           membershipId,
           productId: produto ?? null,
-          status: estado,
+          status: temAcesso ? "active" : estado,
         },
         update: {
           email: email || undefined,
-          status: estado,
+          status: temAcesso ? "active" : estado,
           whopUserId,
           productId: produto ?? null,
           claimedAt: null,
@@ -318,11 +331,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ pendente: true, ...diagnostico }, { status: 200 });
     }
 
+    // `whopUserId` é único. Se a mesma pessoa da Whop pagar por uma segunda
+    // conta, gravá-lo nesta rebentava com a restrição — 500 em todas as
+    // retentativas, e ao fim de muitas a Whop desliga o webhook. A conta fica
+    // PRO na mesma; só não se muda a quem pertence esse id da Whop.
+    const donoDoWhopUser = whopUserId ? await prisma.user.findUnique({ where: { whopUserId }, select: { id: true } }) : null;
+    const podeLigarWhopUser = !donoDoWhopUser || donoDoWhopUser.id === utilizador.id;
+
     await prisma.user.update({
       where: { id: utilizador.id },
       data: {
         plan: temAcesso ? "PRO" : "FREE",
-        whopUserId: whopUserId ?? utilizador.whopUserId,
+        whopUserId: podeLigarWhopUser ? (whopUserId ?? utilizador.whopUserId) : utilizador.whopUserId,
         whopMembershipId: d.id ?? utilizador.whopMembershipId,
         whopStatus: estado,
         whopProductId: produto ?? utilizador.whopProductId,

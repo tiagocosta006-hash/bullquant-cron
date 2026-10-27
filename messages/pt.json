@@ -36,7 +36,7 @@
       "yearsLabel": "de fundamentais por empresa",
       "companies": "500",
       "companiesLabel": "empresas do S&P 500",
-      "price": "10 €",
+      "price": "7 €",
       "priceLabel": "por mês"
     },
     "ctaTitle": "Começa a ver o valor que os outros não veem.",
@@ -130,7 +130,10 @@
       }
     },
     "tour": {
-      "alt": "Tour pelas funcionalidades do BullValue"
+      "alt": "Tour pelas funcionalidades do BullValue",
+      "title": "Do preço ao valor,",
+      "titleAccent": "em minutos.",
+      "subtitle": "A calculadora abre preenchida; o modelo completo mostra de onde vem cada número."
     },
     "bento": {
       "title": "Tudo num terminal.",
@@ -174,12 +177,12 @@
     },
     "pricing": {
       "eyebrow": "Planos",
-      "title": "Um plano, todas as ferramentas.",
-      "subtitle": "Uma subscrição mensal com acesso a todas as empresas do S&P 500 e a todas as ferramentas. Pagas na Whop e cancelas quando quiseres.",
+      "title": "Dois planos, todas as ferramentas.",
+      "subtitle": "A plataforma inteira desde 7 € por mês, ou com a comunidade TCValue Group por 9,97 €. Cancelas quando quiseres.",
       "pro": {
         "name": "Pro",
         "badge": "Acesso completo",
-        "price": "10 €",
+        "price": "7 €",
         "period": "por mês",
         "f1": "Fundamentais completos de todo o S&P 500",
         "f2": "8 créditos de IA por dia, com chat do Analista IA sobre qualquer empresa",
@@ -212,14 +215,52 @@
       "q4": "Com que frequência os dados são atualizados?",
       "a4": "Os preços das ações e os relatórios financeiros são atualizados diariamente, com as métricas essenciais e os gráficos a serem processados pouco tempo após a publicação oficial por parte das empresas.",
       "q5": "Como subscrevo?",
-      "a5": "Em Preços carregas em Subscrever PRO e pagas na Whop. Depois crias a conta em thebullvalue.com com o mesmo e-mail da compra (ou entras, se já tens conta) e o acesso PRO é ativado automaticamente. Cancelas na Whop quando quiseres."
+      "a5": "Crias a conta em thebullvalue.com e segues logo para o pagamento seguro na Whop, já ligado à tua conta. Depois de pagares, confirmas o email e entras com o PRO ativo. Cancelas na Whop quando quiseres."
     },
-    "floatingNote": "10 € por mês · cancelas quando quiseres",
+    "floatingNote": "Desde 7 € por mês · cancelas quando quiseres",
     "mission": {
       "badge": "A Missão",
       "title": "Democratizar o acesso a dados financeiros.",
       "desc": "Uma plataforma desenvolvida por jovens universitários com o objetivo de entregar dados profissionais a investidores independentes.",
       "cta": "Conhece a equipa por trás"
+    },
+    "inside": {
+      "eyebrow": "Sem maquetas",
+      "title": "A plataforma",
+      "titleAccent": "por dentro.",
+      "subtitle": "Ecrãs reais do thebullvalue.com, tal como os vais usar. Escolhe uma secção.",
+      "items": {
+        "fund": {
+          "label": "Fundamentais",
+          "caption": "10 anos de receitas, margens, FCF e EPS por empresa, com segmentos, geografia e as estimativas dos analistas.",
+          "alt": "Separador Fundamentais da Microsoft na BullValue"
+        },
+        "val": {
+          "label": "Valuation",
+          "caption": "Múltiplos históricos (P/E, P/Sales, EV/EBITDA, FCF Yield) com média e mediana, e o preço contra os lucros a 10 anos.",
+          "alt": "Separador Valuation com o P/E histórico da Microsoft"
+        },
+        "dcf": {
+          "label": "Calculadora DCF",
+          "caption": "Abre já preenchida, com o histórico e o consenso ao lado de cada pressuposto e três cenários: Bear, Base e Bull.",
+          "alt": "Calculadora DCF simples com a Microsoft"
+        },
+        "fmva": {
+          "label": "Modelo FMVA",
+          "caption": "O modelo completo: revenue build por segmento, schedules, sensibilidade, cenários e exportação para PDF e Excel.",
+          "alt": "Modelo avançado ao estilo FMVA com o revenue build da Microsoft"
+        },
+        "ai": {
+          "label": "Analista IA",
+          "caption": "Um dossier da empresa a partir do 10-K, com citações à fonte, e um chat para lhe fazeres perguntas.",
+          "alt": "Analista IA com o resumo do negócio da Microsoft"
+        },
+        "cal": {
+          "label": "Calendário",
+          "caption": "Resultados, dividendos, splits e macro, filtrados pela tua watchlist ou pelo teu portefólio.",
+          "alt": "Calendário de resultados de outubro"
+        }
+      }
     }
   },
   "insider": {
@@ -321,26 +362,31 @@
     "submitButton": "Entrar",
     "submitLoading": "A entrar...",
     "noAccount": "Não tens conta?",
-    "registerLink": "Já subscreveste? Cria a conta",
+    "registerLink": "Ainda não tens conta? Cria uma",
     "devLoginButton": "Entrar como dev (local)",
     "devLoginLoading": "A entrar..."
   },
   "register": {
     "title": "Criar Conta",
-    "subtitle": "Cria a conta com o mesmo e-mail da subscrição PRO para ativar o acesso.",
+    "subtitle": "Cria a conta e segue para o pagamento. O PRO fica ativo nesta conta.",
     "nameLabel": "Nome",
     "namePlaceholder": "O teu nome",
     "emailLabel": "Email",
     "emailPlaceholder": "nome@email.com",
     "passwordLabel": "Password",
-    "submitButton": "Registar",
-    "submitLoading": "A registar...",
+    "submitButton": "Criar conta e continuar",
+    "submitLoading": "A criar a conta...",
     "hasAccount": "Já tens conta?",
     "loginLink": "Faz Login",
     "confirmPasswordLabel": "Confirmar Password",
     "passwordMismatch": "As passwords não coincidem.",
     "emailInUse": "Este email já está registado.",
-    "consentText": "Declaro que tenho 18 anos ou mais e concordo com os <terms>Termos</terms> e a <privacy>Política de Privacidade</privacy>."
+    "consentText": "Declaro que tenho 18 anos ou mais e concordo com os <terms>Termos</terms> e a <privacy>Política de Privacidade</privacy>.",
+    "planNote": "Cancelas quando quiseres. O pagamento é feito no checkout seguro da Whop.",
+    "immediateText": "Peço expressamente o início imediato do serviço e sei que, se resolver o contrato nos 14 dias de livre resolução, pagarei o valor proporcional ao serviço já prestado. <withdrawal>Livre resolução</withdrawal>",
+    "consentMissing": "Marca as duas caixas para continuar.",
+    "planPrice": "{preco} € por mês, impostos incluídos",
+    "choosePlan": "Escolhe o plano"
   },
   "forgotPassword": {
     "title": "Recuperar Password",
@@ -377,7 +423,8 @@
     "menuTitle": "Menu",
     "openMenu": "Abrir menu",
     "peek": "Espreitar sem conta",
-    "createAccount": "Subscrever PRO"
+    "createAccount": "Subscrever PRO",
+    "createAccountShort": "Subscrever"
   },
   "search": {
     "placeholder": "Pesquisar ticker (ex: AAPL)...",
@@ -809,7 +856,7 @@
     "generateCta": "Gerar Análise",
     "generating": "A ler o 10-K e a analisar... (~20s)",
     "rateLimitTitle": "Limite diário atingido",
-    "rateLimitDesc": "Já usaste as tuas análises de IA de hoje. Volta amanhã ou passa a Pro para análises ilimitadas.",
+    "rateLimitDesc": "Já usaste os teus créditos de IA de hoje. Voltam a estar disponíveis amanhã.",
     "errorTitle": "Não foi possível gerar a análise. Tenta novamente.",
     "retry": "Tentar de novo",
     "needsAuthTitle": "Sessão expirada",
@@ -1237,29 +1284,17 @@
   },
   "pricing": {
     "badge": "Simples e transparente",
-    "title": "Investe com mais confiança.",
-    "subtitle": "Uma subscrição mensal com acesso a todas as empresas do S&P 500 e a todas as ferramentas. Pagas na Whop e cancelas quando quiseres.",
+    "title": "Escolhe o teu plano.",
+    "subtitle": "As mesmas ferramentas de análise nos dois. A diferença é a comunidade. Cancelas quando quiseres.",
     "pro": {
       "name": "PRO",
-      "price": "€10",
+      "price": "7 €",
       "period": "por mês",
       "description": "Para quem quer ir mais fundo na análise de empresas.",
       "cta": "Subscrever PRO",
       "badge": "Acesso completo",
-      "accessNote": "Depois de pagar na Whop, cria a conta em thebullvalue.com com o mesmo e-mail da compra (ou entra, se já tens conta): o acesso PRO é ativado automaticamente.",
-      "note": "Pagamento na Whop · cancelas quando quiseres"
-    },
-    "features": {
-      "title": "O que está incluído",
-      "pro": [
-        "Fundamentais de todo o S&P 500",
-        "Analista IA & Perfil da Empresa",
-        "Calculadora DCF e modelo avançado (cenários, PDF e Excel)",
-        "Explorar & Screener",
-        "Comparador de Empresas",
-        "Calendário de Resultados",
-        "Apoio por e-mail"
-      ]
+      "note": "Pagamento na Whop · cancelas quando quiseres",
+      "steps": "Crias a conta, pagas no checkout seguro da Whop e o PRO fica ativo nessa conta. Sem códigos nem emails para ligar."
     },
     "faq": {
       "title": "Perguntas frequentes",
@@ -1290,17 +1325,63 @@
         }
       ]
     },
-    "trust": "Cancela quando quiseres · Pago e gerido na Whop · Livre resolução em 14 dias",
+    "trust": "Cancelas quando quiseres · Pagamento seguro pela Whop · Livre resolução em 14 dias",
     "consent": {
       "terms": "Li e aceito os <terms>Termos de Serviço</terms> e a <privacy>Política de Privacidade</privacy> e tenho 18 anos ou mais.",
       "immediate": "Peço expressamente o início imediato do serviço e sei que, se resolver o contrato nos 14 dias de livre resolução, pagarei o valor proporcional ao serviço já prestado.",
-      "billing": "10 € por mês. Renova automaticamente todos os meses até cancelares, a qualquer momento, na tua conta Whop. Os impostos aplicáveis são calculados e mostrados no pagamento, antes de confirmares.",
-      "checkout": "Subscrever PRO na Whop",
-      "missing": "Marca as duas caixas para continuar.",
+      "billing": "{preco} € por mês, impostos incluídos. Renova automaticamente todos os meses até cancelares, a qualquer momento, na tua conta Whop.",
+      "checkout": "Continuar para o pagamento",
+      "missing": "Marca a caixa do início imediato para continuar.",
       "unavailable": "A subscrição está temporariamente indisponível. Escreve-nos para {email}.",
-      "haveAccount": "Já subscreveste?",
-      "createAccount": "Cria a tua conta com o mesmo e-mail",
-      "withdrawalLink": "Direito de livre resolução (14 dias)"
+      "haveAccount": "Já tens conta?",
+      "withdrawalLink": "Direito de livre resolução (14 dias)",
+      "start": "Criar conta e subscrever",
+      "login": "Entra",
+      "isPro": "O teu PRO já está ativo.",
+      "goDashboard": "Ir para o dashboard",
+      "error": "Não foi possível abrir o pagamento. Tenta de novo daqui a um minuto ou escreve-nos para {email}.",
+      "startPro": "Começar com o PRO",
+      "startComunidade": "Entrar com a comunidade",
+      "active": "O teu plano atual",
+      "upgradeNote": "Já tens o BullValue PRO. Depois de entrares na comunidade, cancela o PRO na tua conta Whop para não pagares os dois."
+    },
+    "plans": {
+      "pro": {
+        "name": "BullValue PRO",
+        "description": "A plataforma completa de análise.",
+        "features": [
+          "Fundamentais de todo o S&P 500",
+          "Analista IA & Perfil da Empresa (8 créditos por dia)",
+          "Calculadora DCF e modelo avançado (cenários, PDF e Excel)",
+          "Múltiplos de avaliação históricos",
+          "Explorar, comparador e calendário de resultados",
+          "Apoio por e-mail"
+        ]
+      },
+      "comunidade": {
+        "name": "PRO + Comunidade",
+        "badge": "Mais completo",
+        "description": "A plataforma e a comunidade TCValue Group.",
+        "features": [
+          "Tudo o que está no BullValue PRO",
+          "Comunidade TCValue Group no Discord",
+          "Dossiers de negócio de empresas cotadas",
+          "Notas de mercado semanais",
+          "Canais fechados, com dúvidas respondidas pelo Tiago",
+          "Eventos e conteúdos exclusivos"
+        ]
+      }
+    },
+    "features": {
+      "title": "O que está incluído",
+      "pro": [
+        "Fundamentais de todo o S&P 500",
+        "Analista IA & Perfil da Empresa (8 créditos por dia)",
+        "Calculadora DCF e modelo avançado (cenários, PDF e Excel)",
+        "Múltiplos de avaliação históricos",
+        "Explorar, comparador e calendário de resultados",
+        "Apoio por e-mail"
+      ]
     }
   },
   "explore": {
@@ -2078,5 +2159,19 @@
       "carregar": "Não foi possível carregar os dados. Tenta novamente.",
       "negativo": "O {metrica} dos últimos 12 meses é negativo ou zero: o método não se aplica. Muda a métrica ou escreve um valor inicial normalizado."
     }
+  },
+  "welcome": {
+    "title": "Pagamento recebido",
+    "confirmEmail": "Falta um passo: confirma o email que te enviámos{email, select, none {} other { para {email}}}. Depois entras e o PRO já está ativo.",
+    "spam": "Não chegou? Vê no spam ou nas promoções. Podes pedir outro email na página de confirmação.",
+    "resend": "Reenviar o email de confirmação",
+    "activating": "A ativar o teu PRO…",
+    "activatingNote": "A Whop está a confirmar o pagamento. Costuma demorar uns segundos.",
+    "active": "O teu PRO está ativo",
+    "goDashboard": "Entrar na plataforma",
+    "slow": "Está a demorar mais do que o normal. Se em 5 minutos o PRO não aparecer, escreve-nos para {email} e resolvemos.",
+    "failedTitle": "O pagamento não foi concluído",
+    "failed": "Não foi cobrado nada. Podes tentar outra vez quando quiseres.",
+    "retry": "Tentar de novo"
   }
 }

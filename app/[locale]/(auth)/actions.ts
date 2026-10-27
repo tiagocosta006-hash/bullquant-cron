@@ -1,6 +1,7 @@
 "use server"
 
 import { redirect } from 'next/navigation';
+import { getLocale } from 'next-intl/server'
 import { revalidatePath } from 'next/cache'
 import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
@@ -8,7 +9,9 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { AuthError } from '@supabase/supabase-js'
 import { sendWelcomeEmail, sendPasswordResetEmail, sendConfirmationEmail, isEmailEnabled } from '@/lib/resend'
 import { prisma } from '@/lib/prisma'
-import { resgatarPagamentoWhop } from '@/lib/whop'
+import { resgatarPagamentoWhop, criarCheckoutWhop } from '@/lib/whop'
+import { lerPlano, type PlanoId } from '@/lib/planos'
+import { VERSOES } from '@/lib/legal/config'
 import { recordServerEvent } from '@/lib/pulse/server'
 
 function translateError(error: AuthError | { message?: string }) {
@@ -69,8 +72,12 @@ export async function login(formData: FormData) {
     await resgatarPagamentoWhop(sessao.user.id, sessao.user.email)
   }
 
+  // Sem PRO (registou-se e não chegou a pagar, ou cancelou) → preços, onde
+  // ativa o PRO num clique. O dashboard estaria todo trancado.
+  const conta = sessao?.user ? await prisma.user.findUnique({ where: { id: sessao.user.id }, select: { plan: true } }).catch(() => null) : null
+
   revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  redirect(conta && conta.plan !== 'PRO' ? '/pricing' : '/dashboard')
 }
 
 // URL base da app (sem barra final): preferimos o host real do pedido
@@ -84,11 +91,36 @@ async function getSiteUrl() {
   return origin ? origin.replace(/\/$/, '') : 'http://localhost:3000'
 }
 
+// Registo de quem pediu o início imediato (DL 24/2014, art. 15.º): vai na
+// metadata do checkout e fica guardado na membership da Whop, junto do pagamento.
+function consentimentoImediato() {
+  return `imediato;termos=${VERSOES.termos};em=${new Date().toISOString()}`
+}
+
+/**
+ * Depois de criar a conta, segue direto para o checkout da Whop do plano
+ * escolhido, já ligado a ela (ver criarCheckoutWhop, que cai para o link
+ * direto do plano com o email bloqueado se a API da Whop falhar).
+ */
+async function seguirParaCheckout(plano: PlanoId, userId: string, email: string, siteUrl: string) {
+  const locale = await getLocale()
+  const url = await criarCheckoutWhop({
+    plano,
+    userId,
+    email,
+    siteUrl,
+    consentimento: consentimentoImediato(),
+    prefixo: locale === 'pt' ? '' : `/${locale}`,
+  })
+  redirect(url)
+}
+
 export async function signup(formData: FormData) {
   const email = normalizeEmail(formData.get('email'))
   const password = formData.get('password') as string
   const confirmPassword = formData.get('confirmPassword') as string
   const name = ((formData.get('name') as string) || '').trim()
+  const plano = lerPlano(formData.get('plano'))
 
   // Devolve email + nome para o form não perder o que já foi escrito.
   // Códigos conhecidos (passwordMismatch, emailInUse) são traduzidos no client.
@@ -98,8 +130,15 @@ export async function signup(formData: FormData) {
   if (!password || password !== confirmPassword) {
     registerError('passwordMismatch')
   }
+  // Sem plano gratuito: criar conta é começar a subscrição, e o pedido de
+  // início imediato é condição do checkout. O formulário já o exige; isto
+  // cobre quem submete sem o formulário.
+  if (formData.get('imediato') !== 'on') {
+    registerError('consentMissing')
+  }
 
   const siteUrl = await getSiteUrl()
+  let resgatado = false
   // welcome=1 diz ao callback para enviar as boas-vindas só DEPOIS de confirmar.
   const redirectTo = `${siteUrl}/auth/callback?next=/dashboard&welcome=1`
 
@@ -141,7 +180,7 @@ export async function signup(formData: FormData) {
       // FORA do try, de propósito: o create falha sempre que o trigger chegou
       // primeiro, e esse é o caso normal. Lá dentro, quem pagou no Whop ficava
       // em FREE por causa de uma corrida que não é dele.
-      await resgatarPagamentoWhop(linkData.user.id, linkData.user.email!)
+      resgatado = await resgatarPagamentoWhop(linkData.user.id, linkData.user.email!)
     }
 
     // Construímos o link manualmente para forçar o envio do token por Query String (?token_hash=)
@@ -155,6 +194,9 @@ export async function signup(formData: FormData) {
 
     if (linkData?.user) await recordServerEvent(await headers(), 'signup', '/register')
     revalidatePath('/', 'layout')
+    // Quem já tinha pago na loja da Whop ficou PRO no resgate acima: não se
+    // abre outro checkout (pagaria duas vezes).
+    if (linkData?.user && !resgatado) await seguirParaCheckout(plano, linkData.user.id, email, siteUrl)
     redirect(`/verify-email?email=${encodeURIComponent(email)}`)
   }
 
@@ -187,19 +229,18 @@ export async function signup(formData: FormData) {
     // Fora do try: se o registo já existia (trigger), o pagamento pendente tem
     // de ser resgatado à mesma — senão quem pagou ficava em FREE por causa de
     // uma condição de corrida que não é dele.
-    await resgatarPagamentoWhop(data.user.id, data.user.email!)
+    resgatado = await resgatarPagamentoWhop(data.user.id, data.user.email!)
     await recordServerEvent(await headers(), 'signup', '/register')
   }
 
-  // Confirmação de email desligada no projeto → já vem sessão → entra direto.
+  // Confirmação de email desligada no projeto → já vem sessão.
   if (data.session) {
     await sendWelcomeEmail(email, name || 'Investidor')
-    revalidatePath('/', 'layout')
-    redirect('/dashboard')
   }
 
   revalidatePath('/', 'layout')
-  redirect(`/verify-email?email=${encodeURIComponent(email)}`)
+  if (data.user && !resgatado) await seguirParaCheckout(plano, data.user.id, email, siteUrl)
+  redirect(data.session ? (resgatado ? '/dashboard' : '/pricing') : `/verify-email?email=${encodeURIComponent(email)}`)
 }
 
 // Reenvia o email de confirmação de registo (via Resend se ativo, senão via Supabase).

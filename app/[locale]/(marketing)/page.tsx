@@ -29,11 +29,14 @@ import { TerminalMock } from "@/components/marketing/TerminalMock";
 import { TeamMemberModal } from "@/components/marketing/TeamMemberModal";
 import { TeamSignature } from "@/components/marketing/TeamSignature";
 import { TickerMarquee } from "@/components/marketing/TickerMarquee";
+import { PlatformInside } from "@/components/marketing/PlatformInside";
 import { BRAND } from "@/lib/brand";
 import { getTickerItems, GLOBAL_ETFS } from "@/lib/marketing/ticker";
 import { getUser } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
-import { DynamicProPrice } from "@/components/marketing/DynamicProPrice";
+import { PLANOS, PLANO_IDS } from "@/lib/planos";
+import { PricingCards } from "./pricing/PricingCards";
+import { LEGAL } from "@/lib/legal/config";
 
 
 /**
@@ -149,12 +152,13 @@ export default async function LandingPage({
         "applicationCategory": "FinanceApplication",
         "operatingSystem": "Web",
         "url": BRAND.siteUrl,
-        "offers": {
+        "offers": PLANO_IDS.map((id) => ({
           "@type": "Offer",
-          "price": "10",
+          "name": id === "pro" ? "BullValue PRO" : "BullValue PRO + Comunidade",
+          "price": String(PLANOS[id].preco),
           "billingIncrement": "P1M",
-          "priceCurrency": "EUR"
-        }
+          "priceCurrency": "EUR",
+        }))
       },
       {
         "@type": "FAQPage",
@@ -296,7 +300,7 @@ export default async function LandingPage({
 
           <div className="hero-in mt-10 flex flex-col gap-3 sm:flex-row" style={heroDelay(0.28)}>
             <Link
-              href="/pricing"
+              href="/register"
               data-track="hero_register"
               className={cn(
                 buttonVariants({ size: "lg" }),
@@ -509,9 +513,41 @@ export default async function LandingPage({
         </div>
       </section>
 
-      {/* ── 7 · Feature tour (só renderiza com media real) ──────── */}
+      {/* ── 6b · A plataforma por dentro (prints reais, por separador) ── */}
+      <section data-backdrop="grid" className="relative isolate">
+        <div className="relative mx-auto max-w-6xl px-6 py-24 md:px-8 md:py-32">
+          <Reveal className="mx-auto mb-10 max-w-3xl text-center">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary">{t("inside.eyebrow")}</p>
+            <h2 className="text-balance text-4xl font-extrabold tracking-[-0.03em] sm:text-5xl">
+              {t("inside.title")}{" "}
+              <span className="font-heading font-bold italic text-primary">{t("inside.titleAccent")}</span>
+            </h2>
+            <p className="mx-auto mt-5 max-w-[56ch] text-lg leading-relaxed text-muted-foreground">{t("inside.subtitle")}</p>
+          </Reveal>
+          <Reveal>
+            <PlatformInside
+              items={(["fund", "val", "dcf", "fmva", "ai", "cal"] as const).map((k) => ({
+                key: k,
+                label: t(`inside.items.${k}.label`),
+                caption: t(`inside.items.${k}.caption`),
+                alt: t(`inside.items.${k}.alt`),
+                src: `/media/plataforma/${k}.jpg`,
+              }))}
+            />
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ── 7 · Feature tour (vídeo real: calculadora DCF → modelo FMVA) ── */}
       {LANDING_MEDIA.featureTour ? (
         <section className="mx-auto max-w-6xl px-6 pb-28 md:px-8 md:pb-40">
+          <Reveal className="mx-auto mb-10 max-w-3xl text-center">
+            <h2 className="text-balance text-4xl font-extrabold tracking-[-0.03em] sm:text-5xl">
+              {t("tour.title")}{" "}
+              <span className="font-heading font-bold italic text-primary">{t("tour.titleAccent")}</span>
+            </h2>
+            <p className="mx-auto mt-5 max-w-[56ch] text-lg leading-relaxed text-muted-foreground">{t("tour.subtitle")}</p>
+          </Reveal>
           <Reveal>
             <MediaFrame media={LANDING_MEDIA.featureTour} alt={t("tour.alt")} aspect="16 / 9" />
           </Reveal>
@@ -570,7 +606,7 @@ export default async function LandingPage({
               { value: 10, suffix: "", label: t("numbers.years") },
               { value: 500, suffix: "", label: t("numbers.companies") },
               { value: 40, suffix: "", label: t("numbers.quarters") },
-              { value: 10, suffix: " €", label: t("numbers.free") },
+              { value: PLANOS.pro.preco, suffix: " €", label: t("numbers.free") },
             /* Sem Parallax: os counters lado a lado tinham amplitudes
                diferentes (20 vs 36), por isso derivavam uns em relação aos
                outros — o olho lê isso como desalinhamento, não como
@@ -609,54 +645,10 @@ export default async function LandingPage({
             </p>
           </Reveal>
 
-          <div className="mx-auto mt-14 max-w-xl">
-            <Reveal style={{ transitionDelay: "90ms" }}>
-              <div className="h-full">
-                <LiquidGlass className="card-lift flex h-full flex-col rounded-3xl border-primary/40 p-7 shadow-[inset_0_1px_0_rgb(255_255_255/0.28),0_2px_10px_rgb(40_30_10/0.10)]">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm font-semibold text-muted-foreground">
-                      {t("pricing.pro.name")}
-                    </div>
-                    <span className="rounded-full border border-primary/25 bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary">
-                      {t("pricing.pro.badge")}
-                    </span>
-                  </div>
-                  <div className="mt-3 flex items-baseline gap-2">
-                    <span className="nums text-5xl font-extrabold tracking-tight text-primary">
-                      <DynamicProPrice fallback={t("pricing.pro.price")} />
-                    </span>
-                    <span className="text-sm text-muted-foreground">{t("pricing.pro.period")}</span>
-                  </div>
-                  <ul className="mt-6 flex-1 space-y-3">
-                    {(["f1", "f2", "f3", "f4", "f5"] as const).map((k) => (
-                      <li
-                        key={k}
-                        className="flex items-start gap-2.5 text-[15px] leading-relaxed"
-                      >
-                        <Check className="mt-1 h-4 w-4 shrink-0 text-primary" strokeWidth={2.5} />
-                        {t(`pricing.pro.${k}`)}
-                      </li>
-                    ))}
-                  </ul>
-                  {/* O Pro esteve sem CTA nenhum até 2026-08-05 — um cartão de
-                      preço sem botão converte a zero por construção. Outline (não
-                      sólido) para o grátis continuar a ser a ação primária. */}
-                  <Link
-                    href="/pricing"
-                    data-track="pricing_pro"
-                    className={cn(
-                      buttonVariants({ size: "lg" }),
-                      "pressable mt-8 min-h-12 w-full text-base font-semibold",
-                    )}
-                  >
-                    {t("pricing.pro.cta")}
-                  </Link>
-                  <p className="mt-3 text-center text-xs text-muted-foreground">
-                    {t("pricing.pro.note")}
-                  </p>
-                </LiquidGlass>
-              </div>
-            </Reveal>
+          {/* Os mesmos cartões da página de preços (lib/planos.ts é a fonte do preço).
+              Quem vê a landing não tem sessão (com sessão redireciona), daí "anonimo". */}
+          <div className="mt-14">
+            <PricingCards supportEmail={LEGAL.email} estado="anonimo" />
           </div>
         </div>
       </section>
@@ -759,7 +751,7 @@ export default async function LandingPage({
           {/* título+subtítulo clicáveis: um único link em bloco (um só tab
               stop; heading dentro de link é HTML válido), hover subtil */}
           <Link
-            href="/pricing"
+            href="/register"
             data-track="footer_text_register"
             className="group mt-8 flex flex-col items-center"
           >
@@ -780,7 +772,7 @@ export default async function LandingPage({
           >
             <GrowCta>
               <Link
-                href="/pricing"
+                href="/register"
                 data-track="footer_register"
                 className={cn(
                   buttonVariants({ size: "lg" }),

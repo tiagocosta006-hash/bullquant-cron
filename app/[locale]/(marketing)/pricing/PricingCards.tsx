@@ -2,122 +2,189 @@
 
 import * as React from "react";
 import { Link } from "@/i18n/routing";
-import { useTranslations } from "next-intl";
-import { Check, Zap, ArrowRight, ExternalLink } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { Check, Zap, ArrowRight, Lock, Users } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Reveal } from "@/components/fx/Reveal";
 import { cn } from "@/lib/utils";
+import { PLANOS, PLANO_IDS, precoTexto, type PlanoId } from "@/lib/planos";
+
+export type EstadoConta = "anonimo" | "semPro" | "pro";
 
 /**
- * Cartão de preço único: PRO, pago na Whop.
+ * Os dois planos (lib/planos.ts): BullValue PRO e PRO + Comunidade.
  *
- * Não há plano gratuito. A subscrição compra-se na Whop (NEXT_PUBLIC_WHOP_URL) e o acesso chega à
- * conta pelo webhook (app/api/webhooks/whop) por e-mail. Antes de abrir o checkout, o utilizador
- * confirma duas coisas, que ficam à vista e travam o botão enquanto não estiverem marcadas:
- *   1. aceita Termos e Privacidade e declara ter 18 anos;
- *   2. pede expressamente o início imediato do serviço e reconhece o pagamento proporcional se
- *      resolver o contrato nos 14 dias (DL 24/2014 art. 15.º).
- * O preço e as condições de renovação aparecem ANTES do botão (informação pré-contratual).
- * Os impostos aplicáveis são calculados no checkout da Whop.
+ * O que cada cartão pede depende de quem está a ver:
+ *   - sem conta: o botão leva ao registo com o plano escolhido; o registo
+ *     exige os Termos, os 18 anos e o pedido de início imediato, e segue
+ *     sozinho para o checkout;
+ *   - com conta sem PRO: os Termos já foram aceites no registo; falta o pedido
+ *     expresso de início imediato (DL 24/2014 art. 15.º), UMA caixa para os
+ *     dois cartões, e cada botão submete o formulário (POST /api/checkout)
+ *     com o seu plano;
+ *   - com PRO: o plano que a conta já tem aparece como atual; do PRO só para a
+ *     comunidade ainda se pode subir.
+ * As condições de renovação aparecem ANTES do botão (informação pré-contratual).
  */
-export function PricingCards({ supportEmail }: { supportEmail: string }) {
+export function PricingCards({
+  supportEmail,
+  estado,
+  planoAtual,
+  erro,
+}: {
+  supportEmail: string;
+  estado: EstadoConta;
+  /** Com PRO: o plano que a conta tem (pelo produto da Whop). */
+  planoAtual?: PlanoId | null;
+  erro?: string;
+}) {
   const t = useTranslations("pricing");
-  const whopUrl = process.env.NEXT_PUBLIC_WHOP_URL;
-  const proFeatures = t.raw("features.pro") as string[];
+  const locale = useLocale();
 
-  const [aceita, setAceita] = React.useState(false);
   const [imediato, setImediato] = React.useState(false);
-  const [tentou, setTentou] = React.useState(false);
-  const pronto = aceita && imediato;
+  const [tentou, setTentou] = React.useState(erro === "consentimento");
+  const [aEnviar, setAEnviar] = React.useState(false);
+  const comFormulario = estado === "semPro" || (estado === "pro" && planoAtual === "pro");
 
-  const irParaWhop = (e: React.MouseEvent) => {
-    if (!pronto || !whopUrl) { e.preventDefault(); setTentou(true); }
+  const submeter = (e: React.FormEvent) => {
+    if (!imediato) { e.preventDefault(); setTentou(true); return; }
+    setAEnviar(true);
   };
 
-  return (
-    <Reveal className="mx-auto max-w-xl">
-      <div className="relative flex flex-col items-center rounded-3xl border border-primary/40 bg-gradient-to-br from-primary/8 via-card/80 to-card/60 p-8 text-center shadow-[0_0_60px_-10px_hsl(var(--primary)/0.25)] backdrop-blur">
-        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-          <div className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-1 text-xs font-bold text-primary-foreground shadow-lg">
-            <Zap className="h-3 w-3 fill-current" />
-            {t("pro.badge")}
-          </div>
-        </div>
+  const cartao = (id: PlanoId) => {
+    const destaque = id === "comunidade";
+    const preco = precoTexto(PLANOS[id].preco, locale);
+    const features = t.raw(`plans.${id}.features`) as string[];
+    const atual = estado === "pro" && (planoAtual === id || (planoAtual !== "pro" && planoAtual !== "comunidade" && id === "pro"));
+    const jaIncluido = estado === "pro" && planoAtual === "comunidade" && id === "pro";
 
-        <div className="mb-8">
-          <p className="text-sm font-semibold uppercase tracking-widest text-primary">{t("pro.name")}</p>
-          <div className="mt-4 flex items-end justify-center gap-1">
-            <span className="text-5xl font-extrabold tracking-tight">{t("pro.price")}</span>
-            <span className="mb-1.5 text-muted-foreground">/ {t("pro.period")}</span>
-          </div>
-          <p className="mt-3 text-sm text-muted-foreground">{t("pro.description")}</p>
-        </div>
+    let acao: React.ReactNode;
+    if (atual || jaIncluido) {
+      acao = (
+        <Link href="/dashboard" className={cn(buttonVariants({ size: "lg", variant: "outline" }), "w-full font-semibold")}>
+          {atual ? t("consent.active") : t("consent.goDashboard")}
+        </Link>
+      );
+    } else if (estado === "anonimo") {
+      acao = (
+        <Link
+          href={`/register?plano=${id}`}
+          data-track={`pricing_${id}`}
+          className={cn(buttonVariants({ size: "lg", variant: destaque ? "default" : "outline" }), "w-full font-semibold")}
+        >
+          {id === "pro" ? t("consent.startPro") : t("consent.startComunidade")}
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Link>
+      );
+    } else {
+      acao = (
+        <button
+          type="submit"
+          name="plano"
+          value={id}
+          form="form-checkout"
+          data-track={`pricing_${id}`}
+          aria-disabled={!imediato}
+          disabled={aEnviar}
+          className={cn(
+            buttonVariants({ size: "lg", variant: destaque ? "default" : "outline" }),
+            "w-full font-semibold",
+            !imediato && "cursor-not-allowed opacity-60",
+          )}
+        >
+          {id === "pro" ? t("consent.startPro") : t("consent.startComunidade")}
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </button>
+      );
+    }
 
-        <ul className="mx-auto mb-8 flex w-fit flex-col gap-3 text-left">
-          {proFeatures.map((feature) => (
-            <li key={feature} className="flex items-center gap-3 text-sm">
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-primary/15">
+    return (
+      <div
+        key={id}
+        className={cn(
+          "relative flex flex-col rounded-3xl border p-7 text-left backdrop-blur",
+          destaque
+            ? "border-primary/50 bg-gradient-to-br from-primary/10 via-card/80 to-card/60 shadow-[0_0_60px_-10px_hsl(var(--primary)/0.3)]"
+            : "border-border/70 bg-card/70",
+        )}
+      >
+        {destaque && (
+          <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+            <div className="flex items-center gap-1.5 whitespace-nowrap rounded-full bg-primary px-4 py-1 text-xs font-bold text-primary-foreground shadow-lg">
+              <Zap className="h-3 w-3 fill-current" />
+              {t("plans.comunidade.badge")}
+            </div>
+          </div>
+        )}
+        <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-primary">
+          {destaque && <Users className="h-4 w-4" />}
+          {t(`plans.${id}.name`)}
+        </p>
+        <div className="mt-4 flex items-end gap-1">
+          <span className="nums text-5xl font-extrabold tracking-tight">{preco} €</span>
+          <span className="mb-1.5 text-muted-foreground">/ {t("pro.period")}</span>
+        </div>
+        <p className="mt-2 text-sm text-muted-foreground">{t(`plans.${id}.description`)}</p>
+
+        <ul className="mb-7 mt-6 flex flex-1 flex-col gap-3">
+          {features.map((f) => (
+            <li key={f} className="flex items-start gap-3 text-sm">
+              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-primary/15">
                 <Check className="h-3 w-3 text-primary" />
               </span>
-              {feature}
+              {f}
             </li>
           ))}
         </ul>
 
-        <div className="w-full space-y-4 text-left">
-          <p className="rounded-xl border border-border/60 bg-background/60 px-4 py-3 text-sm leading-relaxed text-muted-foreground">
-            {t("consent.billing")}
-          </p>
+        <p className="mb-4 text-xs leading-relaxed text-muted-foreground">{t("consent.billing", { preco })}</p>
+        {acao}
+      </div>
+    );
+  };
 
-          <label className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed">
-            <input type="checkbox" checked={aceita} onChange={(e) => setAceita(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-[var(--primary)]" />
-            <span>
-              {t.rich("consent.terms", {
-                terms: (c) => <Link href="/terms" target="_blank" className="font-medium underline underline-offset-4">{c}</Link>,
-                privacy: (c) => <Link href="/privacy" target="_blank" className="font-medium underline underline-offset-4">{c}</Link>,
-              })}
-            </span>
-          </label>
-          <label className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed">
-            <input type="checkbox" checked={imediato} onChange={(e) => setImediato(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-[var(--primary)]" />
+  return (
+    <Reveal className="mx-auto max-w-4xl">
+      <div className="grid gap-8 md:grid-cols-2 md:gap-5">{PLANO_IDS.map(cartao)}</div>
+
+      {comFormulario && (
+        // Um formulário para os dois cartões: a caixa do início imediato vale para
+        // o plano cujo botão for carregado (os botões levam form="form-checkout").
+        <form id="form-checkout" method="post" action="/api/checkout" onSubmit={submeter} className="mx-auto mt-6 max-w-2xl space-y-3">
+          <input type="hidden" name="locale" value={locale} />
+          {estado === "pro" && planoAtual === "pro" && (
+            <p className="rounded-xl border border-primary/25 bg-primary/5 px-4 py-3 text-sm text-muted-foreground">{t("consent.upgradeNote")}</p>
+          )}
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-border/60 bg-background/60 px-4 py-3 text-sm leading-relaxed">
+            <input type="checkbox" name="imediato" checked={imediato} onChange={(e) => setImediato(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-[var(--primary)]" />
             <span>
               {t("consent.immediate")}{" "}
               <Link href="/refund" target="_blank" className="whitespace-nowrap font-medium underline underline-offset-4">{t("consent.withdrawalLink")}</Link>
             </span>
           </label>
+          {tentou && !imediato && <p role="alert" className="text-center text-sm font-medium text-destructive">{t("consent.missing")}</p>}
+        </form>
+      )}
 
-          {whopUrl ? (
-            <a
-              href={pronto ? whopUrl : "#"}
-              onClick={irParaWhop}
-              target={pronto ? "_blank" : undefined}
-              rel="noopener noreferrer"
-              id="pricing-pro-cta"
-              aria-disabled={!pronto}
-              className={cn(buttonVariants({ size: "lg" }), "w-full font-semibold", !pronto && "cursor-not-allowed opacity-60")}
-            >
-              {t("consent.checkout")}
-              <ExternalLink className="ml-2 h-4 w-4" />
-            </a>
-          ) : (
-            <p role="alert" className="rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm">
-              {t("consent.unavailable", { email: supportEmail })}
-            </p>
-          )}
-          {tentou && !pronto && <p role="alert" className="text-center text-sm font-medium text-destructive">{t("consent.missing")}</p>}
-        </div>
-
-        <p className="mt-6 rounded-xl border border-primary/25 bg-primary/5 px-4 py-3 text-sm leading-relaxed text-muted-foreground">
-          {t("pro.accessNote")}
+      {erro === "checkout" && (
+        <p role="alert" className="mx-auto mt-4 max-w-2xl rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm">
+          {t("consent.error", { email: supportEmail })}
         </p>
-        <p className="mt-4 text-sm text-muted-foreground">
+      )}
+
+      <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
+        <Lock className="h-3 w-3" />
+        {t("pro.steps")}
+      </p>
+      {estado === "anonimo" && (
+        <p className="mt-3 text-center text-sm text-muted-foreground">
           {t("consent.haveAccount")}{" "}
-          <Link href="/register" className="inline-flex items-center gap-1 font-semibold text-primary underline-offset-4 hover:underline">
-            {t("consent.createAccount")}
+          <Link href="/login" className="inline-flex items-center gap-1 font-semibold text-primary underline-offset-4 hover:underline">
+            {t("consent.login")}
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </p>
-      </div>
+      )}
     </Reveal>
   );
 }

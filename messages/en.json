@@ -35,7 +35,7 @@
       "yearsLabel": "of fundamentals per company",
       "companies": "500",
       "companiesLabel": "S&P 500 companies",
-      "price": "€10",
+      "price": "€7",
       "priceLabel": "per month"
     },
     "ctaTitle": "Start seeing the value others miss.",
@@ -129,7 +129,10 @@
       }
     },
     "tour": {
-      "alt": "A tour of BullValue features"
+      "alt": "A tour of BullValue features",
+      "title": "From price to value,",
+      "titleAccent": "in minutes.",
+      "subtitle": "The calculator opens pre-filled; the full model shows where every number comes from."
     },
     "bento": {
       "title": "Everything in one terminal.",
@@ -173,12 +176,12 @@
     },
     "pricing": {
       "eyebrow": "Plans",
-      "title": "One plan, every tool.",
-      "subtitle": "One monthly subscription with access to every S&P 500 company and every tool. You pay on Whop and cancel whenever you like.",
+      "title": "Two plans, every tool.",
+      "subtitle": "The whole platform from €7 a month, or with the TCValue Group community for €9.97. Cancel whenever you want.",
       "pro": {
         "name": "Pro",
         "badge": "Full access",
-        "price": "€10",
+        "price": "€7",
         "period": "per month",
         "f1": "Full fundamentals for the whole S&P 500",
         "f2": "8 AI credits a day, with AI Analyst chat about any company",
@@ -211,16 +214,54 @@
       "q4": "How often is the data updated?",
       "a4": "Stock prices and financial filings are updated daily, with essential metrics and charts processed shortly after the companies' official releases.",
       "q5": "How do I subscribe?",
-      "a5": "On Pricing, click Subscribe to PRO and pay on Whop. Then create your account at thebullvalue.com with the same e-mail you purchased with (or sign in if you already have one) and PRO access is activated automatically. You cancel on Whop whenever you like."
+      "a5": "You create your account at thebullvalue.com and go straight to Whop's secure checkout, already linked to your account. After paying, confirm your e-mail and sign in with PRO active. Cancel on Whop whenever you want."
     },
-    "floatingNote": "€10 per month · cancel anytime",
+    "floatingNote": "From €7 per month · cancel anytime",
     "mission": {
       "badge": "Our Mission",
       "title": "Democratize access to financial data.",
       "desc": "A platform developed by university students with the goal of delivering professional data to independent investors.",
       "cta": "Meet the team behind it"
     },
-    "peekCta": "Peek without an account"
+    "peekCta": "Peek without an account",
+    "inside": {
+      "eyebrow": "No mock-ups",
+      "title": "The platform,",
+      "titleAccent": "from the inside.",
+      "subtitle": "Real screens from thebullvalue.com, exactly as you'll use them. Pick a section.",
+      "items": {
+        "fund": {
+          "label": "Fundamentals",
+          "caption": "10 years of revenue, margins, FCF and EPS per company, with segments, geography and analyst estimates.",
+          "alt": "Microsoft's Fundamentals tab on BullValue"
+        },
+        "val": {
+          "label": "Valuation",
+          "caption": "Historical multiples (P/E, P/Sales, EV/EBITDA, FCF Yield) with mean and median, and price against earnings over 10 years.",
+          "alt": "Valuation tab with Microsoft's historical P/E"
+        },
+        "dcf": {
+          "label": "DCF calculator",
+          "caption": "Opens pre-filled, with history and consensus next to each assumption and three scenarios: Bear, Base and Bull.",
+          "alt": "Simple DCF calculator with Microsoft"
+        },
+        "fmva": {
+          "label": "FMVA model",
+          "caption": "The full model: revenue build by segment, schedules, sensitivity, scenarios and PDF and Excel export.",
+          "alt": "FMVA-style advanced model with Microsoft's revenue build"
+        },
+        "ai": {
+          "label": "AI Analyst",
+          "caption": "A company dossier from the 10-K, with source citations, and a chat to ask it questions.",
+          "alt": "AI Analyst with Microsoft's business summary"
+        },
+        "cal": {
+          "label": "Calendar",
+          "caption": "Earnings, dividends, splits and macro, filtered by your watchlist or portfolio.",
+          "alt": "October earnings calendar"
+        }
+      }
+    }
   },
   "insider": {
     "title": "Company Insider Trading",
@@ -321,26 +362,31 @@
     "submitButton": "Sign in",
     "submitLoading": "Signing in...",
     "noAccount": "Don't have an account?",
-    "registerLink": "Already subscribed? Create your account",
+    "registerLink": "No account yet? Create one",
     "devLoginButton": "Sign in as dev (local)",
     "devLoginLoading": "Signing in..."
   },
   "register": {
     "title": "Create Account",
-    "subtitle": "Create your account with the same e-mail as your PRO subscription to activate access.",
+    "subtitle": "Create your account and continue to payment. PRO is activated on this account.",
     "nameLabel": "Name",
     "namePlaceholder": "Your name",
     "emailLabel": "Email",
     "emailPlaceholder": "name@email.com",
     "passwordLabel": "Password",
-    "submitButton": "Sign up",
-    "submitLoading": "Signing up...",
+    "submitButton": "Create account and continue",
+    "submitLoading": "Creating your account...",
     "hasAccount": "Already have an account?",
     "loginLink": "Sign in",
     "confirmPasswordLabel": "Confirm Password",
     "passwordMismatch": "Passwords don't match.",
     "emailInUse": "This email is already registered.",
-    "consentText": "I declare that I am 18 or older and agree to the <terms>Terms</terms> and the <privacy>Privacy Policy</privacy>."
+    "consentText": "I declare that I am 18 or older and agree to the <terms>Terms</terms> and the <privacy>Privacy Policy</privacy>.",
+    "planNote": "Cancel anytime. Payment happens in Whop's secure checkout.",
+    "immediateText": "I expressly request the service to start immediately and understand that, if I withdraw within the 14-day withdrawal period, I will pay for the service already provided. <withdrawal>Withdrawal right</withdrawal>",
+    "consentMissing": "Tick both boxes to continue.",
+    "planPrice": "€{preco} per month, taxes included",
+    "choosePlan": "Choose your plan"
   },
   "forgotPassword": {
     "title": "Reset Password",
@@ -377,7 +423,8 @@
     "menuTitle": "Menu",
     "openMenu": "Open menu",
     "peek": "Peek without an account",
-    "createAccount": "Subscribe to PRO"
+    "createAccount": "Subscribe to PRO",
+    "createAccountShort": "Subscribe"
   },
   "search": {
     "placeholder": "Search ticker (e.g., AAPL)...",
@@ -809,7 +856,7 @@
     "generateCta": "Generate Analysis",
     "generating": "Reading the 10-K and analyzing... (~20s)",
     "rateLimitTitle": "Daily limit reached",
-    "rateLimitDesc": "You've used today's AI analyses. Come back tomorrow or go Pro for unlimited analyses.",
+    "rateLimitDesc": "You've used today's AI credits. They'll be available again tomorrow.",
     "errorTitle": "Couldn't generate the analysis. Try again.",
     "retry": "Try again",
     "needsAuthTitle": "Session expired",
@@ -1237,29 +1284,17 @@
   },
   "pricing": {
     "badge": "Simple and transparent",
-    "title": "Invest with more confidence.",
-    "subtitle": "One monthly subscription with access to every S&P 500 company and every tool. You pay on Whop and cancel whenever you like.",
+    "title": "Choose your plan.",
+    "subtitle": "The same analysis tools in both. The difference is the community. Cancel whenever you want.",
     "pro": {
       "name": "PRO",
-      "price": "€10",
+      "price": "€7",
       "period": "per month",
       "description": "For those who want to go deeper in company analysis.",
       "cta": "Subscribe to PRO",
       "badge": "Full access",
-      "accessNote": "After paying on Whop, create your account at thebullvalue.com with the same e-mail you purchased with (or sign in if you already have one): PRO access is activated automatically.",
-      "note": "Paid on Whop · cancel anytime"
-    },
-    "features": {
-      "title": "What's included",
-      "pro": [
-        "Fundamentals for the whole S&P 500",
-        "AI Analyst & Company Profile",
-        "DCF calculator and advanced model (scenarios, PDF and Excel)",
-        "Explore & Screener",
-        "Company Comparison",
-        "Earnings Calendar",
-        "E-mail support"
-      ]
+      "note": "Paid on Whop · cancel anytime",
+      "steps": "You create your account, pay in Whop's secure checkout and PRO is activated on that account. No codes or e-mails to match."
     },
     "faq": {
       "title": "Frequently asked questions",
@@ -1290,17 +1325,63 @@
         }
       ]
     },
-    "trust": "Cancel anytime · Paid and managed on Whop · 14-day right of withdrawal",
+    "trust": "Cancel anytime · Secure payment by Whop · 14-day withdrawal right",
     "consent": {
       "terms": "I have read and accept the <terms>Terms of Service</terms> and the <privacy>Privacy Policy</privacy> and I am 18 or older.",
       "immediate": "I expressly request that the service starts immediately and I understand that, if I withdraw within the 14-day right of withdrawal, I will pay a proportionate amount for the service already provided.",
-      "billing": "€10 per month. Renews automatically every month until you cancel, at any time, in your Whop account. Applicable taxes are calculated and shown at checkout, before you confirm.",
-      "checkout": "Subscribe to PRO on Whop",
-      "missing": "Tick both boxes to continue.",
+      "billing": "€{preco} per month, taxes included. Renews automatically every month until you cancel, at any time, in your Whop account.",
+      "checkout": "Continue to payment",
+      "missing": "Tick the immediate-start box to continue.",
       "unavailable": "Subscription is temporarily unavailable. Write to us at {email}.",
-      "haveAccount": "Already subscribed?",
-      "createAccount": "Create your account with the same e-mail",
-      "withdrawalLink": "Right of withdrawal (14 days)"
+      "haveAccount": "Already have an account?",
+      "withdrawalLink": "Right of withdrawal (14 days)",
+      "start": "Create account and subscribe",
+      "login": "Sign in",
+      "isPro": "Your PRO is already active.",
+      "goDashboard": "Go to the dashboard",
+      "error": "We couldn't open the payment. Try again in a minute or write to {email}.",
+      "startPro": "Start with PRO",
+      "startComunidade": "Join with the community",
+      "active": "Your current plan",
+      "upgradeNote": "You already have BullValue PRO. After joining the community, cancel PRO in your Whop account so you don't pay for both."
+    },
+    "plans": {
+      "pro": {
+        "name": "BullValue PRO",
+        "description": "The complete analysis platform.",
+        "features": [
+          "Fundamentals for the whole S&P 500",
+          "AI Analyst & Company Profile (8 credits a day)",
+          "DCF calculator and advanced model (scenarios, PDF and Excel)",
+          "Historical valuation multiples",
+          "Explore, comparison and earnings calendar",
+          "E-mail support"
+        ]
+      },
+      "comunidade": {
+        "name": "PRO + Community",
+        "badge": "Most complete",
+        "description": "The platform and the TCValue Group community.",
+        "features": [
+          "Everything in BullValue PRO",
+          "TCValue Group community on Discord",
+          "Business dossiers on listed companies",
+          "Weekly market notes",
+          "Private channels, with questions answered by Tiago",
+          "Exclusive events and content"
+        ]
+      }
+    },
+    "features": {
+      "title": "What's included",
+      "pro": [
+        "Fundamentals for the whole S&P 500",
+        "AI Analyst & Company Profile (8 credits a day)",
+        "DCF calculator and advanced model (scenarios, PDF and Excel)",
+        "Historical valuation multiples",
+        "Explore, comparison and earnings calendar",
+        "E-mail support"
+      ]
     }
   },
   "explore": {
@@ -2078,5 +2159,19 @@
       "carregar": "Could not load the data. Please try again.",
       "negativo": "The last 12 months {metrica} is negative or zero: the method does not apply. Switch metric or enter a normalized starting value."
     }
+  },
+  "welcome": {
+    "title": "Payment received",
+    "confirmEmail": "One step left: confirm the e-mail we sent you{email, select, none {} other { at {email}}}. Then sign in and PRO is already active.",
+    "spam": "Didn't get it? Check spam or promotions. You can request another e-mail on the confirmation page.",
+    "resend": "Resend the confirmation e-mail",
+    "activating": "Activating your PRO…",
+    "activatingNote": "Whop is confirming the payment. It usually takes a few seconds.",
+    "active": "Your PRO is active",
+    "goDashboard": "Enter the platform",
+    "slow": "This is taking longer than usual. If PRO doesn't show up within 5 minutes, write to {email} and we'll sort it out.",
+    "failedTitle": "The payment wasn't completed",
+    "failed": "Nothing was charged. You can try again whenever you want.",
+    "retry": "Try again"
   }
 }

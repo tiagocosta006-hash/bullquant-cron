@@ -1,4 +1,5 @@
 import { LEGAL } from "./config"
+import { PLANOS, precoTexto } from "@/lib/planos"
 import type { Conteudo } from "./tipos"
 
 const e = LEGAL.email
@@ -30,8 +31,9 @@ export const TERMOS: Conteudo = {
       {
         h: "3. Subscrição PRO, preço e pagamento",
         p: [
-          `O acesso às funcionalidades da plataforma exige uma subscrição PRO paga. Não existe, nesta fase, plano gratuito. O preço é ${LEGAL.preco.simbolo}${LEGAL.preco.valor} por mês; os impostos aplicáveis são calculados e apresentados no pagamento, antes de confirmar a compra.`,
-          `A subscrição é contratada e paga através da plataforma Whop, que processa o pagamento (e, conforme o caso, a faturação e a cobrança de impostos) e tem os seus próprios termos. Nós não vemos nem guardamos dados de cartão: recebemos da Whop apenas a confirmação de que a subscrição está ativa e o e-mail associado, para atribuir o acesso PRO à conta com esse e-mail.`,
+          `O acesso às funcionalidades da plataforma exige uma subscrição PRO paga. Não existe, nesta fase, plano gratuito. Há dois planos mensais, com impostos incluídos no preço: "BullValue PRO", a ${precoTexto(PLANOS.pro.preco)} € por mês, que dá acesso à plataforma; e "BullValue PRO + Comunidade", a ${precoTexto(PLANOS.comunidade.preco)} € por mês, que dá acesso à plataforma e à comunidade TCValue Group. O preço e as condições são apresentados antes de confirmar a compra.`,
+          `A comunidade TCValue Group (canais no Discord, dossiers de empresas, notas de mercado e conteúdos relacionados) é disponibilizada através da Whop. Tem fins educativos: não constitui aconselhamento financeiro, recomendação personalizada nem serviço de investimento, e as decisões de investimento são sempre suas.`,
+          `A subscrição é contratada e paga através da plataforma Whop, que processa o pagamento (e, conforme o caso, a faturação e a cobrança de impostos) e tem os seus próprios termos. Nós não vemos nem guardamos dados de cartão: recebemos da Whop apenas a confirmação de que a subscrição está ativa, a identificação da conta a partir da qual a compra foi feita e o e-mail associado, para atribuir o acesso PRO a essa conta.`,
         ],
         ul: [
           "Renovação automática: a subscrição renova-se todos os meses, pelo mesmo período e preço, até a cancelar.",
@@ -143,8 +145,9 @@ export const TERMOS: Conteudo = {
       {
         h: "3. PRO subscription, price and payment",
         p: [
-          `Access to the platform's features requires a paid PRO subscription. There is no free plan at this stage. The price is ${LEGAL.preco.simbolo}${LEGAL.preco.valor} per month; applicable taxes are calculated and shown at checkout, before you confirm the purchase.`,
-          "The subscription is purchased and paid through the Whop platform, which processes the payment (and, as applicable, invoicing and tax collection) and has its own terms. We do not see or store card details: we only receive from Whop confirmation that the subscription is active and the associated e-mail, in order to grant PRO access to the account with that e-mail.",
+          `Access to the platform's features requires a paid PRO subscription. There is no free plan at this stage. There are two monthly plans, with taxes included in the price: "BullValue PRO", at €${precoTexto(PLANOS.pro.preco, "en")} per month, which gives access to the platform; and "BullValue PRO + Community", at €${precoTexto(PLANOS.comunidade.preco, "en")} per month, which gives access to the platform and to the TCValue Group community. The price and conditions are shown before you confirm the purchase.`,
+          "The TCValue Group community (Discord channels, company dossiers, market notes and related content) is provided through Whop. It is educational: it is not financial advice, a personal recommendation or an investment service, and investment decisions are always yours.",
+          "The subscription is purchased and paid through the Whop platform, which processes the payment (and, as applicable, invoicing and tax collection) and has its own terms. We do not see or store card details: we only receive from Whop confirmation that the subscription is active, the identification of the account from which the purchase was made and the associated e-mail, in order to grant PRO access to that account.",
         ],
         ul: [
           "Automatic renewal: the subscription renews every month, for the same period and price, until you cancel.",

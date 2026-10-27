@@ -37,6 +37,9 @@ export const TERMOS: Conteudo = {
         ],
         ul: [
           "Renovação automática: a subscrição renova-se todos os meses, pelo mesmo período e preço, até a cancelar.",
+          ...(PLANOS.comunidade.diasGratis
+            ? [`Período experimental: no plano "BullValue PRO + Comunidade" os primeiros ${PLANOS.comunidade.diasGratis} dias são grátis. Os dados de pagamento são pedidos no início; se cancelar antes do fim desses ${PLANOS.comunidade.diasGratis} dias, não é cobrado nada. Se não cancelar, a primeira mensalidade (${precoTexto(PLANOS.comunidade.preco)} €) é cobrada no fim do período experimental e a subscrição renova-se daí em diante. O período experimental destina-se a quem ainda não o usou; podemos recusá-lo a quem já o tenha usado.`]
+            : []),
           "Cancelamento: pode cancelar a qualquer momento na sua conta Whop, sem penalização. O acesso mantém-se até ao fim do período já pago; depois, a conta deixa de ter acesso às funcionalidades PRO.",
           "Falha de pagamento: se a cobrança falhar, o acesso pode ser suspenso após as tentativas de cobrança da Whop, e é reposto assim que o pagamento for regularizado.",
           "Alterações de preço: comunicamo-las com antecedência razoável e só se aplicam ao período seguinte; pode cancelar antes de se aplicarem.",
@@ -151,6 +154,9 @@ export const TERMOS: Conteudo = {
         ],
         ul: [
           "Automatic renewal: the subscription renews every month, for the same period and price, until you cancel.",
+          ...(PLANOS.comunidade.diasGratis
+            ? [`Trial period: on the "BullValue PRO + Community" plan the first ${PLANOS.comunidade.diasGratis} days are free. Payment details are requested at the start; if you cancel before those ${PLANOS.comunidade.diasGratis} days end, nothing is charged. If you do not cancel, the first monthly fee (€${precoTexto(PLANOS.comunidade.preco, "en")}) is charged at the end of the trial and the subscription renews from then on. The trial is meant for people who have not used it before; we may refuse it to anyone who already has.`]
+            : []),
           "Cancellation: you can cancel at any time in your Whop account, without penalty. Access continues until the end of the period already paid; afterwards the account no longer has PRO access.",
           "Failed payment: if a charge fails, access may be suspended after Whop's retry attempts, and is restored as soon as payment is settled.",
           "Price changes: we give reasonable advance notice and they only apply to the next period; you may cancel before they apply.",

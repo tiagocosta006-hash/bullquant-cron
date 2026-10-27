@@ -61,18 +61,19 @@ export async function LandingB() {
   ]);
   const preco = precoTexto(PLANOS.pro.preco, locale);
   const comunidade = precoTexto(PLANOS.comunidade.preco, locale);
+  const dias = PLANOS.comunidade.diasGratis ?? 0;
   const nf = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
   const bold = { b: (c: React.ReactNode) => <strong className="font-semibold text-foreground">{c}</strong> };
 
   const faq: FaqItem[] = [
-    { q: tb("faq.free.q"), a: tb("faq.free.a") },
+    { q: tb("faq.free.q"), a: tb("faq.free.a", { dias }) },
     { q: t("faq.q6"), a: t("faq.a6") },
     { q: tb("faq.lang.q"), a: tb("faq.lang.a") },
     { q: t("faq.q2"), a: t("faq.a2") },
-    { q: tb("faq.plans.q"), a: tb("faq.plans.a", { preco, comunidade }) },
+    { q: tb("faq.plans.q"), a: tb("faq.plans.a", { preco, comunidade, dias }) },
     { q: t("faq.q7"), a: t("faq.a7") },
     { q: t("faq.q3"), a: t("faq.a3") },
-    { q: t("faq.q5"), a: t("faq.a5") },
+    { q: t("faq.q5"), a: t("faq.a5", { dias }) },
   ];
 
   const chapter = (c: { key: string; start: number; end: number; seekTo: number }, i: number, total: number, duration: number): ReelChapter => {
@@ -147,7 +148,7 @@ export async function LandingB() {
             {peek("b_hero_peek", "min-h-12 w-full px-7 text-base sm:w-auto")}
           </div>
           <p className="hero-in mt-3 max-w-[40ch] text-balance text-xs text-muted-foreground" style={heroDelay(0.34)}>
-            {tb("hero.note", { preco })}
+            {tb("hero.note", { preco, dias })}
           </p>
         </div>
 
@@ -306,7 +307,7 @@ export async function LandingB() {
               </span>
             </h2>
             <p className="mx-auto mt-4 max-w-[62ch] text-lg leading-relaxed text-muted-foreground">
-              {tb("pricing.subtitle", { preco, comunidade })}
+              {tb("pricing.subtitle", { preco, comunidade, dias })}
             </p>
           </Reveal>
           <PricingCards supportEmail={LEGAL.email} estado="anonimo" />
@@ -314,7 +315,7 @@ export async function LandingB() {
             label={tb("pricing.factsLabel")}
             facts={(["cancel", "withdrawal", "vat"] as const).map((icon) => ({ icon, text: tb(`pricing.facts.${icon}`) }))}
             peekTitle={tb("pricing.peekTitle")}
-            peekBody={tb("pricing.peekBody")}
+            peekBody={tb("pricing.peekBody", { dias })}
             peekCta={tb("hero.peek")}
           />
         </div>
@@ -352,7 +353,7 @@ export async function LandingB() {
             </Link>
             {peek("b_final_peek", "min-h-14 px-8 text-lg")}
           </div>
-          <p className="mt-5 text-xs text-muted-foreground">{tb("hero.note", { preco })}</p>
+          <p className="mt-5 text-xs text-muted-foreground">{tb("hero.note", { preco, dias })}</p>
           <Link href="/about" data-track="b_team_about" className="group mt-8 inline-flex flex-col items-center gap-2">
             <TeamSignature faces={TEAM} label={tb("final.team")} className="inline-flex items-center gap-3" />
             <span className="text-sm underline-offset-4 group-hover:underline">{tb("final.teamLink")}</span>

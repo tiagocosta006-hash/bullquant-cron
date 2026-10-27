@@ -177,7 +177,7 @@
     "pricing": {
       "eyebrow": "Plans",
       "title": "Two plans, every tool.",
-      "subtitle": "The whole platform from €7 a month, or with the TCValue Group community for €9.97. Cancel whenever you want.",
+      "subtitle": "The whole platform from €7 a month, or with the TCValue Group community for €9.97, with the first {dias} days free. Cancel whenever you want.",
       "pro": {
         "name": "Pro",
         "badge": "Full access",
@@ -214,7 +214,7 @@
       "q4": "How often is the data updated?",
       "a4": "Stock prices and financial filings are updated daily, with essential metrics and charts processed shortly after the companies' official releases.",
       "q5": "How do I subscribe?",
-      "a5": "You create your account at thebullvalue.com and go straight to Whop's secure checkout, already linked to your account. After paying, confirm your e-mail and sign in with PRO active. Cancel on Whop whenever you want.",
+      "a5": "You create your account at thebullvalue.com and go straight to Whop's secure checkout, already linked to your account. On the community plan the first {dias} days are free and you only pay if you don't cancel before then. After confirming your e-mail, you sign in with PRO active. Cancel on Whop whenever you want.",
       "q6": "Is it for beginners?",
       "a6": "Yes. Every company opens with the numbers already charted and the DCF already filled in, so there's nothing to build by hand, and the Glossary explains every metric. If you already build models, the advanced model goes down to a segment-level revenue build.",
       "q7": "What if I change my mind?",
@@ -269,7 +269,7 @@
     "hero2": {
       "subtitle": "10 years of fundamentals, a DCF calculator and an AI analyst for every S&P 500 company. All in one place.",
       "cta": "Get started",
-      "priceNote": "From €{preco} per month · cancel anytime",
+      "priceNote": "From €{preco} per month · {dias} days free on the community plan",
       "tabCompany": "Analyse a company",
       "tabDcf": "DCF calculator",
       "altCompany": "Video: Microsoft's page on BullValue, from the summary to fundamentals, the AI analyst and valuation",
@@ -293,7 +293,7 @@
         "titleTail": "before you buy it.",
         "subtitle": "10 years of SEC numbers in charts, a DCF that opens pre-filled and an AI analyst that reads the annual report for you. All in one place.",
         "peek": "See Apple without an account",
-        "note": "From €{preco} a month · cancel anytime · 14-day right of withdrawal"
+        "note": "From €{preco} a month · {dias}-day free trial on the community plan · cancel anytime"
       },
       "reel": {
         "end": {
@@ -378,7 +378,7 @@
       "pricing": {
         "titleLead": "€{preco} a month.",
         "titleAccent": "About {cents} cents a day.",
-        "subtitle": "PRO costs €{preco} a month and gives you the whole platform. With the TCValue Group community, €{comunidade}. Final price with VAT, no lock-in: it renews monthly until you cancel.",
+        "subtitle": "PRO costs €{preco} a month and gives you the whole platform. With the TCValue Group community it is €{comunidade}, and the first {dias} days are free. Final price with VAT, no lock-in: it renews monthly until you cancel.",
         "factsLabel": "Subscription terms",
         "facts": {
           "cancel": "Cancel on Whop whenever you want. PRO stays active until the end of the paid month.",
@@ -386,13 +386,13 @@
           "vat": "Final price, VAT included. Secure payment on Whop."
         },
         "peekTitle": "Still deciding?",
-        "peekBody": "Open Apple's page without an account: you see the summary and 10 years of fundamentals just like in PRO. The AI Analyst, Valuation and company profile are PRO-only."
+        "peekBody": "Try the community plan free for {dias} days, or open Apple's page right now without an account: you see the summary and 10 years of fundamentals just like in PRO. The AI Analyst, Valuation and company profile are PRO-only."
       },
       "faq": {
         "title": "Before you subscribe",
         "free": {
-          "q": "Is there a free plan or trial?",
-          "a": "No. Instead, Apple's page opens without an account: you see the summary and 10 years of fundamentals just like in PRO. And if you subscribe and change your mind within 14 days, you only pay for the time used."
+          "q": "Can I try it before paying?",
+          "a": "Yes, in two ways. The community plan's first {dias} days are free: cancel before then and you pay nothing. And Apple's page opens without an account: you see the summary and 10 years of fundamentals just like in PRO. PRO on its own has no trial, but if you change your mind within 14 days you only pay for the time used."
         },
         "lang": {
           "q": "Is it all in Portuguese? And the data?",
@@ -400,7 +400,7 @@
         },
         "plans": {
           "q": "What's the difference between the two plans?",
-          "a": "The tools are the same. PRO (€{preco}/month) gives you the whole platform. PRO + Community (€{comunidade}/month) adds access to the TCValue Group community on Discord: business dossiers on listed companies, weekly market notes and private channels where Tiago answers questions."
+          "a": "The tools are the same. PRO (€{preco}/month) gives you the whole platform. PRO + Community (€{comunidade}/month, first {dias} days free) adds access to the TCValue Group community on Discord: business dossiers on listed companies, weekly market notes and private channels where Tiago answers questions."
         }
       },
       "final": {
@@ -625,12 +625,12 @@
     "confirmPasswordLabel": "Confirm Password",
     "passwordMismatch": "Passwords don't match.",
     "emailInUse": "This email is already registered.",
-    "consentText": "I declare that I am 18 or older and agree to the <terms>Terms</terms> and the <privacy>Privacy Policy</privacy>.",
+    "consentText": "By creating an account you confirm you are 18 or older, accept the <terms>Terms</terms> and the <privacy>Privacy Policy</privacy> and ask for the service to start now: if you withdraw within 14 days, you only pay for the days used (<withdrawal>right of withdrawal</withdrawal>).",
     "planNote": "Cancel anytime. Payment happens in Whop's secure checkout.",
-    "immediateText": "I expressly request the service to start immediately and understand that, if I withdraw within the 14-day withdrawal period, I will pay for the service already provided. <withdrawal>Withdrawal right</withdrawal>",
-    "consentMissing": "Tick both boxes to continue.",
+    "consentMissing": "We couldn't record your request. Please try again.",
     "planPrice": "€{preco} per month, taxes included",
-    "choosePlan": "Choose your plan"
+    "choosePlan": "Choose your plan",
+    "planPriceTrial": "{dias} days free, then €{preco} per month, taxes included"
   },
   "forgotPassword": {
     "title": "Reset Password",
@@ -1571,23 +1571,22 @@
     },
     "trust": "Cancel anytime · Secure payment by Whop · 14-day withdrawal right",
     "consent": {
-      "terms": "I have read and accept the <terms>Terms of Service</terms> and the <privacy>Privacy Policy</privacy> and I am 18 or older.",
-      "immediate": "I expressly request that the service starts immediately and I understand that, if I withdraw within the 14-day right of withdrawal, I will pay a proportionate amount for the service already provided.",
+      "immediate": "By continuing, you ask for the service to start now: if you withdraw within 14 days, you only pay for the days used (<withdrawal>right of withdrawal</withdrawal>).",
       "billing": "€{preco} per month, taxes included. Renews automatically every month until you cancel, at any time, in your Whop account.",
       "checkout": "Continue to payment",
-      "missing": "Tick the immediate-start box to continue.",
+      "missing": "We couldn't record your request. Please try again.",
       "unavailable": "Subscription is temporarily unavailable. Write to us at {email}.",
       "haveAccount": "Already have an account?",
-      "withdrawalLink": "Right of withdrawal (14 days)",
       "start": "Create account and subscribe",
       "login": "Sign in",
       "isPro": "Your PRO is already active.",
       "goDashboard": "Go to the dashboard",
       "error": "We couldn't open the payment. Try again in a minute or write to {email}.",
       "startPro": "Start with PRO",
-      "startComunidade": "Join with the community",
+      "startComunidade": "Try {dias} days free",
       "active": "Your current plan",
-      "upgradeNote": "You already have BullValue PRO. After joining the community, cancel PRO in your Whop account so you don't pay for both."
+      "upgradeNote": "You already have BullValue PRO. After joining the community, cancel PRO in your Whop account so you don't pay for both.",
+      "billingTrial": "The first {dias} days are free: cancel before then and you pay nothing. After that, €{preco} per month, taxes included, renewing automatically until you cancel in your Whop account."
     },
     "plans": {
       "pro": {
@@ -1613,7 +1612,8 @@
           "Weekly market notes",
           "Private channels, with questions answered by Tiago",
           "Exclusive events and content"
-        ]
+        ],
+        "trial": "{dias} days free"
       }
     },
     "features": {

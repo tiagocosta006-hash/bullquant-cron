@@ -1,7 +1,7 @@
 /**
  * Os planos à venda no site — fonte ÚNICA do preço e do plano da Whop.
  *
- * Os preços têm de ser iguais aos dos planos na Whop (impostos INCLUÍDOS,
+ * Os preços (e os dias grátis) têm de ser iguais aos dos planos na Whop (impostos INCLUÍDOS,
  * tax_type "inclusive"): é o que o checkout cobra, e o preço anunciado a
  * consumidores é o preço final. Mudar um preço é mudar aqui E na Whop.
  *
@@ -10,11 +10,14 @@
  */
 export type PlanoId = "pro" | "comunidade"
 
-export const PLANOS: Record<PlanoId, { whopPlano: string; whopProduto: string; preco: number }> = {
+export const PLANOS: Record<PlanoId, { whopPlano: string; whopProduto: string; preco: number; diasGratis?: number }> = {
   /** Só a plataforma. Produto "BullValue PRO" (oculto na loja da Whop). */
   pro: { whopPlano: "plan_5qUb5vb35EzYM", whopProduto: "prod_IqTFWobXaDpeN", preco: 7 },
-  /** Plataforma + comunidade TCValue Group. Produto "TCosta Group" (o da comunidade, que também dá PRO). */
-  comunidade: { whopPlano: "plan_pN9S9ki0o3vhI", whopProduto: "prod_48E2j9tWRNacG", preco: 9.97 },
+  /**
+   * Plataforma + comunidade TCValue Group. Produto "TCosta Group" (o da comunidade, que também dá PRO).
+   * Primeiros 7 dias grátis: tem de ser igual ao trial_period_days do plano na Whop.
+   */
+  comunidade: { whopPlano: "plan_pN9S9ki0o3vhI", whopProduto: "prod_48E2j9tWRNacG", preco: 9.97, diasGratis: 7 },
 }
 
 export const PLANO_IDS = Object.keys(PLANOS) as PlanoId[]

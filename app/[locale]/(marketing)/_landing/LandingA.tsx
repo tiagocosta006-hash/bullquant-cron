@@ -27,7 +27,9 @@ import { FAQ_IDS, FaqList, LandingJsonLd, TEAM, heroDelay, heroLead, heroWords }
  */
 export async function LandingA() {
   const t = await getTranslations("marketing");
-  const faq = FAQ_IDS.map((n) => ({ q: t(`faq.q${n}`), a: t(`faq.a${n}`) }));
+  // Dias grátis do plano com comunidade (lib/planos.ts, igual ao trial da Whop).
+  const dias = PLANOS.comunidade.diasGratis ?? 0;
+  const faq = FAQ_IDS.map((n) => ({ q: t(`faq.q${n}`), a: t(`faq.a${n}`, { dias }) }));
 
   return (
     <div className="relative flex-1 overflow-x-clip">
@@ -69,7 +71,7 @@ export async function LandingA() {
             </Link>
           </div>
           <p className="hero-in mt-3 text-xs text-muted-foreground" style={heroDelay(0.34)}>
-            {t("hero2.priceNote", { preco: precoTexto(PLANOS.pro.preco) })}
+            {t("hero2.priceNote", { preco: precoTexto(PLANOS.pro.preco), dias })}
           </p>
         </div>
 
@@ -145,7 +147,7 @@ export async function LandingA() {
         <div className="relative mx-auto max-w-5xl px-6 py-16 md:px-8 md:py-24">
           <Reveal className="mx-auto mb-12 max-w-3xl text-center">
             <h2 className="text-balance text-3xl font-extrabold tracking-[-0.03em] sm:text-5xl">{t("pricing.title")}</h2>
-            <p className="mx-auto mt-4 max-w-[62ch] text-lg leading-relaxed text-muted-foreground">{t("pricing.subtitle")}</p>
+            <p className="mx-auto mt-4 max-w-[62ch] text-lg leading-relaxed text-muted-foreground">{t("pricing.subtitle", { dias })}</p>
           </Reveal>
           {/* Quem vê a landing não tem sessão (com sessão redireciona), daí "anonimo". */}
           <PricingCards supportEmail={LEGAL.email} estado="anonimo" />
@@ -187,7 +189,7 @@ export async function LandingA() {
               {t("peekCta")}
             </Link>
           </div>
-          <p className="mt-5 text-xs text-muted-foreground/80">{t("hero2.priceNote", { preco: precoTexto(PLANOS.pro.preco) })}</p>
+          <p className="mt-5 text-xs text-muted-foreground/80">{t("hero2.priceNote", { preco: precoTexto(PLANOS.pro.preco), dias })}</p>
         </Reveal>
       </section>
     </div>

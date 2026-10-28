@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { MarkLegend, ShotMarks } from "./ShotMarks";
 import { ShotLightbox, type LightboxLabels } from "./ShotLightbox";
 import { useMediaQuery } from "./useVideoGate";
+import { ThemedImg, darkSrc } from "./ThemedImg";
 
 export type GalleryItem = {
   key: string;
@@ -92,7 +93,7 @@ export function ShowcaseGallery({
 
   const prefetch = (i: number) => {
     const img = new window.Image();
-    img.src = items[i].wide;
+    img.src = document.documentElement.classList.contains("dark") ? darkSrc(items[i].wide) : items[i].wide;
   };
 
   const onTabKey = (e: KeyboardEvent<HTMLButtonElement>, i: number) => {
@@ -188,13 +189,10 @@ export function ShowcaseGallery({
             >
               {items.map((x, i) =>
                 i === active || i === prev ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- WebP já pré-dimensionado pelo script
-                  <img
+                  <ThemedImg
                     key={x.key}
                     src={x.wide}
                     alt={i === active ? x.alt : ""}
-                    loading="lazy"
-                    decoding="async"
                     className={cn(
                       "absolute inset-0 h-full w-full object-cover transition-opacity duration-250 ease-out motion-reduce:transition-none",
                       i === active ? "opacity-100" : "opacity-0",
@@ -247,12 +245,9 @@ export function ShowcaseGallery({
                 onClick={() => setLightbox(i)}
                 className="relative block aspect-square w-full"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element -- WebP já pré-dimensionado pelo script */}
-                <img
+                <ThemedImg
                   src={x.square}
                   alt={x.alt}
-                  loading="lazy"
-                  decoding="async"
                   className={cn("absolute inset-0 h-full w-full object-cover", x.fade.square && FADE_MASK)}
                 />
                 <ShotMarks marks={x.marksSquare} size="sm" />

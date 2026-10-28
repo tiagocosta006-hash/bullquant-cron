@@ -1,8 +1,8 @@
-import Image from "next/image";
 import type { ReactNode } from "react";
 import { Maximize2 } from "lucide-react";
 import { MediaFrame } from "../MediaFrame";
 import { MarkLegend, ShotMarks } from "../showcase/ShotMarks";
+import { ThemedImg } from "../showcase/ThemedImg";
 import { cn } from "@/lib/utils";
 import { ZoomTrigger } from "./JobsZoom";
 
@@ -61,14 +61,7 @@ export function JobRow({
             track={track}
             className="relative block aspect-[16/10] w-full cursor-zoom-in overflow-hidden rounded-2xl border border-border/50 bg-card/40"
           >
-            <Image
-              src={wide.src}
-              alt={alt}
-              fill
-              loading="lazy"
-              sizes="(min-width: 1024px) 680px, 90vw"
-              className={cn("object-cover", wide.fade && FADE_MASK)}
-            />
+            <ThemedImg src={wide.src} alt={alt} className={cn("absolute inset-0 h-full w-full object-cover", wide.fade && FADE_MASK)} />
             <ShotMarks size="md" marks={wide.marks} />
             <span className="glass-frost absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium">
               <Maximize2 className="h-3.5 w-3.5" aria-hidden />
@@ -87,7 +80,7 @@ export function JobRow({
           track={track}
           className="relative mx-auto block aspect-square w-full max-w-[440px] overflow-hidden rounded-2xl border border-border/60 bg-card"
         >
-          <Image src={square.src} alt={alt} fill loading="lazy" sizes="90vw" className={cn("object-cover", square.fade && FADE_MASK)} />
+          <ThemedImg src={square.src} alt={alt} className={cn("absolute inset-0 h-full w-full object-cover", square.fade && FADE_MASK)} />
           <ShotMarks size="sm" marks={square.marks} />
         </ZoomTrigger>
         <MarkLegend marks={square.marks} title={marksTitle} className="mt-4 text-[13px]" />

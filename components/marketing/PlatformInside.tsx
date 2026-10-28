@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { MediaFrame } from "./MediaFrame";
+import { ThemedImg } from "./showcase/ThemedImg";
 import { cn } from "@/lib/utils";
 
 /**
@@ -13,7 +13,8 @@ import { cn } from "@/lib/utils";
  * tal e qual, para quem quer ver o produto antes de subscrever. Roda sozinho
  * a cada 5 s até a pessoa escolher um separador (e nunca com
  * prefers-reduced-motion). As imagens estão todas montadas e trocam por
- * opacidade, para não haver salto de layout nem carregamento a meio.
+ * opacidade, para não haver salto de layout nem carregamento a meio. Cada
+ * print tem versão clara e escura, conforme o tema da página (ThemedImg).
  */
 export function PlatformInside({
   items,
@@ -61,18 +62,14 @@ export function PlatformInside({
       <MediaFrame alt={items[ativo].alt}>
         <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-card/40" style={{ aspectRatio: "16 / 10" }}>
           {items.map((it, i) => (
-            <Image
+            <ThemedImg
               key={it.key}
               src={it.src}
-              alt={it.alt}
-              fill
-              sizes="(min-width: 1024px) 1100px, 100vw"
+              alt={i === ativo ? it.alt : ""}
               className={cn(
-                "object-cover object-top transition-opacity duration-500 motion-reduce:transition-none",
+                "absolute inset-0 h-full w-full object-cover object-top transition-opacity duration-500 motion-reduce:transition-none",
                 i === ativo ? "opacity-100" : "opacity-0",
               )}
-              aria-hidden={i !== ativo}
-              priority={i === 0}
             />
           ))}
         </div>

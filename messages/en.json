@@ -323,8 +323,8 @@
           "dcf": {
             "label": "DCF calculator",
             "title": "Is it expensive or cheap?",
-            "body": "Compare today's multiples with the <b>10-year average</b> and open a <b>pre-filled DCF</b> with three scenarios: Bear, Base and Bull. In the example shown, the Base scenario gives $511 per share, with Microsoft at $532. The maths is yours: the assumptions are in plain sight and you change whatever you like.",
-            "alt": "Microsoft DCF calculator with three scenarios: $286.62, $511.07 and $856.59 per share, with the stock at $532.60"
+            "body": "Compare today's multiples with the <b>10-year average</b> and open a <b>pre-filled DCF</b> with three scenarios: Bear, Base and Bull. In the example shown, the Base scenario gives $526 per share, with Microsoft at $529. The maths is yours: the assumptions are in plain sight and you change whatever you like.",
+            "alt": "Microsoft DCF calculator with three scenarios: $291.75, $526.05 and $886.86 per share, with the stock at $529.21"
           },
           "ai": {
             "label": "AI Analyst",

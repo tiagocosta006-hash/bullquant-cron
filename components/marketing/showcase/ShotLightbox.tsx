@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { MarkLegend, ShotMarks } from "./ShotMarks";
 import type { GalleryItem } from "./ShowcaseGallery";
 import { useMediaQuery } from "./useVideoGate";
+import { ThemedImg } from "./ThemedImg";
 
 export type LightboxLabels = {
   titles: string[];
@@ -125,16 +126,19 @@ export function ShotLightbox({
                     className="absolute inset-0 overflow-auto overscroll-contain [touch-action:pan-x_pan-y_pinch-zoom]"
                   >
                     <div className="relative" style={{ width: coarse ? "max(200vw, 760px)" : 1920, aspectRatio: "16 / 10" }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element -- WebP do print inteiro, sem otimização do Next */}
-                      <img src={it.full} alt={it.alt} className="absolute inset-0 h-full w-full" />
+                      <ThemedImg src={it.full} alt={it.alt} className="absolute inset-0 h-full w-full" />
                       <ShotMarks marks={it.marksFull} size="md" />
                     </div>
                   </div>
                 ) : (
                   <div className="absolute inset-0 grid place-items-center p-4">
                     <div className="relative" style={{ width: "min(92vw, calc((100dvh - 15rem) * 1.6))", aspectRatio: "16 / 10" }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element -- WebP do print inteiro, sem otimização do Next */}
-                      <img src={it.full} alt={it.alt} className="absolute inset-0 h-full w-full rounded-lg border border-border/50 bg-card object-contain" />
+                      <ThemedImg
+                        src={it.full}
+                        alt={it.alt}
+                       
+                        className="absolute inset-0 h-full w-full rounded-lg border border-border/50 bg-card object-contain"
+                      />
                       <ShotMarks marks={it.marksFull} size="md" />
                     </div>
                   </div>

@@ -32,15 +32,16 @@ const CHROME = process.env.CHROME_PATH ?? "C:/Program Files/Google/Chrome/Applic
  * Enquadramento igual ao dos prints originais (1920x1200 = 1440x900 a 1,33x),
  * para as coordenadas de shots.json continuarem a bater certo:
  * `tab` = separador a abrir; `anchor` = texto de um título que fica a `top`
- * px CSS do topo; sem anchor, a página fica no topo.
+ * px CSS do topo; sem anchor, a página desce `scroll` px. O menu da app sai
+ * da imagem e o corte de cima cai sempre em espaço vazio.
  */
 const SHOTS = {
-  fund: { url: "/stock/MSFT", tab: "Fundamentais", anchor: "Motor de Decisão", top: 176 },
-  val: { url: "/stock/MSFT", tab: "Valuation" },
-  dcf: { url: "/dcf?ticker=MSFT" },
-  fmva: { url: "/dcf?ticker=MSFT&modo=modelo", tab: "Schedules", anchor: "Historicals", top: 84 },
-  ai: { url: "/stock/MSFT", tab: "Analista", anchor: "Analista IA", top: 176 },
-  cal: { url: "/calendar" },
+  fund: { url: "/stock/MSFT", tab: "Fundamentais", anchor: "Motor de Decisão", top: 112 },
+  val: { url: "/stock/MSFT", tab: "Valuation", scroll: 72 },
+  dcf: { url: "/dcf?ticker=MSFT", scroll: 72 },
+  fmva: { url: "/dcf?ticker=MSFT&modo=modelo", tab: "Schedules", anchor: "Historicals", top: 24 },
+  ai: { url: "/stock/MSFT", tab: "Analista", anchor: "Analista IA", top: 112 },
+  cal: { url: "/calendar", scroll: 72 },
 };
 
 const only = process.env.ONLY?.split(",");
@@ -90,7 +91,10 @@ for (const theme of ["light", "dark"]) {
     });
     await page.addStyleTag({
       content: `*,*::before,*::after{caret-color:transparent!important}
-        .boot-screen,[data-cookie-banner]{display:none!important}`,
+        .boot-screen,[data-cookie-banner]{display:none!important}
+        /* Menu da app (TopNav) fora da imagem; os separadores da empresa sobem para o topo. */
+        .fixed.inset-x-3.top-3.z-50{display:none!important}
+        .sticky.top-20{top:16px!important}`,
     });
 
     if (shot.tab) {
@@ -105,8 +109,8 @@ for (const theme of ["light", "dark"]) {
 
     await page.mouse.move(W - 1, H - 1);
     await page.evaluate(
-      ({ anchor, top }) => {
-        let y = 0;
+      ({ anchor, top, scroll }) => {
+        let y = scroll;
         if (anchor) {
           const el = [...document.querySelectorAll("h1,h2,h3,button,span")].find(
             (e) => {
@@ -119,7 +123,7 @@ for (const theme of ["light", "dark"]) {
         }
         window.scrollTo({ top: y, behavior: "instant" });
       },
-      { anchor: shot.anchor, top: shot.top ?? 0 },
+      { anchor: shot.anchor, top: shot.top ?? 0, scroll: shot.scroll ?? 0 },
     );
     // Animações de entrada, gráficos e o header que se esconde ao fazer scroll.
     await sleep(6000);

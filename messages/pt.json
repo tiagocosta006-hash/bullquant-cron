@@ -323,8 +323,8 @@
           "dcf": {
             "label": "Calculadora DCF",
             "title": "Está cara ou barata?",
-            "body": "Compara os múltiplos de hoje com a <b>média de 10 anos</b> e abre uma <b>DCF já preenchida</b> com três cenários: Bear, Base e Bull. No exemplo da imagem, o cenário Base dá 526 $ por ação, com a Microsoft a 529 $. A conta é tua: os pressupostos estão à vista e mudas o que quiseres.",
-            "alt": "Calculadora DCF da Microsoft com três cenários: 291,75 $, 526,05 $ e 886,86 $ por ação, com a ação a 529,21 $"
+            "body": "Compara os múltiplos de hoje com a <b>média de 10 anos</b> e abre uma <b>DCF já preenchida</b> com três cenários: Bear, Base e Bull. No exemplo da imagem, o cenário Base dá 471 $ por ação, com a Microsoft a 525 $. A conta é tua: os pressupostos estão à vista e mudas o que quiseres.",
+            "alt": "Calculadora DCF da Microsoft com três cenários: 261,38 $, 471,29 $ e 794,54 $ por ação, com a ação a 525,33 $"
           },
           "ai": {
             "label": "Analista IA",

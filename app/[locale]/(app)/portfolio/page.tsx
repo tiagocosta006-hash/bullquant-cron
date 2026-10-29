@@ -19,6 +19,7 @@ import { ImportPortfolio } from "@/components/portfolio/ImportPortfolio"
 import { AddPositionDialog } from "@/components/portfolio/AddPositionDialog"
 import { calculatePositionPnl, aggregatePnl } from "@/lib/finance/portfolio"
 import type { PortfolioItem, PriceData, SortKey, ViewMode } from "@/components/portfolio/types"
+import { intervaloVisivel } from '@/lib/intervaloVisivel'
 
 const VIEW_MODE_STORAGE_KEY = "portfolio.viewMode"
 
@@ -137,11 +138,7 @@ export default function Home() {
       const initPrices = async () => { await fetchPrices(tickers) }
       initPrices()
 
-      const interval = setInterval(() => {
-        fetchPrices(tickers)
-      }, 60000) // update every minute
-
-      return () => clearInterval(interval)
+      return intervaloVisivel(() => fetchPrices(tickers), 60000)
     }
   }, [items])
 

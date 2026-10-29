@@ -13,8 +13,16 @@ function getClientIp(request: NextRequest): string {
   return request.headers.get('x-real-ip') ?? 'unknown'
 }
 
+// Sondas de scanners (WordPress, .env, .git…). Respondem-se aqui com 404 seco:
+// sem isto cada uma renderizava a página 404 completa no servidor.
+const SONDA = /\.(php|asp|aspx|jsp|cgi|env|ini|bak|sql)$|^\/(wp-|wordpress|\.git|\.env|cgi-bin|phpmyadmin|xmlrpc)/i
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+
+  if (SONDA.test(pathname)) {
+    return new NextResponse(null, { status: 404 })
+  }
   
   // Ignorar rotas de API para o next-intl (ele só atua em rotas de UI)
   const isApiRoute = pathname.startsWith('/api/')

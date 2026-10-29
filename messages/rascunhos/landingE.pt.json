@@ -1,0 +1,85 @@
+{
+  "draftBanner": "Rascunho interno: esta página não está publicada. Os Termos atuais não preveem acesso grátis.",
+  "eyebrow": "Campanha de lançamento",
+  "draft_titleLead": "Análise fundamental em português,",
+  "draft_titleAccent": "grátis no lançamento.",
+  "subtitle": "10 anos de dados da SEC, avaliação e DCF pré-preenchido para as 500 empresas do S&P 500. E as primeiras {total} contas confirmadas recebem um livro do economista Nuno Palma.",
+  "cta": "Criar conta",
+  "heroNote": "Enquanto houver livros. Não é aconselhamento de investimento.",
+  "book": {
+    "kicker": "Oferta de lançamento",
+    "title": "As Causas do Atraso Português",
+    "author": "Nuno Palma",
+    "remaining": "{restantes, plural, one {Falta # livro} other {Faltam # livros}} de {total}",
+    "offered": "{total} exemplares oferecidos pelo autor, o economista Nuno Palma, às primeiras {total} pessoas que cumprirem os três passos."
+  },
+  "steps": {
+    "title": "Como funciona,",
+    "titleAccent": "em três passos",
+    "items": {
+      "conta": {
+        "title": "Cria a conta",
+        "body": "Só precisas de email e palavra-passe."
+      },
+      "email": {
+        "title": "Confirma o email",
+        "body": "Abre o link que te enviamos. Só contam contas com o email confirmado."
+      },
+      "acao": {
+        "title": "Faz uma ação na plataforma",
+        "body": "Por exemplo, adiciona uma empresa à tua watchlist. É assim que sabemos que está uma pessoa do outro lado."
+      }
+    },
+    "after": "Se ficares entre os primeiros {total}, recebes um email nosso a pedir a morada de envio."
+  },
+  "draft_offerTitle": "O que tens grátis",
+  "draft_offerAccent": "durante o lançamento",
+  "offerSubtitle": "A plataforma inteira, sem versões cortadas. Só o analista de IA tem um limite diário.",
+  "offer": {
+    "fundamentais": {
+      "title": "Fundamentais de 10 anos",
+      "body": "Receitas, margens, free cash flow, dívida e ações em circulação das 500 empresas do S&P 500, a partir dos relatórios entregues à SEC."
+    },
+    "avaliacao": {
+      "title": "Avaliação",
+      "body": "Os múltiplos de hoje ao lado do histórico de cada empresa, para leres o preço com contexto."
+    },
+    "dcf": {
+      "title": "DCF pré-preenchido",
+      "body": "O modelo de fluxos de caixa descontados já vem com os números da empresa. Mexes nos pressupostos e vês o valor intrínseco mudar."
+    },
+    "ia": {
+      "title": "Analista de IA em português",
+      "body": "Resumo, vantagens competitivas, catalisadores e riscos de cada empresa, com um limite diário de análises."
+    }
+  },
+  "rules": {
+    "title": "Regras",
+    "titleAccent": "da campanha",
+    "items": {
+      "primeiros": "Os livros vão para as primeiras {total} contas que cumprirem os três passos, por ordem de chegada.",
+      "email": "Só contam contas com o email confirmado.",
+      "acao": "É preciso fazer pelo menos uma ação na plataforma, como adicionar uma empresa à watchlist.",
+      "morada": "Só pedimos a morada a quem ganhar, por email. Nunca a pedimos no registo.",
+      "fim": "Um livro por pessoa. A campanha termina quando acabarem os livros."
+    }
+  },
+  "faq": {
+    "title": "Perguntas sobre a campanha",
+    "q1": "Quem oferece os livros?",
+    "a1": "O economista Nuno Palma, autor de «As Causas do Atraso Português», ofereceu {total} exemplares para esta campanha.",
+    "q2": "Como sei se ganhei um livro?",
+    "a2": "Se estiveres entre as primeiras {total} contas que cumprem os três passos, recebes um email nosso a pedir a morada de envio. Só pedimos a morada a quem ganha.",
+    "q3": "Que ação conta?",
+    "a3": "Uma ação simples dentro da plataforma, por exemplo adicionar uma empresa à tua watchlist.",
+    "q4": "Até quando dura a campanha?",
+    "a4": "Até acabarem os livros. O contador nesta página mostra quantos faltam.",
+    "q5": "A BullValue diz-me o que comprar?",
+    "a5": "Não. Mostramos dados, avaliação e cálculos para estudares as empresas e decidires por ti. Nada aqui é aconselhamento de investimento."
+  },
+  "final": {
+    "title": "{restantes, plural, one {Falta # livro.} other {Faltam # livros.}}",
+    "lead": "Cria a conta, confirma o email e faz a primeira ação na plataforma.",
+    "note": "Não é aconselhamento de investimento."
+  }
+}

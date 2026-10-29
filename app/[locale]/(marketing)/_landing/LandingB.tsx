@@ -200,7 +200,7 @@ export async function LandingB() {
       </section>
 
       {/* ── 2 · Prova verificável ───────────────────────────────────── */}
-      <section aria-label={tb("proof.aria")} className="relative isolate px-4 py-10 md:px-8 md:py-14">
+      <section aria-label={tb("proof.aria")} className="relative isolate px-4 py-10 sm:px-6 md:px-8 md:py-14">
         <div className="mx-auto grid max-w-5xl grid-cols-2 items-center justify-items-center gap-y-5 text-center sm:flex sm:flex-wrap sm:justify-center sm:gap-x-10">
           <div>
             <div className="nums text-3xl font-extrabold tracking-tight">500</div>
@@ -211,7 +211,12 @@ export async function LandingB() {
             <div className="text-sm text-muted-foreground">{t("hero2.proofYears")}</div>
           </div>
           <div className="col-span-2 text-sm font-semibold">{tb("proof.language")}</div>
-          <Link href="/about" data-track="b_team_about" aria-label={tb("proof.teamAria")} className="col-span-2">
+          <Link
+            href="/about"
+            data-track="b_team_about"
+            aria-label={tb("proof.teamAria")}
+            className="col-span-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
             <TeamSignature
               faces={TEAM}
               label={t("hero2.proofTeam")}
@@ -264,7 +269,7 @@ export async function LandingB() {
             ))}
           </JobsZoomProvider>
 
-          <Reveal className="glass mt-16 rounded-3xl p-6 md:mt-20 md:p-8">
+          <Reveal className="glass mt-16 rounded-3xl p-5 sm:p-6 md:mt-20 md:p-8">
             <h3 className="text-lg font-bold">{tb("jobs.more.title")}</h3>
             <ul className="mt-5 grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
               {MORE.map(({ key, icon: Icon }) => (
@@ -351,10 +356,14 @@ export async function LandingB() {
             >
               {t("hero2.cta")}
             </Link>
-            {peek("b_final_peek", "min-h-14 px-8 text-lg")}
+            {peek("b_final_peek", "min-h-14 w-full px-8 text-lg sm:w-auto")}
           </div>
           <p className="mt-5 text-xs text-muted-foreground">{tb("hero.note", { preco, dias })}</p>
-          <Link href="/about" data-track="b_team_about" className="group mt-8 inline-flex flex-col items-center gap-2">
+          <Link
+            href="/about"
+            data-track="b_team_about"
+            className="group mt-8 inline-flex flex-col items-center gap-2 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+          >
             <TeamSignature faces={TEAM} label={tb("final.team")} className="inline-flex items-center gap-3" />
             <span className="text-sm underline-offset-4 group-hover:underline">{tb("final.teamLink")}</span>
           </Link>

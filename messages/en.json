@@ -38,7 +38,7 @@
       "price": "€7",
       "priceLabel": "per month"
     },
-    "ctaTitle": "Start seeing the value others miss.",
+    "ctaTitle": "Before your next buy, see what the company is worth.",
     "ctaSubtitle": "Subscribe to PRO and analyze any S&P 500 company in seconds.",
     "ticker": {
       "label": "Latest available closes · S&P 500",
@@ -210,11 +210,11 @@
       "q2": "Is this financial advice?",
       "a2": "No. BullValue is an analysis and education tool. No value, metric or insight is a recommendation to buy or sell. Decisions are always yours.",
       "q3": "Which companies are available?",
-      "a3": "The 500 companies of the S&P 500. European coverage (including Euronext Lisbon) is on the roadmap.",
+      "a3": "The 500 companies of the S&P 500. We want to add European companies, including Euronext Lisbon, but there is no date yet.",
       "q4": "How often is the data updated?",
-      "a4": "Stock prices and financial filings are updated daily, with essential metrics and charts processed shortly after the companies' official releases.",
+      "a4": "Prices update daily. When a company files a report with the SEC, the metrics and charts update shortly after.",
       "q5": "How do I subscribe?",
-      "a5": "You create your account at thebullvalue.com and go straight to Whop's secure checkout, already linked to your account. On the community plan the first {dias} days are free and you only pay if you don't cancel before then. After confirming your e-mail, you sign in with PRO active. Cancel on Whop whenever you want.",
+      "a5": "Three steps: create your account, pay on Whop (the payments platform, already linked to your account) and confirm your e-mail. You're in with PRO active right away. On the community plan the first {dias} days are free and you only pay if you don't cancel before then. Cancel on Whop whenever you want.",
       "q6": "Is it for beginners?",
       "a6": "Yes. Every company opens with the numbers already charted and the DCF already filled in, so there's nothing to build by hand, and the Glossary explains every metric. If you already build models, the advanced model goes down to a segment-level revenue build.",
       "q7": "What if I change my mind?",
@@ -227,7 +227,7 @@
       "desc": "A platform developed by university students with the goal of delivering professional data to independent investors.",
       "cta": "Meet the team behind it"
     },
-    "peekCta": "Peek without an account",
+    "peekCta": "See Apple, no account needed",
     "inside": {
       "eyebrow": "No mock-ups",
       "title": "The platform,",
@@ -267,9 +267,9 @@
       }
     },
     "hero2": {
-      "subtitle": "10 years of fundamentals, a DCF calculator and an AI analyst for every S&P 500 company. All in one place.",
+      "subtitle": "10 years of numbers in charts, a DCF that opens pre-filled and an AI analyst that explains the business. For all 500 S&P 500 companies.",
       "cta": "Get started",
-      "priceNote": "From €{preco} per month · {dias} days free on the community plan",
+      "priceNote": "From €{preco} per month · {dias} days free on the community plan · cancel anytime",
       "tabCompany": "Analyse a company",
       "tabDcf": "DCF calculator",
       "altCompany": "Video: Microsoft's page on BullValue, from the summary to fundamentals, the AI analyst and valuation",
@@ -283,7 +283,12 @@
       "label": "Landing versions",
       "a": "Version A — current, with fixes",
       "b": "Version B — redesigned",
-      "c": "Version C — videos and screenshots shown differently"
+      "c": "Version C — videos and screenshots shown differently",
+      "d": "Version D — editorial",
+      "e": "Version E — draft: launch campaign + Nuno Palma's books",
+      "f": "Version F — guided scroll tour",
+      "g": "Version G — ultra-short, mobile-first",
+      "h": "Version H — made by Bullocracy"
     },
     "landingB": {
       "hero": {
@@ -373,7 +378,7 @@
         "noTitle": "It's not for you if",
         "n1": "You want stock tips or buy signals. BullValue is an analysis tool, not advice: the decisions are yours.",
         "n2": "You day trade: this is fundamentals, not minute-by-minute charts.",
-        "n3": "You only invest in European companies: for now we cover the S&P 500. Europe, including Euronext Lisbon, is on the roadmap."
+        "n3": "You only invest in European companies: for now we cover the S&P 500. We want to add Europe, including Euronext Lisbon, but there is no date yet."
       },
       "pricing": {
         "titleLead": "€{preco} a month.",
@@ -386,7 +391,7 @@
           "vat": "Final price, VAT included. Secure payment on Whop."
         },
         "peekTitle": "Still deciding?",
-        "peekBody": "Try the community plan free for {dias} days, or open Apple's page right now without an account: you see the summary and 10 years of fundamentals just like in PRO. The AI Analyst, Valuation and company profile are PRO-only."
+        "peekBody": "Try the community plan free for {dias} days, or open Apple's page right now without an account: you see the summary and 10 years of fundamentals just like in PRO. The Analyst, Valuation and Company tabs are PRO-only."
       },
       "faq": {
         "title": "Before you subscribe",
@@ -476,7 +481,7 @@
           },
           "dcf": {
             "m1": "Each scenario's assumptions come pre-filled; change whatever you like",
-            "m2": "Each scenario's value: the most to pay today to earn your required return",
+            "m2": "Value per share in each scenario: the price that gives you the return you ask for, if the assumptions hold",
             "m3": "Your required return: here, 10% a year"
           },
           "fmva": {
@@ -504,6 +509,168 @@
         "fit": "Fit to screen",
         "actual": "View at 100%",
         "hintTouch": "Drag to see the whole screen · pinch to zoom in"
+      }
+    },
+    "landingD": {
+      "kicker": "S&P 500 · 10 years of SEC filings · in Portuguese",
+      "titleLead": "Study companies with the calm of someone who",
+      "titleAccent": "invests for ten years.",
+      "lead": "Ten years of financials, a pre-filled DCF and an AI analyst that answers in Portuguese. No tips, no rush.",
+      "peek": "See Apple without an account",
+      "figure": "Fig. 1 — A company from the inside: ten years of financials, charts and the DCF.",
+      "inside": {
+        "n": "01",
+        "eyebrow": "The platform",
+        "title": "What you see",
+        "titleAccent": "in a company",
+        "lead": "Each crop is the real page, at reading size. The numbered marks explain what you are looking at. Tap one to open it in full."
+      },
+      "manifesto": {
+        "n": "02",
+        "eyebrow": "Why we exist",
+        "quote": "Investing well is not guessing next month. It is understanding the business and knowing what you are paying for it.",
+        "p1": "Almost everything written about stocks in Portuguese is noise: hunches, price targets, hurry. Serious tools exist, but they are in English and built for professionals.",
+        "p2": "The BullValue puts what a long-term investor needs on one page: ten years of financials from the SEC, a pre-filled DCF so you can change the assumptions, and an AI analyst that explains in Portuguese. The decision is still yours. This is not financial advice."
+      },
+      "pricing": {
+        "n": "03",
+        "eyebrow": "Plans"
+      },
+      "faq": {
+        "n": "04",
+        "eyebrow": "Questions"
+      },
+      "closing": {
+        "titleLead": "Your next decision deserves",
+        "titleAccent": "ten years of context."
+      }
+    },
+    "landingF": {
+      "hero": {
+        "eyebrow": "Guided tour · 6 stops",
+        "titleLead": "Before you pay, see",
+        "titleAccent": "everything inside.",
+        "subtitle": "Scroll down and walk through the platform screen by screen: from 10 years of SEC fundamentals to the earnings calendar. No promises, just the product as it is.",
+        "tourCta": "Start the tour",
+        "peek": "Or open Apple's page without an account"
+      },
+      "tour": {
+        "kicker": "The tour",
+        "title": "Six stops,",
+        "titleAccent": "no detours.",
+        "subtitle": "Every image is a real screenshot of the platform, in light or dark mode to match your screen.",
+        "railLabel": "Tour stops",
+        "steps": {
+          "fund": {
+            "title": "10 years of numbers, at a glance.",
+            "body": "Revenue, margins, free cash flow, ROIC and debt for all 500 S&P 500 companies, taken from the reports filed with the SEC. Quarterly, TTM or annual, as a chart or a table."
+          },
+          "val": {
+            "title": "Cheap or expensive? Compare it with its own history.",
+            "body": "P/E, EV/EBITDA, P/FCF and friends, calculated with today's price and set next to what the company has usually been worth in recent years."
+          },
+          "dcf": {
+            "title": "A DCF that comes pre-filled.",
+            "body": "Pick the company and the free cash flow, shares and price fill in on their own. Adjust growth, WACC and terminal growth and each scenario's per-share value updates instantly."
+          },
+          "fmva": {
+            "title": "When you want to go deeper.",
+            "body": "The advanced model, for serious valuation work: scenarios, saved versions and export to PDF and Excel."
+          },
+          "ai": {
+            "title": "An analyst that answers in Portuguese.",
+            "body": "Ask about the moat, the risks or the latest quarter and get a structured answer, based on the company's numbers. Not investment advice: a starting point."
+          },
+          "cal": {
+            "title": "Know when each company reports.",
+            "body": "The earnings calendar shows the dates, the estimates and, after the release, whether the company beat or missed expectations."
+          }
+        }
+      },
+      "final": {
+        "title": "You've seen the inside.",
+        "titleAccent": "Now try it.",
+        "lead": "Cancel anytime on Whop, and you have 14 days to withdraw, paying only the proportional part."
+      }
+    },
+    "landingG": {
+      "hero": {
+        "titleLead": "See what a stock",
+        "titleAccent": "is really worth.",
+        "subtitle": "Every S&P 500 company with 10 years of SEC filings, a pre-filled DCF and an AI analyst."
+      },
+      "reel": {
+        "title": "See how it works,",
+        "titleAccent": "in half a minute."
+      },
+      "proof": {
+        "label": "What you get inside",
+        "sec": "10 years of official SEC filings",
+        "dcf": "Pre-filled DCF: you only tweak the assumptions",
+        "ai": "AI analyst that answers in Portuguese"
+      },
+      "faq": {
+        "title": "Quick questions"
+      },
+      "final": {
+        "titleLead": "Before you buy,",
+        "titleAccent": "read the numbers.",
+        "finePrint": "Prices include VAT · cancel anytime on Whop · not investment advice"
+      }
+    },
+    "landingH": {
+      "hero": {
+        "eyebrow": "Made by Bullocracy",
+        "titleLead": "We built the tool",
+        "titleAccent": "we were missing.",
+        "subtitle": "We are three Portuguese founders from Bullocracy. We got tired of analysing companies on sites that were expensive, in English and full of noise. So we built our own, and opened it to anyone who wants to do the same.",
+        "peek": "See Apple without an account",
+        "signature": "Made in Portugal by the Bullocracy team"
+      },
+      "team": {
+        "eyebrow": "Who we are",
+        "title": "Who is behind",
+        "titleAccent": "this.",
+        "note": "No gurus, no buy signals, no \"stock of the month\". Just data and the maths done in plain sight."
+      },
+      "tool": {
+        "eyebrow": "The platform",
+        "title": "What we use to analyse companies",
+        "titleAccent": "in our videos.",
+        "subtitle": "Not a mockup. This is the platform recorded as it is: SEC numbers, a pre-filled DCF and the AI analyst in Portuguese."
+      },
+      "jobs": {
+        "title": "Three things you start doing",
+        "titleAccent": "on your own.",
+        "items": {
+          "read": {
+            "title": "Understand the business without opening the annual report",
+            "text": "Ten years of revenue, margins, cash flow and debt, taken from SEC filings, in charts you can read without a dictionary."
+          },
+          "value": {
+            "title": "Get a sense of what the company is worth",
+            "text": "The DCF comes pre-filled with the company's numbers. Change the assumptions and watch each scenario's per-share value move instantly."
+          },
+          "ask": {
+            "title": "Ask questions in Portuguese",
+            "text": "The AI analyst explains what the numbers mean, without jargon. It won't tell you what to buy: that's up to you."
+          }
+        }
+      },
+      "not": {
+        "title": "What this is not",
+        "items": {
+          "advice": "It is not financial advice. The decisions are always yours.",
+          "tips": "No hot tips, buy alerts or promised returns.",
+          "lockin": "No lock-in: cancel anytime on Whop."
+        }
+      },
+      "pricing": {
+        "facts": "Prices include VAT. 14 days to withdraw (you only pay the proportional part). Cancel anytime."
+      },
+      "final": {
+        "title": "If you watch our videos, you already know how we think.",
+        "titleAccent": "Now you have the tool."
       }
     }
   },

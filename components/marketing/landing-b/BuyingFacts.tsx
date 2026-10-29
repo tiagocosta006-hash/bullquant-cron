@@ -36,7 +36,7 @@ export function BuyingFacts({
           );
         })}
       </ul>
-      <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-border/60 bg-card/50 p-5 md:flex md:items-center md:justify-between md:gap-6 md:p-6">
+      <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-border/70 bg-card/50 p-5 md:flex md:items-center md:justify-between md:gap-6 md:p-6 dark:bg-card/70">
         <div>
           <p className="font-semibold">{peekTitle}</p>
           <p className="mt-1 text-sm text-muted-foreground">{peekBody}</p>

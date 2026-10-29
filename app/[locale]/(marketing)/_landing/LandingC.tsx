@@ -80,11 +80,11 @@ export async function LandingC() {
       <LandingJsonLd faq={faq} />
 
       {/* ── 1 · Topo: igual à A, com o vídeo em capítulos ────────────── */}
-      <section data-backdrop="paper" className="relative isolate px-5 pt-10 md:px-8 md:pt-20">
+      <section data-backdrop="paper" aria-labelledby="c-hero-title" className="relative isolate px-5 pt-10 md:px-8 md:pt-20">
         <div className="hero-aurora" aria-hidden />
         <HeroHorizon />
         <div className="relative mx-auto flex max-w-5xl flex-col items-center text-center">
-          <h1 className="max-w-[22ch] text-balance text-[2.1rem] font-extrabold leading-[1.02] tracking-[-0.035em] sm:text-6xl md:text-7xl">
+          <h1 id="c-hero-title" className="max-w-[22ch] text-balance text-[2.1rem] font-extrabold leading-[1.02] tracking-[-0.035em] sm:text-6xl md:text-7xl">
             <span className="sr-only">{t("titleLead")} {t("titleAccent")}</span>
             {heroLead(t("titleLead"))}
             {heroWords(
@@ -189,10 +189,10 @@ export async function LandingC() {
       </section>
 
       {/* ── 3 · A plataforma por dentro: recortes legíveis ─────────── */}
-      <section data-backdrop="grid" className="relative isolate">
+      <section data-backdrop="grid" aria-labelledby="c-inside-title" className="relative isolate">
         <div className="relative mx-auto max-w-6xl px-6 py-16 md:px-8 md:py-24">
           <Reveal className="mx-auto mb-10 max-w-3xl text-center">
-            <h2 className="text-balance text-3xl font-extrabold tracking-[-0.03em] sm:text-5xl">
+            <h2 id="c-inside-title" className="text-balance text-3xl font-extrabold tracking-[-0.03em] sm:text-5xl">
               {t("inside.title")}{" "}
               <span className="font-heading font-bold italic text-primary">{t("inside.titleAccent")}</span>
             </h2>
@@ -225,10 +225,10 @@ export async function LandingC() {
       </section>
 
       {/* ── 4 · Planos ──────────────────────────────────────────────── */}
-      <section id="planos" data-backdrop="rings" data-hide-floating className="relative isolate">
+      <section id="planos" data-backdrop="rings" data-hide-floating aria-labelledby="c-pricing-title" className="relative isolate">
         <div className="relative mx-auto max-w-5xl px-6 py-16 md:px-8 md:py-24">
           <Reveal className="mx-auto mb-12 max-w-3xl text-center">
-            <h2 className="text-balance text-3xl font-extrabold tracking-[-0.03em] sm:text-5xl">{t("pricing.title")}</h2>
+            <h2 id="c-pricing-title" className="text-balance text-3xl font-extrabold tracking-[-0.03em] sm:text-5xl">{t("pricing.title")}</h2>
             <p className="mx-auto mt-4 max-w-[62ch] text-lg leading-relaxed text-muted-foreground">{t("pricing.subtitle", { dias })}</p>
           </Reveal>
           <PricingCards supportEmail={LEGAL.email} estado="anonimo" />
@@ -236,20 +236,20 @@ export async function LandingC() {
       </section>
 
       {/* ── 5 · FAQ ─────────────────────────────────────────────────── */}
-      <section data-backdrop="paper-grid" className="relative isolate">
+      <section data-backdrop="paper-grid" aria-labelledby="c-faq-title" className="relative isolate">
         <div className="relative mx-auto max-w-2xl px-6 py-16 md:px-8 md:py-24">
           <Reveal>
-            <h2 className="text-center text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">{t("faq.title")}</h2>
+            <h2 id="c-faq-title" className="text-center text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">{t("faq.title")}</h2>
           </Reveal>
           <FaqList items={faq} />
         </div>
       </section>
 
       {/* ── 6 · CTA final ───────────────────────────────────────────── */}
-      <section data-backdrop="closing" data-hide-floating className="relative isolate px-6 py-24 md:px-8 md:py-32">
+      <section data-backdrop="closing" data-hide-floating aria-labelledby="c-final-title" className="relative isolate px-6 py-24 md:px-8 md:py-32">
         <Reveal data-reveal="zoom" className="flex flex-col items-center text-center">
           <BrandMark className="h-14 w-14 rounded-2xl shadow-lg" />
-          <h2 className="mt-8 max-w-[18ch] text-balance text-4xl font-extrabold leading-[1.04] tracking-[-0.035em] sm:text-6xl">
+          <h2 id="c-final-title" className="mt-8 max-w-[18ch] text-balance text-4xl font-extrabold leading-[1.04] tracking-[-0.035em] sm:text-6xl">
             {t("ctaTitle")}
           </h2>
           <div data-final-cta className="mt-9 flex flex-col items-center gap-4 sm:flex-row">

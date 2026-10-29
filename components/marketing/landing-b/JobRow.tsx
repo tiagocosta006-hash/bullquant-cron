@@ -9,6 +9,8 @@ import { ZoomTrigger } from "./JobsZoom";
 type Shot = { src: string; fade: boolean; marks: { n: number; text: string; left: string; top: string }[] };
 
 const FADE_MASK = "[mask-image:linear-gradient(to_right,#000_calc(100%-28px),transparent)]";
+const FOCUS_RING =
+  "outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
 /**
  * Uma pergunta de compra respondida por um ecrã real (versão B): número,
@@ -45,11 +47,11 @@ export function JobRow({
 }) {
   const track = `b_jobs_full_${trackKey}`;
   return (
-    <div className="md:grid md:grid-cols-12 md:items-center md:gap-12">
+    <div className="md:grid md:grid-cols-12 md:items-center md:gap-10 lg:gap-14">
       <div className="md:col-span-5">
         <span className="nums text-sm font-semibold text-muted-foreground">{n}</span>
-        <h3 className="mt-2 text-2xl font-extrabold tracking-tight md:text-3xl">{title}</h3>
-        <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground md:text-base">{body}</p>
+        <h3 className="mt-2 text-balance text-2xl font-extrabold tracking-tight md:text-3xl">{title}</h3>
+        <p className="mt-3 text-pretty text-[15px] leading-relaxed text-muted-foreground md:text-base">{body}</p>
       </div>
 
       {/* desktop */}
@@ -59,7 +61,10 @@ export function JobRow({
             index={index}
             ariaLabel={seeFullAria}
             track={track}
-            className="relative block aspect-[16/10] w-full cursor-zoom-in overflow-hidden rounded-2xl border border-border/50 bg-card/40"
+            className={cn(
+              "relative block aspect-[16/10] w-full cursor-zoom-in overflow-hidden rounded-2xl border border-border/50 bg-card/40",
+              FOCUS_RING,
+            )}
           >
             <ThemedImg src={wide.src} alt={alt} className={cn("absolute inset-0 h-full w-full object-cover", wide.fade && FADE_MASK)} />
             <ShotMarks size="md" marks={wide.marks} />
@@ -78,7 +83,10 @@ export function JobRow({
           index={index}
           ariaLabel={seeFullAria}
           track={track}
-          className="relative mx-auto block aspect-square w-full max-w-[440px] overflow-hidden rounded-2xl border border-border/60 bg-card"
+          className={cn(
+            "relative mx-auto block aspect-square w-full max-w-[440px] overflow-hidden rounded-2xl border border-border/60 bg-card",
+            FOCUS_RING,
+          )}
         >
           <ThemedImg src={square.src} alt={alt} className={cn("absolute inset-0 h-full w-full object-cover", square.fade && FADE_MASK)} />
           <ShotMarks size="sm" marks={square.marks} />
@@ -87,7 +95,10 @@ export function JobRow({
         <ZoomTrigger
           index={index}
           track={track}
-          className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-border/70 text-sm font-medium"
+          className={cn(
+            "mx-auto mt-4 flex min-h-11 w-full max-w-[440px] items-center justify-center gap-2 rounded-xl border border-border/70 bg-card/40 text-sm font-medium transition-colors hover:border-primary/50",
+            FOCUS_RING,
+          )}
         >
           <Maximize2 className="h-4 w-4" aria-hidden />
           {seeFull}

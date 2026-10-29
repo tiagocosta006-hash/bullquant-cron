@@ -9,7 +9,7 @@ import { Reveal } from "@/components/fx/Reveal";
 export function FitCards({ yesTitle, yes, noTitle, no }: { yesTitle: string; yes: string[]; noTitle: string; no: string[] }) {
   return (
     <div className="mt-10 grid gap-5 md:grid-cols-2">
-      <Reveal className="glass rounded-3xl p-5 md:p-8">
+      <Reveal className="glass rounded-3xl p-5 sm:p-6 md:p-8">
         <h3 className="text-lg font-bold">{yesTitle}</h3>
         <ul className="mt-4 space-y-3">
           {yes.map((item) => (
@@ -20,7 +20,7 @@ export function FitCards({ yesTitle, yes, noTitle, no }: { yesTitle: string; yes
           ))}
         </ul>
       </Reveal>
-      <Reveal className="rounded-3xl border border-border/60 bg-card/40 p-5 md:p-8">
+      <Reveal className="rounded-3xl border border-border/70 bg-card/40 p-5 sm:p-6 md:p-8 dark:bg-card/60">
         <h3 className="text-lg font-bold">{noTitle}</h3>
         <ul className="mt-4 space-y-3">
           {no.map((item) => (

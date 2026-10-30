@@ -9,6 +9,7 @@ import { Link, useRouter } from '@/i18n/routing';
 import { getCurrencySymbol } from "@/lib/finance/format"
 import { CompanyLogo } from "@/components/ui/CompanyLogo"
 import { obterPrecoAoVivo } from "@/lib/precoAoVivo"
+import { intervaloVisivel } from '@/lib/intervaloVisivel'
 
 type CompanyProp = {
   ticker: string;
@@ -79,8 +80,7 @@ export function StockHeader({ company, shareComponent, initialPriceData = null }
       await fetchWatchlistState()
     }
     init()
-    const interval = setInterval(fetchPrice, 60000)
-    return () => clearInterval(interval)
+    return intervaloVisivel(fetchPrice, 60000)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [company.ticker])
 

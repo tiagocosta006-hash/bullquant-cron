@@ -43,6 +43,12 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: ['Google-Extended', 'GPTBot', 'CCBot'],
         disallow: ['/'],
       },
+      // Raspadores de ferramentas de SEO e afins: não trazem utilizadores e
+      // percorrem as ~1100 páginas de ações, cada uma renderizada no servidor.
+      {
+        userAgent: ['AhrefsBot', 'SemrushBot', 'MJ12bot', 'DotBot', 'Bytespider', 'PetalBot', 'BLEXBot', 'DataForSeoBot'],
+        disallow: ['/'],
+      },
     ],
     sitemap: `${BRAND.siteUrl}/sitemap.xml`,
   }

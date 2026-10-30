@@ -32,6 +32,7 @@ function formatVal(value: number | null | undefined, isPercent = false, isCurren
 }
 
 import { GlossaryTooltip } from "@/components/ui/glossary-tooltip"
+import { intervaloVisivel } from '@/lib/intervaloVisivel'
 
 // Linha de métrica: mostra o valor formatado, um skeleton enquanto carrega,
 // ou um "N/A" explicado (tooltip) quando o dado não existe — nunca um 0 enganador.
@@ -102,8 +103,7 @@ export function StockSnapshot({ ticker, fundamentals, currencySymbol = "$", init
       }
     }
     fetchPrice()
-    const interval = setInterval(fetchPrice, 60000)
-    return () => clearInterval(interval)
+    return intervaloVisivel(fetchPrice, 60000)
   }, [ticker])
 
   // Derive TTM data — null-aware: distingue "sem dados" (null) de "zero real".

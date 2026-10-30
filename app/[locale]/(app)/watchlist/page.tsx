@@ -11,6 +11,7 @@ import { PortfolioSuggestions } from "@/components/portfolio/PortfolioSuggestion
 import { ManualAddSearch } from "@/components/portfolio/ManualAddSearch"
 import { ExploreTeaser } from "@/components/watchlist/ExploreTeaser"
 import type { Company, PortfolioItem, PriceData } from "@/components/portfolio/types"
+import { intervaloVisivel } from '@/lib/intervaloVisivel'
 
 const POPULAR_TICKERS = ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA", "NFLX"]
 
@@ -133,8 +134,7 @@ export default function WatchlistPage() {
       const tickers = items.map((item) => item.company.ticker)
       const initPrices = async () => { await fetchPrices(tickers) }
       initPrices()
-      const interval = setInterval(() => fetchPrices(tickers), 60000)
-      return () => clearInterval(interval)
+      return intervaloVisivel(() => fetchPrices(tickers), 60000)
     }
   }, [items])
 

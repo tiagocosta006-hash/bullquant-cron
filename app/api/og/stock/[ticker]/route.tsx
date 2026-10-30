@@ -232,6 +232,8 @@ export async function GET(
       {
         width: 1200,
         height: 630,
+        // Cache na CDN: a imagem gera-se uma vez em vez de a cada partilha ou crawler.
+        headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=604800' },
         fonts: [
           {
             name: '"SF UI Text"',

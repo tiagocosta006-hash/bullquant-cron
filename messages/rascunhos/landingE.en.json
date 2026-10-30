@@ -1,0 +1,93 @@
+{
+  "draftBanner": "Internal draft: this page is not published. The current Terms do not include free access.",
+  "eyebrow": "Launch campaign",
+  "draft_titleLead": "Fundamental analysis in Portuguese,",
+  "draft_titleAccent": "free at launch.",
+  "subtitle": "10 years of SEC data, valuation and a pre-filled DCF for all 500 S&P 500 companies, in Portuguese.",
+  "cta": "Create account",
+  "heroNote": "Books only while copies last. Not investment advice.",
+  "book": {
+    "kicker": "The author's gift",
+    "title": "As Causas do Atraso Português",
+    "author": "Nuno Palma",
+    "remaining": "{restantes, plural, =0 {No books left} =1 {1 of {total} books left} other {# of {total} books left}}",
+    "offered": "Copies (in Portuguese) donated by the author himself to the first {total} people who complete the three steps."
+  },
+  "steps": {
+    "title": "Three steps to",
+    "titleAccent": "get the book",
+    "items": {
+      "conta": {
+        "title": "Create your account",
+        "body": "All you need is your name, an email and a password."
+      },
+      "email": {
+        "title": "Confirm your email",
+        "body": "Open the link we'll email you. Without it, the account doesn't count."
+      },
+      "usar": {
+        "title": "Use the platform",
+        "body": "For example, add a company to your watchlist. That's how we know there's a real person on the other side."
+      }
+    },
+    "after": "If you're among the first {total} people to complete the three steps, we'll email you to ask for a shipping address."
+  },
+  "draft_offerTitle": "What you get for free",
+  "draft_offerAccent": "during the launch",
+  "offerSubtitle": "The whole platform, nothing locked. Only the AI Analyst has a daily limit.",
+  "offer": {
+    "fundamentais": {
+      "title": "10 years of fundamentals",
+      "body": "Revenue, margins, free cash flow, debt and shares outstanding for all 500 S&P 500 companies, from their filings with the SEC.",
+      "alt": "Microsoft's Fundamentals tab with 10 years of revenue, segments and geography"
+    },
+    "avaliacao": {
+      "title": "Valuation",
+      "body": "Today's multiples next to each company's history, so you can read the price in context.",
+      "alt": "Microsoft's historical valuation: P/E over time with its average and median"
+    },
+    "dcf": {
+      "title": "Pre-filled DCF",
+      "body": "The company's numbers are already in the calculator. Change the assumptions and watch each scenario's per-share value move.",
+      "alt": "Microsoft DCF calculator with the Bear, Base and Bull scenarios"
+    },
+    "ia": {
+      "title": "AI Analyst in Portuguese",
+      "body": "Summary, competitive advantages, catalysts and risks for each company, explained in Portuguese.",
+      "alt": "AI Analyst with Microsoft's business summary and the label Source: 10-K"
+    }
+  },
+  "rules": {
+    "title": "Campaign",
+    "titleAccent": "rules",
+    "items": {
+      "primeiros": "The books go to the first {total} people who complete the three steps, first come, first served.",
+      "email": "Only accounts with a confirmed email count.",
+      "usar": "You need to use the platform at least once, for example by adding a company to your watchlist.",
+      "morada": "We only ask winners for an address, by email. Never at sign-up.",
+      "fim": "One book per person. The offer ends when the copies run out."
+    }
+  },
+  "faq": {
+    "title": "Questions about",
+    "titleAccent": "the campaign",
+    "q1": "Who is giving the books?",
+    "a1": "The economist Nuno Palma, author of «As Causas do Atraso Português», donated {total} copies for this campaign.",
+    "q2": "How do I know if I won a book?",
+    "a2": "If you're among the first {total} people to complete the three steps, we'll email you to ask for a shipping address. We only ask winners for an address.",
+    "q3": "What counts as using the platform?",
+    "a3": "A simple action inside the platform, such as adding a company to your watchlist.",
+    "q4": "How long will the books last?",
+    "a4": "Until the copies run out. The counter at the top of this page shows how many are left.",
+    "q5": "And free access, until when?",
+    "a5": "[To be decided by the team before publishing: how long the launch lasts, what happens afterwards and whether any payment details are asked for.]",
+    "q6": "Does BullValue tell me what to buy?",
+    "a6": "No. We show data, multiples and calculations so you can study companies and decide for yourself. Nothing here is investment advice."
+  },
+  "final": {
+    "title": "{restantes, plural, =0 {The books are gone.} other {There are still}}",
+    "titleAccent": "{restantes, plural, =0 {} =1 {1 book to give away.} other {# books to give away.}}",
+    "lead": "Create your account, confirm your email and add your first company to your watchlist.",
+    "note": "Not investment advice."
+  }
+}

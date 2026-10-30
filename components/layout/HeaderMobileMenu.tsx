@@ -40,7 +40,7 @@ export function HeaderMobileMenu({
     <Sheet>
       <SheetTrigger
         render={
-          <Button variant="ghost" size="icon" className="md:hidden" aria-label={labels.openMenu} />
+          <Button variant="ghost" size="icon" className="lg:hidden" aria-label={labels.openMenu} />
         }
       >
         <Menu className="h-5 w-5" />

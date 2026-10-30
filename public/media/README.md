@@ -37,3 +37,19 @@ showcaseTerminal: {
 
 Screenshots para os cards do bento: PNG/WebP 2×, nome `bento-<card>.png`.
 Adicionamos os slots quando existirem.
+
+## Versão C da landing (`public/media/c`)
+
+Recortes legíveis dos prints (wide 16:10 para o desktop, square 1:1 para o
+telemóvel, full para o lightbox), posters em WebP e os três vídeos reencodados
+com keyframe a cada 1 s (os saltos de capítulo ficam imediatos). Tudo sai dos
+ficheiros acima, que não se tocam:
+
+```bash
+node scripts/media/landing-c.mjs           # WebP
+node scripts/media/landing-c.mjs --video   # + MP4 (ffmpeg do PATH ou $FFMPEG)
+```
+
+Os retângulos e as marcas estão em `components/marketing/showcase/shots.json`
+(px do print de 1920x1200). Se os prints forem recapturados, ajusta-se esse
+ficheiro, sobe-se `version` e corre-se o script.

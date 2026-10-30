@@ -24,12 +24,20 @@ export async function Header() {
         {/* Logo: sem bolha, só uma hairline dourada por baixo — destaca-se
             do vidro das restantes */}
         <div className="relative flex h-14 shrink-0 items-center px-1">
-          <Logo href="/" size="md" />
+          {/* Abaixo de 400px (iPhone mini/SE, Androids de 360px) o logo com
+              nome + menu + tema + CTA não cabem numa linha e o CTA ficava
+              cortado à direita; aí fica só o touro. */}
+          <div className="max-[400px]:hidden">
+            <Logo href="/" size="md" />
+          </div>
+          <div className="hidden max-[400px]:block">
+            <Logo href="/" size="md" iconOnly />
+          </div>
           <span className="gold-rule absolute inset-x-0 -bottom-0.5 h-px" aria-hidden />
         </div>
 
         {/* Bolha da navegação */}
-        <nav className="relative hidden h-12 shrink-0 items-center px-5 md:flex">
+        <nav className="relative hidden h-12 shrink-0 items-center px-5 lg:flex">
           <div className="glass glass-frost absolute inset-0 rounded-full" aria-hidden />
           <div className="relative z-10 flex items-center gap-6">
             <Link
@@ -60,9 +68,9 @@ export async function Header() {
         </nav>
 
         {/* Bolha da direita: menu mobile, tema, auth */}
-        <div className="relative ml-auto flex h-12 shrink-0 items-center px-2.5 sm:px-4">
+        <div className="relative ml-auto flex h-12 shrink-0 items-center px-1.5 sm:px-4">
           <div className="glass glass-frost absolute inset-0 rounded-full" aria-hidden />
-          <div className="relative z-10 flex items-center space-x-2">
+          <div className="relative z-10 flex items-center space-x-1 sm:space-x-2">
             <HeaderMobileMenu
               isLoggedIn={!!user}
               labels={{
@@ -97,16 +105,17 @@ export async function Header() {
               </div>
             ) : (
               <div className="flex items-center space-x-2">
-                {/* Login some abaixo de sm — Logo + hamburger + tema + Espreitar +
-                    Login + Criar conta não cabem todos numa linha em ecrãs
-                    pequenos (ficava cortado); Login e Espreitar passam para o
-                    menu mobile. Criar conta é o único CTA sempre visível. */}
+                {/* Login some abaixo de md e "Ver a Apple" abaixo de lg — logo +
+                    navegação + tema + os três botões só cabem numa linha a partir
+                    de ~1024px (entre 768 e ~990 o Login e o CTA ficavam cortados).
+                    Abaixo disso passam para o menu, que vai até lg. Criar conta é
+                    o único CTA sempre visível. */}
                 <Link
                   href="/stock/AAPL"
                   data-track="header_peek"
                   className={cn(
                     buttonVariants({ variant: "outline" }),
-                    "hidden h-11 rounded-full md:inline-flex md:h-8",
+                    "hidden h-11 rounded-full md:h-8 lg:inline-flex",
                   )}
                 >
                   {t('peek')}

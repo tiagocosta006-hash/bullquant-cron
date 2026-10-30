@@ -20,7 +20,7 @@ import { VARIANTES_RASCUNHO, VariantSwitcher, type Variante } from "./_landing/V
  *   scroll, G ultra-curta para o telemóvel, H "feita pela Bullocracy";
  *   ?v=i / ?v=j — a F com o título e subtítulo (maiores) da A / da B.
  * Com `?v=` na URL aparece o seletor flutuante para saltar entre elas; sem
- * parâmetro o público vê a A. Quando escolherem, fica só a escolhida.
+ * parâmetro o público vê a J (escolhida a 30/10/2026: a F com o texto da B). Quando escolherem, fica só a escolhida.
  */
 const LandingI = () => LandingF({ heroTexto: "a" });
 const LandingJ = () => LandingF({ heroTexto: "b" });
@@ -30,9 +30,9 @@ const VARIANTES = { a: LandingA, b: LandingB, c: LandingC, d: LandingD, e: Landi
 const RASCUNHOS = process.env.LANDING_RASCUNHOS === "1";
 
 function lerVariante(v: string | undefined): Variante {
-  if (!v || !(v in VARIANTES)) return "a";
+  if (!v || !(v in VARIANTES)) return "j";
   const x = v as Variante;
-  return VARIANTES_RASCUNHO.includes(x) && !RASCUNHOS ? "a" : x;
+  return VARIANTES_RASCUNHO.includes(x) && !RASCUNHOS ? "j" : x;
 }
 
 export default async function LandingPage({

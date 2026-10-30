@@ -45,7 +45,7 @@ export function ReelEndCard({
       <Link
         href="/register"
         data-track={`${track}_register`}
-        className={cn(buttonVariants({ size: "lg" }), "pressable cta-sheen mt-4 min-h-12 w-full px-6 font-semibold md:w-auto")}
+        className={cn(buttonVariants({ size: "lg" }), "pressable mt-4 min-h-12 w-full px-6 font-semibold md:w-auto")}
       >
         {cta}
         <ArrowRight className="ml-1.5 h-4 w-4" />

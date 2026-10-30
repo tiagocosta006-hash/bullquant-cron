@@ -4,8 +4,6 @@ import { ArrowRight } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { Reveal } from "@/components/fx/Reveal";
-import { HeroHorizon } from "@/components/marketing/HeroHorizon";
-import { GrowCta } from "@/components/marketing/GrowCta";
 import { TeamSignature } from "@/components/marketing/TeamSignature";
 import { ShowcaseReel, type ReelChapter } from "@/components/marketing/showcase/ShowcaseReel";
 import { ShowcaseGallery } from "@/components/marketing/showcase/ShowcaseGallery";
@@ -24,6 +22,10 @@ import { LEGAL } from "@/lib/legal/config";
 import { PricingCards } from "../pricing/PricingCards";
 import { FAQ_IDS, FaqList, LandingJsonLd, TEAM, heroDelay, heroLead, heroWords } from "./shared";
 
+/** Cola o "·" à palavra anterior (espaço inseparável): a nota pode partir em
+ *  duas linhas, mas nenhuma começa por um separador. */
+const colaSeparadores = (s: string) => s.split(" · ").join("\u00a0· ");
+
 /**
  * Versão C (27/10/2026): igual à A, só muda a forma de mostrar o produto.
  *   - hero: o vídeo real com capítulos (saltar para o que interessa), a tocar
@@ -41,6 +43,7 @@ export async function LandingC() {
   ]);
   // Dias grátis do plano com comunidade (lib/planos.ts, igual ao trial da Whop).
   const dias = PLANOS.comunidade.diasGratis ?? 0;
+  const preco = precoTexto(PLANOS.pro.preco, locale);
   const faq = FAQ_IDS.map((n) => ({ q: t(`faq.q${n}`), a: t(`faq.a${n}`, { dias }) }));
   const nf = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
   const sizeLabel = (mb: number) => tc("reel.videoSize", { mb: nf.format(mb) });
@@ -82,7 +85,6 @@ export async function LandingC() {
       {/* ── 1 · Topo: igual à A, com o vídeo em capítulos ────────────── */}
       <section data-backdrop="paper" aria-labelledby="c-hero-title" className="relative isolate px-5 pt-10 md:px-8 md:pt-20">
         <div className="hero-aurora" aria-hidden />
-        <HeroHorizon />
         <div className="relative mx-auto flex max-w-5xl flex-col items-center text-center">
           <h1 id="c-hero-title" className="max-w-[22ch] text-balance text-[2.1rem] font-extrabold leading-[1.02] tracking-[-0.035em] sm:text-6xl md:text-7xl">
             <span className="sr-only">{t("titleLead")} {t("titleAccent")}</span>
@@ -90,17 +92,21 @@ export async function LandingC() {
             {heroWords(
               t("titleAccent"),
               t("titleLead").split(" ").length,
-              "font-heading font-bold italic text-primary gold-sheen-text",
+              "font-heading font-bold italic text-primary",
             )}
           </h1>
-          <p className="hero-in mt-4 max-w-[56ch] text-[15px] leading-relaxed text-muted-foreground sm:mt-5 sm:text-lg" style={heroDelay(0.18)}>
+          <p className="hero-in mt-4 max-w-[56ch] text-pretty text-[15px] leading-relaxed text-muted-foreground sm:mt-5 sm:text-lg" style={heroDelay(0.18)}>
             {t("hero2.subtitle")}
           </p>
-          <div data-hero-cta className="hero-in mt-6 flex flex-row flex-wrap items-center justify-center gap-2.5 sm:mt-7 sm:gap-3" style={heroDelay(0.28)}>
+          <div
+            data-hero-cta
+            className="hero-in mt-6 flex w-full flex-col items-stretch gap-2.5 sm:mt-7 sm:w-auto sm:flex-row sm:items-center sm:justify-center sm:gap-3"
+            style={heroDelay(0.28)}
+          >
             <Link
               href="/register"
               data-track="hero_register"
-              className={cn(buttonVariants({ size: "lg" }), "pressable cta-sheen min-h-12 px-6 text-base font-semibold sm:px-8")}
+              className={cn(buttonVariants({ size: "lg" }), "pressable min-h-12 w-full px-8 text-base font-semibold sm:w-auto")}
             >
               {t("hero2.cta")}
               <ArrowRight className="ml-1.5 h-4 w-4" />
@@ -108,13 +114,13 @@ export async function LandingC() {
             <Link
               href="/stock/AAPL"
               data-track="hero_demo"
-              className={cn(buttonVariants({ size: "lg", variant: "outline" }), "pressable min-h-12 px-5 text-base sm:px-7")}
+              className={cn(buttonVariants({ size: "lg", variant: "outline" }), "pressable min-h-12 w-full px-7 text-base sm:w-auto")}
             >
               {t("peekCta")}
             </Link>
           </div>
-          <p className="hero-in mt-3 text-xs text-muted-foreground" style={heroDelay(0.34)}>
-            {t("hero2.priceNote", { preco: precoTexto(PLANOS.pro.preco), dias })}
+          <p className="hero-in mt-3 max-w-[46ch] text-balance text-[13px] text-muted-foreground sm:max-w-none" style={heroDelay(0.34)}>
+            {colaSeparadores(t("hero2.priceNote", { preco, dias }))}
           </p>
         </div>
 
@@ -196,7 +202,7 @@ export async function LandingC() {
               {t("inside.title")}{" "}
               <span className="font-heading font-bold italic text-primary">{t("inside.titleAccent")}</span>
             </h2>
-            <p className="mx-auto mt-4 max-w-[56ch] text-lg leading-relaxed text-muted-foreground">{t("inside.subtitle")}</p>
+            <p className="mx-auto mt-4 max-w-[56ch] text-pretty text-lg leading-relaxed text-muted-foreground">{t("inside.subtitle")}</p>
           </Reveal>
           <Reveal>
             <ShowcaseGallery
@@ -229,7 +235,7 @@ export async function LandingC() {
         <div className="relative mx-auto max-w-5xl px-6 py-16 md:px-8 md:py-24">
           <Reveal className="mx-auto mb-12 max-w-3xl text-center">
             <h2 id="c-pricing-title" className="text-balance text-3xl font-extrabold tracking-[-0.03em] sm:text-5xl">{t("pricing.title")}</h2>
-            <p className="mx-auto mt-4 max-w-[62ch] text-lg leading-relaxed text-muted-foreground">{t("pricing.subtitle", { dias })}</p>
+            <p className="mx-auto mt-4 max-w-[62ch] text-pretty text-lg leading-relaxed text-muted-foreground">{t("pricing.subtitle", { dias })}</p>
           </Reveal>
           <PricingCards supportEmail={LEGAL.email} estado="anonimo" />
         </div>
@@ -252,25 +258,23 @@ export async function LandingC() {
           <h2 id="c-final-title" className="mt-8 max-w-[18ch] text-balance text-4xl font-extrabold leading-[1.04] tracking-[-0.035em] sm:text-6xl">
             {t("ctaTitle")}
           </h2>
-          <div data-final-cta className="mt-9 flex flex-col items-center gap-4 sm:flex-row">
-            <GrowCta>
-              <Link
-                href="/register"
-                data-track="footer_register"
-                className={cn(buttonVariants({ size: "lg" }), "pressable cta-sheen min-h-14 px-12 text-lg font-semibold")}
-              >
-                {t("hero2.cta")}
-              </Link>
-            </GrowCta>
+          <div data-final-cta className="mt-9 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-4">
+            <Link
+              href="/register"
+              data-track="footer_register"
+              className={cn(buttonVariants({ size: "lg" }), "pressable min-h-14 w-full px-12 text-lg font-semibold sm:w-auto")}
+            >
+              {t("hero2.cta")}
+            </Link>
             <Link
               href="/stock/AAPL"
               data-track="footer_peek"
-              className={cn(buttonVariants({ size: "lg", variant: "outline" }), "pressable min-h-14 px-9 text-lg")}
+              className={cn(buttonVariants({ size: "lg", variant: "outline" }), "pressable min-h-14 w-full px-9 text-lg sm:w-auto")}
             >
               {t("peekCta")}
             </Link>
           </div>
-          <p className="mt-5 text-xs text-muted-foreground/80">{t("hero2.priceNote", { preco: precoTexto(PLANOS.pro.preco), dias })}</p>
+          <p className="mt-5 text-balance text-[13px] text-muted-foreground">{t("hero2.finalNote", { preco })}</p>
         </Reveal>
       </section>
     </div>

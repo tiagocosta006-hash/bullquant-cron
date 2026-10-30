@@ -28,6 +28,9 @@ import { PricingCards } from "../pricing/PricingCards";
 import { FaqList, LandingJsonLd, TEAM, centimosPorDia, heroDelay, heroWords, type FaqItem } from "./shared";
 
 const JOBS: ShotKey[] = ["fund", "dcf", "ai"];
+/** Cola o "·" à palavra anterior (espaço inseparável): a nota pode partir em
+ *  duas linhas, mas nenhuma começa por um separador. */
+const colaSeparadores = (s: string) => s.split(" · ").join("\u00a0· ");
 const MORE: { key: string; icon: LucideIcon }[] = [
   { key: "fmva", icon: Table2 },
   { key: "cal", icon: CalendarDays },
@@ -129,7 +132,7 @@ export async function LandingB() {
               tb("hero.titleLead").split(" ").length + tb("hero.titleAccent").split(" ").length,
             )}
           </h1>
-          <p className="hero-in mt-5 max-w-[56ch] text-[15px] leading-relaxed text-muted-foreground sm:text-lg" style={heroDelay(0.18)}>
+          <p className="hero-in mt-5 max-w-[56ch] text-pretty text-[15px] leading-relaxed text-muted-foreground sm:text-lg" style={heroDelay(0.18)}>
             {tb("hero.subtitle")}
           </p>
           <div
@@ -140,15 +143,15 @@ export async function LandingB() {
             <Link
               href="/register"
               data-track="b_hero_register"
-              className={cn(buttonVariants({ size: "lg" }), "pressable cta-sheen min-h-12 w-full px-8 text-base font-semibold sm:w-auto")}
+              className={cn(buttonVariants({ size: "lg" }), "pressable min-h-12 w-full px-8 text-base font-semibold sm:w-auto")}
             >
               {t("hero2.cta")}
               <ArrowRight className="ml-1.5 h-4 w-4" />
             </Link>
             {peek("b_hero_peek", "min-h-12 w-full px-7 text-base sm:w-auto")}
           </div>
-          <p className="hero-in mt-3 max-w-[40ch] text-balance text-xs text-muted-foreground" style={heroDelay(0.34)}>
-            {tb("hero.note", { preco, dias })}
+          <p className="hero-in mt-3 max-w-[46ch] text-balance text-[13px] text-muted-foreground" style={heroDelay(0.34)}>
+            {colaSeparadores(tb("hero.note", { preco, dias }))}
           </p>
         </div>
 
@@ -287,7 +290,7 @@ export async function LandingB() {
       </section>
 
       {/* ── 4 · É para ti? ──────────────────────────────────────────── */}
-      <section aria-labelledby="b-fit-title" className="relative isolate px-4 py-16 sm:px-6 md:px-8 md:py-20">
+      <section aria-labelledby="b-fit-title" className="relative isolate px-4 py-16 sm:px-6 md:px-8 md:py-24">
         <div className="mx-auto max-w-4xl">
           <h2 id="b-fit-title" className="text-center text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">
             {tb("fit.title")}
@@ -307,12 +310,12 @@ export async function LandingB() {
           <Reveal className="mx-auto mb-12 max-w-3xl text-center">
             <h2 id="b-pricing-title" className="text-balance text-3xl font-extrabold tracking-[-0.03em] sm:text-5xl">
               {tb("pricing.titleLead", { preco })}{" "}
-              <span className="font-heading font-bold italic text-primary">
+              <span className="block font-heading font-bold italic text-primary">
                 {tb("pricing.titleAccent", { cents: centimosPorDia(PLANOS.pro.preco) })}
               </span>
             </h2>
-            <p className="mx-auto mt-4 max-w-[62ch] text-lg leading-relaxed text-muted-foreground">
-              {tb("pricing.subtitle", { preco, comunidade, dias })}
+            <p className="mx-auto mt-4 max-w-[56ch] text-pretty text-lg leading-relaxed text-muted-foreground">
+              {tb("pricing.subtitle", { comunidade, dias })}
             </p>
           </Reveal>
           <PricingCards supportEmail={LEGAL.email} estado="anonimo" />
@@ -320,7 +323,7 @@ export async function LandingB() {
             label={tb("pricing.factsLabel")}
             facts={(["cancel", "withdrawal", "vat"] as const).map((icon) => ({ icon, text: tb(`pricing.facts.${icon}`) }))}
             peekTitle={tb("pricing.peekTitle")}
-            peekBody={tb("pricing.peekBody", { dias })}
+            peekBody={tb("pricing.peekBody")}
             peekCta={tb("hero.peek")}
           />
         </div>
@@ -352,13 +355,13 @@ export async function LandingB() {
             <Link
               href="/register"
               data-track="b_final_register"
-              className={cn(buttonVariants({ size: "lg" }), "pressable cta-sheen min-h-14 w-full px-10 text-lg font-semibold sm:w-auto")}
+              className={cn(buttonVariants({ size: "lg" }), "pressable min-h-14 w-full px-10 text-lg font-semibold sm:w-auto")}
             >
               {t("hero2.cta")}
             </Link>
             {peek("b_final_peek", "min-h-14 w-full px-8 text-lg sm:w-auto")}
           </div>
-          <p className="mt-5 text-xs text-muted-foreground">{tb("hero.note", { preco, dias })}</p>
+          <p className="mt-5 text-balance text-[13px] text-muted-foreground">{t("hero2.finalNote", { preco })}</p>
           <Link
             href="/about"
             data-track="b_team_about"

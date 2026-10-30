@@ -68,7 +68,7 @@ export function ChapterBar({
           ))}
         </div>
       )}
-      <div className={cn("grid", ruler ? "gap-2" : "grid-cols-4 gap-1.5")} style={ruler ? { gridTemplateColumns: cols } : undefined}>
+      <div className={cn("grid", ruler ? "gap-2" : "grid-cols-4 gap-2")} style={ruler ? { gridTemplateColumns: cols } : undefined}>
         {chapters.map((c, i) => (
           <button
             key={c.key}
@@ -100,7 +100,7 @@ export function ChapterBar({
             <span
               className={cn(
                 "block",
-                ruler ? "mt-2 text-[13px]" : "mt-1.5 text-[12px] leading-tight",
+                ruler ? "mt-2 text-[13px]" : "mt-1.5 text-[13px] leading-tight",
                 i === active ? "font-semibold text-foreground" : "text-muted-foreground group-hover:text-foreground",
               )}
             >

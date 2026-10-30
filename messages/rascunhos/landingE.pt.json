@@ -3,83 +3,91 @@
   "eyebrow": "Campanha de lançamento",
   "draft_titleLead": "Análise fundamental em português,",
   "draft_titleAccent": "grátis no lançamento.",
-  "subtitle": "10 anos de dados da SEC, avaliação e DCF pré-preenchido para as 500 empresas do S&P 500. E as primeiras {total} contas confirmadas recebem um livro do economista Nuno Palma.",
+  "subtitle": "10 anos de dados da SEC, valuation e uma DCF já preenchida para as 500 empresas do S&P 500, em português.",
   "cta": "Criar conta",
-  "heroNote": "Enquanto houver livros. Não é aconselhamento de investimento.",
+  "heroNote": "O livro é só enquanto houver exemplares. Não é aconselhamento de investimento.",
   "book": {
-    "kicker": "Oferta de lançamento",
+    "kicker": "Oferta do autor",
     "title": "As Causas do Atraso Português",
     "author": "Nuno Palma",
-    "remaining": "{restantes, plural, one {Falta # livro} other {Faltam # livros}} de {total}",
-    "offered": "{total} exemplares oferecidos pelo autor, o economista Nuno Palma, às primeiras {total} pessoas que cumprirem os três passos."
+    "remaining": "{restantes, plural, =0 {Já não há livros} =1 {Resta 1 de {total} livros} other {Restam # de {total} livros}}",
+    "offered": "Exemplares oferecidos pelo próprio autor às primeiras {total} pessoas a cumprir os três passos."
   },
   "steps": {
-    "title": "Como funciona,",
-    "titleAccent": "em três passos",
+    "title": "Três passos para",
+    "titleAccent": "receberes o livro",
     "items": {
       "conta": {
         "title": "Cria a conta",
-        "body": "Só precisas de email e palavra-passe."
+        "body": "Só precisas de nome, email e palavra-passe."
       },
       "email": {
         "title": "Confirma o email",
-        "body": "Abre o link que te enviamos. Só contam contas com o email confirmado."
+        "body": "Abre o link que te vamos enviar por email. Sem esse passo, a conta não entra na contagem."
       },
-      "acao": {
-        "title": "Faz uma ação na plataforma",
-        "body": "Por exemplo, adiciona uma empresa à tua watchlist. É assim que sabemos que está uma pessoa do outro lado."
+      "usar": {
+        "title": "Usa a plataforma",
+        "body": "Por exemplo, adiciona uma empresa à tua watchlist. É assim que sabemos que há uma pessoa real do outro lado."
       }
     },
-    "after": "Se ficares entre os primeiros {total}, recebes um email nosso a pedir a morada de envio."
+    "after": "Se estiveres entre as primeiras {total} pessoas a cumprir os três passos, recebes um email nosso a pedir a morada de envio."
   },
   "draft_offerTitle": "O que tens grátis",
   "draft_offerAccent": "durante o lançamento",
-  "offerSubtitle": "A plataforma inteira, sem versões cortadas. Só o analista de IA tem um limite diário.",
+  "offerSubtitle": "A plataforma inteira, sem funcionalidades bloqueadas. Só o Analista IA tem um limite diário de análises.",
   "offer": {
     "fundamentais": {
       "title": "Fundamentais de 10 anos",
-      "body": "Receitas, margens, free cash flow, dívida e ações em circulação das 500 empresas do S&P 500, a partir dos relatórios entregues à SEC."
+      "body": "Receitas, margens, free cash flow, dívida e ações em circulação das 500 empresas do S&P 500, a partir dos relatórios entregues à SEC.",
+      "alt": "Separador Fundamentais da Microsoft com as receitas a 10 anos, os segmentos e a geografia"
     },
     "avaliacao": {
-      "title": "Avaliação",
-      "body": "Os múltiplos de hoje ao lado do histórico de cada empresa, para leres o preço com contexto."
+      "title": "Valuation",
+      "body": "Os múltiplos de hoje ao lado do histórico de cada empresa, para leres o preço com contexto.",
+      "alt": "Valuation histórico da Microsoft: o P/E ao longo do tempo, com a média e a mediana"
     },
     "dcf": {
-      "title": "DCF pré-preenchido",
-      "body": "O modelo de fluxos de caixa descontados já vem com os números da empresa. Mexes nos pressupostos e vês o valor intrínseco mudar."
+      "title": "DCF já preenchida",
+      "body": "Os números da empresa já vêm na calculadora. Mexes nos pressupostos e vês o valor por ação de cada cenário mudar.",
+      "alt": "Calculadora DCF da Microsoft com os cenários Bear, Base e Bull"
     },
     "ia": {
-      "title": "Analista de IA em português",
-      "body": "Resumo, vantagens competitivas, catalisadores e riscos de cada empresa, com um limite diário de análises."
+      "title": "Analista IA em português",
+      "body": "Resumo, vantagens competitivas, catalisadores e riscos de cada empresa, explicados em português.",
+      "alt": "Analista IA com o resumo do negócio da Microsoft e a indicação Fonte: 10-K"
     }
   },
   "rules": {
     "title": "Regras",
     "titleAccent": "da campanha",
     "items": {
-      "primeiros": "Os livros vão para as primeiras {total} contas que cumprirem os três passos, por ordem de chegada.",
-      "email": "Só contam contas com o email confirmado.",
-      "acao": "É preciso fazer pelo menos uma ação na plataforma, como adicionar uma empresa à watchlist.",
+      "primeiros": "Os livros vão para as primeiras {total} pessoas a cumprir os três passos, por ordem de chegada.",
+      "email": "Só entram na contagem contas com o email confirmado.",
+      "usar": "É preciso usar a plataforma pelo menos uma vez, por exemplo adicionando uma empresa à watchlist.",
       "morada": "Só pedimos a morada a quem ganhar, por email. Nunca a pedimos no registo.",
-      "fim": "Um livro por pessoa. A campanha termina quando acabarem os livros."
+      "fim": "Um livro por pessoa. A oferta termina quando acabarem os exemplares."
     }
   },
   "faq": {
-    "title": "Perguntas sobre a campanha",
+    "title": "Perguntas sobre",
+    "titleAccent": "a campanha",
     "q1": "Quem oferece os livros?",
     "a1": "O economista Nuno Palma, autor de «As Causas do Atraso Português», ofereceu {total} exemplares para esta campanha.",
     "q2": "Como sei se ganhei um livro?",
-    "a2": "Se estiveres entre as primeiras {total} contas que cumprem os três passos, recebes um email nosso a pedir a morada de envio. Só pedimos a morada a quem ganha.",
-    "q3": "Que ação conta?",
-    "a3": "Uma ação simples dentro da plataforma, por exemplo adicionar uma empresa à tua watchlist.",
-    "q4": "Até quando dura a campanha?",
-    "a4": "Até acabarem os livros. O contador nesta página mostra quantos faltam.",
-    "q5": "A BullValue diz-me o que comprar?",
-    "a5": "Não. Mostramos dados, avaliação e cálculos para estudares as empresas e decidires por ti. Nada aqui é aconselhamento de investimento."
+    "a2": "Se estiveres entre as primeiras {total} pessoas a cumprir os três passos, recebes um email nosso a pedir a morada de envio. Só pedimos a morada a quem ganhar.",
+    "q3": "O que conta como usar a plataforma?",
+    "a3": "Um gesto simples dentro da plataforma, como adicionar uma empresa à tua watchlist.",
+    "q4": "Até quando há livros?",
+    "a4": "Até acabarem os exemplares. O contador no topo desta página mostra quantos ainda há.",
+    "q5": "E o acesso grátis, até quando?",
+    "a5": "[A definir pela equipa antes de publicar: quanto tempo dura o lançamento, o que acontece depois e se é pedido algum dado de pagamento.]",
+    "q6": "A BullValue diz-me o que comprar?",
+    "a6": "Não. Mostramos dados, múltiplos e cálculos para estudares as empresas e decidires por ti. Nada aqui é aconselhamento de investimento."
   },
   "final": {
-    "title": "{restantes, plural, one {Falta # livro.} other {Faltam # livros.}}",
-    "lead": "Cria a conta, confirma o email e faz a primeira ação na plataforma.",
+    "title": "{restantes, plural, =0 {Os livros esgotaram.} other {Ainda há}}",
+    "titleAccent": "{restantes, plural, =0 {} =1 {1 livro para oferecer.} other {# livros para oferecer.}}",
+    "lead": "Cria a conta, confirma o email e adiciona a tua primeira empresa à watchlist.",
     "note": "Não é aconselhamento de investimento."
   }
 }

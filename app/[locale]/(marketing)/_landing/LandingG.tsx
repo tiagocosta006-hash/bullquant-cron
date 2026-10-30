@@ -21,9 +21,14 @@ import { FAQ_IDS, FaqList, LandingJsonLd, heroDelay } from "./shared";
 /**
  * Versão G (29/10/2026): ultra-curta, para quem chega do Instagram/TikTok
  * pelo telemóvel. Promessa de 7 palavras + preço + CTA acima da dobra a 360px,
- * o vídeo (moldura de telemóvel), três provas numa linha cada, planos,
- * 4 perguntas e o CTA final. Coluna estreita (max-w-xl) também no desktop.
- * Texto novo em marketing.landingG.* (messages/_landing/g.*.json).
+ * o vídeo (moldura de telemóvel; no desktop, o leitor 16:10), as três provas
+ * num só cartão (lista no telemóvel, três colunas no desktop), planos,
+ * 4 perguntas e o CTA final. Texto em marketing.landingG.* (messages/pt.json
+ * e en.json).
+ *
+ * Ritmo: topo + vídeo + provas formam um bloco só (espaços curtos, para o
+ * vídeo aparecer cedo); daí para baixo cada secção leva py-16 md:py-24.
+ * Notas pequenas a 13px (nada abaixo disso no telemóvel).
  */
 export async function LandingG() {
   const [t, tc, tg, locale] = await Promise.all([
@@ -71,7 +76,7 @@ export async function LandingG() {
       <LandingJsonLd faq={faq} />
 
       {/* ── 1 · Topo: promessa, preço e CTA acima da dobra ─────────── */}
-      <section data-backdrop="paper" className="relative isolate px-4 pb-8 pt-8 sm:px-6 md:pb-12 md:pt-20">
+      <section data-backdrop="paper" className="relative isolate px-4 pb-10 pt-8 sm:px-6 md:pb-16 md:pt-20">
         <div className="relative mx-auto flex max-w-xl flex-col items-center text-center">
           <h1
             className="hero-in text-balance text-[2.15rem] font-extrabold leading-[1.04] tracking-[-0.035em] sm:text-5xl"
@@ -81,7 +86,7 @@ export async function LandingG() {
             <span className="font-heading font-bold italic text-primary">{tg("hero.titleAccent")}</span>
           </h1>
           <p
-            className="hero-in mt-3 max-w-[44ch] text-[15px] leading-relaxed text-muted-foreground sm:mt-4 sm:text-base"
+            className="hero-in mt-3 max-w-[40ch] text-pretty text-[15px] leading-relaxed text-muted-foreground sm:mt-4 sm:text-base"
             style={heroDelay(0.15)}
           >
             {tg("hero.subtitle")}
@@ -107,21 +112,28 @@ export async function LandingG() {
               {t("peekCta")}
             </Link>
           </div>
-          <p className="hero-in mt-3 text-xs text-muted-foreground" style={heroDelay(0.3)}>
+          <p
+            className="hero-in mt-3 max-w-[46ch] text-balance text-[13px] leading-snug text-muted-foreground sm:max-w-none"
+            style={heroDelay(0.3)}
+          >
             {priceNote}
           </p>
         </div>
       </section>
 
       {/* ── 2 · O vídeo (moldura de telemóvel no telemóvel) ────────── */}
-      <section className="relative isolate px-4 pb-10 sm:px-6 md:pb-16">
-        <Reveal className="mx-auto mb-5 max-w-xl text-center">
-          <h2 className="text-balance text-2xl font-extrabold tracking-[-0.03em] sm:text-3xl">
-            {tg("reel.title")}{" "}
-            <span className="font-heading font-bold italic text-primary">{tg("reel.titleAccent")}</span>
-          </h2>
-        </Reveal>
-        <div className="hero-in mx-auto max-w-sm md:max-w-3xl" style={heroDelay(0.35)}>
+      {/* O título entra com o topo (hero-in), não com o scroll: está acima da
+          dobra em todos os ecrãs e com o Reveal aparecia depois do vídeo. */}
+      <section className="relative isolate px-4 pb-10 sm:px-6 md:pb-14">
+        <h2
+          className="hero-in mx-auto mb-5 max-w-xl text-balance text-center text-2xl font-extrabold tracking-[-0.03em] sm:text-3xl md:mb-8"
+          style={heroDelay(0.3)}
+        >
+          {tg("reel.title")}{" "}
+          {/* nowrap: a quebra cai antes do acento, nunca a meio dele */}
+          <span className="whitespace-nowrap font-heading font-bold italic text-primary">{tg("reel.titleAccent")}</span>
+        </h2>
+        <div className="hero-in mx-auto max-w-sm md:max-w-3xl" style={heroDelay(0.4)}>
           <ShowcaseReel
             desktop={{
               sources: [
@@ -171,16 +183,28 @@ export async function LandingG() {
         </div>
       </section>
 
-      {/* ── 3 · Três provas, uma linha cada ────────────────────────── */}
-      <section className="relative isolate px-4 pb-12 sm:px-6 md:pb-16">
-        <ul aria-label={tg("proof.label")} className="mx-auto flex max-w-xl flex-col gap-2.5">
+      {/* ── 3 · Três provas: um cartão só, com a largura do vídeo ───── */}
+      {/* Antes eram três caixas soltas com contorno fino, que pareciam campos
+          de formulário; agora é uma ficha com divisórias (colunas no desktop). */}
+      <section className="relative isolate px-4 pb-16 sm:px-6 md:pb-24">
+        <ul
+          aria-label={tg("proof.label")}
+          className="mx-auto grid max-w-sm divide-y divide-border/60 overflow-hidden rounded-2xl border border-border/60 bg-card/70 md:max-w-3xl md:grid-cols-3 md:divide-x md:divide-y-0"
+        >
           {proof.map(({ key, Icon }) => (
             <li
               key={key}
-              className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card/60 px-4 py-3 text-[15px] font-medium"
+              className="flex items-center gap-3.5 px-4 py-3.5 md:flex-col md:gap-3 md:px-6 md:py-7 md:text-center"
             >
-              <Icon className="h-4 w-4 shrink-0 text-primary" aria-hidden />
-              {tg(`proof.${key}`)}
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+                <Icon className="h-[18px] w-[18px]" aria-hidden />
+              </span>
+              {/* Facto curto + o que ganhas: duas linhas certas, em vez de uma
+                  frase longa a partir onde calha nas colunas do desktop. */}
+              <span className="min-w-0">
+                <span className="block text-[15px] font-semibold leading-snug">{tg(`proof.${key}.title`)}</span>
+                <span className="mt-0.5 block text-sm leading-snug text-muted-foreground">{tg(`proof.${key}.text`)}</span>
+              </span>
             </li>
           ))}
         </ul>
@@ -188,7 +212,7 @@ export async function LandingG() {
 
       {/* ── 4 · Planos ──────────────────────────────────────────────── */}
       <section id="planos" data-backdrop="rings" data-hide-floating className="relative isolate">
-        <div className="relative mx-auto max-w-5xl px-4 py-12 sm:px-6 md:py-20">
+        <div className="relative mx-auto max-w-5xl px-4 py-16 sm:px-6 md:py-24">
           <Reveal className="mx-auto mb-8 max-w-xl text-center">
             <h2 className="text-balance text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">{t("pricing.title")}</h2>
             <p className="mx-auto mt-3 max-w-[52ch] text-base leading-relaxed text-muted-foreground">
@@ -201,7 +225,7 @@ export async function LandingG() {
 
       {/* ── 5 · 4 perguntas ─────────────────────────────────────────── */}
       <section className="relative isolate">
-        <div className="relative mx-auto max-w-xl px-4 py-12 sm:px-6 md:py-16">
+        <div className="relative mx-auto max-w-xl px-4 py-16 sm:px-6 md:py-24">
           <h2 className="text-center text-2xl font-extrabold tracking-[-0.03em] sm:text-3xl">{tg("faq.title")}</h2>
           <FaqList items={faq} className="mt-6 space-y-2.5" />
         </div>
@@ -213,13 +237,15 @@ export async function LandingG() {
           <BrandMark className="h-12 w-12 rounded-2xl shadow-lg" />
           <h2 className="mt-6 text-balance text-3xl font-extrabold leading-[1.06] tracking-[-0.035em] sm:text-5xl">
             {tg("final.titleLead")}{" "}
-            <span className="font-heading font-bold italic text-primary">{tg("final.titleAccent")}</span>
+            <span className="whitespace-nowrap font-heading font-bold italic text-primary">{tg("final.titleAccent")}</span>
           </h2>
+          {/* Mesmos botões do topo, com o mesmo tamanho: a força do fecho vem do
+              título, não de botões maiores (a 390px os de 56px pesavam). */}
           <div data-final-cta className="mt-7 flex w-full flex-col items-stretch gap-2.5 min-[400px]:w-auto min-[400px]:flex-row">
             <Link
               href="/register"
               data-track="footer_register"
-              className={cn(buttonVariants({ size: "lg" }), "pressable min-h-14 px-10 text-lg font-semibold")}
+              className={cn(buttonVariants({ size: "lg" }), "pressable min-h-12 px-7 text-base font-semibold")}
             >
               {t("hero2.cta")}
               <ArrowRight className="ml-1.5 h-4 w-4" />
@@ -227,13 +253,15 @@ export async function LandingG() {
             <Link
               href="/stock/AAPL"
               data-track="footer_peek"
-              className={cn(buttonVariants({ size: "lg", variant: "outline" }), "pressable min-h-14 px-8 text-lg")}
+              className={cn(buttonVariants({ size: "lg", variant: "outline" }), "pressable min-h-12 px-6 text-base")}
             >
               {t("peekCta")}
             </Link>
           </div>
-          <p className="mt-4 text-xs text-muted-foreground">{priceNote}</p>
-          <p className="mt-1.5 max-w-[48ch] text-xs text-muted-foreground/80">{tg("final.finePrint")}</p>
+          {/* A nota de preço já diz "cancelas quando quiseres"; a letra miúda
+              não repete (só IVA e o aviso). Sem /80: a 13px precisa do contraste. */}
+          <p className="mt-4 max-w-[46ch] text-balance text-[13px] leading-snug text-muted-foreground sm:max-w-none">{priceNote}</p>
+          <p className="mt-1.5 text-[13px] leading-snug text-muted-foreground">{tg("final.finePrint")}</p>
         </Reveal>
       </section>
     </div>

@@ -4,7 +4,6 @@ import { Link } from '@/i18n/routing';
 
 import { useEffect, useRef } from "react";
 import { buttonVariants } from "@/components/ui/button";
-import { gsap, useGSAP, ScrollTrigger, MOTION_OK } from "@/lib/marketing/gsap";
 import { cn } from "@/lib/utils";
 import { usePathname } from '@/i18n/routing';
 
@@ -20,8 +19,8 @@ import { usePathname } from '@/i18n/routing';
  * secção inteira do hero (que no telemóvel inclui o vídeo) e fazia "morph"
  * para o CTA final, o que deixava dois pares de botões empilhados no fim.
  *
- * Com motion, a pill cresce um pouco com o scroll (monotónico — nunca encolhe
- * ao subir) e ganha um glow dourado.
+ * Sem crescer com o scroll, sem glow e sem "respiração" (30/10/2026): o
+ * dono não quer brilhos nem animações em loop; a pill só aparece e desaparece.
  */
 export function FloatingCta({
   label,
@@ -34,7 +33,6 @@ export function FloatingCta({
 }) {
   const pathname = usePathname();
   const ref = useRef<HTMLDivElement>(null);
-  const pillRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (pathname !== "/") return;
@@ -71,56 +69,6 @@ export function FloatingCta({
     };
   }, [pathname]);
 
-  // Crescimento monotónico + glow — só com motion.
-  useGSAP(
-    () => {
-      if (pathname !== "/") return;
-      const mm = gsap.matchMedia();
-      mm.add(MOTION_OK, () => {
-        const pill = pillRef.current;
-        if (!pill) return;
-
-        const isMobile = window.matchMedia("(max-width: 767.98px)").matches;
-        const maxGrow = isMobile ? 0.22 : 0.45;
-        let pMax = 0;
-        const growProxy = { scale: 1, pull: 0 };
-        const scaleTo = gsap.quickTo(growProxy, "scale", {
-          duration: 0.4,
-          ease: "power2.out",
-          onUpdate: () => pill.style.setProperty("--cta-scale", growProxy.scale.toFixed(3)),
-        });
-        const pullTo = gsap.quickTo(growProxy, "pull", {
-          duration: 0.4,
-          ease: "power2.out",
-          onUpdate: () => {
-            pill.style.setProperty("--cta-pull", growProxy.pull.toFixed(3));
-            pill.classList.toggle("floating-cta-peak", growProxy.pull > 0.85);
-          },
-        });
-        const marketingWrap = document.getElementById("marketing-wrap");
-        if (!marketingWrap) return;
-        // trigger passado como ELEMENTO (não string) — useGSAP({scope: ref})
-        // resolve seletores-texto só dentro do próprio ref, e #marketing-wrap
-        // vive fora do wrapper fixed do FloatingCta.
-        const growTrigger = ScrollTrigger.create({
-          trigger: marketingWrap,
-          start: "top top",
-          end: "bottom bottom",
-          onUpdate: (self) => {
-            pMax = Math.max(pMax, self.progress);
-            scaleTo(1 + pMax * maxGrow);
-            pullTo(pMax);
-          },
-        });
-
-        return () => {
-          growTrigger.kill();
-        };
-      });
-    },
-    { scope: ref, dependencies: [pathname] },
-  );
-
   if (pathname !== "/") return null;
 
   return (
@@ -131,7 +79,6 @@ export function FloatingCta({
       <div>
         {/* Em telemóvel a nota desaparece para os 2 botões caberem lado a lado. */}
         <div
-          ref={pillRef}
           className="floating-cta-pill glass glass-frost flex items-center gap-2 rounded-full py-1.5 pl-4 pr-1.5 shadow-lg"
         >
           <span className="nums hidden text-xs font-medium text-muted-foreground sm:inline">

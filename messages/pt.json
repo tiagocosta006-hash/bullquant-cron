@@ -213,11 +213,11 @@
       "q3": "Que empresas estão disponíveis?",
       "a3": "As 500 empresas do S&P 500. Queremos juntar empresas europeias, incluindo a Euronext Lisboa, mas ainda não há data.",
       "q4": "Com que frequência os dados são atualizados?",
-      "a4": "Os preços atualizam todos os dias. Quando uma empresa entrega um relatório à SEC, as métricas e os gráficos são atualizados pouco depois.",
+      "a4": "Os preços são atualizados todos os dias. Quando uma empresa entrega um relatório à SEC, as métricas e os gráficos refletem-no pouco depois.",
       "q5": "Como subscrevo?",
       "a5": "Em três passos: crias a conta, pagas na Whop (a plataforma de pagamentos, já ligada à tua conta) e confirmas o email. Entras logo com o PRO ativo. No plano com a comunidade, os primeiros {dias} dias são grátis e só pagas se não cancelares antes. Cancelas na Whop quando quiseres.",
       "q6": "Serve para quem está a começar?",
-      "a6": "Sim. Cada empresa abre já com os números em gráficos e a DCF já preenchida, por isso não precisas de montar nada à mão, e o Glossário explica cada métrica em português. Se já fazes modelos, o modelo avançado vai até ao revenue build por segmento.",
+      "a6": "Sim. Cada empresa abre com os números em gráficos e a DCF já preenchida, por isso não precisas de montar nada à mão, e o Glossário explica cada métrica em português. Se já fazes modelos, o modelo avançado vai até ao revenue build por segmento.",
       "q7": "E se mudar de ideias?",
       "a7": "Cancelas na Whop quando quiseres e o PRO fica ativo até ao fim do mês pago. Tens ainda 14 dias de livre resolução: se desistires nesse prazo, pagas só a parte proporcional ao tempo usado."
     },
@@ -272,12 +272,13 @@
       "priceNote": "Desde {preco} € por mês · {dias} dias grátis no plano com a comunidade · cancelas quando quiseres",
       "tabCompany": "Analisar uma empresa",
       "tabDcf": "Calculadora DCF",
-      "altCompany": "Vídeo: a página da Microsoft na BullValue, do resumo aos fundamentais, ao analista IA e ao valuation",
+      "altCompany": "Vídeo: a página da Microsoft na BullValue, do resumo aos fundamentais, ao Analista IA e ao Valuation",
       "altDcf": "Vídeo: a calculadora DCF da BullValue e o modelo completo ao estilo FMVA",
       "proofCompanies": "empresas do S&P 500",
       "proofYears": "anos de dados da SEC",
       "proofLanguage": "Explicado em português",
-      "proofTeam": "Feito por três portugueses"
+      "proofTeam": "Feito por três portugueses",
+      "finalNote": "Desde {preco} € por mês, com IVA incluído e sem fidelização."
     },
     "variants": {
       "label": "Versões da landing",
@@ -302,8 +303,8 @@
       },
       "reel": {
         "end": {
-          "title": "Isto foi a Microsoft.",
-          "lead": "A Apple abre aqui mesmo, sem conta. As outras 499 vêm com o PRO.",
+          "title": "Acabaste de ver a Microsoft.",
+          "lead": "A página da Apple abre sem conta. As outras 499 empresas vêm com o PRO.",
           "appleAria": "Abrir a página da Apple, sem conta"
         }
       },
@@ -322,7 +323,7 @@
           "fund": {
             "label": "Fundamentais",
             "title": "O negócio está mesmo a crescer?",
-            "body": "Abre qualquer empresa e vês <b>10 anos</b> de receitas, margens, free cash flow e lucro por ação em gráficos, com os segmentos, a geografia e as estimativas dos analistas. Os números vêm dos relatórios <b>10-K e 10-Q entregues à SEC</b>, sem folhas de Excel.",
+            "body": "Abre qualquer empresa e vês <b>10 anos</b> de receitas, margens, free cash flow e lucro por ação em gráficos, com os segmentos, a geografia e as estimativas dos analistas. Os números vêm dos relatórios <b>10-K e 10-Q entregues à SEC</b>: não tens de copiar nada para o Excel.",
             "alt": "Separador Fundamentais da Microsoft: receitas a 10 anos com CAGR de +14,7%, segmentos e geografia"
           },
           "dcf": {
@@ -342,7 +343,7 @@
           "title": "E ainda, no mesmo PRO:",
           "items": {
             "fmva": {
-              "title": "Modelo avançado",
+              "title": "Modelo FMVA",
               "body": "revenue build por segmento, sensibilidade e exportação para PDF e Excel"
             },
             "cal": {
@@ -372,7 +373,7 @@
         "title": "É para ti?",
         "yesTitle": "É para ti se",
         "y1": "Estás a começar e queres perceber o que compras: os números vêm em gráficos e o Glossário explica cada métrica.",
-        "y2": "Investes a longo prazo e queres saber se uma empresa está cara antes de comprar.",
+        "y2": "Investes a longo prazo e queres comparar o preço com o histórico da empresa antes de comprar.",
         "y3": "Já fazes modelos e queres o histórico e o consenso prontos, sem copiar números à mão.",
         "y4": "Preferes ler e perguntar em português.",
         "noTitle": "Não é para ti se",
@@ -383,7 +384,7 @@
       "pricing": {
         "titleLead": "{preco} € por mês.",
         "titleAccent": "Uns {cents} cêntimos por dia.",
-        "subtitle": "O PRO custa {preco} € por mês e dá-te a plataforma inteira. Com a comunidade TCValue Group, {comunidade} €, e os primeiros {dias} dias são grátis. Preço final com IVA, sem fidelização: renova todos os meses até cancelares.",
+        "subtitle": "O PRO dá-te a plataforma inteira. Com a comunidade TCValue Group são {comunidade} € por mês, com os primeiros {dias} dias grátis.",
         "factsLabel": "Condições da subscrição",
         "facts": {
           "cancel": "Cancelas na Whop quando quiseres. O PRO fica ativo até ao fim do mês pago.",
@@ -391,7 +392,7 @@
           "vat": "Preço final, com IVA incluído. Pagamento seguro na Whop."
         },
         "peekTitle": "Ainda a decidir?",
-        "peekBody": "Experimenta o plano com a comunidade {dias} dias sem pagar, ou abre já a página da Apple sem conta: vês o resumo e os 10 anos de fundamentais tal como no PRO. Os separadores Analista, Valuation e Empresa ficam para o PRO."
+        "peekBody": "A página da Apple abre sem conta, com o resumo e os 10 anos de fundamentais completos. Os separadores Analista, Valuation e Empresa ficam para o PRO."
       },
       "faq": {
         "title": "Antes de subscreveres",
@@ -422,7 +423,7 @@
         "pause": "Pausar vídeo",
         "play": "Reproduzir vídeo",
         "openPage": "Abrir esta página",
-        "openPageAria": "Abrir a página pública da Microsoft, sem conta",
+        "openPageAria": "Abrir a página da Microsoft na plataforma",
         "startPlay": "Ver a plataforma a funcionar",
         "videoSize": "Vídeo · {mb} MB",
         "replay": "Rever",
@@ -453,8 +454,8 @@
           }
         },
         "end": {
-          "title": "Isto foi a Microsoft.",
-          "lead": "A Apple abre aqui mesmo, sem conta. As outras 499 vêm com o PRO.",
+          "title": "Acabaste de ver a Microsoft.",
+          "lead": "A página da Apple abre sem conta. As outras 499 empresas vêm com o PRO.",
           "tickerAria": "Abrir a página da {ticker}, sem conta"
         }
       },
@@ -512,25 +513,26 @@
       }
     },
     "landingD": {
-      "kicker": "S&P 500 · 10 anos de contas da SEC · em português",
+      "kicker": "Análise fundamental em português",
       "titleLead": "Estuda empresas com a calma de quem",
       "titleAccent": "investe a dez anos.",
-      "lead": "Dez anos de contas, uma DCF já preenchida e um analista de IA que responde em português. Sem palpites, sem pressa.",
+      "lead": "As contas de cada empresa em gráficos, a DCF já preenchida e o Analista IA a explicar-te o negócio. Sem palpites, sem pressa.",
       "peek": "Ver a Apple sem conta",
-      "figure": "Fig. 1 — Uma empresa por dentro: contas de dez anos, gráficos e a DCF.",
+      "figure": "A plataforma tal como a vês com o PRO.",
       "inside": {
         "n": "01",
         "eyebrow": "A plataforma",
         "title": "O que vês",
-        "titleAccent": "numa empresa",
-        "lead": "Cada recorte é a página real, ao tamanho de leitura. Os números marcados explicam o que estás a ver. Toca num para o abrir inteiro."
+        "titleAccent": "lá dentro.",
+        "lead": "Cada recorte é uma página real da plataforma e abre em ecrã inteiro. Os números assinalam o que estás a ver."
       },
       "manifesto": {
         "n": "02",
         "eyebrow": "Porque existimos",
         "quote": "Investir bem não é adivinhar o próximo mês. É perceber o negócio e saber quanto estás a pagar por ele.",
-        "p1": "Quase tudo o que se escreve sobre ações em português é ruído: palpites, alvos de preço, pressa. As ferramentas sérias existem, mas estão em inglês e foram feitas para profissionais.",
-        "p2": "A The BullValue junta numa página o que um investidor de longo prazo precisa: dez anos de contas tiradas da SEC, a DCF já preenchida para mexeres nos pressupostos e um analista de IA que explica em português. A decisão continua a ser tua. Isto não é aconselhamento financeiro."
+        "p1": "Muito do que se escreve sobre ações em português é ruído: palpites, alvos de preço, pressa. As ferramentas sérias existem, mas estão em inglês e foram feitas para profissionais.",
+        "p2": "A BullValue junta num só sítio o que interessa a quem investe a longo prazo: dez anos de contas entregues à SEC, a DCF já preenchida para mexeres nos pressupostos e o Analista IA, que explica o negócio em português. A decisão continua a ser tua: isto não é aconselhamento financeiro.",
+        "teamLink": "Conhecer a equipa"
       },
       "pricing": {
         "n": "03",
@@ -538,84 +540,101 @@
       },
       "faq": {
         "n": "04",
-        "eyebrow": "Perguntas"
+        "eyebrow": "Perguntas frequentes",
+        "title": "Antes de começares."
       },
       "closing": {
         "titleLead": "A próxima decisão merece",
         "titleAccent": "dez anos de contexto."
-      }
+      },
+      "factScenarios": "cenários em cada DCF"
     },
     "landingF": {
       "hero": {
-        "eyebrow": "Visita guiada · 6 paragens",
+        "eyebrow": "Visita guiada à plataforma",
         "titleLead": "Antes de pagar, vê",
         "titleAccent": "tudo por dentro.",
-        "subtitle": "Desce a página e percorre a plataforma ecrã a ecrã: dos 10 anos de fundamentais da SEC ao calendário de resultados. Sem promessas, só o produto tal como é.",
-        "tourCta": "Começar a visita",
+        "subtitle": "Desce a página e percorre a plataforma ecrã a ecrã, dos 10 anos de dados da SEC ao calendário de resultados. Sem promessas: só o produto, tal como é.",
+        "tourCta": "Fazer a visita",
         "peek": "Ou abre a ficha da Apple sem criar conta"
       },
       "tour": {
         "kicker": "A visita",
         "title": "Seis paragens,",
-        "titleAccent": "zero rodeios.",
-        "subtitle": "Cada imagem é um print real da plataforma, em modo claro ou escuro conforme o teu ecrã.",
+        "titleAccent": "sem rodeios.",
+        "subtitle": "Capturas reais da plataforma, sem maquetas, no tema que estás a usar: claro ou escuro.",
         "railLabel": "Paragens da visita",
         "steps": {
           "fund": {
             "title": "10 anos de números, num relance.",
-            "body": "Receitas, margens, free cash flow, ROIC e dívida das 500 empresas do S&P 500, tirados dos relatórios entregues à SEC. Trimestral, TTM ou anual, em gráfico ou em tabela."
+            "body": "Receitas, margens, free cash flow, ROIC e dívida de cada empresa do S&P 500, tirados dos relatórios entregues à SEC. Trimestral, TTM ou anual, em gráfico ou em tabela."
           },
           "val": {
-            "title": "Caro ou barato? Compara com o próprio histórico.",
-            "body": "P/E, EV/EBITDA, P/FCF e companhia, calculados com o preço do dia e postos ao lado do que a empresa costumou valer nos últimos anos."
+            "title": "Os múltiplos de hoje, ao lado dos de sempre.",
+            "body": "P/E, P/Sales, EV/EBITDA e FCF Yield com o preço do dia, comparados com a média e a mediana históricas. Vês logo se a empresa negoceia acima ou abaixo do seu normal."
           },
           "dcf": {
             "title": "Uma DCF que já vem preenchida.",
-            "body": "Escolhes a empresa e o free cash flow, as ações e o preço entram sozinhos. Mexes no crescimento, no WACC e no crescimento terminal e o valor por ação de cada cenário atualiza na hora."
+            "body": "Escolhes a empresa e os números entram sozinhos, com o histórico e o consenso dos analistas ao lado de cada pressuposto. Ajustas o crescimento, o múltiplo de saída e o retorno que queres, e o valor de cada cenário (Bear, Base e Bull) atualiza-se na hora."
           },
           "fmva": {
             "title": "Quando quiseres ir mais fundo.",
-            "body": "O modelo avançado, para quem quer fazer valuation a sério: cenários, versões guardadas e exportação para PDF e Excel."
+            "body": "O modelo completo: revenue build por segmento, WACC e crescimento terminal, tabelas de sensibilidade, cenários, versões guardadas e exportação para PDF e Excel."
           },
           "ai": {
             "title": "Um analista que responde em português.",
-            "body": "Pergunta pelo moat, pelos riscos ou pelo último trimestre e recebe uma resposta estruturada, com base nos números da empresa. Não é conselho de investimento: é um ponto de partida."
+            "body": "Lê o relatório anual (10-K) por ti e monta um dossier da empresa, com citações à fonte. Depois, pergunta-lhe pelo moat, pelos riscos ou pelo último trimestre. Não é conselho de investimento: é um ponto de partida."
           },
           "cal": {
-            "title": "Sabe quando cada empresa apresenta contas.",
-            "body": "O calendário de resultados mostra as datas, as estimativas e, depois do anúncio, se a empresa bateu ou falhou as expectativas."
+            "title": "Fica a par dos resultados de cada empresa.",
+            "body": "O calendário mostra quando cada empresa apresenta contas, com as estimativas e, depois do anúncio, se superou ou ficou aquém do esperado. Filtras pela tua watchlist ou pelo teu portefólio."
           }
         }
       },
       "final": {
         "title": "Já viste por dentro.",
         "titleAccent": "Falta experimentares.",
-        "lead": "Cancelas quando quiseres na Whop e tens 14 dias para desistir, pagando só a parte proporcional."
+        "lead": "Desde {preco} € por mês, IVA incluído. Cancelas na Whop quando quiseres e, se desistires nos primeiros 14 dias, pagas só a parte proporcional."
+      },
+      "priceFrom": "Desde {preco} € por mês · cancelas quando quiseres",
+      "trial": "{dias} dias grátis no plano com a comunidade",
+      "proof": {
+        "languageValue": "PT",
+        "languageLabel": "explicado em português"
       }
     },
     "landingG": {
       "hero": {
-        "titleLead": "Descobre quanto vale uma ação.",
+        "titleLead": "Calcula quanto vale uma ação.",
         "titleAccent": "Em português.",
-        "subtitle": "As empresas do S&P 500 com 10 anos de contas da SEC, DCF já preenchida e um analista IA."
+        "subtitle": "Análise fundamental de todo o S&P 500, para quem investe a longo prazo."
       },
       "reel": {
-        "title": "Vê como funciona,",
-        "titleAccent": "em meio minuto."
+        "title": "Vê como funciona",
+        "titleAccent": "num minuto."
       },
       "proof": {
         "label": "O que tens lá dentro",
-        "sec": "10 anos de contas oficiais da SEC",
-        "dcf": "DCF já preenchida: só mexes nos pressupostos",
-        "ai": "Analista IA que responde em português"
+        "sec": {
+          "title": "10 anos de dados da SEC",
+          "text": "Em gráficos, ano a ano."
+        },
+        "dcf": {
+          "title": "DCF já preenchida",
+          "text": "Só mexes nos pressupostos."
+        },
+        "ai": {
+          "title": "Analista IA em português",
+          "text": "Explica-te o negócio."
+        }
       },
       "faq": {
         "title": "Perguntas rápidas"
       },
       "final": {
         "titleLead": "Antes de comprar,",
-        "titleAccent": "vê as contas.",
-        "finePrint": "Preços com IVA · cancelas quando quiseres na Whop · não é aconselhamento de investimento"
+        "titleAccent": "vê os números.",
+        "finePrint": "Preços com IVA · não é aconselhamento de investimento"
       }
     },
     "landingH": {
@@ -623,50 +642,61 @@
         "eyebrow": "Feito pela Bullocracy",
         "titleLead": "Fizemos a ferramenta que",
         "titleAccent": "nos faltava.",
-        "subtitle": "Somos três portugueses da Bullocracy. Cansámo-nos de analisar empresas em sites caros, em inglês e cheios de ruído. Por isso construímos a nossa, e abrimo-la a quem quiser fazer o mesmo.",
-        "peek": "Ver a Apple sem conta",
-        "signature": "Feito em Portugal pela equipa da Bullocracy"
+        "subtitle": "A BullValue junta 10 anos de dados da SEC de todas as empresas do S&P 500, a DCF já preenchida e um Analista IA que te explica o negócio em português.",
+        "peek": "Ver a Apple sem conta"
       },
       "team": {
-        "eyebrow": "Quem somos",
+        "eyebrow": "A equipa",
         "title": "Quem está por trás",
         "titleAccent": "disto.",
-        "note": "Sem gurus, sem sinais de compra, sem \"a ação do mês\". Só dados e as contas feitas à vista."
+        "note": "Somos a Bullocracy: três portugueses que acreditam que a literacia financeira merece melhor do que dicas de rede social.",
+        "p1": "A BullValue nasceu de uma frustração simples: para analisar uma empresa a sério, só encontrávamos sites caros, em inglês e cheios de ruído. Em português, não havia nada.",
+        "p2": "Por isso construímos a plataforma que queríamos usar e abrimos as portas a quem quiser fazer o mesmo: ler uma empresa pelos números, sem depender de opiniões."
       },
       "tool": {
         "eyebrow": "A plataforma",
-        "title": "O que usamos para analisar empresas",
-        "titleAccent": "nos nossos vídeos.",
-        "subtitle": "Não é um mockup. É a plataforma gravada tal como está: os números da SEC, o DCF já preenchido e o analista IA em português."
+        "title": "Vê a BullValue",
+        "titleAccent": "a funcionar.",
+        "subtitle": "Não é uma simulação: é a plataforma gravada tal como está. Escolhe um capítulo e o vídeo salta para essa parte."
       },
       "jobs": {
         "title": "Três coisas que passas a fazer",
-        "titleAccent": "sozinho.",
+        "titleAccent": "por tua conta.",
         "items": {
           "read": {
             "title": "Perceber o negócio sem abrir o relatório anual",
             "text": "Dez anos de receitas, margens, cash flow e dívida, tirados dos relatórios entregues à SEC, em gráficos que se leem sem dicionário."
           },
           "value": {
-            "title": "Ter uma ideia do que a empresa vale",
-            "text": "O DCF já vem preenchido com os números da empresa. Mexes nos pressupostos e vês o valor por ação de cada cenário mudar na hora."
+            "title": "Fazer as contas ao valor da empresa",
+            "text": "A DCF já vem preenchida com os números da empresa. Mexes nos pressupostos e vês o valor por ação de cada cenário mudar na hora."
           },
           "ask": {
             "title": "Tirar dúvidas em português",
-            "text": "O analista IA explica o que os números querem dizer, sem jargão. Não te diz o que comprar: isso é contigo."
+            "text": "O Analista IA lê o relatório anual e explica o que os números querem dizer, sem jargão e com a fonte indicada."
           }
-        }
+        },
+        "eyebrow": "Para que serve"
       },
       "not": {
         "title": "O que isto não é",
         "items": {
-          "advice": "Não é aconselhamento financeiro. As decisões são sempre tuas.",
-          "tips": "Não há dicas quentes, alertas de compra nem promessas de retorno.",
-          "lockin": "Não te prende: cancelas quando quiseres na Whop."
+          "advice": {
+            "title": "Não é aconselhamento financeiro.",
+            "text": "As decisões são sempre tuas."
+          },
+          "tips": {
+            "title": "Não é um grupo de sinais.",
+            "text": "Não há alertas de compra nem promessas de retorno."
+          },
+          "broker": {
+            "title": "Não é uma corretora.",
+            "text": "Aqui analisas empresas, não compras nem vendes ações."
+          }
         }
       },
       "pricing": {
-        "facts": "Preços com IVA incluído. 14 dias para desistir (pagas só a parte proporcional). Cancelas quando quiseres."
+        "facts": "Preços com IVA incluído. Se desistires nos primeiros 14 dias, pagas só a parte proporcional ao tempo usado."
       },
       "final": {
         "title": "Se vês os nossos vídeos, já sabes como pensamos.",
@@ -778,7 +808,7 @@
     "devLoginLoading": "A entrar..."
   },
   "register": {
-    "title": "Criar Conta",
+    "title": "Criar conta",
     "subtitle": "Cria a conta e segue para o pagamento. O PRO fica ativo nesta conta.",
     "nameLabel": "Nome",
     "namePlaceholder": "O teu nome",
@@ -833,7 +863,7 @@
     "about": "Quem somos",
     "menuTitle": "Menu",
     "openMenu": "Abrir menu",
-    "peek": "Espreitar sem conta",
+    "peek": "Ver a Apple sem conta",
     "createAccount": "Começar agora",
     "createAccountShort": "Começar"
   },
@@ -1664,12 +1694,12 @@
   },
   "footer": {
     "rights": "© {year} {brand}. Todos os direitos reservados.",
-    "terms": "Termos de Serviço",
+    "terms": "Termos de serviço",
     "privacy": "Privacidade",
-    "refund": "Política de Reembolso",
+    "refund": "Política de reembolso",
     "pricing": "Preços",
-    "about": "Sobre Nós",
-    "directory": "Diretório de Ações",
+    "about": "Quem somos",
+    "directory": "Diretório de ações",
     "legalNotice": "A BullValue é uma ferramenta de análise e de educação financeira. Não presta serviços de investimento e nada neste sítio é aconselhamento, recomendação personalizada ou convite a comprar, vender ou deter instrumentos financeiros. Investir envolve risco, incluindo a perda total do capital. A rendibilidade passada não garante rendibilidade futura. Os dados de terceiros podem conter erros ou atrasos.",
     "cookies": "Cookies",
     "cookieSettings": "Definições de cookies",

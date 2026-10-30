@@ -365,7 +365,7 @@ function Player({
     <p
       aria-live={interacted ? "polite" : "off"}
       className={cn(
-        "mx-auto text-center text-muted-foreground",
+        "mx-auto text-pretty text-center text-muted-foreground",
         compact ? "mt-2 min-h-[3lh] text-[13px] leading-snug" : "mt-3 min-h-[2lh] max-w-[64ch] text-[15px] leading-snug",
       )}
     >

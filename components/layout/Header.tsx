@@ -37,7 +37,7 @@ export async function Header() {
         </div>
 
         {/* Bolha da navegação */}
-        <nav className="relative hidden h-12 shrink-0 items-center px-5 md:flex">
+        <nav className="relative hidden h-12 shrink-0 items-center px-5 lg:flex">
           <div className="glass glass-frost absolute inset-0 rounded-full" aria-hidden />
           <div className="relative z-10 flex items-center gap-6">
             <Link
@@ -105,16 +105,17 @@ export async function Header() {
               </div>
             ) : (
               <div className="flex items-center space-x-2">
-                {/* Login some abaixo de sm — Logo + hamburger + tema + Espreitar +
-                    Login + Criar conta não cabem todos numa linha em ecrãs
-                    pequenos (ficava cortado); Login e Espreitar passam para o
-                    menu mobile. Criar conta é o único CTA sempre visível. */}
+                {/* Login some abaixo de md e "Ver a Apple" abaixo de lg — logo +
+                    navegação + tema + os três botões só cabem numa linha a partir
+                    de ~1024px (entre 768 e ~990 o Login e o CTA ficavam cortados).
+                    Abaixo disso passam para o menu, que vai até lg. Criar conta é
+                    o único CTA sempre visível. */}
                 <Link
                   href="/stock/AAPL"
                   data-track="header_peek"
                   className={cn(
                     buttonVariants({ variant: "outline" }),
-                    "hidden h-11 rounded-full md:inline-flex md:h-8",
+                    "hidden h-11 rounded-full md:h-8 lg:inline-flex",
                   )}
                 >
                   {t('peek')}

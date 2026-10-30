@@ -19,8 +19,12 @@ export type TourStep = {
 /**
  * Versão F ("Tour guiado"): passos de texto à esquerda e, no desktop, um ecrã
  * fixo (sticky) à direita que troca de print conforme o passo que cruza o meio
- * do ecrã. Só IntersectionObserver (sem scroll listeners). Com
- * prefers-reduced-motion a troca é instantânea (transições só em motion-safe).
+ * do ecrã. O ecrã fica centrado na vertical, à altura do passo ativo. Por baixo,
+ * uma régua de progresso com 6 segmentos (links para cada paragem): ao
+ * contrário das 6 pílulas com nome, não parte em duas linhas em nenhuma largura,
+ * e o nome da paragem já está no passo ao lado.
+ * Só IntersectionObserver (sem scroll listeners). Com prefers-reduced-motion
+ * a troca é instantânea (transições só em motion-safe).
  * No telemóvel não há sticky: cada passo traz o seu recorte quadrado por baixo.
  */
 export function TourSteps({ steps, railLabel }: { steps: TourStep[]; railLabel: string }) {
@@ -67,8 +71,8 @@ export function TourSteps({ steps, railLabel }: { steps: TourStep[]; railLabel: 
                 <span className="nums font-heading text-lg italic text-primary">{String(i + 1).padStart(2, "0")}</span>
                 <span>{s.label}</span>
               </p>
-              <h3 className="mt-2 text-balance text-2xl font-extrabold leading-tight tracking-[-0.025em] sm:text-3xl">{s.title}</h3>
-              <p className="mt-3 max-w-[46ch] text-base leading-relaxed text-muted-foreground">{s.body}</p>
+              <h3 className="mt-2 text-balance text-2xl font-extrabold leading-tight tracking-[-0.025em] xl:text-3xl">{s.title}</h3>
+              <p className="mt-3 max-w-[46ch] text-pretty text-base leading-relaxed text-muted-foreground">{s.body}</p>
             </div>
             <div className="mt-6 overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm md:hidden">
               <ThemedImg src={s.square} alt={s.alt} className="aspect-square h-auto w-full object-cover" />
@@ -78,7 +82,9 @@ export function TourSteps({ steps, railLabel }: { steps: TourStep[]; railLabel: 
       </ol>
 
       <div className="hidden md:block">
-        <div className="sticky top-24 pb-6">
+        {/* 15rem ≈ metade da moldura + régua: o ecrã fica ao centro do viewport,
+            onde passa o passo ativo (nunca acima dos 6rem do header). */}
+        <div className="sticky top-[max(6rem,calc(50vh_-_15rem))] pb-2">
           <MediaFrame alt={current?.alt ?? ""} address={current?.address}>
             <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-card">
               {steps.map((s, i) => (
@@ -95,22 +101,31 @@ export function TourSteps({ steps, railLabel }: { steps: TourStep[]; railLabel: 
               ))}
             </div>
           </MediaFrame>
-          <nav aria-label={railLabel} className="mt-4 flex flex-wrap justify-center gap-1.5">
-            {steps.map((s, i) => (
-              <a
-                key={s.key}
-                href={`#visita-${s.key}`}
-                aria-current={active === i ? "step" : undefined}
-                className={cn(
-                  "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
-                  active === i
-                    ? "border-primary/50 bg-primary/10 text-foreground"
-                    : "border-border/60 text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {s.label}
-              </a>
-            ))}
+          <nav aria-label={railLabel} className="mt-2 px-3">
+            <ol className="grid grid-cols-6 gap-2">
+              {steps.map((s, i) => (
+                <li key={s.key}>
+                  <a
+                    href={`#visita-${s.key}`}
+                    aria-label={s.label}
+                    title={s.label}
+                    aria-current={active === i ? "step" : undefined}
+                    className="group flex h-11 items-center rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <span
+                      className={cn(
+                        "h-1 w-full rounded-full motion-safe:transition-colors motion-safe:duration-300",
+                        i === active
+                          ? "bg-primary"
+                          : i < active
+                            ? "bg-primary/40"
+                            : "bg-foreground/12 group-hover:bg-foreground/25",
+                      )}
+                    />
+                  </a>
+                </li>
+              ))}
+            </ol>
           </nav>
         </div>
       </div>

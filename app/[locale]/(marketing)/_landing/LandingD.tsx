@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { Link } from "@/i18n/routing";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArrowRight } from "lucide-react";
@@ -22,20 +23,73 @@ import { PricingCards } from "../pricing/PricingCards";
 import { FAQ_IDS, FaqList, LandingJsonLd, TEAM, heroDelay } from "./shared";
 
 /**
- * Versão D (29/10/2026): "editorial". Lê-se como uma publicação financeira
- * calma: título serifado grande, grelha assimétrica de 12 colunas, secções
- * numeradas (01–04) com filetes finos, sem brilhos nem loops. Pensada para
- * ficar bem em modo escuro (só tokens: background/foreground/border/primary).
- * Produto: o mesmo vídeo em capítulos e os recortes da C.
- * Texto novo em marketing.landingD.* (messages/_landing/d.*.json).
+ * Versão D: "editorial". Lê-se como uma publicação financeira calma: título
+ * serifado grande, secções numeradas (01–04) com filetes finos, sem brilhos
+ * nem loops. Uma só grelha de 12 colunas a partir de lg: etiqueta da secção
+ * nas colunas 1–4, título e conteúdo nas 5–12 (a galeria ocupa as 12 porque
+ * já tem a mesma divisão por dentro). Abaixo de lg tudo empilha, para o título
+ * e os cartões não ficarem espremidos em tablet. Só tokens de tema
+ * (background/foreground/border/primary), por isso o modo escuro sai sozinho.
+ * Texto próprio em marketing.landingD.* (messages/pt.json e en.json).
  */
 
-/** Cabeçalho de secção editorial: número, filete e etiqueta. */
-function SectionHead({ n, eyebrow }: { n: string; eyebrow: string }) {
+const SECTION = "relative isolate px-4 py-16 sm:px-6 md:px-8 md:py-24";
+const GRID = "mx-auto grid max-w-6xl gap-6 lg:grid-cols-12 lg:gap-10";
+const H2 = "text-balance font-heading text-4xl font-semibold leading-[1.05] tracking-[-0.02em] sm:text-5xl";
+const LEAD = "mt-4 max-w-[60ch] text-base leading-relaxed text-muted-foreground sm:text-lg";
+/** Ligação de texto (a segunda ação de cada bloco): sublinhado discreto, 44px de alvo. */
+const TEXT_LINK =
+  "inline-flex min-h-11 items-center font-medium underline decoration-foreground/30 underline-offset-[5px] transition-colors hover:decoration-foreground";
+
+/** Cabeçalho de secção editorial: filete, número e etiqueta. */
+function SectionHead({ n, eyebrow, id }: { n: string; eyebrow: string; id?: string }) {
+  // Sem título próprio (manifesto), a etiqueta é o h2 da secção.
+  const Label = id ? "h2" : "p";
   return (
-    <div className="flex items-baseline gap-4 border-t border-foreground/80 pt-3">
-      <span className="nums font-heading text-sm italic text-primary">{n}</span>
-      <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{eyebrow}</span>
+    <div className="flex items-baseline gap-3 border-t border-foreground/80 pt-3">
+      <span aria-hidden className="nums font-heading text-base italic text-primary">
+        {n}
+      </span>
+      <Label id={id} className="text-[13px] font-medium text-muted-foreground sm:text-sm">
+        {eyebrow}
+      </Label>
+    </div>
+  );
+}
+
+/** Botão principal + ligação "ver a Apple": o mesmo par no topo e no fecho. */
+function CtaPair({
+  kind,
+  cta,
+  peek,
+  className,
+  style,
+}: {
+  kind: "hero" | "final";
+  cta: string;
+  peek: string;
+  className?: string;
+  style?: CSSProperties;
+}) {
+  const hero = kind === "hero";
+  return (
+    <div
+      data-hero-cta={hero ? "" : undefined}
+      data-final-cta={hero ? undefined : ""}
+      className={cn("flex flex-wrap items-center gap-x-6 gap-y-1", className)}
+      style={style}
+    >
+      <Link
+        href="/register"
+        data-track={hero ? "hero_register" : "footer_register"}
+        className={cn(buttonVariants({ size: "lg" }), "pressable min-h-12 px-6 text-base font-semibold")}
+      >
+        {cta}
+        <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden />
+      </Link>
+      <Link href="/stock/AAPL" data-track={hero ? "hero_demo" : "footer_peek"} className={cn(TEXT_LINK, "text-[15px]")}>
+        {peek}
+      </Link>
     </div>
   );
 }
@@ -84,73 +138,67 @@ export async function LandingD() {
     ),
   );
 
+  // Ficha técnica do topo: três números com a mesma forma (valor + legenda).
+  // Os três cenários são os da DCF simples (Bear, Base e Bull).
   const facts = [
     { value: "500", label: t("hero2.proofCompanies") },
     { value: "10", label: t("hero2.proofYears") },
+    { value: "3", label: td("factScenarios") },
   ];
 
   return (
-    // "dark" no topo: escuro por defeito, mesmo com o site em claro (os tokens
-    // de .dark aplicam-se à subárvore; ThemedImg usa dark:, segue o fundo).
     <div className="relative flex-1 overflow-x-clip">
       <LandingJsonLd faq={faq} />
 
       {/* ── Topo: título serifado à esquerda, entrada + CTA à direita ── */}
-      <section data-backdrop="paper" className="relative isolate px-4 pt-10 sm:px-6 md:px-8 md:pt-20">
+      <section
+        data-backdrop="paper"
+        aria-labelledby="d-hero-title"
+        className="relative isolate px-4 pt-10 sm:px-6 md:px-8 md:pt-20"
+      >
         <div className="relative mx-auto max-w-6xl">
-          <p className="hero-in flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground" style={heroDelay(0)}>
+          <p
+            className="hero-in flex items-center gap-3 text-[13px] font-medium text-muted-foreground sm:text-sm"
+            style={heroDelay(0)}
+          >
             <span aria-hidden className="h-px w-8 bg-primary" />
             {td("kicker")}
           </p>
-          <div className="mt-6 grid gap-8 md:mt-10 md:grid-cols-12 md:gap-10">
+          <div className="mt-6 grid gap-8 md:mt-10 lg:grid-cols-12 lg:gap-10">
             <h1
-              className="hero-in text-balance font-heading text-[2.35rem] font-semibold leading-[1.02] tracking-[-0.02em] sm:text-6xl md:col-span-8 md:text-7xl"
+              id="d-hero-title"
+              className="hero-in text-balance font-heading text-[2.35rem] font-semibold leading-[1.02] tracking-[-0.02em] sm:text-6xl lg:col-span-8 xl:text-7xl"
               style={heroDelay(0.08)}
             >
               {td("titleLead")} <span className="italic text-primary">{td("titleAccent")}</span>
             </h1>
-            <div className="flex flex-col justify-end md:col-span-4 md:border-l md:border-border md:pl-8">
-              <p className="hero-in text-[15px] leading-relaxed text-muted-foreground sm:text-lg" style={heroDelay(0.18)}>
+            <div className="max-w-xl lg:col-span-4 lg:max-w-none lg:border-l lg:border-border lg:pl-8">
+              <p className="hero-in text-base leading-relaxed text-muted-foreground sm:text-lg" style={heroDelay(0.18)}>
                 {td("lead")}
               </p>
-              <div data-hero-cta className="hero-in mt-6 flex flex-row flex-wrap items-center gap-2.5" style={heroDelay(0.26)}>
-                <Link
-                  href="/register"
-                  data-track="hero_register"
-                  className={cn(buttonVariants({ size: "lg" }), "pressable min-h-12 px-6 text-base font-semibold")}
-                >
-                  {t("hero2.cta")}
-                  <ArrowRight className="ml-1.5 h-4 w-4" />
-                </Link>
-                <Link
-                  href="/stock/AAPL"
-                  data-track="hero_demo"
-                  className={cn(buttonVariants({ size: "lg", variant: "ghost" }), "pressable min-h-12 px-3 text-base underline-offset-4 hover:underline")}
-                >
-                  {td("peek")}
-                </Link>
-              </div>
-              <p className="hero-in mt-3 text-xs text-muted-foreground" style={heroDelay(0.32)}>
+              <CtaPair kind="hero" cta={t("hero2.cta")} peek={td("peek")} className="hero-in mt-6" style={heroDelay(0.26)} />
+              <p className="hero-in mt-2 text-[13px] leading-relaxed text-muted-foreground" style={heroDelay(0.32)}>
                 {priceNote}
               </p>
             </div>
           </div>
 
-          {/* Faixa de factos, entre filetes, como a ficha técnica de um artigo. */}
+          {/* Ficha técnica, entre filetes, como a de um artigo. */}
           <div className="hero-in mt-10 grid grid-cols-3 border-y border-border md:mt-14" style={heroDelay(0.36)}>
             {facts.map((f) => (
-              <p key={f.value} className="border-r border-border px-2 py-4 sm:px-4">
-                <span className="nums block font-heading text-2xl font-semibold sm:text-3xl">{f.value}</span>
-                <span className="mt-0.5 block text-xs leading-snug text-muted-foreground sm:text-sm">{f.label}</span>
+              <p key={f.value} className="border-r border-border py-4 pl-3 pr-2 first:pl-0 last:border-r-0 sm:pl-6 sm:pr-4">
+                <span className="nums block font-heading text-2xl font-semibold sm:text-3xl">{f.value}</span>{" "}
+                <span className="mt-1 block text-[13px] leading-snug text-muted-foreground sm:text-sm">{f.label}</span>
               </p>
             ))}
-            <p className="flex items-center px-2 py-4 font-heading text-sm italic leading-snug text-primary sm:px-4 sm:text-base">
-              {t("hero2.proofLanguage")}
-            </p>
           </div>
         </div>
 
         <figure className="hero-in relative mx-auto mt-8 max-w-6xl md:mt-12" style={heroDelay(0.42)}>
+          {/* Legenda por cima: por baixo o vídeo já tem a legenda de cada capítulo. */}
+          <figcaption className="mb-4 text-center text-[13px] italic leading-relaxed text-muted-foreground sm:text-sm md:border-l-2 md:border-primary md:pl-3 md:text-left">
+            {td("figure")}
+          </figcaption>
           <ShowcaseReel
             desktop={{
               sources: [
@@ -197,25 +245,25 @@ export async function LandingD() {
               />
             }
           />
-          <figcaption className="mt-3 border-l-2 border-primary pl-3 text-xs italic leading-relaxed text-muted-foreground sm:text-sm">
-            {td("figure")}
-          </figcaption>
         </figure>
       </section>
 
-      {/* ── 01 · O que vês numa empresa ─────────────────────────────── */}
-      <section className="relative isolate px-4 py-16 sm:px-6 md:px-8 md:py-28">
-        <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-12">
-          <Reveal className="md:col-span-4">
-            <div className="md:sticky md:top-24">
+      {/* ── 01 · A plataforma ───────────────────────────────────────── */}
+      <section aria-labelledby="d-inside-title" className={SECTION}>
+        <div className="mx-auto max-w-6xl">
+          <Reveal className={GRID}>
+            <div className="lg:col-span-4">
               <SectionHead n={td("inside.n")} eyebrow={td("inside.eyebrow")} />
-              <h2 className="mt-6 text-balance font-heading text-4xl font-semibold leading-[1.05] tracking-[-0.02em] sm:text-5xl">
+            </div>
+            <div className="lg:col-span-8">
+              <h2 id="d-inside-title" className={H2}>
                 {td("inside.title")} <span className="italic text-primary">{td("inside.titleAccent")}</span>
               </h2>
-              <p className="mt-5 max-w-[42ch] leading-relaxed text-muted-foreground">{td("inside.lead")}</p>
+              <p className={LEAD}>{td("inside.lead")}</p>
             </div>
           </Reveal>
-          <Reveal className="min-w-0 md:col-span-8">
+          {/* A galeria ocupa as 12 colunas: a lista fica nas 1–4 e o recorte nas 5–12. */}
+          <Reveal className="mt-10 min-w-0 lg:mt-14">
             <ShowcaseGallery
               items={galleryItems}
               labels={{
@@ -241,91 +289,88 @@ export async function LandingD() {
         </div>
       </section>
 
-      {/* ── 02 · Manifesto ──────────────────────────────────────────── */}
-      <section className="relative isolate border-y border-border bg-card/40 px-4 py-16 sm:px-6 md:px-8 md:py-28">
-        <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-12">
-          <Reveal className="md:col-span-4">
-            <SectionHead n={td("manifesto.n")} eyebrow={td("manifesto.eyebrow")} />
+      {/* ── 02 · Porque existimos ───────────────────────────────────── */}
+      <section aria-labelledby="d-manifesto-title" className={cn(SECTION, "border-y border-border bg-card/40")}>
+        <div className={GRID}>
+          <Reveal className="lg:col-span-4">
+            <SectionHead n={td("manifesto.n")} eyebrow={td("manifesto.eyebrow")} id="d-manifesto-title" />
           </Reveal>
-          <Reveal className="md:col-span-8">
-            <blockquote className="text-balance font-heading text-3xl font-medium italic leading-[1.15] tracking-[-0.01em] sm:text-4xl md:text-5xl">
-              <span aria-hidden className="text-primary">“</span>
+          <Reveal className="lg:col-span-8">
+            {/* Uma frase nossa, não uma citação: sem aspas nem autor inventado. */}
+            <p className="text-balance font-heading text-3xl font-medium italic leading-[1.15] tracking-[-0.01em] sm:text-4xl lg:text-5xl">
               {td("manifesto.quote")}
-              <span aria-hidden className="text-primary">”</span>
-            </blockquote>
-            <div className="mt-10 grid gap-6 text-[15px] leading-relaxed text-muted-foreground sm:grid-cols-2 sm:text-base">
+            </p>
+            <div className="mt-8 grid gap-6 text-base leading-relaxed text-muted-foreground sm:grid-cols-2 lg:mt-10">
               <p>{td("manifesto.p1")}</p>
               <p>{td("manifesto.p2")}</p>
             </div>
-            <TeamSignature
-              faces={TEAM}
-              label={t("hero2.proofTeam")}
-              className="mt-10 inline-flex items-center gap-3 border-t border-border pt-4"
-            />
+            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-border pt-4 lg:mt-10">
+              <TeamSignature faces={TEAM} label={t("hero2.proofTeam")} className="inline-flex items-center gap-3" />
+              <Link href="/about" data-track="manifesto_team" className={cn(TEXT_LINK, "text-sm")}>
+                {td("manifesto.teamLink")}
+              </Link>
+            </div>
           </Reveal>
         </div>
       </section>
 
       {/* ── 03 · Planos ─────────────────────────────────────────────── */}
-      <section id="planos" data-hide-floating className="relative isolate px-4 py-16 sm:px-6 md:px-8 md:py-28">
+      <section id="planos" data-hide-floating aria-labelledby="d-pricing-title" className={SECTION}>
         <div className="mx-auto max-w-6xl">
-          <Reveal className="grid gap-6 md:grid-cols-12 md:gap-10">
-            <div className="md:col-span-4">
+          <Reveal className={GRID}>
+            <div className="lg:col-span-4">
               <SectionHead n={td("pricing.n")} eyebrow={td("pricing.eyebrow")} />
             </div>
-            <div className="md:col-span-8">
-              <h2 className="text-balance font-heading text-4xl font-semibold leading-[1.05] tracking-[-0.02em] sm:text-5xl">
+            <div className="lg:col-span-8">
+              <h2 id="d-pricing-title" className={H2}>
                 {t("pricing.title")}
               </h2>
-              <p className="mt-4 max-w-[62ch] leading-relaxed text-muted-foreground sm:text-lg">{t("pricing.subtitle", { dias })}</p>
+              <p className={LEAD}>{t("pricing.subtitle", { dias })}</p>
             </div>
           </Reveal>
-          <div className="mt-12">
-            <PricingCards supportEmail={LEGAL.email} estado="anonimo" />
+          {/* Em xl os cartões alinham com o título (colunas 5–12); abaixo disso
+              precisam da largura toda e encostam à esquerda, como a etiqueta. */}
+          <div className="mt-10 grid lg:mt-14 xl:grid-cols-12 xl:gap-10">
+            <div className="min-w-0 max-w-4xl xl:col-span-8 xl:col-start-5">
+              <PricingCards supportEmail={LEGAL.email} estado="anonimo" />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── 04 · FAQ ────────────────────────────────────────────────── */}
-      <section className="relative isolate border-t border-border px-4 py-16 sm:px-6 md:px-8 md:py-28">
-        <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-12">
-          <Reveal className="md:col-span-4">
+      {/* ── 04 · Perguntas frequentes ───────────────────────────────── */}
+      <section aria-labelledby="d-faq-title" className={cn(SECTION, "border-t border-border")}>
+        <div className={GRID}>
+          <Reveal className="lg:col-span-4">
             <SectionHead n={td("faq.n")} eyebrow={td("faq.eyebrow")} />
-            <h2 className="mt-6 text-balance font-heading text-4xl font-semibold leading-[1.05] tracking-[-0.02em]">
-              {t("faq.title")}
-            </h2>
           </Reveal>
-          <div className="min-w-0 md:col-span-8">
-            <FaqList items={faq} className="space-y-3" />
+          <div className="min-w-0 lg:col-span-8">
+            <Reveal>
+              <h2 id="d-faq-title" className={H2}>
+                {td("faq.title")}
+              </h2>
+            </Reveal>
+            <FaqList items={faq} className="mt-8 space-y-3 lg:mt-10" />
           </div>
         </div>
       </section>
 
-      {/* ── Fecho ───────────────────────────────────────────────────── */}
-      <section data-hide-floating className="relative isolate border-t border-foreground/80 px-4 py-20 sm:px-6 md:px-8 md:py-32">
-        <Reveal className="mx-auto grid max-w-6xl gap-8 md:grid-cols-12 md:items-end">
-          <h2 className="text-balance font-heading text-4xl font-semibold leading-[1.04] tracking-[-0.02em] sm:text-6xl md:col-span-8">
+      {/* ── Fecho: o mesmo par de ações do topo ─────────────────────── */}
+      <section
+        data-hide-floating
+        aria-labelledby="d-final-title"
+        className="relative isolate border-t border-foreground/80 px-4 py-20 sm:px-6 md:px-8 md:py-28"
+      >
+        <Reveal className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-12 lg:items-end lg:gap-10">
+          <h2
+            id="d-final-title"
+            className="text-balance font-heading text-4xl font-semibold leading-[1.04] tracking-[-0.02em] sm:text-6xl lg:col-span-8"
+          >
             {td("closing.titleLead")} <span className="italic text-primary">{td("closing.titleAccent")}</span>
           </h2>
-          <div className="md:col-span-4">
-            <div data-final-cta className="flex flex-row flex-wrap items-center gap-2.5">
-              <Link
-                href="/register"
-                data-track="footer_register"
-                className={cn(buttonVariants({ size: "lg" }), "pressable min-h-12 px-6 text-base font-semibold")}
-              >
-                {t("hero2.cta")}
-                <ArrowRight className="ml-1.5 h-4 w-4" />
-              </Link>
-              <Link
-                href="/stock/AAPL"
-                data-track="footer_peek"
-                className={cn(buttonVariants({ size: "lg", variant: "ghost" }), "pressable min-h-12 px-3 text-base underline-offset-4 hover:underline")}
-              >
-                {td("peek")}
-              </Link>
-            </div>
-            <p className="mt-3 text-xs text-muted-foreground">{priceNote}</p>
+          <div className="lg:col-span-4 lg:border-l lg:border-border lg:pl-8">
+            <CtaPair kind="final" cta={t("hero2.cta")} peek={td("peek")} />
+            <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">{priceNote}</p>
           </div>
         </Reveal>
       </section>

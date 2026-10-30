@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { PLANOS, precoTexto } from "@/lib/planos";
 import { LEGAL } from "@/lib/legal/config";
 import { PricingCards } from "../pricing/PricingCards";
-import { FAQ_IDS, FaqList, LandingJsonLd, TEAM, heroDelay } from "./shared";
+import { FAQ_IDS, FaqList, LandingJsonLd, TEAM, heroDelay, heroLead, heroWords } from "./shared";
 
 /** Barra de endereço decorativa de cada paragem (rotas reais, sem ticker). */
 const ADDRESS: Record<ShotKey, string> = {
@@ -33,8 +33,13 @@ const STACKED_BTN = "w-full max-w-[22rem] sm:w-auto";
  * Texto novo em marketing.landingF.* (messages/pt.json + en.json); rótulos e
  * alts dos prints, CTA principal, planos e FAQ reutilizam marketing.*.
  */
-export async function LandingF() {
+/**
+ * `heroTexto` troca só o título e o subtítulo do topo pelos da A ou da B
+ * (versões I e J, 30/10/2026: "a F mas com o texto da A ou B, maior").
+ */
+export async function LandingF({ heroTexto }: { heroTexto?: "a" | "b" } = {}) {
   const [t, tf] = await Promise.all([getTranslations("marketing"), getTranslations("marketing.landingF")]);
+  const grande = heroTexto !== undefined;
   const dias = PLANOS.comunidade.diasGratis ?? 0;
   const preco = precoTexto(PLANOS.pro.preco);
   const faq = FAQ_IDS.map((n) => ({ q: t(`faq.q${n}`), a: t(`faq.a${n}`, { dias }) }));
@@ -72,18 +77,41 @@ export async function LandingF() {
           >
             {tf("hero.eyebrow")}
           </p>
-          <h1
-            className="hero-in mt-5 max-w-[20ch] text-balance text-[2.1rem] font-extrabold leading-[1.04] tracking-[-0.035em] sm:text-6xl"
-            style={heroDelay(0.06)}
-          >
-            {tf("hero.titleLead")}{" "}
-            <span className="font-heading font-bold italic text-primary">{tf("hero.titleAccent")}</span>
-          </h1>
+          {heroTexto === "a" ? (
+            <h1 className="mt-5 max-w-[22ch] text-balance text-[2.5rem] font-extrabold leading-[1.02] tracking-[-0.035em] sm:text-6xl md:text-7xl xl:text-[5.5rem]">
+              <span className="sr-only">{t("titleLead")} {t("titleAccent")}</span>
+              {heroLead(t("titleLead"))}
+              {heroWords(t("titleAccent"), t("titleLead").split(" ").length, "font-heading font-bold italic text-primary")}
+            </h1>
+          ) : heroTexto === "b" ? (
+            <h1 className="mt-5 max-w-[18ch] text-balance text-[2.5rem] font-extrabold leading-[1.02] tracking-[-0.035em] sm:text-6xl md:text-7xl xl:text-[5.5rem]">
+              <span className="sr-only">
+                {t("landingB.hero.titleLead")} {t("landingB.hero.titleAccent")} {t("landingB.hero.titleTail")}
+              </span>
+              {heroWords(t("landingB.hero.titleLead"), 0)}
+              {heroWords(t("landingB.hero.titleAccent"), t("landingB.hero.titleLead").split(" ").length, "font-heading font-bold italic text-primary")}
+              {heroWords(
+                t("landingB.hero.titleTail"),
+                t("landingB.hero.titleLead").split(" ").length + t("landingB.hero.titleAccent").split(" ").length,
+              )}
+            </h1>
+          ) : (
+            <h1
+              className="hero-in mt-5 max-w-[20ch] text-balance text-[2.1rem] font-extrabold leading-[1.04] tracking-[-0.035em] sm:text-6xl"
+              style={heroDelay(0.06)}
+            >
+              {tf("hero.titleLead")}{" "}
+              <span className="font-heading font-bold italic text-primary">{tf("hero.titleAccent")}</span>
+            </h1>
+          )}
           <p
-            className="hero-in mt-4 max-w-[54ch] text-balance text-[15px] leading-relaxed text-muted-foreground sm:mt-5 sm:text-lg"
+            className={cn(
+              "hero-in mt-4 max-w-[56ch] text-balance leading-relaxed text-muted-foreground sm:mt-6",
+              grande ? "text-base sm:text-xl" : "text-[15px] sm:text-lg",
+            )}
             style={heroDelay(0.14)}
           >
-            {tf("hero.subtitle")}
+            {heroTexto === "a" ? t("hero2.subtitle") : heroTexto === "b" ? t("landingB.hero.subtitle") : tf("hero.subtitle")}
           </p>
           <div
             data-hero-cta

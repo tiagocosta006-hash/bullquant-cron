@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 
-export const VARIANTES_TODAS = ["a", "b", "c", "d", "e", "f", "g", "h"] as const;
+export const VARIANTES_TODAS = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"] as const;
 export type Variante = (typeof VARIANTES_TODAS)[number];
 /** Versões que ainda não podem ir para produção (ver LandingE). */
 export const VARIANTES_RASCUNHO: readonly Variante[] = ["e"];

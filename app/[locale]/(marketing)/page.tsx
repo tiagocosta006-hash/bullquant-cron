@@ -17,11 +17,14 @@ import { VARIANTES_RASCUNHO, VariantSwitcher, type Variante } from "./_landing/V
  *   ?v=c — igual à A, muda só a forma de mostrar os vídeos e os prints;
  *   ?v=d…h — mais alternativas (29/10/2026): D editorial, E rascunho da
  *   campanha grátis + livros (só com LANDING_RASCUNHOS=1), F visita guiada com
- *   scroll, G ultra-curta para o telemóvel, H "feita pela Bullocracy".
+ *   scroll, G ultra-curta para o telemóvel, H "feita pela Bullocracy";
+ *   ?v=i / ?v=j — a F com o título e subtítulo (maiores) da A / da B.
  * Com `?v=` na URL aparece o seletor flutuante para saltar entre elas; sem
  * parâmetro o público vê a A. Quando escolherem, fica só a escolhida.
  */
-const VARIANTES = { a: LandingA, b: LandingB, c: LandingC, d: LandingD, e: LandingE, f: LandingF, g: LandingG, h: LandingH } as const;
+const LandingI = () => LandingF({ heroTexto: "a" });
+const LandingJ = () => LandingF({ heroTexto: "b" });
+const VARIANTES = { a: LandingA, b: LandingB, c: LandingC, d: LandingD, e: LandingE, f: LandingF, g: LandingG, h: LandingH, i: LandingI, j: LandingJ } as const;
 
 /** Rascunhos (E) só nas pré-visualizações da equipa: em produção caem na A. */
 const RASCUNHOS = process.env.LANDING_RASCUNHOS === "1";

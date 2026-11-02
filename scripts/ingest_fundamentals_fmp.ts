@@ -123,6 +123,7 @@ async function main() {
   const falhas: string[] = [];
   const semCambio: string[] = [];
   const semDados: string[] = [];
+  const futuros: string[] = [];
 
   await emParalelo(empresas, async (empresa) => {
     // Em reconstrução, junta-se tudo o que a FMP dá para esta empresa e só
@@ -143,6 +144,13 @@ async function main() {
       for (const { linha, coerencia, origem } of registos) {
         // A base é toda em dólares. A FMP responde na moeda de reporte e não
         // tem parâmetro para pedir noutra — ver `lib/fmp/cambio.ts`.
+        // Um período que ainda não acabou não pode ter sido reportado: é a FMP
+        // com o rótulo trocado (o Q3 2026 da BNY, entregue a 15/10, veio como
+        // Q4 a 31/12). Gravá-lo deixava um trimestre fantasma no gráfico.
+        if ((linha.periodEnd as Date).getTime() > Date.now()) {
+          futuros.push(`${empresa.ticker} ${origem.fiscalYear}${origem.period} (${origem.date})`);
+          continue;
+        }
         const moeda = (origem.reportedCurrency ?? "USD").toUpperCase();
         const taxa = await taxaParaUsd(moeda, linha.periodEnd as Date);
         if (taxa === null) {
@@ -222,6 +230,9 @@ async function main() {
       `[fmp] ${semDados.length} empresas sem dados na FMP (mantidas como estavam): ` +
         semDados.slice(0, 25).join(", "),
     );
+  }
+  if (futuros.length) {
+    console.log(`[fmp] ${futuros.length} períodos com data no futuro ignorados: ${futuros.slice(0, 10).join(", ")}`);
   }
   if (semCambio.length) {
     console.log(`[fmp] ${semCambio.length} períodos sem câmbio disponível:`);

@@ -1,4 +1,29 @@
 {
+  "aiLoading": {
+    "title": "AI analysis in progress",
+    "checkingTitle": "Loading the analysis",
+    "checkingDescription": "Checking whether a saved analysis is available for this company.",
+    "checkingNote": "The report will appear here as soon as it is available.",
+    "note": "This may take a few moments. The analysis will appear here as soon as it is ready.",
+    "analyst": {
+      "label": "AI Analyst",
+      "description": "Preparing the analysis of the business, its competitive advantages and key risks.",
+      "topics": [
+        "Business model",
+        "Competitive advantages",
+        "Risks and opportunities"
+      ]
+    },
+    "management": {
+      "label": "Management Team",
+      "description": "Preparing the analysis of leadership, capital allocation and alignment with shareholders.",
+      "topics": [
+        "Leadership and structure",
+        "Capital allocation",
+        "Shareholder alignment"
+      ]
+    }
+  },
   "notFound": {
     "title": "404",
     "heading": "Page not found",
@@ -1326,6 +1351,11 @@
       "bearCase": "Bear case"
     },
     "chat": {
+      "interrupted": "The response was interrupted. You can send your question again.",
+      "authError": "Your session has expired. Sign in again to continue.",
+      "proError": "The Analyst chat is available to PRO accounts.",
+      "limitError": "The AI request or credit limit has been reached. Please try again later.",
+      "send": "Send message",
       "title": "Ask the Analyst",
       "placeholder": "Ask anything about the company...",
       "proOnly": "Pro-only chat",

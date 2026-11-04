@@ -1,4 +1,29 @@
 {
+  "aiLoading": {
+    "title": "A IA está a analisar",
+    "checkingTitle": "A carregar a análise",
+    "checkingDescription": "A verificar se já existe uma análise guardada para esta empresa.",
+    "checkingNote": "O relatório aparece aqui assim que estiver disponível.",
+    "note": "Pode demorar alguns instantes. A análise aparece aqui assim que estiver pronta.",
+    "analyst": {
+      "label": "Analista IA",
+      "description": "A preparar a análise do negócio, das vantagens competitivas e dos principais riscos.",
+      "topics": [
+        "Modelo de negócio",
+        "Vantagens competitivas",
+        "Riscos e oportunidades"
+      ]
+    },
+    "management": {
+      "label": "Equipa de Gestão",
+      "description": "A preparar a análise da liderança, da alocação de capital e do alinhamento com os acionistas.",
+      "topics": [
+        "Liderança e estrutura",
+        "Alocação de capital",
+        "Alinhamento com acionistas"
+      ]
+    }
+  },
   "notFound": {
     "title": "404",
     "heading": "Página não encontrada",
@@ -1327,6 +1352,11 @@
       "bearCase": "Caso pessimista"
     },
     "chat": {
+      "interrupted": "A resposta foi interrompida. Podes voltar a enviar a pergunta.",
+      "authError": "A tua sessão expirou. Inicia sessão novamente para continuar.",
+      "proError": "O chat com o Analista está disponível para contas PRO.",
+      "limitError": "O limite de pedidos ou de créditos de IA foi atingido. Tenta novamente mais tarde.",
+      "send": "Enviar mensagem",
       "title": "Pergunta ao Analista",
       "placeholder": "Pergunta o que quiseres sobre a empresa...",
       "proOnly": "Chat exclusivo Pro",

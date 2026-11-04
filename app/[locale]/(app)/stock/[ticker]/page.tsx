@@ -25,7 +25,10 @@ import { LatestResults } from '@/components/stock/LatestResults'
 import { CompanyProfile } from '@/components/stock/CompanyProfile'
 import { StockNews } from '@/components/stock/StockNews'
 import { ManagementTeam } from '@/components/stock/ManagementTeam'
-const StockAnalyst = dynamic(() => import('@/components/stock/StockAnalyst').then(mod => mod.StockAnalyst))
+import { AiAnalysisLoading } from '@/components/stock/AiAnalysisLoading'
+const StockAnalyst = dynamic(() => import('@/components/stock/StockAnalyst').then(mod => mod.StockAnalyst), {
+  loading: () => <AiAnalysisLoading checking className="mt-4" />,
+})
 import { StockTabs } from '@/components/stock/StockTabs'
 const ValuationMultiples = dynamic(() => import('@/components/stock/ValuationMultiples').then(mod => mod.ValuationMultiples))
 const PriceVsEarnings = dynamic(() => import('@/components/stock/PriceVsEarnings').then(mod => mod.PriceVsEarnings))

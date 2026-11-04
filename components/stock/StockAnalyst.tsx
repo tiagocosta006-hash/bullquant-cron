@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   BrainCircuit,
   FileText,
@@ -30,6 +30,8 @@ import {
 import { DecisionChart } from "./DecisionChart";
 import { LiquidGlass } from "@/components/fx/LiquidGlass";
 import { BullMarkAnimated } from "@/components/brand/BullMarkAnimated";
+import { AiAnalysisLoading } from "./AiAnalysisLoading";
+import { analystHistory, ChatStreamError, readAnalystAnswer, type ChatCitation, type ChatAction } from "@/lib/ai/chat-stream";
 import { buildTextFragmentUrl } from "@/lib/finance/textFragment";
 import { cn } from "@/lib/utils";
 
@@ -63,9 +65,9 @@ type Status =
   | "rate_limit"
   | "needs_auth";
 
-type ChatCitation = { label: string; quote: string };
-type ChatAction = { label: string; href: string };
 type ChatMessage = {
+  id: string;
+  error?: string;
   role: "user" | "assistant";
   content: string;
   citations?: ChatCitation[];
@@ -378,16 +380,11 @@ export function StockAnalyst({
 
   // ── Estados que não são "ready" ───────────────────────────────────
   if (status === "loading") {
-    return (
-      <div className="mt-4 space-y-6">
-        <div className="h-40 w-full animate-pulse rounded-3xl border border-border/40 bg-card" />
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-24 animate-pulse rounded-2xl border border-border/40 bg-card" />
-          ))}
-        </div>
-      </div>
-    );
+    return <AiAnalysisLoading ticker={ticker} checking className="mt-4" />;
+  }
+
+  if (status === "generating" && !isDemo) {
+    return <AiAnalysisLoading ticker={ticker} className="mt-4" />;
   }
 
   if (
@@ -754,6 +751,7 @@ export function StockAnalyst({
         {/* ── Coluna direita: chat fixo (sticky em lg+) ────────────── */}
         <div {...demoReveal("lg:sticky lg:top-24 lg:h-[calc(100svh-8rem)]")}>
           <AnalystChat
+            key={ticker}
             ticker={ticker}
             isPro={!!isPro}
             isLoggedIn={!!isLoggedIn}
@@ -891,32 +889,6 @@ function CasePanel({
   );
 }
 
-// ── Parser mínimo do stream de UI messages (SSE) ─────────────────────
-// Sem @ai-sdk/react instalado: interpretamos os chunks `data: {...}\n\n`
-// manualmente. Cada evento é um UIMessageChunk (text-delta, tool-input-
-// available, tool-output-available, error, ...). Ver lib/ai/tools.ts para
-// os tools `cite`/`suggestAction` cujos outputs viram citações/chips aqui.
-function parseSseEvents(buffer: string): { events: unknown[]; remainder: string } {
-  const events: unknown[] = [];
-  let rest = buffer;
-  let idx: number;
-  while ((idx = rest.indexOf("\n\n")) !== -1) {
-    const rawEvent = rest.slice(0, idx);
-    rest = rest.slice(idx + 2);
-    for (const line of rawEvent.split("\n")) {
-      if (!line.startsWith("data:")) continue;
-      const jsonStr = line.slice(5).trim();
-      if (!jsonStr || jsonStr === "[DONE]") continue;
-      try {
-        events.push(JSON.parse(jsonStr));
-      } catch {
-        // chunk parcial/corrompido — ignora, o stream continua
-      }
-    }
-  }
-  return { events, remainder: rest };
-}
-
 // ── Indicador de "a escrever" (três pontos) ──────────────────────────
 function TypingDots() {
   return (
@@ -949,117 +921,77 @@ function AnalystChat({
   className?: string;
 }) {
   const t = useTranslations("analista");
+  const locale = useLocale();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const requestRef = useRef<AbortController | null>(null);
+  const followRef = useRef(true);
   const suggestions = (t.raw("chat.suggestions") as string[]) || [];
 
+  useEffect(() => () => requestRef.current?.abort(), []);
+
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+    const el = scrollRef.current;
+    if (el && followRef.current) el.scrollTop = el.scrollHeight;
   }, [messages]);
 
   const send = useCallback(
     async (text: string) => {
       const q = text.trim();
-      if (!q || streaming) return;
-      const next: ChatMessage[] = [...messages, { role: "user", content: q }];
-      setMessages(next);
+      // State alone cannot lock two submissions in the same render.
+      if (!q || requestRef.current) return;
+      const controller = new AbortController();
+      requestRef.current = controller;
+      // Also bound the browser wait if a proxy/provider leaves the stream open.
+      const timeout = setTimeout(() => controller.abort("timeout"), 55_000);
+      const abandoned = () => controller.signal.aborted && controller.signal.reason !== "timeout";
+      const next: ChatMessage[] = [...messages, { id: crypto.randomUUID(), role: "user", content: q }];
+      const answerId = crypto.randomUUID();
+      followRef.current = true;
+      setMessages([...next, { id: answerId, role: "assistant", content: "" }]);
       setInput("");
       setStreaming(true);
-      // placeholder do assistente para stream incremental
-      setMessages((m) => [...m, { role: "assistant", content: "" }]);
-
-      const toolNames = new Map<string, string>();
-      // Texto reposto a cada novo "step" (start-step) — um step tipicamente
-      // é só tool-calls OU só a resposta final, nunca os dois misturados;
-      // sem este reset, um eventual preâmbulo antes de uma tool-call (ex.:
-      // "vou verificar isso...") ficava concatenado com a resposta final
-      // seguinte, produzindo uma bolha confusa. Citações/ações persistem
-      // entre steps — enriquecem a resposta final, não são "descartáveis".
-      let text_ = "";
-      const citations: ChatCitation[] = [];
-      const actions: ChatAction[] = [];
-      const updateMessage = () =>
-        setMessages((m) => {
-          const copy = [...m];
-          copy[copy.length - 1] = {
-            role: "assistant",
-            content: text_,
-            citations: [...citations],
-            actions: [...actions],
-          };
-          return copy;
-        });
+      const updateAnswer = (patch: Partial<ChatMessage>) => {
+        if (abandoned()) return;
+        setMessages((current) => current.map((m) => m.id === answerId ? { ...m, ...patch } : m));
+      };
 
       try {
         const res = await fetch(`/api/analyst/${ticker}/chat`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
           body: JSON.stringify({
-            messages: next.map(({ role, content }) => ({ role, content })),
+            locale,
+            // Failed/partial answers are not authoritative conversation context.
+            messages: analystHistory(next),
           }),
         });
         if (!res.ok || !res.body) {
-          setMessages((m) => {
-            const copy = [...m];
-            copy[copy.length - 1] = { role: "assistant", content: t("chat.error") };
-            return copy;
-          });
-          setStreaming(false);
+          const key = res.status === 401 ? "authError"
+            : res.status === 403 ? "proError"
+            : res.status === 429 ? "limitError" : "error";
+          updateAnswer({ error: t(`chat.${key}`) });
           return;
         }
-        const reader = res.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = "";
-        for (;;) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          buffer += decoder.decode(value, { stream: true });
-          const { events, remainder } = parseSseEvents(buffer);
-          buffer = remainder;
-
-          for (const raw of events) {
-            const chunk = raw as { type: string; [key: string]: unknown };
-            if (chunk.type === "start-step") {
-              text_ = ""; // novo step — não misturar com texto de um step anterior
-              updateMessage();
-            } else if (chunk.type === "text-delta") {
-              text_ += (chunk.delta as string) ?? "";
-              updateMessage();
-            } else if (chunk.type === "tool-input-available") {
-              toolNames.set(chunk.toolCallId as string, chunk.toolName as string);
-            } else if (chunk.type === "tool-output-available") {
-              const name = toolNames.get(chunk.toolCallId as string);
-              const output = chunk.output as Record<string, string> | undefined;
-              if (name === "cite" && output?.label && output?.quote) {
-                citations.push({ label: output.label, quote: output.quote });
-                updateMessage();
-              } else if (name === "suggestAction" && output?.label && output?.href) {
-                actions.push({ label: output.label, href: output.href });
-                updateMessage();
-              }
-            } else if (chunk.type === "error") {
-              // errorText já vem classificado/localizado pelo servidor (ver
-              // onError na rota) — nunca é o erro bruto do provedor de IA.
-              text_ = (chunk.errorText as string) || t("chat.error");
-              updateMessage();
-            }
-          }
+        await readAnalystAnswer(res.body, updateAnswer);
+      } catch (error) {
+        if (!abandoned()) {
+          updateAnswer({ error: error instanceof ChatStreamError && error.publicMessage
+            ? error.publicMessage : t("chat.interrupted") });
         }
-      } catch {
-        setMessages((m) => {
-          const copy = [...m];
-          copy[copy.length - 1] = { role: "assistant", content: t("chat.error") };
-          return copy;
-        });
       } finally {
-        setStreaming(false);
+        clearTimeout(timeout);
+        if (requestRef.current === controller) {
+          requestRef.current = null;
+          if (!abandoned()) setStreaming(false);
+        }
       }
     },
-    [messages, streaming, ticker, t],
+    [messages, locale, ticker, t],
   );
-
 
 
   return (
@@ -1072,22 +1004,34 @@ function AnalystChat({
 
       <div className="flex flex-1 min-h-0 flex-col p-4">
         {messages.length > 0 && (
-          <div ref={scrollRef} className="mb-4 flex-1 min-h-0 space-y-4 overflow-y-auto pr-1">
+          <div
+            ref={scrollRef}
+            onScroll={(event) => {
+              const el = event.currentTarget;
+              followRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 48;
+            }}
+            className="mb-4 flex-1 min-h-0 space-y-4 overflow-y-auto pr-1"
+          >
             {messages.map((m, i) => (
               <div
-                key={i}
+                key={m.id}
                 className={m.role === "user" ? "flex justify-end" : "flex flex-col items-start gap-2"}
               >
                 <div
                   className={cn(
-                    "max-w-[85%] whitespace-pre-wrap px-4 py-2.5 text-sm leading-relaxed",
+                    "max-w-[95%] min-w-0 whitespace-pre-wrap break-words px-4 py-2.5 text-sm leading-relaxed",
                     m.role === "user"
                       ? "rounded-2xl rounded-br-md bg-primary text-primary-foreground shadow-sm"
                       : "rounded-2xl rounded-bl-md border border-border/50 bg-muted/50 text-foreground",
                   )}
                 >
                   {m.content ||
-                    (streaming && i === messages.length - 1 ? <TypingDots /> : "")}
+                    (streaming && !m.error && i === messages.length - 1 ? <TypingDots /> : "")}
+                  {m.error && (
+                    <p role="alert" className={cn("text-sm text-bear", m.content && "mt-3 border-t border-border pt-3")}>
+                      {m.error}
+                    </p>
+                  )}
                 </div>
 
                 {m.role === "assistant" && (!!m.citations?.length || !!m.actions?.length) && (
@@ -1127,6 +1071,7 @@ function AnalystChat({
                 <button
                   key={i}
                   onClick={() => send(s)}
+                  disabled={streaming}
                   className="pressable rounded-full border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/5 hover:text-foreground"
                 >
                   {s}
@@ -1147,13 +1092,16 @@ function AnalystChat({
         >
           <input
             value={input}
+            maxLength={6000}
             onChange={(e) => setInput(e.target.value)}
+            aria-label={t("chat.placeholder")}
             placeholder={t("chat.placeholder")}
             disabled={streaming}
-            className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/70"
+            className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/70"
           />
           <Button
             type="submit"
+            aria-label={t("chat.send")}
             size="icon"
             disabled={streaming || !input.trim()}
             className="pressable h-8 w-8 shrink-0 rounded-full"

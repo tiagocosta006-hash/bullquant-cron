@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Users, Crown, CheckCircle2, AlertTriangle, XCircle, Briefcase, Info } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { useLocale } from 'next-intl'
+import { AiAnalysisLoading } from './AiAnalysisLoading'
 
 type ManagementProfile = {
   ceoName: string
@@ -72,21 +73,7 @@ export function ManagementTeam({ ticker }: { ticker: string }) {
   }, [ticker])
 
   if (loading) {
-    return (
-      <Card className="border-ink-700 bg-ink-900 overflow-hidden relative">
-        <CardHeader className="border-b border-ink-800 pb-4">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Users className="h-5 w-5 text-gold-500" />
-            {locale === 'pt' ? 'Equipa de Gestão' : 'Management Team'}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6 space-y-4">
-          <div className="h-16 bg-ink-800 rounded-md animate-pulse" />
-          <div className="h-24 bg-ink-800 rounded-md animate-pulse" />
-          <div className="h-20 bg-ink-800 rounded-md animate-pulse" />
-        </CardContent>
-      </Card>
-    )
+    return <AiAnalysisLoading kind="management" ticker={ticker} />
   }
 
   if (ocupado) {

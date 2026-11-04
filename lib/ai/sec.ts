@@ -1,5 +1,5 @@
-import * as cheerio from "cheerio";
 import { prisma } from "@/lib/prisma";
+import { extractAnnualSections, filingHtmlToLines, isSectionedText } from "@/lib/ai/filingSections";
 
 // User-Agent obrigatório da SEC (≤10 req/s). Mantido igual ao já usado na app.
 const SEC_HEADERS = { "User-Agent": "BullValue Analyst (suporte@thebullvalue.com)" };
@@ -37,30 +37,11 @@ export async function getLatestAnnualFiling(cik: string): Promise<LatestFiling |
   return null;
 }
 
-/** Descarrega o HTML do filing e devolve o texto limpo. */
-export async function fetchFilingText(url: string): Promise<string | null> {
+/** Descarrega o HTML do filing (o recorte por secções precisa da estrutura, não só do texto). */
+export async function fetchFilingHtml(url: string): Promise<string | null> {
   const res = await fetch(url, { headers: SEC_HEADERS });
   if (!res.ok) return null;
-  const html = await res.text();
-  const $ = cheerio.load(html);
-  return $.text().replace(/\s+/g, " ").trim();
-}
-
-/**
- * Recorta a janela mais relevante do filing (MD&A / discussão operacional),
- * onde vivem os KPIs e o comentário da gestão — evita cortar a meio e cabe
- * confortavelmente no contexto do Gemini Flash.
- */
-export function sliceRelevant(rawText: string, maxChars = 160_000): string {
-  let start = rawText.indexOf("Item 7. Management");
-  if (start === -1) start = rawText.indexOf("Item 7.");
-  if (start === -1) start = rawText.indexOf("Item 5. Operating and Financial Review");
-  if (start === -1) start = rawText.indexOf("Item 5.");
-  // Sem cabeçalhos reconhecíveis → cai para a zona final, onde ficam os financeiros.
-  if (start === -1 || start > rawText.length - 100_000) {
-    start = Math.max(0, rawText.length - (maxChars + 100_000));
-  }
-  return rawText.substring(start, start + maxChars);
+  return res.text();
 }
 
 export type FilingResult = {
@@ -88,7 +69,10 @@ export async function getFilingForCompany(company: {
   const cached = await prisma.filingCache.findUnique({
     where: { companyId_accession: { companyId: company.id, accession: latest.accession } },
   });
-  if (cached) {
+  // A cache antiga é a janela fixa de 160k, que em muitos 10-K deixava de fora
+  // o Item 1 e o 1A (ver lib/ai/filingSections.ts). Sem o marcador das secções,
+  // volta a descarregar-se e a linha é reescrita.
+  if (cached && isSectionedText(cached.text)) {
     return {
       url: cached.url,
       text: cached.text,
@@ -98,16 +82,17 @@ export async function getFilingForCompany(company: {
     };
   }
 
-  const rawText = await fetchFilingText(latest.url);
-  if (!rawText) return null;
-  const text = sliceRelevant(rawText);
+  const html = await fetchFilingHtml(latest.url);
+  if (!html) return null;
+  const text = extractAnnualSections(filingHtmlToLines(html), latest.form);
 
   // Persistir para o chat / próximas gerações. Best-effort — falha de escrita
   // não deve rebentar a geração do relatório.
   try {
     await prisma.filingCache.upsert({
       where: { companyId_accession: { companyId: company.id, accession: latest.accession } },
-      update: { text, url: latest.url, form: latest.form },
+      // fetchedAt explícito: o chat lê o filing mais recente por fetchedAt.
+      update: { text, url: latest.url, form: latest.form, fetchedAt: new Date() },
       create: {
         companyId: company.id,
         accession: latest.accession,

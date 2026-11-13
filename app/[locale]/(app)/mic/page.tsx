@@ -89,7 +89,7 @@ export default async function MicPage() {
       <div className={`grid items-start gap-6 ${configured && account ? "lg:grid-cols-[minmax(0,1fr)_340px]" : ""}`}>
         {configured && !failed && (
           <div className={account ? "space-y-3 lg:order-last" : "max-w-xl space-y-3"}>
-            {analyst && <MicDesk started={!!account} />}
+            {analyst && <MicDesk started={!!account} holdings={account?.positions.map(({ ticker, name }) => ({ ticker, name })) ?? []} />}
             <MicAccess unlocked={analyst} name={accountName} />
           </div>
         )}

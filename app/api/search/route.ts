@@ -3,7 +3,9 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
-  const query = searchParams.get('q')
+  const mic = searchParams.get('mic') === '1'
+  const rawQuery = searchParams.get('q')
+  const query = mic ? rawQuery?.trim().slice(0, 80) : rawQuery
   // ?empresas=1: só empresas (sem ETFs, guardados com exchange MACRO) — para
   // o DCF, onde um ETF não tem demonstrações financeiras para modelar.
   const soEmpresas = searchParams.get('empresas') === '1'
@@ -26,6 +28,7 @@ export async function GET(request: Request) {
         // sequer destino onde um índice faça sentido.
         NOT: { ticker: { startsWith: '^' } },
         ...(soEmpresas ? { exchange: { not: 'MACRO' } } : {}),
+        ...(mic ? { currency: 'USD', exchange: { not: 'INDEX' } } : {}),
         OR: [
           { ticker: { contains: query, mode: 'insensitive' } },
           { name: { contains: query, mode: 'insensitive' } },

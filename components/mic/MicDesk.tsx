@@ -6,15 +6,18 @@ import { ArrowDownUp, Loader2 } from "lucide-react"
 import { useRouter } from "@/i18n/routing"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { MicInstrumentSearch, type MicInstrument } from "./MicInstrumentSearch"
 import { Label } from "@/components/ui/label"
 import { reviewMicOrder, startMicPortfolio, submitMicOrder } from "@/app/[locale]/(app)/mic/actions"
 
 type Ticket = NonNullable<Awaited<ReturnType<typeof reviewMicOrder>>["order"]>
 
-export function MicDesk({ started }: { started: boolean }) {
+export function MicDesk({ started, holdings }: { started: boolean; holdings: MicInstrument[] }) {
   const t = useTranslations("mic")
   const locale = useLocale()
   const router = useRouter()
+  const [instrument, setInstrument] = useState<MicInstrument | null>(null)
+  const [side, setSide] = useState<"BUY" | "SELL">("BUY")
   const [ticket, setTicket] = useState<Ticket>()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState("")
@@ -52,7 +55,9 @@ export function MicDesk({ started }: { started: boolean }) {
             hidden={!!ticket}
             onSubmit={(event) => {
               event.preventDefault()
+              if (!instrument) return
               const data = new FormData(event.currentTarget)
+              data.set("ticker", instrument.ticker)
               void run(async () => {
                 const result = await reviewMicOrder(Object.fromEntries(data))
                 if (result.order) setTicket(result.order)
@@ -60,24 +65,25 @@ export function MicDesk({ started }: { started: boolean }) {
               })
             }}
           >
-            <fieldset disabled={busy} className="grid gap-3 grid-cols-2 sm:grid-cols-[minmax(105px,1fr)_1fr_1fr] lg:grid-cols-2">
+            <fieldset disabled={busy} className="grid grid-cols-2 gap-3">
+              <MicInstrumentSearch key={side} value={instrument} onChange={setInstrument} disabled={busy} holdings={side === "SELL" ? holdings : undefined} />
               <div>
                 <Label htmlFor="mic-side">{t("side")}</Label>
-                <select id="mic-side" name="side" className="mt-1.5 h-10 w-full rounded-lg border border-input bg-background px-2.5 text-sm">
+                <select id="mic-side" name="side" value={side} onChange={(event) => {
+                  setSide(event.target.value === "SELL" ? "SELL" : "BUY")
+                  setInstrument(null)
+                  setError("")
+                }} className="mt-1.5 h-10 w-full rounded-lg border border-input bg-background px-2.5 text-sm">
                   <option value="BUY">{t("BUY")}</option>
                   <option value="SELL">{t("SELL")}</option>
                 </select>
               </div>
               <div>
-                <Label htmlFor="mic-ticker">{t("ticker")}</Label>
-                <Input id="mic-ticker" name="ticker" placeholder="AAPL" className={inputClass + " uppercase"} maxLength={20} required />
-              </div>
-              <div className="col-span-2 sm:col-span-1 lg:col-span-2">
                 <Label htmlFor="mic-quantity">{t("quantity")}</Label>
                 <Input id="mic-quantity" name="quantity" className={inputClass} inputMode="decimal" maxLength={14} required />
               </div>
             </fieldset>
-            <Button type="submit" className="mt-4 w-full" disabled={busy}>
+            <Button type="submit" className="mt-4 w-full" disabled={busy || !instrument}>
               {busy && <Loader2 className="animate-spin" />}{t("review")}
             </Button>
           </form>

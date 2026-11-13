@@ -795,6 +795,13 @@
     "loadMore": "Carregar mais"
   },
   "mic": {
+    "instrumentLabel": "Pesquisar ativo",
+    "instrumentPlaceholder": "Ex.: Alphabet ou Apple",
+    "searchHint": "Escreve pelo menos 2 caracteres.",
+    "searching": "A pesquisar…",
+    "searchError": "Pesquisa temporariamente indisponível.",
+    "noMatches": "Sem resultados.",
+    "noHeldMatches": "Nenhuma posição correspondente na carteira.",
     "signedAs": "Sessão BullValue de {name}",
     "sharedPassword": "Palavra-passe comum do MIC",
     "unlock": "Entrar na área de analista",

@@ -56,4 +56,9 @@ CREATE TABLE IF NOT EXISTS "mic_activity" (
 CREATE INDEX IF NOT EXISTS "mic_activity_analystId_createdAt_idx" ON "mic_activity"("analystId", "createdAt");
 ALTER TABLE "mic_activity" ENABLE ROW LEVEL SECURITY;
 
+-- Só inicializa a carteira. Um novo deploy preserva o saldo e as operações.
+INSERT INTO "mic_portfolio" ("id", "initialCapital", "cash")
+VALUES ('MIC', 100000, 100000)
+ON CONFLICT ("id") DO NOTHING;
+
 COMMIT;

@@ -795,6 +795,13 @@
     "loadMore": "Load more"
   },
   "mic": {
+    "instrumentLabel": "Search for an asset",
+    "instrumentPlaceholder": "E.g. Alphabet or Apple",
+    "searchHint": "Type at least 2 characters.",
+    "searching": "Searching…",
+    "searchError": "Search temporarily unavailable.",
+    "noMatches": "No matches.",
+    "noHeldMatches": "No matching holding in the portfolio.",
     "signedAs": "BullValue session for {name}",
     "sharedPassword": "MIC shared password",
     "unlock": "Enter analyst desk",

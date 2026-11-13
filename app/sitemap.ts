@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma'
 import { BRAND } from '@/lib/brand'
 import { routing } from '@/i18n/routing'
 import { SECTORS } from '@/lib/data/sectors'
+import { NewsStatus } from '@prisma/client'
+import { URL_LISTA_NOTICIAS, urlNoticia } from '@/lib/news/seo'
 
 function createSitemapEntries(path: string, options: Partial<MetadataRoute.Sitemap[0]>): MetadataRoute.Sitemap {
   const languages: Record<string, string> = {}
@@ -57,6 +59,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   )
 
+  // Notícias: só em português (/en/news mostra o mesmo texto), por isso uma
+  // entrada por notícia, sem hreflang. lastmod real, ao contrário do resto.
+  let newsPages: MetadataRoute.Sitemap = []
+  try {
+    const noticias = await prisma.newsArticle.findMany({
+      where: { status: NewsStatus.PUBLISHED },
+      orderBy: { publishedAt: 'desc' },
+      select: { slug: true, updatedAt: true },
+    })
+    newsPages = [
+      { url: URL_LISTA_NOTICIAS, lastModified: noticias[0]?.updatedAt ?? now, changeFrequency: 'hourly', priority: 0.7 },
+      ...noticias.map((n) => ({ url: urlNoticia(n.slug), lastModified: n.updatedAt, changeFrequency: 'weekly' as const, priority: 0.6 })),
+    ]
+  } catch {
+    // Sem base de dados no build: o sitemap sai sem notícias, como sai sem ações.
+  }
+
   // Dynamic stock pages
   try {
     const companies = await prisma.company.findMany({
@@ -72,8 +91,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })
     )
 
-    return [...staticPages, ...categoryPages, ...stockPages]
+    return [...staticPages, ...categoryPages, ...newsPages, ...stockPages]
   } catch {
-    return [...staticPages, ...categoryPages]
+    return [...staticPages, ...categoryPages, ...newsPages]
   }
 }

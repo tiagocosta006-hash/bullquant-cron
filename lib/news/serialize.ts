@@ -75,7 +75,8 @@ export function serializeArticle(article: SerializableArticle, locale = "pt"): N
     imageUrl: article.imageUrl,
     imageProxyUrl: article.imageUrl ? `/api/news/image/${article.id}` : null,
     publishedAt: article.publishedAt.toISOString(),
-    bullValueUrl: `${siteUrl()}/${locale}/news/${article.slug}`,
+    // PT sem prefixo (localePrefix "as-needed"): /pt/news/... respondia 307.
+    bullValueUrl: `${siteUrl()}${locale === "pt" ? "" : `/${locale}`}/news/${article.slug}`,
     sources: parseSources(article.sources),
   };
 }

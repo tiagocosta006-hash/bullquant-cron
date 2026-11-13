@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import { CATEGORY_LABELS } from "@/lib/news/labels";
 
@@ -33,14 +33,15 @@ export function SentimentBadge({ sentimento }: { sentimento: string }) {
   );
 }
 
-export function TickerBadges({ tickers, locale }: { tickers: string[]; locale: string }) {
+// Link do next-intl: o locale vai sozinho e o PT fica sem o /pt/ (que respondia 307).
+export function TickerBadges({ tickers }: { tickers: string[] }) {
   if (tickers.length === 0) return null;
   return (
     <div className="flex flex-wrap gap-1.5">
       {tickers.map((ticker) => (
         <Link
           key={ticker}
-          href={`/${locale}/stock/${ticker}`}
+          href={`/stock/${ticker}`}
           className="rounded-md border border-border bg-muted/50 px-1.5 py-0.5 font-mono text-[11px] text-foreground transition-colors hover:border-primary hover:text-primary"
         >
           {ticker}

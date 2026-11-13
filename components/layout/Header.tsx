@@ -1,5 +1,5 @@
 import { Link } from '@/i18n/routing';
-import { LogOut, UserCircle, Zap, Users, BookOpen } from 'lucide-react';
+import { LogOut, UserCircle, Zap, Users, BookOpen, Newspaper } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
@@ -64,6 +64,18 @@ export async function Header() {
               <BookOpen className="h-4 w-4" />
               <span>{t('glossary')}</span>
             </Link>
+            {/* Notícias no menu público: sem nenhum link vindo das páginas
+                públicas, o Google quase não as encontrava. Só a partir de
+                1120px: entre 1024 e ~1100 o 4.º item empurrava o CTA para
+                fora do ecrã (abaixo disso fica no rodapé e no menu mobile). */}
+            <Link
+              href="/news"
+              className="hidden min-[1120px]:flex items-center space-x-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              title={t('news')}
+            >
+              <Newspaper className="h-4 w-4" />
+              <span>{t('news')}</span>
+            </Link>
           </div>
         </nav>
 
@@ -79,6 +91,7 @@ export async function Header() {
                 about: t('about'),
                 pricing: t('pricing'),
                 glossary: t('glossary'),
+                news: t('news'),
                 login: t('login'),
                 peek: t('peek'),
                 createAccount: t('createAccount'),

@@ -17,6 +17,9 @@ export async function Footer() {
           <Link href="/directory" className="hover:text-foreground transition-colors font-medium text-foreground/80">
             {t('directory')}
           </Link>
+          <Link href="/news" className="hover:text-foreground transition-colors">
+            {t('news')}
+          </Link>
           <Link href="/about" className="hover:text-foreground transition-colors">
             {t('about')}
           </Link>

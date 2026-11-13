@@ -3,7 +3,7 @@ import { BRAND } from '@/lib/brand'
 import { routing } from '@/i18n/routing'
 
 export default function robots(): MetadataRoute.Robots {
-  const allowBase = ['/', '/stock/', '/explore', '/directory', '/calendar', '/pricing', '/terms', '/privacy', '/refund', '/cookies', '/legal', '/withdrawal', '/glossary', '/about', '/dcf/']
+  const allowBase = ['/', '/stock/', '/explore', '/directory', '/calendar', '/pricing', '/terms', '/privacy', '/refund', '/cookies', '/legal', '/withdrawal', '/glossary', '/about', '/dcf/', '/news']
   const disallowBase = [
     '/api/',
     '/auth/',
@@ -50,6 +50,8 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/'],
       },
     ],
-    sitemap: `${BRAND.siteUrl}/sitemap.xml`,
+    // O de notícias (Google News) só tem as dos últimos 2 dias; as outras
+    // estão no sitemap principal.
+    sitemap: [`${BRAND.siteUrl}/sitemap.xml`, `${BRAND.siteUrl}/news-sitemap.xml`],
   }
 }

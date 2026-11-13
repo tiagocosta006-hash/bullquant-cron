@@ -1,17 +1,18 @@
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArrowLeft, TrendingUp } from "lucide-react";
 import { NewsStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { serializeArticle } from "@/lib/news/serialize";
+import { parseSources, serializeArticle } from "@/lib/news/serialize";
+import { CATEGORY_LABELS } from "@/lib/news/labels";
+import { dataNoticia, imagemNoticia, jsonLdNoticia, jsonParaScript, urlNoticia } from "@/lib/news/seo";
 import {
   ArticleFooter,
   CategoryBadge,
   InlineMarkdown,
   SentimentBadge,
   TickerBadges,
-  timeAgoPt,
 } from "@/components/news/shared";
 import { ImageWithFallback } from "@/components/news/ImageWithFallback";
 
@@ -29,6 +30,7 @@ const ARTICLE_SELECT = {
   sentimento: true,
   imageUrl: true,
   publishedAt: true,
+  updatedAt: true,
   sources: true,
   status: true,
 } as const;
@@ -51,15 +53,35 @@ export async function generateMetadata({
   const article = await getArticle(slug);
   if (!article) return { title: "Notícia não encontrada | Bull Value" };
 
+  const url = urlNoticia(article.slug);
+  // Sempre o cartão da BullValue, não a foto da fonte: é nosso (sem direitos
+  // de terceiros) e tem o título. Sem twitter:* próprio, o X mostrava o
+  // título e a imagem da página inicial (herdados do layout).
+  const imagem = { url: imagemNoticia(article.slug), width: 1200, height: 630, alt: article.titulo };
+
   return {
-    title: `${article.titulo} | Bull Value`,
+    // O layout já junta " · The BullValue"; o "| Bull Value" repetia a marca.
+    title: article.titulo,
     description: article.resumoCurto,
+    // Só existe em português: o /en/news/... aponta para aqui (ver lib/news/seo.ts).
+    alternates: { canonical: url },
     openGraph: {
       title: article.titulo,
       description: article.resumoCurto,
       type: "article",
+      url,
+      locale: "pt_PT",
       publishedTime: article.publishedAt.toISOString(),
-      images: article.imageUrl ? [article.imageUrl] : undefined,
+      modifiedTime: article.updatedAt.toISOString(),
+      section: CATEGORY_LABELS[article.categoria] ?? article.categoria,
+      tags: article.tickers,
+      images: [imagem],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.titulo,
+      description: article.resumoCurto,
+      images: [imagem.url],
     },
   };
 }
@@ -74,11 +96,14 @@ export default async function NewsArticlePage({
   if (!row) notFound();
 
   const article = serializeArticle(row, locale);
+  const jsonLd = jsonLdNoticia({ ...row, sources: parseSources(row.sources) });
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonParaScript(jsonLd) }} />
+      {/* Link do next-intl: sem o /pt/ à frente, que respondia 307 a cada clique e a cada visita do Google. */}
       <Link
-        href={`/${locale}/news`}
+        href="/news"
         className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
@@ -89,9 +114,10 @@ export default async function NewsArticlePage({
         <div className="flex flex-wrap items-center gap-2">
           <CategoryBadge category={article.categoria} />
           <SentimentBadge sentimento={article.sentimento} />
-          <span className="text-xs text-muted-foreground">
-            {timeAgoPt(article.publishedAt)}
-          </span>
+          {/* Data absoluta e legível por máquina: "há 2 dias" não dizia ao Google quando foi. */}
+          <time dateTime={article.publishedAt} className="text-xs text-muted-foreground">
+            {dataNoticia(article.publishedAt)}
+          </time>
         </div>
 
         <h1 className="mt-3 text-3xl font-bold leading-tight tracking-tight">
@@ -104,7 +130,7 @@ export default async function NewsArticlePage({
 
         {article.tickers.length > 0 && (
           <div className="mt-4">
-            <TickerBadges tickers={article.tickers} locale={locale} />
+            <TickerBadges tickers={article.tickers} />
           </div>
         )}
 

@@ -5,6 +5,7 @@ import { Link } from '@/i18n/routing';
 
 import {
   Activity,
+  Briefcase,
   LayoutDashboard,
   SearchCode,
   Star,
@@ -62,6 +63,7 @@ export function TopNav({
   const primary = [
     { href: "/dashboard", icon: LayoutDashboard, label: t("dashboard") },
     { href: "/explore", icon: SearchCode, label: t("explore") },
+    { href: "/mic", icon: Briefcase, label: t("mic") },
     // /portfolio e /macro fora do menu para já (pedido do Costa). As páginas
     // continuam a responder por URL — é só o menu que não as anuncia.
     { href: "/watchlist", icon: Star, label: t("watchlist") },
@@ -106,7 +108,12 @@ export function TopNav({
                 )}
               >
                 <Icon className="h-4 w-4 shrink-0" strokeWidth={2} />
-                <span className="hidden whitespace-nowrap xl:inline">{label}</span>
+                {href === "/mic" ? (
+                  <>
+                    <span className="hidden whitespace-nowrap xl:inline min-[1500px]:hidden">{t("micShort")}</span>
+                    <span className="hidden whitespace-nowrap min-[1500px]:inline">{label}</span>
+                  </>
+                ) : <span className="hidden whitespace-nowrap xl:inline">{label}</span>}
               </Link>
             ))}
           </nav>

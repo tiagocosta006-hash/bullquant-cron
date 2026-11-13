@@ -72,6 +72,7 @@ export async function updateSession(request: NextRequest) {
   // dados (posições, watchlist, cenários DCF) protege-se sempre na própria API
   // com 401 — isto é só o gate das PÁGINAS.
   const isPrivateRoute =
+    path === '/mic' ||
     path.startsWith('/portfolio') ||
     path.startsWith('/watchlist') ||
     path.startsWith('/settings')
@@ -92,8 +93,8 @@ export async function updateSession(request: NextRequest) {
   // falso e a regra fica exatamente como estava.
   if (!user && isPrivateRoute && !isDevUnlocked()) {
     const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    url.searchParams.set('redirect', pathname)
+    url.pathname = path === '/mic' && pathname === '/en/mic' ? '/en/login' : '/login'
+    url.searchParams.set('redirect', path === '/mic' && pathname === '/pt/mic' ? '/mic' : pathname)
     return NextResponse.redirect(url)
   }
 

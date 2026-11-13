@@ -153,6 +153,7 @@ export type Cotacao = {
   open: number | null;
   dayHigh: number | null;
   dayLow: number | null;
+  timestamp?: number;
 };
 
 type LinhaQuote = {
@@ -165,6 +166,7 @@ type LinhaQuote = {
   open?: number;
   dayHigh?: number;
   dayLow?: number;
+  timestamp?: number;
 };
 
 /**
@@ -174,7 +176,7 @@ type LinhaQuote = {
  * mapa pelo ticker tal como a base o escreve (com ponto), para quem chama não
  * ter de saber da conversão.
  */
-export async function cotacoes(tickers: string[]): Promise<Map<string, Cotacao>> {
+export async function cotacoes(tickers: string[], revalidate = REVALIDATE_COTACAO): Promise<Map<string, Cotacao>> {
   const out = new Map<string, Cotacao>();
   if (tickers.length === 0) return out;
 
@@ -185,7 +187,7 @@ export async function cotacoes(tickers: string[]): Promise<Map<string, Cotacao>>
   for (let i = 0; i < todos.length; i += 200) blocos.push(todos.slice(i, i + 200));
 
   const respostas = await Promise.all(
-    blocos.map((b) => get<LinhaQuote[]>("batch-quote", { symbols: b.join(",") }, REVALIDATE_COTACAO)),
+    blocos.map((b) => get<LinhaQuote[]>("batch-quote", { symbols: b.join(",") }, revalidate)),
   );
   for (const linhas of respostas) {
     if (!Array.isArray(linhas)) continue;
@@ -201,6 +203,7 @@ export async function cotacoes(tickers: string[]): Promise<Map<string, Cotacao>>
         open: q.open ?? null,
         dayHigh: q.dayHigh ?? null,
         dayLow: q.dayLow ?? null,
+        timestamp: q.timestamp,
       });
     }
   }

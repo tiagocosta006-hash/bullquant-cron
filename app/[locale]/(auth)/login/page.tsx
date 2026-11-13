@@ -14,24 +14,27 @@ const showDevLogin =
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ message?: string; error?: string; email?: string }>
+  searchParams: Promise<{ message?: string; error?: string; email?: string; redirect?: string }>
 }) {
   const resolvedParams = await searchParams
+  const mic = resolvedParams.redirect === "/mic" || resolvedParams.redirect === "/en/mic"
+  const micText = await getTranslations("mic")
   const t = await getTranslations('login')
 
   return (
     <div className="flex flex-col">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <h2 className="text-center text-3xl font-extrabold tracking-tight text-foreground">
-          {t('title')}
+          {mic ? micText('loginTitle') : t('title')}
         </h2>
         <p className="mt-2 text-center text-sm text-muted-foreground">
-          {t('subtitle')}
+          {mic ? micText('loginDescription') : t('subtitle')}
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
         <form className="space-y-6" action={login}>
+          {mic && <input type="hidden" name="redirect" value={resolvedParams.redirect} />}
           <div>
             <label htmlFor="email" className="block text-sm font-medium leading-6 text-foreground mb-2">
               {t('emailLabel')}

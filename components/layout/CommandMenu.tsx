@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useTranslations } from "next-intl";
 import {
+  Briefcase,
   LayoutDashboard,
   SearchCode,
   Star,
@@ -105,6 +106,7 @@ export function CommandMenu({
     { href: "/explore", icon: SearchCode, label: t("explore") },
     { href: "/compare", icon: GitCompareArrows, label: t("compare") },
     // /portfolio fora da navegação para já — ver TopNav.
+    { href: "/mic", icon: Briefcase, label: t("mic") },
     { href: "/watchlist", icon: Star, label: t("watchlist") },
     { href: "/calendar", icon: CalendarDays, label: t("calendar") },
     { href: "/news", icon: Newspaper, label: "Notícias" },

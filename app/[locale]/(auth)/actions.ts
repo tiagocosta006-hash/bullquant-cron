@@ -38,6 +38,8 @@ function normalizeEmail(raw: unknown) {
 export async function login(formData: FormData) {
   const supabase = await createClient()
   const email = normalizeEmail(formData.get('email'))
+  const requested = formData.get('redirect')
+  const mic = requested === '/mic' || requested === '/en/mic' ? requested : null
   const data = {
     email,
     password: formData.get('password') as string,
@@ -50,7 +52,10 @@ export async function login(formData: FormData) {
     if ((error.message || '').toLowerCase().includes('email not confirmed')) {
       redirect(`/verify-email?email=${encodeURIComponent(email)}&unconfirmed=1`)
     }
-    redirect(`/login?error=${encodeURIComponent(translateError(error))}&email=${encodeURIComponent(email)}`)
+    const loginPath = mic === '/en/mic' ? '/en/login' : '/login'
+    const query = new URLSearchParams({ error: translateError(error), email })
+    if (mic) query.set('redirect', mic)
+    redirect(`${loginPath}?${query}`)
   }
 
   // Resgatar um pagamento do Whop também NO LOGIN, e não só no registo.
@@ -77,7 +82,7 @@ export async function login(formData: FormData) {
   const conta = sessao?.user ? await prisma.user.findUnique({ where: { id: sessao.user.id }, select: { plan: true } }).catch(() => null) : null
 
   revalidatePath('/', 'layout')
-  redirect(conta && conta.plan !== 'PRO' ? '/pricing' : '/dashboard')
+  redirect(mic ?? (conta && conta.plan !== 'PRO' ? '/pricing' : '/dashboard'))
 }
 
 // URL base da app (sem barra final): preferimos o host real do pedido

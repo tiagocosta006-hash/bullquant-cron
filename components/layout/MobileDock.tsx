@@ -3,6 +3,7 @@
 import { Link } from '@/i18n/routing';
 
 import {
+  Briefcase,
   LayoutDashboard,
   SearchCode,
   Star,
@@ -26,6 +27,7 @@ export function MobileDock() {
     { href: "/dashboard", icon: LayoutDashboard, label: t("dashboard") },
     { href: "/explore", icon: SearchCode, label: t("explore") },
     // /portfolio fora da navegação para já — ver TopNav.
+    { href: "/mic", icon: Briefcase, label: t("micShort") },
     { href: "/watchlist", icon: Star, label: t("watchlist") },
     { href: "/calendar", icon: CalendarDays, label: t("calendar") },
     { href: "/dcf", icon: Calculator, label: t("dcfShort") },
@@ -41,12 +43,12 @@ export function MobileDock() {
               key={href}
               href={href}
               className={cn(
-                "flex flex-col items-center gap-0.5 rounded-2xl px-3 py-1.5 transition-colors",
+                "flex flex-col items-center gap-0.5 rounded-2xl px-1.5 py-1.5 min-[380px]:px-2 transition-colors",
                 active ? "text-primary" : "text-muted-foreground",
               )}
             >
               <Icon className="h-5 w-5" strokeWidth={2} />
-              <span className="text-[10px] font-medium leading-none">{label}</span>
+              <span className="whitespace-nowrap text-[10px] font-medium leading-none">{label}</span>
             </Link>
           );
         })}

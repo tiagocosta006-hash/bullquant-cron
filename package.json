@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npx prisma db push && next build",
+    "build": "prisma db execute --schema prisma/schema.prisma --file prisma/migrations/20261113140000_add_mic_portfolio/migration.sql && prisma db push && next build",
     "start": "next start",
     "lint": "eslint",
     "type-check": "tsc --noEmit",

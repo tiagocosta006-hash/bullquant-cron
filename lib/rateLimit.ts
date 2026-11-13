@@ -42,6 +42,9 @@ const BUCKETS = {
   // a /api/news/image/*, por isso um limite apertado travaria a navegação
   // normal de um leitor ao fim de duas ou três páginas.
   news: { tokens: 200, windowMs: 60_000 },
+  // /api/newsletter é público e envia um e-mail por pedido: apertado para
+  // não servir para bombardear caixas de correio alheias.
+  newsletter: { tokens: 5, windowMs: 60_000 },
 } satisfies Record<string, WindowConfig>
 
 export type BucketName = keyof typeof BUCKETS
@@ -62,6 +65,12 @@ if (hasUpstash) {
       redis,
       limiter: Ratelimit.slidingWindow(BUCKETS.api.tokens, "60 s"),
       prefix: "rl:api",
+      analytics: false,
+    }),
+    newsletter: new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(BUCKETS.newsletter.tokens, "60 s"),
+      prefix: "rl:newsletter",
       analytics: false,
     }),
     search: new Ratelimit({

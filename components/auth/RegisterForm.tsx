@@ -145,6 +145,12 @@ export function RegisterForm({
         )}
       </div>
 
+      {/* Marketing é à parte da conta (RGPD): caixa opcional, desmarcada. */}
+      <label className="flex items-start gap-3 text-sm leading-snug text-muted-foreground cursor-pointer">
+        <input type="checkbox" name="marketing" className="mt-0.5 h-4 w-4 shrink-0 accent-primary" />
+        <span>{t("marketingOptIn")}</span>
+      </label>
+
       {errorText && (
         <div className="text-sm text-center text-destructive p-3 bg-destructive/10 rounded-md font-medium">
           {errorText}

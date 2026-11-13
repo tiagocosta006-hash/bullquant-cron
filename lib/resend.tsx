@@ -341,3 +341,40 @@ export const sendWithdrawalEmails = async (
     return { ok: false as const, error: err?.message || 'Falha de rede ao contactar Resend' };
   }
 };
+
+/**
+ * Dupla confirmação de "A empresa da semana" (formulário público).
+ * Sem nome: o formulário só pede o e-mail.
+ */
+export const sendNewsletterConfirmEmail = async (email: string, confirmLink: string, locale: string) => {
+  if (!resend) return { data: null, error: { message: 'RESEND_API_KEY não configurada' } };
+  const en = locale === 'en';
+  const subject = en ? 'Confirm your subscription — BullValue' : 'Confirma a tua inscrição — BullValue';
+  const text = en
+    ? `Confirm that you want to receive "Company of the week" from BullValue:\n\n${confirmLink}\n\nIf it wasn't you, ignore this email and nothing will be sent.`
+    : `Confirma que queres receber "A empresa da semana" da BullValue:\n\n${confirmLink}\n\nSe não foste tu, ignora este e-mail e não te enviamos nada.`;
+  try {
+    const res = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [email],
+      subject,
+      text,
+      html: getEmailTemplate(en ? `
+        <h2>One click to confirm</h2>
+        <p>Every Monday, one company analysed on BullValue: the numbers that matter, the scenarios and what to watch. You can leave whenever you want.</p>
+        <div style="text-align: center;"><a href="${confirmLink}" class="btn">Confirm subscription</a></div>
+        <p style="margin-top: 24px; font-size: 14px;">If it wasn't you, ignore this email and nothing will be sent.</p>
+      ` : `
+        <h2>Falta um clique</h2>
+        <p>Todas as segundas, uma empresa analisada na BullValue: os números que importam, os cenários e o que vigiar. Sais quando quiseres.</p>
+        <div style="text-align: center;"><a href="${confirmLink}" class="btn">Confirmar inscrição</a></div>
+        <p style="margin-top: 24px; font-size: 14px;">Se não foste tu, ignora este e-mail e não te enviamos nada.</p>
+      `),
+    });
+    if (res.error) console.error('[Resend] Erro ao enviar confirmação da newsletter:', res.error);
+    return res;
+  } catch (err: any) {
+    console.error('[Resend] Exceção ao enviar confirmação da newsletter:', err);
+    return { data: null, error: { message: err?.message || 'Falha de rede ao contactar Resend' } };
+  }
+};

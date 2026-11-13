@@ -2,6 +2,7 @@ import { tipoFinanceira } from "@/lib/fmp/mapear";
 import { cache } from 'react'
 import dynamic from 'next/dynamic'
 import { eTickerDemo } from '@/lib/api/acessoPro'
+import { EmpresaDaSemanaForm } from '@/components/marketing/EmpresaDaSemanaForm'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
@@ -388,6 +389,8 @@ export default async function StockPage({
             )}
             <StockPriceChart ticker={company.ticker} currencySymbol={currencySymbol} />
             <CompanyProfile company={company} />
+            {/* Anónimo na demo da Apple: quem ainda não quer pagar deixa o e-mail. */}
+            {!isLoggedIn && eDemo && <EmpresaDaSemanaForm origem="stock-aapl" className="mt-6" />}
           </>
         }
         financials={

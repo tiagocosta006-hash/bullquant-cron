@@ -929,7 +929,8 @@
     "consentMissing": "We couldn't record your request. Please try again.",
     "planPrice": "€{preco} per month, taxes included",
     "choosePlan": "Choose your plan",
-    "planPriceTrial": "{dias} days free, then €{preco} per month, taxes included"
+    "planPriceTrial": "{dias} days free, then €{preco} per month, taxes included",
+    "marketingOptIn": "I want to receive «Company of the week» and BullValue news by email (optional; leave whenever you want)."
   },
   "forgotPassword": {
     "title": "Reset Password",
@@ -2721,5 +2722,26 @@
     "failedTitle": "The payment wasn't completed",
     "failed": "Nothing was charged. You can try again whenever you want.",
     "retry": "Try again"
+  },
+  "newsletter": {
+    "title": "Company of the week",
+    "subtitle": "Every Monday, one company analysed on BullValue: the numbers that matter, the scenarios and what to watch. No cost, leave whenever you want.",
+    "placeholder": "you@email.com",
+    "button": "Sign me up",
+    "sending": "Sending...",
+    "consent": "By clicking «Sign me up» you agree to receive the company of the week and BullValue news by email. Leave with one click in any email. <privacy>Privacy</privacy>.",
+    "success": "We sent you an email. Open it and confirm to start receiving it.",
+    "errorEmail": "That email doesn't look valid.",
+    "errorRate": "Too many requests. Try again in a minute.",
+    "errorGeneric": "We couldn't sign you up right now. Please try again.",
+    "page": {
+      "confirmadoTitle": "Subscription confirmed",
+      "confirmadoText": "Next Monday you'll get the first company of the week. Meanwhile, see the full Apple analysis, open without an account.",
+      "saiuTitle": "You've left the list",
+      "saiuText": "We won't send you marketing emails anymore. If you change your mind, sign up again below.",
+      "invalidoTitle": "Invalid or expired link",
+      "invalidoText": "This link no longer works. If you want the company of the week, sign up again.",
+      "ctaDemo": "See Apple without an account"
+    }
   }
 }

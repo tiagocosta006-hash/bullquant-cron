@@ -14,6 +14,7 @@ import { LiquidGlass } from "@/components/fx/LiquidGlass";
 import { Reveal } from "@/components/fx/Reveal";
 import { cn } from "@/lib/utils";
 import { PricingCards } from "./PricingCards";
+import { EmpresaDaSemanaForm } from "@/components/marketing/EmpresaDaSemanaForm";
 
 import { BRAND } from "@/lib/brand";
 import { LEGAL } from "@/lib/legal/config";
@@ -139,6 +140,13 @@ export default async function PricingPage({
               </LiquidGlass>
             ))}
           </div>
+        </Reveal>
+      </section>
+
+      {/* ── Ainda não? Deixa o e-mail ─────────────────────────── */}
+      <section className="mx-auto max-w-3xl px-6 pb-16 md:px-8">
+        <Reveal>
+          <EmpresaDaSemanaForm origem="pricing" />
         </Reveal>
       </section>
 

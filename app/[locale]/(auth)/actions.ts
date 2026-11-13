@@ -1,6 +1,7 @@
 "use server"
 
 import { redirect } from 'next/navigation';
+import { pedirConsentimento } from '@/lib/marketing'
 import { getLocale } from 'next-intl/server'
 import { revalidatePath } from 'next/cache'
 import { headers } from 'next/headers'
@@ -186,6 +187,15 @@ export async function signup(formData: FormData) {
       // primeiro, e esse é o caso normal. Lá dentro, quem pagou no Whop ficava
       // em FREE por causa de uma corrida que não é dele.
       resgatado = await resgatarPagamentoWhop(linkData.user.id, linkData.user.email!)
+      // Caixa opcional de marketing: fica por confirmar até a pessoa abrir o
+      // link de confirmação da conta (auth/callback → confirmarPorConta).
+      if (formData.get('marketing') === 'on') {
+        try {
+          await pedirConsentimento({ email, origem: 'registo', locale: await getLocale(), userId: linkData.user.id })
+        } catch (e) {
+          console.error('[Signup] Falha ao registar consentimento de marketing:', e)
+        }
+      }
     }
 
     // Construímos o link manualmente para forçar o envio do token por Query String (?token_hash=)

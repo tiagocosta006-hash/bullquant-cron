@@ -40,9 +40,11 @@ export async function middleware(request: NextRequest) {
         ? 'search'
         : pathname.startsWith('/api/track')
           ? 'track'
-          : pathname.startsWith('/api/news')
-            ? 'news'
-            : 'api'
+          : pathname.startsWith('/api/newsletter')
+            ? 'newsletter'
+            : pathname.startsWith('/api/news')
+              ? 'news'
+              : 'api'
     const result = await checkRateLimit(ip, bucket)
 
     if (!result.success) {

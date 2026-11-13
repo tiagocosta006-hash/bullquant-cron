@@ -48,7 +48,7 @@ export const LEGAL = {
 /** Datas FIXAS (não `new Date()`): a data de uma versão jurídica tem de ficar parada. */
 export const VERSOES = {
   termos: "2026-10-27",
-  privacidade: "2026-10-16",
+  privacidade: "2026-11-08",
   reembolso: "2026-10-16",
   cookies: "2026-10-16",
   avisoLegal: "2026-10-16",

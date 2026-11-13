@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { sendWelcomeEmail } from '@/lib/resend'
+import { confirmarPorConta } from '@/lib/marketing'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -44,6 +45,7 @@ export async function GET(request: Request) {
         const { data: { user } } = await supabase.auth.getUser()
         if (user?.email) {
           await sendWelcomeEmail(user.email, (user.user_metadata?.name as string) || 'Investidor')
+          await confirmarPorConta(user.email).catch((e) => console.error('Falha ao confirmar consentimento de marketing:', e))
         }
       } catch (e) {
         console.error('Falha ao enviar email de boas-vindas:', e)

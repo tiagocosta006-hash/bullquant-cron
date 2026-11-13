@@ -929,7 +929,8 @@
     "consentMissing": "Não conseguimos registar o pedido. Tenta de novo.",
     "planPrice": "{preco} € por mês, impostos incluídos",
     "choosePlan": "Escolhe o plano",
-    "planPriceTrial": "{dias} dias grátis, depois {preco} € por mês, impostos incluídos"
+    "planPriceTrial": "{dias} dias grátis, depois {preco} € por mês, impostos incluídos",
+    "marketingOptIn": "Quero receber «A empresa da semana» e novidades da BullValue por e-mail (opcional; sais quando quiseres)."
   },
   "forgotPassword": {
     "title": "Recuperar Password",
@@ -2721,5 +2722,26 @@
     "failedTitle": "O pagamento não foi concluído",
     "failed": "Não foi cobrado nada. Podes tentar outra vez quando quiseres.",
     "retry": "Tentar de novo"
+  },
+  "newsletter": {
+    "title": "A empresa da semana",
+    "subtitle": "Todas as segundas, uma empresa analisada na BullValue: os números que importam, os cenários e o que vigiar. Sem custo, sais quando quiseres.",
+    "placeholder": "o.teu@email.com",
+    "button": "Quero receber",
+    "sending": "A enviar...",
+    "consent": "Ao carregar em «Quero receber» aceitas receber da BullValue a empresa da semana e novidades por e-mail. Sais com um clique em qualquer e-mail. <privacy>Privacidade</privacy>.",
+    "success": "Enviámos-te um e-mail. Abre-o e confirma para começares a receber.",
+    "errorEmail": "Esse e-mail não parece válido.",
+    "errorRate": "Demasiados pedidos. Tenta daqui a um minuto.",
+    "errorGeneric": "Não conseguimos registar agora. Tenta outra vez.",
+    "page": {
+      "confirmadoTitle": "Inscrição confirmada",
+      "confirmadoText": "Na próxima segunda recebes a primeira empresa da semana. Enquanto esperas, vê a análise completa da Apple, aberta sem conta.",
+      "saiuTitle": "Saíste da lista",
+      "saiuText": "Não te enviamos mais e-mails de marketing. Se mudares de ideias, voltas a inscrever-te aqui em baixo.",
+      "invalidoTitle": "Link inválido ou expirado",
+      "invalidoText": "Este link já não funciona. Se queres receber a empresa da semana, inscreve-te outra vez.",
+      "ctaDemo": "Ver a Apple sem conta"
+    }
   }
 }

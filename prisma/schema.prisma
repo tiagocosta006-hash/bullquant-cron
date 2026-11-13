@@ -813,6 +813,34 @@ model NewsArticle {
   @@map("news_article")
 }
 
+/// Quem pediu e-mails de marketing ("A empresa da semana" e novidades).
+///
+/// Uma linha por e-mail, venha do registo (caixa opcional) ou do formulário
+/// público. O consentimento é separado da conta de propósito: criar conta não
+/// dá autorização para marketing (RGPD art. 7.º, Lei 41/2004 art. 13.º-A).
+/// Só se envia marketing a quem tem `confirmedAt` e não tem `unsubscribedAt`.
+model MarketingContact {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  /// Onde foi dado o consentimento: "registo", "stock-aapl", "pricing"…
+  source         String
+  /// Texto exato a que a pessoa disse que sim (prova do consentimento).
+  consentText    String
+  consentAt      DateTime  @default(now())
+  /// Dupla confirmação: preenchido ao abrir o link do e-mail (ou no registo,
+  /// quando a conta confirma o e-mail).
+  confirmedAt    DateTime?
+  unsubscribedAt DateTime?
+  /// Segredo dos links de confirmar e de sair (não é o id).
+  token          String    @unique
+  userId         String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([confirmedAt, unsubscribedAt])
+  @@map("marketing_contacts")
+}
+
 model MicPortfolio {
   id             String   @id
   initialCapital Decimal  @db.Decimal(20, 4)

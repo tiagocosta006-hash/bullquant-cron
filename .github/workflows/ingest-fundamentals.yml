@@ -32,6 +32,43 @@ jobs:
       - name: Install dependencies
         run: pip install -r scripts/requirements.txt
 
+      # As regras do motor (D&A, splits, dívida do balanço, validador) com os
+      # casos reais que as originaram. Se alguma partir, nada é gravado.
+      - name: Testes das regras do motor
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: python scripts/test_regras_motor.py
+
+      # Linhas impressas do balanço (Financial Statement Data Sets da SEC) para
+      # a dívida que o companyfacts não traz (tags próprias da empresa) — ver
+      # scripts/divida_balanco.py. Um ficheiro pequeno por trimestre, em cache
+      # entre corridas: só se descarregam os trimestres que ainda faltam (o
+      # mais recente só é publicado ~1 mês depois do fim do trimestre; até lá
+      # o download falha e o motor segue só com as tags). Nunca bloqueia o ingest.
+      - name: Restaurar cache DERA
+        uses: actions/cache/restore@v4
+        with:
+          path: scripts/.cache/dera
+          key: dera-${{ github.run_id }}
+          restore-keys: dera-
+
+      - name: Atualizar DERA (trimestres em falta)
+        continue-on-error: true
+        timeout-minutes: 60
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          SEC_USER_AGENT: ${{ secrets.SEC_IDENTITY }}
+        run: |
+          ATE=$(python -c "import datetime as d;t=d.date.today();q=(t.month-1)//3;print(f'{t.year}q{q}' if q else f'{t.year-1}q4')")
+          python scripts/dera_demonstracoes.py 2015q1 "$ATE"
+
+      - name: Guardar cache DERA
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: scripts/.cache/dera
+          key: dera-${{ github.run_id }}
+
       # A seleção normal é event-driven: só toca em quem reportou há pouco ou
       # não é atualizado há mais de 95 dias. Isso é o correto no dia a dia, mas
       # não repara histórico — uma linha de 2016 com um defeito de extração
@@ -68,11 +105,26 @@ jobs:
       #
       # Antes do passo do Finnhub, de propósito: esta fonte traz HISTÓRICO, a
       # outra só o número de hoje.
+      # Cache por filing do fill_missing_shares.py (cada XBRL só é lido uma vez).
+      - name: Restaurar cache das ações
+        uses: actions/cache/restore@v4
+        with:
+          path: scripts/.cache/acoes
+          key: acoes-${{ github.run_id }}
+          restore-keys: acoes-
+
       - name: Fill missing shares from XBRL
         env:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
           SEC_IDENTITY: ${{ secrets.SEC_IDENTITY }}
         run: python scripts/fill_missing_shares.py --apply
+
+      - name: Guardar cache das ações
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: scripts/.cache/acoes
+          key: acoes-${{ github.run_id }}
 
       # A API companyfacts da SEC descarta factos dimensionados, e empresas de
       # classes múltiplas (Visa A/B/C, Constellation A/B) taggam as ações por

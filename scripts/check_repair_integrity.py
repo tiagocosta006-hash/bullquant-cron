@@ -76,9 +76,9 @@ check("guard CVNA-class ativo (total direto < LTD é descartado)",
 # 18/11: o EBITDA passou a ter fórmula única (EBT + juros + D&A) e o ramo dos
 # Financials deixou de ser um `elif` a seguir ao valor reportado. O que importa
 # é o comportamento: logo a seguir à condição dos Financials, ebitda = None.
-check("EBITDA de Financials é NULL estrutural",
+check("EBITDA de bancos/seguradoras é NULL estrutural",
       any("ebitda = None" in bloco[:600]
-          for bloco in src_build.split('if sector == "Financials":')[1:]))
+          for bloco in src_build.split('if banco_ou_seguradora:')[1:]))
 check("fabricação grossProfit=revenue de bancos REMOVIDA",
       "gross_profit is None and revenue is not None" not in src_build.split('sector == "Financials"')[1][:600]
       if 'sector == "Financials"' in src_build else False)

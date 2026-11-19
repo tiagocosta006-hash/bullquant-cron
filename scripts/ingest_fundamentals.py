@@ -25,6 +25,8 @@ from urllib.parse import urlparse
 from psycopg2.extras import Json
 from dotenv import load_dotenv
 from notas_valores import aplicar_correcoes, notas_definicao, notas_reexpressao, gravar_notas
+from validar_fundamentais import validar, relatorio as relatorio_validacao
+import divida_balanco
 
 # Consolas Windows usam cp1252 — sem isto, prints com caracteres fora do cp1252
 # (ex.: "←" no sync de classes duplas) matam o script a meio da ingestão.
@@ -339,6 +341,25 @@ DURATION_TAGS = {
         "AdjustmentsForDepreciationAndAmortisationExpense",
         "DepreciationAmortizationAndAccretionNet",  # LEN
     ],
+    # Capex alargado (auditoria 19/11): software capitalizado e compras de
+    # intangíveis são investimento, e a FMP soma-os (377 dos 1 174 capex
+    # diferentes). Só se juntam quando o capex escolhido é a linha pura de
+    # imobilizado (capexPPE) — senão podia já os incluir (ProductiveAssets).
+    "capexPPE": ["PaymentsToAcquirePropertyPlantAndEquipment"],
+    "capexSoftware": ["PaymentsToDevelopSoftware", "PaymentsForSoftware", "PaymentsToAcquireSoftware"],
+    "capexIntangiveis": ["PaymentsToAcquireIntangibleAssets"],
+    # Componentes da D&A, lidos à parte para escolher o total certo em build_row
+    # (melhor_da): a lista acima pára na primeira tag que existe, e muitas
+    # empresas taggam como "DepreciationDepletionAndAmortization" SÓ a
+    # depreciação, com a amortização dos intangíveis noutra tag (MRSH 2024:
+    # 369 + 377 = 746). Diferenças na D&A explicavam 4/5 dos EBITDA diferentes.
+    "daDDA": ["DepreciationDepletionAndAmortization"],
+    "daDA": ["DepreciationAndAmortization"],
+    "daDep": ["Depreciation"],
+    "daAmortInt": ["AmortizationOfIntangibleAssets"],
+    # Juros líquidos fora da exploração: única tag de juros de algumas empresas
+    # (BLDR, KMI). Negativo = encargo líquido. Só alimenta o EBITDA.
+    "jurosLiquidosNaoOp": ["InterestIncomeExpenseNonoperatingNet"],
     "incomeBeforeTax": [
         "IncomeLossFromContinuingOperationsBeforeIncomeTaxesMinorityInterestAndIncomeLossFromEquityMethodInvestments",
         "IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest",
@@ -1113,7 +1134,9 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
     # como no OCF/capex. O Q4 continua a vir da síntese FY − 9M.
     _anterior = {"Q2": "Q1", "Q3": "Q2"}
     for field in ("depreciationAndAmortization", "stockBasedCompensation", "shareRepurchases",
-                  "dividendsPaid", "investingCashFlow", "financingCashFlow"):
+                  "dividendsPaid", "investingCashFlow", "financingCashFlow",
+                  "daDDA", "daDA", "daDep", "daAmortInt",
+                  "capexPPE", "capexSoftware", "capexIntangiveis"):
         tags_f = DURATION_TAGS.get(field) or []
         trimestral = {p: dur_map[p].get(field) for p in periods}  # valores de 3 meses originais
         ytd: dict = {}
@@ -1496,6 +1519,22 @@ def compute_company_evidence(facts_json: dict) -> dict:
 
 
 
+def melhor_da(dur: dict) -> float | None:
+    """D&A total: o maior entre o total reportado e depreciação + amortização de intangíveis.
+
+    Nunca soma duas tags que possam conter a mesma coisa: a soma só se faz com a
+    tag "Depreciation" (só depreciação) e a dos intangíveis. O máximo protege dos
+    totais parciais (MRSH, NTAP) sem inventar: cada candidato é um valor
+    reportado pela empresa ou a soma de duas linhas disjuntas.
+    """
+    cands = [dur.get("depreciationAndAmortization"), dur.get("daDDA"), dur.get("daDA")]
+    dep, amort = dur.get("daDep"), dur.get("daAmortInt")
+    if dep is not None and amort is not None and dep > 0 and amort > 0:
+        cands.append(dep + amort)
+    cands = [c for c in cands if c is not None and c >= 0]
+    return max(cands) if cands else None
+
+
 def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str | None,
               dur: dict, inst: dict, sector: str | None = None,
               evidence: dict | None = None) -> dict:
@@ -1580,6 +1619,18 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
             # sem tags de desenvolvimento/melhorias (vêm em tags próprias da
             # empresa): fica o valor das aquisições, com aviso no site
             nota_capex = "inclui_aquisicoes"
+    ppe = dur.get("capexPPE")
+    if (capex is not None and sector != "Real Estate" and ppe is not None
+            and abs(abs(ppe) - capex) < 1):
+        sw = dur.get("capexSoftware")
+        if sw and sw > 0:
+            capex += abs(sw)
+        # Intangíveis só quando são rotina: uma compra de espectro ou de uma
+        # licença grande (dezenas de vezes o capex normal) é uma aquisição,
+        # como as de empresas, e não entra no FCF recorrente.
+        it = dur.get("capexIntangiveis")
+        if it and 0 < abs(it) <= 0.5 * capex:
+            capex += abs(it)
     op_cf = dur.get("operatingCashFlow")
     fcf = (op_cf - capex) if (op_cf is not None and capex is not None) else None
 
@@ -1989,7 +2040,12 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
 
     roe = plausivel(safe_div(net_income, total_equity) if total_equity and total_equity > 0 else None, -5.0, 5.0)
 
-    if sector == "Financials":
+    # Só bancos e seguradoras: corretoras de seguros (MRSH), bolsas (CME),
+    # gestoras (BX) e redes de pagamento (V, MA) também são "Financials", mas
+    # têm EBITDA com o significado de sempre (auditoria 19/11).
+    banco_ou_seguradora = sector == "Financials" and (
+        dur.get("bancoJurosLiquidos") is not None or dur.get("policyholderClaims") is not None)
+    if banco_ou_seguradora:
         # EBITDA não tem significado económico para bancos/seguradoras (juros
         # SÃO o negócio, não um custo de financiamento a excluir). Sintetizá-lo
         # produzia um número que nenhum analista usaria → NULL estrutural,
@@ -1999,8 +2055,10 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         # Fórmula única alinhada com a FMP (EBT + juros + D&A); a tag ebitda
         # reportada pela empresa é non-GAAP e não comparável. Sem D&A explícito
         # fica None (não somar zero às escondidas).
-        da = dur.get("depreciationAndAmortization")
+        da = melhor_da(dur)
         interest_exp = dur.get("interestExpense")
+        if interest_exp is None and (dur.get("jurosLiquidosNaoOp") or 0) < 0:
+            interest_exp = -dur["jurosLiquidosNaoOp"]
         ibt = dur.get("incomeBeforeTax")
         if da is None:
             ebitda = None
@@ -2100,7 +2158,7 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
 
     net_interest_income = dur.get("netInterestIncome")
     other_non_operating = dur.get("otherNonOperatingIncome")
-    da_val = dur.get("depreciationAndAmortization")
+    da_val = melhor_da(dur)
 
     # Balance Sheet details
     total_curr_assets = inst.get("totalCurrentAssets")
@@ -2173,6 +2231,10 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         "operatingCashFlow": op_cf,
         "capex": capex,
         "_notaCapex": nota_capex,
+        # Só para o validador (não vão para a BD): o balanço fecha com eles.
+        "_minoritarios": inst.get("minorityInterestInst"),
+        "_capitalTotal": inst.get("equityInclNci"),
+        "_capitalTemporario": inst.get("temporaryEquity"),
         "freeCashFlow": fcf,
         "totalAssets": total_assets,
         "totalCurrentLiab": curr_liab,
@@ -2758,6 +2820,8 @@ def synthesize_q4(periods: set, period_ends: dict, period_filed: dict,
         "incomeBeforeTax", "netInterestIncome", "otherNonOperatingIncome",
         "investingCashFlow", "financingCashFlow", "stockBasedCompensation",
         "shareRepurchases", "dividendsPaid", "netChangeInCash",
+        "daDDA", "daDA", "daDep", "daAmortInt", "jurosLiquidosNaoOp",
+        "capexPPE", "capexSoftware", "capexIntangiveis",
         # ⚠️ NÃO REMOVER: sem isto o Q4 de DPS nunca é derivado e os payers
         # ficam com buraco no Q4 (paradoxo da Apple). O ramo per-share abaixo
         # depende desta entrada.
@@ -3191,6 +3255,30 @@ def process_company(conn, company: dict, dry_run: bool = False,
 
     # Notas por valor (mini aviso no site): correções revistas aplicam-se às
     # linhas ANTES de gravar; reexpressões detetam-se no XBRL. Ver notas_valores.py.
+    # Dívida lida das LINHAS IMPRESSAS do balanço (DERA, ver divida_balanco.py):
+    # apanha as linhas com tags próprias da empresa, que o companyfacts não traz
+    # (EXR, WRB, CAT…). Só sobe o valor — quando o balanço mostra mais dívida do
+    # que as tags encontraram, faltava uma linha; o contrário é quase sempre o
+    # balanço a esconder parte da dívida noutra linha. Medido contra a FMP em
+    # 20 mil períodos: +1 004 iguais, −724 diferentes. Bancos ficam de fora.
+    if company.get("sector") != "Financials":
+        dividas = divida_balanco.para_cik(cik)
+        if dividas:
+            for row in rows:
+                fim = str(row.get("periodEnd"))[:10]
+                try:
+                    f0 = datetime.date.fromisoformat(fim)
+                except ValueError:
+                    continue
+                hit = next((v for d, v in dividas
+                            if abs((datetime.date.fromisoformat(d) - f0).days) <= 5), None)
+                td = row.get("totalDebt")
+                if hit and hit > 0 and (td is None or hit > td * 1.001):
+                    row["totalDebt"] = hit
+
+    # Rede de segurança: anula o impossível e sinaliza incoerências ANTES das
+    # correções revistas (essas têm prova e passam por cima). Ver validar_fundamentais.py.
+    validar(ticker, rows, company.get("sector"))
     notas = notas_definicao(rows) + aplicar_correcoes(ticker, rows)
     try:
         notas += notas_reexpressao(facts_json, cik, rows, {**DURATION_TAGS, **INSTANT_TAGS},
@@ -3415,6 +3503,11 @@ def main():
 
     conn.close()
     print(f"\nConcluído. {total_periods} períodos inseridos. {errors} erros.")
+    val = relatorio_validacao(gravar=not dry_run_path)
+    print(f"Validação: {val['por_nivel'].get('anular', 0)} valores anulados, "
+          f"{val['por_nivel'].get('sinalizar', 0)} sinalizados para revisão")
+    for m in val["por_motivo"][:8]:
+        print(f"   {m['nivel']:9} {m['casos']:6}  {m['motivo']}")
 
     # Terminar com 0 mesmo havendo erros é o que deixou a BRK.B e a BF.B falharem
     # todos os dias durante semanas com o workflow verde: a contagem de erros ia

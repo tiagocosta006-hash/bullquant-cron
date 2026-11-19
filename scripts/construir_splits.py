@@ -34,6 +34,25 @@ DEFAULT_FMP_DIR = os.path.expanduser("~/Documents/BullValue/Exportacao-FMP-2026-
 DEFAULT_OUT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "splits_eventos.json")
 
 
+def fator_limpo(fator: float) -> float | None:
+    """Um split verdadeiro é uma razão simples (2:1, 3:2, 1:8, 1:200). A FMP marca
+    como "stock-split" ajustes de preço de spin-offs (FTV 1,195 com a Vontier,
+    DHR 1,319 com a Fortive e 1,128 com a Veralto): aplicados aos fundamentais,
+    inflacionavam as ações e encolhiam o EPS (FTV 2018: 423 M ações em vez de
+    ~350 M). Aceita só fatores a ≤0,2% de p/q com q ∈ {1,2,3,4,5,8,10} — e devolve
+    a razão exata (GOOGL 1,998 → 2). Os mistos split+spin-off (HLT, DD) caem e
+    ficam para o adjust_splits.py, que confirma contra o rácio taggado no EDGAR."""
+    for f, inv in ((fator, False), (1 / fator, True)):
+        for q in (1, 2, 3, 4, 5, 8, 10):
+            p = round(f * q)
+            if 1 <= p <= 400 and abs(f - p / q) <= 0.002 * f:
+                r = p / q
+                if r == 1:
+                    return None
+                return 1 / r if inv else r
+    return None
+
+
 def ler_splits_fmp(pasta_empresas: str = DEFAULT_FMP_DIR) -> tuple[dict[str, list[dict]], dict[str, int]]:
     """Lê `splits.json.gz` de cada subpasta `<TICKER>` na exportação FMP.
 
@@ -94,8 +113,9 @@ def ler_splits_fmp(pasta_empresas: str = DEFAULT_FMP_DIR) -> tuple[dict[str, lis
             ):
                 stats["ignorados_invalidos"] += 1
                 continue
-            fator = float(num) / float(den)
-            if fator == 1.0:
+            fator = fator_limpo(float(num) / float(den))
+            if fator is None:
+                stats["ignorados_tipo"] += 1
                 continue
             eventos.append({"data": data[:10], "fator": fator})
 

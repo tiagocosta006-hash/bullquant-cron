@@ -47,7 +47,7 @@ DIRECT_URL = os.getenv("DIRECT_URL")
 if not DIRECT_URL:
     sys.exit("DIRECT_URL não definida")
 
-UA = os.getenv("SEC_IDENTITY", "Tiago Costa costa@engimov.pt")
+UA = os.getenv("SEC_IDENTITY") or "BullValue admin@bullocracy.com"  # contacto da SEC vem do ambiente
 BASE = "https://www.sec.gov/files/dera/data/financial-statement-data-sets"
 
 # Métrica -> tags us-gaap aceites, por ordem de preferência. Deliberadamente

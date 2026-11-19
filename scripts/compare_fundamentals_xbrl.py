@@ -49,7 +49,7 @@ if not DIRECT_URL:
     sys.exit("DIRECT_URL não definida")
 
 import edgar  # noqa: E402
-edgar.set_identity(os.getenv("SEC_IDENTITY", "Tiago Costa costa@engimov.pt"))
+edgar.set_identity(os.getenv("SEC_IDENTITY") or "BullValue admin@bullocracy.com")  # contacto da SEC vem do ambiente
 
 TOL = 0.02  # divergência relativa a partir da qual se reporta
 

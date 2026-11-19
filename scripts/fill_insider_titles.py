@@ -38,7 +38,7 @@ if not DIRECT_URL:
     sys.exit("DIRECT_URL não definida")
 
 import edgar  # noqa: E402
-edgar.set_identity(os.getenv("SEC_IDENTITY", "Tiago Costa costa@engimov.pt"))
+edgar.set_identity(os.getenv("SEC_IDENTITY") or "BullValue admin@bullocracy.com")  # contacto da SEC vem do ambiente
 
 # Sufixos e partículas que não identificam a pessoa e atrapalham o casamento.
 _NOISE = {"jr", "sr", "ii", "iii", "iv", "md", "phd", "mr", "mrs", "ms", "dr"}

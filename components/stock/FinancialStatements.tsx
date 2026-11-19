@@ -15,6 +15,8 @@ import {
 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { GlossaryTooltip } from "@/components/ui/glossary-tooltip"
+import { NotaValorIcone } from "@/components/stock/NotaValorIcone"
+import type { NotasPeriodo } from "@/lib/notasValores"
 
 export type StatementType = "INCOME_STATEMENT" | "BALANCE_SHEET" | "CASH_FLOW"
 export type PeriodType = "ANNUAL" | "QUARTERLY" | "TTM"
@@ -22,6 +24,8 @@ export type DisplayMode = "ABSOLUTE" | "PERCENT_REVENUE" | "YOY_GROWTH"
 
 export type FundamentalDataRow = {
   id?: string
+  /** Notas por valor (corrigido/reexpresso), por coluna — vêm de /api/fundamentals. */
+  notas?: NotasPeriodo
   periodType?: string
   fiscalYear?: number
   fiscalQuarter?: number | null
@@ -937,6 +941,10 @@ export function FinancialStatements({
                                   title={formatted.rawText}
                                 >
                                   {formatted.text}
+                                  {/* Mini aviso: só em valores absolutos (o % e o crescimento são derivados). */}
+                                  {displayMode === "ABSOLUTE" && (
+                                    <NotaValorIcone nota={periodRow.notas?.[line.key as string]} />
+                                  )}
                                 </td>
                               )
                             })}

@@ -2752,5 +2752,12 @@
       "invalidoText": "This link no longer works. If you want the company of the week, sign up again.",
       "ctaDemo": "See Apple without an account"
     }
+  },
+  "notasValor": {
+    "correcao": "Corrected value",
+    "definicao": "Definition note",
+    "reexpressao": "Restated value",
+    "ia": "Correction identified with AI and verified against the company's official filing.",
+    "verRelatorio": "View the filing on the SEC"
   }
 }

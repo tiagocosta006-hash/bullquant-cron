@@ -2752,5 +2752,12 @@
       "invalidoText": "Este link já não funciona. Se queres receber a empresa da semana, inscreve-te outra vez.",
       "ctaDemo": "Ver a Apple sem conta"
     }
+  },
+  "notasValor": {
+    "correcao": "Valor corrigido",
+    "definicao": "Nota de definição",
+    "reexpressao": "Valor reexpresso",
+    "ia": "Correção identificada com IA e verificada no relatório oficial da empresa.",
+    "verRelatorio": "Ver o relatório na SEC"
   }
 }

@@ -1,0 +1,4048 @@
+[
+  {
+    "ticker": "CTAS",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2017,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 3133524000,
+    "motivoPt": "O balanço do 10-K de 2017 mostra dívida a menos de um ano de 362,9 M (que já inclui 50,5 M de papel comercial) e a mais de um ano de 2 770,6 M; a extração contava o papel comercial duas vezes.",
+    "motivoEn": "The 2017 10-K balance sheet shows debt due within one year of 362.9M (already including 50.5M of commercial paper) and after one year of 2,770.6M; the extraction counted the commercial paper twice.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/723254/000072325417000020/",
+    "accession": "0000723254-17-000020",
+    "revisto": true,
+    "revistoPor": "Claude, 18/11: tags LongTermDebtCurrent + LongTermDebt do mesmo filing conferidas no XBRL"
+  },
+  {
+    "ticker": "ARES",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2025,
+    "fiscalQuarter": null,
+    "field": "capex",
+    "valor": 72178000,
+    "motivoPt": "Capex (compra de mobiliário, equipamento e benfeitorias) na demonstração de fluxos de caixa do 10-K 2025 (R8.htm): $72,178 mil.",
+    "motivoEn": "Capex (Purchase of furniture, equipment and leasehold improvements, net of disposals) on the 2025 10-K Cash Flows (R8.htm): $72,178 thousand.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1176948/000162828026011413/",
+    "accession": "0001628280-26-011413",
+    "revisto": true,
+    "revistoPor": "Claude, 19/11: linhas e números conferidos na página do relatório na SEC (soma das parcelas 72,178,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1176948/000162828026011413/R8.htm",
+        "linha": "Purchase of furniture, equipment and leasehold improvements, net of disposals",
+        "impresso": "(72,178)",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "ARES",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "capex",
+    "valor": 91509000,
+    "motivoPt": "Capex (compra de mobiliário, equipamento e benfeitorias) na demonstração de fluxos de caixa do 10-K 2025 (R8.htm): $91,509 mil.",
+    "motivoEn": "Capex (Purchase of furniture, equipment and leasehold improvements, net of disposals) on the 2025 10-K Cash Flows (R8.htm): $91,509 thousand.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1176948/000162828026011413/",
+    "accession": "0001628280-26-011413",
+    "revisto": true,
+    "revistoPor": "Claude, 19/11: linhas e números conferidos na página do relatório na SEC (soma das parcelas 91,509,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1176948/000162828026011413/R8.htm",
+        "linha": "Purchase of furniture, equipment and leasehold improvements, net of disposals",
+        "impresso": "(91,509)",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "ARES",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "capex",
+    "valor": 67183000,
+    "motivoPt": "Capex (compra de mobiliário, equipamento e benfeitorias) na demonstração de fluxos de caixa do 10-K 2025 (R8.htm): $67,183 mil.",
+    "motivoEn": "Capex (Purchase of furniture, equipment and leasehold improvements, net of disposals) on the 2025 10-K Cash Flows (R8.htm): $67,183 thousand.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1176948/000162828026011413/",
+    "accession": "0001628280-26-011413",
+    "revisto": true,
+    "revistoPor": "Claude, 19/11: linhas e números conferidos na página do relatório na SEC (soma das parcelas 67,183,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1176948/000162828026011413/R8.htm",
+        "linha": "Purchase of furniture, equipment and leasehold improvements, net of disposals",
+        "impresso": "(67,183)",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "ARES",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "capex",
+    "valor": 35796000,
+    "motivoPt": "Capex (compra de mobiliário, equipamento e benfeitorias) na demonstração de fluxos de caixa do 10-K 2023 (R8.htm): $35,796 mil.",
+    "motivoEn": "Capex (Purchase of furniture, equipment and leasehold improvements, net of disposals) on the 2023 10-K Cash Flows (R8.htm): $35,796 thousand.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1176948/000162828024007014/",
+    "accession": "0001628280-24-007014",
+    "revisto": true,
+    "revistoPor": "Claude, 19/11: linhas e números conferidos na página do relatório na SEC (soma das parcelas 35,796,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1176948/000162828024007014/R8.htm",
+        "linha": "Purchase of furniture, equipment and leasehold improvements, net of disposals",
+        "impresso": "(35,796)",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "FRT",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2025,
+    "fiscalQuarter": null,
+    "field": "capex",
+    "valor": 291338000,
+    "motivoPt": "CapEx real na demonstração de fluxos de caixa (R8.htm): soma de Capital expenditures - development and redevelopment ($179.086 mil) e Capital expenditures - other ($112.252 mil), e não aquisições de imóveis.",
+    "motivoEn": "Actual CapEx on Consolidated Statements of Cash Flows (R8.htm): sum of Capital expenditures - development and redevelopment ($179,086k) and Capital expenditures - other ($112,252k), excluding real estate acquisitions.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/34903/000003490326000017/",
+    "accession": "0000034903-26-000017",
+    "revisto": true,
+    "revistoPor": "Claude, 19/11: linhas e números conferidos na página do relatório na SEC (soma das parcelas 291,338,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/34903/000003490326000017/R8.htm",
+        "linha": "Capital expenditures - development and redevelopment",
+        "impresso": "(179,086)",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/34903/000003490326000017/R8.htm",
+        "linha": "Capital expenditures - other",
+        "impresso": "(112,252)",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "FRT",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "capex",
+    "valor": 246760000,
+    "motivoPt": "CapEx real na demonstração de fluxos de caixa (R8.htm): soma de Capital expenditures - development and redevelopment ($139.534 mil) e Capital expenditures - other ($107.226 mil), e não aquisições de imóveis.",
+    "motivoEn": "Actual CapEx on Consolidated Statements of Cash Flows (R8.htm): sum of Capital expenditures - development and redevelopment ($139,534k) and Capital expenditures - other ($107,226k), excluding real estate acquisitions.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/34903/000003490326000017/",
+    "accession": "0000034903-26-000017",
+    "revisto": true,
+    "revistoPor": "Claude, 19/11: linhas e números conferidos na página do relatório na SEC (soma das parcelas 246,760,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/34903/000003490326000017/R8.htm",
+        "linha": "Capital expenditures - development and redevelopment",
+        "impresso": "(139,534)",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/34903/000003490326000017/R8.htm",
+        "linha": "Capital expenditures - other",
+        "impresso": "(107,226)",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "FRT",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "capex",
+    "valor": 311120000,
+    "motivoPt": "CapEx real na demonstração de fluxos de caixa (R8.htm): soma de Capital expenditures - development and redevelopment ($214.062 mil) e Capital expenditures - other ($97.058 mil), e não aquisições de imóveis.",
+    "motivoEn": "Actual CapEx on Consolidated Statements of Cash Flows (R8.htm): sum of Capital expenditures - development and redevelopment ($214,062k) and Capital expenditures - other ($97,058k), excluding real estate acquisitions.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/34903/000003490326000017/",
+    "accession": "0000034903-26-000017",
+    "revisto": true,
+    "revistoPor": "Claude, 19/11: linhas e números conferidos na página do relatório na SEC (soma das parcelas 311,120,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/34903/000003490326000017/R8.htm",
+        "linha": "Capital expenditures - development and redevelopment",
+        "impresso": "(214,062)",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/34903/000003490326000017/R8.htm",
+        "linha": "Capital expenditures - other",
+        "impresso": "(97,058)",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "FRT",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "capex",
+    "valor": 416701000,
+    "motivoPt": "CapEx real na demonstração de fluxos de caixa (R8.htm): soma de Capital expenditures - development and redevelopment ($309.046 mil) e Capital expenditures - other ($107.655 mil), e não aquisições de imóveis.",
+    "motivoEn": "Actual CapEx on Consolidated Statements of Cash Flows (R8.htm): sum of Capital expenditures - development and redevelopment ($309,046k) and Capital expenditures - other ($107,655k), excluding real estate acquisitions.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/34903/000003490324000032/",
+    "accession": "0000034903-24-000032",
+    "revisto": true,
+    "revistoPor": "Claude, 19/11: linhas e números conferidos na página do relatório na SEC (soma das parcelas 416,701,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/34903/000003490324000032/R8.htm",
+        "linha": "Capital expenditures - development and redevelopment",
+        "impresso": "(309,046)",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/34903/000003490324000032/R8.htm",
+        "linha": "Capital expenditures - other",
+        "impresso": "(107,655)",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "IEX",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2021,
+    "fiscalQuarter": null,
+    "field": "cash",
+    "valor": 900700000,
+    "motivoPt": "Caixa e equivalentes (855,4 M) mais títulos negociáveis de curto prazo disponíveis para liquidação overnight incluídos em Other current assets (45,3 M, Nota Fair Value Measurements)",
+    "motivoEn": "Cash and cash equivalents ($855.4M) plus short-term available-for-sale marketable securities available for overnight settlement included in Other current assets ($45.3M, Fair Value Measurements Note)",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/832101/000083210122000008/",
+    "accession": "0000832101-22-000008",
+    "revisto": true,
+    "revistoPor": "Claude, 19/11: linhas e números conferidos na página do relatório na SEC (soma das parcelas 900,700,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/832101/000083210122000008/R3.htm",
+        "linha": "Cash and cash equivalents",
+        "impresso": "855.4",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/832101/000083210122000008/R75.htm",
+        "linha": "Available-for-sale securities - equities",
+        "impresso": "45.3",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "TRGP",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2021,
+    "fiscalQuarter": null,
+    "field": "totalLiabilities",
+    "valor": 9279800000,
+    "motivoPt": "Soma das 5 linhas de passivo no Balanço Consolidado do 10-K de 2022 (R2.htm): exclui Noncontrolling interests ($3,166.9M) e Series A Preferred Stock ($749.7M, capital temporário/mezzanine).",
+    "motivoEn": "Sum of the 5 liability lines on the Consolidated Balance Sheet in the 2022 10-K (R2.htm): excludes Noncontrolling interests ($3,166.9M) and Series A Preferred Stock ($749.7M, mezzanine equity).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1389170/000095017023003797/",
+    "accession": "0000950170-23-003797",
+    "revisto": true,
+    "revistoPor": "Claude, 19/11: linhas e números conferidos na página do relatório na SEC (soma das parcelas 9,279,800,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1389170/000095017023003797/R2.htm",
+        "linha": "Total current liabilities",
+        "impresso": "2,298.5",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1389170/000095017023003797/R2.htm",
+        "linha": "Long-term debt",
+        "impresso": "6,434.4",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1389170/000095017023003797/R2.htm",
+        "linha": "Long-term liabilities from risk management activities",
+        "impresso": "109.3",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1389170/000095017023003797/R2.htm",
+        "linha": "Deferred income taxes, net",
+        "impresso": "136.0",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1389170/000095017023003797/R2.htm",
+        "linha": "Other long-term liabilities",
+        "impresso": "301.6",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "BXP",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2025,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 16609483000,
+    "motivoPt": "Soma das linhas de dívida financeira (excluindo leasings) no Balanço Consolidado do 10-K de 2025 (R3.htm): Mortgage notes payable, Unsecured senior notes, Unsecured exchangeable senior notes, Unsecured term loans e Unsecured commercial paper.",
+    "motivoEn": "Sum of financial debt lines (excluding leases) on the 2025 10-K Consolidated Balance Sheet (R3.htm): Mortgage notes payable, Unsecured senior notes, Unsecured exchangeable senior notes, Unsecured term loans, and Unsecured commercial paper.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1037540/000103754026000006/",
+    "accession": "0001037540-26-000006",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 16,609,483,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000103754026000006/R3.htm",
+        "linha": "Mortgage notes payable, net (amounts related to VIEs of $3,286,870 and $3,282,027 at December 31, 2025 and December 31, 2024, respectively)",
+        "impresso": "4,280,067",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000103754026000006/R3.htm",
+        "linha": "Unsecured senior notes, net",
+        "impresso": "9,806,100",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000103754026000006/R3.htm",
+        "linha": "Unsecured exchangeable senior notes, net",
+        "impresso": "976,263",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000103754026000006/R3.htm",
+        "linha": "Unsecured line of credit",
+        "impresso": "0",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000103754026000006/R3.htm",
+        "linha": "Unsecured term loans, net",
+        "impresso": "797,053",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000103754026000006/R3.htm",
+        "linha": "Unsecured commercial paper",
+        "impresso": "750,000",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "BXP",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 16220499000,
+    "motivoPt": "Soma das linhas de dívida financeira (excluindo leasings) no Balanço Consolidado do 10-K de 2025 (R3.htm): Mortgage notes payable, Unsecured senior notes, Unsecured term loans e Unsecured commercial paper.",
+    "motivoEn": "Sum of financial debt lines (excluding leases) on the 2025 10-K Consolidated Balance Sheet (R3.htm): Mortgage notes payable, Unsecured senior notes, Unsecured term loans, and Unsecured commercial paper.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1037540/000103754026000006/",
+    "accession": "0001037540-26-000006",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 16,220,499,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000103754026000006/R3.htm",
+        "linha": "Mortgage notes payable, net (amounts related to VIEs of $3,286,870 and $3,282,027 at December 31, 2025 and December 31, 2024, respectively)",
+        "impresso": "4,276,609",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000103754026000006/R3.htm",
+        "linha": "Unsecured senior notes, net",
+        "impresso": "10,645,077",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000103754026000006/R3.htm",
+        "linha": "Unsecured exchangeable senior notes, net",
+        "impresso": "0",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000103754026000006/R3.htm",
+        "linha": "Unsecured line of credit",
+        "impresso": "0",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000103754026000006/R3.htm",
+        "linha": "Unsecured term loans, net",
+        "impresso": "798,813",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000103754026000006/R3.htm",
+        "linha": "Unsecured commercial paper",
+        "impresso": "500,000",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "BXP",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 15856297000,
+    "motivoPt": "Soma das linhas de dívida financeira (excluindo leasings) no Balanço Consolidado do 10-K de 2023 (R3.htm): Mortgage notes payable, Unsecured senior notes e Unsecured term loan.",
+    "motivoEn": "Sum of financial debt lines (excluding leases) on the 2023 10-K Consolidated Balance Sheet (R3.htm): Mortgage notes payable, Unsecured senior notes, and Unsecured term loan.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1037540/000165642324000007/",
+    "accession": "0001656423-24-000007",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 15,856,297,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000165642324000007/R3.htm",
+        "linha": "Mortgage notes payable, net (amounts related to VIEs of $3,277,185 and $3,272,368 at December 31, 2023 and December 31, 2022, respectively)",
+        "impresso": "4,166,379",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000165642324000007/R3.htm",
+        "linha": "Unsecured senior notes, net",
+        "impresso": "10,491,617",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000165642324000007/R3.htm",
+        "linha": "Unsecured line of credit",
+        "impresso": "0",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000165642324000007/R3.htm",
+        "linha": "Unsecured term loan, net",
+        "impresso": "1,198,301",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "BXP",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 14240336000,
+    "motivoPt": "Soma das linhas de dívida financeira (excluindo leasings) no Balanço Consolidado do 10-K de 2023 (R3.htm): Mortgage notes payable, Unsecured senior notes e Unsecured term loan.",
+    "motivoEn": "Sum of financial debt lines (excluding leases) on the 2023 10-K Consolidated Balance Sheet (R3.htm): Mortgage notes payable, Unsecured senior notes, and Unsecured term loan.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1037540/000165642324000007/",
+    "accession": "0001656423-24-000007",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 14,240,336,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000165642324000007/R3.htm",
+        "linha": "Mortgage notes payable, net (amounts related to VIEs of $3,277,185 and $3,272,368 at December 31, 2023 and December 31, 2022, respectively)",
+        "impresso": "3,272,368",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000165642324000007/R3.htm",
+        "linha": "Unsecured senior notes, net",
+        "impresso": "10,237,968",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000165642324000007/R3.htm",
+        "linha": "Unsecured line of credit",
+        "impresso": "0",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1037540/000165642324000007/R3.htm",
+        "linha": "Unsecured term loan, net",
+        "impresso": "730,000",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "EVRG",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2025,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 15202200000,
+    "motivoPt": "Balanço Consolidado (10-K 2025): soma de dívida de curto prazo (367,0 M), papel comercial (1.394,0 M), nota colateralizada a pagar (402,0 M) e dívida de longo prazo (13.039,2 M).",
+    "motivoEn": "Consolidated Balance Sheet (2025 10-K): sum of current maturities of long-term debt ($367.0M), commercial paper ($1,394.0M), collateralized note payable ($402.0M), and long-term debt, net ($13,039.2M).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1711269/000171126926000017/",
+    "accession": "0001711269-26-000017",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 15,202,200,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1711269/000171126926000017/R4.htm",
+        "linha": "Current maturities of long-term debt, includes $17.0 and $16.2 related to variable interest entity, respectively",
+        "impresso": "367.0",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1711269/000171126926000017/R4.htm",
+        "linha": "Commercial paper",
+        "impresso": "1,394.0",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1711269/000171126926000017/R4.htm",
+        "linha": "Collateralized note payable",
+        "impresso": "402.0",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1711269/000171126926000017/R4.htm",
+        "linha": "Long-term debt, net, includes $279.2 and $295.7 related to variable interest entity, respectively",
+        "impresso": "13,039.2",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "EVRG",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 14069500000,
+    "motivoPt": "Balanço Consolidado (10-K 2025): soma de dívida de curto prazo (651,7 M), papel comercial (1.207,6 M), nota colateralizada a pagar (401,0 M) e dívida de longo prazo (11.809,2 M).",
+    "motivoEn": "Consolidated Balance Sheet (2025 10-K): sum of current maturities of long-term debt ($651.7M), commercial paper ($1,207.6M), collateralized note payable ($401.0M), and long-term debt, net ($11,809.2M).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1711269/000171126926000017/",
+    "accession": "0001711269-26-000017",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 14,069,500,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1711269/000171126926000017/R4.htm",
+        "linha": "Current maturities of long-term debt, includes $17.0 and $16.2 related to variable interest entity, respectively",
+        "impresso": "651.7",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1711269/000171126926000017/R4.htm",
+        "linha": "Commercial paper",
+        "impresso": "1,207.6",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1711269/000171126926000017/R4.htm",
+        "linha": "Collateralized note payable",
+        "impresso": "401.0",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1711269/000171126926000017/R4.htm",
+        "linha": "Long-term debt, net, includes $279.2 and $295.7 related to variable interest entity, respectively",
+        "impresso": "11,809.2",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "EVRG",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 13147100000,
+    "motivoPt": "Balanço Consolidado (10-K 2023): soma de dívida de curto prazo (800,0 M), papel comercial (951,8 M), nota colateralizada a pagar (342,0 M) e dívida de longo prazo (11.053,3 M).",
+    "motivoEn": "Consolidated Balance Sheet (2023 10-K): sum of current maturities of long-term debt ($800.0M), commercial paper ($951.8M), collateralized note payable ($342.0M), and long-term debt, net ($11,053.3M).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1711269/000171126924000007/",
+    "accession": "0001711269-24-000007",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 13,147,100,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1711269/000171126924000007/R4.htm",
+        "linha": "Current maturities of long-term debt",
+        "impresso": "800.0",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1711269/000171126924000007/R4.htm",
+        "linha": "Commercial paper",
+        "impresso": "951.8",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1711269/000171126924000007/R4.htm",
+        "linha": "Collateralized note payable",
+        "impresso": "342.0",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1711269/000171126924000007/R4.htm",
+        "linha": "Long-term debt, net",
+        "impresso": "11,053.3",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "EVRG",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 12036100000,
+    "motivoPt": "Balanço Consolidado (10-K 2023): soma de dívida de curto prazo (439,1 M), papel comercial (1.332,3 M), nota colateralizada a pagar (359,0 M) e dívida de longo prazo (9.905,7 M).",
+    "motivoEn": "Consolidated Balance Sheet (2023 10-K): sum of current maturities of long-term debt ($439.1M), commercial paper ($1,332.3M), collateralized note payable ($359.0M), and long-term debt, net ($9,905.7M).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1711269/000171126924000007/",
+    "accession": "0001711269-24-000007",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 12,036,100,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1711269/000171126924000007/R4.htm",
+        "linha": "Current maturities of long-term debt",
+        "impresso": "439.1",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1711269/000171126924000007/R4.htm",
+        "linha": "Commercial paper",
+        "impresso": "1,332.3",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1711269/000171126924000007/R4.htm",
+        "linha": "Collateralized note payable",
+        "impresso": "359.0",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1711269/000171126924000007/R4.htm",
+        "linha": "Long-term debt, net",
+        "impresso": "9,905.7",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "HAS",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2025,
+    "fiscalQuarter": null,
+    "field": "cash",
+    "valor": 881600000,
+    "motivoPt": "Caixa e equivalentes excluindo caixa restrito ($776.6M - $0.4M = $776.2M) mais Short-term investments ($105.4M) no Balanço Consolidado de 2025 = $881.6M.",
+    "motivoEn": "Cash and cash equivalents excluding restricted cash ($776.6M - $0.4M = $776.2M) plus Short-term investments ($105.4M) on the 2025 Consolidated Balance Sheet = $881.6M.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/46080/000004608026000011/",
+    "accession": "0000046080-26-000011",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 882,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/46080/000004608026000011/R3.htm",
+        "linha": "Cash and cash equivalents, including restricted cash of $0.4 and $0.3",
+        "impresso": "776.6",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/46080/000004608026000011/R3.htm",
+        "linha": "Short-term investments",
+        "impresso": "105.4",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "TDG",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2025,
+    "fiscalQuarter": null,
+    "field": "netIncome",
+    "valor": 1866000000,
+    "motivoPt": "Demonstração de Resultados Consolidada (R5.htm): linha 'NET INCOME APPLICABLE TO TD GROUP COMMON STOCKHOLDERS' = $1,866 milhões.",
+    "motivoEn": "Consolidated Statements of Income (R5.htm): line 'NET INCOME APPLICABLE TO TD GROUP COMMON STOCKHOLDERS' = $1,866 million.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1260221/000126022125000081/",
+    "accession": "0001260221-25-000081",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 1,866,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1260221/000126022125000081/R5.htm",
+        "linha": "NET INCOME APPLICABLE TO TD GROUP COMMON STOCKHOLDERS",
+        "impresso": "$ 1,866",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "TDG",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "netIncome",
+    "valor": 1481000000,
+    "motivoPt": "Demonstração de Resultados Consolidada (R5.htm): linha 'NET INCOME APPLICABLE TO TD GROUP COMMON STOCKHOLDERS' = $1,481 milhões.",
+    "motivoEn": "Consolidated Statements of Income (R5.htm): line 'NET INCOME APPLICABLE TO TD GROUP COMMON STOCKHOLDERS' = $1,481 million.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1260221/000126022125000081/",
+    "accession": "0001260221-25-000081",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 1,481,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1260221/000126022125000081/R5.htm",
+        "linha": "NET INCOME APPLICABLE TO TD GROUP COMMON STOCKHOLDERS",
+        "impresso": "1,481",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "TDG",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "netIncome",
+    "valor": 1260000000,
+    "motivoPt": "Demonstração de Resultados Consolidada (R5.htm): linha 'NET INCOME APPLICABLE TO TD GROUP COMMON STOCKHOLDERS' = $1,260 milhões.",
+    "motivoEn": "Consolidated Statements of Income (R5.htm): line 'NET INCOME APPLICABLE TO TD GROUP COMMON STOCKHOLDERS' = $1,260 million.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1260221/000126022125000081/",
+    "accession": "0001260221-25-000081",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 1,260,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1260221/000126022125000081/R5.htm",
+        "linha": "NET INCOME APPLICABLE TO TD GROUP COMMON STOCKHOLDERS",
+        "impresso": "1,260",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "TDG",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "netIncome",
+    "valor": 780000000,
+    "motivoPt": "Demonstração de Resultados Consolidada (R5.htm): linha 'NET INCOME APPLICABLE TO TD GROUP COMMON STOCKHOLDERS' = $780 milhões.",
+    "motivoEn": "Consolidated Statements of Income (R5.htm): line 'NET INCOME APPLICABLE TO TD GROUP COMMON STOCKHOLDERS' = $780 million.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1260221/000126022122000065/",
+    "accession": "0001260221-22-000065",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 780,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1260221/000126022122000065/R5.htm",
+        "linha": "NET INCOME APPLICABLE TO TD GROUP COMMON STOCKHOLDERS",
+        "impresso": "$ 780",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "TDG",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2021,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 19998000000,
+    "motivoPt": "Balanço Consolidado (R2.htm): soma de Current portion of long-term debt ($277M), Short-term borrowings ($349M) e LONG-TERM DEBT ($19,372M) = $19,998 milhões.",
+    "motivoEn": "Consolidated Balance Sheets (R2.htm): sum of Current portion of long-term debt ($277M), Short-term borrowings ($349M), and LONG-TERM DEBT ($19,372M) = $19,998 million.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1260221/000126022121000134/",
+    "accession": "0001260221-21-000134",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria soma (us-gaap:LongTermDebt=19,649,000,000, us-gaap:LongTermDebtCurrent=277,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1260221/000126022121000134/R2.htm",
+        "linha": "Current portion of long-term debt",
+        "impresso": "277",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1260221/000126022121000134/R2.htm",
+        "linha": "Short-term borrowings—trade receivable securitization facility",
+        "impresso": "349",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1260221/000126022121000134/R2.htm",
+        "linha": "LONG-TERM DEBT",
+        "impresso": "19,372",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "ADP",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2025,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 8782600000,
+    "motivoPt": "Soma das linhas de dívida no Balanço Consolidado (R6.htm): papel comercial (4.769,5M) + acordos de recompra inversa (38,4M) + dívida de longo prazo (3.974,7M) = 8.782,6M USD.",
+    "motivoEn": "Sum of debt lines on the Consolidated Balance Sheet (R6.htm): commercial paper borrowings ($4,769.5M) + reverse repurchase agreements ($38.4M) + long-term debt ($3,974.7M) = $8,782.6M.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/8670/000000867026000030/",
+    "accession": "0000008670-26-000030",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (us-gaap:CommercialPaper=4,769,500,000, us-gaap:LongTermDebtNoncurrent=3,974,700,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/8670/000000867026000030/R6.htm",
+        "linha": "Obligations under commercial paper borrowings",
+        "impresso": "4,769.5",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/8670/000000867026000030/R6.htm",
+        "linha": "Obligations under reverse repurchase agreements",
+        "impresso": "38.4",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/8670/000000867026000030/R6.htm",
+        "linha": "Long-term debt",
+        "impresso": "3,974.7",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "ADP",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 3376700000,
+    "motivoPt": "Soma das linhas de dívida no Balanço Consolidado (R6.htm): acordos de recompra inversa (385,4M) + dívida de longo prazo (2.991,3M) = 3.376,7M USD.",
+    "motivoEn": "Sum of debt lines on the Consolidated Balance Sheet (R6.htm): reverse repurchase agreements ($385.4M) + long-term debt ($2,991.3M) = $3,376.7M.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/8670/000000867024000024/",
+    "accession": "0000008670-24-000024",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (soma das parcelas 3,376,700,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/8670/000000867024000024/R6.htm",
+        "linha": "Obligations under reverse repurchase agreements",
+        "impresso": "385.4",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/8670/000000867024000024/R6.htm",
+        "linha": "Long-term debt",
+        "impresso": "2,991.3",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "ADP",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 3094400000,
+    "motivoPt": "Soma das linhas de dívida no Balanço Consolidado (R6.htm): acordos de recompra inversa (105,4M) + dívida de longo prazo (2.989,0M) = 3.094,4M USD.",
+    "motivoEn": "Sum of debt lines on the Consolidated Balance Sheet (R6.htm): reverse repurchase agreements ($105.4M) + long-term debt ($2,989.0M) = $3,094.4M.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/8670/000000867024000024/",
+    "accession": "0000008670-24-000024",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (soma das parcelas 3,094,400,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/8670/000000867024000024/R6.htm",
+        "linha": "Obligations under reverse repurchase agreements",
+        "impresso": "105.4",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/8670/000000867024000024/R6.htm",
+        "linha": "Long-term debt",
+        "impresso": "2,989.0",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "ADP",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 3123500000,
+    "motivoPt": "Soma das linhas de dívida no Balanço Consolidado (R6.htm): acordos de recompra inversa (136,4M) + dívida de longo prazo (2.987,1M) = 3.123,5M USD.",
+    "motivoEn": "Sum of debt lines on the Consolidated Balance Sheet (R6.htm): reverse repurchase agreements ($136.4M) + long-term debt ($2,987.1M) = $3,123.5M.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/8670/000000867023000030/",
+    "accession": "0000008670-23-000030",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (soma das parcelas 3,123,500,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/8670/000000867023000030/R6.htm",
+        "linha": "Obligations under reverse repurchase agreements",
+        "impresso": "136.4",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/8670/000000867023000030/R6.htm",
+        "linha": "Long-term debt",
+        "impresso": "2,987.1",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "GM",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 129732000000,
+    "motivoPt": "Soma da dívida de curto e longo prazo (Automotive + GM Financial) no Balanço Consolidado do 10-K de 2024 (2.141 + 13.327 + 37.291 + 76.973 = 129.732 milhões USD), em vez das maturidades contratuais da Nota 13.",
+    "motivoEn": "Sum of short-term and long-term debt (Automotive + GM Financial) on the Consolidated Balance Sheet in the 2024 10-K (2,141 + 13,327 + 37,291 + 76,973 = $129,732 million), instead of contractual maturities from Note 13.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1467858/000146785825000032/",
+    "accession": "0001467858-25-000032",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (linha não encontrada: 'Automotive — Short-term debt and current portion of long-term debt (Note 13)')",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1467858/000146785825000032/R5.htm",
+        "linha": "Automotive — Short-term debt and current portion of long-term debt (Note 13)",
+        "impresso": "2,141",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1467858/000146785825000032/R5.htm",
+        "linha": "Automotive — Long-term debt (Note 13)",
+        "impresso": "13,327",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1467858/000146785825000032/R5.htm",
+        "linha": "GM Financial — Short-term debt and current portion of long-term debt (Note 13)",
+        "impresso": "37,291",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1467858/000146785825000032/R5.htm",
+        "linha": "GM Financial — Long-term debt (Note 13)",
+        "impresso": "$ 76,973",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "GM",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 121741000000,
+    "motivoPt": "Soma da dívida de curto e longo prazo (Automotive + GM Financial) no Balanço Consolidado do 10-K de 2024 (428 + 15.985 + 38.540 + 66.788 = 121.741 milhões USD), em vez das maturidades contratuais da Nota 13.",
+    "motivoEn": "Sum of short-term and long-term debt (Automotive + GM Financial) on the Consolidated Balance Sheet in the 2024 10-K (428 + 15,985 + 38,540 + 66,788 = $121,741 million), instead of contractual maturities from Note 13.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1467858/000146785825000032/",
+    "accession": "0001467858-25-000032",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (linha não encontrada: 'Automotive — Short-term debt and current portion of long-term debt (Note 13)')",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1467858/000146785825000032/R5.htm",
+        "linha": "Automotive — Short-term debt and current portion of long-term debt (Note 13)",
+        "impresso": "428",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1467858/000146785825000032/R5.htm",
+        "linha": "Automotive — Long-term debt (Note 13)",
+        "impresso": "15,985",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1467858/000146785825000032/R5.htm",
+        "linha": "GM Financial — Short-term debt and current portion of long-term debt (Note 13)",
+        "impresso": "38,540",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1467858/000146785825000032/R5.htm",
+        "linha": "GM Financial — Long-term debt (Note 13)",
+        "impresso": "$ 66,788",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "GM",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 114699000000,
+    "motivoPt": "Soma da dívida de curto e longo prazo (Automotive + GM Financial) no Balanço Consolidado do 10-K de 2023 (1.959 + 15.885 + 36.819 + 60.036 = 114.699 milhões USD), em vez das maturidades contratuais da Nota 13.",
+    "motivoEn": "Sum of short-term and long-term debt (Automotive + GM Financial) on the Consolidated Balance Sheet in the 2023 10-K (1,959 + 15,885 + 36,819 + 60,036 = $114,699 million), instead of contractual maturities from Note 13.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1467858/000146785824000031/",
+    "accession": "0001467858-24-000031",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (linha não encontrada: 'Automotive — Short-term debt and current portion of long-term debt (Note 13)')",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1467858/000146785824000031/R5.htm",
+        "linha": "Automotive — Short-term debt and current portion of long-term debt (Note 13)",
+        "impresso": "1,959",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1467858/000146785824000031/R5.htm",
+        "linha": "Automotive — Long-term debt (Note 13)",
+        "impresso": "15,885",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1467858/000146785824000031/R5.htm",
+        "linha": "GM Financial — Short-term debt and current portion of long-term debt (Note 13)",
+        "impresso": "36,819",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1467858/000146785824000031/R5.htm",
+        "linha": "GM Financial — Long-term debt (Note 13)",
+        "impresso": "$ 60,036",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "GM",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2018,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 104951000000,
+    "motivoPt": "Soma da dívida de curto e longo prazo (Automotive + GM Financial) no Balanço Consolidado do 10-K de 2019 (935 + 13.028 + 30.956 + 60.032 = 104.951 milhões USD), em vez das maturidades contratuais da Nota 13.",
+    "motivoEn": "Sum of short-term and long-term debt (Automotive + GM Financial) on the Consolidated Balance Sheet in the 2019 10-K (935 + 13,028 + 30,956 + 60,032 = $104,951 million), instead of contractual maturities from Note 13.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1467858/000146785820000028/",
+    "accession": "0001467858-20-000028",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (linha não encontrada: 'Automotive — Short-term debt and current portion of long-term debt (Note 13)')",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1467858/000146785820000028/R4.htm",
+        "linha": "Automotive — Short-term debt and current portion of long-term debt (Note 13)",
+        "impresso": "935",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1467858/000146785820000028/R4.htm",
+        "linha": "Automotive — Long-term debt (Note 13)",
+        "impresso": "$ 13,028",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1467858/000146785820000028/R4.htm",
+        "linha": "GM Financial — Short-term debt and current portion of long-term debt (Note 13)",
+        "impresso": "30,956",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1467858/000146785820000028/R4.htm",
+        "linha": "GM Financial — Long-term debt (Note 13)",
+        "impresso": "60,032",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "HON",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2016,
+    "fiscalQuarter": null,
+    "field": "totalLiabilities",
+    "valor": 34596000000,
+    "motivoPt": "Passivo total obtido pela soma das linhas de passivo do balanço consolidado do 10-K de 2016 (34,596M).",
+    "motivoEn": "Total liabilities equal to the sum of liability line items on the 2016 10-K consolidated balance sheet (34,596M).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/773840/000093041317000391/",
+    "accession": "0000930413-17-000391",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 34,596,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/773840/000093041317000391/R4.htm",
+        "linha": "Total current liabilities",
+        "impresso": "16,331",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/773840/000093041317000391/R4.htm",
+        "linha": "Long-term debt",
+        "impresso": "12,182",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/773840/000093041317000391/R4.htm",
+        "linha": "Deferred income taxes",
+        "impresso": "486",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/773840/000093041317000391/R4.htm",
+        "linha": "Postretirement benefit obligations other than pensions",
+        "impresso": "473",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/773840/000093041317000391/R4.htm",
+        "linha": "Asbestos related liabilities",
+        "impresso": "1,014",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/773840/000093041317000391/R4.htm",
+        "linha": "Other liabilities",
+        "impresso": "4,110",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "DOC",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "stockBasedCompensation",
+    "valor": 31766000,
+    "motivoPt": "Soma das duas linhas de remuneração em ações na Demonstração de Fluxos de Caixa do 10-K de 2025: amortização regular ($15,543 mil) + pós-fusão ($16,223 mil) = $31,766 mil.",
+    "motivoEn": "Sum of the two stock-based compensation lines on the Consolidated Statements of Cash Flows in the FY2025 10-K: regular SBC ($15,543k) + merger-related post-combination SBC ($16,223k) = $31,766k.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/765880/000162828026005044/",
+    "accession": "0001628280-26-005044",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 31,766,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/765880/000162828026005044/R9.htm",
+        "linha": "Stock-based compensation amortization expense",
+        "impresso": "15,543",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/765880/000162828026005044/R9.htm",
+        "linha": "Merger-related post-combination stock compensation expense",
+        "impresso": "16,223",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "EXR",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2025,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 13230651000,
+    "motivoPt": "Soma das 4 linhas de dívida financeira no Balanço Consolidado do 10-K de 2025 (sem passivos de leasing).",
+    "motivoEn": "Sum of the 4 financial debt lines on the 2025 10-K Consolidated Balance Sheet (excluding lease liabilities).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1289490/000128949026000011/",
+    "accession": "0001289490-26-000011",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 13,230,651,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1289490/000128949026000011/R3.htm",
+        "linha": "Secured notes payable, net",
+        "impresso": "1,079,565",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1289490/000128949026000011/R3.htm",
+        "linha": "Unsecured term loans, net",
+        "impresso": "1,494,659",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1289490/000128949026000011/R3.htm",
+        "linha": "Unsecured senior notes, net",
+        "impresso": "9,432,427",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1289490/000128949026000011/R3.htm",
+        "linha": "Revolving lines of credit and commercial paper",
+        "impresso": "1,224,000",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "EXR",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 12322016000,
+    "motivoPt": "Soma das 4 linhas de dívida financeira no Balanço Consolidado do 10-K de 2025 (comparativo de 2024).",
+    "motivoEn": "Sum of the 4 financial debt lines on the 2025 10-K Consolidated Balance Sheet (2024 comparative).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1289490/000128949026000011/",
+    "accession": "0001289490-26-000011",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 12,322,016,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1289490/000128949026000011/R3.htm",
+        "linha": "Secured notes payable, net",
+        "impresso": "1,010,541",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1289490/000128949026000011/R3.htm",
+        "linha": "Unsecured term loans, net",
+        "impresso": "2,192,507",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1289490/000128949026000011/R3.htm",
+        "linha": "Unsecured senior notes, net",
+        "impresso": "7,756,968",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1289490/000128949026000011/R3.htm",
+        "linha": "Revolving lines of credit and commercial paper",
+        "impresso": "1,362,000",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "EXR",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 11016748000,
+    "motivoPt": "Soma das 4 linhas de dívida financeira no Balanço Consolidado do 10-K de 2023.",
+    "motivoEn": "Sum of the 4 financial debt lines on the 2023 10-K Consolidated Balance Sheet.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1289490/000162828024008044/",
+    "accession": "0001628280-24-008044",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 11,016,748,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1289490/000162828024008044/R3.htm",
+        "linha": "Notes payable, net",
+        "impresso": "1,273,549",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1289490/000162828024008044/R3.htm",
+        "linha": "Unsecured term loans, net",
+        "impresso": "2,650,581",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1289490/000162828024008044/R3.htm",
+        "linha": "Unsecured senior notes, net",
+        "impresso": "6,410,618",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1289490/000162828024008044/R3.htm",
+        "linha": "Revolving lines of credit",
+        "impresso": "682,000",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "EXR",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 7331462000,
+    "motivoPt": "Soma das 4 linhas de dívida financeira no Balanço Consolidado do 10-K de 2023 (comparativo de 2022).",
+    "motivoEn": "Sum of the 4 financial debt lines on the 2023 10-K Consolidated Balance Sheet (2022 comparative).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1289490/000162828024008044/",
+    "accession": "0001628280-24-008044",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 7,331,462,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1289490/000162828024008044/R3.htm",
+        "linha": "Notes payable, net",
+        "impresso": "1,288,555",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1289490/000162828024008044/R3.htm",
+        "linha": "Unsecured term loans, net",
+        "impresso": "2,340,116",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1289490/000162828024008044/R3.htm",
+        "linha": "Unsecured senior notes, net",
+        "impresso": "2,757,791",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1289490/000162828024008044/R3.htm",
+        "linha": "Revolving lines of credit",
+        "impresso": "945,000",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "SLB",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2016,
+    "fiscalQuarter": null,
+    "field": "cash",
+    "valor": 9257000000,
+    "motivoPt": "Balanço Consolidado (10-K 2017, R4.htm): Cash ($2,929M) + Short-term investments ($6,328M) = $9,257M.",
+    "motivoEn": "Consolidated Balance Sheet (2017 10-K, R4.htm): Cash ($2,929M) + Short-term investments ($6,328M) = $9,257M.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/87347/000156459018000821/",
+    "accession": "0001564590-18-000821",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria soma (us-gaap:Cash=2,929,000,000, us-gaap:ShortTermInvestments=6,328,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/87347/000156459018000821/R4.htm",
+        "linha": "Cash",
+        "impresso": "$ 2,929",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/87347/000156459018000821/R4.htm",
+        "linha": "Short-term investments",
+        "impresso": "6,328",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "WRB",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2025,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 2839725000,
+    "motivoPt": "Soma das duas linhas de dívida no Balanço Consolidado do 10-K 2025 (R4.htm): Senior notes and other debt ($1,829,198 mil) + Subordinated debentures ($1,010,527 mil).",
+    "motivoEn": "Sum of the two debt lines on the Consolidated Balance Sheet in the 2025 10-K (R4.htm): Senior notes and other debt ($1,829,198 thousand) + Subordinated debentures ($1,010,527 thousand).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/11544/000001154426000005/",
+    "accession": "0000011544-26-000005",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 2,839,725,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/11544/000001154426000005/R4.htm",
+        "linha": "Senior notes and other debt",
+        "impresso": "1,829,198",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/11544/000001154426000005/R4.htm",
+        "linha": "Subordinated debentures",
+        "impresso": "1,010,527",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "WRB",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 2840966000,
+    "motivoPt": "Soma das duas linhas de dívida no Balanço Consolidado comparativo do 10-K 2025 (R4.htm): Senior notes and other debt ($1,831,158 mil) + Subordinated debentures ($1,009,808 mil).",
+    "motivoEn": "Sum of the two debt lines on the comparative Consolidated Balance Sheet in the 2025 10-K (R4.htm): Senior notes and other debt ($1,831,158 thousand) + Subordinated debentures ($1,009,808 thousand).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/11544/000001154426000005/",
+    "accession": "0000011544-26-000005",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 2,840,966,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/11544/000001154426000005/R4.htm",
+        "linha": "Senior notes and other debt",
+        "impresso": "1,831,158",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/11544/000001154426000005/R4.htm",
+        "linha": "Subordinated debentures",
+        "impresso": "1,009,808",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "WRB",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 2837041000,
+    "motivoPt": "Soma das duas linhas de dívida no Balanço Consolidado do 10-K 2024/2023 (R4.htm): Senior notes and other debt ($1,827,951 mil) + Subordinated debentures ($1,009,090 mil).",
+    "motivoEn": "Sum of the two debt lines on the Consolidated Balance Sheet in the 2024/2023 10-K (R4.htm): Senior notes and other debt ($1,827,951 thousand) + Subordinated debentures ($1,009,090 thousand).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/11544/000001154425000005/",
+    "accession": "0000011544-25-000005",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 2,837,041,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/11544/000001154425000005/R4.htm",
+        "linha": "Senior notes and other debt",
+        "impresso": "1,827,951",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/11544/000001154425000005/R4.htm",
+        "linha": "Subordinated debentures",
+        "impresso": "1,009,090",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "WRB",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 2837194000,
+    "motivoPt": "Soma das duas linhas de dívida no Balanço Consolidado comparativo do 10-K 2023 (R4.htm): Senior notes and other debt ($1,828,823 mil) + Subordinated debentures ($1,008,371 mil).",
+    "motivoEn": "Sum of the two debt lines on the comparative Consolidated Balance Sheet in the 2023 10-K (R4.htm): Senior notes and other debt ($1,828,823 thousand) + Subordinated debentures ($1,008,371 thousand).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/11544/000001154424000005/",
+    "accession": "0000011544-24-000005",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 2,837,194,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/11544/000001154424000005/R4.htm",
+        "linha": "Senior notes and other debt",
+        "impresso": "1,828,823",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/11544/000001154424000005/R4.htm",
+        "linha": "Subordinated debentures",
+        "impresso": "1,008,371",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "BRO",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2018,
+    "fiscalQuarter": null,
+    "field": "cash",
+    "valor": 451829000,
+    "motivoPt": "Soma das linhas do Balanço Consolidado de 2018: Cash and cash equivalents ($438,961 mil) + Short-term investments ($12,868 mil) = $451,829 mil.",
+    "motivoEn": "Sum of 2018 Consolidated Balance Sheet lines: Cash and cash equivalents ($438,961 thousand) + Short-term investments ($12,868 thousand) = $451,829 thousand.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/79282/000007928219000006/",
+    "accession": "0000079282-19-000006",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria soma (us-gaap:CashAndCashEquivalentsAtCarryingValue=438,961,000, us-gaap:ShortTermInvestments=12,868,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/79282/000007928219000006/R3.htm",
+        "linha": "Cash and cash equivalents",
+        "impresso": "$ 438,961",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/79282/000007928219000006/R3.htm",
+        "linha": "Short-term investments",
+        "impresso": "12,868",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "BRO",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2016,
+    "fiscalQuarter": null,
+    "field": "cash",
+    "valor": 530694000,
+    "motivoPt": "Soma das linhas do Balanço Consolidado de 2016: Cash and cash equivalents ($515,646 mil) + Short-term investments ($15,048 mil) = $530,694 mil.",
+    "motivoEn": "Sum of 2016 Consolidated Balance Sheet lines: Cash and cash equivalents ($515,646 thousand) + Short-term investments ($15,048 thousand) = $530,694 thousand.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/79282/000007928217000006/",
+    "accession": "0000079282-17-000006",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria soma (us-gaap:CashAndCashEquivalentsAtCarryingValue=515,646,000, us-gaap:ShortTermInvestments=15,048,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/79282/000007928217000006/R3.htm",
+        "linha": "Cash and cash equivalents",
+        "impresso": "$ 515,646",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/79282/000007928217000006/R3.htm",
+        "linha": "Short-term investments",
+        "impresso": "15,048",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "PFE",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2025,
+    "fiscalQuarter": null,
+    "field": "cash",
+    "valor": 13596000000,
+    "motivoPt": "Soma de Cash and cash equivalents ($1,142M) e Short-term investments ($12,454M) no Balanço Consolidado do 10-K de 2025.",
+    "motivoEn": "Sum of Cash and cash equivalents ($1,142M) and Short-term investments ($12,454M) on the Consolidated Balance Sheet of the 2025 10-K.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/78003/000007800326000026/",
+    "accession": "0000078003-26-000026",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 13,596,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/78003/000007800326000026/R5.htm",
+        "linha": "Cash and cash equivalents",
+        "impresso": "$ 1,142",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/78003/000007800326000026/R5.htm",
+        "linha": "Short-term investments",
+        "impresso": "12,454",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "PFE",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "cash",
+    "valor": 20477000000,
+    "motivoPt": "Soma de Cash and cash equivalents ($1,043M) e Short-term investments ($19,434M) no Balanço Consolidado do 10-K de 2025.",
+    "motivoEn": "Sum of Cash and cash equivalents ($1,043M) and Short-term investments ($19,434M) on the Consolidated Balance Sheet of the 2025 10-K.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/78003/000007800326000026/",
+    "accession": "0000078003-26-000026",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 20,477,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/78003/000007800326000026/R5.htm",
+        "linha": "Cash and cash equivalents",
+        "impresso": "$ 1,043",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/78003/000007800326000026/R5.htm",
+        "linha": "Short-term investments",
+        "impresso": "19,434",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "PFE",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "cash",
+    "valor": 12690000000,
+    "motivoPt": "Soma de Cash and cash equivalents ($2,853M) e Short-term investments ($9,837M) no Balanço Consolidado do 10-K de 2023.",
+    "motivoEn": "Sum of Cash and cash equivalents ($2,853M) and Short-term investments ($9,837M) on the Consolidated Balance Sheet of the 2023 10-K.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/78003/000007800324000039/",
+    "accession": "0000078003-24-000039",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 12,690,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/78003/000007800324000039/R5.htm",
+        "linha": "Cash and cash equivalents",
+        "impresso": "$ 2,853",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/78003/000007800324000039/R5.htm",
+        "linha": "Short-term investments",
+        "impresso": "9,837",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "PFE",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "cash",
+    "valor": 22732000000,
+    "motivoPt": "Soma de Cash and cash equivalents ($416M) e Short-term investments ($22,316M) no Balanço Consolidado do 10-K de 2023.",
+    "motivoEn": "Sum of Cash and cash equivalents ($416M) and Short-term investments ($22,316M) on the Consolidated Balance Sheet of the 2023 10-K.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/78003/000007800324000039/",
+    "accession": "0000078003-24-000039",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 22,732,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/78003/000007800324000039/R5.htm",
+        "linha": "Cash and cash equivalents",
+        "impresso": "$ 416",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/78003/000007800324000039/R5.htm",
+        "linha": "Short-term investments",
+        "impresso": "22,316",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "SYK",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "cash",
+    "valor": 4493000000,
+    "motivoPt": "Soma de Cash and cash equivalents ($3,652M), Short-term investments ($750M) e Marketable securities ($91M) no Balanço Consolidado do 10-K de 2025.",
+    "motivoEn": "Sum of Cash and cash equivalents ($3,652M), Short-term investments ($750M), and Marketable securities ($91M) on the Consolidated Balance Sheet in the 2025 10-K.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/310764/000031076426000010/",
+    "accession": "0000310764-26-000010",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 4,493,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/310764/000031076426000010/R5.htm",
+        "linha": "Cash and cash equivalents",
+        "impresso": "$ 3,652",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/310764/000031076426000010/R5.htm",
+        "linha": "Short-term investments",
+        "impresso": "750",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/310764/000031076426000010/R5.htm",
+        "linha": "Marketable securities",
+        "impresso": "91",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "APO",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2020,
+    "fiscalQuarter": null,
+    "field": "totalEquity",
+    "valor": 1429000000,
+    "motivoPt": "Capital próprio atribuível aos acionistas da Apollo Global Management, Inc. (sem minoritários) de $1,429 milhões em 31/12/2020, conforme Demonstração Consolidada de Capital Próprio (R7.htm).",
+    "motivoEn": "Apollo Global Management, Inc. Stockholders' Equity (excluding non-controlling interests) of $1,429 million as of Dec. 31, 2020, per Consolidated Statements of Equity (R7.htm).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1858681/000185868123000007/",
+    "accession": "0001858681-23-000007",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (linha não encontrada: 'Ending Balance at Dec. 31, 2020 | Total Apollo Global Management, Inc. Stockholders’ Equity (Deficit)')",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1858681/000185868123000007/R7.htm",
+        "linha": "Ending Balance at Dec. 31, 2020 | Total Apollo Global Management, Inc. Stockholders’ Equity (Deficit)",
+        "impresso": "1,429",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "CMS",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2017,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 10374000000,
+    "motivoPt": "Dívida total sem leasings em 2017-12-31: dívida de longo prazo corrente ($1,081M, Nota 5 R66.htm) + notes payable ($170M, Balanço R6.htm) + dívida de longo prazo ($9,123M, Balanço R6.htm) = $10,374M.",
+    "motivoEn": "Total debt excluding leases as of 2017-12-31: current portion of long-term debt ($1,081M, Note 5 R66.htm) + notes payable ($170M, Balance Sheet R6.htm) + long-term debt ($9,123M, Balance Sheet R6.htm) = $10,374M.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/811156/000110465918009493/",
+    "accession": "0001104659-18-009493",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 10,374,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/811156/000110465918009493/R66.htm",
+        "linha": "Current amounts",
+        "impresso": "(1,081,000,000)",
+        "escala": "unidades"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/811156/000110465918009493/R6.htm",
+        "linha": "Notes payable",
+        "impresso": "170",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/811156/000110465918009493/R6.htm",
+        "linha": "Long-term debt",
+        "impresso": "9,123",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "CMS",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2016,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 9902000000,
+    "motivoPt": "Dívida total sem leasings em 2016-12-31: dívida de longo prazo corrente ($864M, Nota 5 R66.htm) + notes payable ($398M, Balanço R6.htm) + dívida de longo prazo ($8,640M, Balanço R6.htm) = $9,902M.",
+    "motivoEn": "Total debt excluding leases as of 2016-12-31: current portion of long-term debt ($864M, Note 5 R66.htm) + notes payable ($398M, Balance Sheet R6.htm) + long-term debt ($8,640M, Balance Sheet R6.htm) = $9,902M.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/811156/000110465918009493/",
+    "accession": "0001104659-18-009493",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 9,902,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/811156/000110465918009493/R66.htm",
+        "linha": "Current amounts",
+        "impresso": "(864,000,000)",
+        "escala": "unidades"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/811156/000110465918009493/R6.htm",
+        "linha": "Notes payable",
+        "impresso": "398",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/811156/000110465918009493/R6.htm",
+        "linha": "Long-term debt",
+        "impresso": "8,640",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "CAT",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2025,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 43330000000,
+    "motivoPt": "Balanço Consolidado (R5.htm) do 10-K de 2025: Short-term borrowings ($5,514M) + Long-term debt due within one year ($35M + $7,085M) + Long-term debt due after one year ($10,678M + $20,018M) = $43,330M.",
+    "motivoEn": "Consolidated Financial Position (R5.htm) of 2025 10-K: Short-term borrowings ($5,514M) + Long-term debt due within one year ($35M + $7,085M) + Long-term debt due after one year ($10,678M + $20,018M) = $43,330M.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/18230/000001823026000008/",
+    "accession": "0000018230-26-000008",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (linha não encontrada: 'Machinery, Power & Energy | Long-term debt due within one year')",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823026000008/R5.htm",
+        "linha": "Short-term borrowings",
+        "impresso": "5,514",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823026000008/R5.htm",
+        "linha": "Machinery, Power & Energy | Long-term debt due within one year",
+        "impresso": "35",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823026000008/R5.htm",
+        "linha": "Financial Products | Long-term debt due within one year",
+        "impresso": "7,085",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823026000008/R5.htm",
+        "linha": "Machinery, Power & Energy | Long-term debt due after one year",
+        "impresso": "10,678",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823026000008/R5.htm",
+        "linha": "Financial Products | Long-term debt due after one year",
+        "impresso": "20,018",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "CAT",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 38409000000,
+    "motivoPt": "Balanço Consolidado (R5.htm) do 10-K de 2025/2024: Short-term borrowings ($4,393M) + Long-term debt due within one year ($46M + $6,619M) + Long-term debt due after one year ($8,564M + $18,787M) = $38,409M.",
+    "motivoEn": "Consolidated Financial Position (R5.htm) of 2025/2024 10-K: Short-term borrowings ($4,393M) + Long-term debt due within one year ($46M + $6,619M) + Long-term debt due after one year ($8,564M + $18,787M) = $38,409M.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/18230/000001823026000008/",
+    "accession": "0000018230-26-000008",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (linha não encontrada: 'Machinery, Power & Energy | Long-term debt due within one year')",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823026000008/R5.htm",
+        "linha": "Short-term borrowings",
+        "impresso": "4,393",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823026000008/R5.htm",
+        "linha": "Machinery, Power & Energy | Long-term debt due within one year",
+        "impresso": "46",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823026000008/R5.htm",
+        "linha": "Financial Products | Long-term debt due within one year",
+        "impresso": "6,619",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823026000008/R5.htm",
+        "linha": "Machinery, Power & Energy | Long-term debt due after one year",
+        "impresso": "8,564",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823026000008/R5.htm",
+        "linha": "Financial Products | Long-term debt due after one year",
+        "impresso": "18,787",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "CAT",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 37878000000,
+    "motivoPt": "Balanço Consolidado (R5.htm) do 10-K de 2024: Short-term borrowings ($4,643M) + Long-term debt due within one year ($1,044M + $7,719M) + Long-term debt due after one year ($8,579M + $15,893M) = $37,878M.",
+    "motivoEn": "Consolidated Financial Position (R5.htm) of 2024 10-K: Short-term borrowings ($4,643M) + Long-term debt due within one year ($1,044M + $7,719M) + Long-term debt due after one year ($8,579M + $15,893M) = $37,878M.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/18230/000001823025000008/",
+    "accession": "0000018230-25-000008",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (linha não encontrada: 'Machinery, Energy & Transportation | Long-term debt due within one year')",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823025000008/R5.htm",
+        "linha": "Short-term borrowings",
+        "impresso": "4,643",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823025000008/R5.htm",
+        "linha": "Machinery, Energy & Transportation | Long-term debt due within one year",
+        "impresso": "1,044",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823025000008/R5.htm",
+        "linha": "Financial Products | Long-term debt due within one year",
+        "impresso": "7,719",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823025000008/R5.htm",
+        "linha": "Machinery, Energy & Transportation | Long-term debt due after one year",
+        "impresso": "8,579",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823025000008/R5.htm",
+        "linha": "Financial Products | Long-term debt due after one year",
+        "impresso": "15,893",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "CAT",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 36993000000,
+    "motivoPt": "Balanço Consolidado (R5.htm) do 10-K de 2023: Short-term borrowings ($5,957M) + Long-term debt due within one year ($120M + $5,202M) + Long-term debt due after one year ($9,498M + $16,216M) = $36,993M.",
+    "motivoEn": "Consolidated Financial Position (R5.htm) of 2023 10-K: Short-term borrowings ($5,957M) + Long-term debt due within one year ($120M + $5,202M) + Long-term debt due after one year ($9,498M + $16,216M) = $36,993M.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/18230/000001823024000009/",
+    "accession": "0000018230-24-000009",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (linha não encontrada: 'Machinery, Energy & Transportation | Long-term debt due within one year')",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823024000009/R5.htm",
+        "linha": "Short-term borrowings",
+        "impresso": "5,957",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823024000009/R5.htm",
+        "linha": "Machinery, Energy & Transportation | Long-term debt due within one year",
+        "impresso": "120",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823024000009/R5.htm",
+        "linha": "Financial Products | Long-term debt due within one year",
+        "impresso": "5,202",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823024000009/R5.htm",
+        "linha": "Machinery, Energy & Transportation | Long-term debt due after one year",
+        "impresso": "9,498",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/18230/000001823024000009/R5.htm",
+        "linha": "Financial Products | Long-term debt due after one year",
+        "impresso": "16,216",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "NRG",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2018,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 6521000000,
+    "motivoPt": "Soma das linhas de dívida no Balanço Consolidado do 10-K de 2018 (72M corrente + 6,449M longo prazo = 6,521M), corrigindo duplicação da parcela corrente na extração SEC.",
+    "motivoEn": "Sum of debt lines on the Consolidated Balance Sheet of the 2018 10-K ($72M current + $6,449M long-term = $6,521M), fixing double-counting of current maturities in the SEC extraction.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1013871/000101387119000007/",
+    "accession": "0001013871-19-000007",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 6,521,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1013871/000101387119000007/R5.htm",
+        "linha": "Current portion of long-term debt and capital leases",
+        "impresso": "72",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1013871/000101387119000007/R5.htm",
+        "linha": "Long-term debt and capital leases",
+        "impresso": "6,449",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "NRG",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2017,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 9384000000,
+    "motivoPt": "Soma das linhas de dívida de 2017 no Balanço Consolidado do 10-K de 2018 (204M corrente + 9,180M longo prazo = 9,384M), corrigindo duplicação da parcela corrente na extração SEC.",
+    "motivoEn": "Sum of 2017 debt lines on the Consolidated Balance Sheet of the 2018 10-K ($204M current + $9,180M long-term = $9,384M), fixing double-counting of current maturities in the SEC extraction.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1013871/000101387119000007/",
+    "accession": "0001013871-19-000007",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 9,384,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1013871/000101387119000007/R5.htm",
+        "linha": "Current portion of long-term debt and capital leases",
+        "impresso": "204",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1013871/000101387119000007/R5.htm",
+        "linha": "Long-term debt and capital leases",
+        "impresso": "9,180",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "NRG",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2016,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 16473000000,
+    "motivoPt": "Soma das linhas de dívida de 2016 no Balanço Consolidado do 10-K de 2017 (516M corrente + 15,957M longo prazo = 16,473M), corrigindo duplicação da parcela corrente na extração SEC.",
+    "motivoEn": "Sum of 2016 debt lines on the Consolidated Balance Sheet of the 2017 10-K ($516M current + $15,957M long-term = $16,473M), fixing double-counting of current maturities in the SEC extraction.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1013871/000101387118000011/",
+    "accession": "0001013871-18-000011",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 16,473,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1013871/000101387118000011/R5.htm",
+        "linha": "Current portion of long-term debt and capital leases",
+        "impresso": "516",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1013871/000101387118000011/R5.htm",
+        "linha": "Long-term debt and capital leases",
+        "impresso": "15,957",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "PNC",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2017,
+    "fiscalQuarter": null,
+    "field": "cash",
+    "valor": 5249000000,
+    "motivoPt": "Caixa em 2017 deve ser apenas 'Cash and due from banks' ($5,249M no balanço), sem somar títulos disponíveis para venda ($57,618M).",
+    "motivoEn": "Cash in 2017 should be 'Cash and due from banks' only ($5,249M on the balance sheet), without adding available-for-sale investment securities ($57,618M).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/713676/000071367619000015/",
+    "accession": "0000713676-19-000015",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 5,249,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/713676/000071367619000015/R4.htm",
+        "linha": "Cash and due from banks",
+        "impresso": "5,249",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "WELL",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2025,
+    "fiscalQuarter": null,
+    "field": "revenue",
+    "valor": 10838034000,
+    "motivoPt": "Total revenues na demonstração de resultados do 10-K de 2025 (inclui resident fees, rental income, interest income e other income).",
+    "motivoEn": "Total revenues on the 2025 10-K Consolidated Statements of Comprehensive Income (includes resident fees, rental income, interest income, and other income).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/766704/000076670426000010/",
+    "accession": "0000766704-26-000010",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada (us-gaap:Revenues=10,838,034,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/766704/000076670426000010/R4.htm",
+        "linha": "Total revenues",
+        "impresso": "10,838,034",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "WELL",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "revenue",
+    "valor": 7991118000,
+    "motivoPt": "Total revenues na demonstração de resultados comparativa do 10-K de 2025.",
+    "motivoEn": "Total revenues on the comparative 2025 10-K Consolidated Statements of Comprehensive Income.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/766704/000076670426000010/",
+    "accession": "0000766704-26-000010",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada (us-gaap:Revenues=7,991,118,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/766704/000076670426000010/R4.htm",
+        "linha": "Total revenues",
+        "impresso": "7,991,118",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "WELL",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "revenue",
+    "valor": 6637995000,
+    "motivoPt": "Total revenues na demonstração de resultados comparativa do 10-K de 2025.",
+    "motivoEn": "Total revenues on the comparative 2025 10-K Consolidated Statements of Comprehensive Income.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/766704/000076670426000010/",
+    "accession": "0000766704-26-000010",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada (us-gaap:Revenues=6,637,995,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/766704/000076670426000010/R4.htm",
+        "linha": "Total revenues",
+        "impresso": "6,637,995",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "WELL",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "revenue",
+    "valor": 5860615000,
+    "motivoPt": "Total revenues na demonstração de resultados comparativa do 10-K de 2024.",
+    "motivoEn": "Total revenues on the comparative 2024 10-K Consolidated Statements of Comprehensive Income.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/766704/000076670425000009/",
+    "accession": "0000766704-25-000009",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada (us-gaap:Revenues=5,860,615,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/766704/000076670425000009/R4.htm",
+        "linha": "Total revenues",
+        "impresso": "5,860,615",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "WELL",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2020,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 13798720000,
+    "motivoPt": "Soma das linhas de dívida (sem leasings) no Balanço Consolidado de 2020: linha de crédito ($0) + notas seniores não garantidas ($11,420,790k) + dívida garantida ($2,377,930k).",
+    "motivoEn": "Sum of debt lines (excluding leases) on the 2020 Consolidated Balance Sheet: credit facility ($0) + senior unsecured notes ($11,420,790k) + secured debt ($2,377,930k).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/766704/000076670421000018/",
+    "accession": "0000766704-21-000018",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria soma (us-gaap:SecuredDebt=2,377,930,000, us-gaap:UnsecuredDebt=11,420,790,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/766704/000076670421000018/R2.htm",
+        "linha": "Unsecured credit facility and commercial paper",
+        "impresso": "0",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/766704/000076670421000018/R2.htm",
+        "linha": "Senior unsecured notes",
+        "impresso": "11,420,790",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/766704/000076670421000018/R2.htm",
+        "linha": "Secured debt",
+        "impresso": "2,377,930",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "WFC",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2020,
+    "fiscalQuarter": null,
+    "field": "stockBasedCompensation",
+    "valor": 1766000000,
+    "motivoPt": "Valor impresso na linha 'Stock-based compensation' da Demonstração Consolidada de Fluxos de Caixa do 10-K de 2020 (US$ 1.766 milhões).",
+    "motivoEn": "Value printed on the 'Stock-based compensation' line of the Consolidated Statement of Cash Flows in the 2020 10-K ($1,766 million).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/72971/000007297121000197/",
+    "accession": "0000072971-21-000197",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 1,766,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297121000197/R7.htm",
+        "linha": "Stock-based compensation",
+        "impresso": "1,766",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "WFC",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2019,
+    "fiscalQuarter": null,
+    "field": "stockBasedCompensation",
+    "valor": 2274000000,
+    "motivoPt": "Valor impresso na linha 'Stock-based compensation' da Demonstração Consolidada de Fluxos de Caixa comparativa do 10-K de 2020 (US$ 2.274 milhões).",
+    "motivoEn": "Value printed on the 'Stock-based compensation' line of the comparative Consolidated Statement of Cash Flows in the 2020 10-K ($2,274 million).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/72971/000007297121000197/",
+    "accession": "0000072971-21-000197",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 2,274,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297121000197/R7.htm",
+        "linha": "Stock-based compensation",
+        "impresso": "2,274",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "WFC",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2018,
+    "fiscalQuarter": null,
+    "field": "stockBasedCompensation",
+    "valor": 2255000000,
+    "motivoPt": "Valor impresso na linha 'Stock-based compensation' da Demonstração Consolidada de Fluxos de Caixa comparativa do 10-K de 2020 (US$ 2.255 milhões).",
+    "motivoEn": "Value printed on the 'Stock-based compensation' line of the comparative Consolidated Statement of Cash Flows in the 2020 10-K ($2,255 million).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/72971/000007297121000197/",
+    "accession": "0000072971-21-000197",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 2,255,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297121000197/R7.htm",
+        "linha": "Stock-based compensation",
+        "impresso": "2,255",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "WFC",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2017,
+    "fiscalQuarter": null,
+    "field": "stockBasedCompensation",
+    "valor": 2046000000,
+    "motivoPt": "Valor impresso na linha 'Stock-based compensation' da Demonstração Consolidada de Fluxos de Caixa comparativa do 10-K de 2019 (US$ 2.046 milhões).",
+    "motivoEn": "Value printed on the 'Stock-based compensation' line of the comparative Consolidated Statement of Cash Flows in the 2019 10-K ($2,046 million).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000217/",
+    "accession": "0000072971-20-000217",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 2,046,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/72971/000007297120000217/R9.htm",
+        "linha": "Stock-based compensation",
+        "impresso": "2,046",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "ED",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2025,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 27876000000,
+    "motivoPt": "Soma das linhas de dívida no Balanço Consolidado do 10-K 2025 (250 + 500 + 1.575 + 25.551 = 27.876M USD), sem leasings.",
+    "motivoEn": "Sum of debt lines on the Consolidated Balance Sheet in the 2025 10-K (250 + 500 + 1,575 + 25,551 = 27,876M USD), excluding leases.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1047862/000104786226000031/",
+    "accession": "0001047862-26-000031",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 27,876,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1047862/000104786226000031/R6.htm",
+        "linha": "Long-term debt due within one year",
+        "impresso": "250",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1047862/000104786226000031/R6.htm",
+        "linha": "Term loan",
+        "impresso": "500",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1047862/000104786226000031/R6.htm",
+        "linha": "Notes payable",
+        "impresso": "1,575",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1047862/000104786226000031/R6.htm",
+        "linha": "LONG-TERM DEBT",
+        "impresso": "25,551",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "ED",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 27321000000,
+    "motivoPt": "Soma das linhas de dívida no Balanço Consolidado do 10-K 2024 (500 + 2.170 + 24.651 = 27.321M USD), sem leasings.",
+    "motivoEn": "Sum of debt lines on the Consolidated Balance Sheet in the 2024 10-K (500 + 2,170 + 24,651 = 27,321M USD), excluding leases.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1047862/000104786225000011/",
+    "accession": "0001047862-25-000011",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 27,321,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1047862/000104786225000011/R6.htm",
+        "linha": "Term loan",
+        "impresso": "500",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1047862/000104786225000011/R6.htm",
+        "linha": "Notes payable",
+        "impresso": "2,170",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1047862/000104786225000011/R6.htm",
+        "linha": "LONG-TERM DEBT",
+        "impresso": "24,651",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "ED",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2020,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 24219000000,
+    "motivoPt": "Soma das linhas de dívida no Balanço Consolidado do 10-K 2020 (1.967 + 165 + 1.705 + 20.382 = 24.219M USD), sem leasings.",
+    "motivoEn": "Sum of debt lines on the Consolidated Balance Sheet in the 2020 10-K (1,967 + 165 + 1,705 + 20,382 = 24,219M USD), excluding leases.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1047862/000104786221000049/",
+    "accession": "0001047862-21-000049",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria soma (us-gaap:LongTermDebt=22,349,000,000, us-gaap:OtherLongTermDebtCurrent=1,967,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1047862/000104786221000049/R5.htm",
+        "linha": "Long-term debt due within one year",
+        "impresso": "1,967",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1047862/000104786221000049/R5.htm",
+        "linha": "Term Loan",
+        "impresso": "165",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1047862/000104786221000049/R5.htm",
+        "linha": "Notes payable",
+        "impresso": "1,705",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1047862/000104786221000049/R5.htm",
+        "linha": "LONG-TERM DEBT",
+        "impresso": "20,382",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "ED",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2018,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 20711000000,
+    "motivoPt": "Soma das linhas de dívida no Balanço Consolidado do 10-K 2018 (650 + 825 + 1.741 + 17.495 = 20.711M USD), sem leasings.",
+    "motivoEn": "Sum of debt lines on the Consolidated Balance Sheet in the 2018 10-K (650 + 825 + 1,741 + 17,495 = 20,711M USD), excluding leases.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1047862/000104786219000035/",
+    "accession": "0001047862-19-000035",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 20,711,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1047862/000104786219000035/R5.htm",
+        "linha": "Long-term debt due within one year",
+        "impresso": "650",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1047862/000104786219000035/R5.htm",
+        "linha": "Term Loan",
+        "impresso": "825",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1047862/000104786219000035/R5.htm",
+        "linha": "Notes payable",
+        "impresso": "1,741",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1047862/000104786219000035/R5.htm",
+        "linha": "LONG-TERM DEBT",
+        "impresso": "17,495",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "OMC",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "totalLiabilities",
+    "valor": 24445800000,
+    "motivoPt": "Soma do passivo corrente e passivos não correntes no Balanço Consolidado (exclui Temporary Equity de $429.0M).",
+    "motivoEn": "Sum of current and non-current liabilities on the Consolidated Balance Sheet (excludes Temporary Equity of $429.0M).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/29989/000002998925000009/",
+    "accession": "0000029989-25-000009",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 24,445,800,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/29989/000002998925000009/R3.htm",
+        "linha": "Total Current Liabilities",
+        "impresso": "16,300.3",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/29989/000002998925000009/R3.htm",
+        "linha": "Long-Term Liabilities",
+        "impresso": "804.2",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/29989/000002998925000009/R3.htm",
+        "linha": "Long-Term Liability - Operating Leases",
+        "impresso": "814.2",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/29989/000002998925000009/R3.htm",
+        "linha": "Long-Term Debt",
+        "impresso": "6,035.3",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/29989/000002998925000009/R3.htm",
+        "linha": "Deferred Tax Liabilities",
+        "impresso": "491.8",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "OMC",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "totalLiabilities",
+    "valor": 23404900000,
+    "motivoPt": "Soma do passivo corrente e passivos não correntes no Balanço Consolidado (exclui Temporary Equity de $414.6M).",
+    "motivoEn": "Sum of current and non-current liabilities on the Consolidated Balance Sheet (excludes Temporary Equity of $414.6M).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/29989/000002998925000009/",
+    "accession": "0000029989-25-000009",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 23,404,900,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/29989/000002998925000009/R3.htm",
+        "linha": "Total Current Liabilities",
+        "impresso": "16,246.0",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/29989/000002998925000009/R3.htm",
+        "linha": "Long-Term Liabilities",
+        "impresso": "887.7",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/29989/000002998925000009/R3.htm",
+        "linha": "Long-Term Liability - Operating Leases",
+        "impresso": "853.0",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/29989/000002998925000009/R3.htm",
+        "linha": "Long-Term Debt",
+        "impresso": "4,889.1",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/29989/000002998925000009/R3.htm",
+        "linha": "Deferred Tax Liabilities",
+        "impresso": "529.1",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "OMC",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "totalLiabilities",
+    "valor": 22843200000,
+    "motivoPt": "Soma do passivo corrente e passivos não correntes no Balanço Consolidado (exclui Temporary Equity de $382.9M).",
+    "motivoEn": "Sum of current and non-current liabilities on the Consolidated Balance Sheet (excludes Temporary Equity of $382.9M).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/29989/000002998924000007/",
+    "accession": "0000029989-24-000007",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 22,843,200,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/29989/000002998924000007/R3.htm",
+        "linha": "Total Current Liabilities",
+        "impresso": "15,052.8",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/29989/000002998924000007/R3.htm",
+        "linha": "Long-Term Liabilities",
+        "impresso": "837.5",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/29989/000002998924000007/R3.htm",
+        "linha": "Long-Term Liability - Operating Leases",
+        "impresso": "900.0",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/29989/000002998924000007/R3.htm",
+        "linha": "Long-Term Debt",
+        "impresso": "5,577.2",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/29989/000002998924000007/R3.htm",
+        "linha": "Deferred Tax Liabilities",
+        "impresso": "475.7",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "V",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2025,
+    "fiscalQuarter": null,
+    "field": "cash",
+    "valor": 18997000000,
+    "motivoPt": "Caixa e equivalentes ($17,164M) mais títulos de investimento circulantes ($1,833M) no Balanço Consolidado do 10-K FY2025.",
+    "motivoEn": "Cash and cash equivalents ($17,164M) plus current investment securities ($1,833M) on the FY2025 10-K Consolidated Balance Sheet.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1403161/000140316125000089/",
+    "accession": "0001403161-25-000089",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (linha não encontrada: 'Investment securities (Current assets)')",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1403161/000140316125000089/R3.htm",
+        "linha": "Cash and cash equivalents",
+        "impresso": "$ 17,164",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1403161/000140316125000089/R3.htm",
+        "linha": "Investment securities (Current assets)",
+        "impresso": "1,833",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "V",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "cash",
+    "valor": 15175000000,
+    "motivoPt": "Caixa e equivalentes ($11,975M) mais títulos de investimento circulantes ($3,200M) no Balanço Consolidado do 10-K FY2025 (comparativo FY2024).",
+    "motivoEn": "Cash and cash equivalents ($11,975M) plus current investment securities ($3,200M) on the FY2025 10-K Consolidated Balance Sheet (FY2024 comparative).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1403161/000140316125000089/",
+    "accession": "0001403161-25-000089",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (linha não encontrada: 'Investment securities (Current assets)')",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1403161/000140316125000089/R3.htm",
+        "linha": "Cash and cash equivalents",
+        "impresso": "$ 11,975",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1403161/000140316125000089/R3.htm",
+        "linha": "Investment securities (Current assets)",
+        "impresso": "3,200",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "V",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "cash",
+    "valor": 20128000000,
+    "motivoPt": "Caixa e equivalentes ($16,286M) mais títulos de investimento circulantes ($3,842M) no Balanço Consolidado do 10-K FY2023.",
+    "motivoEn": "Cash and cash equivalents ($16,286M) plus current investment securities ($3,842M) on the FY2023 10-K Consolidated Balance Sheet.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1403161/000140316123000099/",
+    "accession": "0001403161-23-000099",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (linha não encontrada: 'Investment securities (Current assets)')",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1403161/000140316123000099/R3.htm",
+        "linha": "Cash and cash equivalents",
+        "impresso": "$ 16,286",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1403161/000140316123000099/R3.htm",
+        "linha": "Investment securities (Current assets)",
+        "impresso": "3,842",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "V",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "cash",
+    "valor": 18522000000,
+    "motivoPt": "Caixa e equivalentes ($15,689M) mais títulos de investimento circulantes ($2,833M) no Balanço Consolidado do 10-K FY2023 (comparativo FY2022).",
+    "motivoEn": "Cash and cash equivalents ($15,689M) plus current investment securities ($2,833M) on the FY2023 10-K Consolidated Balance Sheet (FY2022 comparative).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1403161/000140316123000099/",
+    "accession": "0001403161-23-000099",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (linha não encontrada: 'Investment securities (Current assets)')",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1403161/000140316123000099/R3.htm",
+        "linha": "Cash and cash equivalents",
+        "impresso": "$ 15,689",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1403161/000140316123000099/R3.htm",
+        "linha": "Investment securities (Current assets)",
+        "impresso": "2,833",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "CEG",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2025,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 8992000000,
+    "motivoPt": "Dívida total a 31/12/2025 é 8.992 M$ (Short-term borrowings 1.650 M$ + Long-term debt due within one year 92 M$ + Long-term debt 7.250 M$, Balanço Consolidado, 10-K 2025).",
+    "motivoEn": "Total debt as of Dec. 31, 2025 is $8,992M (Short-term borrowings $1,650M + Long-term debt due within one year $92M + Long-term debt $7,250M, Consolidated Balance Sheet, 2025 10-K).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1868275/000186827526000032/",
+    "accession": "0001868275-26-000032",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 8,992,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1868275/000186827526000032/R5.htm",
+        "linha": "Short-term borrowings",
+        "impresso": "1,650",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1868275/000186827526000032/R5.htm",
+        "linha": "Long-term debt due within one year",
+        "impresso": "92",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1868275/000186827526000032/R5.htm",
+        "linha": "Long-term debt",
+        "impresso": "7,250",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "CEG",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 8412000000,
+    "motivoPt": "Dívida total a 31/12/2024 é 8.412 M$ (Short-term borrowings 0 M$ + Long-term debt due within one year 1.028 M$ + Long-term debt 7.384 M$, Balanço Consolidado, 10-K 2025).",
+    "motivoEn": "Total debt as of Dec. 31, 2024 is $8,412M (Short-term borrowings $0M + Long-term debt due within one year $1,028M + Long-term debt $7,384M, Consolidated Balance Sheet, 2025 10-K).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1868275/000186827526000032/",
+    "accession": "0001868275-26-000032",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria soma (us-gaap:LongTermDebtNoncurrent=7,384,000,000, us-gaap:LongTermDebtCurrent=1,028,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1868275/000186827526000032/R5.htm",
+        "linha": "Short-term borrowings",
+        "impresso": "0",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1868275/000186827526000032/R5.htm",
+        "linha": "Long-term debt due within one year",
+        "impresso": "1,028",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1868275/000186827526000032/R5.htm",
+        "linha": "Long-term debt",
+        "impresso": "7,384",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "CEG",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 9261000000,
+    "motivoPt": "Dívida total a 31/12/2023 é 9.261 M$ (Short-term borrowings 1.644 M$ + Long-term debt due within one year 121 M$ + Long-term debt 7.496 M$, Balanço Consolidado, 10-K 2024).",
+    "motivoEn": "Total debt as of Dec. 31, 2023 is $9,261M (Short-term borrowings $1,644M + Long-term debt due within one year $121M + Long-term debt $7,496M, Consolidated Balance Sheet, 2024 10-K).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1868275/000186827525000023/",
+    "accession": "0001868275-25-000023",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 9,261,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1868275/000186827525000023/R5.htm",
+        "linha": "Short-term borrowings",
+        "impresso": "1,644",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1868275/000186827525000023/R5.htm",
+        "linha": "Long-term debt due within one year",
+        "impresso": "121",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1868275/000186827525000023/R5.htm",
+        "linha": "Long-term debt",
+        "impresso": "7,496",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "CEG",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 5768000000,
+    "motivoPt": "Dívida total a 31/12/2022 é 5.768 M$ (Short-term borrowings 1.159 M$ + Long-term debt due within one year 143 M$ + Long-term debt 4.466 M$, Balanço Consolidado, 10-K 2023).",
+    "motivoEn": "Total debt as of Dec. 31, 2022 is $5,768M (Short-term borrowings $1,159M + Long-term debt due within one year $143M + Long-term debt $4,466M, Consolidated Balance Sheet, 2023 10-K).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1868275/000186827524000014/",
+    "accession": "0001868275-24-000014",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 5,768,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1868275/000186827524000014/R5.htm",
+        "linha": "Short-term borrowings",
+        "impresso": "1,159",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1868275/000186827524000014/R5.htm",
+        "linha": "Long-term debt due within one year",
+        "impresso": "143",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1868275/000186827524000014/R5.htm",
+        "linha": "Long-term debt",
+        "impresso": "4,466",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "ESS",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 6601617000,
+    "motivoPt": "Soma das três linhas de dívida no Balanço Consolidado do 10-K de 2025 (Unsecured debt, net + Mortgage notes payable, net + Lines of credit and commercial paper).",
+    "motivoEn": "Sum of the three debt lines on the Consolidated Balance Sheet in the 2025 10-K (Unsecured debt, net + Mortgage notes payable, net + Lines of credit and commercial paper).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/920522/000092052226000003/",
+    "accession": "0000920522-26-000003",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 6,601,617,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/920522/000092052226000003/R3.htm",
+        "linha": "Unsecured debt, net",
+        "impresso": "5,473,788",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/920522/000092052226000003/R3.htm",
+        "linha": "Mortgage notes payable, net",
+        "impresso": "989,884",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/920522/000092052226000003/R3.htm",
+        "linha": "Lines of credit and commercial paper",
+        "impresso": "137,945",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "ESS",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2021,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 6287410000,
+    "motivoPt": "Soma das três linhas de dívida no Balanço Consolidado do 10-K de 2021 (Unsecured debt, net + Mortgage notes payable, net + Lines of credit).",
+    "motivoEn": "Sum of the three debt lines on the Consolidated Balance Sheet in the 2021 10-K (Unsecured debt, net + Mortgage notes payable, net + Lines of credit).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/920522/000092052222000019/",
+    "accession": "0000920522-22-000019",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 6,287,410,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/920522/000092052222000019/R3.htm",
+        "linha": "Unsecured debt, net",
+        "impresso": "5,307,196",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/920522/000092052222000019/R3.htm",
+        "linha": "Mortgage notes payable, net",
+        "impresso": "638,957",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/920522/000092052222000019/R3.htm",
+        "linha": "Lines of credit",
+        "impresso": "341,257",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "ESS",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2020,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 6251535000,
+    "motivoPt": "Soma das linhas de dívida no Balanço Consolidado do 10-K de 2021 (Unsecured debt, net + Mortgage notes payable, net + Lines of credit).",
+    "motivoEn": "Sum of the debt lines on the Consolidated Balance Sheet in the 2021 10-K (Unsecured debt, net + Mortgage notes payable, net + Lines of credit).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/920522/000092052222000019/",
+    "accession": "0000920522-22-000019",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria soma (us-gaap:LongTermDebt=643,550,000, us-gaap:UnsecuredDebt=5,607,985,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/920522/000092052222000019/R3.htm",
+        "linha": "Unsecured debt, net",
+        "impresso": "5,607,985",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/920522/000092052222000019/R3.htm",
+        "linha": "Mortgage notes payable, net",
+        "impresso": "643,550",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/920522/000092052222000019/R3.htm",
+        "linha": "Lines of credit",
+        "impresso": "0",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "ESS",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2019,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 5808873000,
+    "motivoPt": "Soma das três linhas de dívida no Balanço Consolidado do 10-K de 2020 (Unsecured debt, net + Mortgage notes payable, net + Lines of credit).",
+    "motivoEn": "Sum of the three debt lines on the Consolidated Balance Sheet in the 2020 10-K (Unsecured debt, net + Mortgage notes payable, net + Lines of credit).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/920522/000092052221000015/",
+    "accession": "0000920522-21-000015",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 5,808,873,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/920522/000092052221000015/R2.htm",
+        "linha": "Unsecured debt, net",
+        "impresso": "4,763,206",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/920522/000092052221000015/R2.htm",
+        "linha": "Mortgage notes payable, net",
+        "impresso": "990,667",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/920522/000092052221000015/R2.htm",
+        "linha": "Lines of credit",
+        "impresso": "55,000",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "INVH",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2017,
+    "fiscalQuarter": null,
+    "field": "epsDiluted",
+    "valor": -0.26,
+    "motivoPt": "EPS diluído reportado na nota de Earnings per Share (11 meses pós-IPO terminados em 2017-12-31) do 10-K de 2019.",
+    "motivoEn": "Diluted EPS reported in the Earnings per Share footnote (11 months post-IPO ended Dec 31, 2017) of the 2019 10-K.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1687229/000168722920000004/",
+    "accession": "0001687229-20-000004",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada (us-gaap:EarningsPerShareDiluted=-0)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1687229/000168722920000004/R74.htm",
+        "linha": "Net income per share — diluted",
+        "impresso": "$ (0.26)",
+        "escala": "unidades"
+      }
+    ]
+  },
+  {
+    "ticker": "MCK",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2026,
+    "fiscalQuarter": null,
+    "field": "totalLiabilities",
+    "valor": 83157000000,
+    "motivoPt": "Soma das linhas de passivo corrente e não corrente do Balanço Consolidado (10-K FY2026, R5.htm), excluindo Redeemable noncontrolling interests (mezzanine).",
+    "motivoEn": "Sum of current and non-current liability lines on the Consolidated Balance Sheet (FY2026 10-K, R5.htm), excluding Redeemable noncontrolling interests (temporary equity).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/927653/000092765326000069/",
+    "accession": "0000927653-26-000069",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 83,157,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765326000069/R5.htm",
+        "linha": "Total current liabilities",
+        "impresso": "67,017",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765326000069/R5.htm",
+        "linha": "Long-term debt",
+        "impresso": "5,259",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765326000069/R5.htm",
+        "linha": "Long-term deferred tax liabilities",
+        "impresso": "1,330",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765326000069/R5.htm",
+        "linha": "Long-term operating lease liabilities",
+        "impresso": "1,801",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765326000069/R5.htm",
+        "linha": "Long-term litigation liabilities",
+        "impresso": "5,091",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765326000069/R5.htm",
+        "linha": "Other non-current liabilities",
+        "impresso": "2,659",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "MCK",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2021,
+    "fiscalQuarter": null,
+    "field": "totalLiabilities",
+    "valor": 63569000000,
+    "motivoPt": "Soma das linhas de passivo corrente e não corrente do Balanço Consolidado (10-K FY2021, R4.htm), excluindo Redeemable noncontrolling interests (mezzanine).",
+    "motivoEn": "Sum of current and non-current liability lines on the Consolidated Balance Sheet (FY2021 10-K, R4.htm), excluding Redeemable noncontrolling interests (temporary equity).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/927653/000092765321000039/",
+    "accession": "0000927653-21-000039",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 63,569,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765321000039/R4.htm",
+        "linha": "Total current liabilities",
+        "impresso": "44,103",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765321000039/R4.htm",
+        "linha": "Long-term debt",
+        "impresso": "6,406",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765321000039/R4.htm",
+        "linha": "Long-term deferred tax liabilities",
+        "impresso": "1,411",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765321000039/R4.htm",
+        "linha": "Long-term operating lease liabilities",
+        "impresso": "1,867",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765321000039/R4.htm",
+        "linha": "Long-term litigation liabilities",
+        "impresso": "8,067",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765321000039/R4.htm",
+        "linha": "Other non-current liabilities",
+        "impresso": "1,715",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "MCK",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2020,
+    "fiscalQuarter": null,
+    "field": "totalLiabilities",
+    "valor": 54536000000,
+    "motivoPt": "Soma das linhas de passivo corrente e não corrente do Balanço Consolidado (10-K FY2021 comparativo / FY2020, R4.htm), excluindo Redeemable noncontrolling interests (mezzanine).",
+    "motivoEn": "Sum of current and non-current liability lines on the Consolidated Balance Sheet (FY2021 comparative / FY2020 10-K, R4.htm), excluding Redeemable noncontrolling interests (temporary equity).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/927653/000092765320000033/",
+    "accession": "0000927653-20-000033",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 54,536,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765320000033/R4.htm",
+        "linha": "Total Current Liabilities",
+        "impresso": "42,624",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765320000033/R4.htm",
+        "linha": "Long-Term Debt",
+        "impresso": "6,335",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765320000033/R4.htm",
+        "linha": "Long-Term Deferred Tax Liabilities",
+        "impresso": "2,255",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765320000033/R4.htm",
+        "linha": "Long-Term Operating Lease Liabilities",
+        "impresso": "1,660",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765320000033/R4.htm",
+        "linha": "Other Noncurrent Liabilities",
+        "impresso": "1,662",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "MCK",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2019,
+    "fiscalQuarter": null,
+    "field": "totalLiabilities",
+    "valor": 49992000000,
+    "motivoPt": "Soma das linhas de passivo corrente e não corrente do Balanço Consolidado (10-K FY2020 comparativo, R4.htm), excluindo Redeemable noncontrolling interests (mezzanine).",
+    "motivoEn": "Sum of current and non-current liability lines on the Consolidated Balance Sheet (FY2020 comparative 10-K, R4.htm), excluding Redeemable noncontrolling interests (temporary equity).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/927653/000092765320000033/",
+    "accession": "0000927653-20-000033",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 49,992,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765320000033/R4.htm",
+        "linha": "Total Current Liabilities",
+        "impresso": "37,626",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765320000033/R4.htm",
+        "linha": "Long-Term Debt",
+        "impresso": "7,265",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765320000033/R4.htm",
+        "linha": "Long-Term Deferred Tax Liabilities",
+        "impresso": "2,998",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/927653/000092765320000033/R4.htm",
+        "linha": "Other Noncurrent Liabilities",
+        "impresso": "2,103",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "F",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2020,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 161684000000,
+    "motivoPt": "Soma da dívida de curto e longo prazo consolidada (Corporativa, Automotive, Ford Credit e Other Segments) no Balanço Consolidado do 10-K de 2020 (161,684 milhões USD).",
+    "motivoEn": "Sum of consolidated short-term and long-term debt (Corporate, Automotive, Ford Credit, and Other Segments) on the 2020 10-K Consolidated Balance Sheet ($161,684 million).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/37996/000003799621000012/",
+    "accession": "0000037996-21-000012",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (linha não encontrada: 'Operating Segments | Automotive | Total debt payable within one year')",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/37996/000003799621000012/R6.htm",
+        "linha": "Long-term debt",
+        "impresso": "291",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/37996/000003799621000012/R6.htm",
+        "linha": "Operating Segments | Automotive | Total debt payable within one year",
+        "impresso": "1,194",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/37996/000003799621000012/R6.htm",
+        "linha": "Operating Segments | Automotive | Long-term debt",
+        "impresso": "22,342",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/37996/000003799621000012/R6.htm",
+        "linha": "Operating Segments | Ford Credit | Total debt payable within one year",
+        "impresso": "49,969",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/37996/000003799621000012/R6.htm",
+        "linha": "Operating Segments | Ford Credit | Long-term debt",
+        "impresso": "87,708",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/37996/000003799621000012/R6.htm",
+        "linha": "Operating Segments | Other Segments | Total debt payable within one year",
+        "impresso": "180",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "F",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2019,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 155307000000,
+    "motivoPt": "Soma da dívida de curto e longo prazo consolidada (Corporativa, Automotive, Ford Credit e Other Segments) no Balanço Consolidado do 10-K de 2020 (155,307 milhões USD).",
+    "motivoEn": "Sum of consolidated short-term and long-term debt (Corporate, Automotive, Ford Credit, and Other Segments) on the 2020 10-K Consolidated Balance Sheet ($155,307 million).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/37996/000003799621000012/",
+    "accession": "0000037996-21-000012",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (linha não encontrada: 'Operating Segments | Automotive | Total debt payable within one year')",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/37996/000003799621000012/R6.htm",
+        "linha": "Long-term debt",
+        "impresso": "470",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/37996/000003799621000012/R6.htm",
+        "linha": "Operating Segments | Automotive | Total debt payable within one year",
+        "impresso": "1,445",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/37996/000003799621000012/R6.htm",
+        "linha": "Operating Segments | Automotive | Long-term debt",
+        "impresso": "13,233",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/37996/000003799621000012/R6.htm",
+        "linha": "Operating Segments | Ford Credit | Total debt payable within one year",
+        "impresso": "52,371",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/37996/000003799621000012/R6.htm",
+        "linha": "Operating Segments | Ford Credit | Long-term debt",
+        "impresso": "87,658",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/37996/000003799621000012/R6.htm",
+        "linha": "Operating Segments | Other Segments | Total debt payable within one year",
+        "impresso": "130",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "F",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2018,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 154213000000,
+    "motivoPt": "Soma da dívida consolidada (Corporativa, Automotive e Ford Credit) no Balanço Consolidado do 10-K de 2019 (154,213 milhões USD).",
+    "motivoEn": "Sum of consolidated debt (Corporate, Automotive, and Ford Credit) on the 2019 10-K Consolidated Balance Sheet ($154,213 million).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/37996/000003799620000010/",
+    "accession": "0000037996-20-000010",
+    "revisto": true,
+    "revistoPor": "Claude: números conferidos à mão nas páginas citadas (linha não encontrada: 'Operating Segments | Automotive | Total debt payable within one year')",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/37996/000003799620000010/R5.htm",
+        "linha": "Debt",
+        "impresso": "600",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/37996/000003799620000010/R5.htm",
+        "linha": "Operating Segments | Automotive | Total debt payable within one year",
+        "impresso": "2,314",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/37996/000003799620000010/R5.htm",
+        "linha": "Operating Segments | Automotive | Long-term Debt, Excluding Current Maturities",
+        "impresso": "11,233",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/37996/000003799620000010/R5.htm",
+        "linha": "Operating Segments | Ford Credit | Total debt payable within one year",
+        "impresso": "51,179",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/37996/000003799620000010/R5.htm",
+        "linha": "Operating Segments | Ford Credit | Long-term Debt, Excluding Current Maturities",
+        "impresso": "88,887",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "BX",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2018,
+    "fiscalQuarter": null,
+    "field": "epsDiluted",
+    "valor": 2.26,
+    "motivoPt": "EPS diluído GAAP reportado na Demonstração de Resultados (10-K 2020, R4.htm): $2,26 por ação.",
+    "motivoEn": "GAAP diluted EPS reported on Consolidated Statements of Operations (2020 10-K, R4.htm): $2.26 per share.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1393818/000119312521060361/",
+    "accession": "0001193125-21-060361",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada (us-gaap:EarningsPerShareDiluted=2)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1393818/000119312521060361/R4.htm",
+        "linha": "Net Income Per Share of Class A Common Stock - Diluted",
+        "impresso": "$ 2.26",
+        "escala": "unidades"
+      }
+    ]
+  },
+  {
+    "ticker": "BX",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2016,
+    "fiscalQuarter": null,
+    "field": "epsDiluted",
+    "valor": 1.56,
+    "motivoPt": "EPS diluído GAAP reportado na Demonstração de Resultados (10-K 2018, R4.htm): $1,56 por unidade comum.",
+    "motivoEn": "GAAP diluted EPS reported on Consolidated Statements of Operations (2018 10-K, R4.htm): $1.56 per common unit.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1393818/000119312519061011/",
+    "accession": "0001193125-19-061011",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada (us-gaap:EarningsPerShareDiluted=2)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1393818/000119312519061011/R4.htm",
+        "linha": "Net Income Per Common Unit - Common Units, Diluted",
+        "impresso": "$ 1.56",
+        "escala": "unidades"
+      }
+    ]
+  },
+  {
+    "ticker": "DELL",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "epsDiluted",
+    "valor": 7.02,
+    "motivoPt": "EPS diluído total = operações continuadas ($6.26) + operações descontinuadas ($0.76) na Demonstração de Resultados (R5.htm, 10-K FY2022).",
+    "motivoEn": "Total diluted EPS = continuing operations ($6.26) + discontinued operations ($0.76) on the Consolidated Statements of Income (R5.htm, FY2022 10-K).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1571996/000157199622000009/",
+    "accession": "0001571996-22-000009",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 7)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1571996/000157199622000009/R5.htm",
+        "linha": "Continuing operations - diluted (in dollars per share)",
+        "impresso": "6.26",
+        "escala": "unidades"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1571996/000157199622000009/R5.htm",
+        "linha": "Discontinued operations - diluted (in dollars per share)",
+        "impresso": "$ 0.76",
+        "escala": "unidades"
+      }
+    ]
+  },
+  {
+    "ticker": "VTR",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2025,
+    "fiscalQuarter": null,
+    "field": "capex",
+    "valor": 363863000,
+    "motivoPt": "Valor impresso na linha 'Capital expenditures' da Demonstração dos Fluxos de Caixa do 10-K de 2025: $(363,863) mil ($363,863,000 em valor positivo).",
+    "motivoEn": "Value printed on the 'Capital expenditures' line of the Consolidated Statements of Cash Flows in the 2025 10-K: $(363,863) thousand ($363,863,000 positive).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/740260/000074026026000006/",
+    "accession": "0000740260-26-000006",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 363,863,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/740260/000074026026000006/R10.htm",
+        "linha": "Capital expenditures",
+        "impresso": "(363,863)",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "VTR",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "capex",
+    "valor": 281614000,
+    "motivoPt": "Valor impresso na linha 'Capital expenditures' da Demonstração dos Fluxos de Caixa do 10-K de 2025: $(281,614) mil ($281,614,000 em valor positivo).",
+    "motivoEn": "Value printed on the 'Capital expenditures' line of the Consolidated Statements of Cash Flows in the 2025 10-K: $(281,614) thousand ($281,614,000 positive).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/740260/000074026026000006/",
+    "accession": "0000740260-26-000006",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 281,614,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/740260/000074026026000006/R10.htm",
+        "linha": "Capital expenditures",
+        "impresso": "(281,614)",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "VTR",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "capex",
+    "valor": 259415000,
+    "motivoPt": "Valor impresso na linha 'Capital expenditures' da Demonstração dos Fluxos de Caixa do 10-K de 2025: $(259,415) mil ($259,415,000 em valor positivo).",
+    "motivoEn": "Value printed on the 'Capital expenditures' line of the Consolidated Statements of Cash Flows in the 2025 10-K: $(259,415) thousand ($259,415,000 positive).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/740260/000074026026000006/",
+    "accession": "0000740260-26-000006",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 259,415,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/740260/000074026026000006/R10.htm",
+        "linha": "Capital expenditures",
+        "impresso": "(259,415)",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "VTR",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "capex",
+    "valor": 222130000,
+    "motivoPt": "Valor impresso na linha 'Capital expenditures' da Demonstração dos Fluxos de Caixa do 10-K de 2024: $(222,130) mil ($222,130,000 em valor positivo).",
+    "motivoEn": "Value printed on the 'Capital expenditures' line of the Consolidated Statements of Cash Flows in the 2024 10-K: $(222,130) thousand ($222,130,000 positive).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/740260/000074026025000052/",
+    "accession": "0000740260-25-000052",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 222,130,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/740260/000074026025000052/R10.htm",
+        "linha": "Capital expenditures",
+        "impresso": "(222,130)",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "AXP",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2019,
+    "fiscalQuarter": null,
+    "field": "shareRepurchases",
+    "valor": 4685000000,
+    "motivoPt": "Recompras de ações de $4,685 milhões na linha 'Repurchase of American Express common shares and other' dos fluxos de caixa (10-K 2019).",
+    "motivoEn": "Share repurchases of $4,685 million on the 'Repurchase of American Express common shares and other' line of the cash flow statement (2019 10-K).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/4962/000000496220000030/",
+    "accession": "0000004962-20-000030",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 4,685,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/4962/000000496220000030/R7.htm",
+        "linha": "Repurchase of American Express common shares and other",
+        "impresso": "(4,685)",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "AXP",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2018,
+    "fiscalQuarter": null,
+    "field": "shareRepurchases",
+    "valor": 1685000000,
+    "motivoPt": "Recompras de ações de $1,685 milhões na linha 'Repurchase of American Express common shares and other' dos fluxos de caixa (10-K 2019).",
+    "motivoEn": "Share repurchases of $1,685 million on the 'Repurchase of American Express common shares and other' line of the cash flow statement (2019 10-K).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/4962/000000496220000030/",
+    "accession": "0000004962-20-000030",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 1,685,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/4962/000000496220000030/R7.htm",
+        "linha": "Repurchase of American Express common shares and other",
+        "impresso": "(1,685)",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "AXP",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2017,
+    "fiscalQuarter": null,
+    "field": "shareRepurchases",
+    "valor": 4400000000,
+    "motivoPt": "Recompras de ações de $4,400 milhões na linha 'Repurchase of American Express common shares and other' dos fluxos de caixa (10-K 2019).",
+    "motivoEn": "Share repurchases of $4,400 million on the 'Repurchase of American Express common shares and other' line of the cash flow statement (2019 10-K).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/4962/000000496220000030/",
+    "accession": "0000004962-20-000030",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 4,400,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/4962/000000496220000030/R7.htm",
+        "linha": "Repurchase of American Express common shares and other",
+        "impresso": "(4,400)",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "AXP",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2016,
+    "fiscalQuarter": null,
+    "field": "shareRepurchases",
+    "valor": 4498000000,
+    "motivoPt": "Recompras de ações de $4,498 milhões na linha 'Repurchase of American Express common shares and other' dos fluxos de caixa (10-K 2018).",
+    "motivoEn": "Share repurchases of $4,498 million on the 'Repurchase of American Express common shares and other' line of the cash flow statement (2018 10-K).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/4962/000000496219000018/",
+    "accession": "0000004962-19-000018",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 4,498,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/4962/000000496219000018/R7.htm",
+        "linha": "Repurchase of American Express common shares and other",
+        "impresso": "(4,498)",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "CDNS",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 649056000,
+    "motivoPt": "Dívida total é a soma da parcela corrente da dívida de longo prazo ($349,285 mil) com a dívida de longo prazo ($299,771 mil) no Balanço Consolidado do 10-K FY2024.",
+    "motivoEn": "Total debt is the sum of current portion of long-term debt ($349,285 thousand) and long-term debt ($299,771 thousand) on the FY2024 10-K Consolidated Balance Sheet.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/813672/000081367225000024/",
+    "accession": "0000813672-25-000024",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria soma (us-gaap:UnsecuredLongTermDebt=299,771,000, us-gaap:UnsecuredDebtCurrent=349,285,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/813672/000081367225000024/R3.htm",
+        "linha": "Current portion of long-term debt",
+        "impresso": "349,285",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/813672/000081367225000024/R3.htm",
+        "linha": "Long-term debt",
+        "impresso": "299,771",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "CDNS",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 748078000,
+    "motivoPt": "Dívida total é a soma da linha de crédito rotativo ($100,000 mil) com a dívida de longo prazo ($648,078 mil) no Balanço Consolidado do 10-K FY2023.",
+    "motivoEn": "Total debt is the sum of revolving credit facility ($100,000 thousand) and long-term debt ($648,078 thousand) on the FY2023 10-K Consolidated Balance Sheet.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/813672/000081367224000034/",
+    "accession": "0000813672-24-000034",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 748,078,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/813672/000081367224000034/R3.htm",
+        "linha": "Revolving credit facility",
+        "impresso": "100,000",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/813672/000081367224000034/R3.htm",
+        "linha": "Long-term debt",
+        "impresso": "648,078",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "CDNS",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2018,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 445291000,
+    "motivoPt": "Dívida total é a soma da linha de crédito rotativo ($100,000 mil) com a dívida de longo prazo ($345,291 mil) no Balanço Consolidado do 10-K FY2018.",
+    "motivoEn": "Total debt is the sum of revolving credit facility ($100,000 thousand) and long-term debt ($345,291 thousand) on the FY2018 10-K Consolidated Balance Sheet.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/813672/000081367219000008/",
+    "accession": "0000813672-19-000008",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 445,291,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/813672/000081367219000008/R2.htm",
+        "linha": "Revolving credit facility",
+        "impresso": "100,000",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/813672/000081367219000008/R2.htm",
+        "linha": "Long-term debt",
+        "impresso": "345,291",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "CDNS",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2017,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 729369000,
+    "motivoPt": "Dívida total é a soma da linha de crédito rotativo ($85,000 mil) com a dívida de longo prazo ($644,369 mil) no Balanço Consolidado do 10-K FY2018.",
+    "motivoEn": "Total debt is the sum of revolving credit facility ($85,000 thousand) and long-term debt ($644,369 thousand) on the FY2018 10-K Consolidated Balance Sheet.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/813672/000081367219000008/",
+    "accession": "0000813672-19-000008",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 729,369,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/813672/000081367219000008/R2.htm",
+        "linha": "Revolving credit facility",
+        "impresso": "85,000",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/813672/000081367219000008/R2.htm",
+        "linha": "Long-term debt",
+        "impresso": "644,369",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "EQIX",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 15211000000,
+    "motivoPt": "Soma das linhas de dívida (curto e longo prazo, sem leasings) no Balanço Consolidado do 10-K de 2024: 5 + 1.199 + 644 + 13.363 = 15.211 milhões USD.",
+    "motivoEn": "Sum of debt lines (short- and long-term, excluding leases) on the Consolidated Balance Sheet in the 2024 10-K: 5 + 1,199 + 644 + 13,363 = $15,211 million.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1101239/000162828025005126/",
+    "accession": "0001628280-25-005126",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 15,211,000,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1101239/000162828025005126/R3.htm",
+        "linha": "Current portion of mortgage and loans payable",
+        "impresso": "5",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1101239/000162828025005126/R3.htm",
+        "linha": "Current portion of senior notes",
+        "impresso": "1,199",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1101239/000162828025005126/R3.htm",
+        "linha": "Mortgage and loans payable, less current portion",
+        "impresso": "644",
+        "escala": "milhões"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1101239/000162828025005126/R3.htm",
+        "linha": "Senior notes, less current portion",
+        "impresso": "13,363",
+        "escala": "milhões"
+      }
+    ]
+  },
+  {
+    "ticker": "EQIX",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 13731894000,
+    "motivoPt": "Soma das linhas de dívida (curto e longo prazo, sem leasings) no Balanço Consolidado do 10-K de 2023: 7.705 + 998.580 + 663.263 + 12.062.346 = 13.731.894 milhares USD.",
+    "motivoEn": "Sum of debt lines (short- and long-term, excluding leases) on the Consolidated Balance Sheet in the 2023 10-K: 7,705 + 998,580 + 663,263 + 12,062,346 = $13,731,894 thousand.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1101239/000162828024005350/",
+    "accession": "0001628280-24-005350",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 13,731,894,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1101239/000162828024005350/R3.htm",
+        "linha": "Current portion of mortgage and loans payable",
+        "impresso": "7,705",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1101239/000162828024005350/R3.htm",
+        "linha": "Current portion of senior notes",
+        "impresso": "998,580",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1101239/000162828024005350/R3.htm",
+        "linha": "Mortgage and loans payable, less current portion",
+        "impresso": "663,263",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1101239/000162828024005350/R3.htm",
+        "linha": "Senior notes, less current portion",
+        "impresso": "12,062,346",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "EQIX",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2021,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 11603808000,
+    "motivoPt": "Soma das linhas de dívida (curto e longo prazo, sem leasings) no Balanço Consolidado do 10-K de 2021: 33.087 + 0 + 586.577 + 10.984.144 = 11.603.808 milhares USD.",
+    "motivoEn": "Sum of debt lines (short- and long-term, excluding leases) on the Consolidated Balance Sheet in the 2021 10-K: 33,087 + 0 + 586,577 + 10,984,144 = $11,603,808 thousand.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1101239/000162828022003171/",
+    "accession": "0001628280-22-003171",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 11,603,808,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1101239/000162828022003171/R3.htm",
+        "linha": "Current portion of mortgage and loans payable",
+        "impresso": "33,087",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1101239/000162828022003171/R3.htm",
+        "linha": "Current portion of senior notes",
+        "impresso": "0",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1101239/000162828022003171/R3.htm",
+        "linha": "Mortgage and loans payable, less current portion",
+        "impresso": "586,577",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1101239/000162828022003171/R3.htm",
+        "linha": "Senior notes, less current portion",
+        "impresso": "10,984,144",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "EQIX",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2017,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 8381458000,
+    "motivoPt": "Soma das linhas de dívida (curto e longo prazo, sem leasings) no Balanço Consolidado do 10-K de 2017: 64.491 + 1.393.118 + 6.923.849 = 8.381.458 milhares USD.",
+    "motivoEn": "Sum of debt lines (short- and long-term, excluding leases) on the Consolidated Balance Sheet in the 2017 10-K: 64,491 + 1,393,118 + 6,923,849 = $8,381,458 thousand.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1101239/000162828018002212/",
+    "accession": "0001628280-18-002212",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 8,381,458,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1101239/000162828018002212/R2.htm",
+        "linha": "Current portion of mortgage and loans payable",
+        "impresso": "64,491",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1101239/000162828018002212/R2.htm",
+        "linha": "Mortgage and loans payable, less current portion",
+        "impresso": "1,393,118",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1101239/000162828018002212/R2.htm",
+        "linha": "Senior notes",
+        "impresso": "6,923,849",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "HRL",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2016,
+    "fiscalQuarter": null,
+    "field": "totalLiabilities",
+    "valor": 1918661000,
+    "motivoPt": "Passivo total de FY2016 é $1,918,661 mil (soma das 4 linhas de passivo no Balanço do 10-K de 2016, R2.htm); o valor SEC usou por engano Assets de 2017 mal datado no 10-K de 2019.",
+    "motivoEn": "FY2016 total liabilities is $1,918,661 thousand (sum of the 4 liability lines on the 2016 10-K Balance Sheet, R2.htm); the SEC extraction mistakenly used 2017 Assets mis-dated to 2016-10-30 in the 2019 10-K.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/48465/000110465916163147/",
+    "accession": "0001104659-16-163147",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 1,918,661,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/48465/000110465916163147/R2.htm",
+        "linha": "TOTAL CURRENT LIABILITIES",
+        "impresso": "1,053,196",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/48465/000110465916163147/R2.htm",
+        "linha": "LONG-TERM DEBT-less current maturities",
+        "impresso": "250,000",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/48465/000110465916163147/R2.htm",
+        "linha": "PENSION AND POST-RETIREMENT BENEFITS",
+        "impresso": "522,356",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/48465/000110465916163147/R2.htm",
+        "linha": "OTHER LONG-TERM LIABILITIES",
+        "impresso": "93,109",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "PH",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 10560099000,
+    "motivoPt": "Soma das duas linhas de dívida do Balanço Consolidado do 10-K FY2024 (3,403,065 + 7,157,034 milhares; nota: inclui 103,385 milhares de locações financeiras embutidas no balanço).",
+    "motivoEn": "Sum of the two debt lines on the FY2024 10-K Consolidated Balance Sheet (3,403,065 + 7,157,034 thousand; note: includes 103,385 thousand of finance lease liabilities embedded on the balance sheet).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/76334/000007633424000044/",
+    "accession": "0000076334-24-000044",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria soma (us-gaap:CommercialPaper=2,100,000,000, us-gaap:LongTermDebt=8,412,014,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/76334/000007633424000044/R6.htm",
+        "linha": "Notes payable and long-term debt payable within one year",
+        "impresso": "3,403,065",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/76334/000007633424000044/R6.htm",
+        "linha": "Long-term debt",
+        "impresso": "7,157,034",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "PH",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 12559459000,
+    "motivoPt": "Soma das duas linhas de dívida do Balanço Consolidado do 10-K FY2023/FY2024 (3,763,175 + 8,796,284 milhares).",
+    "motivoEn": "Sum of the two debt lines on the FY2023/FY2024 10-K Consolidated Balance Sheet (3,763,175 + 8,796,284 thousand).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/76334/000007633423000042/",
+    "accession": "0000076334-23-000042",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria soma (us-gaap:CommercialPaper=1,800,000,000, us-gaap:LongTermDebt=10,770,655,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/76334/000007633423000042/R6.htm",
+        "linha": "Notes payable and long-term debt payable within one year",
+        "impresso": "3,763,175",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/76334/000007633423000042/R6.htm",
+        "linha": "Long-term debt",
+        "impresso": "8,796,284",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "PH",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 11480135000,
+    "motivoPt": "Soma das duas linhas de dívida do Balanço Consolidado do 10-K FY2022/FY2023 (1,724,310 + 9,755,825 milhares).",
+    "motivoEn": "Sum of the two debt lines on the FY2022/FY2023 10-K Consolidated Balance Sheet (1,724,310 + 9,755,825 thousand).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/76334/000007633422000034/",
+    "accession": "0000076334-22-000034",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria soma (us-gaap:CommercialPaper=1,422,000,000, us-gaap:LongTermDebt=10,058,105,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/76334/000007633422000034/R6.htm",
+        "linha": "Notes payable and long-term debt payable within one year",
+        "impresso": "1,724,310",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/76334/000007633422000034/R6.htm",
+        "linha": "Long-term debt",
+        "impresso": "9,755,825",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "PH",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2021,
+    "fiscalQuarter": null,
+    "field": "totalDebt",
+    "valor": 6584877000,
+    "motivoPt": "Soma das duas linhas de dívida do Balanço Consolidado do 10-K FY2022 (2,824 + 6,582,053 milhares).",
+    "motivoEn": "Sum of the two debt lines on the FY2022 10-K Consolidated Balance Sheet (2,824 + 6,582,053 thousand).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/76334/000007633422000034/",
+    "accession": "0000076334-22-000034",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada (us-gaap:LongTermDebt=6,584,872,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/76334/000007633422000034/R6.htm",
+        "linha": "Notes payable and long-term debt payable within one year",
+        "impresso": "2,824",
+        "escala": "milhares"
+      },
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/76334/000007633422000034/R6.htm",
+        "linha": "Long-term debt",
+        "impresso": "6,582,053",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "TPL",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2025,
+    "fiscalQuarter": null,
+    "field": "capex",
+    "valor": 59531000,
+    "motivoPt": "CapEx ('Purchase of fixed assets') na Demonstração de Fluxos de Caixa do 10-K de 2025 é $59,531 mil ($59,531,000), e não $50,000 mil (investimento em participação societária).",
+    "motivoEn": "CapEx ('Purchase of fixed assets') on the 2025 10-K Statements of Cash Flows is $59,531 thousand ($59,531,000), not $50,000 thousand (equity investment).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1811074/000181107426000018/",
+    "accession": "0001811074-26-000018",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 59,531,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1811074/000181107426000018/R9.htm",
+        "linha": "Purchase of fixed assets",
+        "impresso": "(59,531)",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "TPL",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2024,
+    "fiscalQuarter": null,
+    "field": "capex",
+    "valor": 29696000,
+    "motivoPt": "CapEx ('Purchase of fixed assets') na Demonstração de Fluxos de Caixa do 10-K de 2025 é $29,696 mil ($29,696,000).",
+    "motivoEn": "CapEx ('Purchase of fixed assets') on the 2025 10-K Statements of Cash Flows is $29,696 thousand ($29,696,000).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1811074/000181107426000018/",
+    "accession": "0001811074-26-000018",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 29,696,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1811074/000181107426000018/R9.htm",
+        "linha": "Purchase of fixed assets",
+        "impresso": "(29,696)",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "TPL",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2023,
+    "fiscalQuarter": null,
+    "field": "capex",
+    "valor": 15028000,
+    "motivoPt": "CapEx ('Purchase of fixed assets') na Demonstração de Fluxos de Caixa do 10-K de 2025 é $15,028 mil ($15,028,000).",
+    "motivoEn": "CapEx ('Purchase of fixed assets') on the 2025 10-K Statements of Cash Flows is $15,028 thousand ($15,028,000).",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1811074/000181107426000018/",
+    "accession": "0001811074-26-000018",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 15,028,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1811074/000181107426000018/R9.htm",
+        "linha": "Purchase of fixed assets",
+        "impresso": "(15,028)",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "TPL",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2022,
+    "fiscalQuarter": null,
+    "field": "capex",
+    "valor": 19212000,
+    "motivoPt": "CapEx ('Purchase of fixed assets') na Demonstração de Fluxos de Caixa do 10-K de 2024 é $19,212 mil ($19,212,000), e não $18,967 mil.",
+    "motivoEn": "CapEx ('Purchase of fixed assets') on the 2024 10-K Statements of Cash Flows is $19,212 thousand ($19,212,000), not $18,967 thousand.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/1811074/000181107425000044/",
+    "accession": "0001811074-25-000044",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 19,212,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/1811074/000181107425000044/R9.htm",
+        "linha": "Purchase of fixed assets",
+        "impresso": "(19,212)",
+        "escala": "milhares"
+      }
+    ]
+  },
+  {
+    "ticker": "TPL",
+    "periodType": "ANNUAL",
+    "fiscalYear": 2018,
+    "fiscalQuarter": null,
+    "field": "cash",
+    "valor": 119647000,
+    "motivoPt": "Caixa e equivalentes no Balanço Consolidado do 10-K de 2019 (CIK 0000097517) é $119,647 mil ($119,647,000); $123,446 mil inclui $3,799 mil de 'Tax like-kind exchange escrow' (caixa restrito).",
+    "motivoEn": "Cash and cash equivalents on the 2019 10-K Consolidated Balance Sheet (CIK 0000097517) is $119,647 thousand ($119,647,000); $123,446 thousand includes $3,799 thousand of restricted 'Tax like-kind exchange escrow'.",
+    "fonteUrl": "https://www.sec.gov/Archives/edgar/data/97517/000009751720000017/",
+    "accession": "0000097517-20-000017",
+    "revisto": true,
+    "revistoPor": "Claude: auditoria confirmada_na_pagina (soma das parcelas 119,647,000)",
+    "prova": [
+      {
+        "url": "https://www.sec.gov/Archives/edgar/data/97517/000009751720000017/R2.htm",
+        "linha": "Cash and cash equivalents",
+        "impresso": "$ 119,647",
+        "escala": "milhares"
+      }
+    ]
+  }
+]

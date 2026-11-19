@@ -58,7 +58,7 @@ import edgar  # noqa: E402
 # como STRING VAZIA, não como variável por definir, e o default nunca entra.
 # O edgar.set_identity("") passa e só falha lá à frente, na SEC, como se fosse
 # outra coisa qualquer.
-edgar.set_identity(os.getenv("SEC_IDENTITY") or "Tiago Costa costa@engimov.pt")
+edgar.set_identity(os.getenv("SEC_IDENTITY") or "BullValue admin@bullocracy.com")  # contacto da SEC vem do ambiente
 
 
 def purge_edgar_cache_if_big(limit_gb: float = 3.0) -> bool:

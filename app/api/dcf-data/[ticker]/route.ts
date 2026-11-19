@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma"
 import { deriveFcff, deriveEffectiveTaxRate, type FcfSourceRecord } from "@/lib/finance/fcf"
 import { exigirPro } from "@/lib/api/acessoPro"
 import { normalizarTicker } from "@/lib/ticker"
-import { cotacao, get, simbolo } from "@/lib/fmp/mercado"
+import { cotacao } from "@/lib/fmp/mercado"
+import { betaFinnhub } from "@/lib/finnhub"
 import { tipoFinanceira } from "@/lib/fmp/mapear"
 
 function num(val: unknown): number | null {
@@ -27,9 +28,8 @@ async function fetchCurrentPrice(ticker: string): Promise<number | null> {
 
 async function fetchBeta(ticker: string): Promise<number | null> {
   try {
-    const perfil = await get<Array<{ beta?: number }>>("profile", { symbol: simbolo(ticker) }, 86_400)
-    const beta = perfil?.[0]?.beta
-    return typeof beta === "number" && beta > 0 && beta < 10 ? beta : null
+    const beta = await betaFinnhub(ticker)
+    return beta !== null && beta > 0 && beta < 10 ? beta : null
   } catch {
     return null
   }
@@ -41,7 +41,7 @@ export async function GET(
 ) {
   try {
     const { ticker } = await params
-    // Validado antes de chegar à FMP (duas chamadas abaixo) — ver lib/ticker.ts.
+    // Validado antes de chegar às APIs externas (FMP/Finnhub) — ver lib/ticker.ts.
     const upper = normalizarTicker(ticker)
     if (!upper) {
       return NextResponse.json({ error: "Ticker inválido" }, { status: 400 })

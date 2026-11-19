@@ -12,7 +12,8 @@
  *
  *   · fundamentais e segmentos → a base PostgreSQL LOCAL (DATABASE_URL do
  *     .env.local), alimentada pelos mesmos scripts FMP da produção;
- *   · preços, estimativas, resultados, notícias → a FMP, com a chave local.
+ *   · preços e estimativas → a FMP;
+ *   · resultados, notícias e logos em falta → a Finnhub, com a chave local.
  *
  * ── Regras ────────────────────────────────────────────────────────────────
  *
@@ -36,6 +37,7 @@ import { PrismaClient, type Fundamental } from "@prisma/client"
 import { cotacao, cotacoes, historico, noticias, amostrar, semanal, modoEstritoFmp, FmpLimite } from "../../lib/fmp/mercado"
 import { analistas } from "../../lib/fmp/estimativas"
 import { resultadosDe } from "../../lib/fmp/calendario"
+import { resolverLogoEmpresa } from "../../lib/finnhub"
 
 const url = process.env.DATABASE_URL ?? ""
 if (!/@(localhost|127\.0\.0\.1)[:/]/.test(url)) {
@@ -72,12 +74,6 @@ function erro(msg: string) {
  * Só empresas ativas: a base local ainda guarda europeias inativas de uma
  * experiência antiga (L'Oréal, LVMH…) com dados pré-FMP que o site não mostra.
  */
-/**
- * Logo público da FMP (PNG, sem chave). Cobre empresas que não têm logo na
- * base (ex.: Novo Nordisk) e deixa o Claude pô-los nas apresentações.
- */
-const logo = (ticker: string) => `https://images.financialmodelingprep.com/symbol/${ticker.toUpperCase().replace(/\./g, "-")}.png`
-
 async function empresa(ticker: string) {
   const c = await prisma.company.findUnique({ where: { ticker: ticker.trim().toUpperCase() } })
   return c && c.isActive ? c : null
@@ -170,7 +166,7 @@ async function calcularValuation(ticker: string) {
   return {
     ticker: c.ticker,
     nome: c.name,
-    logo: logo(c.ticker),
+    logo: await resolverLogoEmpresa(c.ticker, c.logoUrl),
     baseDosFundamentais: base.periodo,
     preco: r2(preco),
     variacaoDiaPct: r2(q?.changePercentage ?? null),
@@ -237,11 +233,14 @@ server.registerTool(
         ticker: { not: { startsWith: "^" } },
         OR: [{ ticker: { contains: q.toUpperCase() } }, { name: { contains: q, mode: "insensitive" } }],
       },
-      select: { ticker: true, name: true, sector: true, industry: true, exchange: true },
+      select: { ticker: true, name: true, sector: true, industry: true, exchange: true, logoUrl: true },
       take: 15,
       orderBy: { ticker: "asc" },
     })
-    return resposta(rows.map((r) => ({ ...r, logo: logo(r.ticker) })))
+    const logos = await Promise.all(rows.map((r) => resolverLogoEmpresa(r.ticker, r.logoUrl)))
+    return resposta(
+      rows.map(({ logoUrl: _logoUrl, ...r }, i) => ({ ...r, logo: logos[i] })),
+    )
   }),
 )
 
@@ -255,9 +254,12 @@ server.registerTool(
   seguro(async ({ ticker }) => {
     const c = await empresa(ticker)
     if (!c) return erro(`Empresa ${ticker} não está na base da BullValue.`)
-    const q = await cotacao(c.ticker)
+    const [q, logoResolvido] = await Promise.all([
+      cotacao(c.ticker),
+      resolverLogoEmpresa(c.ticker, c.logoUrl),
+    ])
     return resposta({
-      ticker: c.ticker, nome: c.name, logo: logo(c.ticker), bolsa: c.exchange, setor: c.sector, industria: c.industry,
+      ticker: c.ticker, nome: c.name, logo: logoResolvido, bolsa: c.exchange, setor: c.sector, industria: c.industry,
       pais: c.country, website: c.website, trabalhadores: c.employees, descricao: c.description,
       preco: q?.price ?? null, variacaoDiaPct: q?.changePercentage ?? null, marketCapFmp: q?.marketCap ?? null,
     })
@@ -462,8 +464,26 @@ server.registerTool(
     inputSchema: { tickers: z.array(z.string()).min(1).max(100) },
   },
   seguro(async ({ tickers }) => {
-    const m = await cotacoes(tickers.map((t) => t.trim().toUpperCase()))
-    return resposta([...m.values()].map((q) => ({ ticker: q.ticker, logo: logo(q.ticker), preco: q.price, variacaoDiaPct: q.changePercentage, marketCap: q.marketCap })))
+    const lista = tickers.map((t) => t.trim().toUpperCase())
+    const [m, metas] = await Promise.all([
+      cotacoes(lista),
+      prisma.company.findMany({
+        where: { ticker: { in: lista }, isActive: true },
+        select: { ticker: true, logoUrl: true },
+      }),
+    ])
+    const logoPorTicker = new Map(metas.map((c) => [c.ticker, c.logoUrl]))
+    const vals = [...m.values()]
+    const logos = await Promise.all(vals.map((q) => resolverLogoEmpresa(q.ticker, logoPorTicker.get(q.ticker))))
+    return resposta(
+      vals.map((q, i) => ({
+        ticker: q.ticker,
+        logo: logos[i],
+        preco: q.price,
+        variacaoDiaPct: q.changePercentage,
+        marketCap: q.marketCap,
+      })),
+    )
   }),
 )
 

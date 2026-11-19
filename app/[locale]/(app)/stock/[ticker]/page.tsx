@@ -159,7 +159,7 @@ export default async function StockPage({
     // 7. Cotação atual — da FMP, não da tabela `prices` (ver lib/fmp/mercado.ts)
     cotacao(company.ticker),
 
-    // Último resultado já reportado — da FMP (lib/fmp/calendario.ts).
+    // Último resultado já reportado — da Finnhub (lib/fmp/calendario.ts).
     resultadosDe(company.ticker).then(rs => rs.find(r => r.epsActual != null) ?? null),
 
     // 8. Peers — mesma INDÚSTRIA (peers reais); fallback para o setor só quando

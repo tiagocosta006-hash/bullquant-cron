@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { exigirPro, CACHE_PRIVADO } from "@/lib/api/acessoPro"
 import { normalizarTicker } from "@/lib/ticker"
 import { cotacao, get, simbolo, historico as historicoPrecos } from "@/lib/fmp/mercado"
+import { betaFinnhub } from "@/lib/finnhub"
 import { analistas } from "@/lib/fmp/estimativas"
 import { carregarSeriesReduzidas } from "@/lib/finance/seriesMacro"
 import { modeloFcffAplicavel } from "@/lib/finance/modelo/aplicabilidade"
@@ -103,8 +104,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
       { symbol: simbolo(company.ticker), period: "annual", limit: "12" },
       86_400,
     ).catch(() => null),
-    // Inflação e PIB real (variação homóloga, em cache) para o terminal growth.
-    carregarSeriesReduzidas(["^CPI_YOY", "^GDP_YOY"], { desde: new Date(Date.now() - 2 * 365 * 86_400_000), alvoPontos: 60 }).catch(() => null),
+    // Taxa do Tesouro a 10 anos (DGS10) + inflação e PIB real (FRED, em cache)
+    // para a WACC (taxa sem risco) e o terminal growth.
+    carregarSeriesReduzidas(["^DGS10", "^CPI_YOY", "^GDP_YOY"], { desde: new Date(Date.now() - 2 * 365 * 86_400_000), alvoPontos: 60 }).catch(() => null),
   ])
   const ultimoMacro = (t: string) => {
     const s = macro?.[t]
@@ -150,18 +152,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
       }
     : null
 
-  // Dados de mercado: preço, beta (perfil FMP), taxa do Tesouro a 10 anos.
-  const hoje = new Date()
-  const ha15dias = new Date(hoje.getTime() - 15 * 86_400_000)
+  // Dados de mercado: preço e histórico (FMP), beta (Finnhub /stock/metric).
+  // A taxa sem risco (^DGS10) vem da FRED via `seriesMacro.ts` acima.
   const inicioPrecos = new Date(anuais[0].periodEnd.getTime() - 10 * 86_400_000)
-  const [q, perfil, tesouro, a, serie] = await Promise.all([
+  const [q, beta, a, serie] = await Promise.all([
     cotacao(company.ticker),
-    get<Array<{ beta?: number }>>("profile", { symbol: simbolo(company.ticker) }, 86_400),
-    get<Array<{ date: string; year10?: number }>>(
-      "treasury-rates",
-      { from: ha15dias.toISOString().slice(0, 10), to: hoje.toISOString().slice(0, 10) },
-      6 * 3600,
-    ),
+    betaFinnhub(company.ticker),
     analistas(company.ticker, ultimoAnual.reportedCurrency ?? "USD", {
       fiscalYear: ultimoAnual.fiscalYear,
       periodEnd: ultimoAnual.periodEnd,
@@ -185,9 +181,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
     const ev = preco && acoes ? preco * acoes + (n(f.totalDebt) ?? 0) - (n(f.cash) ?? 0) + (n(f.minorityInterest) ?? 0) : null
     return { fiscalYear: f.fiscalYear, evEbitda: ev !== null && ebitda && ebitda > 0 ? ev / ebitda : null }
   })
-  const ultimaTaxa = Array.isArray(tesouro)
-    ? [...tesouro].sort((x, y) => (x.date < y.date ? 1 : -1)).find((t) => typeof t.year10 === "number")
-    : undefined
+  const ultimaTaxa = ultimoMacro("^DGS10")
 
   const acoes = n(recente?.sharesOutstanding) ?? null
   const divida = n(recente?.totalDebt) ?? 0
@@ -229,12 +223,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
         dataBalanco: recente ? recente.periodEnd.toISOString().slice(0, 10) : null,
       },
       contexto: {
-        rf: ultimaTaxa?.year10 != null ? ultimaTaxa.year10 / 100 : null,
-        dataRf: ultimaTaxa?.date ?? null,
+        rf: ultimaTaxa?.valor ?? null,
+        dataRf: ultimaTaxa?.data ?? null,
         cpiYoy: ultimoMacro("^CPI_YOY")?.valor ?? null,
         pibRealYoy: ultimoMacro("^GDP_YOY")?.valor ?? null,
         dataMacro: ultimoMacro("^CPI_YOY")?.data ?? null,
-        beta: typeof perfil?.[0]?.beta === "number" ? perfil[0].beta : null,
+        beta,
         custoDivida: jurosTtm !== null && divida > 0 ? Math.abs(jurosTtm) / divida : null,
         evEbitdaAtual: ev !== null && ebitdaTtm && ebitdaTtm > 0 ? ev / ebitdaTtm : null,
       },

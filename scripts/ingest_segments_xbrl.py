@@ -916,7 +916,7 @@ def segments_from_snapshot(snap: dict, receitas: dict | None = None):
         # trimestrais apesar de os publicarem no 10-Q. É a MESMA janela que o
         # is_quarterly_duration do ingest_fundamentals já usa (:716); tê-las
         # diferentes fazia a linha existir na BD sem o segmento nunca lhe chegar.
-        if 80 <= days <= 100:
+        if 80 <= days <= 119:   # Q1 de 16 semanas (KR) — mesma janela do ingest_fundamentals
             ptype = "QUARTERLY"
         elif 340 <= days <= 380:
             ptype = "ANNUAL"

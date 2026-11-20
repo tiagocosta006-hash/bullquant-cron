@@ -35,6 +35,9 @@ SAIDA = os.path.join(AQUI, ".cache", "dera")
 URL = "https://www.sec.gov/files/dera/data/financial-statement-data-sets/{q}.zip"
 UA = os.getenv("SEC_USER_AGENT") or os.getenv("SEC_IDENTITY") or "BullValue admin@bullocracy.com"
 STMTS = {"BS", "IS", "CF"}
+# v2 (20/11/2026): linhas do cash flow com dimensões ("seg"). Os trimestres feitos
+# com o formato antigo são refeitos uma vez.
+VERSAO = "v2"
 
 
 def trimestres(de, ate):
@@ -64,7 +67,8 @@ def ler_tsv(z, nome):
 
 def processar(q, ciks):
     destino = os.path.join(SAIDA, f"{q}.json.gz")
-    if os.path.exists(destino):
+    marca = os.path.join(SAIDA, f"{q}.{VERSAO}")
+    if os.path.exists(destino) and os.path.exists(marca):
         return "já feito"
     zpath = os.path.join(SAIDA, f"{q}.zip")
     req = urllib.request.Request(URL.format(q=q), headers={"User-Agent": UA})
@@ -93,19 +97,29 @@ def processar(q, ciks):
                     (p["stmt"], int(p["report"] or 0), int(p["line"] or 0), p["plabel"], p["negating"] == "1"))
         for n in ler_tsv(z, "num.txt"):
             k = (n["adsh"], n["tag"], n["version"])
-            if k not in pres or n.get("segments") or n.get("coreg") or not n["value"]:
+            if k not in pres or n.get("coreg") or not n["value"]:
                 continue
             for stmt, rep, linha, rotulo, neg in pres[k]:
-                subs[n["adsh"]]["linhas"].append({
+                # Valores com dimensões: só no cash flow, marcados com "seg". Há linhas
+                # impressas cujo valor SÓ existe por membro (TSN: recompras só na classe A)
+                # — sem elas, "a linha não está no cash flow" seria falso.
+                if n.get("segments") and stmt != "CF":
+                    continue
+                linha_out = {
                     "st": stmt, "r": rep, "l": linha, "tag": n["tag"],
                     "propria": n["version"] == n["adsh"],  # tag criada pela empresa
                     "rot": rotulo, "neg": neg, "data": n["ddate"], "q": int(n["qtrs"]),
-                    "un": n["uom"], "v": float(n["value"])})
+                    "un": n["uom"], "v": float(n["value"])}
+                if n.get("segments"):
+                    linha_out["seg"] = n["segments"]
+                subs[n["adsh"]]["linhas"].append(linha_out)
         z.close()
     finally:
         os.remove(zpath)
-    with gzip.open(destino, "wt") as fh:
+    with gzip.open(destino + ".tmp", "wt") as fh:
         json.dump(subs, fh, separators=(",", ":"))
+    os.replace(destino + ".tmp", destino)
+    open(marca, "w").close()
     return f"{len(subs)} filings, {sum(len(s['linhas']) for s in subs.values())} linhas"
 
 

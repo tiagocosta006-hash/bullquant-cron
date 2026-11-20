@@ -28,6 +28,8 @@ from notas_valores import aplicar_correcoes, notas_definicao, notas_reexpressao,
 from validar_fundamentais import validar, relatorio as relatorio_validacao
 import divida_balanco
 import receita_impressa
+import factos_em_falta
+import fluxos_impressos
 import aplicacoes_balanco
 
 # Consolas Windows usam cp1252 — sem isto, prints com caracteres fora do cp1252
@@ -401,7 +403,13 @@ DURATION_TAGS = {
         "PaymentsForRepurchaseOfEquity",
         "PaymentsToAcquireOrRedeemEntitysShares",
         "PurchaseOfTreasuryShares",
-        "PaymentsForRepurchaseOfPreferredStockAndPreferenceStock",
+        # REMOVIDO (20/11/2026): PaymentsForRepurchaseOfPreferredStockAndPreferenceStock.
+        # Resgatar preferenciais não é recomprar capital ordinário — e misturava bases entre
+        # trimestres: a KEY resgatou 525 M de preferenciais nos 9M de 2026 e o Q3 ficava
+        # 202 M em vez de 320 M; a EIX (538 M de preferenciais) idem.
+        # Última: a linha do cash flow IMPRESSO (tag própria, só com dimensões, ou
+        # ausente = 0) — ver fluxos_impressos.py. Só conta sem nenhuma tag acima.
+        fluxos_impressos.TAG_IMPRESSA,
     ],
     "dividendsPaid": [
         "PaymentsOfDividendsCommonStock",
@@ -861,6 +869,9 @@ session = requests.Session()
 session.headers.update(EDGAR_HEADERS)
 
 CACHE_DIR = os.path.join(os.path.dirname(__file__), ".cache", "companyfacts")
+# Completar o companyfacts com o XBRL dos filings que lá faltam (precisa de rede;
+# BULLVALUE_SEM_FILINGS=1 desliga, p.ex. para correr offline).
+COMPLETAR_FILINGS = os.getenv("BULLVALUE_SEM_FILINGS") != "1"
 
 # True quando o último fetch foi à rede (cache miss) — o loop principal só
 # dorme SLEEP_BETWEEN nesses casos; com cache quente a re-ingestão é local.
@@ -893,8 +904,11 @@ def fetch_edgar_facts(cik: str, refresh: bool = False) -> dict | None:
         data = r.json()
         try:
             os.makedirs(CACHE_DIR, exist_ok=True)
-            with gzip.open(cache_path, "wt", encoding="utf-8") as f:
+            # tmp + rename: um corte a meio (disco cheio, job cancelado) deixava um
+            # .gz truncado (NWSA, 20/11) — o rename é atómico.
+            with gzip.open(cache_path + ".tmp", "wt", encoding="utf-8") as f:
                 json.dump(data, f)
+            os.replace(cache_path + ".tmp", cache_path)
         except Exception:
             pass  # cache é otimização; falhar a escrita nunca é fatal
         return data
@@ -960,7 +974,11 @@ def is_quarterly_duration(entry):
         return False
     d1 = datetime.date.fromisoformat(start)
     d2 = datetime.date.fromisoformat(end)
-    return 80 <= (d2 - d1).days <= 100
+    # Até 16 semanas (112 dias): calendários 16-12-12-12 (KR) têm o Q1 de 16 semanas.
+    # Com o teto antigo de 100 dias o Q1 da KR ficava SEMPRE vazio (receita, resultado,
+    # OCF) e, por arrasto, o OCF do Q2 e a receita do Q4 (que se calculam a partir dele).
+    # 119 deixa de fora transições de calendário (FDX 2026: 121 dias).
+    return 80 <= (d2 - d1).days <= 119
 
 
 def is_ytd_duration(entry, fp):
@@ -974,7 +992,7 @@ def is_ytd_duration(entry, fp):
     # Limites inferiores acomodam calendários fiscais 4-4-5 (COST/AES):
     # Q2 YTD = 24 semanas = 168 dias; Q3 YTD = 36 semanas = 252 dias — as
     # janelas antigas (170/260) rejeitavam-nos e o capex/OCF ficava null.
-    if fp == "Q1": return 80 <= days <= 110
+    if fp == "Q1": return 80 <= days <= 119   # Q1 de 16 semanas (KR): 112 dias
     if fp == "Q2": return 160 <= days <= 200
     if fp == "Q3": return 245 <= days <= 290
     if fp in ("Q4", "FY"): return 350 <= days <= 380
@@ -1149,39 +1167,119 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
                    if fp.startswith("Q")
                    and dur_map[(fy, fp)].get("dividendPerShare") is None
                    and period_ends.get((fy, fp))]
-    if dps_missing:
-        declared: dict[tuple[str, float], str | None] = {}
-        for tag in DURATION_TAGS["dividendPerShare"]:
-            node = us_gaap.get(tag) or {}
-            for unit_key, unit_entries in (node.get("units") or {}).items():
-                if "/" not in unit_key or not isinstance(unit_entries, list):
+    # Factos com DATA por tag: {tag: {(data, valor): filed}}. Numa janela (trimestre, Q4,
+    # ano) usa-se a PRIMEIRA tag, pela ordem de prioridade, que tenha factos nessa janela:
+    # o mesmo dividendo aparece na declaração (…Declared) e no pagamento (…CashPaid) —
+    # juntar as duas tags dobrava-o (DIS 2024 Q2: 1,05 em vez de 0,45); e escolher uma só
+    # tag para todos os anos perdia as janelas que só a outra cobre.
+    datados: dict[str, dict] = {}
+    for tag in DURATION_TAGS["dividendPerShare"]:
+        node = us_gaap.get(tag) or {}
+        for unit_key, unit_entries in (node.get("units") or {}).items():
+            if "/" not in unit_key or not isinstance(unit_entries, list):
+                continue
+            for e in unit_entries:
+                if "start" in e or not e.get("end") or e.get("val") is None:
                     continue
-                for e in unit_entries:
-                    if "start" in e or not e.get("end") or e.get("val") is None:
-                        continue
-                    if "14A" in (e.get("form") or ""):
-                        continue
-                    k_decl = (e["end"], float(e["val"]))
-                    f_decl = e.get("filed")
-                    if k_decl not in declared or (f_decl or "") > (declared[k_decl] or ""):
-                        declared[k_decl] = f_decl
-        if declared:
-            q_ends = sorted({period_ends[p] for p in periods
-                             if p[1].startswith("Q") and period_ends.get(p)})
-            for (fy, fp) in dps_missing:
-                p_end = period_ends[(fy, fp)]
-                idx = q_ends.index(p_end) if p_end in q_ends else -1
-                prev_end = q_ends[idx - 1] if idx > 0 else None
-                floor = (datetime.date.fromisoformat(p_end)
-                         - datetime.timedelta(days=95)).isoformat()
-                lower = max(prev_end, floor) if prev_end else floor
-                parts = [(v, f_decl) for (d, v), f_decl in declared.items() if lower < d <= p_end]
-                if parts:
-                    dur_map[(fy, fp)]["dividendPerShare"] = sum(v for v, _ in parts)
-                    dur_map[(fy, fp)]["dividendPerShare_parts"] = parts
-                    dur_map[(fy, fp)]["dividendPerShare_filed"] = max(
-                        (f_decl for _, f_decl in parts if f_decl), default=None
-                    )
+                if "14A" in (e.get("form") or ""):
+                    continue
+                k_decl = (e["end"], float(e["val"]))
+                f_decl = e.get("filed")
+                d_tag = datados.setdefault(tag, {})
+                if k_decl not in d_tag or (f_decl or "") > (d_tag[k_decl] or ""):
+                    d_tag[k_decl] = f_decl
+
+    def _datados(ini: str, fim: str) -> list:
+        """[(valor, filed)] dos factos com data em (ini, fim], da primeira tag que os tem."""
+        for tag in DURATION_TAGS["dividendPerShare"]:
+            parts = [(v, f_d) for (d, v), f_d in (datados.get(tag) or {}).items() if ini < d <= fim]
+            if parts:
+                return parts
+        return []
+
+    if datados:
+        q_ends = sorted({period_ends[p] for p in periods
+                         if p[1].startswith("Q") and period_ends.get(p)})
+        for (fy, fp) in dps_missing:
+            p_end = period_ends[(fy, fp)]
+            idx = q_ends.index(p_end) if p_end in q_ends else -1
+            prev_end = q_ends[idx - 1] if idx > 0 else None
+            floor = (datetime.date.fromisoformat(p_end)
+                     - datetime.timedelta(days=95)).isoformat()
+            lower = max(prev_end, floor) if prev_end else floor
+            parts = _datados(lower, p_end)
+            if parts:
+                dur_map[(fy, fp)]["dividendPerShare"] = sum(v for v, _ in parts)
+                dur_map[(fy, fp)]["dividendPerShare_parts"] = parts
+                dur_map[(fy, fp)]["dividendPerShare_filed"] = max(
+                    (f_decl for _, f_decl in parts if f_decl), default=None
+                )
+
+    # DPS do Q4 dado diretamente no 10-K (3 meses a acabar no fecho do ano): quando o 10-K
+    # não traz o anual, a síntese FY − 9M não tem por onde ir e o Q4 ficava N/A apesar de
+    # impresso (JBL, FDS em 2026). Guarda-se ao lado do FY; synthesize_q4 usa-o.
+    for (fy, fp) in periods:
+        if fp != "FY" or not period_ends.get((fy, fp)):
+            continue
+        fim = period_ends[(fy, fp)]
+        for tag in DURATION_TAGS["dividendPerShare"]:
+            pool = [e for e in extract_tag_entries(us_gaap, tag, prefer_per_share=True)
+                    if is_quarterly_duration(e)]
+            ent = _best_entry_for_period(pool, fim, prefer_annual_form=True, prefer_max_scale=False)
+            if ent and ent.get("val") is not None:
+                dur_map[(fy, fp)]["_dpsQ4"] = ent["val"]
+                break
+        else:
+            # …ou como factos com DATA (DIS: 0,75 a 22/07/2026): (fecho do Q3, fecho do ano]
+            q3 = period_ends.get((fy, "Q3"))
+            parts = _datados(q3, fim) if q3 else []
+            if parts:
+                dur_map[(fy, fp)]["_dpsQ4"] = sum(v for v, _ in parts)
+        # …e o ANO pela mesma via quando o 10-K não traz o anual (DIS paga duas vezes por
+        # ano, 0,75 + 0,75, só como datas)
+        if dur_map[(fy, fp)].get("dividendPerShare") is None:
+            ini = (datetime.date.fromisoformat(fim) - datetime.timedelta(days=364)).isoformat()
+            parts = _datados(ini, fim)
+            if parts:
+                dur_map[(fy, fp)]["dividendPerShare"] = sum(v for v, _ in parts)
+                dur_map[(fy, fp)]["dividendPerShare_parts"] = parts
+
+    # DPS só acumulado: há 10-Q que dão o dividendo declarado apenas para os 9 meses
+    # (CAT, BKNG, LLY, TAP, DD em 2026) — sem facto de 3 meses, o Q3 ficava N/A. Q2/Q3 =
+    # acumulado deste trimestre − acumulado do anterior (ou Q1 + Q2 de 3 meses). Mesmo
+    # filing / mesmo exercício → a mesma base de ações, sem risco de split a meio.
+    _ant_dps = {"Q2": "Q1", "Q3": "Q2"}
+
+    def _dps_ytd(fy, fp):
+        fim = period_ends.get((fy, fp))
+        if not fim:
+            return None
+        for tag in DURATION_TAGS["dividendPerShare"]:
+            pool = [e for e in extract_tag_entries(us_gaap, tag, prefer_per_share=True)
+                    if is_ytd_duration(e, fp)]
+            ent = _best_entry_for_period(pool, fim, prefer_annual_form=False, prefer_max_scale=False)
+            if ent and ent.get("val") is not None:
+                return ent
+        return None
+
+    for (fy, fp) in sorted(periods):
+        if fp not in ("Q2", "Q3") or dur_map[(fy, fp)].get("dividendPerShare") is not None:
+            continue
+        atual = _dps_ytd(fy, fp)
+        if atual is None:
+            continue
+        ant_ent = _dps_ytd(fy, _ant_dps[fp]) if _ant_dps[fp] != "Q1" else None
+        ant = ant_ent["val"] if ant_ent else None
+        if ant is None:
+            qs = ["Q1"] if fp == "Q2" else ["Q1", "Q2"]
+            vals = [dur_map.get((fy, q), {}).get("dividendPerShare") for q in qs]
+            ant = sum(vals) if all(v is not None for v in vals) else None
+        if ant is None:
+            continue
+        v = atual["val"] - ant
+        if v >= -1e-9:
+            dur_map[(fy, fp)]["dividendPerShare"] = max(v, 0.0)
+            dur_map[(fy, fp)]["dividendPerShare_filed"] = atual.get("filed")
 
     # 18/11: amortizações, SBC, recompras, dividendos pagos e os fluxos de
     # investimento/financiamento vêm muitas vezes SÓ no cash flow, que nos 10-Q
@@ -1495,7 +1593,12 @@ _DIVIDEND_EVIDENCE = _re.compile(r"Dividend")
 # common), e assumptions de option pricing (ExpectedDividend/Rate/Yield).
 _DIVIDEND_EXCLUDE = _re.compile(
     r"Received|Income|Restriction|MinorityInterest|Noncontrolling|Preferred|"
-    r"ExpectedDividend|DividendRate|Yield"
+    r"ExpectedDividend|DividendRate|Yield|"
+    # 20/11/2026: dividendos RECEBIDOS de participadas e ações com direito a dividendo
+    # não são a empresa a pagar — UBER/PLTR (ProceedsFromEquityMethodInvestmentDividends…),
+    # CMG (…NonForfeitableDividendRights): 17 não pagadoras ficavam com DPS N/A em vez de 0.
+    r"^Proceeds|EquityMethod|Distributions?FromAffiliate|Incremental|NonForfeitableDividendRights|"
+    r"ParticipatingSecurit|Subsidiar"
 )
 # Tags inequivocamente de dividendos a COMMON — só estas contam para os ANOS.
 # Tags genéricas (Dividends, PaymentsOfDividends, DividendsPayable) incluem
@@ -2959,6 +3062,9 @@ def synthesize_q4(periods: set, period_ends: dict, period_filed: dict,
             if ja_extraido is not None:
                 continue  # extração EDGAR é fonte de verdade
             vals = [d.get(field) for d in q_durs]
+            if field == "dividendPerShare" and fy_dur.get("_dpsQ4") is not None:
+                derived[field] = fy_dur["_dpsQ4"]   # o 10-K imprime o Q4: não há que subtrair
+                continue
             if fv is None or any(v is None for v in vals):
                 continue
             # Per-share: FY pode vir retaggado pós-split e os quarters não —
@@ -3200,6 +3306,12 @@ def process_company(conn, company: dict, dry_run: bool = False,
     facts_json = fetch_edgar_facts(cik, refresh=REFRESH_CACHE)
     if not facts_json:
         return 0
+    # O companyfacts da SEC não traz alguns filings (EIX/XOM/NEE 10-Q de 2026…):
+    # juntam-se os factos lidos do XBRL desses filings — ver factos_em_falta.py.
+    if COMPLETAR_FILINGS:
+        juntos = factos_em_falta.completar(cik, facts_json)
+        if juntos:
+            print(f"    + filings fora do companyfacts: {', '.join(juntos)}")
 
     facts = facts_json.get("facts") or {}
     ns_us = facts.get("us-gaap") or {}
@@ -3211,6 +3323,8 @@ def process_company(conn, company: dict, dry_run: bool = False,
     if not namespace:
         return 0
 
+    if namespace is ns_us:
+        fluxos_impressos.injetar(cik, namespace)
     dei_ns = facts.get("dei") or {}
     filtrar_splits_desmentidos(company.get("ticker"), dei_ns)
     evidence = compute_company_evidence(facts_json)
@@ -3511,6 +3625,18 @@ def process_company(conn, company: dict, dry_run: bool = False,
     # Rede de segurança: anula o impossível e sinaliza incoerências ANTES das
     # correções revistas (essas têm prova e passam por cima). Ver validar_fundamentais.py.
     validar(ticker, rows, company.get("sector"))
+
+    # DPS anual em falta = soma dos quatro trimestres (já na mesma base de ações, depois
+    # dos ajustes de split): há 10-K que só dão o dividendo do Q4 (JBL, FDS em 2026) e
+    # anuais que o validador anula por serem menores do que três trimestres (V 2026: 0,67).
+    dps_q = {(r.get("fiscalYear"), r.get("fiscalQuarter")): r.get("dividendPerShare")
+             for r in rows if r.get("periodType") == "QUARTERLY"}
+    for row in rows:
+        if row.get("periodType") != "ANNUAL" or row.get("dividendPerShare") is not None:
+            continue
+        qs = [dps_q.get((row.get("fiscalYear"), i)) for i in (1, 2, 3, 4)]
+        if all(v is not None for v in qs) and sum(qs) > 0:
+            row["dividendPerShare"] = sum(qs)
     notas = notas_definicao(rows) + aplicar_correcoes(ticker, rows)
     try:
         notas += notas_reexpressao(facts_json, cik, rows, {**DURATION_TAGS, **INSTANT_TAGS},

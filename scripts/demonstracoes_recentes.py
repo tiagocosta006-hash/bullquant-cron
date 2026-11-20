@@ -30,6 +30,7 @@ import time
 AQUI = os.path.dirname(os.path.abspath(__file__))
 PASTA = os.path.join(AQUI, ".cache", "dera")
 DESTINO = os.path.join(PASTA, "recentes.json.gz")
+VERSAO = 2   # 2: com o cash flow (recompras impressas — fluxos_impressos.py)
 _COL = re.compile(r"^(\d{4}-\d{2}-\d{2})(?: \((Q\d|FY|YTD)\))?$")
 
 
@@ -49,8 +50,11 @@ def linhas_do_filing(filing, moeda: str = "USD") -> list[dict]:
     if xbrl is None:
         return []
     anual = filing.form.startswith("10-K")
+    info = getattr(xbrl, "entity_info", None) or {}
+    fp = str(info.get("fiscal_period") or ("FY" if anual else ""))
+    q_cf = 4 if (anual or fp == "FY") else {"Q1": 1, "Q2": 2, "Q3": 3}.get(fp)
     out = []
-    for st, r, fn in (("BS", 2, "balance_sheet"), ("IS", 4, "income_statement")):
+    for st, r, fn in (("BS", 2, "balance_sheet"), ("IS", 4, "income_statement"), ("CF", 6, "cashflow_statement")):
         try:
             df = getattr(xbrl.statements, fn)().to_dataframe()
         except Exception:
@@ -58,10 +62,14 @@ def linhas_do_filing(filing, moeda: str = "USD") -> list[dict]:
         cols = [(c, _COL.match(str(c))) for c in df.columns]
         cols = [(c, m.group(1), m.group(2)) for c, m in cols if m]
         for i, row in enumerate(df.itertuples(index=False), start=1):
-            rd = row._asdict() if hasattr(row, "_asdict") else dict(zip(df.columns, row))
             rd = dict(zip(df.columns, row))
-            if rd.get("abstract") or rd.get("dimension") or rd.get("is_breakdown"):
+            if rd.get("abstract"):
                 continue
+            seg = None
+            if rd.get("dimension") or rd.get("is_breakdown"):
+                if st != "CF" or not rd.get("dimension_axis"):
+                    continue
+                seg = f"{rd.get('dimension_axis')}={rd.get('dimension_member')};"   # como no DERA
             conceito = str(rd.get("concept") or "")
             prefixo, _, tag = conceito.partition("_")
             if not tag:
@@ -72,16 +80,31 @@ def linhas_do_filing(filing, moeda: str = "USD") -> list[dict]:
                     continue
                 if st == "BS":
                     q = 0
+                elif st == "CF":
+                    # o cash flow é acumulado desde o início do ano: a duração vem do
+                    # período fiscal do filing (Q2 → 2 trimestres), como o qtrs do DERA
+                    if not q_cf:
+                        continue
+                    q = q_cf
                 elif tipo == "YTD":
                     continue
                 elif tipo == "FY" or (tipo is None and anual):
                     q = 4
                 else:
                     q = 1
-                out.append({"st": st, "r": r, "l": i, "tag": tag, "propria": prefixo not in ("us-gaap", "dei", "srt"),
-                            "rot": str(rd.get("label") or ""), "data": data.replace("-", ""), "q": q,
-                            "un": moeda, "v": float(v)})
+                linha = {"st": st, "r": r, "l": i, "tag": tag, "propria": prefixo not in ("us-gaap", "dei", "srt"),
+                         "rot": str(rd.get("label") or ""), "data": data.replace("-", ""), "q": q,
+                         "un": moeda, "v": float(v)}
+                if seg:
+                    linha["seg"] = seg
+                out.append(linha)
     return out
+
+
+def _gravar(cache):
+    with gzip.open(DESTINO + ".tmp", "wt") as fh:
+        json.dump(cache, fh)
+    os.replace(DESTINO + ".tmp", DESTINO)
 
 
 def main():
@@ -104,7 +127,8 @@ def main():
     except (OSError, ValueError):
         cache = {}
     # filings já cobertos por um trimestre DERA saem (o DERA é a fonte oficial)
-    cache = {k: v for k, v in cache.items() if v["filed"] > desde.replace("-", "")}
+    cache = {k: v for k, v in cache.items() if v["filed"] > desde.replace("-", "")
+             and v.get("versao") == VERSAO}   # formato antigo (sem cash flow) → reler
     novos = 0
     for i, (ticker, cik, moeda) in enumerate(empresas, 1):
         try:
@@ -122,13 +146,13 @@ def main():
                 print(f"[{i}] {ticker} {adsh}: erro {e!r}", flush=True)
                 continue
             cache[adsh] = {"cik": str(int(cik)), "form": f.form, "period": str(f.period_of_report).replace("-", ""),
-                           "filed": str(f.filing_date).replace("-", ""), "linhas": linhas}
+                           "filed": str(f.filing_date).replace("-", ""), "linhas": linhas, "versao": VERSAO}
             novos += 1
             print(f"[{i}/{len(empresas)}] {ticker} {f.form} {f.filing_date}: {len(linhas)} linhas", flush=True)
             time.sleep(0.15)
         if novos and novos % 25 == 0:
-            json.dump(cache, gzip.open(DESTINO, "wt"))
-    json.dump(cache, gzip.open(DESTINO, "wt"))
+            _gravar(cache)
+    _gravar(cache)
     print(f"recentes: {len(cache)} filings (novos {novos}) desde {desde} → {DESTINO}")
 
 

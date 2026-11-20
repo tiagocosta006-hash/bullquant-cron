@@ -193,5 +193,54 @@ al.append({"ticker": "D", "periodo": "2026Q3", "campo": "cash", "nivel": "sinali
 g = {x["motivo"]: x["tipo"] for x in AN.triar(al)}
 check("mesmo motivo em 3 empresas = padrão; numa só = isolado", g == {"m1": "padrão", "m2": "isolado"})
 
+# ── Recompras lidas do cash flow impresso (fluxos_impressos.py) ──
+import fluxos_impressos as FI  # noqa: E402
+
+
+def cf(l, tag, rot, v, seg=None, data="20260930", q=3):
+    x = {"st": "CF", "r": 6, "l": l, "tag": tag, "rot": rot, "data": data, "q": q, "un": "USD", "v": v}
+    if seg:
+        x["seg"] = seg
+    return x
+
+
+base = [cf(1, "NetIncomeLoss", "Net income", 5e9), cf(2, "NetCashProvidedByUsedInOperatingActivities", "OCF", 7e9),
+        cf(3, "PaymentsToAcquirePropertyPlantAndEquipment", "Capex", 1e9),
+        cf(9, "PaymentsOfDividends", "Dividends paid", 1e9)]
+check("KEY: recompras em bolsa (tag própria); a linha do plano de empregados sai",
+      FI.recompras_do_cf(base + [cf(5, "PaymentsForRepurchaseOfCommonStockOpenMarket", "Common Share repurchases", 1047e6),
+                                 cf(6, "PaymentsForRepurchaseOfOtherEquity",
+                                    "Employee equity compensation program Common Share repurchases", 47e6)],
+                         "20260930", 3) == 1047e6)
+check("IBM: só retenções para impostos → não há recompra (0)",
+      FI.recompras_do_cf(base + [cf(5, "PaymentsRelatedToTaxWithholdingForShareBasedCompensation",
+                                    "Common stock repurchases for tax withholdings", 817e6)], "20260930", 3) == 0)
+check("FDX: total e parcelas dos programas com a mesma tag → o total",
+      FI.recompras_do_cf(base + [cf(5, "PaymentsForRepurchaseOfCommonStock", "Purchases of common stock", 900e6),
+                                 cf(6, "PaymentsForRepurchaseOfCommonStock", "2024 program", 200e6),
+                                 cf(7, "PaymentsForRepurchaseOfCommonStock", "2026 program", 700e6)],
+                         "20260930", 3) == 900e6)
+check("TSN: linha impressa só com o membro da classe A conta",
+      FI.recompras_do_cf(base + [cf(5, "PaymentsForRepurchaseOfCommonStock", "Repurchase of common stock", 123e6,
+                                    seg="ClassOfStock=CommonClassA;")], "20260930", 3) == 123e6)
+check("FANG: a tag padrão manda; as unidades da subsidiária (tag própria) saem",
+      FI.recompras_do_cf(base + [cf(5, "PaymentsForRepurchaseOfCommonStock", "Repurchased shares", 431e6,
+                                    seg="RelatedPartyTransactionsByRelatedParty=NonrelatedParty;"),
+                                 cf(5, "PaymentsForRepurchaseOfCommonStock", "Repurchased shares", 509e6,
+                                    seg="RelatedPartyTransactionsByRelatedParty=RelatedParty;"),
+                                 cf(6, "PaymentsForRepurchaseOfCommonStockUnits",
+                                    "Repurchased shares/units under Viper's repurchase program", 318e6)],
+                         "20260930", 3) == 940e6)
+check("cash flow sem linha de recompra → 0; acordos de recompra (repos) e preferenciais não contam",
+      FI.recompras_do_cf(base + [cf(5, "IncreaseDecreaseInPayablesUnderRepurchaseAgreements",
+                                    "Securities sold under agreements to repurchase", 13e9),
+                                 cf(6, "PaymentsForRepurchaseOfPreferredStockAndPreferenceStock",
+                                    "Preferred stock repurchased", 538e6)], "20260930", 3) == 0)
+check("sem cash flow nessa coluna → None (não se inventa zero)",
+      FI.recompras_do_cf(base, "20250930", 3) is None)
+check("KEY: coluna de 3 meses com linhas soltas (sem o total operacional) não é cash flow → None",
+      FI.recompras_do_cf([cf(1, "NetIncomeLoss", "Net income", 5e8, q=1), cf(2, "ProvisionForLoanLossesExpensed",
+                          "Provision", 1e8, q=1), cf(3, "Depreciation", "Depreciation", 1e8, q=1)], "20260930", 1) is None)
+
 print(f"\n{'OK' if not falhas else f'{falhas} FALHA(S)'}")
 sys.exit(1 if falhas else 0)

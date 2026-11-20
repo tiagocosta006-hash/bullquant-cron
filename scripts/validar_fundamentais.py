@@ -39,7 +39,9 @@ _alertas: list[dict] = []
 
 def _a(ticker, row, campo, nivel, motivo, **extra):
     _alertas.append({"ticker": ticker, "periodo": _periodo(row), "campo": campo,
-                     "nivel": nivel, "motivo": motivo, **extra})
+                     "nivel": nivel, "motivo": motivo,
+                     # data do filing: o relatório dos filings NOVOS filtra por ela
+                     "filed": str(row.get("filedAt") or "")[:10] or None, **extra})
 
 
 def _periodo(row):

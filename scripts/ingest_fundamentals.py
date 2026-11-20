@@ -3692,7 +3692,9 @@ def main():
             n = process_company(conn, company, dry_run=bool(dry_run_path), collector=collector)
             print(f"{n} períodos")
             total_periods += n
-        except psycopg2.OperationalError:
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            # InterfaceError = "connection already closed": a ligação caiu entre duas
+            # empresas (na réplica caiu à 358.ª e as 162 seguintes falharam todas).
             try:
                 # Supabase drops idle connections after ~10 mins, reconnect and retry
                 conn = psycopg2.connect(DIRECT_URL)
@@ -3731,6 +3733,9 @@ def main():
         conn.close()
         return
 
+    if conn.closed:   # a ligação caiu a meio da corrida: a sincronização abre outra
+        conn = psycopg2.connect(DIRECT_URL)
+        conn.autocommit = False
     sync_dual_class(conn)
 
     conn.close()

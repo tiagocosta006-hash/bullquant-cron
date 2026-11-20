@@ -185,5 +185,13 @@ check("ADP: 1.236 antes de impostos + 138 juros − 102 não operacionais = 1.27
       abs(IF.ebit_de_baixo({"incomeBeforeTax": 1236e6, "interestExpense": 138e6,
                             "otherNonOperatingIncome": 102e6}) - 1272e6) < 1)
 
+# ── Alertas dos filings novos: padrão (≥3 empresas) vs isolado ──
+import alertas_novos as AN  # noqa: E402
+al = [{"ticker": t, "periodo": "2026Q3", "campo": "totalDebt", "nivel": "sinalizar", "motivo": "m1",
+       "filed": "2026-11-05"} for t in ("A", "B", "C")]
+al.append({"ticker": "D", "periodo": "2026Q3", "campo": "cash", "nivel": "sinalizar", "motivo": "m2", "filed": "2026-11-05"})
+g = {x["motivo"]: x["tipo"] for x in AN.triar(al)}
+check("mesmo motivo em 3 empresas = padrão; numa só = isolado", g == {"m1": "padrão", "m2": "isolado"})
+
 print(f"\n{'OK' if not falhas else f'{falhas} FALHA(S)'}")
 sys.exit(1 if falhas else 0)

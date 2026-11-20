@@ -14,6 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from construir_splits import fator_limpo  # noqa: E402
 from divida_balanco import divida_do_balanco  # noqa: E402
+import ingest_fundamentals as IF  # noqa: E402
 from ingest_fundamentals import melhor_da  # noqa: E402
 import validar_fundamentais as V  # noqa: E402
 
@@ -42,6 +43,13 @@ check("3:2", fator_limpo(1.5) == 1.5)
 check("spin-off FTV 1,195 rejeitado", fator_limpo(1.195) is None)
 check("spin-off DHR 1,319 rejeitado", fator_limpo(1.319) is None)
 check("spin-off DHR 1,128 rejeitado", fator_limpo(1.128) is None)
+
+IF._splits_eventos_cache = {"SNDK": [{"data": "2026-11-20", "fator": 8.0}]}
+check("split anunciado (SNDK 8:1 a 20/11/2026) não se aplica antes da data",
+      IF.fator_split_para_filed("SNDK", "2026-08-01", hoje="2026-11-19") == 1.0)
+check("… e aplica-se depois da data",
+      IF.fator_split_para_filed("SNDK", "2026-08-01", hoje="2026-11-21") == 8.0)
+IF._splits_eventos_cache = None
 
 
 # ── Dívida lida do balanço ──
@@ -85,6 +93,43 @@ b = {"fiscalYear": 2024, "fiscalQuarter": None, "periodType": "ANNUAL", "totalAs
 V.validar("Y", [b])
 check("balanço fecha com minoritários + capital temporário → sem alerta",
       not any(a["motivo"].startswith("ativo") for a in V._alertas))
+
+# ── Segmentos: só eixos que fecham com a receita gravada ──
+from ingest_segments_xbrl import eixos_coerentes  # noqa: E402
+rsg = {"segment": {"Group 1": 8.6, "Group 2": 8.2, "Group 3": 1.8, "Corporate": 0.4},
+       "product": {"Landfill": 4.0, "Collection": 12.6}}
+ok = eixos_coerentes(rsg, 16.6)
+check("RSG: segmentos antes de eliminações (+15%) rejeitados; produto que fecha fica",
+      "segment" not in ok and "product" in ok)
+trgp = {"segment": {"Other": 0.0, "Reconciling items": 22.0, "Corporate and Eliminations": -4.9}}
+check("TRGP: partição feita de linhas de reconciliação rejeitada", eixos_coerentes(trgp, 17.0) == {})
+check("sem receita gravada → eixos passam", eixos_coerentes(rsg, None) == rsg)
+
+# ── Receita: a linha impressa na demonstração de resultados ──
+import receita_impressa as RI  # noqa: E402
+
+
+def li(l, tag, rot, v, r=3, data="20251231", q=4):
+    return {"st": "IS", "r": r, "l": l, "tag": tag, "rot": rot, "v": v, "data": data, "q": q, "un": "USD"}
+
+
+cop = [li(2, "Revenues", "Sales and other operating revenues", 58.94e9),
+       li(3, "IncomeLossFromEquityMethodInvestments", "Equity in earnings of affiliates", 1.33e9),
+       li(6, "RevenuesAndOtherIncome", "Total revenues and other income", 61.55e9)]
+check("COP 2025: 'Sales and other operating revenues' 58,94 mM (não o subtotal ASC 606)",
+      RI.receita_da_demonstracao(cop, "20251231", 4) == (58.94e9, "Revenues"))
+rej = set()
+cvx = [li(2, "RevenueFromContractWithCustomerExcludingAssessedTax", "Sales and other operating revenues", 193.41e9),
+       li(3, "EquityMethodInvestmentIncome", "Income (loss) from equity affiliates", 4.60e9),
+       li(5, "Revenues", "Total", 202.79e9)]
+check("CVX: total com associadas (mesmo só 'Total') fica de fora e é vetado",
+      RI.receita_da_demonstracao(cvx, "20251231", 4, rej)[0] == 193.41e9 and ("Revenues", 202.79e9) in rej)
+mo = [li(1, "RevenueFromContractWithCustomerExcludingAssessedTax", "Net revenues", 23.28e9),
+      li(3, "OtherCostOfOperatingRevenue", "Excise taxes on products", 3.14e9)]
+check("MO: receita impressa com impostos especiais → não se usa", RI.receita_da_demonstracao(mo, "20251231", 4) is None)
+rjf = [li(1, "Revenues", "Total revenues", 15.91e9), li(3, "RevenuesNetOfInterestExpense", "Net revenues", 14.07e9)]
+check("RJF: corretora usa a receita líquida de juros",
+      RI.receita_da_demonstracao(rjf, "20251231", 4)[0] == 14.07e9)
 
 print(f"\n{'OK' if not falhas else f'{falhas} FALHA(S)'}")
 sys.exit(1 if falhas else 0)

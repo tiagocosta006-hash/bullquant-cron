@@ -760,6 +760,39 @@ def canonicalize_labels(merged: dict) -> int:
     return trocas
 
 
+TOL_RECEITA_GRAVADA = 0.10
+_LINHA_RECONCILIACAO = _re.compile(r"\bcorporate\b|eliminat|reconcil|intersegment|unallocated", _re.I)
+
+
+def eixos_coerentes(by_axis, receita):
+    """Só os eixos que se podem mostrar AO LADO da receita gravada.
+
+    O filing reconcilia a partição com o seu próprio total, mas esse total pode
+    ser outro: vendas antes de eliminar as vendas entre segmentos (RSG, COP,
+    SRE: +10–15%), receita com impostos especiais (MO, DEO), ou uma "partição"
+    feita quase só de linhas de reconciliação (TRGP: 'Reconciling items' 22 mM
+    e 'Corporate and Eliminations' −4,9 mM). Um gráfico cuja soma não é a
+    receita que o utilizador vê ao lado engana, por isso:
+      · a soma tem de ficar a ±10% da receita gravada;
+      · linhas corporativas/eliminações/reconciliação não podem pesar >25%.
+    Sem receita gravada não há com que comparar e o eixo passa como está.
+    """
+    if not receita or receita <= 0:
+        return by_axis
+    out = {}
+    for eixo, membros in by_axis.items():
+        if not membros:
+            continue
+        soma = sum(membros.values())
+        if abs(soma / receita - 1) > TOL_RECEITA_GRAVADA:
+            continue
+        recon = sum(abs(v) for k, v in membros.items() if _LINHA_RECONCILIACAO.search(k))
+        if recon > 0.25 * receita:
+            continue
+        out[eixo] = membros
+    return out
+
+
 def pick_primary(by_axis):
     """Partição principal para a coluna revenueSegments (mapa plano).
 
@@ -1110,9 +1143,6 @@ def main():
                         (company_id,),
                     )
                 for (ptype, pend), by_axis in merged.items():
-                    primary = pick_primary(by_axis)
-                    if not primary:
-                        continue
                     # A partição reconcilia dentro do FILING, mas a receita da
                     # nossa BD pode ser outro conceito. Nos bancos é: o XBRL
                     # reparte só as comissões e a BD guarda a receita com margem
@@ -1128,10 +1158,17 @@ def main():
                     )
                     _row = cur.fetchone()
                     _rev = float(_row[0]) if _row and _row[0] else None
-                    if _rev and _rev > 0:
-                        if sum(primary.values()) < 0.5 * _rev:
-                            stats["cobertura_insuficiente"] += 1
-                            continue
+                    by_axis = eixos_coerentes(by_axis, _rev)
+                    primary = pick_primary(by_axis)
+                    if not primary:
+                        stats["cobertura_insuficiente"] += 1
+                        cur.execute(
+                            'UPDATE fundamentals SET "revenueSegments" = NULL, "revenueSegmentsByAxis" = NULL '
+                            'WHERE "companyId" = %s AND "periodType" = %s::"period_type" '
+                            'AND "periodEnd"::date = %s::date',
+                            (company_id, ptype, pend),
+                        )
+                        continue
                     cur.execute(
                         'UPDATE fundamentals SET "revenueSegments" = %s, '
                         '"revenueSegmentsByAxis" = %s '

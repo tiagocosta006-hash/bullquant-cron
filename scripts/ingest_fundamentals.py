@@ -27,6 +27,7 @@ from dotenv import load_dotenv
 from notas_valores import aplicar_correcoes, notas_definicao, notas_reexpressao, gravar_notas
 from validar_fundamentais import validar, relatorio as relatorio_validacao
 import divida_balanco
+import receita_impressa
 
 # Consolas Windows usam cp1252 — sem isto, prints com caracteres fora do cp1252
 # (ex.: "←" no sync de classes duplas) matam o script a meio da ingestão.
@@ -718,21 +719,24 @@ def carregar_splits_eventos() -> dict[str, list[dict]]:
     return _splits_eventos_cache
 
 
-def fator_split_para_filed(ticker: str | None, filed: str | None) -> float:
-    """Produto dos fatores dos splits de `ticker` com `data >= 2000-01-01` e `data > filed`."""
+def fator_split_para_filed(ticker: str | None, filed: str | None, hoje: str | None = None) -> float:
+    """Produto dos fatores dos splits de `ticker` com `data >= 2000-01-01`, `data > filed` e já ocorridos."""
     if not ticker or not filed:
         return 1.0
     eventos = carregar_splits_eventos().get(ticker)
     if not eventos:
         return 1.0
     filed_iso = str(filed)[:10]
+    # Split anunciado mas ainda por acontecer: os números publicados continuam na base antiga.
+    # Quando a data passar, a seleção por eventos (get_companies_with_cik) reprocessa a empresa.
+    hoje = (hoje or datetime.date.today().isoformat())[:10]
     f = 1.0
     for ev in eventos:
         d = ev.get("data")
         fac = ev.get("fator")
         if not d or not fac:
             continue
-        if d >= SPLIT_MIN_DATE and d > filed_iso:
+        if d >= SPLIT_MIN_DATE and d > filed_iso and d <= hoje:
             f *= float(fac)
     return f
 
@@ -749,10 +753,11 @@ def get_companies_with_cik(cur, tickers: list[str] | None = None) -> list[dict]:
         # ainda não publicou o 10-Q correspondente, quem teve um split após o último
         # updatedAt dos seus fundamentais, ou quem não é atualizado há >95 dias.
         splits_eventos = carregar_splits_eventos()
+        hoje_iso = datetime.date.today().isoformat()
         split_tickers: list[str] = []
         split_dates: list[str] = []
         for t, evs in splits_eventos.items():
-            datas = [ev["data"] for ev in evs if ev.get("data") and ev["data"] >= SPLIT_MIN_DATE]
+            datas = [ev["data"] for ev in evs if ev.get("data") and SPLIT_MIN_DATE <= ev["data"] <= hoje_iso]
             if datas:
                 split_tickers.append(t)
                 split_dates.append(max(datas))
@@ -2997,6 +3002,102 @@ def dei_shares_near(dei: dict, period_end: str | None) -> float | None:
     return val
 
 
+def aplicar_receita_impressa(cik, dur_map, period_ends, namespace) -> int:
+    """Receita = a linha que a empresa IMPRIME na demonstração de resultados, quando é
+    maior do que a escolhida pelas tags (ver receita_impressa.py: COP, SRE, BRK.B
+    ficavam com o subtotal ASC 606). Só sobe, nunca desce: uma receita impressa menor
+    seria outro conceito (excise, segmento) e a escolha por tags já a tratou.
+    Corre ANTES do Q4 sintético para que Q4 = ano − 9 meses use a receita certa."""
+    try:
+        impressas = receita_impressa.para_cik(cik)
+    except Exception as e:  # sem DERA o motor segue só com as tags
+        print(f"    ⚠️ receita impressa indisponível ({e})")
+        return 0
+    if not impressas:
+        return 0
+    n = 0
+    for (fy, fp), dur in dur_map.items():
+        fim = period_ends.get((fy, fp))
+        if not fim or fp == "Q4":
+            continue
+        q = 4 if fp == "FY" else 1
+        try:
+            f0 = datetime.date.fromisoformat(str(fim)[:10])
+        except ValueError:
+            continue
+        hit = next((vf for (d, qq), vf in impressas.items() if qq == q
+                    and abs((datetime.date.fromisoformat(d) - f0).days) <= 5), None)
+        if not hit:
+            continue
+        v, filed = hit
+        atual = dur.get("revenue")
+        if atual is not None and v <= atual * 1.01:
+            continue
+        # A nossa receita é uma REEXPRESSÃO posterior à linha impressa (operações
+        # descontinuadas, spin-off: RVTY 2021, HON 3T 2025)? Então fica a nossa.
+        if atual is not None and _receita_reexpressa_depois(namespace, f0, fp, atual, filed):
+            continue
+        # A diferença é exatamente os proveitos que não são receita (associadas, outros
+        # proveitos, derivados)? Então a linha impressa é "receita + outros proveitos" —
+        # a ExxonMobil, desde 2023, só deixa ver essa linha no DERA (82,914 = 80,795 de
+        # receita + 2,119 de associadas e outros proveitos).
+        if atual is not None:
+            outros = _outros_proveitos(namespace, f0, fp)
+            if outros and abs((v - atual) - outros) <= 0.02 * abs(v - atual):
+                continue
+        dur["revenue"] = v
+        n += 1
+    return n
+
+
+_TAGS_OUTROS_PROVEITOS = ("IncomeLossFromEquityMethodInvestments", "OtherNonoperatingIncomeExpense",
+                          "NonoperatingIncomeExpense", "OtherNonoperatingIncome",
+                          "InvestmentIncomeInterestAndDividend", "DerivativeGainLossOnDerivativeNet",
+                          "GainLossOnDerivativeInstrumentsNetPretax", "GainLossOnSaleOfPropertyPlantEquipment")
+
+
+def _outros_proveitos(namespace, fim, fp) -> float:
+    """Soma dos proveitos que não são receita publicados para o período (o facto mais
+    recente de cada tag)."""
+    total = 0.0
+    for tag in _TAGS_OUTROS_PROVEITOS:
+        melhor = None
+        for e in extract_tag_entries(namespace, tag):
+            if not e.get("end") or not (is_annual_duration(e) if fp == "FY" else is_quarterly_duration(e)):
+                continue
+            try:
+                if abs((datetime.date.fromisoformat(e["end"]) - fim).days) > 5:
+                    continue
+            except ValueError:
+                continue
+            if melhor is None or (e.get("filed") or "") > (melhor.get("filed") or ""):
+                melhor = e
+        if melhor and melhor.get("val") is not None:
+            total += melhor["val"]
+    return total
+
+
+def _receita_reexpressa_depois(namespace, fim, fp, valor, filed_impresso) -> bool:
+    """Há um facto de receita = `valor` (±0,5%) para este período entregue DEPOIS do
+    filing que imprimiu a linha?"""
+    limite = f"{filed_impresso[:4]}-{filed_impresso[4:6]}-{filed_impresso[6:]}"
+    for tag in DURATION_TAGS["revenue"]:
+        for e in extract_tag_entries(namespace, tag):
+            if (e.get("filed") or "") <= limite or not e.get("end"):
+                continue
+            if not (is_annual_duration(e) if fp == "FY" else is_quarterly_duration(e)):
+                continue
+            try:
+                if abs((datetime.date.fromisoformat(e["end"]) - fim).days) > 5:
+                    continue
+            except ValueError:
+                continue
+            val = e.get("val")
+            if val and abs(val - valor) <= 0.005 * abs(valor):
+                return True
+    return False
+
+
 def process_company(conn, company: dict, dry_run: bool = False,
                     collector: dict | None = None) -> int:
     company_id = company["id"]
@@ -3084,6 +3185,8 @@ def process_company(conn, company: dict, dry_run: bool = False,
     apply_manual_capex_overrides(dur_map, ticker)
     aplicar_splits_por_evento(ticker, dur_map, inst_map)
     aplicar_racio_ads(ticker, dur_map, inst_map)
+    if reporting_currency == "USD":
+        aplicar_receita_impressa(cik, dur_map, period_ends, namespace)
 
     # Q4 sintético (FY − Q1−Q2−Q3) + anos cujo Q4 existente na BD deve ser limpo
     drop_q4_years = synthesize_q4(periods, period_ends, period_filed, dur_map, inst_map)

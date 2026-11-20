@@ -37,12 +37,41 @@ _FORA = re.compile(
     r"Fair ?Value|Hedge|Warrant|Tax|Pension|Revenue|Contract)", re.I)
 _ROT_FORA = re.compile(r"(lease|receivable|interest payable|accrued interest|issuance cost|investments?\b|"
                        r"held-to-maturity|available-for-sale|guarantee|deferred revenue)", re.I)
+# Financiamento de fornecedores ("Structured accounts payable arrangements" da Mosaic,
+# com tag de empréstimos): são contas a pagar, não dívida financeira.
+_ROT_NAO_DIVIDA = re.compile(r"accounts payable|payable arrangements|supplier financ", re.I)
+_ROT_FORA_SEMPRE = re.compile(r"(operating lease|receivable|interest payable|accrued interest|investments?\b|"
+                              r"held-to-maturity|available-for-sale|guarantee|deferred revenue)", re.I)
+_TAG_STD = re.compile(r"(LongTermDebt(Noncurrent|Current)?|DebtCurrent|ShortTermBorrowings|CommercialPaper|"
+                      r"LongTermDebtAndCapitalLeaseObligations(Current)?|SeniorNotes(Noncurrent|Current)?|"
+                      r"ConvertibleNotesPayable(Current)?|LinesOfCreditCurrent|LongTermLineOfCredit)$")
 _TOTAL = re.compile(r"^\s*total\b", re.I)
+
+
+# Dívida + leasings FINANCEIROS numa só linha (CMI: LongTermDebtAndCapitalLeaseObligations)
+# é dívida — o "Lease" que o _FORA apanha é o dos leasings operacionais.
+# (CMS: LongTermDebtAndLeaseObligationCurrentExcludingNotesPayable.)
+_COMBINADA = re.compile(r"^(?!.*OperatingLease)(?=.*(Debt|Borrowings?))(?=.*Lease)", re.I)
 
 
 def _e_divida(l):
     t, r = l["tag"], l["rot"] or ""
-    if _FORA.search(t) or _ROT_FORA.search(r):
+    # (A Tesla imprime "Debt and finance leases" e a AbbVie "Long-term debt and finance
+    # lease obligations": é a dívida delas, com os leasings financeiros lá dentro — a
+    # FMP conta-a assim e a linha não se pode partir. Só os OPERACIONAIS ficam de fora.)
+    if (_COMBINADA.search(t) and not re.match(r"Liabilities|.*OtherThan", t)
+            and "operating" not in r.lower() and not _ROT_NAO_DIVIDA.search(r)):
+        return True
+    if _FORA.search(t):
+        return False
+    # Tag de dívida standard: o rótulo "Long-term debt, less debt issuance costs and
+    # discounts" (HCA, ZTS) é a dívida LÍQUIDA desses custos, não o custo — só os
+    # leasings e os ativos no rótulo a excluem.
+    if _ROT_NAO_DIVIDA.search(r):
+        return False
+    if _TAG_STD.match(t):
+        return not _ROT_FORA_SEMPRE.search(r)
+    if _ROT_FORA.search(r):
         return False
     return bool(_TAG.search(t) or _ROT.search(r))
 
@@ -83,10 +112,51 @@ def divida_do_balanco(linhas, data):
         if parcelas and any(abs(sum(p["v"] for p in parcelas) - t["v"]) <= 0.01 * abs(t["v"]) for t in totais):
             usadas = totais[:1]
         else:
-            usadas = parcelas or totais[:1]
+            # O total cobre só PARTE das parcelas (ou nenhuma): a PSEG imprime
+            # "Total Long-Term Debt" (as obrigações estão com dimensões) e, à parte,
+            # a dívida corrente e o papel comercial. Fica o total + as parcelas que
+            # não fazem parte dele (o maior subconjunto que soma o total sai).
+            from itertools import combinations
+            t0 = totais[0]
+            # As parcelas IMEDIATAMENTE acima de um total são dele (a AEP imprime
+            # "Other Short-term Debt" e logo abaixo "Total Short-term Debt", com o
+            # papel comercial escondido em dimensões): sobe-se a partir do total
+            # enquanto as linhas forem contíguas (≤3 posições) e couberem nele.
+            acima = sorted((p for p in parcelas if p["l"] < t0["l"]), key=lambda p: -p["l"])
+            pos, soma, contiguas = t0["l"], 0.0, []
+            for p in acima:
+                if pos - p["l"] > 3 or soma + p["v"] > t0["v"] * 1.01:
+                    break
+                contiguas.append(p)
+                soma += p["v"]
+                pos = p["l"]
+            if contiguas:
+                parcelas = [p for p in parcelas if p not in contiguas]
+            dentro: tuple = ()
+            for k in range(len(parcelas), 0, -1):
+                if len(parcelas) > 12:
+                    break
+                hit = next((c for c in combinations(parcelas, k)
+                            if abs(sum(p["v"] for p in c) - t0["v"]) <= 0.01 * abs(t0["v"])), None)
+                if hit:
+                    dentro = hit
+                    break
+            usadas = [p for p in parcelas if p not in dentro] + [t0]
     if not usadas:
         return None
     return sum(l["v"] for l in usadas), [(l["tag"], l["rot"], l["v"]) for l in usadas]
+
+
+def completa(usadas) -> bool:
+    """A leitura apanhou dívida de LONGO prazo? Sem ela (a AbbVie só mostrava
+    'Short-term borrowings' = 0) a soma não pode substituir o valor das tags."""
+    for t, r, _ in usadas:
+        r = (r or "").lower()
+        if "Noncurrent" in t or ("LongTerm" in t and "Current" not in t) or t in ("SeniorNotes", "ConvertibleNotesPayable"):
+            return True
+        if re.search(r"long[- ]term", r) and not re.search(r"current|due within|portion", r):
+            return True
+    return False
 
 
 def carregar(ciks: set[str] | None = None) -> dict:
@@ -127,12 +197,12 @@ _POR_CIK: dict = {}
 
 
 def para_cik(cik) -> list:
-    """[(data, valor)] da dívida do balanço de uma empresa. Carrega a cache DERA
+    """[(data, valor, completa)] da dívida do balanço de uma empresa. Carrega a cache DERA
     uma única vez por processo; sem a pasta (ex.: ainda não descarregada no CI)
     devolve [] e o motor segue só com as tags."""
     global _TODAS
     if _TODAS is None:
         _TODAS = carregar() if glob.glob(os.path.join(PASTA, "*.json.gz")) else {}
-        for (c, data), (v, _) in _TODAS.items():
-            _POR_CIK.setdefault(c, []).append((data, v))
+        for (c, data), (v, usadas) in _TODAS.items():
+            _POR_CIK.setdefault(c, []).append((data, v, completa(usadas)))
     return _POR_CIK.get(str(int(cik)), [])

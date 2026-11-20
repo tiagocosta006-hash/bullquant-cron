@@ -28,6 +28,7 @@ from notas_valores import aplicar_correcoes, notas_definicao, notas_reexpressao,
 from validar_fundamentais import validar, relatorio as relatorio_validacao
 import divida_balanco
 import receita_impressa
+import aplicacoes_balanco
 
 # Consolas Windows usam cp1252 — sem isto, prints com caracteres fora do cp1252
 # (ex.: "←" no sync de classes duplas) matam o script a meio da ingestão.
@@ -741,6 +742,51 @@ def fator_split_para_filed(ticker: str | None, filed: str | None, hoje: str | No
     return f
 
 
+def split_desmentido(dei_ns: dict, data: str, fator: float, janela: int = 45) -> bool:
+    """O número de ações da capa (dei) fica IGUAL dos dois lados do evento?
+
+    O catálogo traz ajustes de preço por spin-off com razões que parecem splits
+    (EXC 2022: 1,4 = 7:5 depois da Constellation; HPE 2017, DXC). Um split multiplica
+    as ações pelo fator; uma distribuição de outra empresa não lhes toca. Compara a
+    última capa ≥45 dias antes com a primeira ≥45 dias depois (perto da data a capa
+    pode já vir ajustada), com o valor entregue mais recentemente para cada data (a
+    Kroger corrigiu num 10-K/A as ações erradas do 10-K de 2015). Sem dados → não desmente."""
+    if abs(fator - 1) <= 0.1:
+        return False
+    por_data: dict = {}
+    for vals in (dei_ns.get("EntityCommonStockSharesOutstanding") or {}).get("units", {}).values():
+        for v in vals:
+            if v.get("end") and v.get("val") is not None:
+                chave = (v.get("filed") or "", v.get("accn") or "")
+                por_data.setdefault(v["end"], {}).setdefault(chave, 0)
+                por_data[v["end"]][chave] += v["val"]   # várias classes no mesmo filing
+    serie = {d: x[max(x)] for d, x in por_data.items()}
+    try:
+        d0 = datetime.date.fromisoformat(data)
+    except ValueError:
+        return False
+    antes = [d for d in serie if datetime.date.fromisoformat(d) < d0 - datetime.timedelta(days=janela)]
+    depois = [d for d in serie if datetime.date.fromisoformat(d) > d0 + datetime.timedelta(days=janela)]
+    if not antes or not depois:
+        return False
+    a, b = serie[max(antes)], serie[min(depois)]
+    if not a or not b:
+        return False
+    return abs(b / a - 1) <= 0.05
+
+
+def filtrar_splits_desmentidos(ticker: str | None, dei_ns: dict) -> list:
+    """Retira do catálogo (só neste processo) os eventos que as ações da capa desmentem."""
+    evs = carregar_splits_eventos().get(ticker or "")
+    if not evs:
+        return []
+    fora = [e for e in evs if e.get("data") and e.get("fator") and split_desmentido(dei_ns, e["data"], float(e["fator"]))]
+    if fora:
+        carregar_splits_eventos()[ticker] = [e for e in evs if e not in fora]
+        print(f"    {ticker}: {len(fora)} evento(s) de split desmentidos pelas ações ({', '.join(e['data'] for e in fora)})")
+    return fora
+
+
 def get_companies_with_cik(cur, tickers: list[str] | None = None) -> list[dict]:
     if tickers:
         cur.execute(
@@ -1012,6 +1058,12 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
                     dur_map[(fy, fp)][field] = val
                     if field in ("epsDiluted", "dividendPerShare", "sharesOutstandingDur"):
                         dur_map[(fy, fp)][f"{field}_filed"] = entry.get("filed")
+                    # Um ZERO numa tag de pagamentos não prova que não houve pagamentos:
+                    # a Leidos tagga 0 em ações ordinárias e 542 M no total de equity;
+                    # o Huntington 0 em ordinárias e 82 M em preferenciais. Fica o zero
+                    # só se nenhuma tag seguinte tiver valor.
+                    if field == "shareRepurchases" and val == 0:
+                        continue
                     break
 
             # Revenue: seleção sensível à magnitude. A prioridade cega falha para
@@ -1706,8 +1758,13 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
     # em >5%, o net revenue verdadeiro é gp+cogs por definição (DEO: "sales"
     # $27.9B incl. excise vs net sales $20.3B = 12.2+8.1). Só encolhe, nunca
     # cresce, e exige coerência (gp+cogs entre 50% e 98% do bruto).
-    if (revenue is not None and cost_of_rev is not None and gross_profit is not None
-            and revenue > 0):
+    #
+    # SÓ em filers IFRS: em us-gaap os impostos especiais já saem na escolha das
+    # tags (ExciseAndSalesTaxes), e aqui a identidade só apanhava custos PARCIAIS —
+    # a Caterpillar tagga como custo só o dos produtos (sem serviços financeiros) e
+    # a receita do 3T2020 descia de 9.881 para 9.228 M; a TMO e a MO idem.
+    if (dur.get("_ifrs") and revenue is not None and cost_of_rev is not None
+            and gross_profit is not None and revenue > 0):
         net_rev = gross_profit + cost_of_rev
         if (abs(gross_profit - (revenue - cost_of_rev)) > 0.05 * revenue
                 and 0.5 * revenue < net_rev < 0.98 * revenue):
@@ -1990,6 +2047,13 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
     if (cash is not None and restrita and 0 < restrita < cash and sector != "Financials"
             and "RestrictedCash" in (inst.get("cash_tag") or "")):
         cash = cash - restrita
+    # Seguradora pela ATIVIDADE, não pelo setor: a Humana, a Elevance, a Cigna e a
+    # Centene estão em Health Care, mas os sinistros são a maior parte da receita e
+    # os "investimentos" do balanço são a carteira que os cobre (HUM 2025: 15,7 mM
+    # somados a 4,2 mM de caixa). Material = sinistros ≥30% da receita.
+    claims = dur.get("policyholderClaims")
+    seguradora = bool(claims and revenue and revenue > 0 and claims >= 0.3 * revenue)
+    caixa_base = cash
     if cash is not None:
         # Bancos/seguradoras: "AvailableForSaleSecurities" é a carteira de
         # investimento (PNC 2018: 63 mil M somados a 5,6 mil M de caixa), não caixa.
@@ -1998,7 +2062,9 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         marketable = inst.get("marketableSecuritiesCurrent") or 0
         if sector == "Financials" and marketable >= cash:
             marketable = 0
-        if (not marketable and sector != "Financials" and dur.get("policyholderClaims") is None
+        if seguradora:
+            marketable = 0
+        if (not marketable and sector != "Financials" and claims is None
                 and inst.get("outrasAplicacoesCurto")):
             marketable = inst["outrasAplicacoesCurto"]
         cash = cash + marketable
@@ -2240,6 +2306,9 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         "_minoritarios": inst.get("minorityInterestInst"),
         "_capitalTotal": inst.get("equityInclNci"),
         "_capitalTemporario": inst.get("temporaryEquity"),
+        # Para a caixa lida do balanço impresso (process_company → aplicacoes_balanco).
+        "_caixaBase": caixa_base,
+        "_aplicacoesBloqueadas": seguradora or sector == "Financials",
         "freeCashFlow": fcf,
         "totalAssets": total_assets,
         "totalCurrentLiab": curr_liab,
@@ -3118,6 +3187,7 @@ def process_company(conn, company: dict, dry_run: bool = False,
         return 0
 
     dei_ns = facts.get("dei") or {}
+    filtrar_splits_desmentidos(company.get("ticker"), dei_ns)
     evidence = compute_company_evidence(facts_json)
 
     min_fy = datetime.date.today().year - HISTORY_YEARS
@@ -3190,6 +3260,9 @@ def process_company(conn, company: dict, dry_run: bool = False,
 
     # Q4 sintético (FY − Q1−Q2−Q3) + anos cujo Q4 existente na BD deve ser limpo
     drop_q4_years = synthesize_q4(periods, period_ends, period_filed, dur_map, inst_map)
+    if namespace is ns_ifrs:   # marca para build_row (correção de excise só em IFRS)
+        for _d in dur_map.values():
+            _d["_ifrs"] = True
     periods_list = sorted(periods)
 
     rows = []
@@ -3360,10 +3433,10 @@ def process_company(conn, company: dict, dry_run: bool = False,
     # linhas ANTES de gravar; reexpressões detetam-se no XBRL. Ver notas_valores.py.
     # Dívida lida das LINHAS IMPRESSAS do balanço (DERA, ver divida_balanco.py):
     # apanha as linhas com tags próprias da empresa, que o companyfacts não traz
-    # (EXR, WRB, CAT…). Só sobe o valor — quando o balanço mostra mais dívida do
-    # que as tags encontraram, faltava uma linha; o contrário é quase sempre o
-    # balanço a esconder parte da dívida noutra linha. Medido contra a FMP em
-    # 20 mil períodos: +1 004 iguais, −724 diferentes. Bancos ficam de fora.
+    # (EXR, WRB, CAT…). Com a leitura COMPLETA (tem dívida de longo prazo) manda nos
+    # dois sentidos; parcial, só sobe. Revisto a 20/11 com a fila do Codex: na
+    # simulação +1 072/−132 nas empresas de afinação e +367/−72 no controlo.
+    # Bancos ficam de fora.
     if company.get("sector") != "Financials":
         dividas = divida_balanco.para_cik(cik)
         if dividas:
@@ -3373,11 +3446,42 @@ def process_company(conn, company: dict, dry_run: bool = False,
                     f0 = datetime.date.fromisoformat(fim)
                 except ValueError:
                     continue
-                hit = next((v for d, v in dividas
+                hit = next(((v, comp) for d, v, comp in dividas
                             if abs((datetime.date.fromisoformat(d) - f0).days) <= 5), None)
+                if not hit:
+                    continue
+                v, comp = hit
                 td = row.get("totalDebt")
-                if hit and hit > 0 and (td is None or hit > td * 1.001):
-                    row["totalDebt"] = hit
+                # Leitura COMPLETA (apanhou a dívida de longo prazo): o balanço impresso
+                # manda nos dois sentidos — a cascata de tags somava a mesma dívida duas
+                # vezes (DVN, HPE, IBM: maturidades dentro de ShortTermBorrowings; UPS:
+                # total combinado + parcela corrente; ARE/PLD: LineOfCredit já incluída).
+                # Leitura parcial: só pode subir, como antes.
+                if v > 0 and (comp or td is None or v > td * 1.001):
+                    row["totalDebt"] = v
+
+    # Caixa = caixa e equivalentes + as aplicações que o balanço IMPRIME no ativo
+    # corrente (DERA, ver aplicacoes_balanco.py): as tags de aplicações misturam o
+    # total do balanço com parcelas das notas (BA 2020: 0,6 mM em vez de 17,8 mM).
+    # Bancos e seguradoras ficam com a regra deles (build_row).
+    if reporting_currency == "USD":
+        aplic = aplicacoes_balanco.para_cik(cik)
+        if aplic:
+            for row in rows:
+                base = row.get("_caixaBase")
+                if base is None or row.get("_aplicacoesBloqueadas"):
+                    continue
+                fim = str(row.get("periodEnd"))[:10]
+                hit = aplic.get(fim)
+                if hit is None:
+                    try:
+                        f0 = datetime.date.fromisoformat(fim)
+                        hit = next((v for d, v in aplic.items()
+                                    if abs((datetime.date.fromisoformat(d) - f0).days) <= 5), None)
+                    except ValueError:
+                        hit = None
+                if hit is not None:
+                    row["cash"] = base + hit[0]
 
     # Rede de segurança: anula o impossível e sinaliza incoerências ANTES das
     # correções revistas (essas têm prova e passam por cima). Ver validar_fundamentais.py.

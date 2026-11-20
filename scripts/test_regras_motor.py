@@ -131,5 +131,54 @@ rjf = [li(1, "Revenues", "Total revenues", 15.91e9), li(3, "RevenuesNetOfInteres
 check("RJF: corretora usa a receita líquida de juros",
       RI.receita_da_demonstracao(rjf, "20251231", 4)[0] == 14.07e9)
 
+# ── Dívida do balanço: leitura das linhas (casos do Codex, auditados) ──
+hca = [linha(2, 1, "Assets", "Total assets", 59e9),
+       linha(2, 27, "LongTermDebtCurrent", "Long-term debt due within one year", 4.698e9),
+       linha(2, 29, "LongTermDebtNoncurrent", "Long-term debt, less debt issuance costs and discounts of $3", 38.333e9)]
+check("HCA: 'less debt issuance costs' é a dívida líquida, não o custo",
+      abs(divida_do_balanco(hca, "20241231")[0] - 43.031e9) < 1)
+aep = [linha(2, 1, "Assets", "Total assets", 100e9),
+       linha(2, 10, "ShortTermBankLoansAndNotesPayable", "Other Short-term Debt", 0.7817e9),
+       linha(2, 11, "ShortTermBorrowings", "Total Short-term Debt", 1.6817e9),
+       linha(2, 12, "LongTermDebtCurrent", "Long-term Debt Due Within One Year", 2.0719e9),
+       linha(2, 20, "LongTermDebtNoncurrent", "Long-term Debt", 39.9904e9)]
+check("AEP: 'Total Short-term Debt' cobre a linha logo acima (sem dupla contagem)",
+      abs(divida_do_balanco(aep, "20241231")[0] - (1.6817e9 + 2.0719e9 + 39.9904e9)) < 1e3)
+mos = [linha(2, 1, "Assets", "Total assets", 23e9),
+       linha(2, 5, "ShortTermBankLoansAndNotesPayable", "Structured accounts payable arrangements", 0.2658e9),
+       linha(2, 6, "LongTermDebtNoncurrent", "Long-term debt, less current maturities", 3.1944e9)]
+check("MOS: financiamento de fornecedores não é dívida", abs(divida_do_balanco(mos, "20241231")[0] - 3.1944e9) < 1)
+cms = [linha(2, 1, "Assets", "Total assets", 37e9),
+       linha(2, 37, "LongTermDebtAndLeaseObligationCurrentExcludingNotesPayable",
+             "Current portion of long-term debt and finance leases", 1.195e9),
+       linha(2, 38, "NotesPayableCurrent", "Notes payable", 0.065e9),
+       linha(2, 47, "LongTermDebtNoncurrent", "Long-term debt", 15.194e9),
+       linha(2, 48, "OperatingLeaseLiabilityNoncurrent", "Operating lease liabilities", 0.3e9)]
+v_cms, u_cms = divida_do_balanco(cms, "20241231")
+check("CMS: dívida + leasings financeiros conta; leasings operacionais não", abs(v_cms - 16.454e9) < 1e3)
+import divida_balanco as DB  # noqa: E402
+check("leitura sem dívida de longo prazo é incompleta (não pode baixar o valor das tags)",
+      not DB.completa([("ShortTermBorrowings", "Short-term borrowings", 0)]) and DB.completa(u_cms))
+
+# ── Caixa: aplicações impressas no ativo corrente ──
+import aplicacoes_balanco as AB  # noqa: E402
+ba = [linha(4, 1, "Assets", "Total assets", 152e9),
+      linha(4, 2, "CashAndCashEquivalentsAtCarryingValue", "Cash and cash equivalents", 7.752e9),
+      linha(4, 6, "ShortTermInvestments", "Short-term and other investments", 17.838e9),
+      linha(4, 9, "AssetsCurrent", "Total current assets", 121e9),
+      linha(4, 12, "AvailableForSaleSecuritiesDebtSecuritiesNoncurrent", "Investments", 1e9)]
+check("BA 2020: aplicações = 'Short-term and other investments' 17,8 mM (só o ativo corrente)",
+      AB.aplicacoes_do_balanco(ba, "20241231")[0] == 17.838e9)
+
+# ── Splits desmentidos pelas ações da capa ──
+dei = {"EntityCommonStockSharesOutstanding": {"units": {"shares": [
+    {"end": "2021-09-30", "val": 979e6, "filed": "2021-11-01", "accn": "a"},
+    {"end": "2022-03-31", "val": 980e6, "filed": "2022-04-29", "accn": "b"}]}}}
+check("EXC 2022: fator 1,4 com ações iguais = spin-off, não split", IF.split_desmentido(dei, "2022-02-02", 1.4))
+dei2 = {"EntityCommonStockSharesOutstanding": {"units": {"shares": [
+    {"end": "2024-05-24", "val": 2.46e9, "filed": "2024-05-29", "accn": "a"},
+    {"end": "2024-08-23", "val": 24.5e9, "filed": "2024-08-28", "accn": "b"}]}}}
+check("NVDA 2024: 10:1 confirmado pelas ações", not IF.split_desmentido(dei2, "2024-06-10", 10.0))
+
 print(f"\n{'OK' if not falhas else f'{falhas} FALHA(S)'}")
 sys.exit(1 if falhas else 0)

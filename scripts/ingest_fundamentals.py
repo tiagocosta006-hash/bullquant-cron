@@ -1576,6 +1576,20 @@ def compute_company_evidence(facts_json: dict) -> dict:
 
 
 
+def ebit_de_baixo(dur, ni_pre=None, tax_expense=None):
+    """EBIT reconstruído de baixo: lucro antes de impostos + juros − outros proveitos
+    não operacionais. None sem lucro antes de impostos."""
+    ibt = dur.get("incomeBeforeTax")
+    if ibt is None and ni_pre is not None and tax_expense is not None:
+        ibt = ni_pre + tax_expense
+    if ibt is None:
+        return None
+    juros = dur.get("interestExpense")
+    if juros is None and (dur.get("jurosLiquidosNaoOp") or 0) < 0:
+        juros = -dur["jurosLiquidosNaoOp"]
+    return ibt + (juros or 0) - (dur.get("otherNonOperatingIncome") or 0)
+
+
 def melhor_da(dur: dict) -> float | None:
     """D&A total: o maior entre o total reportado e depreciação + amortização de intangíveis.
 
@@ -2086,6 +2100,17 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         mi = inst.get("minorityInterestInst")
         if mi and 0 < mi < abs(total_equity):
             total_equity = total_equity - mi
+
+    # Resultado operacional DERIVADO (a empresa não o publica) que não bate com o
+    # EBIT reconstruído de baixo — lucro antes de impostos + juros − outros proveitos
+    # não operacionais: as "despesas" encontradas não eram as operacionais. A ADP
+    # não tem linha de resultado operacional e o total de despesas dela leva juros:
+    # o 1T FY25 dava −87 M com 1.236 M de lucro antes de impostos; o EBIT é 1.272 M.
+    if (not op_income_reportado and op_income is not None and revenue and revenue > 0
+            and sector not in ("Financials", "Real Estate")):
+        _ebit = ebit_de_baixo(dur, ni_pre, tax_expense)
+        if _ebit is not None and abs(op_income - _ebit) > 0.10 * revenue:
+            op_income = _ebit
 
     gross_margin = plausivel(safe_div(gross_profit, revenue), -1.0, 1.0)
     op_margin = plausivel(safe_div(op_income, revenue), -10.0, 2.0)

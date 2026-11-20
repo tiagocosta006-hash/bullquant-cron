@@ -180,5 +180,10 @@ dei2 = {"EntityCommonStockSharesOutstanding": {"units": {"shares": [
     {"end": "2024-08-23", "val": 24.5e9, "filed": "2024-08-28", "accn": "b"}]}}}
 check("NVDA 2024: 10:1 confirmado pelas ações", not IF.split_desmentido(dei2, "2024-06-10", 10.0))
 
+# ── EBIT reconstruído de baixo (ADP 1T FY25, sem linha de resultado operacional) ──
+check("ADP: 1.236 antes de impostos + 138 juros − 102 não operacionais = 1.272 M",
+      abs(IF.ebit_de_baixo({"incomeBeforeTax": 1236e6, "interestExpense": 138e6,
+                            "otherNonOperatingIncome": 102e6}) - 1272e6) < 1)
+
 print(f"\n{'OK' if not falhas else f'{falhas} FALHA(S)'}")
 sys.exit(1 if falhas else 0)

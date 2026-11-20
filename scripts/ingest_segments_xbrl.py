@@ -858,7 +858,7 @@ def extract_segments_from_filing(filing):
     return segments_from_snapshot(snap) if snap else ({}, None)
 
 
-def segments_from_snapshot(snap: dict):
+def segments_from_snapshot(snap: dict, receitas: dict | None = None):
     """Devolve ({(period_type, period_end): {axis_name: {segmento: valor}}}, moeda).
 
     A moeda é a do filing (SEK na Ericsson, DKK na Novo Nordisk, GBP na Diageo),
@@ -948,6 +948,14 @@ def segments_from_snapshot(snap: dict):
         # não é "a repartição do banco" — é uma fatia estreita a fingir que é o
         # todo. A AstraZeneca (55,6 de 58,7 mM = 95%) continua a passar.
         totais = [t for t in totais if t >= 0.5 * totais[0]]
+        # Com a receita GRAVADA conhecida (filings em USD), testa-se primeiro o total
+        # mais perto dela: a Republic Services publica a repartição BRUTA (Revenues
+        # 19,03 mM, antes de eliminar vendas entre segmentos) e a EXTERNA (receita de
+        # contratos 16,59 mM = a consolidada). Começar pelo maior dava a bruta, que
+        # depois não fecha com a receita e o ano ficava sem repartição.
+        rev = (receitas or {}).get((ptype, str(pend)[:10])) if filing_currency == "USD" else None
+        if rev:
+            totais.sort(key=lambda t: abs(t - rev))
         total = totais[0]
 
         by_axis = {}
@@ -1077,6 +1085,12 @@ def main():
             # descontinuada — a versão antiga somava 14,7 mM contra uma receita
             # reapresentada de 10,4 mM. Preferir "quem tem mais segmentos"
             # escolhia justamente a versão errada.
+            # Receita GRAVADA por período (USD): ordena os totais candidatos de cada
+            # filing — ver segments_from_snapshot(receitas=...).
+            cur.execute('SELECT "periodType"::text, "periodEnd"::date, revenue FROM fundamentals '
+                        'WHERE "companyId" = %s AND revenue IS NOT NULL', (company_id,))
+            receitas = {(pt, str(pe)[:10]): float(rv) for pt, pe, rv in cur.fetchall()}
+
             def _fdate(f):
                 return str(getattr(f, "filing_date", "") or getattr(f, "period_of_report", "") or "")
 
@@ -1099,7 +1113,7 @@ def main():
                         novos += 1
                     time.sleep(args.sleep)
                 try:
-                    got, fcur = segments_from_snapshot(snap) if snap else ({}, None)
+                    got, fcur = segments_from_snapshot(snap, receitas) if snap else ({}, None)
                 except Exception as e:
                     print(f"    {ticker} {getattr(f,'form','?')}: erro no cálculo {e!r}", flush=True)
                     continue

@@ -35,7 +35,7 @@ export async function receitaDiferida(cik: string | null | undefined): Promise<M
   for (const tag of ["ContractWithCustomerLiabilityCurrent", "DeferredRevenueCurrent"]) {
     const fs = (await conceito(cik, tag)).filter((f) => !f.start && (f.form ?? "").startsWith("10-K"))
     fs.sort((a, b) => ((a.filed ?? "") < (b.filed ?? "") ? -1 : 1))
-    for (const f of fs) if (!out.has(f.end) || tag === "ContractWithCustomerLiabilityCurrent") out.set(f.end, f.val)
+    for (const f of fs) out.set(f.end, f.val) // por ordem de entrega: fica a reexpressão mais recente
     if (out.size > 0) break
   }
   return out

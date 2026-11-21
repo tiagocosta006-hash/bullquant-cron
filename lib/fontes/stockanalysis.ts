@@ -16,6 +16,8 @@ export type AnoSA = {
   fiscalYear: number
   revenue: number | null
   eps: number | null
+  /** EPS ajustado (o que os analistas estimam); só nos anos em que existe. */
+  adjustedEps: number | null
   netIncome: number | null
   operatingIncome: number | null
   analistas: number | null
@@ -100,6 +102,7 @@ export async function estimativasStockAnalysis(ticker: string): Promise<Estimati
       fiscalYear: Number.isFinite(fy) ? fy : Number(d.slice(0, 4)),
       revenue: n(tab.revenue?.[i]),
       eps: n(tab.eps?.[i]),
+      adjustedEps: n(tab.adjustedEps?.[i]),
       netIncome: n(tab.netIncome?.[i]),
       operatingIncome: n(tab.operatingIncome?.[i]),
       analistas: n(tab.analysts?.[i]),

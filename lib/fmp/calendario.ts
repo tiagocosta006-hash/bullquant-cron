@@ -2,7 +2,7 @@ import * as fs from "node:fs/promises"
 import * as path from "node:path"
 import { unstable_cache } from "next/cache"
 import { prisma } from "@/lib/prisma"
-import { nasdaqGet, num, dataUs } from "@/lib/fontes/nasdaq"
+import { nasdaqResposta, num, dataUs } from "@/lib/fontes/nasdaq"
 import { eventosOficiais } from "@/lib/fontes/macroOficial"
 import { finnhubGet, simboloFinnhub } from "@/lib/finnhub"
 
@@ -74,9 +74,8 @@ function diasUteis(de: Date, ate: Date): string[] {
 }
 
 /**
- * Um pedido por dia útil, no máximo 3 em simultâneo: com muitos em paralelo o Nasdaq
- * responde `data: null` a alguns dias (medido a 2026-11-21). Um dia vazio repete-se
- * uma vez, meio segundo depois.
+ * Um pedido por dia, no máximo 3 em simultâneo. Um ERRO (rede/HTTP) repete-se uma vez,
+ * meio segundo depois; `data: null` é um dia sem eventos e não se repete.
  */
 async function nasdaqPorDia<T>(caminho: string, dias: string[]): Promise<Array<T | null>> {
   const out: Array<T | null> = new Array(dias.length).fill(null)
@@ -84,12 +83,13 @@ async function nasdaqPorDia<T>(caminho: string, dias: string[]): Promise<Array<T
   const trabalhador = async () => {
     while (i < dias.length) {
       const k = i++
-      let r = await nasdaqGet<T>(caminho, { date: dias[k] }, REVALIDATE_CALENDARIO)
-      if (r === null) {
+      let r = await nasdaqResposta<T>(caminho, { date: dias[k] }, REVALIDATE_CALENDARIO)
+      // Só se repete um ERRO; "sem dados" (fim de semana, dia sem eventos) é resposta válida.
+      if (r.erro) {
         await new Promise((ok) => setTimeout(ok, 500))
-        r = await nasdaqGet<T>(caminho, { date: dias[k] }, REVALIDATE_CALENDARIO)
+        r = await nasdaqResposta<T>(caminho, { date: dias[k] }, REVALIDATE_CALENDARIO)
       }
-      out[k] = r
+      out[k] = r.data
     }
   }
   await Promise.all([trabalhador(), trabalhador(), trabalhador()])

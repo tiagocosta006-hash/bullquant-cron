@@ -31,6 +31,18 @@ export async function nasdaqGet<T>(
   params: Record<string, string | string[]>,
   revalidate: number,
 ): Promise<T | null> {
+  return (await nasdaqResposta<T>(caminho, params, revalidate)).data
+}
+
+/**
+ * Como `nasdaqGet`, mas distingue erro (rede/HTTP — vale a pena repetir) de resposta
+ * válida sem dados (`data: null`, ex.: "No record found" num dia sem eventos).
+ */
+export async function nasdaqResposta<T>(
+  caminho: string,
+  params: Record<string, string | string[]>,
+  revalidate: number,
+): Promise<{ erro: boolean; data: T | null }> {
   const url = new URL(`${BASE}/${caminho}`)
   for (const [k, v] of Object.entries(params)) {
     for (const x of Array.isArray(v) ? v : [v]) url.searchParams.append(k, x)
@@ -43,13 +55,13 @@ export async function nasdaqGet<T>(
     })
     if (!resp.ok) {
       console.error(`[nasdaq] ${caminho} → HTTP ${resp.status}`)
-      return null
+      return { erro: true, data: null }
     }
     const corpo = (await resp.json()) as { data?: T | null }
-    return corpo?.data ?? null
+    return { erro: false, data: corpo?.data ?? null }
   } catch (e) {
     console.error(`[nasdaq] ${caminho}: ${(e as Error).message}`)
-    return null
+    return { erro: true, data: null }
   }
 }
 

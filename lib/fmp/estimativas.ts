@@ -33,8 +33,9 @@ export type EstimativaAnual = {
   /** Fim do ano fiscal, YYYY-MM-DD. */
   date: string
   revenueAvg: number
-  revenueLow: number
-  revenueHigh: number
+  /** Mínimo / máximo dos analistas — null quando a fonte não os dá. */
+  revenueLow: number | null
+  revenueHigh: number | null
   epsAvg: number
   epsLow: number
   epsHigh: number
@@ -168,17 +169,24 @@ export async function analistas(
     const fimReportado = ultimoAnual ? ultimoAnual.periodEnd.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)
     const futuros = eps.filter((e) => e.date > fimReportado && anoFiscal(e.date, ultimoAnual) > (ultimoAnual?.fiscalYear ?? 0))
     const primeiroSA = anosSA.find((a) => a.estimativa) ?? null
-    futuros.forEach((e, k) => {
+    // O ano a seguir ao 1.º estimado do stockanalysis: só tem a receita pública ("seguinte").
+    // Casa-se por DATA (≈ um ano depois), não por posição — se a nossa base ainda não tiver
+    // o último ano reportado, o 2.º de `futuros` é o 1.º estimado e não o "seguinte".
+    const dataSeguinte = primeiroSA
+      ? new Date(Date.parse(primeiroSA.date + "T00:00:00Z") + 365 * DIA).toISOString().slice(0, 10)
+      : null
+    futuros.forEach((e) => {
       const a = anoPerto(anosSA, e.date)
-      // 1.º ano: a linha completa do stockanalysis; 2.º: só a receita pública ("seguinte")
-      const receita = a && a.estimativa ? a.revenue : k === 1 && primeiroSA ? sa?.seguinte?.revenue ?? null : null
+      const ehSeguinte = !a && dataSeguinte !== null && Math.abs(Date.parse(e.date) - Date.parse(dataSeguinte)) <= 45 * DIA
+      const receita = a && a.estimativa ? a.revenue : ehSeguinte ? sa?.seguinte?.revenue ?? null : null
       if (receita === null || receita <= 0) return
       anuais.push({
         fiscalYear: anoFiscal(e.date, ultimoAnual),
         date: e.date,
         revenueAvg: receita * taxa,
-        revenueLow: receita * taxa,
-        revenueHigh: receita * taxa,
+        // Sem dispersão nas fontes gratuitas: N/A, não um intervalo falso igual à média.
+        revenueLow: null,
+        revenueHigh: null,
         epsAvg: e.avg,
         epsLow: e.low,
         epsHigh: e.high,
@@ -201,6 +209,12 @@ export async function analistas(
     if (fy0 && fy1 && eps1 && eps2 && rec2 && fy0.revenue && fy1.revenue && fy0.netIncome && fy1.netIncome) {
       const w = Math.min(1, Math.max(0, (Date.parse(fy1.date + "T00:00:00Z") - Date.now()) / (365 * DIA)))
       const lucro2 = fy1.netIncome * (eps1.avg > 0 ? eps2.avg / eps1.avg : 1)
+      // EPS do último ano nas UNIDADES do Nasdaq (dólares por título cotado): o rácio
+      // último/próximo ano lê-se dentro do stockanalysis (moeda e ação ordinária dele —
+      // NVO em coroas) e aplica-se ao consenso do Nasdaq. Ajustado se existir, porque o
+      // consenso é ajustado; GAAP só se faltar.
+      const base0 = fy0.adjustedEps ?? fy0.eps
+      const eps0 = base0 !== null && fy1.eps && fy1.eps > 0 ? eps1.avg * (base0 / fy1.eps) : eps1.avg
       const mix = (a: number, b: number) => w * a + (1 - w) * b
       ntm = {
         revenue: mix(fy1.revenue, rec2) * taxa,
@@ -212,7 +226,7 @@ export async function analistas(
         revenue: mix(fy0.revenue, fy1.revenue) * taxa,
         netIncome: mix(fy0.netIncome, fy1.netIncome) * taxa,
         ebitda: 0,
-        eps: mix(fy0.eps ?? eps1.avg, eps1.avg),
+        eps: mix(eps0, eps1.avg),
       }
       analistasEps = eps1.n
     }

@@ -9,7 +9,7 @@ export async function GET(
   { params }: { params: Promise<{ ticker: string }> }
 ) {
   const bruto = await params;
-  // Validado antes de chamar a FMP: sem isto, cada ticker inventado era uma
+  // Validado antes de chamar a Finnhub: sem isto, cada ticker inventado era uma
   // chave de cache nova e uma chamada nova. Ver lib/ticker.ts.
   const ticker = normalizarTicker(bruto.ticker);
   if (!ticker) {

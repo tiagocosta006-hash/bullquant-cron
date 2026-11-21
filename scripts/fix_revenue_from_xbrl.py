@@ -67,7 +67,7 @@ if not DIRECT_URL:
     sys.exit("DIRECT_URL não definida")
 
 import edgar  # noqa: E402
-edgar.set_identity(os.getenv("SEC_IDENTITY", "Tiago Costa costa@engimov.pt"))
+edgar.set_identity(os.getenv("SEC_IDENTITY") or "BullValue admin@bullocracy.com")  # contacto da SEC vem do ambiente
 
 # Reutiliza as regras já validadas do extrator de segmentos em vez de as duplicar:
 # a lista estrita de conceitos-total e o recurso ao calculation linkbase.

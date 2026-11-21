@@ -39,8 +39,8 @@ export async function GET(request: NextRequest) {
   if (isNaN(from.getTime()) || isNaN(to.getTime())) {
     return NextResponse.json({ error: 'Invalid date range' }, { status: 400 })
   }
-  // Cada semana do intervalo são pedidos à FMP. A página pede um mês (com as
-  // pontas da grelha, ~6 semanas); mais de ~3 meses não tem uso legítimo.
+  // Cada semana do intervalo são pedidos às APIs externas (Finnhub/FMP). A página
+  // pede um mês (com as pontas da grelha, ~6 semanas); mais de ~3 meses não tem uso legítimo.
   if (to.getTime() - from.getTime() > 100 * 86_400_000 || to < from) {
     return NextResponse.json({ error: 'Date range too large' }, { status: 400 })
   }
@@ -77,8 +77,9 @@ export async function GET(request: NextRequest) {
       companyIds = portfolio?.items.map(i => i.companyId) ?? []
     }
 
-    // Os eventos vêm da FMP (lib/fmp/calendario.ts); a base só diz que
-    // empresas existem e, nos ramos watchlist/portfolio, quais são do user.
+    // Os eventos vêm de `lib/fmp/calendario.ts` (resultados da Finnhub, splits
+    // locais, dividendos e macro da FMP); a base só diz que empresas existem e,
+    // nos ramos watchlist/portfolio, quais são do user.
     const empresas = await empresasPorTicker()
     const porId = new Map(Object.values(empresas).map(e => [e.id, e.ticker]))
     const tickers = new Set(

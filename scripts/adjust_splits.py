@@ -20,6 +20,7 @@ Uso: python scripts/adjust_splits.py [--dry-run]
 
 import os
 import sys
+import json
 import math
 import time
 import itertools
@@ -52,7 +53,7 @@ if not DIRECT_URL:
     sys.exit("DIRECT_URL não definida")
 
 EDGAR_BASE = "https://data.sec.gov/api/xbrl/companyfacts"
-EDGAR_HEADERS = {"User-Agent": "BullValue admin@bullocracy.com"}
+EDGAR_HEADERS = {"User-Agent": os.getenv("SEC_USER_AGENT") or os.getenv("SEC_IDENTITY") or "BullValue admin@bullocracy.com"}  # contacto da SEC vem do ambiente
 
 # Deteção e tolerância são coisas diferentes e tinham o mesmo valor (2.5), o
 # que escondia uma família inteira de casos: um split 2:1 dá um degrau de
@@ -254,8 +255,30 @@ def plan_adjustments(rows: list[dict], splits: list[tuple[str, float]]) -> tuple
     return updates, warnings
 
 
+SPLITS_EVENTOS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "splits_eventos.json")
+
+
+def carregar_tickers_cobertos_por_eventos() -> set[str]:
+    """Devolve o conjunto de tickers já tratados por `splits_eventos.json` em
+    `ingest_fundamentals.py`. Estes tickers não podem voltar a ser ajustados aqui
+    para evitar dupla aplicação caso tenham outra quebra não-split (ex.: spin-off
+    ou emissão de ações)."""
+    if not os.path.exists(SPLITS_EVENTOS_PATH):
+        return set()
+    try:
+        with open(SPLITS_EVENTOS_PATH, encoding="utf-8") as f:
+            dados = json.load(f)
+        if not isinstance(dados, dict):
+            return set()
+        return {t for t, evs in dados.items() if evs}
+    except Exception as e:
+        print(f"⚠ Aviso ao ler {SPLITS_EVENTOS_PATH}: {e}")
+        return set()
+
+
 def main():
     dry_run = "--dry-run" in sys.argv
+    cobertos_por_eventos = carregar_tickers_cobertos_por_eventos()
 
     conn = psycopg2.connect(DIRECT_URL)
     conn.autocommit = False
@@ -263,11 +286,16 @@ def main():
     with conn.cursor() as cur:
         companies = find_break_companies(cur)
     print(f"{len(companies)} empresas com quebras de shares >{BREAK_DETECT}x a validar contra splits EDGAR.")
+    if cobertos_por_eventos:
+        print(f"({len(cobertos_por_eventos)} tickers cobertos por splits_eventos.json serão ignorados para evitar dupla aplicação.)")
 
     total_updates = 0
     for company in companies:
         ticker = company["ticker"]
         print(f"\n{ticker}:")
+        if ticker in cobertos_por_eventos:
+            print("  já coberta por splits_eventos.json (passo 2) — ignorada para evitar dupla aplicação")
+            continue
         splits = fetch_split_ratios(company["cik"])
         time.sleep(0.2)
         if not splits:

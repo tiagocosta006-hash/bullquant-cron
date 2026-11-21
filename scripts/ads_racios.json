@@ -1,0 +1,224 @@
+{
+ "_nota": "Ações ordinárias por 1 ADS cotado nos EUA (fonte: capa do 20-F/10-K na SEC). Recolhido pelo Gemini a 2026-11-18 e revisto. 'mudancas' = alterações de rácio com data (tratar como split do ADS).",
+ "empresas": {
+  "GSK": {
+   "tipo": "ADS",
+   "racio": 2,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/1131399/000113139926000004/gsk-20251231.htm",
+   "citacao": "American Depositary Shares, each representing 2 Ordinary Shares, Par value 31 1⁄4 pence (Form 20-F FY2025, capa; rácio 2 inalterado desde 2015)."
+  },
+  "ASML": {
+   "tipo": "ordinária",
+   "racio": 1,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/937966/000162828026011378/asml-20251231.htm",
+   "citacao": "Ordinary Shares, nominal value €0.09 per share, The Nasdaq Stock Market LLC (Form 20-F FY2025, capa; negocia ações ordinárias diretas em NY desde 2015)."
+  },
+  "SPOT": {
+   "tipo": "ordinária",
+   "racio": 1,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/1639920/000162828026006874/ck0001639920-20251231.htm",
+   "citacao": "Ordinary Shares (par value of €0.000625 per share), New York Stock Exchange (Form 20-F FY2025, capa; listagem direta de ações ordinárias desde 2018)."
+  },
+  "AZN": {
+   "tipo": "ordinária",
+   "racio": 1,
+   "mudancas": [
+    {
+     "data": "2015-07-27",
+     "de": 1,
+     "para": 0.5
+    },
+    {
+     "data": "2026-02-02",
+     "de": 0.5,
+     "para": 1
+    }
+   ],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/901832/000110465926019130/azn-20251231x20f.htm",
+   "citacao": "Ordinary Shares of 25 ¢ each, The New York Stock Exchange (Form 20-F FY2025, capa e Item 12D; rácio ADS mudou de 1 para 0,5 em 2015-07-27 e programa ADR encerrado em 2026-02-02 com listagem direta de ordinárias na NYSE)."
+  },
+  "ARM": {
+   "tipo": "ADS",
+   "racio": 1,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/1973239/000197323926000097/arm-20260331.htm",
+   "citacao": "American Depositary Shares, each representing one Ordinary Share, nominal value £0.001 per share, The Nasdaq Stock Market LLC (Form 20-F FY2026, capa; rácio 1 desde IPO em 2023)."
+  },
+  "RYAAY": {
+   "tipo": "ADS",
+   "racio": 2,
+   "mudancas": [
+    {
+     "data": "2024-09-27",
+     "de": 5,
+     "para": 2
+    }
+   ],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/1038683/000110465926076131/tmb-20260331x20f.htm",
+   "citacao": "American Depositary Shares, each representing two Ordinary Shares, The Nasdaq Stock Market LLC (Form 20-F FY2026, capa; alterado de 5 para 2 conforme 6-K de 2024-08-15, efetivo c. 2024-09-27 e negociação 2024-09-30)."
+  },
+  "UL": {
+   "tipo": "ADS",
+   "racio": 1,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/217410/000021741026000007/ul-20251231.htm",
+   "citacao": "American Depositary Shares (evidenced by Depositary Receipts) each representing one ordinary share of the nominal amount of 3 1/2 pence each (Form 20-F FY2025, capa; rácio 1 inalterado desde 2015)."
+  },
+  "UBS": {
+   "tipo": "ordinária",
+   "racio": 1,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/1610520/000161052026000023/ubs-20251231.htm",
+   "citacao": "Ordinary Shares (par value of USD 0.10 each), New York Stock Exchange (Form 20-F FY2025, capa; ações ordinárias globais registadas sem ADS desde 2015)."
+  },
+  "BUD": {
+   "tipo": "ADS",
+   "racio": 1,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/1668717/000119312526088105/d65314d20f.htm",
+   "citacao": "American Depositary Shares, each representing one ordinary share without nominal value, New York Stock Exchange (Form 20-F FY2025, capa; rácio 1 inalterado desde 2015)."
+  },
+  "NOK": {
+   "tipo": "ADS",
+   "racio": 1,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/924613/000162828026015034/nok-20251231.htm",
+   "citacao": "Nokia’s ADSs, each representing one share, are traded on the NYSE under the symbol “NOK”. (Form 20-F FY2025; rácio 1 inalterado desde 2015)."
+  },
+  "NVO": {
+   "tipo": "ADS",
+   "racio": 1,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/353278/000035327826000012/nvo-20251231.htm",
+   "citacao": "American Depositary Receipts, each representing one B Share, New York Stock Exchange (Form 20-F FY2025, capa; rácio 1 inalterado desde 2015)."
+  },
+  "TTE": {
+   "tipo": "ordinária",
+   "racio": 1,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/879764/000110465926035876/tot-20251231x20f.htm",
+   "citacao": "Shares, New York Stock Exchange; On December 8, 2025, TotalEnergies converted its ADSs into ordinary shares listed on the NYSE (Form 20-F FY2025, capa e Item 14; antes 1 ADS = 1 ação desde 2015, conversão 1:1 sem alteração de rácio)."
+  },
+  "STLA": {
+   "tipo": "ordinária",
+   "racio": 1,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/1605484/000160548426000021/stellantis-20251231.htm",
+   "citacao": "Common Shares, par value €0.01, New York Stock Exchange (Form 20-F FY2025, capa e Item 12D None; ações ordinárias diretas desde 2015)."
+  },
+  "NXPI": {
+   "tipo": "ordinária",
+   "racio": 1,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/1413447/000141344726000008/nxpi-20251231.htm",
+   "citacao": "Common shares, EUR 0.20 par value, The Nasdaq Global Select Market (Form 10-K FY2025, capa; ações ordinárias diretas desde 2015)."
+  },
+  "DEO": {
+   "tipo": "ADS",
+   "racio": 4,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/835403/000162828026057529/deo-20260630.htm",
+   "citacao": "Each Diageo ADS represents four ordinary shares of Diageo. (Form 20-F FY2026; rácio 4 inalterado desde 2015)."
+  },
+  "RACE": {
+   "tipo": "ordinária",
+   "racio": 1,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/1648416/000164841626000024/race-20251231.htm",
+   "citacao": "Common Shares (par value of €0.01 each), New York Stock Exchange (Form 20-F FY2025, capa; ações ordinárias diretas desde IPO em 2015)."
+  },
+  "RIO": {
+   "tipo": "ADS",
+   "racio": 1,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/863064/000162828026009531/rio-20251231.htm",
+   "citacao": "Each American Depositary Share Represents one Rio Tinto plc Ordinary Shares of 10p each. (Form 20-F FY2025, capa; rácio 1 inalterado desde 2015)."
+  },
+  "ERIC": {
+   "tipo": "ADS",
+   "racio": 1,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/717826/000119312526104149/d948057d20f.htm",
+   "citacao": "American Depositary Shares (each representing one B share), The NASDAQ Stock Market LLC (Form 20-F FY2025, capa; rácio 1 inalterado desde 2015)."
+  },
+  "STM": {
+   "tipo": "ordinária",
+   "racio": 1,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/932787/000093278726000009/stm-20251231.htm",
+   "citacao": "Common shares, nominal value €1.04 per share, New York Stock Exchange; ordinary shares evidenced by American registered certificates (“New York Shares”) (Form 20-F FY2025, capa e Item 12; sem ADS desde 2015)."
+  },
+  "HSBC": {
+   "tipo": "ADS",
+   "racio": 5,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/1089113/000108911326000010/hsbc-20251231.htm",
+   "citacao": "American Depositary Shares, each representing 5 Ordinary Shares of nominal value US$0.50 each (Form 20-F FY2025, capa; rácio 5 inalterado desde 2015)."
+  },
+  "CRH": {
+   "tipo": "ordinária",
+   "racio": 1,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/849395/000162828026009043/crh-20251231.htm",
+   "citacao": "Ordinary Shares of €0.32 each, New York Stock Exchange (Form 10-K FY2025, capa; antes 1 ADS = 1 ordinária desde 2015, programa ADS encerrado em 2023-09-25 com conversão 1:1 para listagem direta na NYSE)."
+  },
+  "BCS": {
+   "tipo": "ADS",
+   "racio": 4,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/312069/000031206926000004/bcs-20251231.htm",
+   "citacao": "American Depositary Shares, each representing four 25p ordinary shares, New York Stock Exchange (Form 20-F FY2025, capa; rácio 4 inalterado desde 2015)."
+  },
+  "BP": {
+   "tipo": "ADS",
+   "racio": 6,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/313807/000031380726000006/bp-20251231.htm",
+   "citacao": "Each ADS represents six ordinary shares. (Form 20-F FY2025; rácio 6 inalterado desde 2015)."
+  },
+  "BTI": {
+   "tipo": "ADS",
+   "racio": 1,
+   "mudancas": [
+    {
+     "data": "2017-02-14",
+     "de": 2,
+     "para": 1
+    }
+   ],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/1303523/000130352326000017/bti-20251231.htm",
+   "citacao": "American Depositary Shares (evidenced by American Depositary Receipts) each representing one ordinary share (Form 20-F FY2025, capa; alterado de 2 para 1 em 2017-02-14 conforme Form 20-F FY2017)."
+  },
+  "NVS": {
+   "tipo": "ADS",
+   "racio": 1,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/1114448/000111444826000004/nvs-20251231.htm",
+   "citacao": "American Depositary Shares each representing 1 share, New York Stock Exchange (Form 20-F FY2025, capa; rácio 1 inalterado desde 2015)."
+  },
+  "SAP": {
+   "tipo": "ADS",
+   "racio": 1,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/1000184/000110465926020058/sap-20251231x20f.htm",
+   "citacao": "American Depositary Shares, each Representing one Ordinary Share, without nominal value, New York Stock Exchange (Form 20-F FY2025, capa; rácio 1 inalterado desde 2015)."
+  },
+  "SHEL": {
+   "tipo": "ADS",
+   "racio": 2,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/1306965/000162828026017024/shel-20251231.htm",
+   "citacao": "American Depositary Shares representing two ordinary shares with a nominal value of €0.07 each, New York Stock Exchange (Form 20-F FY2025, capa; rácio 2 inalterado desde 2015)."
+  },
+  "SNY": {
+   "tipo": "ADS",
+   "racio": 0.5,
+   "mudancas": [],
+   "fonte": "https://www.sec.gov/Archives/edgar/data/1121404/000162828026008403/sny-20251231.htm",
+   "citacao": "American Depositary Shares, each representing one half of one ordinary share, par value €2 per share, NASDAQ Global Select Market (Form 20-F FY2025, capa; rácio 0,5 inalterado desde 2015)."
+  }
+ }
+}

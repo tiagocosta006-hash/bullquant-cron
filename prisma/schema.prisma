@@ -120,6 +120,7 @@ model Company {
   dcfModelos             DcfModelo[]
   earnings               EarningsEvent[]
   fundamentals           Fundamental[]
+  fundamentalNotes       FundamentalNote[]
   insiderTxns            InsiderTransaction[]
   managementProfile      ManagementProfile?
   portfolioItems         PortfolioItem[]
@@ -234,6 +235,37 @@ model Fundamental {
   @@index([companyId, periodEnd])
   @@index([companyId, periodType, fiscalYear])
   @@map("fundamentals")
+}
+
+// ── NOTAS POR VALOR (mini aviso no site) ──────
+// Cada valor de `fundamentals` que não é o publicado tal e qual leva uma nota:
+// "reexpressao" (a empresa republicou; automático a partir do XBRL) ou
+// "correcao" (a fonte estava errada; só correções revistas, com citação —
+// scripts/correcoes.json). Gravadas pelo ingest_fundamentals.py na mesma
+// transação das linhas. Decisão do Costa, 2026-11-18.
+model FundamentalNote {
+  id            String     @id @default(cuid())
+  companyId     String
+  periodType    PeriodType
+  fiscalYear    Int
+  fiscalQuarter Int?
+  field         String // nome da coluna em fundamentals (ex.: "revenue")
+  kind          String // "correcao" | "reexpressao"
+  valueSource   Decimal?   @db.Decimal(20, 4) // valor da fonte / original
+  valueShown    Decimal?   @db.Decimal(20, 4) // valor mostrado no site
+  reasonPt      String     @db.Text
+  reasonEn      String     @db.Text
+  sourceUrl     String?
+  accession     String?
+  reviewed      Boolean    @default(false)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([companyId, periodType, fiscalYear])
+  @@map("fundamental_notes")
 }
 
 model Price {

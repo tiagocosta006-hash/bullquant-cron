@@ -56,7 +56,40 @@ DIRECT_URL = os.getenv("DIRECT_URL")
 if not DIRECT_URL:
     sys.exit("DIRECT_URL não definida")
 
-IDENTITY = os.getenv("SEC_IDENTITY", "Tiago Costa costa@engimov.pt")
+IDENTITY = os.getenv("SEC_IDENTITY") or os.getenv("SEC_USER_AGENT") or "BullValue admin@bullocracy.com"
+
+# Cache por filing (19/11): cada 10-K/10-Q é lido UMA vez e o resultado fica em
+# scripts/.cache/segmentos/<cik>.json. Antes, cada sábado voltava a descarregar
+# os mesmos ~11 XBRL por empresa (≈5 800 downloads) e, por isso mesmo, só se
+# lia o fim do histórico (3 10-K → ~5 anos). Com a cache, a primeira passagem
+# vai buscar 10 anos e as seguintes só leem os filings novos.
+# A cache guarda os FACTOS de cada filing (snapshot_filing), não o resultado:
+# mudar a lógica das partições não obriga a descarregar nada outra vez. Só
+# mudar o que snapshot_filing guarda exige subir EXTRATOR_VERSAO.
+EXTRATOR_VERSAO = 2
+CACHE_SEG = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".cache", "segmentos")
+
+
+def _cache_ler(cik) -> dict:
+    p = os.path.join(CACHE_SEG, f"{int(cik)}.json.gz")
+    try:
+        import gzip
+        d = json.load(gzip.open(p, "rt"))
+        if d.get("versao") == EXTRATOR_VERSAO:
+            return d.get("filings", {})
+    except (OSError, ValueError):
+        pass
+    return {}
+
+
+def _cache_gravar(cik, filings: dict) -> None:
+    os.makedirs(CACHE_SEG, exist_ok=True)
+    import gzip
+    p = os.path.join(CACHE_SEG, f"{int(cik)}.json.gz")
+    tmp = p + ".tmp"
+    with gzip.open(tmp, "wt") as fh:
+        json.dump({"versao": EXTRATOR_VERSAO, "filings": filings}, fh, separators=(",", ":"))
+    os.replace(tmp, p)
 
 import edgar  # noqa: E402  (set_identity tem de correr antes de qualquer fetch)
 edgar.set_identity(IDENTITY)
@@ -188,6 +221,15 @@ _GEO_TOKENS = (
 )
 
 RECONCILE_TOL = 0.02  # ±2%, igual ao componente R do SDQI em validate_segments.py
+# Fatia com OUTRO eixo fixado num membro (UNH: clientes externos; NFLX: streaming):
+# é aí que aparecem coincidências — a CAT 2023 juntou as parcelas da América do
+# Norte com o total da América do Norte e deu 67,7 contra 67,1 mM de receita
+# (0,9%). Uma repartição verdadeira numa fatia destas fecha quase exata.
+RECONCILE_TOL_FATIA = 0.005
+# Membros que são agregados de outros e nunca uma fatia: "Reportable segment net
+# sales" (MDT), "Segments Excluding All Other Segments" (CAT), "Total ...".
+_AGREGADO = _re.compile(r"\bexcluding\b|\breportable segments?\b.*\b(sales|revenues?)\b|^\s*total\b|"
+                        r"\ball segments\b|\bsegments? total\b", _re.I)
 
 _TERSE = "http://www.xbrl.org/2003/role/terseLabel"
 _PLAIN = "http://www.xbrl.org/2003/role/label"
@@ -262,17 +304,37 @@ def _total_concepts_from_calculation(xbrl):
     return out
 
 
-def _member_label(xbrl, member_id: str) -> str:
+_NS_PADRAO = ("us-gaap:", "srt:", "country:", "ifrs-full:", "dei:", "stpr:", "currency:")
+
+
+def _rotulos_do_xbrl(xbrl, membros) -> dict:
+    """{membro: {"terse": ..., "plain": ...}} tirado do label linkbase do filing."""
+    out = {}
+    cat = xbrl.element_catalog or {}
+    for mid in membros:
+        el = cat.get((mid or "").replace(":", "_", 1))
+        labels = getattr(el, "labels", None) or {}
+        out[mid] = {"terse": labels.get(_TERSE), "plain": labels.get(_PLAIN)}
+    return out
+
+
+def _member_label(rotulos: dict, member_id: str) -> str:
     """Rótulo humano de um membro, tirado do label linkbase do próprio filing.
 
     Não se usa a coluna `dimension_member_label` do dataframe porque, quando um
     facto tem dois eixos (segmento + consolidação), ela traz o rótulo do eixo
     errado — no JPM os três segmentos vinham todos como "Operating Segments".
+
+    Membros da taxonomia PADRÃO (country:US, srt:EuropeMember) usam o rótulo
+    normal: o "terse" deles é partilhado por todas as tabelas do filing e pode
+    vir de outra — a CAT tinha country:US com terse "U.S. pensions". Nos membros
+    próprios da empresa o terse é o mais limpo ("Americas" vs "Americas Segment").
     """
-    key = (member_id or "").replace(":", "_", 1)
-    el = (xbrl.element_catalog or {}).get(key)
-    labels = getattr(el, "labels", None) or {}
-    for role in (_TERSE, _PLAIN):
+    labels = (rotulos or {}).get(member_id) or {}
+    # Só os PAÍSES (country:US) — nos membros us-gaap/srt o terse é o que a
+    # empresa escolheu ("Other revenue" na Visa; o rótulo padrão é "Service, Other").
+    ordem = ("plain", "terse") if (member_id or "").startswith("country:") else ("terse", "plain")
+    for role in ordem:
         lab = labels.get(role)
         if not lab:
             continue
@@ -308,6 +370,28 @@ def _candidate_partitions(vals, allowed, total):
     plain = {k: v[0] for k, v in vals.items()}
 
     cands = []
+    # Primeiro, sem os membros que são agregados: pelo rótulo, ou porque o valor
+    # é a soma de dois ou mais irmãos (subtotal de um grupo de segmentos).
+    agregados = {k for k in plain if _AGREGADO.search(k)}
+    outros = [k for k in plain if k not in agregados]
+    if 3 <= len(outros) <= 12 and total > 0:
+        from itertools import combinations
+        for k in outros:
+            resto = [j for j in outros if j != k]
+            for n in range(2, len(resto) + 1):
+                if any(abs(sum(plain[j] for j in comb) - plain[k]) <= 0.005 * abs(plain[k])
+                       for comb in combinations(resto, n)):
+                    agregados.add(k)
+                    break
+    if agregados:
+        limpo = {k: v for k, v in plain.items() if k not in agregados}
+        if allowed:
+            dom = {k: v[0] for k, v in vals.items() if v[1] in allowed and k not in agregados}
+            if len(dom) >= 2:
+                cands.append(dom)
+        if len(limpo) >= 2:
+            cands.append(limpo)
+        plain = limpo
     if allowed:
         dom = {k: v[0] for k, v in vals.items() if v[1] in allowed}
         if len(dom) >= 2:
@@ -374,69 +458,190 @@ def _axis_row_variants(grp, axis_col, dim_cols):
     reconciliação com o total que decide qual vale.
     """
     others = [c for c in dim_cols if c != axis_col and c not in CONSOLIDATION_AXES]
-    base = grp[grp[axis_col].notna()]
-    for cons_col in CONSOLIDATION_AXES:
-        if cons_col in base.columns:
-            cons = base[cons_col]
-            # Aceita sem qualificador ou explicitamente "segmentos operacionais";
-            # exclui eliminações intersegmento e itens de reconciliação.
-            base = base[cons.isna()
-                        | (cons.map(_norm) == _norm(OPERATING_MEMBER))
-                        | cons.map(lambda v: "OperatingSegments" in str(v))]
-    if len(base) == 0:
-        return
-    if not others:
-        yield base
-        return
-
-    # 1) fatia sem qualquer outro eixo preenchido — o caso simples e mais comum.
-    strict = base[base[others].isna().all(axis=1)]
-    if len(strict):
-        yield strict
-
-    # 2) fixar UM outro eixo num valor e exigir os restantes vazios.
-    for c in others:
-        for v in base[c].dropna().unique():
-            rest = [o for o in others if o != c]
-            sub = base[base[c] == v]
-            if rest:
-                sub = sub[sub[rest].isna().all(axis=1)]
+    todos = grp[grp[axis_col].notna()]
+    # Uma fatia por membro de CONSOLIDAÇÃO, nunca misturadas (19/11): a CAT
+    # publica cada segmento duas vezes — com vendas intersegmento
+    # (OperatingSegmentsMember) e só externas (...ExcludingIntersegmentElimination).
+    # Juntá-las e ficar "com o maior de cada" dava uma repartição que não era
+    # nenhuma das duas. Ordem: só externas, sem qualificador, com intersegmento.
+    cons_cols = [c for c in CONSOLIDATION_AXES if c in todos.columns]
+    fatias_cons = []
+    if cons_cols:
+        cc = cons_cols[0]
+        valores = [None] + sorted({v for v in todos[cc].dropna().unique() if "OperatingSegments" in str(v)},
+                                  key=lambda v: (0 if "Excluding" in str(v) or "External" in str(v) else 1, str(v)))
+        for v in valores:
+            sub = todos[todos[cc].isna()] if v is None else todos[todos[cc] == v]
+            for o in cons_cols[1:]:
+                sub = sub[sub[o].isna()]
             if len(sub):
-                yield sub
+                fatias_cons.append(sub)
+    else:
+        fatias_cons = [todos]
 
-
-def _partition_for_axis(xbrl, grp, axis_col, dim_cols, domain_members, total):
-    """Melhor partição que reconcilia neste eixo, ou None."""
-    if axis_col not in grp.columns:
-        return None
-    allowed = domain_members.get(axis_col)
-
-    for sub in _axis_row_variants(grp, axis_col, dim_cols):
-        sub = sub[sub["concept"].map(_is_revenue_concept)]
-        if len(sub) == 0:
+    for base in fatias_cons:
+        if not others:
+            yield base, False
             continue
-        got = _best_partition(xbrl, sub, axis_col, allowed, total)
-        if got:
-            return got
+        # 1) fatia sem qualquer outro eixo preenchido — o caso simples e mais comum.
+        strict = base[base[others].isna().all(axis=1)]
+        if len(strict):
+            yield strict, False
+        # 2) fixar UM outro eixo num valor e exigir os restantes vazios.
+        for c in others:
+            for v in base[c].dropna().unique():
+                rest = [o for o in others if o != c]
+                sub = base[base[c] == v]
+                if rest:
+                    sub = sub[sub[rest].isna().all(axis=1)]
+                if len(sub):
+                    yield sub, True
+
+
+def _itens_reconciliacao(grp, axis_col, dim_cols):
+    """Factos de reconciliação PUBLICADOS (itens corporativos, eliminações), sem
+    o eixo de segmento: só eixo de consolidação, nada mais. Servem para fechar
+    uma repartição que a empresa fecha com eles (CAT: segmentos externos +
+    "Corporate items" = receita). Nunca se inventa um resíduo."""
+    cons_cols = [c for c in CONSOLIDATION_AXES if c in grp.columns]
+    if not cons_cols or axis_col not in grp.columns:
+        return grp.iloc[0:0]
+    outros = [c for c in dim_cols if c not in cons_cols]
+    r = grp[grp[outros].isna().all(axis=1)] if outros else grp
+    cc = cons_cols[0]
+    return r[r[cc].notna() & ~r[cc].map(lambda v: "OperatingSegments" in str(v)).astype(bool)]
+
+
+def _maior_subconjunto(vals: dict, total: float, tol: float):
+    """Quando o eixo traz DUAS repartições sobrepostas (CAT: EUA + resto do mundo
+    E quatro regiões, todas no mesmo eixo), nenhuma soma do conjunto fecha.
+    Procura o maior subconjunto que fecha com o total; só aceita se for único
+    nesse tamanho (senão não há como saber qual é a repartição certa)."""
+    from itertools import combinations
+    ks = list(vals)
+    if not (3 <= len(ks) <= 14) or total <= 0:
+        return None
+    for n in range(len(ks) - 1, 1, -1):
+        hits = [c for c in combinations(ks, n) if abs(sum(vals[k] for k in c) - total) / total <= tol]
+        if len(hits) == 1:
+            return {k: vals[k] for k in hits[0]}
+        if len(hits) > 1:
+            return None
     return None
 
 
-def _best_partition(xbrl, sub, axis_col, allowed, total):
+def _fatia_juntada(grp, axis_col, dim_cols):
+    """A fatia como era antes de 19/11: sem qualificador de consolidação e
+    "segmentos operacionais" juntos, outros eixos vazios. Último recurso — há
+    empresas que põem um membro numa e os restantes na outra (MDT 2023: os
+    quatro segmentos com OperatingSegmentsMember e "Other" sem qualificador)."""
+    base = grp[grp[axis_col].notna()]
+    for cc in CONSOLIDATION_AXES:
+        if cc in base.columns:
+            c = base[cc]
+            base = base[(c.isna() | c.map(lambda v: "OperatingSegments" in str(v))).astype(bool)]
+    outros = [c for c in dim_cols if c != axis_col and c not in CONSOLIDATION_AXES]
+    return base[base[outros].isna().all(axis=1)] if outros else base
 
+
+def _partition_for_axis(rotulos, grp, axis_col, dim_cols, domain_members, total):
+    """Melhor partição que reconcilia neste eixo, ou None.
+
+    Duas passagens por TODAS as fatias: primeiro só repartições exatas (±0,5%),
+    depois a melhor aproximada. Uma aproximada numa fatia já não tapa uma
+    exata noutra."""
+    if axis_col not in grp.columns:
+        return None
+    recon = _itens_reconciliacao(grp, axis_col, dim_cols)
+    allowed = domain_members.get(axis_col)
+    variantes = list(_axis_row_variants(grp, axis_col, dim_cols)) + [(_fatia_juntada(grp, axis_col, dim_cols), False)]
+    variantes = [(sub[sub["concept"].map(_is_revenue_concept)], f) for sub, f in variantes]
+    variantes = [(sub, f) for sub, f in variantes if len(sub)]
+    for so_exata in (True, False):
+        for sub, fatia in variantes:
+            got = _best_partition(rotulos, sub, axis_col, allowed, total,
+                                  RECONCILE_TOL_FATIA if fatia else RECONCILE_TOL,
+                                  None if fatia else recon, so_exata)
+            if got:
+                return got
+    return None
+
+
+# Nomes fixos para as linhas de reconciliação: o rótulo da taxonomia muda de
+# ano para ano ("Corporate, Non-Segment" / "Segment Reporting, Reconciling Item,
+# Corporate Nonsegment") e partia a série no gráfico.
+_NOME_RECONCILIACAO = (
+    ("CorporateNonSegment", "Corporate"),
+    ("IntersegmentElimination", "Intersegment eliminations"),
+    ("EliminationsAndReconciling", "Eliminations and reconciling items"),
+    ("ReconcilingItems", "Reconciling items"),
+)
+
+
+def _nome_reconciliacao(rotulos, mid):
+    for chave, nome in _NOME_RECONCILIACAO:
+        if chave in (mid or ""):
+            return nome
+    return _member_label(rotulos, mid)
+
+
+def _best_partition(rotulos, sub, axis_col, allowed, total, tol=RECONCILE_TOL, recon=None, so_exata=False):
+    """Duas passagens por TODOS os conceitos de receita: primeiro só aceita uma
+    repartição que fecha exata (±0,5%) — sozinha, com itens de reconciliação
+    publicados, ou como o maior subconjunto que fecha —, depois aceita a melhor
+    aproximada (±tol). Antes, a aproximada de um conceito ganhava à exata do
+    conceito seguinte (MDT 2023 perdia "Other Segments")."""
+    from itertools import combinations
+    aproximadas = []
     for concept in sorted(sub["concept"].unique(), key=_concept_rank):
         c_rows = sub[sub["concept"] == concept]
         vals = {}
         for _, r in c_rows.iterrows():
             mid = _norm(r[axis_col])
-            label = _member_label(xbrl, mid)
+            label = _member_label(rotulos, mid)
             v = float(r["numeric_value"])
             # Membro repetido: fica o maior (o outro costuma ser fatia parcial).
             prev = vals.get(label)
             if prev is None or abs(v) > abs(prev[0]):
                 vals[label] = (v, mid)
-        for cand in _candidate_partitions(vals, allowed, total):
-            if abs(sum(cand.values()) - total) / total <= RECONCILE_TOL:
+        # Dois membros com EXATAMENTE o mesmo valor (≠ 0) são o mesmo número
+        # taggado duas vezes — MDT 2025: AllOtherSegments e OtherSegment, ambos
+        # 495 M. Sem isto, tirar um ou outro fechava a conta e a ambiguidade
+        # fazia rejeitar a repartição inteira.
+        vistos = {}
+        for k in sorted(vals):
+            v0 = vals[k][0]
+            if v0 != 0 and v0 in vistos:
+                del vals[k]
+            else:
+                vistos[v0] = k
+        cands = _candidate_partitions(vals, allowed, total)
+        for cand in cands:
+            if abs(sum(cand.values()) - total) / total <= min(tol, RECONCILE_TOL_FATIA):
                 return cand
+        aproximadas += [c for c in cands if abs(sum(c.values()) - total) / total <= tol]
+        # Segmentos + itens de reconciliação publicados (o menor número deles).
+        if recon is not None and len(recon):
+            r_rows = recon[recon["concept"] == concept]
+            itens = {}
+            cc = next((c for c in CONSOLIDATION_AXES if c in r_rows.columns), None) if len(r_rows) else None
+            for _, r in r_rows.iterrows():
+                itens[_nome_reconciliacao(rotulos, _norm(r[cc]))] = float(r["numeric_value"])
+            for cand in cands[:2]:
+                for k in range(1, min(len(itens), 3) + 1):
+                    for comb in combinations(itens, k):
+                        if any(x in cand for x in comb):
+                            continue
+                        soma = sum(cand.values()) + sum(itens[x] for x in comb)
+                        if abs(soma - total) / total <= RECONCILE_TOL_FATIA:
+                            return {**cand, **{x: itens[x] for x in comb}}
+        # Duas repartições sobrepostas no mesmo eixo: a maior que fecha.
+        plain = {k: v[0] for k, v in vals.items() if not _AGREGADO.search(k)}
+        sub_ok = _maior_subconjunto(plain, total, RECONCILE_TOL_FATIA)
+        if sub_ok:
+            return sub_ok
+    if aproximadas and not so_exata:
+        return min(aproximadas, key=lambda c: abs(sum(c.values()) - total))
     return None
 
 
@@ -471,6 +676,8 @@ def _label_key(label: str) -> str:
             if s.endswith(suf) and len(s) > len(suf) + 1:
                 s = s[: -len(suf)].strip()
                 changed = True
+    # singular/plural é a mesma série ("Other Operating Segment(s)", MDT)
+    s = _re.sub(r"(?<=[a-z]{3})s\b", "", s)
     return _re.sub(r"[^a-z0-9]+", "", s)
 
 
@@ -553,6 +760,39 @@ def canonicalize_labels(merged: dict) -> int:
     return trocas
 
 
+TOL_RECEITA_GRAVADA = 0.10
+_LINHA_RECONCILIACAO = _re.compile(r"\bcorporate\b|eliminat|reconcil|intersegment|unallocated", _re.I)
+
+
+def eixos_coerentes(by_axis, receita):
+    """Só os eixos que se podem mostrar AO LADO da receita gravada.
+
+    O filing reconcilia a partição com o seu próprio total, mas esse total pode
+    ser outro: vendas antes de eliminar as vendas entre segmentos (RSG, COP,
+    SRE: +10–15%), receita com impostos especiais (MO, DEO), ou uma "partição"
+    feita quase só de linhas de reconciliação (TRGP: 'Reconciling items' 22 mM
+    e 'Corporate and Eliminations' −4,9 mM). Um gráfico cuja soma não é a
+    receita que o utilizador vê ao lado engana, por isso:
+      · a soma tem de ficar a ±10% da receita gravada;
+      · linhas corporativas/eliminações/reconciliação não podem pesar >25%.
+    Sem receita gravada não há com que comparar e o eixo passa como está.
+    """
+    if not receita or receita <= 0:
+        return by_axis
+    out = {}
+    for eixo, membros in by_axis.items():
+        if not membros:
+            continue
+        soma = sum(membros.values())
+        if abs(soma / receita - 1) > TOL_RECEITA_GRAVADA:
+            continue
+        recon = sum(abs(v) for k, v in membros.items() if _LINHA_RECONCILIACAO.search(k))
+        if recon > 0.25 * receita:
+            continue
+        out[eixo] = membros
+    return out
+
+
 def pick_primary(by_axis):
     """Partição principal para a coluna revenueSegments (mapa plano).
 
@@ -567,24 +807,78 @@ def pick_primary(by_axis):
     return prod or seg or geo
 
 
+def snapshot_filing(filing) -> dict | None:
+    """Os factos de RECEITA de um filing (com e sem dimensões), os rótulos dos
+    membros, os domínios dos eixos e os totais do calculation linkbase — tudo o
+    que a repartição precisa, num dicionário pequeno que vai para a cache.
+
+    Separar a LEITURA (lenta: descarrega e processa o XBRL inteiro) do CÁLCULO
+    deixa mudar a lógica das partições e recalcular 10 anos de 530 empresas
+    sem voltar a pedir nada à SEC.
+    """
+    xbrl = filing.xbrl()
+    if xbrl is None:
+        return None
+    df = xbrl.query().with_dimensions().to_dataframe()
+    if df is None or len(df) == 0:
+        return None
+    dim_cols = [c for c in df.columns if c.startswith("dim_")]
+    if not dim_cols:
+        return None
+    df = df[df["numeric_value"].notna()]
+    if "period_start" not in df.columns:
+        return None
+    df = df[df["period_start"].notna() & df["period_end"].notna()]
+    calc = sorted(_total_concepts_from_calculation(xbrl))
+    calc_set = set(calc)
+    df = df[df["concept"].map(lambda c: _is_revenue_concept(c) or _is_total_revenue_concept(c)
+                              or _norm(c) in calc_set)]
+    if len(df) == 0:
+        return None
+    moedas = df["currency"].value_counts() if "currency" in df.columns else None
+    linhas, membros = [], set()
+    for _, r in df.iterrows():
+        dims = {c: str(r[c]) for c in dim_cols if r[c] is not None and str(r[c]) not in ("", "nan", "None")}
+        membros.update(_norm(v) for v in dims.values())
+        linhas.append({"c": r["concept"], "s": str(r["period_start"])[:10], "e": str(r["period_end"])[:10],
+                       "v": float(r["numeric_value"]), "m": r.get("currency") if "currency" in df.columns else None,
+                       "d": dims})
+    dominios = {}
+    for axis_id, axis in (xbrl.axes or {}).items():
+        dom = (xbrl.domains or {}).get(axis.domain_id) if axis.domain_id else None
+        if dom is not None:
+            dominios[f"dim_{axis_id}"] = sorted({_norm(m) for m in (dom.members or [])})
+    return {"linhas": linhas, "rotulos": _rotulos_do_xbrl(xbrl, membros), "dominios": dominios,
+            "calc": calc, "moedas": {str(k): int(v) for k, v in moedas.items()} if moedas is not None else {}}
+
+
 def extract_segments_from_filing(filing):
+    """Compatibilidade: lê o filing e calcula logo as partições."""
+    snap = snapshot_filing(filing)
+    return segments_from_snapshot(snap) if snap else ({}, None)
+
+
+def segments_from_snapshot(snap: dict, receitas: dict | None = None):
     """Devolve ({(period_type, period_end): {axis_name: {segmento: valor}}}, moeda).
 
     A moeda é a do filing (SEK na Ericsson, DKK na Novo Nordisk, GBP na Diageo),
     NÃO USD. Quem chama tem de converter antes de gravar, porque a coluna
     `revenue` da BD já está em USD — ver apply_fx_to_segments em main().
     """
-    xbrl = filing.xbrl()
-    if xbrl is None:
+    import pandas as pd
+    rows = []
+    for l in snap["linhas"]:
+        rows.append({"concept": l["c"], "period_start": l["s"], "period_end": l["e"],
+                     "numeric_value": l["v"], "currency": l.get("m"), **l["d"]})
+    df = pd.DataFrame(rows)
+    if len(df) == 0:
         return {}, None
-
-    df = xbrl.query().with_dimensions().to_dataframe()
-    if df is None or len(df) == 0:
-        return {}, None
-
-    dim_cols = [c for c in df.columns if c.startswith("dim_")]
-    if not dim_cols:
-        return {}, None
+    dim_cols = sorted({k for l in snap["linhas"] for k in l["d"]})
+    for c in dim_cols:
+        if c not in df.columns:
+            df[c] = None
+    df[dim_cols] = df[dim_cols].astype(object).where(df[dim_cols].notna(), None)
+    rotulos = snap["rotulos"]
 
     # Só factos de duração (receita é fluxo, não saldo) e numéricos.
     df = df[df["numeric_value"].notna()]
@@ -604,13 +898,9 @@ def extract_segments_from_filing(filing):
         return {}, None
 
     # Membros-folha legítimos por eixo, lidos do domínio do XBRL.
-    domain_members = {}
-    for axis_id, axis in (xbrl.axes or {}).items():
-        dom = (xbrl.domains or {}).get(axis.domain_id) if axis.domain_id else None
-        if dom is not None:
-            domain_members[f"dim_{axis_id}"] = {_norm(m) for m in (dom.members or [])}
+    domain_members = {k: set(v) for k, v in snap["dominios"].items()}
 
-    calc_totals = None  # calculado à cabeça só se a lista estrita falhar
+    calc_totals = set(snap["calc"])
     out = {}
     for (pstart, pend), grp in df.groupby(["period_start", "period_end"]):
         try:
@@ -626,7 +916,7 @@ def extract_segments_from_filing(filing):
         # trimestrais apesar de os publicarem no 10-Q. É a MESMA janela que o
         # is_quarterly_duration do ingest_fundamentals já usa (:716); tê-las
         # diferentes fazia a linha existir na BD sem o segmento nunca lhe chegar.
-        if 80 <= days <= 100:
+        if 80 <= days <= 119:   # Q1 de 16 semanas (KR) — mesma janela do ingest_fundamentals
             ptype = "QUARTERLY"
         elif 340 <= days <= 380:
             ptype = "ANNUAL"
@@ -638,8 +928,6 @@ def extract_segments_from_filing(filing):
         undim = undim_all[undim_all["concept"].map(_is_total_revenue_concept)]
         if len(undim) == 0:
             # Recurso: conceito de total declarado pela empresa no calc linkbase.
-            if calc_totals is None:
-                calc_totals = _total_concepts_from_calculation(xbrl)
             if calc_totals:
                 undim = undim_all[undim_all["concept"].map(lambda c: _norm(c) in calc_totals)]
         if len(undim) == 0:
@@ -660,6 +948,14 @@ def extract_segments_from_filing(filing):
         # não é "a repartição do banco" — é uma fatia estreita a fingir que é o
         # todo. A AstraZeneca (55,6 de 58,7 mM = 95%) continua a passar.
         totais = [t for t in totais if t >= 0.5 * totais[0]]
+        # Com a receita GRAVADA conhecida (filings em USD), testa-se primeiro o total
+        # mais perto dela: a Republic Services publica a repartição BRUTA (Revenues
+        # 19,03 mM, antes de eliminar vendas entre segmentos) e a EXTERNA (receita de
+        # contratos 16,59 mM = a consolidada). Começar pelo maior dava a bruta, que
+        # depois não fecha com a receita e o ano ficava sem repartição.
+        rev = (receitas or {}).get((ptype, str(pend)[:10])) if filing_currency == "USD" else None
+        if rev:
+            totais.sort(key=lambda t: abs(t - rev))
         total = totais[0]
 
         by_axis = {}
@@ -667,7 +963,7 @@ def extract_segments_from_filing(filing):
             found = None
             for axis_col in axis_cols:
                 for cand_total in totais:
-                    part = _partition_for_axis(xbrl, grp, axis_col, dim_cols,
+                    part = _partition_for_axis(rotulos, grp, axis_col, dim_cols,
                                                domain_members, cand_total)
                     if part:
                         found = part
@@ -717,10 +1013,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tickers", help="lista separada por vírgulas; omitir = todas")
     ap.add_argument("--limit-companies", type=int, default=0)
-    ap.add_argument("--tenks", type=int, default=3,
+    # 10 anos: com a cache por filing, só a 1.ª passagem paga o histórico todo.
+    ap.add_argument("--tenks", type=int, default=11,
                     help="quantos 10-K buscar (cada um traz ~3 anos de anuais)")
-    ap.add_argument("--tenqs", type=int, default=8, help="quantos 10-Q buscar")
-    ap.add_argument("--twentyfs", type=int, default=3,
+    ap.add_argument("--tenqs", type=int, default=40, help="quantos 10-Q buscar")
+    ap.add_argument("--twentyfs", type=int, default=11,
                     help="quantos 20-F buscar — emitentes estrangeiros (ASML, SAP, "
                          "SHEL, UBS...) não entregam 10-K e ficavam sem segmentos")
     ap.add_argument("--dry-run", action="store_true", help="não escreve na BD")
@@ -788,15 +1085,37 @@ def main():
             # descontinuada — a versão antiga somava 14,7 mM contra uma receita
             # reapresentada de 10,4 mM. Preferir "quem tem mais segmentos"
             # escolhia justamente a versão errada.
+            # Receita GRAVADA por período (USD): ordena os totais candidatos de cada
+            # filing — ver segments_from_snapshot(receitas=...).
+            cur.execute('SELECT "periodType"::text, "periodEnd"::date, revenue FROM fundamentals '
+                        'WHERE "companyId" = %s AND revenue IS NOT NULL', (company_id,))
+            receitas = {(pt, str(pe)[:10]): float(rv) for pt, pe, rv in cur.fetchall()}
+
             def _fdate(f):
                 return str(getattr(f, "filing_date", "") or getattr(f, "period_of_report", "") or "")
 
+            cache = _cache_ler(cik)
+            novos = 0
             merged = {}
             for f in sorted(filings, key=_fdate):
+                acc = str(getattr(f, "accession_no", "") or getattr(f, "accession_number", ""))
+                if acc and acc in cache:
+                    snap = cache[acc]["snap"]
+                else:
+                    try:
+                        snap = snapshot_filing(f)
+                    except Exception as e:
+                        # erro NÃO entra na cache: tenta-se outra vez na próxima corrida
+                        print(f"    {ticker} {getattr(f,'form','?')}: erro {e!r}", flush=True)
+                        continue
+                    if acc:
+                        cache[acc] = {"data": _fdate(f), "snap": snap}
+                        novos += 1
+                    time.sleep(args.sleep)
                 try:
-                    got, fcur = extract_segments_from_filing(f)
+                    got, fcur = segments_from_snapshot(snap, receitas) if snap else ({}, None)
                 except Exception as e:
-                    print(f"    {ticker} {getattr(f,'form','?')}: erro {e!r}", flush=True)
+                    print(f"    {ticker} {getattr(f,'form','?')}: erro no cálculo {e!r}", flush=True)
                     continue
                 for k, v in got.items():
                     # (period_type, period_end) → converter já aqui, para que o
@@ -811,7 +1130,10 @@ def main():
                         stats["fx_falhou"] += 1
                         continue
                     merged.setdefault(k, {}).update(v)
-                time.sleep(args.sleep)
+            if novos:
+                _cache_gravar(cik, cache)
+                stats["filings_novos"] += novos
+            stats["filings_da_cache"] += len(filings) - novos
 
             # Depois de juntar TODOS os filings da empresa (só aqui se vê a
             # série completa e, com ela, as grafias que mudaram ao longo dos
@@ -835,9 +1157,6 @@ def main():
                         (company_id,),
                     )
                 for (ptype, pend), by_axis in merged.items():
-                    primary = pick_primary(by_axis)
-                    if not primary:
-                        continue
                     # A partição reconcilia dentro do FILING, mas a receita da
                     # nossa BD pode ser outro conceito. Nos bancos é: o XBRL
                     # reparte só as comissões e a BD guarda a receita com margem
@@ -853,10 +1172,17 @@ def main():
                     )
                     _row = cur.fetchone()
                     _rev = float(_row[0]) if _row and _row[0] else None
-                    if _rev and _rev > 0:
-                        if sum(primary.values()) < 0.5 * _rev:
-                            stats["cobertura_insuficiente"] += 1
-                            continue
+                    by_axis = eixos_coerentes(by_axis, _rev)
+                    primary = pick_primary(by_axis)
+                    if not primary:
+                        stats["cobertura_insuficiente"] += 1
+                        cur.execute(
+                            'UPDATE fundamentals SET "revenueSegments" = NULL, "revenueSegmentsByAxis" = NULL '
+                            'WHERE "companyId" = %s AND "periodType" = %s::"period_type" '
+                            'AND "periodEnd"::date = %s::date',
+                            (company_id, ptype, pend),
+                        )
+                        continue
                     cur.execute(
                         'UPDATE fundamentals SET "revenueSegments" = %s, '
                         '"revenueSegmentsByAxis" = %s '

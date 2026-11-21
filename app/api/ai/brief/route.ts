@@ -54,7 +54,7 @@ export async function GET(request: Request) {
       return NextResponse.json(rateLimitError, { status: 429 })
     }
 
-    // 2. Notícias dos últimos 15 dias (FMP, lib/fmp/mercado.ts)
+    // 2. Notícias dos últimos 15 dias (Finnhub via lib/fmp/mercado.ts)
     const rawNews = await noticias(company.ticker, 15)
 
     // Sort descending by datetime, take top 20

@@ -59,6 +59,18 @@ jobs:
         if: steps.gate.outputs.run == 'true'
         run: pip install -r scripts/requirements.txt
 
+      # Cache por filing do ingest_segments_xbrl.py: cada 10-K/10-Q só é lido
+      # uma vez. Guarda-se SEMPRE (mesmo com falha ou timeout), para que a
+      # primeira passagem de 10 anos possa ficar a meio e continuar no sábado
+      # seguinte sem repetir o que já leu.
+      - name: Restaurar cache dos segmentos
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: scripts/.cache/segmentos
+          key: segmentos-${{ github.run_id }}
+          restore-keys: segmentos-
+
       - name: Run segment ingest
         if: steps.gate.outputs.run == 'true'
         env:
@@ -67,6 +79,13 @@ jobs:
         run: |
           python scripts/ingest_segments_xbrl.py \
             ${{ inputs.tickers && format('--tickers {0}', inputs.tickers) || '' }}
+
+      - name: Guardar cache dos segmentos
+        if: always() && steps.gate.outputs.run == 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: scripts/.cache/segmentos
+          key: segmentos-${{ github.run_id }}
 
       # O Q4 não tem 10-Q próprio (a SEC não o exige, porque nesse período as
       # empresas entregam o 10-K), logo não há facto XBRL trimestral para ele e

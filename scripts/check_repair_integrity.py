@@ -73,8 +73,12 @@ check("guard JPM-class no totalDebt (has_ltd_ever)",
       'has_ltd_ever' in src_build)
 check("guard CVNA-class ativo (total direto < LTD é descartado)",
       "ltd_probe" in src_build and "total_debt < ltd_probe" in src_build)
-check("EBITDA de Financials é NULL estrutural",
-      'elif sector == "Financials":' in src_build)
+# 18/11: o EBITDA passou a ter fórmula única (EBT + juros + D&A) e o ramo dos
+# Financials deixou de ser um `elif` a seguir ao valor reportado. O que importa
+# é o comportamento: logo a seguir à condição dos Financials, ebitda = None.
+check("EBITDA de bancos/seguradoras é NULL estrutural",
+      any("ebitda = None" in bloco[:600]
+          for bloco in src_build.split('if banco_ou_seguradora:')[1:]))
 check("fabricação grossProfit=revenue de bancos REMOVIDA",
       "gross_profit is None and revenue is not None" not in src_build.split('sector == "Financials"')[1][:600]
       if 'sector == "Financials"' in src_build else False)

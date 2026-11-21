@@ -35,6 +35,7 @@ Uso:
   python scripts/fill_missing_shares.py --apply
 """
 import argparse
+import json
 import os
 import sys
 import time
@@ -58,7 +59,7 @@ import edgar  # noqa: E402
 # como STRING VAZIA, não como variável por definir, e o default nunca entra.
 # O edgar.set_identity("") passa e só falha lá à frente, na SEC, como se fosse
 # outra coisa qualquer.
-edgar.set_identity(os.getenv("SEC_IDENTITY") or "Tiago Costa costa@engimov.pt")
+edgar.set_identity(os.getenv("SEC_IDENTITY") or "BullValue admin@bullocracy.com")  # contacto da SEC vem do ambiente
 
 
 def purge_edgar_cache_if_big(limit_gb: float = 3.0) -> bool:
@@ -131,6 +132,31 @@ def combinar(valores: list) -> float | None:
     if vs[0] > 0 and vs[-1] / vs[0] > RACIO_CLASSES_EQUIVALENTES:
         return vs[-1]
     return None
+
+
+# Cache por filing (19/11): o ingest diário apaga e reescreve as linhas, as
+# ações voltam a NULL e este passo relia ~62 XBRL por empresa TODOS os dias
+# (~4 min/empresa). O resultado de cada filing não muda — fica em
+# scripts/.cache/acoes/<cik>.json (o workflow guarda-a entre corridas).
+# Mudar shares_do_filing exige subir CACHE_VERSAO.
+CACHE_VERSAO = 1
+CACHE_ACOES = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".cache", "acoes")
+
+
+def _cache_ler(cik) -> dict:
+    try:
+        d = json.load(open(os.path.join(CACHE_ACOES, f"{int(cik)}.json")))
+        return d["filings"] if d.get("versao") == CACHE_VERSAO else {}
+    except (OSError, ValueError, KeyError):
+        return {}
+
+
+def _cache_gravar(cik, filings: dict) -> None:
+    os.makedirs(CACHE_ACOES, exist_ok=True)
+    p = os.path.join(CACHE_ACOES, f"{int(cik)}.json")
+    with open(p + ".tmp", "w") as fh:
+        json.dump({"versao": CACHE_VERSAO, "filings": filings}, fh, separators=(",", ":"))
+    os.replace(p + ".tmp", p)
 
 
 def shares_do_filing(filing) -> dict:
@@ -259,9 +285,21 @@ def main() -> None:
                 continue
 
             shares: dict = {}
+            cache = _cache_ler(cik)
+            novos = 0
             for f in filings:
-                shares.update(shares_do_filing(f))
-                time.sleep(args.sleep)
+                acc = str(getattr(f, "accession_no", "") or "")
+                if acc and acc in cache:
+                    got = {tuple(k.split("|")): v for k, v in cache[acc].items()}
+                else:
+                    got = shares_do_filing(f)
+                    if acc:
+                        cache[acc] = {f"{k[0]}|{k[1]}": v for k, v in got.items()}
+                        novos += 1
+                    time.sleep(args.sleep)
+                shares.update(got)
+            if novos:
+                _cache_gravar(cik, cache)
             if not shares:
                 print(f"[{i}/{len(empresas)}] {ticker}: 0 factos de ações no XBRL", flush=True)
                 continue

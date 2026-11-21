@@ -6,8 +6,8 @@ import { exigirPro, CACHE_PRIVADO } from "@/lib/api/acessoPro"
 /**
  * GET /api/insider/[ticker]
  * Transações de insiders (SEC Form 4) de uma empresa, mais recentes primeiro,
- * + um resumo de compras/vendas na janela recente. Vêm da FMP
- * (lib/fmp/calendario.ts); degrada para lista vazia se a FMP falhar.
+ * + um resumo de compras/vendas na janela recente. Vêm da Finnhub
+ * (lib/fmp/calendario.ts); degrada para lista vazia se a Finnhub falhar.
  */
 const WINDOW_DAYS = 90;
 
@@ -15,7 +15,7 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ ticker: string }> },
 ) {
-  // Validar antes de chamar a FMP: um ticker inventado seria um pedido novo.
+  // Validar antes de chamar a Finnhub: um ticker inventado seria um pedido novo.
   const ticker = normalizarTicker((await params).ticker);
   if (!ticker) return NextResponse.json({ error: "Ticker inválido" }, { status: 400 });
 

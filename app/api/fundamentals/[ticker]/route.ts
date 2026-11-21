@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { exigirPro, CACHE_PRIVADO } from "@/lib/api/acessoPro"
+import { agruparNotas, chaveNota } from "@/lib/notasValores"
 
 // Sem isto, o Next.js cacheia o resultado deste GET internamente por rota
 // resolvida (por ticker) até ao próximo deploy — tickers visitados antes de
@@ -52,6 +53,17 @@ export async function GET(
       return NextResponse.json({ error: "No fundamentals found" }, { status: 404 })
     }
 
+    // Notas por valor (o mini aviso junto a um número corrigido ou reexpresso).
+    // Só os campos que o tooltip usa — poupa egress.
+    const notas = await prisma.fundamentalNote.findMany({
+      where: { companyId: company.id },
+      select: {
+        periodType: true, fiscalYear: true, fiscalQuarter: true, field: true,
+        kind: true, reasonPt: true, reasonEn: true, sourceUrl: true,
+      },
+    })
+    const notasPorPeriodo = agruparNotas(notas)
+
     const serialized = fundamentals.map(f => {
       const obj: Record<string, unknown> = {}
       for (const [key, val] of Object.entries(f)) {
@@ -61,6 +73,8 @@ export async function GET(
           obj[key] = val
         }
       }
+      const doPeriodo = notasPorPeriodo.get(chaveNota(f.periodType, f.fiscalYear, f.fiscalQuarter))
+      if (doPeriodo) obj.notas = doPeriodo
       return obj
     })
 

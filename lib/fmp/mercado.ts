@@ -1,5 +1,6 @@
 /**
  * Preços da FMP para o site: cotações atuais e histórico.
+ * (As notícias por empresa em `noticias()` já usam Finnhub `/company-news`.)
  *
  * ── Porque é que os preços deixam de estar na base ───────────────────────
  *
@@ -17,6 +18,8 @@
  * (ritmo, tentativas, concorrência). Aqui cada pedido é isolado e a cache do
  * Next é que evita repetições.
  */
+
+import { finnhubGet, simboloFinnhub } from "@/lib/finnhub";
 
 const BASE = "https://financialmodelingprep.com/stable";
 
@@ -215,11 +218,11 @@ export async function cotacao(ticker: string): Promise<Cotacao | null> {
   return (await cotacoes([ticker])).get(ticker.toUpperCase()) ?? null;
 }
 
-// ─── Notícias por empresa ──────────────────────────────────────────────────
+// ─── Notícias por empresa (Finnhub /company-news) ─────────────────────────
 
 export type NoticiaEmpresa = {
   id: number;
-  /** Segundos Unix, como a Finnhub dava — o frontend já conta com isso. */
+  /** Segundos Unix, devolvidos diretamente pela Finnhub. */
   datetime: number;
   headline: string;
   summary: string;
@@ -228,45 +231,77 @@ export type NoticiaEmpresa = {
   image: string;
 };
 
-type LinhaNoticia = {
-  publishedDate: string;
-  publisher?: string;
-  site?: string;
-  title: string;
-  text?: string;
-  url: string;
+type LinhaNoticiaFinnhub = {
+  id?: number;
+  datetime?: number;
+  headline?: string;
+  summary?: string;
+  source?: string;
+  url?: string;
   image?: string;
 };
 
-/** Notícias de uma empresa nos últimos `dias`, mais recentes primeiro. */
+/**
+ * Mapeia o payload bruto de `/company-news` da Finnhub para `NoticiaEmpresa[]`,
+ * descartando entradas sem título/URL/timestamp e ordenando da mais recente
+ * para a mais antiga.
+ *
+ * Extraído como função pura para permitir testes unitários determinísticos sem
+ * chamadas de rede.
+ */
+export function mapearNoticiasFinnhub(linhas: unknown): NoticiaEmpresa[] {
+  if (!Array.isArray(linhas)) return [];
+
+  const out: NoticiaEmpresa[] = [];
+  for (const bruto of linhas) {
+    if (!bruto || typeof bruto !== "object") continue;
+    const l = bruto as LinhaNoticiaFinnhub;
+    const headline = typeof l.headline === "string" ? l.headline.trim() : "";
+    const url = typeof l.url === "string" ? l.url.trim() : "";
+    const dt = typeof l.datetime === "number" && Number.isFinite(l.datetime) ? Math.floor(l.datetime) : NaN;
+    if (!headline || !url || !Number.isFinite(dt) || dt <= 0) continue;
+
+    // A Finnhub inclui `id` numérico; se por acaso faltar, gera-se um hash
+    // estável a partir do URL para manter as `key` do React determinísticas.
+    const id =
+      typeof l.id === "number" && Number.isFinite(l.id) && l.id >= 0
+        ? Math.floor(l.id)
+        : [...url].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0) >>> 0;
+
+    out.push({
+      id,
+      datetime: dt,
+      headline,
+      summary: typeof l.summary === "string" ? l.summary.trim() : "",
+      source: typeof l.source === "string" ? l.source.trim() : "",
+      url,
+      image: typeof l.image === "string" ? l.image.trim() : "",
+    });
+  }
+
+  return out.sort((a, b) => b.datetime - a.datetime);
+}
+
+/**
+ * Notícias de uma empresa nos últimos `dias`, mais recentes primeiro.
+ *
+ * Vem da Finnhub (`/company-news`, cache de 15 min) em vez da FMP; em caso de
+ * falha da fonte degrada para lista vazia para não quebrar a página nem o brief.
+ */
 export async function noticias(ticker: string, dias: number): Promise<NoticiaEmpresa[]> {
+  const sym = simboloFinnhub(ticker);
+  if (!sym) return [];
+
   const ate = new Date();
   const de = new Date(ate.getTime() - dias * 86_400_000);
-  const linhas = await get<LinhaNoticia[]>(
-    "news/stock",
+  const linhas = await finnhubGet<LinhaNoticiaFinnhub[]>(
+    "company-news",
     {
-      symbols: simbolo(ticker),
+      symbol: sym,
       from: de.toISOString().slice(0, 10),
       to: ate.toISOString().slice(0, 10),
-      limit: "100",
     },
     900,
   );
-  if (!Array.isArray(linhas)) return [];
-  return linhas
-    .map((l) => {
-      const t = Date.parse(l.publishedDate.replace(" ", "T") + "Z");
-      return {
-        // Id estável a partir do URL, para as `key` do React.
-        id: [...l.url].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0) >>> 0,
-        datetime: Math.floor(t / 1000),
-        headline: l.title,
-        summary: l.text ?? "",
-        source: l.publisher || l.site || "",
-        url: l.url,
-        image: l.image ?? "",
-      };
-    })
-    .filter((n) => Number.isFinite(n.datetime))
-    .sort((a, b) => b.datetime - a.datetime);
+  return mapearNoticiasFinnhub(linhas);
 }

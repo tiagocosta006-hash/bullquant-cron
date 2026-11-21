@@ -20,11 +20,17 @@ import math
 import uuid
 from collections import Counter, defaultdict
 import requests
-import yfinance as yf  # SÓ para splits (TODO(polygon): migrar; FX já é BCE)
 import psycopg2
 from urllib.parse import urlparse
 from psycopg2.extras import Json
 from dotenv import load_dotenv
+from notas_valores import aplicar_correcoes, notas_definicao, notas_reexpressao, gravar_notas
+from validar_fundamentais import validar, relatorio as relatorio_validacao
+import divida_balanco
+import receita_impressa
+import factos_em_falta
+import fluxos_impressos
+import aplicacoes_balanco
 
 # Consolas Windows usam cp1252 — sem isto, prints com caracteres fora do cp1252
 # (ex.: "←" no sync de classes duplas) matam o script a meio da ingestão.
@@ -69,7 +75,7 @@ def assert_local_db(url: str) -> None:
 assert_local_db(DIRECT_URL)
 
 EDGAR_BASE = "https://data.sec.gov/api/xbrl/companyfacts"
-EDGAR_HEADERS = {"User-Agent": "BullValue admin@bullocracy.com"}
+EDGAR_HEADERS = {"User-Agent": os.getenv("SEC_USER_AGENT") or os.getenv("SEC_IDENTITY") or "BullValue admin@bullocracy.com"}  # contacto da SEC vem do ambiente
 SLEEP_BETWEEN = 0.2
 HISTORY_YEARS = 10
 REFRESH_CACHE = "--refresh-cache" in sys.argv
@@ -198,11 +204,19 @@ DURATION_TAGS = {
     ],
     "taxExpense": ["IncomeTaxExpenseBenefit"],
     "netIncome": [
-        "NetIncomeLoss",
-        "ProfitLoss",
-        "ProfitLossAttributableToOwnersOfParent",
+        # Alinhado com o bottomLineNetIncome que a plataforma já usa (lib/fmp/mapear.ts),
+        # para o EPS bater com lucro/ações; nas empresas sem ações preferenciais é igual ao NetIncomeLoss.
         "NetIncomeLossAvailableToCommonStockholdersBasic",
+        "NetIncomeLoss",
+        "ProfitLossAttributableToOwnersOfParent",
+        "ProfitLoss",
     ],
+    # Lucro ANTES dos dividendos preferenciais (atribuível à empresa-mãe). Não
+    # vai para a BD: serve para reconstruir o que fica acima do lucro (resultado
+    # operacional dos bancos, resultado antes de impostos, EBITDA, taxa de
+    # imposto do ROIC). Usar o netIncome "para comuns" nessas contas tirava os
+    # preferenciais ao resultado operacional (JPM 2025: −1 367 M; 18/11/2026).
+    "netIncomeParent": ["NetIncomeLoss", "ProfitLossAttributableToOwnersOfParent"],
     "epsDiluted": [
         "EarningsPerShareDiluted",
         "DilutedEarningsLossPerShare",
@@ -331,6 +345,25 @@ DURATION_TAGS = {
         "AdjustmentsForDepreciationAndAmortisationExpense",
         "DepreciationAmortizationAndAccretionNet",  # LEN
     ],
+    # Capex alargado (auditoria 19/11): software capitalizado e compras de
+    # intangíveis são investimento, e a FMP soma-os (377 dos 1 174 capex
+    # diferentes). Só se juntam quando o capex escolhido é a linha pura de
+    # imobilizado (capexPPE) — senão podia já os incluir (ProductiveAssets).
+    "capexPPE": ["PaymentsToAcquirePropertyPlantAndEquipment"],
+    "capexSoftware": ["PaymentsToDevelopSoftware", "PaymentsForSoftware", "PaymentsToAcquireSoftware"],
+    "capexIntangiveis": ["PaymentsToAcquireIntangibleAssets"],
+    # Componentes da D&A, lidos à parte para escolher o total certo em build_row
+    # (melhor_da): a lista acima pára na primeira tag que existe, e muitas
+    # empresas taggam como "DepreciationDepletionAndAmortization" SÓ a
+    # depreciação, com a amortização dos intangíveis noutra tag (MRSH 2024:
+    # 369 + 377 = 746). Diferenças na D&A explicavam 4/5 dos EBITDA diferentes.
+    "daDDA": ["DepreciationDepletionAndAmortization"],
+    "daDA": ["DepreciationAndAmortization"],
+    "daDep": ["Depreciation"],
+    "daAmortInt": ["AmortizationOfIntangibleAssets"],
+    # Juros líquidos fora da exploração: única tag de juros de algumas empresas
+    # (BLDR, KMI). Negativo = encargo líquido. Só alimenta o EBITDA.
+    "jurosLiquidosNaoOp": ["InterestIncomeExpenseNonoperatingNet"],
     "incomeBeforeTax": [
         "IncomeLossFromContinuingOperationsBeforeIncomeTaxesMinorityInterestAndIncomeLossFromEquityMethodInvestments",
         "IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest",
@@ -370,12 +403,19 @@ DURATION_TAGS = {
         "PaymentsForRepurchaseOfEquity",
         "PaymentsToAcquireOrRedeemEntitysShares",
         "PurchaseOfTreasuryShares",
-        "PaymentsForRepurchaseOfPreferredStockAndPreferenceStock",
+        # REMOVIDO (20/11/2026): PaymentsForRepurchaseOfPreferredStockAndPreferenceStock.
+        # Resgatar preferenciais não é recomprar capital ordinário — e misturava bases entre
+        # trimestres: a KEY resgatou 525 M de preferenciais nos 9M de 2026 e o Q3 ficava
+        # 202 M em vez de 320 M; a EIX (538 M de preferenciais) idem.
+        # Última: a linha do cash flow IMPRESSO (tag própria, só com dimensões, ou
+        # ausente = 0) — ver fluxos_impressos.py. Só conta sem nenhuma tag acima.
+        fluxos_impressos.TAG_IMPRESSA,
     ],
     "dividendsPaid": [
         "PaymentsOfDividendsCommonStock",
         "PaymentsOfDividends",
         "PaymentsOfOrdinaryDividends",
+        "DividendsPaidToEquityHoldersOfParentClassifiedAsFinancingActivities",
         "DividendsPaid",
         "PaymentsOfDividendsMinorityInterest",
     ],
@@ -386,6 +426,32 @@ DURATION_TAGS = {
         "CashAndCashEquivalentsPeriodIncreaseDecreaseExcludingExchangeRateEffect",
         "CashPeriodIncreaseDecrease",
     ],
+    # Sinais de que a empresa TEM dívida (juros e fluxos de emissão/reembolso).
+    # Não vão para a BD: servem só para impedir a regra "debt-free" de gravar 0
+    # em empresas cuja dívida está em tags com dimensões ou extensões próprias,
+    # que o companyfacts não traz (PCAR, TXT, AES, EA — auditoria Gemini 18/11).
+    # Bancos: receita = juros líquidos + receitas sem juros, como os bancos a
+    # apresentam ("total revenue"). Sem isto a lista de revenue apanhava, conforme
+    # o ano, os juros BRUTOS (FITB 2024: 10.426M em vez de 8.479M — auditoria 19/11).
+    "bancoJurosLiquidos": ["InterestIncomeExpenseNet"],
+    "bancoReceitaSemJuros": ["NoninterestIncome"],
+    "sinalDivida": [
+        "InterestExpenseDebt", "InterestExpenseNonoperating", "InterestExpense", "InterestPaidNet", "InterestPaid",
+        "RepaymentsOfLongTermDebt", "RepaymentsOfDebt", "RepaymentsOfSeniorDebt", "RepaymentsOfConvertibleDebt",
+        "RepaymentsOfNotesPayable", "RepaymentsOfCommercialPaper", "RepaymentsOfShortTermDebt",
+        "ProceedsFromIssuanceOfLongTermDebt", "ProceedsFromIssuanceOfDebt", "ProceedsFromIssuanceOfSeniorLongTermDebt",
+        "ProceedsFromIssuanceOfUnsecuredDebt", "ProceedsFromConvertibleDebt", "ProceedsFromRepaymentsOfCommercialPaper",
+        "ProceedsFromRepaymentsOfShortTermDebt", "ProceedsFromRepaymentsOfLinesOfCredit",
+    ],
+    # Capex de REITs (decisão 19/11): compras de imóveis já existentes são
+    # aquisições, não capex — como na FMP e como se exclui o M&A nas outras
+    # empresas. Capex de REIT = desenvolvimento + melhorias.
+    "reitAquisicoes": ["PaymentsToAcquireRealEstate", "PaymentsToAcquireCommercialRealEstate"],
+    "reitDesenvolvimento": ["PaymentsToDevelopRealEstateAssets"],
+    "reitMelhorias": ["PaymentsForCapitalImprovements", "PaymentsForLeasingCostsCommissionsAndTenantImprovements"],
+    # Para reconhecer o custo "só imposto sobre imóveis" dos REITs (ver build_row).
+    "realEstateTax": ["RealEstateTaxExpense"],
+    "propertyOperatingExpense": ["PropertyOperatingExpense", "DirectCostsOfLeasedAndRentedPropertyOrEquipment"],
 }
 
 INSTANT_TAGS = {
@@ -460,6 +526,10 @@ INSTANT_TAGS = {
         "ConvertibleNotesPayableCurrent",  # CIEN/DASH
         "ConvertibleDebtCurrent",          # INCY/PANW/TER
     ],
+    # Só para a regra LongTermDebtAndCapitalLeaseObligations + parte corrente (SRE).
+    # NÃO pôr em longTermDebtCurrent: na XEL a LTD vem de um total que já a inclui
+    # e a parte corrente contava duas vezes (19/11).
+    "ltdLeaseCurrent": ["LongTermDebtAndCapitalLeaseObligationsCurrent"],
     "shortTermDebt": [
         "ShortTermBorrowings", "ShortTermDebt", "ShorttermBorrowings",
         # ── Aceites na revisão CFA 2026-07 ──
@@ -535,20 +605,37 @@ INSTANT_TAGS = {
     # caixa e equivalentes na convenção bancária. NÃO confundir com "Deposits"
     # (passivo = depósitos de clientes), que nunca pode entrar em cash/dívida.
     "interestBearingDeposits": ["InterestBearingDepositsInBanks"],
+    # Caixa restrita: subtraída quando o caixa veio de um tag que a inclui
+    # (REG reporta só o total combinado — auditoria Gemini 18/11).
+    # PFE guarda as aplicações aqui. Em bancos/seguradoras (TRV, AIG, ELV) é
+    # carteira de investimento, não caixa — só se usa fora delas (build_row).
+    "outrasAplicacoesCurto": ["OtherShortTermInvestments"],
+    "restrictedCash": ["RestrictedCashAndCashEquivalents", "RestrictedCash",
+                       "RestrictedCashAndCashEquivalentsAtCarryingValue"],
     "marketableSecuritiesCurrent": [
         "MarketableSecuritiesCurrent",
         "AvailableForSaleSecuritiesDebtSecuritiesCurrent",
         "AvailableForSaleSecuritiesCurrent",
         "AvailableForSaleSecurities",
-        "ShortTermInvestments"
+        "ShortTermInvestments",
+        "DebtSecuritiesAvailableForSaleExcludingAccruedInterestCurrent",  # INTU (auditoria 19/11)
     ],
     "totalEquity": [
         "StockholdersEquity",
-        "Equity",
         "EquityAttributableToOwnersOfParent",
+        "Equity",
         "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
     ],
     "sharesOutstandingInst": ["CommonStockSharesOutstanding", "NumberOfSharesOutstanding"],
+    # Para derivar o passivo quando a empresa não reporta "Liabilities":
+    # ativo − capital próprio TOTAL (com minoritários) − capital temporário.
+    # Com o capital só dos acionistas, os minoritários entravam no passivo
+    # (SRE +10 mil M, KO — auditoria Gemini 18/11).
+    "equityInclNci": ["StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest", "Equity"],
+    "minorityInterestInst": ["MinorityInterest", "NoncontrollingInterestInSubsidiaries", "NoncontrollingInterests"],
+    "temporaryEquity": ["TemporaryEquityCarryingAmountIncludingPortionAttributableToNoncontrollingInterests",
+                        "RedeemableNoncontrollingInterestEquityCarryingAmount",
+                        "TemporaryEquityCarryingAmountAttributableToParent"],
 }
 
 # Override manual de capex para casos em que a empresa reporta "purchases of
@@ -616,6 +703,98 @@ def new_id() -> str:
     return uuid.uuid4().hex
 
 
+SPLITS_EVENTOS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "splits_eventos.json")
+SPLIT_MIN_DATE = "2000-01-01"
+_splits_eventos_cache: dict[str, list[dict]] | None = None
+
+
+def carregar_splits_eventos() -> dict[str, list[dict]]:
+    """Lê `scripts/splits_eventos.json` uma única vez por processo.
+    Se o ficheiro não existir, avisa e devolve `{}` (sem ajuste de splits)."""
+    global _splits_eventos_cache
+    if _splits_eventos_cache is not None:
+        return _splits_eventos_cache
+    if not os.path.exists(SPLITS_EVENTOS_PATH):
+        print(f"⚠️ Aviso: {SPLITS_EVENTOS_PATH} não encontrado — ajuste de splits desativado.")
+        _splits_eventos_cache = {}
+        return _splits_eventos_cache
+    try:
+        with open(SPLITS_EVENTOS_PATH, encoding="utf-8") as f:
+            dados = json.load(f)
+        _splits_eventos_cache = dados if isinstance(dados, dict) else {}
+    except Exception as e:
+        print(f"⚠️ Aviso: erro ao ler {SPLITS_EVENTOS_PATH} ({e}) — ajuste de splits desativado.")
+        _splits_eventos_cache = {}
+    return _splits_eventos_cache
+
+
+def fator_split_para_filed(ticker: str | None, filed: str | None, hoje: str | None = None) -> float:
+    """Produto dos fatores dos splits de `ticker` com `data >= 2000-01-01`, `data > filed` e já ocorridos."""
+    if not ticker or not filed:
+        return 1.0
+    eventos = carregar_splits_eventos().get(ticker)
+    if not eventos:
+        return 1.0
+    filed_iso = str(filed)[:10]
+    # Split anunciado mas ainda por acontecer: os números publicados continuam na base antiga.
+    # Quando a data passar, a seleção por eventos (get_companies_with_cik) reprocessa a empresa.
+    hoje = (hoje or datetime.date.today().isoformat())[:10]
+    f = 1.0
+    for ev in eventos:
+        d = ev.get("data")
+        fac = ev.get("fator")
+        if not d or not fac:
+            continue
+        if d >= SPLIT_MIN_DATE and d > filed_iso and d <= hoje:
+            f *= float(fac)
+    return f
+
+
+def split_desmentido(dei_ns: dict, data: str, fator: float, janela: int = 45) -> bool:
+    """O número de ações da capa (dei) fica IGUAL dos dois lados do evento?
+
+    O catálogo traz ajustes de preço por spin-off com razões que parecem splits
+    (EXC 2022: 1,4 = 7:5 depois da Constellation; HPE 2017, DXC). Um split multiplica
+    as ações pelo fator; uma distribuição de outra empresa não lhes toca. Compara a
+    última capa ≥45 dias antes com a primeira ≥45 dias depois (perto da data a capa
+    pode já vir ajustada), com o valor entregue mais recentemente para cada data (a
+    Kroger corrigiu num 10-K/A as ações erradas do 10-K de 2015). Sem dados → não desmente."""
+    if abs(fator - 1) <= 0.1:
+        return False
+    por_data: dict = {}
+    for vals in (dei_ns.get("EntityCommonStockSharesOutstanding") or {}).get("units", {}).values():
+        for v in vals:
+            if v.get("end") and v.get("val") is not None:
+                chave = (v.get("filed") or "", v.get("accn") or "")
+                por_data.setdefault(v["end"], {}).setdefault(chave, 0)
+                por_data[v["end"]][chave] += v["val"]   # várias classes no mesmo filing
+    serie = {d: x[max(x)] for d, x in por_data.items()}
+    try:
+        d0 = datetime.date.fromisoformat(data)
+    except ValueError:
+        return False
+    antes = [d for d in serie if datetime.date.fromisoformat(d) < d0 - datetime.timedelta(days=janela)]
+    depois = [d for d in serie if datetime.date.fromisoformat(d) > d0 + datetime.timedelta(days=janela)]
+    if not antes or not depois:
+        return False
+    a, b = serie[max(antes)], serie[min(depois)]
+    if not a or not b:
+        return False
+    return abs(b / a - 1) <= 0.05
+
+
+def filtrar_splits_desmentidos(ticker: str | None, dei_ns: dict) -> list:
+    """Retira do catálogo (só neste processo) os eventos que as ações da capa desmentem."""
+    evs = carregar_splits_eventos().get(ticker or "")
+    if not evs:
+        return []
+    fora = [e for e in evs if e.get("data") and e.get("fator") and split_desmentido(dei_ns, e["data"], float(e["fator"]))]
+    if fora:
+        carregar_splits_eventos()[ticker] = [e for e in evs if e not in fora]
+        print(f"    {ticker}: {len(fora)} evento(s) de split desmentidos pelas ações ({', '.join(e['data'] for e in fora)})")
+    return fora
+
+
 def get_companies_with_cik(cur, tickers: list[str] | None = None) -> list[dict]:
     if tickers:
         cur.execute(
@@ -624,10 +803,38 @@ def get_companies_with_cik(cur, tickers: list[str] | None = None) -> list[dict]:
             (tickers,),
         )
     else:
-        # Event-driven + Fallback: Apenas processar quem reportou resultados recentemente e 
-        # ainda não publicou o 10-Q correspondente, ou quem não é atualizado há >95 dias.
+        # Event-driven + Fallback: processar quem reportou resultados recentemente e
+        # ainda não publicou o 10-Q correspondente, quem teve um split após o último
+        # updatedAt dos seus fundamentais, ou quem não é atualizado há >95 dias.
+        splits_eventos = carregar_splits_eventos()
+        hoje_iso = datetime.date.today().isoformat()
+        split_tickers: list[str] = []
+        split_dates: list[str] = []
+        for t, evs in splits_eventos.items():
+            datas = [ev["data"] for ev in evs if ev.get("data") and SPLIT_MIN_DATE <= ev["data"] <= hoje_iso]
+            if datas:
+                split_tickers.append(t)
+                split_dates.append(max(datas))
+
+        split_clause = ""
+        params: tuple = ()
+        if split_tickers:
+            split_clause = """
+                  OR EXISTS (
+                      SELECT 1
+                      FROM unnest(%s::text[], %s::date[]) AS s(ticker, split_date)
+                      WHERE s.ticker = c.ticker
+                        AND s.split_date > (
+                            SELECT MAX(f."updatedAt")::date
+                            FROM fundamentals f
+                            WHERE f."companyId" = c.id
+                        )
+                  )
+            """
+            params = (split_tickers, split_dates)
+
         cur.execute(
-            '''
+            f'''
             SELECT c.id, c.ticker, c.cik, c.sector, c.currency
             FROM companies c
             WHERE c."isActive" = TRUE 
@@ -643,6 +850,7 @@ def get_companies_with_cik(cur, tickers: list[str] | None = None) -> list[dict]:
                             WHERE f."companyId" = c.id AND f."filedAt" >= e.date
                         )
                   )
+                  {split_clause}
                   OR
                   NOT EXISTS (
                       SELECT 1 FROM fundamentals f 
@@ -651,7 +859,8 @@ def get_companies_with_cik(cur, tickers: list[str] | None = None) -> list[dict]:
                   )
               )
             ORDER BY c.ticker
-            '''
+            ''',
+            params,
         )
     return [{"id": r[0], "ticker": r[1], "cik": r[2], "sector": r[3], "currency": r[4]} for r in cur.fetchall()]
 
@@ -660,6 +869,9 @@ session = requests.Session()
 session.headers.update(EDGAR_HEADERS)
 
 CACHE_DIR = os.path.join(os.path.dirname(__file__), ".cache", "companyfacts")
+# Completar o companyfacts com o XBRL dos filings que lá faltam (precisa de rede;
+# BULLVALUE_SEM_FILINGS=1 desliga, p.ex. para correr offline).
+COMPLETAR_FILINGS = os.getenv("BULLVALUE_SEM_FILINGS") != "1"
 
 # True quando o último fetch foi à rede (cache miss) — o loop principal só
 # dorme SLEEP_BETWEEN nesses casos; com cache quente a re-ingestão é local.
@@ -692,8 +904,11 @@ def fetch_edgar_facts(cik: str, refresh: bool = False) -> dict | None:
         data = r.json()
         try:
             os.makedirs(CACHE_DIR, exist_ok=True)
-            with gzip.open(cache_path, "wt", encoding="utf-8") as f:
+            # tmp + rename: um corte a meio (disco cheio, job cancelado) deixava um
+            # .gz truncado (NWSA, 20/11) — o rename é atómico.
+            with gzip.open(cache_path + ".tmp", "wt", encoding="utf-8") as f:
                 json.dump(data, f)
+            os.replace(cache_path + ".tmp", cache_path)
         except Exception:
             pass  # cache é otimização; falhar a escrita nunca é fatal
         return data
@@ -759,7 +974,11 @@ def is_quarterly_duration(entry):
         return False
     d1 = datetime.date.fromisoformat(start)
     d2 = datetime.date.fromisoformat(end)
-    return 80 <= (d2 - d1).days <= 100
+    # Até 16 semanas (112 dias): calendários 16-12-12-12 (KR) têm o Q1 de 16 semanas.
+    # Com o teto antigo de 100 dias o Q1 da KR ficava SEMPRE vazio (receita, resultado,
+    # OCF) e, por arrasto, o OCF do Q2 e a receita do Q4 (que se calculam a partir dele).
+    # 119 deixa de fora transições de calendário (FDX 2026: 121 dias).
+    return 80 <= (d2 - d1).days <= 119
 
 
 def is_ytd_duration(entry, fp):
@@ -773,15 +992,16 @@ def is_ytd_duration(entry, fp):
     # Limites inferiores acomodam calendários fiscais 4-4-5 (COST/AES):
     # Q2 YTD = 24 semanas = 168 dias; Q3 YTD = 36 semanas = 252 dias — as
     # janelas antigas (170/260) rejeitavam-nos e o capex/OCF ficava null.
-    if fp == "Q1": return 80 <= days <= 110
+    if fp == "Q1": return 80 <= days <= 119   # Q1 de 16 semanas (KR): 112 dias
     if fp == "Q2": return 160 <= days <= 200
     if fp == "Q3": return 245 <= days <= 290
     if fp in ("Q4", "FY"): return 350 <= days <= 380
     return False
 
 
-def best_for_period(entries: list[dict], expected_end: str, prefer_annual_form: bool = False,
-                    prefer_max_scale: bool = True) -> float | None:
+def _best_entry_for_period(entries: list[dict], expected_end: str, prefer_annual_form: bool = False,
+                           prefer_max_scale: bool = True) -> dict | None:
+    """Devolve o entry XBRL vencedor para expected_end (valor e metadados como accn)."""
     matches = [e for e in entries if e.get("end") == expected_end]
     if not matches:
         return None
@@ -793,7 +1013,8 @@ def best_for_period(entries: list[dict], expected_end: str, prefer_annual_form: 
         if annual_forms:
             matches = annual_forms
     matches.sort(key=lambda e: e.get("filed") or "", reverse=True)
-    val = matches[0].get("val")
+    best = matches[0]
+    val = best.get("val")
     # Guard de unidades: alguns filings tagham o mesmo facto em milhares/milhões
     # (ex.: ANET NetIncomeLoss "841" vs "841000000" com o mesmo period end).
     # Restatements legítimos nunca divergem 100x; bugs de escala são 1000x+.
@@ -802,12 +1023,19 @@ def best_for_period(entries: list[dict], expected_end: str, prefer_annual_form: 
     # maior é quase sempre o errado (ICE 2016: EPS taggado "120000000" no 10-Q
     # original vs 0.62 nos filings seguintes) — aí fica o mais recente.
     if prefer_max_scale:
-        vals = [e.get("val") for e in matches if e.get("val") is not None]
+        vals = [e for e in matches if e.get("val") is not None]
         if val is not None and val != 0 and vals:
-            vmax = max(vals, key=abs)
-            if abs(vmax) > 100 * abs(val):
-                return vmax
-    return val
+            vmax_entry = max(vals, key=lambda e: abs(e["val"]))
+            if abs(vmax_entry["val"]) > 100 * abs(val):
+                return vmax_entry
+    return best
+
+
+def best_for_period(entries: list[dict], expected_end: str, prefer_annual_form: bool = False,
+                    prefer_max_scale: bool = True) -> float | None:
+    entry = _best_entry_for_period(entries, expected_end, prefer_annual_form=prefer_annual_form,
+                                   prefer_max_scale=prefer_max_scale)
+    return entry.get("val") if entry else None
 
 
 def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) -> tuple[dict, dict]:
@@ -837,11 +1065,23 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
                 else:
                     pool = [e for e in entries if is_quarterly_duration(e)]
 
-                val = best_for_period(pool, expected_end, prefer_annual_form=(fp == "FY"),
-                                      prefer_max_scale=(field not in ("epsDiluted", "dividendPerShare")))
+                entry = _best_entry_for_period(
+                    pool, expected_end,
+                    prefer_annual_form=(fp == "FY"),
+                    prefer_max_scale=(field not in ("epsDiluted", "dividendPerShare")),
+                )
+                val = entry.get("val") if entry else None
                 candidates.append(val)
                 if val is not None and field != "revenue":
                     dur_map[(fy, fp)][field] = val
+                    if field in ("epsDiluted", "dividendPerShare", "sharesOutstandingDur"):
+                        dur_map[(fy, fp)][f"{field}_filed"] = entry.get("filed")
+                    # Um ZERO numa tag de pagamentos não prova que não houve pagamentos:
+                    # a Leidos tagga 0 em ações ordinárias e 542 M no total de equity;
+                    # o Huntington 0 em ordinárias e 82 M em preferenciais. Fica o zero
+                    # só se nenhuma tag seguinte tiver valor.
+                    if field == "shareRepurchases" and val == 0:
+                        continue
                     break
 
             # Revenue: seleção sensível à magnitude. A prioridade cega falha para
@@ -927,32 +1167,166 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
                    if fp.startswith("Q")
                    and dur_map[(fy, fp)].get("dividendPerShare") is None
                    and period_ends.get((fy, fp))]
-    if dps_missing:
-        declared: set = set()
-        for tag in DURATION_TAGS["dividendPerShare"]:
-            node = us_gaap.get(tag) or {}
-            for unit_key, unit_entries in (node.get("units") or {}).items():
-                if "/" not in unit_key or not isinstance(unit_entries, list):
+    # Factos com DATA por tag: {tag: {(data, valor): filed}}. Numa janela (trimestre, Q4,
+    # ano) usa-se a PRIMEIRA tag, pela ordem de prioridade, que tenha factos nessa janela:
+    # o mesmo dividendo aparece na declaração (…Declared) e no pagamento (…CashPaid) —
+    # juntar as duas tags dobrava-o (DIS 2024 Q2: 1,05 em vez de 0,45); e escolher uma só
+    # tag para todos os anos perdia as janelas que só a outra cobre.
+    datados: dict[str, dict] = {}
+    for tag in DURATION_TAGS["dividendPerShare"]:
+        node = us_gaap.get(tag) or {}
+        for unit_key, unit_entries in (node.get("units") or {}).items():
+            if "/" not in unit_key or not isinstance(unit_entries, list):
+                continue
+            for e in unit_entries:
+                if "start" in e or not e.get("end") or e.get("val") is None:
                     continue
-                for e in unit_entries:
-                    if "start" in e or not e.get("end") or e.get("val") is None:
-                        continue
-                    if "14A" in (e.get("form") or ""):
-                        continue
-                    declared.add((e["end"], float(e["val"])))
-        if declared:
-            q_ends = sorted({period_ends[p] for p in periods
-                             if p[1].startswith("Q") and period_ends.get(p)})
-            for (fy, fp) in dps_missing:
-                p_end = period_ends[(fy, fp)]
-                idx = q_ends.index(p_end) if p_end in q_ends else -1
-                prev_end = q_ends[idx - 1] if idx > 0 else None
-                floor = (datetime.date.fromisoformat(p_end)
-                         - datetime.timedelta(days=95)).isoformat()
-                lower = max(prev_end, floor) if prev_end else floor
-                vals = [v for d, v in declared if lower < d <= p_end]
-                if vals:
-                    dur_map[(fy, fp)]["dividendPerShare"] = sum(vals)
+                if "14A" in (e.get("form") or ""):
+                    continue
+                k_decl = (e["end"], float(e["val"]))
+                f_decl = e.get("filed")
+                d_tag = datados.setdefault(tag, {})
+                if k_decl not in d_tag or (f_decl or "") > (d_tag[k_decl] or ""):
+                    d_tag[k_decl] = f_decl
+
+    def _datados(ini: str, fim: str) -> list:
+        """[(valor, filed)] dos factos com data em (ini, fim], da primeira tag que os tem."""
+        for tag in DURATION_TAGS["dividendPerShare"]:
+            parts = [(v, f_d) for (d, v), f_d in (datados.get(tag) or {}).items() if ini < d <= fim]
+            if parts:
+                return parts
+        return []
+
+    if datados:
+        q_ends = sorted({period_ends[p] for p in periods
+                         if p[1].startswith("Q") and period_ends.get(p)})
+        for (fy, fp) in dps_missing:
+            p_end = period_ends[(fy, fp)]
+            idx = q_ends.index(p_end) if p_end in q_ends else -1
+            prev_end = q_ends[idx - 1] if idx > 0 else None
+            floor = (datetime.date.fromisoformat(p_end)
+                     - datetime.timedelta(days=95)).isoformat()
+            lower = max(prev_end, floor) if prev_end else floor
+            parts = _datados(lower, p_end)
+            if parts:
+                dur_map[(fy, fp)]["dividendPerShare"] = sum(v for v, _ in parts)
+                dur_map[(fy, fp)]["dividendPerShare_parts"] = parts
+                dur_map[(fy, fp)]["dividendPerShare_filed"] = max(
+                    (f_decl for _, f_decl in parts if f_decl), default=None
+                )
+
+    # DPS do Q4 dado diretamente no 10-K (3 meses a acabar no fecho do ano): quando o 10-K
+    # não traz o anual, a síntese FY − 9M não tem por onde ir e o Q4 ficava N/A apesar de
+    # impresso (JBL, FDS em 2026). Guarda-se ao lado do FY; synthesize_q4 usa-o.
+    for (fy, fp) in periods:
+        if fp != "FY" or not period_ends.get((fy, fp)):
+            continue
+        fim = period_ends[(fy, fp)]
+        for tag in DURATION_TAGS["dividendPerShare"]:
+            pool = [e for e in extract_tag_entries(us_gaap, tag, prefer_per_share=True)
+                    if is_quarterly_duration(e)]
+            ent = _best_entry_for_period(pool, fim, prefer_annual_form=True, prefer_max_scale=False)
+            if ent and ent.get("val") is not None:
+                dur_map[(fy, fp)]["_dpsQ4"] = ent["val"]
+                break
+        else:
+            # …ou como factos com DATA (DIS: 0,75 a 22/07/2026): (fecho do Q3, fecho do ano]
+            q3 = period_ends.get((fy, "Q3"))
+            parts = _datados(q3, fim) if q3 else []
+            if parts:
+                dur_map[(fy, fp)]["_dpsQ4"] = sum(v for v, _ in parts)
+        # …e o ANO pela mesma via quando o 10-K não traz o anual (DIS paga duas vezes por
+        # ano, 0,75 + 0,75, só como datas)
+        if dur_map[(fy, fp)].get("dividendPerShare") is None:
+            ini = (datetime.date.fromisoformat(fim) - datetime.timedelta(days=364)).isoformat()
+            parts = _datados(ini, fim)
+            if parts:
+                dur_map[(fy, fp)]["dividendPerShare"] = sum(v for v, _ in parts)
+                dur_map[(fy, fp)]["dividendPerShare_parts"] = parts
+
+    # DPS só acumulado: há 10-Q que dão o dividendo declarado apenas para os 9 meses
+    # (CAT, BKNG, LLY, TAP, DD em 2026) — sem facto de 3 meses, o Q3 ficava N/A. Q2/Q3 =
+    # acumulado deste trimestre − acumulado do anterior (ou Q1 + Q2 de 3 meses). Mesmo
+    # filing / mesmo exercício → a mesma base de ações, sem risco de split a meio.
+    _ant_dps = {"Q2": "Q1", "Q3": "Q2"}
+
+    def _dps_ytd(fy, fp):
+        fim = period_ends.get((fy, fp))
+        if not fim:
+            return None
+        for tag in DURATION_TAGS["dividendPerShare"]:
+            pool = [e for e in extract_tag_entries(us_gaap, tag, prefer_per_share=True)
+                    if is_ytd_duration(e, fp)]
+            ent = _best_entry_for_period(pool, fim, prefer_annual_form=False, prefer_max_scale=False)
+            if ent and ent.get("val") is not None:
+                return ent
+        return None
+
+    for (fy, fp) in sorted(periods):
+        if fp not in ("Q2", "Q3") or dur_map[(fy, fp)].get("dividendPerShare") is not None:
+            continue
+        atual = _dps_ytd(fy, fp)
+        if atual is None:
+            continue
+        ant_ent = _dps_ytd(fy, _ant_dps[fp]) if _ant_dps[fp] != "Q1" else None
+        ant = ant_ent["val"] if ant_ent else None
+        if ant is None:
+            qs = ["Q1"] if fp == "Q2" else ["Q1", "Q2"]
+            vals = [dur_map.get((fy, q), {}).get("dividendPerShare") for q in qs]
+            ant = sum(vals) if all(v is not None for v in vals) else None
+        if ant is None:
+            continue
+        v = atual["val"] - ant
+        if v >= -1e-9:
+            dur_map[(fy, fp)]["dividendPerShare"] = max(v, 0.0)
+            dur_map[(fy, fp)]["dividendPerShare_filed"] = atual.get("filed")
+
+    # 18/11: amortizações, SBC, recompras, dividendos pagos e os fluxos de
+    # investimento/financiamento vêm muitas vezes SÓ no cash flow, que nos 10-Q
+    # é acumulado desde o início do ano. Só se aceitavam valores de 3 meses, e
+    # o Q2/Q3 ficavam vazios (19% dos trimestres sem D&A → EBITDA N/A). Quando
+    # falta o trimestre de 3 meses: YTD deste trimestre − YTD do anterior,
+    # como no OCF/capex. O Q4 continua a vir da síntese FY − 9M.
+    _anterior = {"Q2": "Q1", "Q3": "Q2"}
+    for field in ("depreciationAndAmortization", "stockBasedCompensation", "shareRepurchases",
+                  "dividendsPaid", "investingCashFlow", "financingCashFlow",
+                  "daDDA", "daDA", "daDep", "daAmortInt",
+                  "capexPPE", "capexSoftware", "capexIntangiveis"):
+        tags_f = DURATION_TAGS.get(field) or []
+        trimestral = {p: dur_map[p].get(field) for p in periods}  # valores de 3 meses originais
+        ytd: dict = {}
+        for (fy, fp) in periods:
+            if fp not in ("Q1", "Q2", "Q3"):
+                continue
+            if trimestral[(fy, fp)] is not None and fp == "Q1":
+                ytd[(fy, fp)] = trimestral[(fy, fp)]  # no Q1, 3 meses = acumulado
+                continue
+            expected_end = period_ends.get((fy, fp))
+            if not expected_end:
+                continue
+            for tag in tags_f:
+                pool = [e for e in extract_tag_entries(us_gaap, tag) if is_ytd_duration(e, fp)]
+                entry = _best_entry_for_period(pool, expected_end, prefer_annual_form=False,
+                                               prefer_max_scale=True)
+                if entry and entry.get("val") is not None:
+                    ytd[(fy, fp)] = entry["val"]
+                    break
+        for (fy, fp) in periods:
+            if fp not in ("Q1", "Q2", "Q3") or trimestral[(fy, fp)] is not None:
+                continue
+            atual = ytd.get((fy, fp))
+            if atual is None:
+                continue
+            if fp == "Q1":
+                dur_map[(fy, fp)][field] = atual
+                continue
+            ant = ytd.get((fy, _anterior[fp]))
+            if ant is None and fp == "Q3":
+                # YTD do Q2 = Q1 + Q2 de 3 meses, se os dois existirem
+                q1, q2 = trimestral.get((fy, "Q1")), trimestral.get((fy, "Q2"))
+                ant = (q1 + q2) if q1 is not None and q2 is not None else None
+            if ant is not None:
+                dur_map[(fy, fp)][field] = atual - ant
 
     # Apply differencing for cash flow metrics
     original_ytd = {}
@@ -989,7 +1363,8 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
                 entries = extract_tag_entries(us_gaap, tag)
                 if not entries:
                     continue
-                val = best_for_period(entries, expected_end, prefer_annual_form=(fp == "FY"))
+                entry = _best_entry_for_period(entries, expected_end, prefer_annual_form=(fp == "FY"))
+                val = entry.get("val") if entry else None
                 if val is not None:
                     inst_map[(fy, fp)][field] = val
                     if field == "cash":
@@ -998,6 +1373,13 @@ def extract_all_metrics(us_gaap: dict, periods: list[tuple], period_ends: dict) 
                         # JÁ inclui os depósitos remunerados — somar ibd por
                         # cima duplicaria (JPM: 469B → 915B).
                         inst_map[(fy, fp)]["cash_tag"] = tag
+                    elif field == "totalDebt":
+                        inst_map[(fy, fp)]["totalDebt_tag"] = tag
+                    elif field in ("totalAssets", "totalEquity"):
+                        inst_map[(fy, fp)][f"{field}_accn"] = entry.get("accn")
+                        inst_map[(fy, fp)][f"{field}_tag"] = tag
+                    elif field == "sharesOutstandingInst":
+                        inst_map[(fy, fp)]["sharesOutstandingInst_filed"] = entry.get("filed")
                     break
 
     return dur_map, inst_map
@@ -1211,14 +1593,20 @@ _DIVIDEND_EVIDENCE = _re.compile(r"Dividend")
 # common), e assumptions de option pricing (ExpectedDividend/Rate/Yield).
 _DIVIDEND_EXCLUDE = _re.compile(
     r"Received|Income|Restriction|MinorityInterest|Noncontrolling|Preferred|"
-    r"ExpectedDividend|DividendRate|Yield"
+    r"ExpectedDividend|DividendRate|Yield|"
+    # 20/11/2026: dividendos RECEBIDOS de participadas e ações com direito a dividendo
+    # não são a empresa a pagar — UBER/PLTR (ProceedsFromEquityMethodInvestmentDividends…),
+    # CMG (…NonForfeitableDividendRights): 17 não pagadoras ficavam com DPS N/A em vez de 0.
+    r"^Proceeds|EquityMethod|Distributions?FromAffiliate|Incremental|NonForfeitableDividendRights|"
+    r"ParticipatingSecurit|Subsidiar"
 )
 # Tags inequivocamente de dividendos a COMMON — só estas contam para os ANOS.
 # Tags genéricas (Dividends, PaymentsOfDividends, DividendsPayable) incluem
 # preferenciais (ACGL paga preferred desde 2011 sem nunca pagar common até ao
 # especial de 2024) e por isso só sustentam o booleano conservador.
 _DIVIDEND_COMMON_EVIDENCE = _re.compile(
-    r"CommonStockDividend|DividendsCommonStock|DividendsPerShare|OrdinaryShares"
+    r"CommonStockDividend|DividendsCommonStock|DividendsPerShare|OrdinaryShares|"
+    r"DividendsPaidToEquityHoldersOfParentClassifiedAsFinancingActivities"
 )
 _RND_EVIDENCE = _re.compile(r"ResearchAndDevelopment")
 # Excluir IPR&D de aquisições (intangível de balanço, não a linha de despesa).
@@ -1291,6 +1679,36 @@ def compute_company_evidence(facts_json: dict) -> dict:
 
 
 
+def ebit_de_baixo(dur, ni_pre=None, tax_expense=None):
+    """EBIT reconstruído de baixo: lucro antes de impostos + juros − outros proveitos
+    não operacionais. None sem lucro antes de impostos."""
+    ibt = dur.get("incomeBeforeTax")
+    if ibt is None and ni_pre is not None and tax_expense is not None:
+        ibt = ni_pre + tax_expense
+    if ibt is None:
+        return None
+    juros = dur.get("interestExpense")
+    if juros is None and (dur.get("jurosLiquidosNaoOp") or 0) < 0:
+        juros = -dur["jurosLiquidosNaoOp"]
+    return ibt + (juros or 0) - (dur.get("otherNonOperatingIncome") or 0)
+
+
+def melhor_da(dur: dict) -> float | None:
+    """D&A total: o maior entre o total reportado e depreciação + amortização de intangíveis.
+
+    Nunca soma duas tags que possam conter a mesma coisa: a soma só se faz com a
+    tag "Depreciation" (só depreciação) e a dos intangíveis. O máximo protege dos
+    totais parciais (MRSH, NTAP) sem inventar: cada candidato é um valor
+    reportado pela empresa ou a soma de duas linhas disjuntas.
+    """
+    cands = [dur.get("depreciationAndAmortization"), dur.get("daDDA"), dur.get("daDA")]
+    dep, amort = dur.get("daDep"), dur.get("daAmortInt")
+    if dep is not None and amort is not None and dep > 0 and amort > 0:
+        cands.append(dep + amort)
+    cands = [c for c in cands if c is not None and c >= 0]
+    return max(cands) if cands else None
+
+
 def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str | None,
               dur: dict, inst: dict, sector: str | None = None,
               evidence: dict | None = None) -> dict:
@@ -1310,8 +1728,9 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
     # domina — ex.: KMI eps 0.01) e o resultado é plausível (>= 1M ações).
     ni_g = dur.get("netIncome")
     eps_g = dur.get("epsDiluted")
+    eps_raw_abs = abs(eps_g * (dur.get("_eps_split_fator") or 1.0)) if eps_g is not None else 0.0
     expected_shares = None
-    if ni_g is not None and eps_g is not None and abs(eps_g) >= 0.5:
+    if ni_g is not None and eps_g is not None and eps_raw_abs >= 0.5:
         candidate = ni_g / eps_g
         if candidate >= 1_000_000:
             expected_shares = candidate
@@ -1364,15 +1783,41 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
 
     capex_raw = dur.get("capex")
     capex = abs(capex_raw) if capex_raw is not None else None
+    nota_capex = None
+    aq = dur.get("reitAquisicoes")
+    if sector == "Real Estate" and capex is not None and aq is not None and abs(abs(aq) - capex) < 1:
+        dev = [abs(v) for v in (dur.get("reitDesenvolvimento"), dur.get("reitMelhorias")) if v is not None]
+        if dev and sum(dev) > 0:
+            capex = sum(dev)
+        else:
+            # sem tags de desenvolvimento/melhorias (vêm em tags próprias da
+            # empresa): fica o valor das aquisições, com aviso no site
+            nota_capex = "inclui_aquisicoes"
+    ppe = dur.get("capexPPE")
+    if (capex is not None and sector != "Real Estate" and ppe is not None
+            and abs(abs(ppe) - capex) < 1):
+        sw = dur.get("capexSoftware")
+        if sw and sw > 0:
+            capex += abs(sw)
+        # Intangíveis só quando são rotina: uma compra de espectro ou de uma
+        # licença grande (dezenas de vezes o capex normal) é uma aquisição,
+        # como as de empresas, e não entra no FCF recorrente.
+        it = dur.get("capexIntangiveis")
+        if it and 0 < abs(it) <= 0.5 * capex:
+            capex += abs(it)
     op_cf = dur.get("operatingCashFlow")
     fcf = (op_cf - capex) if (op_cf is not None and capex is not None) else None
 
     revenue = dur.get("revenue")
+    nii, nonii = dur.get("bancoJurosLiquidos"), dur.get("bancoReceitaSemJuros")
+    if sector == "Financials" and nii is not None and nonii is not None and nii + nonii > 0:
+        revenue = nii + nonii
     gross_profit = dur.get("grossProfit")
     # Guardar se o lucro bruto veio TAGGADO pelo emitente ou se foi derivado
     # abaixo: se for derivado de um custo que se venha a descobrir incoerente,
     # tem de cair com ele.
     gp_reportado = gross_profit is not None
+    gp_derivado_de_custo = False
 
     # Fallback: muitas empresas reportam Revenue e CostOfRevenue mas NÃO a tag
     # explícita GrossProfit. Calcular grossProfit = revenue − costOfRevenue
@@ -1415,16 +1860,28 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         op_prov = dur.get("operatingIncome")
         if soma < revenue and (op_prov is None or revenue - soma >= op_prov):
             cost_of_rev = soma
+    # REIT cujo "custo" é só o imposto sobre imóveis (REG): não é custo das
+    # vendas, e receita − imposto dava margens brutas de ~87% sem significado.
+    if (cost_of_rev is not None and dur.get("realEstateTax") is not None
+            and abs(cost_of_rev - dur["realEstateTax"]) < 1
+            and dur.get("propertyOperatingExpense") is None):
+        cost_of_rev = None
     if gross_profit is None and revenue is not None and cost_of_rev is not None:
         gross_profit = revenue - cost_of_rev
+        gp_derivado_de_custo = True
 
     # Correção de revenue bruto-de-excise (IFRS sem tag de excise mapeável):
     # quando gp, cogs e revenue estão TODOS taggados e rev−cogs diverge do gp
     # em >5%, o net revenue verdadeiro é gp+cogs por definição (DEO: "sales"
     # $27.9B incl. excise vs net sales $20.3B = 12.2+8.1). Só encolhe, nunca
     # cresce, e exige coerência (gp+cogs entre 50% e 98% do bruto).
-    if (revenue is not None and cost_of_rev is not None and gross_profit is not None
-            and revenue > 0):
+    #
+    # SÓ em filers IFRS: em us-gaap os impostos especiais já saem na escolha das
+    # tags (ExciseAndSalesTaxes), e aqui a identidade só apanhava custos PARCIAIS —
+    # a Caterpillar tagga como custo só o dos produtos (sem serviços financeiros) e
+    # a receita do 3T2020 descia de 9.881 para 9.228 M; a TMO e a MO idem.
+    if (dur.get("_ifrs") and revenue is not None and cost_of_rev is not None
+            and gross_profit is not None and revenue > 0):
         net_rev = gross_profit + cost_of_rev
         if (abs(gross_profit - (revenue - cost_of_rev)) > 0.05 * revenue
                 and 0.5 * revenue < net_rev < 0.98 * revenue):
@@ -1444,6 +1901,7 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         cost_of_rev = None
         if not gp_reportado:
             gross_profit = None
+            gp_derivado_de_custo = False
 
     # Custo que CONTRADIZ o lucro bruto reportado pelo emitente: a tag de custo
     # escolhida não é a contraparte daquele lucro bruto. Diferenças de definição
@@ -1470,10 +1928,19 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         # lucro bruto DERIVA-SE; sem ele, fica NULL, que é honesto.
         if cost_of_rev is not None and 0 <= cost_of_rev <= revenue:
             gross_profit = revenue - cost_of_rev
+            gp_derivado_de_custo = True
         else:
             gross_profit = None
+            gp_derivado_de_custo = False
+
+    if sector == "Financials":
+        # Bancos/seguradoras não têm lucro bruto (COGS/GP ficam NULL estrutural).
+        gross_profit = None
+        gp_derivado_de_custo = False
 
     op_income = dur.get("operatingIncome")
+    op_income_reportado = op_income is not None
+    op_income_derivado_de_gp = False
 
     # operatingExpenses: a tag mãe (OperatingExpenses) falta em ~76% das rows.
     # Fallbacks por ordem de fiabilidade:
@@ -1498,9 +1965,14 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
     # Universal Accounting Identities
     if op_income is None and gross_profit is not None and op_expenses is not None:
         op_income = gross_profit - op_expenses
+        op_income_derivado_de_gp = True
         
-    if gross_profit is None and op_income is not None and op_expenses is not None:
+    # Não sintetizar grossProfit = op_income + op_expenses quando costOfRevenue
+    # não existe (nem em Financials): inventaria margem bruta sem COGS real.
+    if (gross_profit is None and cost_of_rev is not None and sector != "Financials"
+            and op_income is not None and op_expenses is not None):
         gross_profit = op_income + op_expenses
+        gp_derivado_de_custo = True
         # Se a soma ultrapassa a receita, a derivação está errada — normalmente
         # porque as "despesas operacionais" do emitente já incluem o custo da
         # receita. Fixá-la na receita era FABRICAR um número: o lucro bruto
@@ -1521,6 +1993,7 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         # interessa apanhar cai em cima do valor, não acima dele.
         if revenue is not None and revenue > 0 and gross_profit >= 0.999 * revenue:
             gross_profit = None
+            gp_derivado_de_custo = False
 
     # Despesas operacionais que JÁ INCLUEM o custo da receita.
     #
@@ -1560,6 +2033,7 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
             and revenue is not None and revenue > 0
             and gross_profit >= 0.95 * revenue):
         gross_profit = None
+        gp_derivado_de_custo = False
 
     if (gross_profit is not None and op_expenses is not None
             and op_income is not None and revenue is not None and revenue > 0):
@@ -1568,8 +2042,17 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         fecha_com_receita = abs(revenue - op_expenses - op_income) <= tol
         if fecha_com_receita and not fecha_com_lucro_bruto:
             gross_profit = None
+            gp_derivado_de_custo = False
+
+    if gross_profit is None and op_income_derivado_de_gp and not op_income_reportado:
+        op_income = None
+        op_income_derivado_de_gp = False
 
     net_income = dur.get("netIncome")
+    # Para reconstruções acima do lucro (ver DURATION_TAGS["netIncomeParent"]).
+    ni_pre = dur.get("netIncomeParent")
+    if ni_pre is None:
+        ni_pre = net_income
     tax_expense = dur.get("taxExpense")
     total_assets = inst.get("totalAssets")
     curr_liab = inst.get("totalCurrentLiab")
@@ -1582,6 +2065,33 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         ltd_probe = inst.get("longTermDebt")
         if ltd_probe is not None and total_debt < ltd_probe - 1e6:
             total_debt = None
+    # LongTermDebtAndCapitalLeaseObligations é só o NÃO corrente (SRE: 28 979 M
+    # na linha "Long-term debt and finance leases", com o curto prazo à parte).
+    # Usado como total, perdia a dívida corrente: soma-se a parte corrente.
+    if total_debt is not None and inst.get("totalDebt_tag") == "LongTermDebtAndCapitalLeaseObligations":
+        cur = max((inst.get("debtCurrentTotal") or 0),
+                  (inst.get("longTermDebtCurrent") or inst.get("ltdLeaseCurrent") or 0)
+                  + (inst.get("shortTermDebt") or inst.get("commercialPaper") or 0))
+        total_debt = total_debt + cur
+    # REIT com dívida em duas linhas: notes (NotesPayable) + hipotecas
+    # (SecuredDebt). O NotesPayable sozinho deixava as hipotecas de fora
+    # (KIM: 7 965 M + 496 M de "Mortgages payable" — auditoria Gemini 18/11).
+    # "LTD incluindo maturidades correntes" não inclui os empréstimos de curto
+    # prazo (ShortTermBorrowings/papel comercial): USB 2024 58.002M + 15.518M
+    # = 73.520M, como no balanço (auditoria Gemini 19/11).
+    if (total_debt is not None
+            and inst.get("totalDebt_tag") == "LongTermDebtAndCapitalLeaseObligationsIncludingCurrentMaturities"):
+        st_extra = inst.get("shortTermDebt") or inst.get("commercialPaper")
+        if st_extra and 0 < st_extra < total_debt:
+            total_debt = total_debt + st_extra
+    if (total_debt is not None and sector == "Real Estate" and inst.get("totalDebt_tag") == "NotesPayable"
+            and (inst.get("securedDebt") or 0) > 0 and inst["securedDebt"] < total_debt
+            # CPT/MAA: aí NotesPayable = garantida + não garantida; só se soma
+            # quando as notes são só a parte não garantida (ou não há essa tag).
+            and (inst.get("unsecuredDebt") is None
+                 or abs(total_debt - inst["unsecuredDebt"]) <= 0.01 * total_debt)):
+        total_debt = total_debt + inst["securedDebt"]
+    ltd_missing_guard = False
     if total_debt is None:
         # Nível 1: somar current + noncurrent (longTermDebt + longTermDebtCurrent + shortTermDebt/commercialPaper)
         # Bug fix: distinguir "tag ausente" (None) de "tag presente com valor 0" — CMG tem LongTermDebt=0.0
@@ -1595,24 +2105,27 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         # contra sub-contagem se o DebtCurrent do emissor for parcial).
         current_debt = max((dc_total or 0), (ltd_c or 0) + (st or 0))
         if ltd_nc is not None or ltd_c is not None or st is not None or dc_total is not None:
-            # Guard JPM-class: se a empresa JÁ taggou dívida LT nalgum período
-            # mas não neste (bancos modernos só a tagham dimensionada, que a
-            # API descarta), somar só o curto prazo daria um "total" 8× errado
-            # (JPM: $52.9B de ST vs $463B reais). Antes NULL que errado.
-            if ltd_nc is None and ltd_c is None and dc_total is None and evidence.get("has_ltd_ever"):
+            # Guard JPM/DE-class: se a empresa JÁ taggou dívida LT nalgum período
+            # mas não neste (bancos ou industriais cuja LTD só vem dimensionada/custom),
+            # gravar só a dívida corrente (DebtCurrent/ST/LTDcurrent) daria um total parcial.
+            if ltd_nc is None and evidence.get("has_ltd_ever"):
                 total_debt = None
+                ltd_missing_guard = True
             else:
                 total_debt = (ltd_nc or 0) + current_debt
     if total_debt is None:
         # Nível 2: valor de face da dívida emitida (empresas sem tags de componentes, ex: META)
         total_debt = inst.get("debtInstrumentCarryingAmount")
-    if total_debt is None:
+    if total_debt is None and not (ltd_missing_guard and sector != "Real Estate"):
         # Nível 3: dívida secured + unsecured (REITs reportam assim em vez de current/noncurrent)
         secured = inst.get("securedDebt")
         unsecured = inst.get("unsecuredDebt")
         if secured is not None or unsecured is not None:
             total_debt = (secured or 0) + (unsecured or 0)
-    if total_debt is None and sector != "Financials" and not evidence.get("has_ltd_ever"):
+    sinal = dur.get("sinalDivida")
+    tem_sinal_divida = sinal is not None and abs(sinal) > 5e6
+    if (total_debt is None and sector != "Financials" and not evidence.get("has_ltd_ever")
+            and not tem_sinal_divida):
         # Debt-free comprovado (MPWR-class): a empresa NUNCA taggou dívida LT
         # em filing nenhum E não há qualquer componente de borrowing neste
         # período → 0.0 é a verdade, não um buraco. (Financials excluídos:
@@ -1622,7 +2135,10 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
                 "debtCurrentTotal", "commercialPaper", "debtInstrumentCarryingAmount",
                 "securedDebt", "unsecuredDebt")):
             total_debt = 0.0
-    if total_debt is None and sector == "Financials":
+    # A empresa já reportou dívida de longo prazo noutros anos mas não neste
+    # (passou a vir só com dimensões): os componentes bancários (FHLB, linha de
+    # crédito…) seriam só uma fatia — AMP ficava com 200 M de 5,9 mil M. N/A.
+    if total_debt is None and sector == "Financials" and not ltd_missing_guard:
         # Nível 4 (bancos/seguradoras): borrowed funds por componentes — FHLB
         # advances, subordinated debt, other borrowings, linha de crédito
         # sacada + curto prazo/CP/porção corrente. Exige pelo menos um
@@ -1644,8 +2160,30 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
             total_debt = composite if composite > 0 else None
 
     cash = inst.get("cash")
+    restrita = inst.get("restrictedCash")
+    if (cash is not None and restrita and 0 < restrita < cash and sector != "Financials"
+            and "RestrictedCash" in (inst.get("cash_tag") or "")):
+        cash = cash - restrita
+    # Seguradora pela ATIVIDADE, não pelo setor: a Humana, a Elevance, a Cigna e a
+    # Centene estão em Health Care, mas os sinistros são a maior parte da receita e
+    # os "investimentos" do balanço são a carteira que os cobre (HUM 2025: 15,7 mM
+    # somados a 4,2 mM de caixa). Material = sinistros ≥30% da receita.
+    claims = dur.get("policyholderClaims")
+    seguradora = bool(claims and revenue and revenue > 0 and claims >= 0.3 * revenue)
+    caixa_base = cash
     if cash is not None:
+        # Bancos/seguradoras: "AvailableForSaleSecurities" é a carteira de
+        # investimento (PNC 2018: 63 mil M somados a 5,6 mil M de caixa), não caixa.
+        # Mas a Visa/Mastercard (também "Financials") têm aplicações de tesouraria
+        # normais: nas financeiras só entram quando são menores do que a caixa.
         marketable = inst.get("marketableSecuritiesCurrent") or 0
+        if sector == "Financials" and marketable >= cash:
+            marketable = 0
+        if seguradora:
+            marketable = 0
+        if (not marketable and sector != "Financials" and claims is None
+                and inst.get("outrasAplicacoesCurto")):
+            marketable = inst["outrasAplicacoesCurto"]
         cash = cash + marketable
 
     # Bancos: caixa = cash & due from banks + depósitos remunerados detidos
@@ -1658,6 +2196,24 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
             cash = (cash or 0) + ibd
 
     total_equity = inst.get("totalEquity")
+    # Só existe o total COM minoritários (HAS): o capital próprio da BullValue é
+    # o dos acionistas da empresa, por isso tiram-se os minoritários (19/11).
+    if (total_equity is not None and inst.get("totalEquity_tag") in
+            ("StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest", "Equity")):
+        mi = inst.get("minorityInterestInst")
+        if mi and 0 < mi < abs(total_equity):
+            total_equity = total_equity - mi
+
+    # Resultado operacional DERIVADO (a empresa não o publica) que não bate com o
+    # EBIT reconstruído de baixo — lucro antes de impostos + juros − outros proveitos
+    # não operacionais: as "despesas" encontradas não eram as operacionais. A ADP
+    # não tem linha de resultado operacional e o total de despesas dela leva juros:
+    # o 1T FY25 dava −87 M com 1.236 M de lucro antes de impostos; o EBIT é 1.272 M.
+    if (not op_income_reportado and op_income is not None and revenue and revenue > 0
+            and sector not in ("Financials", "Real Estate")):
+        _ebit = ebit_de_baixo(dur, ni_pre, tax_expense)
+        if _ebit is not None and abs(op_income - _ebit) > 0.10 * revenue:
+            op_income = _ebit
 
     gross_margin = plausivel(safe_div(gross_profit, revenue), -1.0, 1.0)
     op_margin = plausivel(safe_div(op_income, revenue), -10.0, 2.0)
@@ -1666,7 +2222,7 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
     roic = None
     if op_income is not None and total_assets is not None:
         if net_income is not None and tax_expense is not None:
-            pre_tax = net_income + tax_expense
+            pre_tax = ni_pre + tax_expense
             tax_rate = safe_clamp(safe_div(tax_expense, pre_tax), 0, 0.5) or 0.21
         else:
             tax_rate = 0.21
@@ -1683,20 +2239,32 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
 
     roe = plausivel(safe_div(net_income, total_equity) if total_equity and total_equity > 0 else None, -5.0, 5.0)
 
-    ebitda_raw = dur.get("ebitda")
-    if ebitda_raw is not None:
-        ebitda = ebitda_raw
-    elif sector == "Financials":
+    # Só bancos e seguradoras: corretoras de seguros (MRSH), bolsas (CME),
+    # gestoras (BX) e redes de pagamento (V, MA) também são "Financials", mas
+    # têm EBITDA com o significado de sempre (auditoria 19/11).
+    banco_ou_seguradora = sector == "Financials" and (
+        dur.get("bancoJurosLiquidos") is not None or dur.get("policyholderClaims") is not None)
+    if banco_ou_seguradora:
         # EBITDA não tem significado económico para bancos/seguradoras (juros
         # SÃO o negócio, não um custo de financiamento a excluir). Sintetizá-lo
         # produzia um número que nenhum analista usaria → NULL estrutural,
         # whitelisted como SECTOR_NO_EBITDA_BANK; a UI esconde o card.
         ebitda = None
     else:
-        da = dur.get("depreciationAndAmortization") or 0
+        # Fórmula única alinhada com a FMP (EBT + juros + D&A); a tag ebitda
+        # reportada pela empresa é non-GAAP e não comparável. Sem D&A explícito
+        # fica None (não somar zero às escondidas).
+        da = melhor_da(dur)
         interest_exp = dur.get("interestExpense")
-        if net_income is not None and tax_expense is not None and interest_exp is not None:
-            ebitda = net_income + tax_expense + interest_exp + da
+        if interest_exp is None and (dur.get("jurosLiquidosNaoOp") or 0) < 0:
+            interest_exp = -dur["jurosLiquidosNaoOp"]
+        ibt = dur.get("incomeBeforeTax")
+        if da is None:
+            ebitda = None
+        elif ibt is not None:
+            ebitda = ibt + (interest_exp or 0) + da
+        elif net_income is not None and tax_expense is not None and interest_exp is not None:
+            ebitda = ni_pre + tax_expense + interest_exp + da
         elif op_income is not None:
             ebitda = op_income + da
         else:
@@ -1761,9 +2329,9 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         # margem bruta de 100% em bancos era um número inventado. COGS/gross
         # profit ficam NULL estrutural (whitelist SECTOR_NO_COGS, UI esconde).
         if op_income is None:
-            if net_income is not None:
+            if ni_pre is not None:
                 tax = tax_expense or 0.0
-                op_income = net_income + tax
+                op_income = ni_pre + tax
             elif revenue is not None and op_expenses is not None:
                 op_income = revenue - op_expenses
         if dur.get("sellingGeneralAndAdmin") is None and op_expenses is not None:
@@ -1784,12 +2352,12 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
     # --- 3-STATEMENT DETAILED FINANCIAL LINE ITEMS ---
     # Income Statement details
     income_before_tax = dur.get("incomeBeforeTax")
-    if income_before_tax is None and net_income is not None and tax_expense is not None:
-        income_before_tax = net_income + tax_expense
+    if income_before_tax is None and ni_pre is not None and tax_expense is not None:
+        income_before_tax = ni_pre + tax_expense
 
     net_interest_income = dur.get("netInterestIncome")
     other_non_operating = dur.get("otherNonOperatingIncome")
-    da_val = dur.get("depreciationAndAmortization")
+    da_val = melhor_da(dur)
 
     # Balance Sheet details
     total_curr_assets = inst.get("totalCurrentAssets")
@@ -1809,7 +2377,15 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
     
     tot_liab = inst.get("totalLiabilities")
     if tot_liab is None and total_assets is not None and total_equity is not None:
-        tot_liab = total_assets - total_equity
+        # 18/11: exigir o mesmo filing (accession) para os dois corrigia a STLA
+        # 2019 (fusão reversa FCA/PSA) mas deixava ~2 900 períodos sem passivo:
+        # na maioria o ativo e o capital vêm de filings diferentes por razões
+        # normais (o 10-K seguinte repete o ano anterior). Deriva-se sempre; os
+        # casos de entidade trocada vão para scripts/correcoes.json.
+        eq_total = inst.get("equityInclNci")
+        if eq_total is None or eq_total < total_equity - 1e6:
+            eq_total = total_equity + max(inst.get("minorityInterestInst") or 0, 0)
+        tot_liab = total_assets - eq_total - max(inst.get("temporaryEquity") or 0, 0)
 
     ret_earnings = inst.get("retainedEarnings")
 
@@ -1853,6 +2429,14 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         "sharesOutstanding": shares,
         "operatingCashFlow": op_cf,
         "capex": capex,
+        "_notaCapex": nota_capex,
+        # Só para o validador (não vão para a BD): o balanço fecha com eles.
+        "_minoritarios": inst.get("minorityInterestInst"),
+        "_capitalTotal": inst.get("equityInclNci"),
+        "_capitalTemporario": inst.get("temporaryEquity"),
+        # Para a caixa lida do balanço impresso (process_company → aplicacoes_balanco).
+        "_caixaBase": caixa_base,
+        "_aplicacoesBloqueadas": seguradora or sector == "Financials",
         "freeCashFlow": fcf,
         "totalAssets": total_assets,
         "totalCurrentLiab": curr_liab,
@@ -1888,6 +2472,8 @@ def build_row(company_id: str, fy: int, fp: str, period_end: str, filed_at: str 
         "shareRepurchases": share_repurchases,
         "dividendsPaid": divs_paid,
         "netChangeInCash": net_change_cash,
+        "_gp_derivado_custo": gp_derivado_de_custo and gross_profit is not None,
+        "_op_inc_derivado_custo": op_income_derivado_de_gp and gp_derivado_de_custo and op_income is not None,
     }
 
 
@@ -2180,14 +2766,30 @@ def descartar_custo_incoerente(periods_data: list[dict]) -> int:
             continue
 
         gp = p.get("grossProfit")
-        # O lucro bruto só cai se tiver SIDO DERIVADO deste custo. Um lucro
-        # bruto que o emitente taggou à parte é fonte primária e sobrevive ao
-        # custo que o acompanhava.
-        derivado = gp is not None and abs(gp - (rev - cogs)) <= 0.01 * rev
+        # O lucro bruto e o operatingIncome só caem se tiverem SIDO DERIVADOS
+        # deste custo. Um valor reportado pelo emitente sobrevive ao custo.
+        derivado = p.get("_gp_derivado_custo")
+        if derivado is None:
+            derivado = gp is not None and abs(gp - (rev - cogs)) <= 0.01 * rev
+        op_inc_derivado = p.get("_op_inc_derivado_custo")
+        if op_inc_derivado is None:
+            opinc = p.get("operatingIncome")
+            opex = p.get("operatingExpenses")
+            op_inc_derivado = (
+                derivado
+                and opinc is not None
+                and opex is not None
+                and gp is not None
+                and abs(opinc - (gp - opex)) <= 0.01 * rev
+            )
         p["costOfRevenue"] = None
         if derivado:
             p["grossProfit"] = None
             p["grossMargin"] = None
+        if op_inc_derivado:
+            p["operatingIncome"] = None
+            p["operatingMargin"] = None
+            p["roic"] = None
         descartados += 1
 
     return descartados
@@ -2255,78 +2857,104 @@ def corrigir_escala_de_acoes(periods_data: list[dict]) -> int:
     return corrigidas
 
 
-def apply_stock_splits(ticker: str, periods_data: list[dict]):
-    periods_data.sort(key=lambda x: x['periodEnd'])
-    # O yfinance usa hífen nas classes de ações (BRK-B), o EDGAR usa ponto
-    # (BRK.B). Sem esta tradução o fetch devolve vazio e a empresa perdia a
-    # ingestão inteira todos os dias.
-    yf_ticker = ticker.replace(".", "-")
-    try:
-        t = yf.Ticker(yf_ticker)
-        splits = t.splits
-    except Exception as e:
-        print(f"    Erro ao extrair splits do yfinance para {ticker}: {e}")
+def aplicar_splits_por_evento(ticker: str | None, dur_map: dict, inst_map: dict) -> None:
+    """Ajusta ações (× F), EPS (÷ F) e DPS (÷ F) por eventos em `splits_eventos.json`.
+
+    Usa a data `filed` do facto XBRL escolhido para cada campo (um 10-K entregue
+    depois do split já vem reexpresso pela empresa, logo F só acumula splits
+    desde 2000 com `data > filed`). Corre ANTES de `synthesize_q4` e `build_row`
+    para que valores derivados (ex.: EPS/ações/DPS de Q4) partam já da base
+    atual ajustada.
+    """
+    if not ticker:
+        return
+    if not carregar_splits_eventos().get(ticker):
         return
 
-    # Quando a chamada ao Yahoo falha (rate limit, rede), o yfinance devolve
-    # None em vez de levantar — o `except` acima não apanha isso e o
-    # `splits.empty` rebentava com AttributeError, abortando a empresa toda.
-    # Os fundamentais da SEC não têm culpa do split não vir: seguem na mesma.
-    if splits is None or splits.empty:
-        return
-        
-    for split_date, ratio in splits.items():
+    for dur in dur_map.values():
+        if dur.get("sharesOutstandingDur") is not None:
+            f_sh = fator_split_para_filed(ticker, dur.get("sharesOutstandingDur_filed"))
+            if f_sh != 1.0:
+                dur["sharesOutstandingDur"] = dur["sharesOutstandingDur"] * f_sh
+
+        if dur.get("epsDiluted") is not None:
+            f_eps = fator_split_para_filed(ticker, dur.get("epsDiluted_filed"))
+            dur["_eps_split_fator"] = f_eps
+            if f_eps != 1.0:
+                dur["epsDiluted"] = dur["epsDiluted"] / f_eps
+
+        parts = dur.get("dividendPerShare_parts")
+        if parts:
+            dur["dividendPerShare"] = sum(
+                (v / fator_split_para_filed(ticker, pf) if fator_split_para_filed(ticker, pf) != 1.0 else v)
+                for v, pf in parts
+            )
+        elif dur.get("dividendPerShare") is not None:
+            f_dps = fator_split_para_filed(ticker, dur.get("dividendPerShare_filed"))
+            if f_dps != 1.0:
+                dur["dividendPerShare"] = dur["dividendPerShare"] / f_dps
+
+    for inst in inst_map.values():
+        if inst.get("sharesOutstandingInst") is not None:
+            f_inst = fator_split_para_filed(ticker, inst.get("sharesOutstandingInst_filed"))
+            if f_inst != 1.0:
+                inst["sharesOutstandingInst"] = inst["sharesOutstandingInst"] * f_inst
+
+
+ADS_RACIOS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ads_racios.json")
+_ADS_CACHE: dict | None = None
+
+
+def racio_ads(ticker: str | None) -> float:
+    """Ações ordinárias por 1 ADS cotado nos EUA (1.0 se não for ADS ou não estiver na tabela).
+
+    O XBRL dos 20-F dá EPS e DPS por AÇÃO ORDINÁRIA; o preço que a plataforma
+    mostra é o do ADS. Sem converter, o P/E da HSBC (1 ADS = 5 ordinárias) saía
+    5× errado. Tabela em scripts/ads_racios.json, com a frase da capa do 20-F
+    como fonte de cada rácio (recolhida a 2026-11-18).
+    """
+    global _ADS_CACHE
+    if _ADS_CACHE is None:
         try:
-            # Em versões recentes, split_date pode ser timestamp tz-aware
-            split_date_only = split_date.date()
-        except:
-            split_date_only = split_date
-            
-        if ratio == 1.0 or ratio == 0.0:
-            continue
-            
-        reference_shares = None
-        for p in periods_data:
-            p_date = datetime.date.fromisoformat(p['periodEnd']) if isinstance(p['periodEnd'], str) else p['periodEnd']
-            if p_date >= split_date_only and p.get('sharesOutstanding'):
-                reference_shares = p['sharesOutstanding']
-                break
-                
-        if not reference_shares:
-            for p in reversed(periods_data):
-                d_str = p.get('filedAt')
-                if not d_str: continue
-                f_date = datetime.date.fromisoformat(d_str) if isinstance(d_str, str) else d_str
-                if f_date >= split_date_only and p.get('sharesOutstanding'):
-                    reference_shares = p['sharesOutstanding']
-                    break
-                    
-        if not reference_shares:
-            continue
-            
-        for p in periods_data:
-            p_date = datetime.date.fromisoformat(p['periodEnd']) if isinstance(p['periodEnd'], str) else p['periodEnd']
-            if p_date < split_date_only:
-                shares = p.get('sharesOutstanding')
-                if not shares:
-                    continue
-                    
-                needs_adjustment = False
-                if ratio > 1:
-                    threshold = reference_shares / (ratio * 0.7)
-                    if shares < threshold:
-                        needs_adjustment = True
-                else:
-                    threshold = reference_shares / (ratio * 1.3)
-                    if shares > threshold:
-                        needs_adjustment = True
-                        
-                if needs_adjustment:
-                    p['sharesOutstanding'] = shares * ratio
-                    if p.get('epsDiluted'): p['epsDiluted'] /= ratio
-                    if p.get('epsBasic'): p['epsBasic'] /= ratio
-                    if p.get('dividendPerShare'): p['dividendPerShare'] /= ratio
-                    
+            with open(ADS_RACIOS_PATH, encoding="utf-8") as f:
+                _ADS_CACHE = json.load(f).get("empresas", {})
+        except (OSError, ValueError):
+            _ADS_CACHE = {}
+    info = _ADS_CACHE.get(ticker or "") or {}
+    if info.get("tipo") != "ADS":
+        return 1.0
+    try:
+        r = float(info.get("racio") or 1)
+    except (TypeError, ValueError):
+        return 1.0
+    return r if r > 0 else 1.0
+
+
+def aplicar_racio_ads(ticker: str | None, dur_map: dict, inst_map: dict) -> None:
+    """Passa EPS, DPS e ações para a base do ADS: EPS × r, DPS × r, ações ÷ r.
+
+    Basta o rácio ATUAL para todo o histórico: a SEC reporta sempre por ação
+    ordinária, e a base que interessa é a do ADS de hoje (a do preço). As
+    mudanças históricas de rácio (Ryanair 5→2 em 2024) só afetariam preços
+    antigos do ADS, não estes números. Corre depois dos splits e antes de
+    synthesize_q4/build_row, para os derivados (EPS do Q4 = lucro/ações) já
+    nascerem na base do ADS.
+    """
+    r = racio_ads(ticker)
+    if r == 1.0:
+        return
+    for dur in dur_map.values():
+        if dur.get("sharesOutstandingDur") is not None:
+            dur["sharesOutstandingDur"] = dur["sharesOutstandingDur"] / r
+        if dur.get("epsDiluted") is not None:
+            dur["epsDiluted"] = dur["epsDiluted"] * r
+        if dur.get("dividendPerShare") is not None:
+            dur["dividendPerShare"] = dur["dividendPerShare"] * r
+    for inst in inst_map.values():
+        if inst.get("sharesOutstandingInst") is not None:
+            inst["sharesOutstandingInst"] = inst["sharesOutstandingInst"] / r
+
+
 def insert_fundamental(cur, row: dict):
     cur.execute(
         """
@@ -2387,12 +3015,15 @@ def synthesize_q4(periods: set, period_ends: dict, period_filed: dict,
     SUBTRACTIVE = [
         "revenue", "costOfRevenue", "grossProfit", "operatingExpenses",
         "policyholderClaims", "costOfProducts",
-        "operatingIncome", "interestExpense", "taxExpense", "netIncome",
+        "operatingIncome", "interestExpense", "taxExpense", "netIncome", "netIncomeParent",
         "operatingCashFlow", "capex", "researchAndDevelopment",
-        "sellingGeneralAndAdmin", "ebitda", "depreciationAndAmortization",
+        # "ebitda" retirado de SUBTRACTIVE: passou a ser calculado em build_row a partir dos componentes (já sintetizados).
+        "sellingGeneralAndAdmin", "depreciationAndAmortization",
         "incomeBeforeTax", "netInterestIncome", "otherNonOperatingIncome",
         "investingCashFlow", "financingCashFlow", "stockBasedCompensation",
         "shareRepurchases", "dividendsPaid", "netChangeInCash",
+        "daDDA", "daDA", "daDep", "daAmortInt", "jurosLiquidosNaoOp",
+        "capexPPE", "capexSoftware", "capexIntangiveis",
         # ⚠️ NÃO REMOVER: sem isto o Q4 de DPS nunca é derivado e os payers
         # ficam com buraco no Q4 (paradoxo da Apple). O ramo per-share abaixo
         # depende desta entrada.
@@ -2431,6 +3062,9 @@ def synthesize_q4(periods: set, period_ends: dict, period_filed: dict,
             if ja_extraido is not None:
                 continue  # extração EDGAR é fonte de verdade
             vals = [d.get(field) for d in q_durs]
+            if field == "dividendPerShare" and fy_dur.get("_dpsQ4") is not None:
+                derived[field] = fy_dur["_dpsQ4"]   # o 10-K imprime o Q4: não há que subtrair
+                continue
             if fv is None or any(v is None for v in vals):
                 continue
             # Per-share: FY pode vir retaggado pós-split e os quarters não —
@@ -2488,13 +3122,21 @@ def synthesize_q4(periods: set, period_ends: dict, period_filed: dict,
             # as shares erradas. Validar aqui contra NI/EPS do próprio FY.
             fy_ni = fy_dur.get("netIncome")
             fy_eps = fy_dur.get("epsDiluted")
-            if fy_ni is not None and fy_eps and abs(fy_eps) >= 0.5:
+            fy_eps_raw_abs = abs(fy_eps * (fy_dur.get("_eps_split_fator") or 1.0)) if fy_eps is not None else 0.0
+            if fy_ni is not None and fy_eps and fy_eps_raw_abs >= 0.5:
                 implied = fy_ni / fy_eps
                 if implied >= 1_000_000 and (
                     sh is None or sh / implied > 5 or sh / implied < 0.2
                 ):
                     sh = implied
             if sh is not None:
+                # A média anual é a média dos 4 trimestres, por isso o Q4 = 4×ano − Q1 − Q2 − Q3;
+                # usar a média anual dava EPS do Q4 errado em empresas com recompras.
+                q_sh = [d.get("sharesOutstandingDur") for d in q_durs]
+                if all(v is not None for v in q_sh) and q_sh[2] > 0:
+                    q4_sh = 4 * sh - sum(q_sh)
+                    if 0.85 * q_sh[2] <= q4_sh <= 1.15 * q_sh[2]:
+                        sh = q4_sh
                 q4_dur["sharesOutstandingDur"] = sh
         if q4_dur.get("epsDiluted") is None:
             ni = q4_dur.get("netIncome")
@@ -2510,7 +3152,7 @@ def synthesize_q4(periods: set, period_ends: dict, period_filed: dict,
     return drop_years
 
 
-def dei_shares_near(dei: dict, period_end: str | None) -> float | None:
+def _dei_shares_near_with_filed(dei: dict, period_end: str | None) -> tuple[float | None, str | None]:
     """Último recurso para shares outstanding: o facto da cover page
     (dei:EntityCommonStockSharesOutstanding), point-in-time datado tipicamente
     semanas após o period end. Aceita o registo mais próximo em
@@ -2522,13 +3164,13 @@ def dei_shares_near(dei: dict, period_end: str | None) -> float | None:
     mesmo facto: classes diferem materialmente (razão máx/mín ≥ 1.3); um
     restatement de cover count difere < 1.3 → usar o maior, nunca somar."""
     if not period_end or not dei:
-        return None
+        return None, None
     node = dei.get("EntityCommonStockSharesOutstanding")
     if not node:
-        return None
+        return None, None
     limit = (datetime.date.fromisoformat(period_end) + datetime.timedelta(days=100)).isoformat()
     best_date = None
-    best_vals: set = set()
+    best_by_val: dict[float, str | None] = {}
     for entries in (node.get("units") or {}).values():
         if not isinstance(entries, list):
             continue
@@ -2536,18 +3178,124 @@ def dei_shares_near(dei: dict, period_end: str | None) -> float | None:
             d, v = e.get("end"), e.get("val")
             if not d or v is None or d < period_end or d > limit:
                 continue
+            vf = float(v)
             if best_date is None or d < best_date:
-                best_date, best_vals = d, {v}
+                best_date = d
+                best_by_val = {vf: e.get("filed")}
             elif d == best_date:
-                best_vals.add(v)
-    vals = sorted(float(v) for v in best_vals if v and v >= 100_000)
+                prev_f = best_by_val.get(vf)
+                if (e.get("filed") or "") >= (prev_f or ""):
+                    best_by_val[vf] = e.get("filed")
+    vals = sorted(v for v in best_by_val if v and v >= 100_000)
     if not vals:
-        return None
+        return None, None
     if len(vals) == 1:
-        return vals[0]
+        return vals[0], best_by_val[vals[0]]
     if len(vals) <= 4 and vals[0] > 0 and vals[-1] / vals[0] >= 1.3:
-        return sum(vals)  # classes distintas → total em circulação
-    return vals[-1]  # valores próximos = restatement → o mais alto/recente
+        fileds = [best_by_val[v] for v in vals if best_by_val.get(v)]
+        return sum(vals), (max(fileds) if fileds else None)  # classes distintas → total em circulação
+    return vals[-1], best_by_val[vals[-1]]  # valores próximos = restatement → o mais alto/recente
+
+
+def dei_shares_near(dei: dict, period_end: str | None) -> float | None:
+    val, _ = _dei_shares_near_with_filed(dei, period_end)
+    return val
+
+
+def aplicar_receita_impressa(cik, dur_map, period_ends, namespace) -> int:
+    """Receita = a linha que a empresa IMPRIME na demonstração de resultados, quando é
+    maior do que a escolhida pelas tags (ver receita_impressa.py: COP, SRE, BRK.B
+    ficavam com o subtotal ASC 606). Só sobe, nunca desce: uma receita impressa menor
+    seria outro conceito (excise, segmento) e a escolha por tags já a tratou.
+    Corre ANTES do Q4 sintético para que Q4 = ano − 9 meses use a receita certa."""
+    try:
+        impressas = receita_impressa.para_cik(cik)
+    except Exception as e:  # sem DERA o motor segue só com as tags
+        print(f"    ⚠️ receita impressa indisponível ({e})")
+        return 0
+    if not impressas:
+        return 0
+    n = 0
+    for (fy, fp), dur in dur_map.items():
+        fim = period_ends.get((fy, fp))
+        if not fim or fp == "Q4":
+            continue
+        q = 4 if fp == "FY" else 1
+        try:
+            f0 = datetime.date.fromisoformat(str(fim)[:10])
+        except ValueError:
+            continue
+        hit = next((vf for (d, qq), vf in impressas.items() if qq == q
+                    and abs((datetime.date.fromisoformat(d) - f0).days) <= 5), None)
+        if not hit:
+            continue
+        v, filed = hit
+        atual = dur.get("revenue")
+        if atual is not None and v <= atual * 1.01:
+            continue
+        # A nossa receita é uma REEXPRESSÃO posterior à linha impressa (operações
+        # descontinuadas, spin-off: RVTY 2021, HON 3T 2025)? Então fica a nossa.
+        if atual is not None and _receita_reexpressa_depois(namespace, f0, fp, atual, filed):
+            continue
+        # A diferença é exatamente os proveitos que não são receita (associadas, outros
+        # proveitos, derivados)? Então a linha impressa é "receita + outros proveitos" —
+        # a ExxonMobil, desde 2023, só deixa ver essa linha no DERA (82,914 = 80,795 de
+        # receita + 2,119 de associadas e outros proveitos).
+        if atual is not None:
+            outros = _outros_proveitos(namespace, f0, fp)
+            if outros and abs((v - atual) - outros) <= 0.02 * abs(v - atual):
+                continue
+        dur["revenue"] = v
+        n += 1
+    return n
+
+
+_TAGS_OUTROS_PROVEITOS = ("IncomeLossFromEquityMethodInvestments", "OtherNonoperatingIncomeExpense",
+                          "NonoperatingIncomeExpense", "OtherNonoperatingIncome",
+                          "InvestmentIncomeInterestAndDividend", "DerivativeGainLossOnDerivativeNet",
+                          "GainLossOnDerivativeInstrumentsNetPretax", "GainLossOnSaleOfPropertyPlantEquipment")
+
+
+def _outros_proveitos(namespace, fim, fp) -> float:
+    """Soma dos proveitos que não são receita publicados para o período (o facto mais
+    recente de cada tag)."""
+    total = 0.0
+    for tag in _TAGS_OUTROS_PROVEITOS:
+        melhor = None
+        for e in extract_tag_entries(namespace, tag):
+            if not e.get("end") or not (is_annual_duration(e) if fp == "FY" else is_quarterly_duration(e)):
+                continue
+            try:
+                if abs((datetime.date.fromisoformat(e["end"]) - fim).days) > 5:
+                    continue
+            except ValueError:
+                continue
+            if melhor is None or (e.get("filed") or "") > (melhor.get("filed") or ""):
+                melhor = e
+        if melhor and melhor.get("val") is not None:
+            total += melhor["val"]
+    return total
+
+
+def _receita_reexpressa_depois(namespace, fim, fp, valor, filed_impresso) -> bool:
+    """Há um facto de receita = `valor` (±0,5%) para este período entregue DEPOIS do
+    filing que imprimiu a linha?"""
+    limite = f"{filed_impresso[:4]}-{filed_impresso[4:6]}-{filed_impresso[6:]}"
+    for tag in DURATION_TAGS["revenue"]:
+        for e in extract_tag_entries(namespace, tag):
+            if (e.get("filed") or "") <= limite or not e.get("end"):
+                continue
+            if not (is_annual_duration(e) if fp == "FY" else is_quarterly_duration(e)):
+                continue
+            try:
+                if abs((datetime.date.fromisoformat(e["end"]) - fim).days) > 5:
+                    continue
+            except ValueError:
+                continue
+            val = e.get("val")
+            if val and abs(val - valor) <= 0.005 * abs(valor):
+                return True
+    return False
 
 
 def process_company(conn, company: dict, dry_run: bool = False,
@@ -2558,6 +3306,12 @@ def process_company(conn, company: dict, dry_run: bool = False,
     facts_json = fetch_edgar_facts(cik, refresh=REFRESH_CACHE)
     if not facts_json:
         return 0
+    # O companyfacts da SEC não traz alguns filings (EIX/XOM/NEE 10-Q de 2026…):
+    # juntam-se os factos lidos do XBRL desses filings — ver factos_em_falta.py.
+    if COMPLETAR_FILINGS:
+        juntos = factos_em_falta.completar(cik, facts_json)
+        if juntos:
+            print(f"    + filings fora do companyfacts: {', '.join(juntos)}")
 
     facts = facts_json.get("facts") or {}
     ns_us = facts.get("us-gaap") or {}
@@ -2569,7 +3323,10 @@ def process_company(conn, company: dict, dry_run: bool = False,
     if not namespace:
         return 0
 
+    if namespace is ns_us:
+        fluxos_impressos.injetar(cik, namespace)
     dei_ns = facts.get("dei") or {}
+    filtrar_splits_desmentidos(company.get("ticker"), dei_ns)
     evidence = compute_company_evidence(facts_json)
 
     min_fy = datetime.date.today().year - HISTORY_YEARS
@@ -2632,11 +3389,19 @@ def process_company(conn, company: dict, dry_run: bool = False,
 
     periods_list = sorted(periods)
 
+    ticker = company.get('ticker')
     dur_map, inst_map = extract_all_metrics(namespace, periods_list, period_ends)
-    apply_manual_capex_overrides(dur_map, company.get("ticker"))
+    apply_manual_capex_overrides(dur_map, ticker)
+    aplicar_splits_por_evento(ticker, dur_map, inst_map)
+    aplicar_racio_ads(ticker, dur_map, inst_map)
+    if reporting_currency == "USD":
+        aplicar_receita_impressa(cik, dur_map, period_ends, namespace)
 
     # Q4 sintético (FY − Q1−Q2−Q3) + anos cujo Q4 existente na BD deve ser limpo
     drop_q4_years = synthesize_q4(periods, period_ends, period_filed, dur_map, inst_map)
+    if namespace is ns_ifrs:   # marca para build_row (correção de excise só em IFRS)
+        for _d in dur_map.values():
+            _d["_ifrs"] = True
     periods_list = sorted(periods)
 
     rows = []
@@ -2654,14 +3419,14 @@ def process_company(conn, company: dict, dry_run: bool = False,
         # Último recurso para shares: cover page (dei). Point-in-time real —
         # para market cap é até MAIS correto que a weighted average em falta.
         if dur.get("sharesOutstandingDur") is None and inst.get("sharesOutstandingInst") is None:
-            dei_val = dei_shares_near(dei_ns, period_end)
+            dei_val, dei_filed = _dei_shares_near_with_filed(dei_ns, period_end)
             if dei_val is not None:
-                inst["sharesOutstandingInst"] = dei_val
+                f_dei = fator_split_para_filed(ticker, dei_filed)
+                inst["sharesOutstandingInst"] = dei_val * f_dei if f_dei != 1.0 else dei_val
+                inst["sharesOutstandingInst_filed"] = dei_filed
 
         rows.append(build_row(company_id, fy, fp, period_end, filed_at, dur, inst,
                               company.get('sector'), evidence))
-
-    ticker = company.get('ticker')
 
     # (moeda de reporte inferida no topo de process_company — ver
     # _PREFERRED_CURRENCY; aqui só se aplica a conversão)
@@ -2692,34 +3457,17 @@ def process_company(conn, company: dict, dry_run: bool = False,
         print(f"    {n_div} dividendo(s) por ação fora de escala — unidade reposta")
 
     n_custo = descartar_custo_incoerente(rows)
+    for r in rows:
+        r.pop("_gp_derivado_custo", None)
+        r.pop("_op_inc_derivado_custo", None)
     if n_custo:
         print(f"    {n_custo} linha(s) com custo das vendas fora da norma da empresa — descartado")
 
-    # Antes dos splits: uma linha com a escala trocada envenenaria a deteção
-    # de degraus, que é toda feita por rácios entre períodos consecutivos.
+    # Os splits já foram aplicados antes de synthesize_q4/build_row; esta limpeza
+    # só corrige eventuais linhas remanescentes em milhares vs vizinhos.
     n_escala = corrigir_escala_de_acoes(rows)
     if n_escala:
         print(f"    {n_escala} linha(s) com nº de ações em milhares — escala reposta")
-
-    if ticker:
-        # O ajuste de splits depende do Yahoo, que falha com frequência. É um
-        # refinamento sobre os dados da SEC — nunca motivo para perder a
-        # ingestão da empresa. A linha fica por ajustar e o adjust_splits.py
-        # (que corre a seguir) apanha-a na próxima passagem.
-        try:
-            apply_stock_splits(ticker, rows)
-        except Exception as e:
-            print(f"    Splits por ajustar em {ticker} ({type(e).__name__}: {e})")
-
-        # Outra vez DEPOIS dos splits, e não por excesso de zelo: o ajuste
-        # multiplica linhas inteiras por um factor, e uma linha que estivesse
-        # correcta pode sair de lá com a escala trocada. A ROL era exactamente
-        # isso — chegava sã a esta altura e saía do ajuste a 0,49 M de acções
-        # com EPS de 97 dólares. A função não faz nada quando não há nada fora
-        # de escala, portanto correr duas vezes não custa.
-        n_pos = corrigir_escala_de_acoes(rows)
-        if n_pos:
-            print(f"    {n_pos} linha(s) fora de escala após o ajuste de splits — repostas")
 
     if dry_run:
         if collector is not None:
@@ -2820,6 +3568,82 @@ def process_company(conn, company: dict, dry_run: bool = False,
             print(f"    ⚠️ {ticker or company_id}: {dropped} períodos preservados SEM "
                   f"correspondência nas linhas novas (enriquecimentos perdidos)")
 
+    # Notas por valor (mini aviso no site): correções revistas aplicam-se às
+    # linhas ANTES de gravar; reexpressões detetam-se no XBRL. Ver notas_valores.py.
+    # Dívida lida das LINHAS IMPRESSAS do balanço (DERA, ver divida_balanco.py):
+    # apanha as linhas com tags próprias da empresa, que o companyfacts não traz
+    # (EXR, WRB, CAT…). Com a leitura COMPLETA (tem dívida de longo prazo) manda nos
+    # dois sentidos; parcial, só sobe. Revisto a 20/11 com a fila do Codex: na
+    # simulação +1 072/−132 nas empresas de afinação e +367/−72 no controlo.
+    # Bancos ficam de fora.
+    if company.get("sector") != "Financials":
+        dividas = divida_balanco.para_cik(cik)
+        if dividas:
+            for row in rows:
+                fim = str(row.get("periodEnd"))[:10]
+                try:
+                    f0 = datetime.date.fromisoformat(fim)
+                except ValueError:
+                    continue
+                hit = next(((v, comp) for d, v, comp in dividas
+                            if abs((datetime.date.fromisoformat(d) - f0).days) <= 5), None)
+                if not hit:
+                    continue
+                v, comp = hit
+                td = row.get("totalDebt")
+                # Leitura COMPLETA (apanhou a dívida de longo prazo): o balanço impresso
+                # manda nos dois sentidos — a cascata de tags somava a mesma dívida duas
+                # vezes (DVN, HPE, IBM: maturidades dentro de ShortTermBorrowings; UPS:
+                # total combinado + parcela corrente; ARE/PLD: LineOfCredit já incluída).
+                # Leitura parcial: só pode subir, como antes.
+                if v > 0 and (comp or td is None or v > td * 1.001):
+                    row["totalDebt"] = v
+
+    # Caixa = caixa e equivalentes + as aplicações que o balanço IMPRIME no ativo
+    # corrente (DERA, ver aplicacoes_balanco.py): as tags de aplicações misturam o
+    # total do balanço com parcelas das notas (BA 2020: 0,6 mM em vez de 17,8 mM).
+    # Bancos e seguradoras ficam com a regra deles (build_row).
+    if reporting_currency == "USD":
+        aplic = aplicacoes_balanco.para_cik(cik)
+        if aplic:
+            for row in rows:
+                base = row.get("_caixaBase")
+                if base is None or row.get("_aplicacoesBloqueadas"):
+                    continue
+                fim = str(row.get("periodEnd"))[:10]
+                hit = aplic.get(fim)
+                if hit is None:
+                    try:
+                        f0 = datetime.date.fromisoformat(fim)
+                        hit = next((v for d, v in aplic.items()
+                                    if abs((datetime.date.fromisoformat(d) - f0).days) <= 5), None)
+                    except ValueError:
+                        hit = None
+                if hit is not None:
+                    row["cash"] = base + hit[0]
+
+    # Rede de segurança: anula o impossível e sinaliza incoerências ANTES das
+    # correções revistas (essas têm prova e passam por cima). Ver validar_fundamentais.py.
+    validar(ticker, rows, company.get("sector"))
+
+    # DPS anual em falta = soma dos quatro trimestres (já na mesma base de ações, depois
+    # dos ajustes de split): há 10-K que só dão o dividendo do Q4 (JBL, FDS em 2026) e
+    # anuais que o validador anula por serem menores do que três trimestres (V 2026: 0,67).
+    dps_q = {(r.get("fiscalYear"), r.get("fiscalQuarter")): r.get("dividendPerShare")
+             for r in rows if r.get("periodType") == "QUARTERLY"}
+    for row in rows:
+        if row.get("periodType") != "ANNUAL" or row.get("dividendPerShare") is not None:
+            continue
+        qs = [dps_q.get((row.get("fiscalYear"), i)) for i in (1, 2, 3, 4)]
+        if all(v is not None for v in qs) and sum(qs) > 0:
+            row["dividendPerShare"] = sum(qs)
+    notas = notas_definicao(rows) + aplicar_correcoes(ticker, rows)
+    try:
+        notas += notas_reexpressao(facts_json, cik, rows, {**DURATION_TAGS, **INSTANT_TAGS},
+                                   company.get("currency"))
+    except Exception as e:  # uma nota nunca pode impedir a gravação dos números
+        print(f"    ⚠️ {ticker}: notas de reexpressão falharam ({e}) — sigo sem elas")
+
     inserted = 0
     try:
         with conn.cursor() as cur:
@@ -2827,6 +3651,7 @@ def process_company(conn, company: dict, dry_run: bool = False,
             for row in rows:
                 insert_fundamental(cur, row)
             _reattach(cur)
+            gravar_notas(cur, company_id, notas)
         conn.commit()
         inserted = len(rows)
     except Exception as e:
@@ -2853,6 +3678,13 @@ def process_company(conn, company: dict, dry_run: bool = False,
             conn.commit()
         except Exception:
             conn.rollback()
+        try:
+            with conn.cursor() as cur:
+                gravar_notas(cur, company_id, notas)
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            print(f"    ⚠️ {ticker}: notas não gravadas ({e})")
 
     try:
         with conn.cursor() as cur:
@@ -2961,6 +3793,8 @@ def main():
             sys.exit("--dry-run requer o caminho do JSON de output")
         dry_run_path = sys.argv[idx + 1]
 
+    carregar_splits_eventos()
+
     conn = psycopg2.connect(DIRECT_URL)
     conn.autocommit = False
 
@@ -2984,7 +3818,9 @@ def main():
             n = process_company(conn, company, dry_run=bool(dry_run_path), collector=collector)
             print(f"{n} períodos")
             total_periods += n
-        except psycopg2.OperationalError:
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            # InterfaceError = "connection already closed": a ligação caiu entre duas
+            # empresas (na réplica caiu à 358.ª e as 162 seguintes falharam todas).
             try:
                 # Supabase drops idle connections after ~10 mins, reconnect and retry
                 conn = psycopg2.connect(DIRECT_URL)
@@ -3023,10 +3859,18 @@ def main():
         conn.close()
         return
 
+    if conn.closed:   # a ligação caiu a meio da corrida: a sincronização abre outra
+        conn = psycopg2.connect(DIRECT_URL)
+        conn.autocommit = False
     sync_dual_class(conn)
 
     conn.close()
     print(f"\nConcluído. {total_periods} períodos inseridos. {errors} erros.")
+    val = relatorio_validacao(gravar=not dry_run_path)
+    print(f"Validação: {val['por_nivel'].get('anular', 0)} valores anulados, "
+          f"{val['por_nivel'].get('sinalizar', 0)} sinalizados para revisão")
+    for m in val["por_motivo"][:8]:
+        print(f"   {m['nivel']:9} {m['casos']:6}  {m['motivo']}")
 
     # Terminar com 0 mesmo havendo erros é o que deixou a BRK.B e a BF.B falharem
     # todos os dias durante semanas com o workflow verde: a contagem de erros ia

@@ -2,7 +2,8 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { exigirPro, CACHE_PRIVADO } from "@/lib/api/acessoPro"
 import { normalizarTicker } from "@/lib/ticker"
-import { cotacao, get, simbolo, historico as historicoPrecos } from "@/lib/fmp/mercado"
+import { cotacao, historico as historicoPrecos } from "@/lib/fmp/mercado"
+import { receitaDiferida } from "@/lib/fontes/sec"
 import { betaFinnhub } from "@/lib/finnhub"
 import { analistas } from "@/lib/fmp/estimativas"
 import { carregarSeriesReduzidas } from "@/lib/finance/seriesMacro"
@@ -70,7 +71,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
 
   const company = await prisma.company.findUnique({
     where: { ticker },
-    select: { id: true, ticker: true, name: true, sector: true, industry: true, logoUrl: true, isActive: true },
+    select: { id: true, ticker: true, name: true, sector: true, industry: true, logoUrl: true, isActive: true, cik: true },
   })
   if (!company || !company.isActive) return NextResponse.json({ error: "Company not found" }, { status: 404 })
 
@@ -98,12 +99,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
         ebitda: true, interestExpense: true, totalEquity: true,
       },
     }),
-    // A receita diferida não está na nossa base: vem do balanço anual da FMP.
-    get<Array<{ date: string; deferredRevenue?: number | null }>>(
-      "balance-sheet-statement",
-      { symbol: simbolo(company.ticker), period: "annual", limit: "12" },
-      86_400,
-    ).catch(() => null),
+    // A receita diferida não está na nossa base: vem dos 10-K na SEC (companyconcept).
+    receitaDiferida(company.cik).catch(() => new Map<string, number>()),
     // Taxa do Tesouro a 10 anos (DGS10) + inflação e PIB real (FRED, em cache)
     // para a WACC (taxa sem risco) e o terminal growth.
     carregarSeriesReduzidas(["^DGS10", "^CPI_YOY", "^GDP_YOY"], { desde: new Date(Date.now() - 2 * 365 * 86_400_000), alvoPontos: 60 }).catch(() => null),
@@ -114,10 +111,11 @@ export async function GET(_req: Request, { params }: { params: Promise<{ ticker:
     return p ? { valor: p.value / 100, data: p.date } : null
   }
   const receitaDiferidaEm = (d: Date): number | null => {
-    if (!Array.isArray(balancos)) return null
     const alvo = d.getTime()
-    const b = balancos.find((x) => Math.abs(new Date(x.date + "T00:00:00Z").getTime() - alvo) <= 10 * 86_400_000)
-    return typeof b?.deferredRevenue === "number" ? b.deferredRevenue : null
+    for (const [data, v] of balancos) {
+      if (Math.abs(new Date(data + "T00:00:00Z").getTime() - alvo) <= 10 * 86_400_000) return v
+    }
+    return null
   }
   if (anuais.length < 2) return NextResponse.json({ error: "Histórico insuficiente" }, { status: 404 })
 

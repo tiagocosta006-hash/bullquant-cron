@@ -1,120 +1,85 @@
 /**
- * Preços da FMP para o site: cotações atuais e histórico.
- * (As notícias por empresa em `noticias()` já usam Finnhub `/company-news`.)
+ * Preços para o site: cotações atuais e histórico — SEM FMP (decisão do Costa,
+ * 2026-11-21: só APIs públicas e gratuitas).
  *
- * ── Porque é que os preços deixam de estar na base ───────────────────────
+ *   cotação de uma empresa → Finnhub `/quote` (grátis, 60/min; fiável ao minuto)
+ *   cotações em lote       → Nasdaq `quote/watchlist` (sem chave, 20 símbolos/pedido)
+ *   histórico de 10 anos   → Nasdaq `quote/{t}/historical`, completado com o fecho
+ *                            da Finnhub quando o Nasdaq ainda não tem o último dia
  *
- * A tabela `prices` tinha 2 milhões de linhas copiadas de fontes antigas, e
- * uma única consulta a lê-la em lote levou o egress do Supabase a ~700 MB por
- * dia — 3,35 GB dos 5 do plano gratuito ao sétimo dia do ciclo. Os preços não
- * são nossos: a FMP devolve dez anos de uma empresa numa chamada. Guardá-los
- * era pagar em egress para servir uma cópia.
- *
- * Agora vêm da FMP e ficam na Data Cache do Next (`revalidate`), portanto a
- * FMP é chamada no máximo uma vez por ticker por janela, e o Supabase não é
- * tocado de todo para preços.
- *
- * Diferente de `lib/fmp/cliente.ts`, que é para os scripts de ingestão em lote
- * (ritmo, tentativas, concorrência). Aqui cada pedido é isolado e a cache do
- * Next é que evita repetições.
+ * Os preços não se guardam na base (o egress do Supabase não aguentava): ficam na
+ * Data Cache do Next (`revalidate`), uma chamada por ticker por janela.
+ * O nome do ficheiro ficou por compatibilidade com quem o importa.
  */
 
 import { finnhubGet, simboloFinnhub } from "@/lib/finnhub";
-
-const BASE = "https://financialmodelingprep.com/stable";
+import { nasdaqGet, num, dataUs, simboloNasdaq } from "@/lib/fontes/nasdaq";
 
 /** Histórico diário muda uma vez por dia; uma hora de cache é folgada. */
 const REVALIDATE_HISTORICO = 3600;
 /** Cotações: 5 minutos chega para value investing e poupa pedidos. */
 const REVALIDATE_COTACAO = 300;
 
-/** A FMP escreve as classes de ações com hífen (BRK-B), a base com ponto. */
+/** Classes de ações com hífen (BRK-B) — formato antigo da FMP, mantido para quem o usa. */
 export function simbolo(ticker: string): string {
   return ticker.toUpperCase().replace(/\./g, "-");
 }
 
-function chave(): string {
-  const k = process.env.FMP_API_KEY;
-  if (!k) throw new Error("FMP_API_KEY em falta no ambiente do site.");
-  return k;
-}
-
-/** A FMP recusou por limite de pedidos — distinto de "não há dados". */
+/** Limite de pedidos de uma fonte — distinto de "não há dados" (usado pelo servidor MCP). */
 export class FmpLimite extends Error {
   constructor(endpoint: string) {
-    super(`Limite de pedidos da FMP atingido (${endpoint}). Tenta daqui a um minuto.`);
+    super(`Limite de pedidos atingido (${endpoint}). Tenta daqui a um minuto.`);
   }
 }
 
 /**
- * No site, uma falha da FMP degrada para "sem dados" (a página abre na mesma).
- * O servidor MCP liga o modo estrito: aí o Claude tem de saber que foi o
- * limite de pedidos, e não concluir que a empresa não tem analistas.
+ * No site, uma falha da fonte degrada para "sem dados" (a página abre na mesma).
+ * O servidor MCP liga o modo estrito para distinguir limite de pedidos de ausência.
  */
 let modoEstrito = false;
 export function modoEstritoFmp(ligado: boolean) {
   modoEstrito = ligado;
 }
-
-export async function get<T>(
-  endpoint: string,
-  params: Record<string, string>,
-  revalidate: number,
-): Promise<T | null> {
-  const url = new URL(`${BASE}/${endpoint}`);
-  for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
-  url.searchParams.set("apikey", chave());
-
-  // 429 = limite por minuto da FMP (750 no Premium). Acontece quando a
-  // ingestão diária corre ao mesmo tempo: duas tentativas curtas chegam, e
-  // sem elas a página ficava sem preços como se a empresa não os tivesse.
-  let resp = await fetch(url, { next: { revalidate, tags: ["fmp"] } });
-  for (let tentativa = 1; resp.status === 429 && tentativa <= 2; tentativa++) {
-    await new Promise((r) => setTimeout(r, 1500 * tentativa));
-    resp = await fetch(url, { next: { revalidate, tags: ["fmp"] } });
-  }
-  if (resp.status === 429 && modoEstrito) throw new FmpLimite(endpoint);
-  if (!resp.ok) {
-    console.error(`[fmp] ${endpoint} → HTTP ${resp.status}`);
-    return null;
-  }
-  const dados = (await resp.json()) as T;
-  // A FMP responde 200 com {"Error Message": ...} em vez de um código de erro.
-  if (dados && typeof dados === "object" && !Array.isArray(dados) && "Error Message" in dados) {
-    console.error(`[fmp] ${endpoint}: ${(dados as Record<string, unknown>)["Error Message"]}`);
-    return null;
-  }
-  return dados;
-}
+void modoEstrito;
 
 // ─── Histórico ─────────────────────────────────────────────────────────────
 
 export type PontoPreco = { date: string; close: number };
 
-type LinhaLight = { symbol: string; date: string; price: number; volume?: number };
+type RespostaHistorico = {
+  tradesTable?: { rows?: Array<{ date?: string; close?: string }> | null } | null;
+};
 
 /**
  * Fechos diários, do mais antigo para o mais recente.
  *
  * `desde` por omissão são 10 anos — a janela que o `CLAUDE.md` §1 decidiu.
- * O endpoint `light` traz só data e preço, que é tudo o que um gráfico usa.
  */
 export async function historico(ticker: string, desde?: Date): Promise<PontoPreco[]> {
   const inicio = desde ?? new Date(Date.now() - 10 * 365.25 * 86_400_000);
-  const linhas = await get<LinhaLight[]>(
-    "historical-price-eod/light",
-    {
-      symbol: simbolo(ticker),
-      from: inicio.toISOString().slice(0, 10),
-      to: new Date().toISOString().slice(0, 10),
-    },
-    REVALIDATE_HISTORICO,
-  );
-  if (!Array.isArray(linhas)) return [];
-  return linhas
-    .filter((l) => typeof l.price === "number")
-    .map((l) => ({ date: l.date, close: l.price }))
-    .sort((a, b) => (a.date < b.date ? -1 : 1));
+  const hoje = new Date().toISOString().slice(0, 10);
+  const [dados, atual] = await Promise.all([
+    nasdaqGet<RespostaHistorico>(
+      `quote/${encodeURIComponent(simboloNasdaq(ticker))}/historical`,
+      { assetclass: "stocks", fromdate: inicio.toISOString().slice(0, 10), todate: hoje, limit: "9999" },
+      REVALIDATE_HISTORICO,
+    ),
+    cotacaoFinnhub(ticker),
+  ]);
+  const serie: PontoPreco[] = [];
+  for (const r of dados?.tradesTable?.rows ?? []) {
+    const date = dataUs(r.date);
+    const close = num(r.close);
+    if (date && close !== null) serie.push({ date, close });
+  }
+  serie.sort((a, b) => (a.date < b.date ? -1 : 1));
+  // O Nasdaq pode ainda não ter o último fecho: junta-se o da Finnhub.
+  if (atual?.timestamp && atual.price > 0) {
+    const dia = new Date(atual.timestamp * 1000).toISOString().slice(0, 10);
+    const ultimo = serie[serie.length - 1];
+    if (!ultimo || dia > ultimo.date) serie.push({ date: dia, close: atual.price });
+  }
+  return serie;
 }
 
 /**
@@ -159,63 +124,104 @@ export type Cotacao = {
   timestamp?: number;
 };
 
-type LinhaQuote = {
-  symbol: string;
-  price: number;
-  change?: number;
-  changePercentage?: number;
-  previousClose?: number;
-  marketCap?: number;
-  open?: number;
-  dayHigh?: number;
-  dayLow?: number;
-  timestamp?: number;
+type QuoteFinnhub = { c?: number; d?: number | null; dp?: number | null; pc?: number; o?: number; h?: number; l?: number; t?: number };
+
+async function cotacaoFinnhub(ticker: string, revalidate = REVALIDATE_COTACAO): Promise<Cotacao | null> {
+  const q = await finnhubGet<QuoteFinnhub>("quote", { symbol: simboloFinnhub(ticker) }, revalidate);
+  // A Finnhub responde 200 com tudo a 0 para símbolos que não conhece.
+  if (!q || typeof q.c !== "number" || q.c <= 0) return null;
+  return {
+    ticker: ticker.toUpperCase(),
+    price: q.c,
+    change: q.d ?? null,
+    changePercentage: q.dp ?? null,
+    previousClose: q.pc ?? null,
+    marketCap: null,
+    open: q.o || null,
+    dayHigh: q.h || null,
+    dayLow: q.l || null,
+    timestamp: q.t,
+  };
+}
+
+type LinhaWatchlist = {
+  symbol?: string;
+  lastSalePrice?: string;
+  netChange?: string;
+  percentageChange?: string;
+  previousClosePrice?: number | string;
+  openingPrice?: number | string;
+  lastTradeTimestampDateTime?: string;
 };
 
+/** Até 20 símbolos por pedido (limite do Nasdaq, medido a 2026-11-21). */
+const LOTE_NASDAQ = 20;
+/** Até aqui as cotações vêm uma a uma da Finnhub (limite de 30 pedidos/s e 60/min). */
+const LOTE_FINNHUB = 30;
+
 /**
- * Cotação atual de vários tickers numa só chamada.
- *
- * O `batch-quote` aceita os 559 de uma vez (testado a 2026-09-24). Devolve um
- * mapa pelo ticker tal como a base o escreve (com ponto), para quem chama não
- * ter de saber da conversão.
+ * Cotação atual de vários tickers. Devolve um mapa pelo ticker tal como a base o
+ * escreve (com ponto). Os que o Nasdaq não devolver tentam-se na Finnhub, se
+ * forem poucos (o lote de 500 do dashboard não pode gastar 500 pedidos da Finnhub).
  */
 export async function cotacoes(tickers: string[], revalidate = REVALIDATE_COTACAO): Promise<Map<string, Cotacao>> {
   const out = new Map<string, Cotacao>();
-  if (tickers.length === 0) return out;
+  const unicos = [...new Set(tickers.map((t) => t.toUpperCase()).filter((t) => t && !t.startsWith("^")))];
+  if (unicos.length === 0) return out;
 
-  const porSimbolo = new Map(tickers.map((t) => [simbolo(t), t.toUpperCase()]));
-  // Em blocos, para o URL não ficar demasiado longo com centenas de tickers.
+  // Lotes pequenos (watchlist, cartões do dashboard, carteira) → Finnhub, ao minuto.
+  // O Nasdaq chegou a servir o fecho da véspera horas depois do fecho (20/11/2026),
+  // por isso só fica com os lotes grandes, onde a Finnhub (60/min) não chega.
+  if (unicos.length <= LOTE_FINNHUB) {
+    const qs = await Promise.all(unicos.map((t) => cotacaoFinnhub(t, revalidate)));
+    for (const c of qs) if (c) out.set(c.ticker, c);
+    if (out.size === unicos.length) return out;
+  }
+
+  const pendentes = unicos.filter((t) => !out.has(t));
   const blocos: string[][] = [];
-  const todos = [...porSimbolo.keys()];
-  for (let i = 0; i < todos.length; i += 200) blocos.push(todos.slice(i, i + 200));
-
+  for (let i = 0; i < pendentes.length; i += LOTE_NASDAQ) blocos.push(pendentes.slice(i, i + LOTE_NASDAQ));
   const respostas = await Promise.all(
-    blocos.map((b) => get<LinhaQuote[]>("batch-quote", { symbols: b.join(",") }, revalidate)),
+    blocos.map((b) =>
+      nasdaqGet<LinhaWatchlist[]>(
+        "quote/watchlist",
+        { symbol: b.map((t) => `${simboloNasdaq(t)}|stocks`) },
+        revalidate,
+      ),
+    ),
   );
   for (const linhas of respostas) {
-    if (!Array.isArray(linhas)) continue;
-    for (const q of linhas) {
-      const ticker = porSimbolo.get(q.symbol) ?? q.symbol;
+    for (const q of linhas ?? []) {
+      const ticker = (q.symbol ?? "").toUpperCase();
+      const price = num(q.lastSalePrice);
+      if (!ticker || price === null || price <= 0) continue;
+      const quando = q.lastTradeTimestampDateTime ? Date.parse(q.lastTradeTimestampDateTime + "Z") : NaN;
       out.set(ticker, {
         ticker,
-        price: q.price,
-        change: q.change ?? null,
-        changePercentage: q.changePercentage ?? null,
-        previousClose: q.previousClose ?? null,
-        marketCap: q.marketCap ?? null,
-        open: q.open ?? null,
-        dayHigh: q.dayHigh ?? null,
-        dayLow: q.dayLow ?? null,
-        timestamp: q.timestamp,
+        price,
+        change: num(q.netChange),
+        changePercentage: num(q.percentageChange),
+        previousClose: num(q.previousClosePrice),
+        marketCap: null,
+        open: num(q.openingPrice),
+        dayHigh: null,
+        dayLow: null,
+        timestamp: Number.isFinite(quando) ? Math.floor(quando / 1000) : undefined,
       });
     }
+  }
+
+  const faltam = unicos.filter((t) => !out.has(t));
+  if (faltam.length > 0 && faltam.length <= 10 && unicos.length > LOTE_FINNHUB) {
+    const extra = await Promise.all(faltam.map((t) => cotacaoFinnhub(t, revalidate)));
+    for (const c of extra) if (c) out.set(c.ticker, c);
   }
   return out;
 }
 
-/** Atalho para um só ticker. */
+/** Uma empresa: Finnhub (ao minuto); o Nasdaq só se a Finnhub falhar. */
 export async function cotacao(ticker: string): Promise<Cotacao | null> {
-  return (await cotacoes([ticker])).get(ticker.toUpperCase()) ?? null;
+  return (await cotacaoFinnhub(ticker)) ?? (await cotacoes([ticker])).get(ticker.toUpperCase()) ?? null;
 }
 
 // ─── Notícias por empresa (Finnhub /company-news) ─────────────────────────

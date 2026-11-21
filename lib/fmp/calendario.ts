@@ -2,7 +2,8 @@ import * as fs from "node:fs/promises"
 import * as path from "node:path"
 import { unstable_cache } from "next/cache"
 import { prisma } from "@/lib/prisma"
-import { get } from "@/lib/fmp/mercado"
+import { nasdaqGet, num, dataUs } from "@/lib/fontes/nasdaq"
+import { eventosOficiais } from "@/lib/fontes/macroOficial"
 import { finnhubGet, simboloFinnhub } from "@/lib/finnhub"
 
 /**
@@ -15,8 +16,9 @@ import { finnhubGet, simboloFinnhub } from "@/lib/finnhub"
  *   · Insiders                             → Finnhub `/stock/insider-transactions`
  *   · Splits                               → catálogo local `scripts/splits_eventos.json`
  *                                            (Finnhub free tier devolve 403 em `/stock/split`)
- *   · Dividendos e macro                   → FMP (`dividends-calendar`, `economic-calendar`),
- *                                            pois ambos são pagos na Finnhub (HTTP 403).
+ *   · Dividendos e macro                   → Nasdaq (`calendar/dividends`, `calendar/economicevents`),
+ *                                            públicos e sem chave (na Finnhub são pagos: HTTP 403).
+ *                                            Decisão do Costa (2026-11-21): sem FMP.
  *
  * A Data Cache do Next (`revalidate`) evita pedidos repetidos.
  */
@@ -26,8 +28,6 @@ const REVALIDATE_CALENDARIO = 6 * 3600
 const REVALIDATE_INSIDERS = 6 * 3600
 
 const iso = (d: Date) => d.toISOString().slice(0, 10)
-/** A FMP escreve BRK-B, a base BRK.B. */
-const daFmp = (s: string) => s.replace(/-/g, ".")
 
 // ─── Empresas cobertas ─────────────────────────────────────────────────────
 
@@ -54,6 +54,7 @@ export const empresasPorTicker = unstable_cache(
 
 // ─── Janelas ───────────────────────────────────────────────────────────────
 
+/** Janelas de 7 dias (a Finnhub corta cada resposta em 1 500 linhas). */
 function semanas(de: Date, ate: Date): Array<[string, string]> {
   const out: Array<[string, string]> = []
   for (let ini = de.getTime(); ini <= ate.getTime(); ini += 7 * DIA) {
@@ -62,11 +63,42 @@ function semanas(de: Date, ate: Date): Array<[string, string]> {
   return out
 }
 
-async function porSemanas<T>(endpoint: string, de: Date, ate: Date): Promise<T[]> {
-  const blocos = await Promise.all(
-    semanas(de, ate).map(([from, to]) => get<T[]>(endpoint, { from, to }, REVALIDATE_CALENDARIO)),
-  )
-  return blocos.flatMap((b) => (Array.isArray(b) ? b : []))
+/** Um pedido por dia útil: o Nasdaq dá os calendários dia a dia. */
+function diasUteis(de: Date, ate: Date): string[] {
+  const out: string[] = []
+  for (let t = Date.UTC(de.getUTCFullYear(), de.getUTCMonth(), de.getUTCDate()); t <= ate.getTime(); t += DIA) {
+    const d = new Date(t)
+    if (d.getUTCDay() !== 0 && d.getUTCDay() !== 6) out.push(iso(d))
+  }
+  return out
+}
+
+/**
+ * Um pedido por dia útil, no máximo 3 em simultâneo: com muitos em paralelo o Nasdaq
+ * responde `data: null` a alguns dias (medido a 2026-11-21). Um dia vazio repete-se
+ * uma vez, meio segundo depois.
+ */
+async function nasdaqPorDia<T>(caminho: string, dias: string[]): Promise<Array<T | null>> {
+  const out: Array<T | null> = new Array(dias.length).fill(null)
+  let i = 0
+  const trabalhador = async () => {
+    while (i < dias.length) {
+      const k = i++
+      let r = await nasdaqGet<T>(caminho, { date: dias[k] }, REVALIDATE_CALENDARIO)
+      if (r === null) {
+        await new Promise((ok) => setTimeout(ok, 500))
+        r = await nasdaqGet<T>(caminho, { date: dias[k] }, REVALIDATE_CALENDARIO)
+      }
+      out[k] = r
+    }
+  }
+  await Promise.all([trabalhador(), trabalhador(), trabalhador()])
+  return out
+}
+
+async function porDias<T>(caminho: string, de: Date, ate: Date, extrair: (dados: unknown) => T[]): Promise<T[]> {
+  const blocos = await nasdaqPorDia<unknown>(caminho, diasUteis(de, ate))
+  return blocos.flatMap((b) => (b ? extrair(b) : []))
 }
 
 // ─── Resultados (Finnhub /calendar/earnings) ───────────────────────────────
@@ -199,7 +231,12 @@ export async function resultadosDe(ticker: string): Promise<Resultado[]> {
 
 // ─── Dividendos (FMP) e splits (catálogo local) ────────────────────────────
 
-type LinhaDividendo = { symbol: string; date: string; paymentDate?: string; dividend?: number }
+type LinhaDividendo = {
+  symbol?: string
+  dividend_Ex_Date?: string
+  payment_Date?: string
+  dividend_Rate?: number | string
+}
 
 export type EntradaSplitLocal = {
   data: string
@@ -285,19 +322,21 @@ async function lerSplitsLocais(de: Date, ate: Date, tickers: Set<string>): Promi
 
 export async function calendarioCorporativo(de: Date, ate: Date, tickers: Set<string>): Promise<EventoCorporativo[]> {
   const [divs, splits] = await Promise.all([
-    porSemanas<LinhaDividendo>("dividends-calendar", de, ate),
+    porDias<LinhaDividendo>("calendar/dividends", de, ate,
+      (d) => ((d as { calendar?: { rows?: LinhaDividendo[] | null } }).calendar?.rows ?? [])),
     lerSplitsLocais(de, ate, tickers),
   ])
   const out: EventoCorporativo[] = []
   for (const d of divs) {
-    const ticker = daFmp(d.symbol)
-    if (!tickers.has(ticker)) continue
+    const ticker = (d.symbol ?? "").trim().toUpperCase().replace(/\//g, ".")
+    const date = dataUs(d.dividend_Ex_Date)
+    if (!tickers.has(ticker) || !date) continue
     out.push({
       ticker,
       type: "DIVIDEND",
-      date: d.date,
-      payDate: d.paymentDate || null,
-      amount: d.dividend ?? null,
+      date,
+      payDate: dataUs(d.payment_Date),
+      amount: num(d.dividend_Rate),
       splitRatio: null,
     })
   }
@@ -308,14 +347,12 @@ export async function calendarioCorporativo(de: Date, ate: Date, tickers: Set<st
 // ─── Macro ─────────────────────────────────────────────────────────────────
 
 type LinhaEconomica = {
-  date: string // "2026-10-10 12:30:00", UTC
-  country: string
-  event: string
-  previous: number | null
-  estimate: number | null
-  actual: number | null
-  impact: "Low" | "Medium" | "High" | string
-  unit?: string | null
+  gmt?: string // "08:30" — apesar do nome, é a hora de Nova Iorque (os dados dos EUA saem às 8:30 ET)
+  country?: string
+  eventName?: string
+  actual?: string
+  consensus?: string
+  previous?: string
 }
 
 export type TipoMacro = "FOMC" | "CPI" | "JOBS" | "GDP" | "PCE" | "RETAIL_SALES" | "OTHER"
@@ -341,68 +378,125 @@ export type EventoMacro = {
  * curado assim.
  */
 const EVENTOS: Record<string, TipoMacro> = {
-  "Fed Interest Rate Decision": "FOMC",
-  "FOMC Minutes": "FOMC",
-  "Inflation Rate YoY": "CPI",
-  "Core Inflation Rate YoY": "CPI",
-  "Non Farm Payrolls": "JOBS",
-  "Unemployment Rate": "JOBS",
-  "GDP Growth Rate QoQ": "GDP",
-  "PCE Price Index YoY": "PCE",
-  "Core PCE Price Index YoY": "PCE",
-  "Retail Sales MoM": "RETAIL_SALES",
+  "fed interest rate decision": "FOMC",
+  "fomc meeting minutes": "FOMC",
+  "fomc minutes": "FOMC",
+  "cpi": "CPI",
+  "core cpi": "CPI",
+  "nonfarm payrolls": "JOBS",
+  "unemployment rate": "JOBS",
+  "gdp": "GDP",
+  "pce price index": "PCE",
+  "pce prices": "PCE",
+  "core pce price index": "PCE",
+  "retail sales": "RETAIL_SALES",
+}
+
+/** Os mais importantes para quem investe a longo prazo; os outros ficam "médios". */
+const ALTO = new Set(["fed interest rate decision", "cpi", "nonfarm payrolls", "gdp", "core pce price index"])
+
+function chaveEvento(evento: string): string {
+  return evento.replace(/\s*\(.*?\)\s*/g, "").trim().toLowerCase()
 }
 
 function tipoDe(evento: string): TipoMacro | null {
-  return EVENTOS[evento.replace(/\s*\(.*?\)\s*/g, "").trim()] ?? null
+  return EVENTOS[chaveEvento(evento)] ?? null
 }
 
-const horaEt = new Intl.DateTimeFormat("en-US", {
-  timeZone: "America/New_York",
-  hour: "2-digit",
-  minute: "2-digit",
-  hour12: false,
-})
-
-function valor(v: number | null, unidade?: string | null): string | null {
-  if (v == null) return null
-  return unidade === "%" ? `${v}%` : String(v)
+/** Valores (atual, consenso, anterior) do Nasdaq — as datas oficiais vêm de macroOficial. */
+async function macroNasdaq(de: Date, ate: Date): Promise<EventoMacro[]> {
+  // O `date=D` do Nasdaq devolve os eventos do dia ANTERIOR (medido a 2026-11-21 contra a
+  // Fed e o BEA: FOMC 10/12 em vez de 9/12, PIB 26/11 em vez de 25/11). Pede-se cada dia
+  // seguinte — fins de semana incluídos, senão as sextas-feiras perdiam-se — e atribui-se
+  // ao dia anterior.
+  const pedidos: string[] = []
+  const dias: string[] = []
+  for (let t = Date.UTC(de.getUTCFullYear(), de.getUTCMonth(), de.getUTCDate()); t <= ate.getTime(); t += DIA) {
+    dias.push(iso(new Date(t)))
+    pedidos.push(iso(new Date(t + DIA)))
+  }
+  const respostas = await nasdaqPorDia<{ rows?: LinhaEconomica[] | null }>("calendar/economicevents", pedidos)
+  const out: EventoMacro[] = []
+  const vistos = new Set<string>()
+  respostas.forEach((r, i) => {
+    const date = dias[i]
+    for (const l of r?.rows ?? []) {
+      if (l.country !== "United States" || !l.eventName) continue
+      const type = tipoDe(l.eventName)
+      if (!type) continue
+      const id = `${date}|${l.eventName}`
+      if (vistos.has(id)) continue // o mesmo nome repetido (ex.: CPI mensal e anual) — fica o primeiro
+      vistos.add(id)
+      const hora = (l.gmt ?? "").trim()
+      const limpo = (v?: string) => {
+        const x = (v ?? "").replace(/&nbsp;/gi, " ").trim()
+        return x ? x : null
+      }
+      out.push({
+        id,
+        type,
+        date,
+        time: /^\d{1,2}:\d{2}$/.test(hora) ? `${hora} ET` : null,
+        title: l.eventName,
+        importance: ALTO.has(chaveEvento(l.eventName)) ? "HIGH" : "MEDIUM",
+        country: "US",
+        actual: limpo(l.actual),
+        estimate: limpo(l.consensus),
+        previous: limpo(l.previous),
+      })
+    }
+  })
+  return out.sort((a, b) => a.date.localeCompare(b.date))
 }
 
 /**
- * Eventos macro dos EUA: só os de `EVENTOS` (FOMC, inflação, emprego, PIB,
- * PCE, vendas a retalho). Horas da FMP em UTC, mostradas em hora de Nova
- * Iorque (confirmado: decisão da Fed às 18:00 UTC = 14:00 ET).
+ * Eventos macro dos EUA (FOMC, inflação, emprego, PIB, PCE, vendas a retalho).
+ *
+ * DATAS e horas de quem publica (Fed, BEA, Census, BLS via FRED — lib/fontes/macroOficial.ts):
+ * oficiais e já conhecidas para os meses seguintes. O calendário do Nasdaq dava respostas
+ * diferentes ao mesmo pedido (56 eventos e depois "No record found", 2026-11-21), por isso
+ * só entra para os VALORES (atual, consenso, anterior) do mesmo dia e tipo, e para o que as
+ * fontes oficiais não cobrirem (ex.: CPI e emprego sem FRED_API_KEY).
  */
 export async function calendarioMacro(de: Date, ate: Date): Promise<EventoMacro[]> {
-  const linhas = await porSemanas<LinhaEconomica>("economic-calendar", de, ate)
+  const [oficiais, nasdaq] = await Promise.all([
+    eventosOficiais(iso(de), iso(ate)).catch(() => []),
+    macroNasdaq(de, ate).catch(() => [] as EventoMacro[]),
+  ])
+  const porDiaTipo = new Map<string, EventoMacro[]>()
+  for (const n of nasdaq) {
+    const k = `${n.date}|${n.type}`
+    porDiaTipo.set(k, [...(porDiaTipo.get(k) ?? []), n])
+  }
+  const usados = new Set<string>()
   const out: EventoMacro[] = []
-  const vistos = new Set<string>()
-  for (const l of linhas) {
-    if (l.country !== "US") continue
-    const type = tipoDe(l.event)
-    if (!type) continue
-    const quando = new Date(l.date.replace(" ", "T") + "Z")
-    const id = `${l.date}|${l.event}`
-    if (vistos.has(id)) continue
-    vistos.add(id)
-    // Hora "00:00" UTC é como a FMP marca eventos sem hora.
-    const semHora = l.date.endsWith("00:00:00")
+  for (const o of oficiais) {
+    const k = `${o.date}|${o.type}`
+    // O valor do Nasdaq com o nome mais parecido (ex.: "CPI" e não "Core CPI").
+    const cand = porDiaTipo.get(k) ?? []
+    const v =
+      cand.find((c) => c.title.toLowerCase() === o.title.toLowerCase()) ??
+      cand.find((c) => !/^core\b/i.test(c.title)) ??
+      cand[0] ??
+      null
+    if (cand.length) usados.add(k)
     out.push({
-      id,
-      type,
-      // Data no fuso de Nova Iorque, que é o dia em que o evento acontece lá.
-      date: semHora ? l.date.slice(0, 10) : quando.toLocaleDateString("en-CA", { timeZone: "America/New_York" }),
-      time: semHora ? null : `${horaEt.format(quando)} ET`,
-      title: l.event,
-      importance: l.impact === "High" ? "HIGH" : l.impact === "Medium" ? "MEDIUM" : "LOW",
+      id: `${o.date}|${o.title}`,
+      type: o.type,
+      date: o.date,
+      time: o.time,
+      title: o.title,
+      importance: o.importance,
       country: "US",
-      actual: valor(l.actual, l.unit),
-      estimate: valor(l.estimate, l.unit),
-      previous: valor(l.previous, l.unit),
+      actual: v?.actual ?? null,
+      estimate: v?.estimate ?? null,
+      previous: v?.previous ?? null,
     })
   }
-  return out.sort((a, b) => a.date.localeCompare(b.date))
+  for (const [k, lista] of porDiaTipo) {
+    if (!usados.has(k)) out.push(...lista)
+  }
+  return out.sort((a, b) => a.date.localeCompare(b.date) || (a.time ?? "").localeCompare(b.time ?? ""))
 }
 
 // ─── Insiders (Finnhub /stock/insider-transactions) ────────────────────────

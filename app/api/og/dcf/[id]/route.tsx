@@ -20,12 +20,19 @@ export async function GET(
   try {
     const { id } = await params
 
+    // Só os campos desenhados (egress do Supabase), e a mesma regra da página pública
+    // /dcf/[id]: um cenário privado não gera imagem (antes desenhava o valor justo e as
+    // notas de qualquer cenário cujo id se soubesse).
     const dcfAnalysis = await prisma.dcfAnalysis.findUnique({
       where: { id },
-      include: { company: true },
+      select: {
+        isPublic: true, label: true, notes: true, fairValue: true, priceAtSave: true,
+        marginOfSafety: true, wacc: true, terminalGrowth: true, growthStage1: true,
+        company: { select: { ticker: true, name: true, logoUrl: true, currency: true } },
+      },
     })
 
-    if (!dcfAnalysis || !dcfAnalysis.company) {
+    if (!dcfAnalysis || !dcfAnalysis.company || !dcfAnalysis.isPublic) {
       return new Response("Not found", { status: 404 })
     }
 

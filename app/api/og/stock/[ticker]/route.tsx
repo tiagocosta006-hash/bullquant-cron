@@ -32,8 +32,10 @@ export async function GET(
     const { ticker } = await params
     const upper = ticker.toUpperCase()
 
+    // Só o que a imagem desenha (egress do Supabase).
     const company = await prisma.company.findUnique({
       where: { ticker: upper },
+      select: { id: true, ticker: true, name: true, logoUrl: true, exchange: true, currency: true },
     })
 
     if (!company) {
@@ -55,10 +57,12 @@ export async function GET(
         where: { companyId: company.id, periodType: "QUARTERLY" },
         orderBy: { periodEnd: "desc" },
         take: 4,
+        select: { sharesOutstanding: true, netIncome: true },
       }),
       prisma.fundamental.findFirst({
         where: { companyId: company.id, periodType: "ANNUAL" },
         orderBy: { periodEnd: "desc" },
+        select: { sharesOutstanding: true, netIncome: true },
       }),
     ])
 

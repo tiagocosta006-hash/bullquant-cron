@@ -26,10 +26,12 @@ export async function GET(
         categoria: true,
         tickers: true,
         publishedAt: true,
+        status: true,
       }
     })
 
-    if (!article) {
+    // Rascunhos e arquivadas não geram imagem (a página da notícia também não as mostra).
+    if (!article || article.status !== "PUBLISHED") {
       return new Response("Not found", { status: 404 })
     }
 

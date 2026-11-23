@@ -68,20 +68,19 @@ export default async function NewsPage({
         slug: true,
         titulo: true,
         resumoCurto: true,
-        corpo: true,
-        impacto: true,
+        // Sem corpo, impacto e fontes: os cartões não os mostram e eram a maior parte
+        // dos bytes de cada artigo (egress do Supabase e HTML da página).
         categoria: true,
         tickers: true,
         sentimento: true,
         imageUrl: true,
         publishedAt: true,
-        sources: true,
       },
     }),
     prisma.newsArticle.count({ where }),
   ]);
 
-  const articles = rows.map((a) => serializeArticle(a, locale));
+  const articles = rows.map((a) => serializeArticle({ ...a, corpo: "", impacto: "", sources: null }, locale));
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   // Link do next-intl: o PT fica sem o /pt/ (que respondia 307).

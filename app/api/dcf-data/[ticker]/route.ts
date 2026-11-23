@@ -54,6 +54,7 @@ export async function GET(
 
     const company = await prisma.company.findUnique({
       where: { ticker: upper },
+      select: { id: true, ticker: true, name: true, logoUrl: true, currency: true, sector: true, industry: true },
     })
 
     if (!company) {
@@ -64,6 +65,12 @@ export async function GET(
       where: { companyId: company.id, periodType: "ANNUAL" },
       orderBy: { periodEnd: "desc" },
       take: 10,
+      // Só os campos do autopreencher (egress: as linhas inteiras traziam os JSON).
+      select: {
+        fiscalYear: true, revenue: true, netIncome: true, operatingIncome: true, taxExpense: true,
+        interestExpense: true, operatingCashFlow: true, capex: true, freeCashFlow: true,
+        cash: true, totalDebt: true, sharesOutstanding: true,
+      },
     })
 
     // Base record: o anual mais recente com FCF não-nulo

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { Link } from "@/i18n/routing";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -35,14 +36,15 @@ const ARTICLE_SELECT = {
   status: true,
 } as const;
 
-async function getArticle(slug: string) {
+// React cache(): generateMetadata e a página pedem o mesmo artigo — uma só leitura por pedido.
+const getArticle = cache(async (slug: string) => {
   const article = await prisma.newsArticle.findUnique({
     where: { slug },
     select: ARTICLE_SELECT,
   });
   // Drafts e arquivados não são acessíveis por URL direto.
   return article && article.status === NewsStatus.PUBLISHED ? article : null;
-}
+});
 
 export async function generateMetadata({
   params,

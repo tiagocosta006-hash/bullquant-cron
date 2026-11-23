@@ -7,6 +7,7 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { prisma } from '@/lib/prisma'
+import type { Prisma } from '@prisma/client'
 import { cotacao } from '@/lib/fmp/mercado'
 import { resultadosDe } from '@/lib/fmp/calendario'
 import { analistas as carregarAnalistas } from '@/lib/fmp/estimativas'
@@ -37,6 +38,16 @@ import { ShareStockModal } from '@/components/stock/ShareStockModal'
 import { SimilarCompanies } from '@/components/stock/SimilarCompanies'
 import { StockShareProvider } from '@/components/stock/StockShareContext'
 import { ProGate } from '@/components/ui/ProGate'
+
+// Os campos que o StockSnapshot lê (sumMetric/instant) e os do período, que a
+// página usa para o overlay preliminar e o trimestre dos resultados.
+const CAMPOS_SNAPSHOT = {
+  periodType: true, fiscalYear: true, fiscalQuarter: true, periodEnd: true,
+  revenue: true, grossProfit: true, operatingIncome: true, netIncome: true, ebitda: true,
+  dividendPerShare: true, operatingCashFlow: true, freeCashFlow: true,
+  cash: true, sharesOutstanding: true, totalAssets: true, totalDebt: true, totalEquity: true,
+  grossMargin: true, operatingMargin: true, netMargin: true,
+} satisfies Prisma.FundamentalSelect
 
 // Partilhado entre generateMetadata e a página (React.cache = 1 query por pedido,
 // em vez de 2 findUnique idênticos).
@@ -136,24 +147,29 @@ export default async function StockPage({
       orderBy: { createdAt: 'desc' },
     }) : Promise.resolve([]),
     
-    // 3. Latest Quarterly Fundamentals (TTM)
+    // 3. Latest Quarterly Fundamentals (TTM) — só os campos do Snapshot (egress do
+    // Supabase: as linhas inteiras traziam os três JSON de segmentos, ~4× mais bytes).
     prisma.fundamental.findMany({
       where: { companyId: company.id, periodType: 'QUARTERLY' },
       orderBy: { periodEnd: 'desc' },
       take: 4,
+      select: CAMPOS_SNAPSHOT,
     }),
     
-    // 4. Historical Annual Fundamentals
+    // 4. Historical Annual Fundamentals — moeda/ano para os analistas, receita e
+    // segmentos para o separador Análise.
     prisma.fundamental.findMany({
       where: { companyId: company.id, periodType: 'ANNUAL' },
       orderBy: { fiscalYear: 'desc' },
       take: 10,
+      select: { fiscalYear: true, periodEnd: true, reportedCurrency: true, revenue: true, revenueSegments: true },
     }),
 
     // 5. Fallback Latest Annual (if quarters are missing)
     prisma.fundamental.findFirst({
       where: { companyId: company.id, periodType: 'ANNUAL' },
       orderBy: { periodEnd: 'desc' },
+      select: CAMPOS_SNAPSHOT,
     }),
 
     // 7. Cotação atual — da FMP, não da tabela `prices` (ver lib/fmp/mercado.ts)
@@ -410,7 +426,7 @@ export default async function StockPage({
               <div className={!canViewProTabs ? "pointer-events-none select-none" : ""}>
                 <StockAnalyst
                   ticker={company.ticker}
-                  fundamentals={JSON.parse(JSON.stringify(historicalAnnual))}
+                  fundamentals={canViewProTabs ? JSON.parse(JSON.stringify(historicalAnnual)) : []}
                   isPro={isPro}
                   isLoggedIn={isLoggedIn}
                   currencySymbol={currencySymbol}

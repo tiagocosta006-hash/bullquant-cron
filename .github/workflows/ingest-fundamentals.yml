@@ -12,6 +12,11 @@ on:
         type: boolean
         required: false
         default: false
+      calibrar_validador:
+        description: "Gerar a baseline do gate de identidades a partir da base atual (artefacto para rever e fazer commit)"
+        type: boolean
+        required: false
+        default: false
   schedule:
     - cron: "0 3 * * *" # diário 3h UTC
 
@@ -179,6 +184,23 @@ jobs:
       # sabe o que mudou. Compara com scripts/out/validator_baseline.json e só
       # falha com violações NOVAS, portanto a dívida conhecida não bloqueia.
       - name: Accounting identities gate
+        if: ${{ github.event.inputs.calibrar_validador != 'true' }}
         env:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
         run: python scripts/validate_fundamentals.py
+
+      # Calibração deliberada (ex.: depois de mudar a fonte dos fundamentais): grava as
+      # violações atuais como baseline e entrega-a como artefacto — só entra no gate
+      # depois de revista e commitada em scripts/out/.
+      - name: Calibrar baseline do gate
+        if: ${{ github.event.inputs.calibrar_validador == 'true' }}
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: python scripts/validate_fundamentals.py --baseline
+
+      - name: Entregar baseline calibrada
+        if: ${{ github.event.inputs.calibrar_validador == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: validator-baseline
+          path: scripts/out/validator_baseline.*.json

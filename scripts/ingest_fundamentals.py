@@ -795,6 +795,46 @@ def filtrar_splits_desmentidos(ticker: str | None, dei_ns: dict) -> list:
     return fora
 
 
+_FORMS_EDGAR = ("10-K", "10-Q", "10-K/A", "10-Q/A", "20-F", "20-F/A", "40-F")
+
+
+def filings_recentes_edgar(dias: int = 10, hoje: datetime.date | None = None) -> dict[str, str]:
+    """{cik sem zeros: data mais recente (YYYY-MM-DD)} dos 10-K/10-Q/20-F entregues nos
+    últimos `dias`, lido do índice diário do EDGAR (um ficheiro por dia útil, sem chave).
+
+    É o sinal de "há filing novo" do cron diário: a tabela earnings_events deixou de ser
+    atualizada (workflow desligado) e, sem ela, um 10-Q novo só entrava pela regra dos
+    95 dias. Falhas de rede degradam para {} — o cron segue com as outras regras."""
+    hoje = hoje or datetime.date.today()
+    out: dict[str, str] = {}
+    for k in range(dias + 1):
+        d = hoje - datetime.timedelta(days=k)
+        if d.weekday() >= 5:
+            continue
+        url = (f"https://www.sec.gov/Archives/edgar/daily-index/{d.year}/QTR{(d.month - 1) // 3 + 1}/"
+               f"form.{d.strftime('%Y%m%d')}.idx")
+        try:
+            r = session.get(url, timeout=30)
+        except Exception:
+            continue
+        if r.status_code != 200:
+            continue   # dia sem índice (feriado) ou ainda não publicado
+        for linha in r.text.splitlines():
+            forma = linha[:17].strip()
+            if forma not in _FORMS_EDGAR:
+                continue
+            campos = linha[17:].split()
+            # "<nome da empresa…> <CIK> <AAAAMMDD> <ficheiro>"
+            if len(campos) < 3 or not campos[-3].isdigit() or not campos[-2].isdigit():
+                continue
+            cik, data = str(int(campos[-3])), campos[-2]
+            data = f"{data[:4]}-{data[4:6]}-{data[6:]}"
+            if data > out.get(cik, ""):
+                out[cik] = data
+        time.sleep(0.15)   # ≤10 pedidos/s da SEC
+    return out
+
+
 def get_companies_with_cik(cur, tickers: list[str] | None = None) -> list[dict]:
     if tickers:
         cur.execute(
@@ -815,6 +855,24 @@ def get_companies_with_cik(cur, tickers: list[str] | None = None) -> list[dict]:
             if datas:
                 split_tickers.append(t)
                 split_dates.append(max(datas))
+
+        # Filings novos no EDGAR (últimos 10 dias) ainda não refletidos na base.
+        novos = filings_recentes_edgar()
+        edgar_clause = ""
+        edgar_params: tuple = ()
+        if novos:
+            edgar_clause = """
+                  OR EXISTS (
+                      SELECT 1
+                      FROM unnest(%s::text[], %s::date[]) AS n(cik, filed)
+                      WHERE n.cik = ltrim(c.cik, '0')
+                        AND NOT EXISTS (
+                            SELECT 1 FROM fundamentals f
+                            WHERE f."companyId" = c.id AND f."filedAt"::date >= n.filed
+                        )
+                  )
+            """
+            edgar_params = (list(novos.keys()), list(novos.values()))
 
         split_clause = ""
         params: tuple = ()
@@ -851,6 +909,7 @@ def get_companies_with_cik(cur, tickers: list[str] | None = None) -> list[dict]:
                         )
                   )
                   {split_clause}
+                  {edgar_clause}
                   OR
                   NOT EXISTS (
                       SELECT 1 FROM fundamentals f 
@@ -860,7 +919,7 @@ def get_companies_with_cik(cur, tickers: list[str] | None = None) -> list[dict]:
               )
             ORDER BY c.ticker
             ''',
-            params,
+            params + edgar_params,
         )
     return [{"id": r[0], "ticker": r[1], "cik": r[2], "sector": r[3], "currency": r[4]} for r in cur.fetchall()]
 

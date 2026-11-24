@@ -50,18 +50,17 @@ describe("créditos prometidos vs orçamento real do Gemini", () => {
     }
   });
 
-  it("a FAQ diz o custo real de cada ação", () => {
-    // Como a página já não traduz créditos em análises, é a FAQ que diz quanto
-    // custa cada coisa — e esses números estão lá escritos à mão. Sem isto,
-    // mudar o `AI_ACTION_COSTS` deixava a FAQ a mentir em silêncio.
-    const { brief, analyst_report, analyst_chat } = AI_ACTION_COSTS;
+  it("se a FAQ disser quanto custa cada ação, os números são os do código", () => {
+    // A FAQ chegou a dizer o custo de cada ação (1/3/4) escrito à mão; o FAQ
+    // mais curto da landing (73ec5b8, 27/10) deixou de o dizer, por decisão de
+    // texto. Se voltar a dizer, os números têm de bater com AI_ACTION_COSTS —
+    // sem isto, mudar os custos deixava a FAQ a mentir em silêncio.
+    const custos = new Set<number>(Object.values(AI_ACTION_COSTS));
+    const ditos = (texto: string) =>
+      [...texto.matchAll(/\b(?:custam?|costs?)\s+(\d+)/gi)].map((m) => Number(m[1]));
 
-    expect(pt.marketing.faq.a1).toContain(`custam ${brief} crédito`);
-    expect(pt.marketing.faq.a1).toContain(`Analista custa ${analyst_report}`);
-    expect(pt.marketing.faq.a1).toContain(`chat custa ${analyst_chat}`);
-
-    expect(en.marketing.faq.a1).toContain(`cost ${brief} credit`);
-    expect(en.marketing.faq.a1).toContain(`report costs ${analyst_report}`);
-    expect(en.marketing.faq.a1).toContain(`message costs ${analyst_chat}`);
+    for (const faq of [pt.marketing.faq.a1, en.marketing.faq.a1]) {
+      for (const n of ditos(faq)) expect(custos).toContain(n);
+    }
   });
 });

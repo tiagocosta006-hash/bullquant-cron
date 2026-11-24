@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Link } from '@/i18n/routing';
 
 import {
@@ -33,6 +33,34 @@ import { useIsMac } from "@/hooks/useIsMac";
 import { usePathname } from '@/i18n/routing';
 
 /**
+ * completo: nomes inteiros · curto: "MIC" em vez de "Portefólio MIC" ·
+ * apertado: curto, links mais justos e a pesquisa só com a lupa · icones.
+ */
+type Modo = "completo" | "curto" | "apertado" | "icones";
+/** Do mais rico para o mais compacto: o primeiro que couber ganha. */
+const MODOS: Modo[] = ["completo", "curto", "apertado", "icones"];
+const LINK_BASE =
+  "flex items-center gap-1.5 rounded-full py-1.5 text-sm font-medium transition-colors";
+const linkPad = (modo: Modo | null) => (modo === "apertado" ? "px-2" : "px-2.5");
+const PESQUISA =
+  "flex shrink-0 items-center gap-2 rounded-full border border-border/60 bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground";
+
+function rotulo(label: string, curto: string | undefined, modo: Modo | null) {
+  // Antes de medir (HTML do servidor): o comportamento antigo por breakpoints.
+  if (modo === null) {
+    return curto ? (
+      <>
+        <span className="hidden whitespace-nowrap xl:inline min-[1500px]:hidden">{curto}</span>
+        <span className="hidden whitespace-nowrap min-[1500px]:inline">{label}</span>
+      </>
+    ) : <span className="hidden whitespace-nowrap xl:inline">{label}</span>;
+  }
+  if (modo === "icones") return null;
+  const texto = modo !== "completo" && curto ? curto : label;
+  return <span className="whitespace-nowrap">{texto}</span>;
+}
+
+/**
  * TopNav — a navegação ÚNICA do terminal: uma pill Liquid Glass
  * flutuante (o conteúdo dobra-se nas bordas ao passar por baixo).
  * Substitui sidebar + header: 6 destinos primários, ⌘K universal,
@@ -60,10 +88,10 @@ export function TopNav({
   const [menuOpen, setMenuOpen] = useState(false);
   const isMac = useIsMac();
 
-  const primary = [
+  const primary: { href: string; icon: typeof Briefcase; label: string; short?: string }[] = [
     { href: "/dashboard", icon: LayoutDashboard, label: t("dashboard") },
     { href: "/explore", icon: SearchCode, label: t("explore") },
-    { href: "/mic", icon: Briefcase, label: t("mic") },
+    { href: "/mic", icon: Briefcase, label: t("mic"), short: t("micShort") },
     // /portfolio e /macro fora do menu para já (pedido do Costa). As páginas
     // continuam a responder por URL — é só o menu que não as anuncia.
     { href: "/watchlist", icon: Star, label: t("watchlist") },
@@ -80,6 +108,44 @@ export function TopNav({
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
+  // Modo dos rótulos: o mais rico que cabe no espaço livre (medido, não adivinhado).
+  const navRef = useRef<HTMLElement>(null);
+  const spacerRef = useRef<HTMLDivElement>(null);
+  const [modo, setModo] = useState<Modo | null>(null);
+  const pesquisaRef = useRef<HTMLButtonElement>(null);
+  useLayoutEffect(() => {
+    const nav = navRef.current;
+    const spacer = spacerRef.current;
+    const pesquisa = pesquisaRef.current;
+    const barra = nav?.parentElement;
+    if (!nav || !spacer || !pesquisa || !barra) return;
+    const reguas = barra.querySelectorAll<HTMLElement>("[data-modo]");
+    const cheia = barra.querySelector<HTMLElement>('[data-pesquisa="cheia"]');
+    const lupa = barra.querySelector<HTMLElement>('[data-pesquisa="lupa"]');
+    const escolher = () => {
+      if (getComputedStyle(nav).display === "none") return; // mobile: usa a dock
+      // Espaço livre como se a pesquisa estivesse por extenso (mede-se o botão
+      // real, não o estado: entre um setModo e o commit o DOM ainda é o antigo),
+      // e quanto se ganha com ela só com a lupa.
+      const larguraCheia = cheia?.offsetWidth ?? pesquisa.offsetWidth;
+      const ganho = Math.max(0, larguraCheia - (lupa?.offsetWidth ?? larguraCheia));
+      const livre = nav.clientWidth + spacer.clientWidth + pesquisa.offsetWidth - larguraCheia;
+      let melhor: Modo = "icones";
+      for (const r of reguas) {
+        const m = r.dataset.modo as Modo;
+        if (r.scrollWidth <= livre + (m === "apertado" ? ganho : 0)) { melhor = m; break; }
+      }
+      setModo((atual) => (atual === melhor ? atual : melhor));
+    };
+    escolher();
+    const ro = new ResizeObserver(escolher);
+    ro.observe(barra);
+    ro.observe(spacer); // controlos da direita a mudar (Upgrade, sessão, fontes)
+    for (const r of reguas) ro.observe(r); // fontes a carregar mudam as larguras
+    if (cheia) ro.observe(cheia);
+    return () => ro.disconnect();
+  }, [plan, userEmail]);
+
   return (
     <>
       <div className="fixed inset-x-3 top-3 z-50 flex justify-center">
@@ -88,37 +154,59 @@ export function TopNav({
           <Logo href="/dashboard" size="sm" iconOnly className="mr-1 sm:hidden" />
 
           {/* Destinos primários (desktop).
-              min-w-0 + overflow-hidden: sem isto, nove destinos com rótulo
-              ocupam mais do que os 1280px do max-w-7xl, nada encolhe (os
-              rótulos têm whitespace-nowrap) e o EXCESSO EMPURRA os controlos da
-              direita para fora do ecrã — o menu de conta ficava inalcançável, o
-              que impedia até de ver com que conta se está autenticado. */}
-          <nav className="hidden min-w-0 items-center gap-0.5 overflow-hidden md:flex">
-            {primary.map(({ href, icon: Icon, label }) => (
+              O espaço livre depende da largura, do plano (Upgrade), de haver
+              sessão (Entrar/Criar conta) e do tamanho do texto. Em vez de
+              adivinhar breakpoints — com o Portefólio MIC a lista deixou de
+              caber e o fim (Calculadora DCF, Juros Compostos) ficava cortado —
+              mede-se: nomes completos → "MIC" curto → só ícones, o primeiro
+              que cabe. O overflow-hidden fica só como rede de segurança. */}
+          <nav
+            ref={navRef}
+            className="hidden min-w-0 items-center gap-0.5 overflow-hidden md:flex"
+          >
+            {primary.map(({ href, icon: Icon, label, short }) => (
               <Link
                 key={href}
                 href={href}
                 aria-label={label}
                 title={label}
                 className={cn(
-                  "flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-sm font-medium transition-colors",
+                  LINK_BASE,
+                  linkPad(modo),
                   isActive(href)
                     ? "bg-primary/12 text-primary"
                     : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
                 )}
               >
                 <Icon className="h-4 w-4 shrink-0" strokeWidth={2} />
-                {href === "/mic" ? (
-                  <>
-                    <span className="hidden whitespace-nowrap xl:inline min-[1500px]:hidden">{t("micShort")}</span>
-                    <span className="hidden whitespace-nowrap min-[1500px]:inline">{label}</span>
-                  </>
-                ) : <span className="hidden whitespace-nowrap xl:inline">{label}</span>}
+                {rotulo(label, short, modo)}
               </Link>
             ))}
           </nav>
 
-          <div className="min-w-0 flex-1" />
+          {/* Réguas invisíveis: a largura de cada modo, para escolher o que cabe. */}
+          <div aria-hidden className="pointer-events-none invisible absolute left-0 top-0 -z-10 h-0 overflow-hidden">
+            {MODOS.map((m) => (
+              <div key={m} data-modo={m} className="flex w-max items-center gap-0.5">
+                {primary.map(({ href, icon: Icon, label, short }) => (
+                  <span key={href} className={cn(LINK_BASE, linkPad(m))}>
+                    <Icon className="h-4 w-4 shrink-0" strokeWidth={2} />
+                    {rotulo(label, short, m)}
+                  </span>
+                ))}
+              </div>
+            ))}
+            <span data-pesquisa="cheia" className={cn(PESQUISA, "w-max")}>
+              <Search className="h-4 w-4" />
+              <span>{t("searchAction")}</span>
+              <span className="rounded-md border border-border px-1.5 py-0.5 text-[10px] font-semibold">{isMac ? "⌘K" : "Ctrl K"}</span>
+            </span>
+            <span data-pesquisa="lupa" className={cn(PESQUISA, "w-max")}>
+              <Search className="h-4 w-4" />
+            </span>
+          </div>
+
+          <div ref={spacerRef} className="min-w-0 flex-1" />
 
           {/* Botão de Upgrade para contas FREE */}
           {plan === "FREE" && (
@@ -135,13 +223,15 @@ export function TopNav({
           {/* pesquisa universal ⌘K */}
           <button
             type="button"
+            ref={pesquisaRef}
             onClick={() => setCmdOpen(true)}
             aria-label={t("searchAction")}
-            className="flex shrink-0 items-center gap-2 rounded-full border border-border/60 bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+            title={modo === "apertado" ? t("searchAction") : undefined}
+            className={PESQUISA}
           >
             <Search className="h-4 w-4" />
-            <span className="hidden md:inline">{t("searchAction")}</span>
-            <span className="hidden rounded-md border border-border px-1.5 py-0.5 text-[10px] font-semibold md:inline">
+            <span className={cn("hidden", modo !== "apertado" && "md:inline")}>{t("searchAction")}</span>
+            <span className={cn("hidden rounded-md border border-border px-1.5 py-0.5 text-[10px] font-semibold", modo !== "apertado" && "md:inline")}>
               {isMac ? "⌘K" : "Ctrl K"}
             </span>
           </button>

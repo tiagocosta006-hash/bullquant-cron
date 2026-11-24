@@ -3,10 +3,13 @@ import { prisma } from "@/lib/prisma";
 import { createClient } from "@/lib/supabase/server";
 import { assertCreditsAvailable, chargeCredits } from "@/lib/ai/credits";
 import { generateAndCacheReport } from "@/lib/ai/generateAnalystReport";
+import { exigirPro } from "@/lib/api/acessoPro";
 
 export const maxDuration = 120; // geração pesada (contexto do 10-K)
 
 // GET — serve apenas da cache (barato, não gera nem consome quota).
+// O separador Analista é só PRO (canViewProTabs na página): sem este guarda, o
+// relatório em cache de qualquer empresa saía a quem o pedisse, sem sessão.
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ ticker: string }> },
@@ -14,6 +17,9 @@ export async function GET(
   try {
     const { ticker } = await params;
     if (!ticker) return NextResponse.json({ error: "Ticker is required" }, { status: 400 });
+
+    const acesso = await exigirPro({ ticker });
+    if (!acesso.ok) return acesso.resposta;
 
     const company = await prisma.company.findUnique({
       where: { ticker: ticker.toUpperCase() },
@@ -35,7 +41,7 @@ export async function GET(
       filingLabel: cached.filingLabel,
       generatedAt: cached.generatedAt,
       cached: true,
-    });
+    }, { headers: { "Cache-Control": "private, no-store" } });
   } catch (error) {
     console.error("Analyst report GET error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

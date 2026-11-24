@@ -206,7 +206,9 @@ export function StockHeader({ company, shareComponent, initialPriceData = null }
             {lastUpdate && (
               <div className="flex items-center gap-1 text-xs text-muted-foreground mt-3 font-medium">
                 <Clock className="w-3 h-3" />
-                <span>{t('updatedAt')} {lastUpdate.toLocaleTimeString(locale)}</span>
+                {/* A hora do servidor (UTC) nunca é a do browser: sem isto o React
+                    acusava o erro de hidratação #418 em todas as páginas de ação. */}
+                <span suppressHydrationWarning>{t('updatedAt')} {lastUpdate.toLocaleTimeString(locale)}</span>
               </div>
             )}
           </>

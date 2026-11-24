@@ -33,16 +33,20 @@ jobs:
     steps:
       # O workflow_run dispara todos os dias (segue o cron diário do ingest de
       # fundamentals), mas esta passagem lê ~54 filings por empresa e demora
-      # horas. Os 10-K/10-Q não mudam de um dia para o outro, logo basta ao
-      # sábado. Acionamento manual corre sempre.
-      - name: Gate semanal
+      # horas. Os 10-K/10-Q não mudam de um dia para o outro: basta à quarta e
+      # ao sábado. Duas vezes por semana e não uma porque o GitHub apaga caches
+      # sem uso há 7 dias — de sábado a sábado a cache dos filings podia
+      # desaparecer e a passagem voltava a ler tudo (mais de 6 h, nunca acaba).
+      # Acionamento manual corre sempre.
+      - name: Gate bissemanal
         id: gate
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$(date -u +%u)" = "6" ]; then
+          dia="$(date -u +%u)"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$dia" = "3" ] || [ "$dia" = "6" ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
-            echo "Não é sábado — passagem de segmentos ignorada."
+            echo "Não é quarta nem sábado — passagem de segmentos ignorada."
           fi
 
       - uses: actions/checkout@v4
@@ -77,7 +81,7 @@ jobs:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
           SEC_IDENTITY: ${{ secrets.SEC_IDENTITY }}
         run: |
-          python scripts/ingest_segments_xbrl.py \
+          python scripts/ingest_segments_xbrl.py --max-minutes 300 \
             ${{ inputs.tickers && format('--tickers {0}', inputs.tickers) || '' }}
 
       - name: Guardar cache dos segmentos

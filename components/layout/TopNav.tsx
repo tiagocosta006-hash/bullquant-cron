@@ -112,26 +112,29 @@ export function TopNav({
   const navRef = useRef<HTMLElement>(null);
   const spacerRef = useRef<HTMLDivElement>(null);
   const [modo, setModo] = useState<Modo | null>(null);
-  const modoRef = useRef<Modo | null>(null);
+  const pesquisaRef = useRef<HTMLButtonElement>(null);
   useLayoutEffect(() => {
     const nav = navRef.current;
     const spacer = spacerRef.current;
+    const pesquisa = pesquisaRef.current;
     const barra = nav?.parentElement;
-    if (!nav || !spacer || !barra) return;
+    if (!nav || !spacer || !pesquisa || !barra) return;
     const reguas = barra.querySelectorAll<HTMLElement>("[data-modo]");
     const cheia = barra.querySelector<HTMLElement>('[data-pesquisa="cheia"]');
     const lupa = barra.querySelector<HTMLElement>('[data-pesquisa="lupa"]');
     const escolher = () => {
       if (getComputedStyle(nav).display === "none") return; // mobile: usa a dock
-      // espaço livre com a pesquisa por extenso, e quanto se ganha só com a lupa
-      const ganho = Math.max(0, (cheia?.offsetWidth ?? 0) - (lupa?.offsetWidth ?? 0));
-      const livre = nav.clientWidth + spacer.clientWidth - (modoRef.current === "apertado" ? ganho : 0);
+      // Espaço livre como se a pesquisa estivesse por extenso (mede-se o botão
+      // real, não o estado: entre um setModo e o commit o DOM ainda é o antigo),
+      // e quanto se ganha com ela só com a lupa.
+      const larguraCheia = cheia?.offsetWidth ?? pesquisa.offsetWidth;
+      const ganho = Math.max(0, larguraCheia - (lupa?.offsetWidth ?? larguraCheia));
+      const livre = nav.clientWidth + spacer.clientWidth + pesquisa.offsetWidth - larguraCheia;
       let melhor: Modo = "icones";
       for (const r of reguas) {
         const m = r.dataset.modo as Modo;
         if (r.scrollWidth <= livre + (m === "apertado" ? ganho : 0)) { melhor = m; break; }
       }
-      modoRef.current = melhor;
       setModo((atual) => (atual === melhor ? atual : melhor));
     };
     escolher();
@@ -196,7 +199,7 @@ export function TopNav({
             <span data-pesquisa="cheia" className={cn(PESQUISA, "w-max")}>
               <Search className="h-4 w-4" />
               <span>{t("searchAction")}</span>
-              <span className="rounded-md border border-border px-1.5 py-0.5 text-[10px] font-semibold">⌘K</span>
+              <span className="rounded-md border border-border px-1.5 py-0.5 text-[10px] font-semibold">{isMac ? "⌘K" : "Ctrl K"}</span>
             </span>
             <span data-pesquisa="lupa" className={cn(PESQUISA, "w-max")}>
               <Search className="h-4 w-4" />
@@ -220,6 +223,7 @@ export function TopNav({
           {/* pesquisa universal ⌘K */}
           <button
             type="button"
+            ref={pesquisaRef}
             onClick={() => setCmdOpen(true)}
             aria-label={t("searchAction")}
             title={modo === "apertado" ? t("searchAction") : undefined}

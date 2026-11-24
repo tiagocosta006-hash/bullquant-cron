@@ -1027,7 +1027,13 @@ def main():
     ap.add_argument("--sleep", type=float, default=0.2)
     ap.add_argument("--cache-limit-gb", type=float, default=3.0,
                     help="purga a cache do edgartools acima deste tamanho")
+    # O GitHub mata a tarefa às 6 h e aí os passos seguintes (guardar a cache,
+    # derivar o Q4) não correm. Com um limite próprio o script pára a tempo e
+    # a corrida seguinte continua pela cache, sem repetir o que já leu.
+    ap.add_argument("--max-minutes", type=float, default=0,
+                    help="pára de pegar em empresas novas ao fim de N minutos (0 = sem limite)")
     args = ap.parse_args()
+    inicio = time.monotonic()
 
     conn = psycopg2.connect(DIRECT_URL)
     cur = conn.cursor()
@@ -1051,6 +1057,12 @@ def main():
     seguidas_sem_filings = 0
 
     for i, (company_id, ticker, cik) in enumerate(companies, 1):
+        if args.max_minutes and (time.monotonic() - inicio) / 60 >= args.max_minutes:
+            print(f"\nLimite de {args.max_minutes:g} min atingido: paro em {ticker} "
+                  f"({i - 1}/{total_co} feitas). A próxima corrida continua pela cache.",
+                  flush=True)
+            stats["por_fazer"] = total_co - i + 1
+            break
         try:
             co = edgar.Company(int(cik))
             filings = []

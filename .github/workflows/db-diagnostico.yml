@@ -24,6 +24,10 @@ on:
         description: "Mostrar os segmentos de receita desta empresa (opcional)"
         required: false
         default: ""
+      pagantes:
+        description: "Verificar os pagantes (Whop → plano PRO), sem emails"
+        type: boolean
+        default: false
 
 jobs:
   diag:
@@ -79,3 +83,44 @@ jobs:
         env:
           DB: ${{ secrets.DIRECT_URL }}
         run: psql "$DB" -v ON_ERROR_STOP=1 -f scripts/sql/identidades.sql
+
+      # Só leitura e sem dados pessoais (o repo do espelho é público): cada
+      # conta aparece pelos 6 primeiros caracteres do id. Responde a "quem
+      # pagou ficou PRO?" — a falha que interessa é um pagamento Whop válido
+      # sem conta PRO (pendente por resgatar, ou estado ativo com plano FREE).
+      - name: Pagantes (Whop → PRO)
+        if: ${{ github.event.inputs.pagantes == 'true' }}
+        env:
+          DB: ${{ secrets.DIRECT_URL }}
+          PGOPTIONS: "-c default_transaction_read_only=on"
+        run: |
+          psql "$DB" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+            \echo '== Contas PRO ou com dados Whop (mais recentes primeiro)'
+            select left(u.id, 6) as conta, u.plan, u."whopStatus" as estado_whop,
+                   (u."whopMembershipId" is not null) as membership_whop,
+                   (u."paddleSubscriptionId" is not null) as paddle,
+                   (a.email_confirmed_at is not null) as email_confirmado,
+                   a.last_sign_in_at::timestamp(0) as ultimo_login,
+                   u."createdAt"::timestamp(0) as criada, u."updatedAt"::timestamp(0) as alterada
+              from public.users u left join auth.users a on a.id::text = u.id
+             where u.plan = 'PRO' or u."whopMembershipId" is not null or u."whopStatus" is not null
+             order by u."updatedAt" desc;
+            \echo '== Pagamentos Whop à espera de conta (pendentes)'
+            select left(id, 6) as linha, status, (email is not null) as tem_email,
+                   ("claimedAt" is not null) as resgatado,
+                   "createdAt"::timestamp(0) as recebido, "updatedAt"::timestamp(0) as alterado
+              from whop_pending_memberships
+             order by "updatedAt" desc limit 30;
+            \echo '== Problemas (devia ser tudo 0)'
+            select
+              (select count(*) from whop_pending_memberships
+                where "claimedAt" is null and status in ('active','trialing','completed','past_due'))
+                as pago_sem_conta,
+              (select count(*) from public.users
+                where plan = 'FREE' and "whopStatus" in ('active','trialing','completed','past_due'))
+                as whop_ativo_mas_free,
+              (select count(*) from public.users u join auth.users a on a.id::text = u.id
+                where u.plan = 'PRO' and a.email_confirmed_at is null)
+                as pro_sem_email_confirmado;
+          SQL
+

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { prisma } from "@/lib/prisma";
-import { whopTemSubscricaoValida } from "@/lib/whop";
+import { confirmarEmailDePagante, whopTemSubscricaoValida } from "@/lib/whop";
 
 /**
  * Webhook do Whop — a fonte de verdade do acesso pago.
@@ -348,6 +348,9 @@ export async function POST(request: Request) {
         whopProductId: produto ?? utilizador.whopProductId,
       },
     });
+    // Pagou, entra: sem isto, quem não recebeu o email de confirmação ficava
+    // PRO e sem conseguir fazer login.
+    if (temAcesso) await confirmarEmailDePagante(utilizador.id);
 
     // Já há conta, portanto não há nada à espera de registo. Deixar um pendente
     // para trás faria o PRO voltar sozinho no login seguinte, mesmo depois de

@@ -1,5 +1,6 @@
 import { PLANOS, type PlanoId } from "@/lib/planos"
 import { prisma } from "@/lib/prisma"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 /**
  * Estados do Whop que dão acesso.
@@ -9,6 +10,26 @@ import { prisma } from "@/lib/prisma"
  * que expirou na véspera.
  */
 export const ESTADOS_COM_ACESSO = new Set(["active", "trialing", "completed", "past_due"])
+
+/**
+ * Quem pagou entra: marca o email da conta como confirmado no Supabase Auth.
+ *
+ * Decisão do Costa (2026-11-26): "pagou, tem acesso". Um cliente pagou a
+ * 24/11, o email de confirmação não lhe chegou (ou foi para o spam) e ficou
+ * dois dias sem conseguir entrar, com o PRO ativo. O pagamento na Whop já
+ * prova que o email é dele, portanto o link de confirmação não acrescenta nada.
+ *
+ * Silencioso: uma falha aqui não pode desfazer o PRO nem levar a Whop a repetir
+ * o evento (o plano já ficou escrito). Fica no registo para tratar à mão.
+ */
+export async function confirmarEmailDePagante(userId: string) {
+  try {
+    const { error } = await createAdminClient().auth.admin.updateUserById(userId, { email_confirm: true })
+    if (error) console.error(`[whop] não consegui confirmar o email da conta ${userId}:`, error.message)
+  } catch (erro) {
+    console.error(`[whop] não consegui confirmar o email da conta ${userId}:`, erro)
+  }
+}
 
 /**
  * Resgata um pagamento do Whop feito ANTES de a conta existir.
@@ -72,6 +93,7 @@ export async function resgatarPagamentoWhop(userId: string, email: string) {
       where: { email: normalizado },
       data: { claimedAt: new Date() },
     })
+    await confirmarEmailDePagante(userId)
 
     console.log(`[whop] pagamento resgatado no registo: ${normalizado} → PRO`)
     return true

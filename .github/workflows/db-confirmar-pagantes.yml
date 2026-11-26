@@ -1,0 +1,31 @@
+name: DB — confirmar o email de quem pagou
+
+# "Pagou, tem acesso" (decisão do Costa, 2026-11-26). Desde o #197 o webhook
+# da Whop confirma o email no momento do pagamento; isto apanha quem pagou
+# ANTES disso e ficou PRO sem conseguir entrar por não ter clicado no link.
+#
+# Só toca em contas PRO com subscrição Whop válida e email por confirmar.
+# Não imprime emails (o espelho dos crons é público): só o prefixo do id.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  confirmar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DB: ${{ secrets.DIRECT_URL }}
+    steps:
+      - name: Confirmar emails de pagantes
+        run: |
+          psql "$DB" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+            update auth.users a
+               set email_confirmed_at = now()
+              from public.users u
+             where a.id::text = u.id
+               and a.email_confirmed_at is null
+               and u.plan = 'PRO'
+               and u."whopStatus" in ('active', 'trialing', 'completed', 'past_due')
+            returning left(u.id, 6) as conta_confirmada;
+          SQL

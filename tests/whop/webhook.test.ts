@@ -12,6 +12,13 @@ type Conta = { id: string; email: string; plan: "FREE" | "PRO"; whopUserId: stri
 const contas = new Map<string, Conta>()
 const pendentes: Record<string, unknown>[] = []
 
+const confirmados: string[] = []
+vi.mock("@/lib/supabase/admin", () => ({
+  createAdminClient: () => ({
+    auth: { admin: { updateUserById: vi.fn(async (id: string, attrs: { email_confirm?: boolean }) => { if (attrs.email_confirm === true) confirmados.push(id); return { error: null } }) } },
+  }),
+}))
+
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
@@ -63,6 +70,7 @@ const conta = (c: Partial<Conta> & { id: string }) =>
 beforeEach(() => {
   contas.clear()
   pendentes.length = 0
+  confirmados.length = 0
   subscricoes = {}
   apiEmBaixo = false
   process.env.WHOP_WEBHOOK_SECRET = SEGREDO
@@ -85,6 +93,8 @@ describe("webhook da Whop", () => {
     expect(r.status).toBe(200)
     expect(contas.get("u1")!.plan).toBe("PRO")
     expect(pendentes).toHaveLength(0)
+    // Pagou, entra: o email fica confirmado sem depender do link.
+    expect(confirmados).toEqual(["u1"])
   })
 
   it("cancelar uma subscrição não tira o PRO se outra (a comunidade) continua ativa", async () => {
@@ -102,6 +112,7 @@ describe("webhook da Whop", () => {
     subscricoes.whop_ana = [{ status: "canceled", product_id: "prod_bv", user_id: "whop_ana" }]
     await POST(pedido("membership.activated", { id: "mem_bv", status: "active", product: { id: "prod_bv" }, user: { id: "whop_ana" }, metadata: { bv_user_id: "u1" } }))
     expect(contas.get("u1")!.plan).toBe("FREE")
+    expect(confirmados).toHaveLength(0)
   })
 
   it("sem resposta da API, decide pelo tipo do evento (como antes)", async () => {

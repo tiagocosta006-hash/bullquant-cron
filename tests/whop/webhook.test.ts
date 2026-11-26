@@ -15,7 +15,7 @@ const pendentes: Record<string, unknown>[] = []
 const confirmados: string[] = []
 vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: () => ({
-    auth: { admin: { updateUserById: vi.fn(async (id: string) => { confirmados.push(id); return { error: null } }) } },
+    auth: { admin: { updateUserById: vi.fn(async (id: string, attrs: { email_confirm?: boolean }) => { if (attrs.email_confirm === true) confirmados.push(id); return { error: null } }) } },
   }),
 }))
 

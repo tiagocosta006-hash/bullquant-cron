@@ -790,6 +790,13 @@ def eixos_coerentes(by_axis, receita):
         if recon > 0.25 * receita:
             continue
         out[eixo] = membros
+    # Uma "geografia" com exatamente os mesmos membros de outro eixo é esse
+    # eixo repetido, não uma repartição por regiões: a Arch Capital punha
+    # Mortgage/Insurance/Reinsurance e a Healthpeak Lab/Senior Housing no
+    # gráfico de geografia (o XBRL marca os mesmos membros nos dois eixos).
+    geo = out.get("geography")
+    if geo and any(out.get(e) and set(out[e]) == set(geo) for e in ("segment", "product")):
+        del out["geography"]
     return out
 
 
@@ -805,6 +812,60 @@ def pick_primary(by_axis):
     if seg and not (_looks_geographic(seg.keys()) and prod):
         return seg
     return prod or seg or geo
+
+
+_EIXOS_NEGOCIO = ("segment", "product")
+
+
+def eixo_da_empresa(periodos: dict) -> str | None:
+    """O eixo do gráfico "Receitas por Segmento" — UM por empresa, igual em
+    todos os períodos.
+
+    O pick_primary decidia período a período, e em 154 de 513 empresas o
+    gráfico saltava de eixo ao longo dos anos: Coca-Cola com segmentos até 2021
+    e produtos depois, Home Depot com geografia até 2021 e segmentos depois,
+    Netflix com produto em 2019-21 e geografia desde 2022. Barras de anos
+    diferentes deixavam de ser comparáveis e a legenda misturava regiões com
+    produtos (reportado pelo Costa a 2026-11-27).
+
+    `periodos`: {(periodType, periodEnd): by_axis já filtrado por
+    eixos_coerentes}. Decide-se pelos anuais (pelos trimestrais se não houver):
+      1. Só conta um eixo que exista no último período com segmentos — o
+         gráfico tem de chegar ao presente, não acabar em 2021.
+      2. Entre segmento e produto, a regra do pick_primary nesse último período
+         (segmento, salvo se for geográfico e houver produto)...
+      3. ...exceto se o escolhido cobrir menos de 60% dos períodos que o outro
+         cobre: a Coca-Cola tem produto só desde 2022 e segmentos desde 2016.
+      4. Geografia só quando não há segmento nem produto no último período (a
+         Netflix e a ABNB só reportam regiões): fica geografia em todos os anos,
+         nunca às fatias.
+    """
+    if not periodos:
+        return None
+    def tem_dados(k):
+        return any(periodos[k].get(e) for e in AXES)
+    # Anuais com dados; se nenhum tiver (todos caíram no eixos_coerentes), os
+    # trimestrais — senão a empresa perdia o gráfico com trimestres válidos.
+    base = [k for k in periodos if k[0] == "ANNUAL" and tem_dados(k)] or \
+           [k for k in periodos if tem_dados(k)]
+    base.sort(key=lambda k: str(k[1]))
+    com_dados = base
+    if not com_dados:
+        return None
+    ultimo = periodos[com_dados[-1]]
+    cobertura = {e: sum(1 for k in base if periodos[k].get(e)) for e in AXES}
+
+    candidatos = [e for e in _EIXOS_NEGOCIO if ultimo.get(e)]
+    if not candidatos:
+        return "geography" if ultimo.get("geography") else None
+    if len(candidatos) == 1:
+        return candidatos[0]
+    preferido = pick_primary({e: ultimo[e] for e in _EIXOS_NEGOCIO})
+    eixo = "segment" if preferido is ultimo["segment"] else "product"
+    outro = "product" if eixo == "segment" else "segment"
+    if cobertura[eixo] < 0.6 * cobertura[outro]:
+        return outro
+    return eixo
 
 
 def snapshot_filing(filing) -> dict | None:
@@ -1161,6 +1222,31 @@ def main():
                 continue
 
             written = 0
+            coerentes = {}
+            for (ptype, pend), by_axis in merged.items():
+                # A partição reconcilia dentro do FILING, mas a receita da
+                # nossa BD pode ser outro conceito. Nos bancos é: o XBRL
+                # reparte só as comissões e a BD guarda a receita com margem
+                # financeira incluída — a Citizens Financial ficava com
+                # 227 M de segmentos contra 1.750 M de receita (13%). Um
+                # gráfico assim não é a repartição do banco, é uma fatia
+                # estreita a fingir que é o todo. Verificar contra o valor
+                # REALMENTE gravado, que é o que o utilizador vê ao lado.
+                cur.execute(
+                    'SELECT revenue FROM fundamentals WHERE "companyId" = %s '
+                    'AND "periodType" = %s::"period_type" AND "periodEnd"::date = %s::date',
+                    (company_id, ptype, pend),
+                )
+                _row = cur.fetchone()
+                _rev = float(_row[0]) if _row and _row[0] else None
+                coerentes[(ptype, pend)] = eixos_coerentes(by_axis, _rev)
+
+            # Um eixo para a empresa toda (ver eixo_da_empresa): decidido
+            # depois de filtrar TODOS os períodos, senão a escolha via
+            # eixos que nunca chegam a ser gravados.
+            eixo = eixo_da_empresa(coerentes)
+            if args.dry_run or eixo != "segment":
+                print(f"    {ticker}: eixo do gráfico de segmentos = {eixo}", flush=True)
             if not args.dry_run:
                 if args.wipe_first:
                     cur.execute(
@@ -1168,25 +1254,8 @@ def main():
                         '"revenueSegmentsByAxis" = NULL WHERE "companyId" = %s',
                         (company_id,),
                     )
-                for (ptype, pend), by_axis in merged.items():
-                    # A partição reconcilia dentro do FILING, mas a receita da
-                    # nossa BD pode ser outro conceito. Nos bancos é: o XBRL
-                    # reparte só as comissões e a BD guarda a receita com margem
-                    # financeira incluída — a Citizens Financial ficava com
-                    # 227 M de segmentos contra 1.750 M de receita (13%). Um
-                    # gráfico assim não é a repartição do banco, é uma fatia
-                    # estreita a fingir que é o todo. Verificar contra o valor
-                    # REALMENTE gravado, que é o que o utilizador vê ao lado.
-                    cur.execute(
-                        'SELECT revenue FROM fundamentals WHERE "companyId" = %s '
-                        'AND "periodType" = %s::"period_type" AND "periodEnd"::date = %s::date',
-                        (company_id, ptype, pend),
-                    )
-                    _row = cur.fetchone()
-                    _rev = float(_row[0]) if _row and _row[0] else None
-                    by_axis = eixos_coerentes(by_axis, _rev)
-                    primary = pick_primary(by_axis)
-                    if not primary:
+                for (ptype, pend), by_axis in coerentes.items():
+                    if not by_axis:
                         stats["cobertura_insuficiente"] += 1
                         cur.execute(
                             'UPDATE fundamentals SET "revenueSegments" = NULL, "revenueSegmentsByAxis" = NULL '
@@ -1195,12 +1264,18 @@ def main():
                             (company_id, ptype, pend),
                         )
                         continue
+                    # Período sem o eixo da empresa: fica sem barra no gráfico
+                    # de segmentos (um buraco é verdade; outro eixo era mentira),
+                    # mas os eixos que tem continuam gravados — a geografia
+                    # desse ano ainda serve o gráfico circular.
+                    primary = by_axis.get(eixo) if eixo else None
                     cur.execute(
                         'UPDATE fundamentals SET "revenueSegments" = %s, '
                         '"revenueSegmentsByAxis" = %s '
                         'WHERE "companyId" = %s AND "periodType" = %s::"period_type" '
                         'AND "periodEnd"::date = %s::date',
-                        (json.dumps(primary), json.dumps(by_axis), company_id, ptype, pend),
+                        (json.dumps(primary) if primary else None, json.dumps(by_axis),
+                         company_id, ptype, pend),
                     )
                     written += cur.rowcount
                 conn.commit()

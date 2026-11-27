@@ -104,6 +104,34 @@ check("RSG: segmentos antes de eliminações (+15%) rejeitados; produto que fech
 trgp = {"segment": {"Other": 0.0, "Reconciling items": 22.0, "Corporate and Eliminations": -4.9}}
 check("TRGP: partição feita de linhas de reconciliação rejeitada", eixos_coerentes(trgp, 17.0) == {})
 check("sem receita gravada → eixos passam", eixos_coerentes(rsg, None) == rsg)
+acgl = {"product": {"Mortgage": 1.2, "Insurance": 5.4, "Reinsurance": 5.8},
+        "geography": {"Mortgage": 1.2, "Insurance": 5.4, "Reinsurance": 5.8}}
+check("ACGL: geografia igual ao produto é o mesmo eixo repetido → sai",
+      eixos_coerentes(acgl, 12.4) == {"product": acgl["product"]})
+
+# ── Segmentos: um eixo por empresa, igual em todos os anos ──
+from ingest_segments_xbrl import eixo_da_empresa  # noqa: E402
+def anos(**por_ano):
+    return {("ANNUAL", f"{a}-12-31"): v for a, v in por_ano.items()}
+regioes = {"EMEA": 11.5, "Asia Pacific": 5.6, "Latin America": 6.3, "North America": 19.6, "Bottling": 5.7}
+ko = anos(**{str(a): {"segment": regioes} for a in range(2016, 2022)},
+          **{str(a): {"segment": regioes, "product": {"Concentrate": 28.5, "Finished": 19.5}} for a in range(2022, 2026)})
+check("KO: produto só desde 2022 (40% dos anos) → segmentos em todos os anos", eixo_da_empresa(ko) == "segment")
+aapl = anos(**{str(a): {"segment": {"Americas": 1, "Europe": 1, "Greater China": 1, "Japan": 1},
+                        "product": {"iPhone": 2, "Mac": 1}} for a in range(2016, 2026)})
+check("AAPL: segmentos geográficos e produto em todos os anos → produto", eixo_da_empresa(aapl) == "product")
+hd = anos(**{str(a): {"geography": {"US": 9, "Intl": 1}} for a in range(2016, 2022)},
+          **{str(a): {"geography": {"US": 9, "Intl": 1}, "segment": {"Primary": 9, "SRS": 1}} for a in range(2022, 2026)})
+check("HD: geografia nos anos antigos, segmentos depois → segmentos (não alterna)", eixo_da_empresa(hd) == "segment")
+nflx = anos(**{str(a): {"product": {"Streaming": 9, "DVD": 1}} for a in range(2019, 2022)},
+            **{str(a): {"geography": {"UCAN": 4, "EMEA": 3, "LATAM": 1, "APAC": 1}} for a in range(2022, 2026)})
+check("NFLX: só regiões nos anos recentes → geografia (o gráfico chega ao presente)", eixo_da_empresa(nflx) == "geography")
+check("sem períodos → None", eixo_da_empresa({}) is None)
+tri = {("QUARTERLY", "2025-03-31"): {"product": {"A": 1, "B": 1}}}
+check("só trimestrais → decide pelos trimestrais", eixo_da_empresa(tri) == "product")
+tri_vazio = {**tri, ("ANNUAL", "2024-12-31"): {}}
+check("anuais sem eixos que passem + trimestrais válidos → decide pelos trimestrais",
+      eixo_da_empresa(tri_vazio) == "product")
 
 # ── Receita: a linha impressa na demonstração de resultados ──
 import receita_impressa as RI  # noqa: E402

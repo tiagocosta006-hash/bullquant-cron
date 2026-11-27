@@ -99,10 +99,21 @@ def main():
 
     stats = defaultdict(int)
     updates = []
+    limpar = []  # Q4 derivados antes; saem desta lista se voltarem a derivar
     for (tic, fy), g in grupos.items():
         q4 = g.get(4)
-        if not q4 or q4["segs"]:
-            continue  # sem linha Q4, ou já tem segmentos
+        # Um Q4 que já foi DERIVADO volta a sê-lo: o ano ou os trimestres podem
+        # ter mudado (reexpressão, ou o eixo da empresa — ver eixo_da_empresa).
+        # Só um Q4 com segmentos REPORTADOS fica como está.
+        if not q4:
+            continue
+        derivado = isinstance(q4.get("byaxis"), dict) and bool(q4["byaxis"].get("__derived"))
+        if q4["segs"] and not derivado:
+            continue  # já tem segmentos reportados
+        # Um Q4 derivado antes que agora não se consegue derivar sai: deixá-lo
+        # era manter um valor calculado com regras antigas (outro eixo).
+        if derivado:
+            limpar.append(q4["id"])
         if not all(k in g for k in ("A", 1, 2, 3)):
             stats["periodos_em_falta"] += 1
             continue
@@ -123,7 +134,19 @@ def main():
             stats["nao_derivavel"] += 1
             continue
 
-        principal = eixos.get("segment") or eixos.get("product") or eixos.get("geography")
+        # O eixo principal do Q4 é o MESMO que o do ano (e o dos outros
+        # trimestres): o motor escolhe um por empresa (eixo_da_empresa). Antes
+        # era sempre segmento primeiro, e a Apple ficava com Q1-Q3 por produto
+        # e o Q4 por região no mesmo gráfico.
+        segs_ano = g["A"].get("segs")
+        eixo_ano = next((e for e, v in (g["A"].get("byaxis") or {}).items()
+                         if isinstance(v, dict) and v == segs_ano), None)
+        if segs_ano and eixo_ano is None and "segment" in eixos and len(eixos) == 1:
+            eixo_ano = "segment"  # linhas antigas sem byAxis: a coluna principal
+        if eixo_ano not in eixos:
+            stats["sem_eixo_do_ano"] += 1
+            continue
+        principal = eixos[eixo_ano]
 
         # Verificação final contra a receita do Q4, quando existe.
         rev_q4 = q4["revenue"]
@@ -136,12 +159,21 @@ def main():
         payload = dict(eixos)
         payload["__derived"] = True  # proveniência: calculado, não reportado
         updates.append((json.dumps(principal), json.dumps(payload), q4["id"]))
+        if derivado:
+            limpar.remove(q4["id"])
         stats["derivados"] += 1
 
     print(f"Q4 derivados: {stats['derivados']} | não derivável: {stats['nao_derivavel']} "
           f"| não reconcilia: {stats['nao_reconcilia']} | períodos em falta: "
-          f"{stats['periodos_em_falta']}")
+          f"{stats['periodos_em_falta']} | sem o eixo do ano: {stats['sem_eixo_do_ano']}")
 
+    if limpar:
+        print(f"Q4 derivados antes que já não derivam (limpos): {len(limpar)}")
+    if limpar and not args.dry_run:
+        cur.executemany(
+            'UPDATE fundamentals SET "revenueSegments" = NULL, "revenueSegmentsByAxis" = NULL '
+            'WHERE id = %s', [(i,) for i in limpar])
+        conn.commit()
     if updates and not args.dry_run:
         cur.executemany(
             'UPDATE fundamentals SET "revenueSegments" = %s, "revenueSegmentsByAxis" = %s '

@@ -842,9 +842,14 @@ def eixo_da_empresa(periodos: dict) -> str | None:
     """
     if not periodos:
         return None
-    base = [k for k in periodos if k[0] == "ANNUAL"] or list(periodos)
+    def tem_dados(k):
+        return any(periodos[k].get(e) for e in AXES)
+    # Anuais com dados; se nenhum tiver (todos caíram no eixos_coerentes), os
+    # trimestrais — senão a empresa perdia o gráfico com trimestres válidos.
+    base = [k for k in periodos if k[0] == "ANNUAL" and tem_dados(k)] or \
+           [k for k in periodos if tem_dados(k)]
     base.sort(key=lambda k: str(k[1]))
-    com_dados = [k for k in base if any(periodos[k].get(e) for e in AXES)]
+    com_dados = base
     if not com_dados:
         return None
     ultimo = periodos[com_dados[-1]]

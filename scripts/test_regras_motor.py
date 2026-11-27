@@ -129,6 +129,9 @@ check("NFLX: só regiões nos anos recentes → geografia (o gráfico chega ao p
 check("sem períodos → None", eixo_da_empresa({}) is None)
 tri = {("QUARTERLY", "2025-03-31"): {"product": {"A": 1, "B": 1}}}
 check("só trimestrais → decide pelos trimestrais", eixo_da_empresa(tri) == "product")
+tri_vazio = dict(tri, **{("ANNUAL", "2024-12-31"): {}})
+check("anuais sem eixos que passem + trimestrais válidos → decide pelos trimestrais",
+      eixo_da_empresa(tri_vazio) == "product")
 
 # ── Receita: a linha impressa na demonstração de resultados ──
 import receita_impressa as RI  # noqa: E402

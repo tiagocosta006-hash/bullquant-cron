@@ -66,7 +66,7 @@ IDENTITY = os.getenv("SEC_IDENTITY") or os.getenv("SEC_USER_AGENT") or "BullValu
 # A cache guarda os FACTOS de cada filing (snapshot_filing), não o resultado:
 # mudar a lógica das partições não obriga a descarregar nada outra vez. Só
 # mudar o que snapshot_filing guarda exige subir EXTRATOR_VERSAO.
-EXTRATOR_VERSAO = 2
+EXTRATOR_VERSAO = 3  # 3: snapshot guarda a hierarquia dos membros ("filhos")
 CACHE_SEG = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".cache", "segmentos")
 
 
@@ -206,7 +206,7 @@ _NON_REVENUE_TOKENS = ("gross", "intersegment", "toothersegments")
 # membro para a receita e para o respetivo custo, e o terseLabel do linkbase vem
 # na versão de custo ("Cost of subscription and maintenance revenue") — o VALOR
 # está certo, o rótulo é que engana.
-_COST_LABEL_TOKENS = ("cost of", "cost and expense", "expense")
+_COST_LABEL_TOKENS = ("cost of", "cost and expense", "expense", "liabilit")
 
 # Tokens que denunciam um eixo geográfico disfarçado de segmento operacional.
 # A Apple reporta os segmentos ASC 280 por região, pelo que o eixo "segment"
@@ -230,6 +230,8 @@ RECONCILE_TOL_FATIA = 0.005
 # sales" (MDT), "Segments Excluding All Other Segments" (CAT), "Total ...".
 _AGREGADO = _re.compile(r"\bexcluding\b|\breportable segments?\b.*\b(sales|revenues?)\b|^\s*total\b|"
                         r"\ball segments\b|\bsegments? total\b", _re.I)
+
+TOL_HIERARQUIA = 0.001
 
 _TERSE = "http://www.xbrl.org/2003/role/terseLabel"
 _PLAIN = "http://www.xbrl.org/2003/role/label"
@@ -358,7 +360,53 @@ def _looks_geographic(labels) -> bool:
     return hits >= max(2, (len(labels) + 1) // 2)
 
 
-def _candidate_partitions(vals, allowed, total):
+def _cortes_da_hierarquia(vals, filhos, total):
+    """Partições tiradas da hierarquia declarada pela empresa (ver
+    _hierarquia_membros): as FOLHAS (membros sem filhos presentes). Só as
+    folhas: o corte de cima mudava o sentido da série (Autodesk 2018 passava de
+    famílias de produto a subscrição/manutenção). Os membros soltos — fora de qualquer árvore, como
+    "Gross sales" ou "Net product sales" na BMS — só entram se, juntando até dois
+    deles, a conta fechar com o total.
+
+    BMS 2025: folhas = 19 medicamentos (48,20 mM, receita 48,19) — antes, com os
+    subtotais misturados, a soma dava 234 mM e o ano ficava sem repartição."""
+    if not filhos or total <= 0:
+        return []
+    por_mid = {v[1]: k for k, v in vals.items()}
+    presentes = set(por_mid)
+    pais = {}
+    for p, fs in filhos.items():
+        if p in presentes:
+            for f in fs:
+                if f in presentes:
+                    pais.setdefault(f, set()).add(p)
+    com_filhos = {p for p, fs in filhos.items() if p in presentes and any(f in presentes for f in fs)}
+    na_arvore = com_filhos | set(pais)
+    if not com_filhos:
+        return []
+    soltos = [m for m in presentes if m not in na_arvore]
+    folhas = [m for m in na_arvore if m not in com_filhos]
+    from itertools import combinations
+    out = []
+    for base in (folhas,):
+        for n in range(0, min(2, len(soltos)) + 1):
+            for extra in combinations(soltos, n):
+                ms = list(base) + list(extra)
+                if len(ms) < 2:
+                    continue
+                cand = {por_mid[m]: vals[por_mid[m]][0] for m in ms}
+                # Quase ao cêntimo: com ±0,5% a WEC perdia as eliminações
+                # (-0,43 mM) e o "Non-Utility" (+0,47) — que se anulam.
+                if abs(sum(cand.values()) - total) / total <= TOL_HIERARQUIA:
+                    out.append(cand)
+                    break
+            else:
+                continue
+            break
+    return out
+
+
+def _candidate_partitions(vals, allowed, total, filhos=None, hier_primeiro=True):
     """Gera partições candidatas por ordem de preferência.
 
     `vals` é {label: (valor, member_id)}. O domínio do XBRL costuma listar as
@@ -366,10 +414,13 @@ def _candidate_partitions(vals, allowed, total):
     omite o Corporate, pelo que a partição do domínio fica a faltar uma fatia.
     Por isso o domínio é PREFERÊNCIA: se não reconciliar, tenta-se o conjunto
     completo e o conjunto sem membros-total/rollup.
+
+    Primeiro de tudo, os cortes da hierarquia declarada (folhas, depois topo),
+    quando fecham com o total.
     """
     plain = {k: v[0] for k, v in vals.items()}
 
-    cands = []
+    cands = list(_cortes_da_hierarquia(vals, filhos, total))
     # Primeiro, sem os membros que são agregados: pelo rótulo, ou porque o valor
     # é a soma de dois ou mais irmãos (subtotal de um grupo de segmentos).
     agregados = {k for k in plain if _AGREGADO.search(k)}
@@ -495,7 +546,62 @@ def _axis_row_variants(grp, axis_col, dim_cols):
                 if rest:
                     sub = sub[sub[rest].isna().all(axis=1)]
                 if len(sub):
-                    yield sub, True
+                    # Fatia de CLIENTES EXTERNOS (srt:MajorCustomersAxis): é, por
+                    # definição, a repartição da receita consolidada — tolerância
+                    # normal. A UnitedHealth fecha a 0,9% (o resto é rendimento de
+                    # investimentos, fora dos segmentos) e com ±0,5% ficava sem
+                    # repartição nenhuma nos 10 anos.
+                    yield sub, ("externa" if "external" in str(v).lower() else True)
+        # 3) UNIÃO das fatias de um qualificador que ARRUMA o eixo: cada membro
+        #    aparece debaixo de um só valor dele. A Pfizer etiqueta cada
+        #    medicamento com o produto E a unidade (Eliquis ⊂ Primary Care,
+        #    Ibrance ⊂ Oncology): nenhuma fatia sozinha fecha, mas juntas são a
+        #    repartição por produto. Os membros sem qualificador (PfizerCentreOne)
+        #    entram também. Se um membro aparecer em dois valores (o mesmo
+        #    produto partido EUA/resto do mundo), o conceito não serve — somar
+        #    ou escolher um dos dois seria inventar.
+        for sub in _unioes_por_qualificador(base, axis_col, others, strict):
+            yield sub, "uniao"
+
+
+def _unioes_por_qualificador(base, axis_col, others, strict):
+    import pandas as pd
+    preenchidos = base[others].notna()
+    assinaturas = preenchidos.apply(lambda r: tuple(r.values), axis=1)
+    sigs = [s for s in sorted(set(assinaturas)) if any(s)]
+    # Cada combinação de qualificadores à parte e, no fim, TODAS juntas: a
+    # Pfizer 2021 etiqueta os medicamentos da Biopharma com unidade+segmento e
+    # os da Business Innovation só com o segmento — cada grupo sozinho fica curto.
+    grupos = [(base[assinaturas == s], [c for c, on in zip(others, s) if on]) for s in sigs]
+    if len(sigs) > 1:
+        grupos.append((base[assinaturas.map(any)], [c for c in others if any(s[others.index(c)] for s in sigs)]))
+    for sub, cols in grupos:
+        # Duas versões: só a união, e a união + membros sem qualificador. Os
+        # soltos tanto podem ser fatias que faltam (Pfizer 2025: CentreOne) como
+        # agrupamentos transversais (Pfizer 2020: "Total Alliance", "Total
+        # Biosimilars" — produtos que já estão nas unidades).
+        so_uniao, com_soltos = [], []
+        for concept, g in sub.groupby("concept"):
+            # Membro que só aparece numa fatia MAIS fina, e numa só (a AbbVie
+            # etiqueta o Creon só com "EUA" — não o vende fora): esse valor é o
+            # total dele. Sem isto a repartição ficava 2,5% curta.
+            if cols:
+                b = base[(base["concept"] == concept) & ~base[axis_col].isin(g[axis_col])]
+                b = b[b[cols].notna().all(axis=1)]
+                if len(b):
+                    n = b.groupby(axis_col)[axis_col].transform("size")
+                    g = pd.concat([g, b[n == 1]])
+            unicos = g.drop_duplicates([axis_col] + cols)
+            if len(unicos) and unicos.groupby(axis_col).size().max() == 1 and g[cols].drop_duplicates().shape[0] >= 2:
+                so_uniao.append(g)
+                com_soltos.append(g)
+                soltos = strict[(strict["concept"] == concept) & ~strict[axis_col].isin(g[axis_col])]
+                if len(soltos):
+                    com_soltos.append(soltos)
+        if so_uniao:
+            yield pd.concat(so_uniao)
+            if len(com_soltos) > len(so_uniao):
+                yield pd.concat(com_soltos)
 
 
 def _itens_reconciliacao(grp, axis_col, dim_cols):
@@ -544,7 +650,7 @@ def _fatia_juntada(grp, axis_col, dim_cols):
     return base[base[outros].isna().all(axis=1)] if outros else base
 
 
-def _partition_for_axis(rotulos, grp, axis_col, dim_cols, domain_members, total):
+def _partition_for_axis(rotulos, grp, axis_col, dim_cols, domain_members, total, filhos=None, hier_primeiro=True):
     """Melhor partição que reconcilia neste eixo, ou None.
 
     Duas passagens por TODAS as fatias: primeiro só repartições exatas (±0,5%),
@@ -552,18 +658,38 @@ def _partition_for_axis(rotulos, grp, axis_col, dim_cols, domain_members, total)
     exata noutra."""
     if axis_col not in grp.columns:
         return None
+    if filhos and not hier_primeiro:
+        # Hierarquia só como RECURSO: primeiro tudo como antes, sem ela.
+        return (_partition_for_axis(rotulos, grp, axis_col, dim_cols, domain_members, total, None)
+                or _partition_for_axis(rotulos, grp, axis_col, dim_cols, domain_members, total, filhos))
     recon = _itens_reconciliacao(grp, axis_col, dim_cols)
     allowed = domain_members.get(axis_col)
     variantes = list(_axis_row_variants(grp, axis_col, dim_cols)) + [(_fatia_juntada(grp, axis_col, dim_cols), False)]
     variantes = [(sub[sub["concept"].map(_is_revenue_concept)], f) for sub, f in variantes]
     variantes = [(sub, f) for sub, f in variantes if len(sub)]
-    for so_exata in (True, False):
-        for sub, fatia in variantes:
-            got = _best_partition(rotulos, sub, axis_col, allowed, total,
-                                  RECONCILE_TOL_FATIA if fatia else RECONCILE_TOL,
-                                  None if fatia else recon, so_exata)
-            if got:
-                return got
+    # As UNIÕES de fatias (28/11) só entram quando as fatias simples não dão
+    # nada, nem aproximado: numa empresa que já tinha repartição, uma união
+    # exata ganhava à aproximada de sempre e mudava o SENTIDO da série (Autodesk
+    # 2018: famílias de produto → subscrição/manutenção).
+    simples = [(sub, f) for sub, f in variantes if f not in ("uniao", "externa")]
+    unioes = [(sub, f) for sub, f in variantes if f == "uniao"]
+    # A fatia de clientes externos vem PRIMEIRO e aceita ±2% logo à cabeça:
+    # sem isto, na UnitedHealth, dois segmentos COM vendas internas
+    # (UnitedHealthcare 344,9 + Optum Health 102,0) fechavam por coincidência
+    # com a receita (447,6) e ganhavam à repartição verdadeira.
+    for sub, fatia in [(sub, f) for sub, f in variantes if f == "externa"]:
+        got = _best_partition(rotulos, sub, axis_col, allowed, total, RECONCILE_TOL, None, False,
+                              filhos, hier_primeiro)
+        if got:
+            return got
+    for grupo in (simples, unioes):
+        for so_exata in (True, False):
+            for sub, fatia in grupo:
+                got = _best_partition(rotulos, sub, axis_col, allowed, total,
+                                      RECONCILE_TOL if fatia in (False, "externa") else RECONCILE_TOL_FATIA,
+                                      None if fatia else recon, so_exata, filhos, hier_primeiro)
+                if got:
+                    return got
     return None
 
 
@@ -585,7 +711,8 @@ def _nome_reconciliacao(rotulos, mid):
     return _member_label(rotulos, mid)
 
 
-def _best_partition(rotulos, sub, axis_col, allowed, total, tol=RECONCILE_TOL, recon=None, so_exata=False):
+def _best_partition(rotulos, sub, axis_col, allowed, total, tol=RECONCILE_TOL, recon=None, so_exata=False,
+                    filhos=None, hier_primeiro=True):
     """Duas passagens por TODOS os conceitos de receita: primeiro só aceita uma
     repartição que fecha exata (±0,5%) — sozinha, com itens de reconciliação
     publicados, ou como o maior subconjunto que fecha —, depois aceita a melhor
@@ -608,6 +735,10 @@ def _best_partition(rotulos, sub, axis_col, allowed, total, tol=RECONCILE_TOL, r
         # taggado duas vezes — MDT 2025: AllOtherSegments e OtherSegment, ambos
         # 495 M. Sem isto, tirar um ou outro fechava a conta e a ambiguidade
         # fazia rejeitar a repartição inteira.
+        # ...mas só quando a repartição COMPLETA não fecha já: a Pfizer 2024 tem
+        # dois medicamentos diferentes com 509 M cada, e apagar um deixava a
+        # soma 1,6% curta e o ano sem repartição por produto.
+        cands_completos = _candidate_partitions(vals, allowed, total, filhos, hier_primeiro)
         vistos = {}
         for k in sorted(vals):
             v0 = vals[k][0]
@@ -615,7 +746,9 @@ def _best_partition(rotulos, sub, axis_col, allowed, total, tol=RECONCILE_TOL, r
                 del vals[k]
             else:
                 vistos[v0] = k
-        cands = _candidate_partitions(vals, allowed, total)
+        cands = _candidate_partitions(vals, allowed, total, filhos, hier_primeiro)
+        if any(abs(sum(c.values()) - total) / total <= min(tol, RECONCILE_TOL_FATIA) for c in cands_completos):
+            cands = cands_completos + cands
         for cand in cands:
             if abs(sum(cand.values()) - total) / total <= min(tol, RECONCILE_TOL_FATIA):
                 return cand
@@ -633,6 +766,12 @@ def _best_partition(rotulos, sub, axis_col, allowed, total, tol=RECONCILE_TOL, r
                         if any(x in cand for x in comb):
                             continue
                         soma = sum(cand.values()) + sum(itens[x] for x in comb)
+                        # Itens que pesam mais de 25% não são "reconciliação", são
+                        # as vendas entre segmentos a ser anuladas (UNH: −168 mM) —
+                        # eixos_coerentes deitava a partição fora depois, e o eixo
+                        # ficava vazio em vez de procurar a fatia externa.
+                        if sum(abs(itens[x]) for x in comb) > 0.25 * total:
+                            continue
                         if abs(soma - total) / total <= RECONCILE_TOL_FATIA:
                             return {**cand, **{x: itens[x] for x in comb}}
         # Duas repartições sobrepostas no mesmo eixo: a maior que fecha.
@@ -910,7 +1049,31 @@ def snapshot_filing(filing) -> dict | None:
         if dom is not None:
             dominios[f"dim_{axis_id}"] = sorted({_norm(m) for m in (dom.members or [])})
     return {"linhas": linhas, "rotulos": _rotulos_do_xbrl(xbrl, membros), "dominios": dominios,
-            "calc": calc, "moedas": {str(k): int(v) for k, v in moedas.items()} if moedas is not None else {}}
+            "calc": calc, "moedas": {str(k): int(v) for k, v in moedas.items()} if moedas is not None else {},
+            "filhos": _hierarquia_membros(xbrl, membros)}
+
+
+def _hierarquia_membros(xbrl, membros) -> dict:
+    """{membro: [membros-filho]} lido da apresentação do filing, só entre membros
+    que aparecem nos factos de receita.
+
+    Sem isto não há como separar as FOLHAS dos subtotais quando a empresa os põe
+    todos no mesmo eixo: a BMS etiqueta cada medicamento E "Growth brands",
+    "Legacy brands", "Net product sales" e "Gross sales" — tudo junto soma 234
+    mil M contra 48 mil M de receita, e a repartição era rejeitada inteira. A
+    Intel faz o mesmo com "Intel Products" ⊃ CCG + DCAI.
+    """
+    out = {}
+    for tree in (getattr(xbrl, "presentation_trees", None) or {}).values():
+        for nid, node in (getattr(tree, "all_nodes", None) or {}).items():
+            pai = _norm(nid)
+            if pai not in membros:
+                continue
+            filhos = [_norm(c) for c in (node.children or []) if _norm(c) in membros and _norm(c) != pai]
+            if filhos:
+                out.setdefault(pai, [])
+                out[pai] += [f for f in filhos if f not in out[pai]]
+    return out
 
 
 def extract_segments_from_filing(filing):
@@ -919,7 +1082,55 @@ def extract_segments_from_filing(filing):
     return segments_from_snapshot(snap) if snap else ({}, None)
 
 
-def segments_from_snapshot(snap: dict, receitas: dict | None = None):
+def rotulos_mais_recentes(snaps) -> dict:
+    """{membro: rótulos} com o nome que a empresa MAIS USA para ele (empate: o
+    mais recente).
+
+    O membro XBRL é estável, o texto não: a Pfizer chama ao mesmo
+    pfe:ComirnatyMember "Comirnaty Direct Sales and Alliance Revenues" no 10-K
+    de 2022 e "Comirnaty" depois. Rotular cada ano com o nome do seu filing
+    partia a série no gráfico em duas. O mais usado e não o mais recente: a
+    Delta passou o rótulo do mesmo membro a "Air traffic liability" (de uma
+    tabela de balanço) nos dois últimos 10-K, depois de sete anos de "Air
+    traffic". `snaps` vem do mais antigo para o mais recente."""
+    from collections import Counter
+    vistos: dict = {}
+    for i, s in enumerate(snaps):
+        for mid, lab in ((s or {}).get("rotulos") or {}).items():
+            if lab and (lab.get("terse") or lab.get("plain")):
+                vistos.setdefault(mid, []).append((i, lab))
+    out = {}
+    for mid, lista in vistos.items():
+        conta = Counter(_member_label({mid: lab}, mid) for _, lab in lista)
+        out[mid] = max(lista, key=lambda x: (conta[_member_label({mid: x[1]}, mid)], x[0]))[1]
+    return out
+
+
+def _rotulos_sem_colisao(proprios: dict, globais: dict | None) -> dict:
+    """Os rótulos do filing, trocados pelo nome mais recente só nos membros da
+    PRÓPRIA empresa e só quando isso não junta dois membros num nome. Os
+    membros-padrão (country:US, us-gaap:...) partilham o rótulo por todas as
+    tabelas do filing — a Prudential passava "International" a "United Kingdom
+    insurance pooled funds". E a Southwest chama hoje "Other" ao que já foi
+    "Freight": dois membros com o mesmo nome no mesmo ano perdiam um."""
+    if not globais:
+        return proprios
+    out = dict(proprios)
+    for mid, lab in globais.items():
+        if mid in proprios and not mid.startswith(_NS_PADRAO):
+            out[mid] = lab
+    nomes = {}
+    for mid in proprios:
+        nomes.setdefault(_member_label(out, mid), []).append(mid)
+    for mids in nomes.values():
+        if len(mids) > 1 and len({_member_label(proprios, m) for m in mids}) > 1:
+            for m in mids:
+                out[m] = proprios[m]
+    return out
+
+
+def segments_from_snapshot(snap: dict, receitas: dict | None = None, rotulos_globais: dict | None = None,
+                           hier_primeiro: bool = True):
     """Devolve ({(period_type, period_end): {axis_name: {segmento: valor}}}, moeda).
 
     A moeda é a do filing (SEK na Ericsson, DKK na Novo Nordisk, GBP na Diageo),
@@ -939,7 +1150,7 @@ def segments_from_snapshot(snap: dict, receitas: dict | None = None):
         if c not in df.columns:
             df[c] = None
     df[dim_cols] = df[dim_cols].astype(object).where(df[dim_cols].notna(), None)
-    rotulos = snap["rotulos"]
+    rotulos = _rotulos_sem_colisao(snap["rotulos"], rotulos_globais)
 
     # Só factos de duração (receita é fluxo, não saldo) e numéricos.
     df = df[df["numeric_value"].notna()]
@@ -962,6 +1173,7 @@ def segments_from_snapshot(snap: dict, receitas: dict | None = None):
     domain_members = {k: set(v) for k, v in snap["dominios"].items()}
 
     calc_totals = set(snap["calc"])
+    filhos = snap.get("filhos") or {}
     out = {}
     for (pstart, pend), grp in df.groupby(["period_start", "period_end"]):
         try:
@@ -1025,7 +1237,7 @@ def segments_from_snapshot(snap: dict, receitas: dict | None = None):
             for axis_col in axis_cols:
                 for cand_total in totais:
                     part = _partition_for_axis(rotulos, grp, axis_col, dim_cols,
-                                               domain_members, cand_total)
+                                               domain_members, cand_total, filhos, hier_primeiro)
                     if part:
                         found = part
                         break
@@ -1068,6 +1280,84 @@ def apply_fx_to_segments(by_axis: dict, currency: str, period_end) -> dict:
         axis: {k: float(v) * rate for k, v in seg.items()}
         for axis, seg in by_axis.items()
     }
+
+
+def _juntar_filings(snaps, receitas, rotulos, hier_primeiro, info):
+    """Calcula as partições de cada filing (do mais antigo para o mais recente,
+    para que o mais recente sobreponha) e junta-as, já em USD."""
+    merged = {}
+    for snap in snaps:
+        try:
+            got, fcur = segments_from_snapshot(snap, receitas, rotulos, hier_primeiro) if snap else ({}, None)
+        except Exception as e:
+            info["avisos"].append(f"erro no cálculo {e!r}")
+            continue
+        for k, v in got.items():
+            # (period_type, period_end) → converter já aqui, para que o
+            # merge entre filings de moedas diferentes (um 10-K em USD e
+            # um 20-F em SEK) nunca misture bases.
+            try:
+                v = apply_fx_to_segments(v, fcur, k[1])
+            except Exception as e:
+                # Falha de FX NÃO pode gravar em moeda crua — foi assim
+                # que a GSK ficou meses em GBP. Salta o período.
+                info["avisos"].append(f"FX {fcur}→USD falhou em {k[1]}: {e!r}")
+                info["fx_falhou"] += 1
+                continue
+            merged.setdefault(k, {}).update(v)
+    return merged
+
+
+def continuidade(coerentes: dict, eixo) -> tuple:
+    """(anos com gráfico, quanto as séries se mantêm de um ano para o outro).
+
+    A segunda parte é a média, entre anos seguidos, da fração de segmentos em
+    comum (Jaccard). Uma série que muda de nomes a meio — a Medtronic 2024 com
+    "Other, Including Diabetes" no lugar de "Diabetes" — perde pontos."""
+    if not eixo:
+        return (0, 0.0)
+    for tipo in ("ANNUAL", "QUARTERLY"):
+        anos = sorted((k for k in coerentes if k[0] == tipo and (coerentes[k] or {}).get(eixo)),
+                      key=lambda k: str(k[1]))
+        if anos:
+            break
+    if not anos:
+        return (0, 0.0)
+    pares = list(zip(anos, anos[1:]))
+    j = [len(set(coerentes[a][eixo]) & set(coerentes[b][eixo])) / len(set(coerentes[a][eixo]) | set(coerentes[b][eixo]))
+         for a, b in pares]
+    return (len(anos), round(sum(j) / len(j), 6) if j else 1.0)
+
+
+def calcular_empresa(snaps: list, receitas: dict):
+    """Partições de todos os períodos da empresa, já filtradas e com o eixo
+    escolhido: (coerentes, eixo, info).
+
+    A hierarquia dos membros (28/11) resolve empresas que antes ficavam sem
+    repartição (BMS, AbbVie), mas preferi-la sempre mudava a escolha em
+    algumas que já estavam bem (Medtronic 2024). Calcula-se das duas maneiras
+    — hierarquia primeiro, ou só como recurso — e fica a que dá mais anos com
+    gráfico e, depois, a série mais contínua. Empate: só como recurso, que é o
+    comportamento de antes."""
+    rotulos = rotulos_mais_recentes(snaps)
+    versoes = []
+    for hier_primeiro in (False, True):
+        info = {"avisos": [], "fx_falhou": 0, "trocas": 0, "hier_primeiro": hier_primeiro}
+        merged = _juntar_filings(snaps, receitas, rotulos, hier_primeiro, info)
+        # Depois de juntar TODOS os filings da empresa (só aqui se vê a
+        # série completa e, com ela, as grafias que mudaram ao longo dos anos).
+        info["trocas"] = canonicalize_labels(merged)
+        # A partição reconcilia dentro do FILING, mas a receita da nossa BD pode
+        # ser outro conceito. Nos bancos é: o XBRL reparte só as comissões e a
+        # BD guarda a receita com margem financeira incluída — a Citizens
+        # Financial ficava com 227 M de segmentos contra 1.750 M de receita
+        # (13%). Verificar contra o valor REALMENTE gravado.
+        coerentes = {k: eixos_coerentes(v, receitas.get(k)) for k, v in merged.items()}
+        eixo = eixo_da_empresa(coerentes)
+        versoes.append((continuidade(coerentes, eixo), hier_primeiro, coerentes, eixo, info))
+    melhor = max(versoes, key=lambda v: (v[0], not v[1]))
+    _, _, coerentes, eixo, info = melhor
+    return coerentes, eixo, info
 
 
 def main():
@@ -1170,6 +1460,7 @@ def main():
             cache = _cache_ler(cik)
             novos = 0
             merged = {}
+            snaps = []
             for f in sorted(filings, key=_fdate):
                 acc = str(getattr(f, "accession_no", "") or getattr(f, "accession_number", ""))
                 if acc and acc in cache:
@@ -1185,66 +1476,28 @@ def main():
                         cache[acc] = {"data": _fdate(f), "snap": snap}
                         novos += 1
                     time.sleep(args.sleep)
-                try:
-                    got, fcur = segments_from_snapshot(snap, receitas) if snap else ({}, None)
-                except Exception as e:
-                    print(f"    {ticker} {getattr(f,'form','?')}: erro no cálculo {e!r}", flush=True)
-                    continue
-                for k, v in got.items():
-                    # (period_type, period_end) → converter já aqui, para que o
-                    # merge entre filings de moedas diferentes (um 10-K em USD e
-                    # um 20-F em SEK) nunca misture bases.
-                    try:
-                        v = apply_fx_to_segments(v, fcur, k[1])
-                    except Exception as e:
-                        # Falha de FX NÃO pode gravar em moeda crua — foi assim
-                        # que a GSK ficou meses em GBP. Salta o período.
-                        print(f"    {ticker}: FX {fcur}→USD falhou em {k[1]}: {e!r}", flush=True)
-                        stats["fx_falhou"] += 1
-                        continue
-                    merged.setdefault(k, {}).update(v)
+                snaps.append((f, snap))
             if novos:
                 _cache_gravar(cik, cache)
                 stats["filings_novos"] += novos
             stats["filings_da_cache"] += len(filings) - novos
 
-            # Depois de juntar TODOS os filings da empresa (só aqui se vê a
-            # série completa e, com ela, as grafias que mudaram ao longo dos
-            # anos).
-            trocas = canonicalize_labels(merged)
-            if trocas:
-                stats["rotulos_unificados"] += trocas
-                print(f"    {ticker}: {trocas} rótulos unificados (grafia mudou entre filings)", flush=True)
+            coerentes, eixo, info = calcular_empresa([s for _, s in snaps], receitas)
+            stats["fx_falhou"] += info["fx_falhou"]
+            for aviso in info["avisos"]:
+                print(f"    {ticker}: {aviso}", flush=True)
+            if info["trocas"]:
+                stats["rotulos_unificados"] += info["trocas"]
+                print(f"    {ticker}: {info['trocas']} rótulos unificados (grafia mudou entre filings)", flush=True)
+            if info["hier_primeiro"]:
+                stats["hierarquia_primeiro"] += 1  # a série ficou mais contínua com a hierarquia à cabeça
 
-            if not merged:
+            if not coerentes:
                 print(f"[{i}/{total_co}] {ticker}: 0 períodos que reconciliem", flush=True)
                 stats["sem_segmentos"] += 1
                 continue
-
+            merged = coerentes
             written = 0
-            coerentes = {}
-            for (ptype, pend), by_axis in merged.items():
-                # A partição reconcilia dentro do FILING, mas a receita da
-                # nossa BD pode ser outro conceito. Nos bancos é: o XBRL
-                # reparte só as comissões e a BD guarda a receita com margem
-                # financeira incluída — a Citizens Financial ficava com
-                # 227 M de segmentos contra 1.750 M de receita (13%). Um
-                # gráfico assim não é a repartição do banco, é uma fatia
-                # estreita a fingir que é o todo. Verificar contra o valor
-                # REALMENTE gravado, que é o que o utilizador vê ao lado.
-                cur.execute(
-                    'SELECT revenue FROM fundamentals WHERE "companyId" = %s '
-                    'AND "periodType" = %s::"period_type" AND "periodEnd"::date = %s::date',
-                    (company_id, ptype, pend),
-                )
-                _row = cur.fetchone()
-                _rev = float(_row[0]) if _row and _row[0] else None
-                coerentes[(ptype, pend)] = eixos_coerentes(by_axis, _rev)
-
-            # Um eixo para a empresa toda (ver eixo_da_empresa): decidido
-            # depois de filtrar TODOS os períodos, senão a escolha via
-            # eixos que nunca chegam a ser gravados.
-            eixo = eixo_da_empresa(coerentes)
             if args.dry_run or eixo != "segment":
                 print(f"    {ticker}: eixo do gráfico de segmentos = {eixo}", flush=True)
             if not args.dry_run:

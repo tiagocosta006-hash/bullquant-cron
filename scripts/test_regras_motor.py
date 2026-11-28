@@ -133,6 +133,82 @@ tri_vazio = {**tri, ("ANNUAL", "2024-12-31"): {}}
 check("anuais sem eixos que passem + trimestrais válidos → decide pelos trimestrais",
       eixo_da_empresa(tri_vazio) == "product")
 
+# ── Repartições que o motor não apanhava (28/11) ──
+import pandas as _pd  # noqa: E402
+import ingest_segments_xbrl as SX  # noqa: E402
+
+PROD = "dim_srt_ProductOrServiceAxis"
+UNID = "dim_us-gaap_ReportingUnitAxis"
+
+
+def factos(linhas, dims=(PROD, UNID)):
+    """[(produto, unidade|None, valor)] → DataFrame como o de segments_from_snapshot."""
+    df = _pd.DataFrame([{"concept": "us-gaap:Revenues", "numeric_value": v, PROD: p, UNID: u}
+                        for p, u, v in linhas])
+    return df.astype(object).where(df.notna(), None)
+
+
+def parte(df, total, filhos=None):
+    return SX._partition_for_axis({}, df, PROD, [PROD, UNID], {}, total, filhos)
+
+
+# BMS: medicamentos + subtotais ("Growth"/"Legacy") + totais soltos no mesmo eixo.
+bmy = factos([("x:Growth", None, 26.41), ("x:Legacy", None, 21.79), ("x:Gross", None, 88.08),
+              ("x:NetProduct", None, 46.76), ("x:Opdivo", None, 10.05), ("x:Orencia", None, 3.71),
+              ("x:OtherGrowth", None, 12.65), ("x:Eliquis", None, 14.44), ("x:OtherLegacy", None, 7.35)])
+hier = {"x:Growth": ["x:Opdivo", "x:Orencia", "x:OtherGrowth"], "x:Legacy": ["x:Eliquis", "x:OtherLegacy"]}
+p = parte(bmy, 48.20, hier)
+check("BMS: com a hierarquia ficam as folhas (medicamentos), sem subtotais nem totais soltos",
+      p is not None and set(p) == {"Opdivo", "Orencia", "Other Growth", "Eliquis", "Other Legacy"})
+
+# Pfizer: cada medicamento com produto + unidade; nenhuma fatia sozinha fecha.
+pfe = factos([("x:Eliquis", "x:Primary", 7.37), ("x:Prevnar", "x:Primary", 6.41),
+              ("x:Ibrance", "x:Onco", 4.36), ("x:Xtandi", "x:Onco", 2.0),
+              ("x:CentreOne", None, 1.38)])
+p = parte(pfe, 21.52)
+check("Pfizer 2025: união das unidades + CentreOne (sem qualificador) = receita",
+      p is not None and len(p) == 5)
+pfe20 = factos([("x:Eliquis", "x:Primary", 7.37), ("x:Prevnar", "x:Primary", 6.41),
+                ("x:Ibrance", "x:Onco", 4.36), ("x:TotalAlliance", None, 5.42)])
+p = parte(pfe20, 18.14)
+check("Pfizer 2020: agrupamento transversal sem qualificador ('Total Alliance') fica de fora",
+      p is not None and "Total Alliance" not in p and len(p) == 3)
+dup = factos([("x:A", "x:U1", 509.0), ("x:B", "x:U2", 509.0), ("x:C", "x:U1", 1000.0)])
+check("dois produtos diferentes com o mesmo valor ficam os dois quando a soma fecha",
+      (parte(dup, 2018.0) or {}).keys() == {"A", "B", "C"})
+geo = factos([("x:A", "x:US", 5.0), ("x:A", "x:Intl", 3.0), ("x:B", "x:US", 2.0)])
+check("produto partido EUA/resto do mundo não se junta (seria somar fatias às cegas)",
+      parte(geo, 10.0) is None)
+
+# UnitedHealth: segmentos com vendas internas + fatia de clientes externos.
+SEG, CLI, CONS = ("dim_us-gaap_StatementBusinessSegmentsAxis", "dim_srt_MajorCustomersAxis",
+                  "dim_srt_ConsolidationItemsAxis")
+unh = _pd.DataFrame([{"concept": "us-gaap:Revenues", "numeric_value": v, SEG: s, CLI: c,
+                      CONS: "us-gaap:OperatingSegmentsMember"}
+                     for s, c, v in [("x:UHC", None, 344.9), ("x:OptumHealth", None, 102.0),
+                                     ("x:OptumInsight", None, 19.4), ("x:OptumRx", None, 154.7),
+                                     ("x:UHC", "x:ExternalCustomersMember", 342.7),
+                                     ("x:OptumHealth", "x:ExternalCustomersMember", 36.9),
+                                     ("x:OptumInsight", "x:ExternalCustomersMember", 6.4),
+                                     ("x:OptumRx", "x:ExternalCustomersMember", 57.7)]])
+unh = unh.astype(object).where(unh.notna(), None)
+p = SX._partition_for_axis({}, unh, SEG, [SEG, CLI, CONS], {}, 447.6)
+check("UNH: fica a fatia de clientes externos (443,7 a 0,9% da receita), não dois segmentos "
+      "com vendas internas que somam 446,9 por acaso", p is not None and len(p) == 4 and round(sum(p.values()), 1) == 443.7)
+
+# Nomes: o mais usado pela empresa, não o do último filing.
+dal = [{"rotulos": {"dal:AirMember": {"terse": "Air traffic", "plain": None}}}] * 7 + \
+      [{"rotulos": {"dal:AirMember": {"terse": "Air traffic liability", "plain": None}}}] * 2
+check("Delta: 'Air traffic' (7 filings) ganha a 'Air traffic liability' (2 mais recentes)",
+      SX._member_label(SX.rotulos_mais_recentes(dal), "dal:AirMember") == "Air traffic")
+check("rótulos-padrão (country:US) não são trocados pelo de outro filing",
+      SX._rotulos_sem_colisao({"country:US": {"plain": "UNITED STATES"}},
+                              {"country:US": {"plain": "U.S. pensions"}})["country:US"]["plain"] == "UNITED STATES")
+check("dois membros da empresa não ficam com o mesmo nome no mesmo ano (Southwest: Freight/Other)",
+      len({SX._member_label(r, m) for r in [SX._rotulos_sem_colisao(
+          {"x:Freight": {"terse": "Freight"}, "x:Other": {"terse": "Other"}},
+          {"x:Freight": {"terse": "Other"}})] for m in ("x:Freight", "x:Other")}) == 2)
+
 # ── Receita: a linha impressa na demonstração de resultados ──
 import receita_impressa as RI  # noqa: E402
 
